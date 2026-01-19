@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoramento de Inteligência - Segurança Pública</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { padding-top: 20px; background-color: #f8f9fa; }
+        #map { height: 600px; width: 100%; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .metric-card { transition: transform 0.2s; }
+        .metric-card:hover { transform: translateY(-5px); }
+        .legend { background: white; padding: 10px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
+        .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-6 fw-bold text-primary"><i class="fas fa-shield-alt"></i> Dashboard de Inteligência Preditiva</h1>
+            <p class="lead text-muted">Análise de Risco em Áreas Monitoradas (CVLI & CVP)</p>
+        </div>
+    </div>
+    <div class="row mb-4 justify-content-center">
+        <div class="col-md-3">
+            <div class="card metric-card border-danger mb-3">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-danger">Áreas de Alto Risco</h5>
+                    <p class="card-text display-4 fw-bold" id="high-risk-count">-</p>
+                    <small class="text-muted">Previsão para Amanhã</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card border-warning mb-3">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-warning">Áreas em Alerta</h5>
+                    <p class="card-text display-4 fw-bold" id="medium-risk-count">-</p>
+                    <small class="text-muted">Atenção Necessária</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card metric-card border-success mb-3">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">Áreas Estáveis</h5>
+                    <p class="card-text display-4 fw-bold" id="low-risk-count">-</p>
+                    <small class="text-muted">Monitoramento Padrão</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-map-marked-alt"></i> Mapa Tático Operacional</span>
+                    <span class="badge bg-danger">Dados Atualizados: Hoje</span>
+                </div>
+                <div class="card-body p-0">
+                    <div id="map"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12 text-center text-muted">
+            <small>Sistema desenvolvido para apoio à decisão tática. Baseado em modelo ST-GCN.</small>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    var map = L.map('map').setView([-3.7319, -38.5267], 12);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(map);
+
+    function getColor(d) {
+        return d > 80 ? '#800026' :
+               d > 60  ? '#BD0026' :
+               d > 40  ? '#E31A1C' :
+               d > 20  ? '#FEB24C' :
+               d > 10   ? '#FED976' :
+                          '#90EE90';
+    }
+
+    function style(feature) {
+        return {
+            fillColor: getColor(feature.properties.risk_score),
+            weight: 2,
+            opacity: 1,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.7
+        };
+    }
+    
+    var legend = L.control({position: 'bottomright'});
+    legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'legend'),
+            grades = [0, 10, 20, 40, 60, 80];
+        div.innerHTML = '<strong>Nível de Risco</strong><br>';
+        for (var i = 0; i < grades.length; i++) {
+            div.innerHTML +=
+                '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+        }
+        return div;
+    };
+    legend.addTo(map);
+
+    $.when(
+        $.getJSON('/api/polygons'),
+        $.getJSON('/api/risk')
+    ).done(function(polygonsArgs, riskArgs) {
+        var geojson = polygonsArgs[0];
+        var riskData = riskArgs[0];
+        var riskMap = {};
+        var highRisk = 0, mediumRisk = 0, lowRisk = 0;
+        
+        riskData.forEach(function(item) {
+            riskMap[item.node_id] = item.risk_score;
+            if (item.risk_score > 60) highRisk++;
+            else if (item.risk_score > 20) mediumRisk++;
+            else lowRisk++;
+        });
+        
+        $('#high-risk-count').text(highRisk);
+        $('#medium-risk-count').text(mediumRisk);
+        $('#low-risk-count').text(lowRisk);
+        
+        geojson.features.forEach(function(feature, index) {
+            feature.properties.risk_score = riskMap[index] || 0;
+            var r = riskData[index];
+            if(r) {
+                feature.properties.cvli_pred = r.cvli_pred.toFixed(2);
+                feature.properties.cvp_pred = r.cvp_pred.toFixed(2);
+                feature.properties.faction = r.faction;
+            }
+        });
+
+        L.geoJson(geojson, {
+            style: style,
+            onEachFeature: function(feature, layer) {
+                if (feature.properties) {
+                    var content = `<strong>Área:</strong> ${feature.properties.name || 'Sem nome'}<br>
+                                   <strong>Facção:</strong> ${feature.properties.faction}<br>
+                                   <hr>
+                                   <strong>Risco Calculado:</strong> ${feature.properties.risk_score.toFixed(1)}%<br>
+                                   <span class="text-danger">Previsão CVLI: ${feature.properties.cvli_pred}</span><br>
+                                   <span class="text-warning">Previsão CVP: ${feature.properties.cvp_pred}</span>`;
+                    layer.bindPopup(content);
+                }
+            }
+        }).addTo(map);
+    });
+</script>
+</body>
+</html>
