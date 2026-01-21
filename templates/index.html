@@ -94,8 +94,8 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-map-marked-alt"></i> Mapa Tático Operacional - Zonas de Calor</span>
+                <div class="card-header bg-white text-dark d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><i class="fas fa-map-marked-alt"></i> Mapa Tático Operacional - Zonas de Calor</span>
                     <span id="simulation-status" class="badge bg-warning text-dark d-none">Modo Simulação Ativo: Clique no mapa</span>
                 </div>
                 <div class="card-body p-0">
@@ -152,8 +152,11 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     var map = L.map('map').setView([-3.7319, -38.5267], 10); // Zoom out a bit to see RMF/Interior
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { // Dark map for heatmap contrast
+
+    // Light/Positron Map for "Harmonic and Modern" look
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap &copy; CARTO',
+        subdomains: 'abcd',
         maxZoom: 19
     }).addTo(map);
 
@@ -166,16 +169,16 @@
     document.getElementById('date-filter').valueAsDate = new Date();
 
     function getColor(value, isCritical) {
-        // Heatmap style colors (Green -> Yellow -> Orange -> Red -> Dark Red)
-        // 0-20: Green, 20-40: Yellow-Green, 40-60: Yellow, 60-80: Orange, 80-100: Red
-        // Critical overrides to Dark Red/Purple or pulsing
-        if (isCritical) return '#7f0000'; // Dark Red
+        // Modern Harmonic Palette
+        // Critical: Vibrant Orange/Red
+        if (isCritical) return '#f83600';
         
-        return value > 80 ? '#bd0026' :
-               value > 60 ? '#f03b20' :
-               value > 40 ? '#fd8d3c' :
-               value > 20 ? '#feb24c' :
-                            '#ffeda0'; // Light Yellow/Greenish
+        // Gradient: Light Blue -> Soft Yellow -> Soft Pink/Red
+        return value > 80 ? '#fa709a' : // Soft Red
+               value > 60 ? '#fee140' : // Soft Yellow
+               value > 40 ? '#96e6a1' : // Soft Green
+               value > 20 ? '#84fab0' : // Light Green/Blue
+                            '#4facfe'; // Light Blue (Low Risk)
     }
 
     function loadData(simulationParams = null) {
@@ -240,11 +243,11 @@
                     var isCritical = d ? d.is_critical : false;
                     return {
                         fillColor: getColor(val, isCritical),
-                        weight: 1,
-                        opacity: 1,
-                        color: 'rgba(255,255,255,0.2)', // Faint border for heatmap look
+                        weight: 0, // No border for cleaner look
+                        opacity: 0,
+                        color: 'white',
                         dashArray: '',
-                        fillOpacity: 0.8
+                        fillOpacity: 0.6 // Glassy effect
                     };
                 },
                 onEachFeature: function(feature, layer) {
