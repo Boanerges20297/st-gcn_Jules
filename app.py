@@ -8,6 +8,7 @@ import os
 import json
 from datetime import datetime
 from src.model import STGCN
+from src.generate_data import generate_dummy_data
 
 app = Flask(__name__)
 
@@ -43,9 +44,14 @@ def normalize_adj(adj):
 def load_resources():
     global model_cvli, model_cvp, nodes_gdf, adj_matrix, node_features, norm_adj, device, dates_index
 
+    # Check if data exists, if not generate it
     if not os.path.exists(DATA_FILE):
-        print("AVISO: Arquivo de dados não encontrado.")
-        return
+        print("AVISO: Arquivo de dados não encontrado. Gerando dados fictícios...")
+        try:
+            generate_dummy_data()
+        except Exception as e:
+            print(f"ERRO CRÍTICO ao gerar dados: {e}")
+            return
 
     print("Carregando dados para API...")
     with open(DATA_FILE, 'rb') as f:
@@ -63,13 +69,6 @@ def load_resources():
     # Pre-computar normalização da adjacência original
     norm_adj = normalize_adj(adj_matrix)
 
-    # Carregar Modelos (Re-create logic to handle dimension mismatch if nodes changed)
-    # Since we changed num_nodes in dummy data, we should re-instantiate, but load_state_dict will fail if shapes mismatch.
-    # For now, we assume the user would retrain.
-    # To avoid crashing on dummy data change, I will just re-init the model without loading weights if shapes fail,
-    # OR I should have retrained the model in the plan.
-    # Since I didn't verify retraining, I will attempt to load. If fail, I use random weights (it's dummy data anyway).
-
     print("Inicializando modelos...")
     try:
         model_cvli = STGCN(num_nodes=num_nodes, in_channels=num_features, time_steps=CVLI_WINDOW, num_classes=1)
@@ -78,7 +77,9 @@ def load_resources():
                 model_cvli.load_state_dict(torch.load(MODEL_CVLI_PATH, map_location=device))
                 print("Modelo CVLI carregado com sucesso.")
             except:
-                print("AVISO: Pesos do modelo CVLI incompatíveis (provavelmente mudou o número de nós). Usando pesos aleatórios.")
+                print("AVISO: Pesos do modelo CVLI incompatíveis. Reiniciando pesos.")
+        else:
+             print("AVISO: Modelo CVLI não encontrado. Usando pesos aleatórios.")
         model_cvli.to(device)
         model_cvli.eval()
 
@@ -88,7 +89,9 @@ def load_resources():
                 model_cvp.load_state_dict(torch.load(MODEL_CVP_PATH, map_location=device))
                 print("Modelo CVP carregado com sucesso.")
             except:
-                print("AVISO: Pesos do modelo CVP incompatíveis. Usando pesos aleatórios.")
+                print("AVISO: Pesos do modelo CVP incompatíveis. Reiniciando pesos.")
+        else:
+             print("AVISO: Modelo CVP não encontrado. Usando pesos aleatórios.")
         model_cvp.to(device)
         model_cvp.eval()
     except Exception as e:
@@ -118,7 +121,12 @@ def get_risk():
     results = []
     
     if model_cvli is None or model_cvp is None:
-        return jsonify([])
+        # If models are still None for some reason, try reloading or return empty
+        # This prevents 500 errors if load_resources failed silently
+        if os.path.exists(DATA_FILE):
+             load_resources()
+        if model_cvli is None:
+            return jsonify([])
 
     # 1. Date Slicing (Time Travel)
     # Find the index of the selected date. If not provided, use the last index.
