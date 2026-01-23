@@ -1,0 +1,80 @@
+{
+  "timestamp": "2026-01-21T16:23:06.320410",
+  "validation_status": "PASSED",
+  "issues": [],
+  "graph": {
+    "num_nodes": 138,
+    "num_edges": 18906,
+    "graph_density": 0.9927536231884058,
+    "avg_degree": 137.0
+  },
+  "node_tensor": {
+    "shape": [
+      375,
+      138,
+      26
+    ],
+    "dtype": "float32",
+    "size_mb": 5.382,
+    "features": [
+      "armas_total_norm_ma30",
+      "day_of_week_cos",
+      "month_sin",
+      "dinheiro_total_reais_norm",
+      "drogas_gramas_total_norm_ma7",
+      "dinheiro_total_reais_norm_lag7",
+      "drogas_gramas_total_norm_lag30",
+      "armas_total_norm_lag30",
+      "dinheiro_total_reais_norm_lag30",
+      "armas_total_norm_lag7",
+      "armas_total_norm_lag1",
+      "armas_total_norm",
+      "armas_total_norm_ma7",
+      "drogas_gramas_total_norm_volatility",
+      "month_cos",
+      "intensity_score",
+      "dinheiro_total_reais_norm_volatility",
+      "drogas_gramas_total_norm",
+      "dinheiro_total_reais_norm_lag1",
+      "drogas_gramas_total_norm_lag1",
+      "drogas_gramas_total_norm_ma30",
+      "day_of_week_sin",
+      "dinheiro_total_reais_norm_ma30",
+      "drogas_gramas_total_norm_lag7",
+      "dinheiro_total_reais_norm_ma7",
+      "armas_total_norm_volatility"
+    ],
+    "statistics": {
+      "min": -1.0,
+      "max": 1.0,
+      "mean": 0.009287688881158829,
+      "std": 0.2828442454338074,
+      "nan_count": 0,
+      "inf_count": 0
+    }
+  },
+  "edge_index": {
+    "shape": [
+      2,
+      18906
+    ],
+    "dtype": "int64",
+    "min_node_id": 0,
+    "max_node_id": 137
+  },
+  "adjacency": {
+    "shape": [
+      138,
+      138
+    ],
+    "dtype": "float32",
+    "nonzero_count": 18906,
+    "density": 0.9927536231884058
+  },
+  "compatibility": {
+    "compatible_with_stgcn": true,
+    "ready_for_training": "True",
+    "min_time_steps": 7,
+    "available_windows": 368
+  }
+}

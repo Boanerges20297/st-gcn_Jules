@@ -10,40 +10,58 @@ from src.model import STGCN
 app = Flask(__name__)
 
 # Configuração e Carregamento de Dados
-DATA_FILE = 'data/processed_graph_data.pkl'
+DATA_FILE = 'data/processed/processed_graph_data.pkl'
 MODEL_PATH = 'models/stgcn_model.pth'
 
-# Verificar se os dados existem antes de carregar
-if not os.path.exists(DATA_FILE) or not os.path.exists(MODEL_PATH):
-    print("AVISO: Arquivos de dados ou modelo não encontrados. Execute o treinamento primeiro.")
-else:
-    print("Carregando dados para API...")
-    with open(DATA_FILE, 'rb') as f:
-        data_pack = pickle.load(f)
+# Valores padrão caso arquivos não estejam presentes — evita NameError nas rotas
+nodes_gdf = None
+adj_matrix = None
+node_features = None
+model = None
+device = None
+norm_adj = None
+history_window = 7
+dates = None
 
-    nodes_gdf = data_pack['nodes_gdf']
-    adj_matrix = data_pack['adj_matrix']
-    node_features = data_pack['node_features']
+try:
+    if not os.path.exists(DATA_FILE) or not os.path.exists(MODEL_PATH):
+        print("AVISO: Arquivos de dados ou modelo não encontrados. Execute o treinamento primeiro.")
+    else:
+        print("Carregando dados para API...")
+        with open(DATA_FILE, 'rb') as f:
+            data_pack = pickle.load(f)
 
-    # Carregar Modelo
-    print("Carregando modelo...")
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    num_nodes = node_features.shape[0]
-    num_features = node_features.shape[2]
-    history_window = 7
+        nodes_gdf = data_pack.get('nodes_gdf')
+        adj_matrix = data_pack.get('adj_matrix')
+        node_features = data_pack.get('node_features')
+        dates = data_pack.get('dates')
 
-    model = STGCN(num_nodes=num_nodes, in_channels=num_features, time_steps=history_window)
-    model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
-    model.to(device)
-    model.eval()
+        # Carregar Modelo
+        print("Carregando modelo...")
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        num_nodes = node_features.shape[0]
+        num_features = node_features.shape[2]
 
-    # Pre-computar normalização da adjacência
-    adj_tensor = torch.FloatTensor(adj_matrix)
-    rowsum = adj_tensor.sum(1)
-    d_inv_sqrt = torch.pow(rowsum, -0.5)
-    d_inv_sqrt[torch.isinf(d_inv_sqrt)] = 0.
-    d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
-    norm_adj = torch.mm(torch.mm(d_mat_inv_sqrt, adj_tensor), d_mat_inv_sqrt).to(device)
+        model = STGCN(num_nodes=num_nodes, in_channels=num_features, time_steps=history_window)
+        model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
+        model.to(device)
+        model.eval()
+
+        # Pre-computar normalização da adjacência
+        adj_tensor = torch.FloatTensor(adj_matrix)
+        rowsum = adj_tensor.sum(1)
+        d_inv_sqrt = torch.pow(rowsum, -0.5)
+        d_inv_sqrt[torch.isinf(d_inv_sqrt)] = 0.
+        d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
+        norm_adj = torch.mm(torch.mm(d_mat_inv_sqrt, adj_tensor), d_mat_inv_sqrt).to(device)
+except Exception as e:
+    print(f"Erro ao carregar dados/modelo: {e}")
+    nodes_gdf = None
+    adj_matrix = None
+    node_features = None
+    model = None
+    device = None
+    norm_adj = None
 
 @app.route('/')
 def index():
@@ -52,44 +70,97 @@ def index():
 @app.route('/api/polygons')
 def get_polygons():
     """Retorna os polígonos em GeoJSON."""
-    return nodes_gdf.to_json()
+    if nodes_gdf is None:
+        return jsonify({'error': 'Dados de polígonos não carregados. Execute o treinamento ou verifique DATA_FILE.'}), 503
+    try:
+        return nodes_gdf.to_json()
+    except Exception as e:
+        return jsonify({'error': f'Erro ao serializar polígonos: {e}'}), 500
 
 @app.route('/api/risk')
 def get_risk():
     """Calcula e retorna o risco previsto para o próximo dia."""
-    
-    # Pegar os últimos 'history_window' dias de dados
-    recent_features = node_features[:, -history_window:, :] # (N, T, F)
-    
-    # Preparar input para o modelo
-    input_tensor = torch.FloatTensor(recent_features).permute(2, 0, 1).unsqueeze(0).to(device)
-    
-    with torch.no_grad():
-        prediction = model(input_tensor, norm_adj) # (1, N, 2)
-        
-    prediction = prediction.squeeze(0).cpu().numpy() # (N, 2) -> [CVLI_pred, CVP_pred]
-    
-    # Calcular Índice de Risco Ponderado
-    # Risco = (CVLI * 5) + (CVP * 1)
-    prediction = np.maximum(prediction, 0)
-    risk_score = (prediction[:, 0] * 5.0) + (prediction[:, 1] * 1.0)
-    
-    # Normalizar Risco
-    max_risk = np.max(risk_score) if np.max(risk_score) > 0 else 1
-    normalized_risk = (risk_score / max_risk) * 100
-    
-    # Retornar lista
-    results = []
-    for i, score in enumerate(normalized_risk):
-        results.append({
-            'node_id': i,
-            'risk_score': float(score),
-            'cvli_pred': float(prediction[i, 0]),
-            'cvp_pred': float(prediction[i, 1]),
-            'faction': nodes_gdf.iloc[i]['faction']
-        })
-        
-    return jsonify(results)
+    if model is None or node_features is None or norm_adj is None or nodes_gdf is None:
+        return jsonify({'error': 'Modelo ou dados não carregados. Verifique DATA_FILE e MODEL_PATH.'}), 503
+
+    try:
+        # aceitar query param 'window' para sobrescrever a janela de histórico usada
+        req_window = request.args.get('window', default=history_window, type=int)
+        window = max(1, int(req_window))
+        total_timesteps = node_features.shape[1]
+        if window > total_timesteps:
+            window = total_timesteps
+
+        # Pegar os últimos 'window' dias de dados
+        recent_features = node_features[:, -window:, :]  # (N, T, F)
+
+        # Preparar input para o modelo
+        input_tensor = torch.FloatTensor(recent_features).permute(2, 0, 1).unsqueeze(0).to(device)
+
+        with torch.no_grad():
+            prediction = model(input_tensor, norm_adj)  # (1, N, 2)
+
+        prediction = prediction.squeeze(0).cpu().numpy()  # (N, 2) -> [CVLI_pred, CVP_pred]
+
+        # Calcular Índice de Risco baseado APENAS em CVLI
+        prediction = np.maximum(prediction, 0)
+        cvli_raw = prediction[:, 0]
+        # Aumentar sensibilidade de CVLI em 20%
+        cvli_adj = cvli_raw * 1.2
+        # Usar apenas CVLI ajustado como risco bruto
+        risk_score = cvli_adj
+
+        # Normalizar Risco
+        max_risk = np.max(risk_score) if np.max(risk_score) > 0 else 1
+        normalized_risk = (risk_score / max_risk) * 100
+
+        # Construir razões de risco e sinalizadores de prioridade
+        results = []
+        # conectividade média para identificar áreas muito conectadas
+        try:
+            conn = np.array(adj_matrix).sum(axis=1)
+            conn_mean = float(np.mean(conn))
+        except Exception:
+            conn = None
+            conn_mean = 0
+
+        for i, score in enumerate(normalized_risk):
+            cvli = float(cvli_adj[i])
+            # não considerar CVP — somente CVLI gera razões
+            reasons = []
+            if cvli > 0.01:
+                reasons.append(f'Previsão CVLI (ajustada +20%): {cvli:.3f}')
+            else:
+                reasons.append('CVLI ausente ou insignificante')
+            if conn is not None and conn_mean > 0 and conn[i] > conn_mean * 1.5:
+                reasons.append('Área com alta conectividade (vizinhança densa)')
+
+            results.append({
+                'node_id': int(i),
+                'risk_score': float(score),
+                'cvli_pred': cvli,
+                'faction': nodes_gdf.iloc[i].get('faction') if 'faction' in nodes_gdf.columns else None,
+                'reasons': reasons,
+                'priority_cvli': bool(cvli > 0.01)
+            })
+
+        # meta info: janela usada
+        meta = {}
+        try:
+            if dates is not None and len(dates) >= window:
+                window_end = pd.to_datetime(dates[-1])
+                window_start = pd.to_datetime(dates[-window])
+                meta = {
+                    'window_size': window,
+                    'window_start': str(window_start.date()),
+                    'window_end': str(window_end.date())
+                }
+        except Exception:
+            meta = {'window_size': window}
+
+        return jsonify({'meta': meta, 'data': results})
+    except Exception as e:
+        return jsonify({'error': f'Erro ao calcular risco: {e}'}), 500
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)

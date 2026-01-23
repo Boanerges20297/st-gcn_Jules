@@ -1,0 +1,45 @@
+{
+  "timestamp": "2026-01-23T11:00:51.967213",
+  "status": "INTEGRA\u00c7\u00c3O_CONCLU\u00cdDA",
+  "etl_source": "etl_producao_v2.py",
+  "input_tensors": {
+    "cvli_univariado": [
+      1472,
+      121
+    ],
+    "multivariado": [
+      1472,
+      121,
+      3
+    ],
+    "prisoes": [
+      1472,
+      121
+    ],
+    "apreensoes": [
+      1472,
+      121
+    ]
+  },
+  "output_dataset": {
+    "shape": [
+      1472,
+      121,
+      3
+    ],
+    "dtype": "float64",
+    "nodes": 121,
+    "dates": 1472,
+    "features": 3
+  },
+  "periodo": {
+    "inicio": "2022-01-01",
+    "fim": "2026-01-11",
+    "dias": 1472
+  },
+  "proximos_passos": [
+    "Executar: python src/graph_builder.py (para criar topologia de grafo)",
+    "Executar: python src/trainer.py (para treinar modelo)",
+    "Executar: python src/predict.py (para fazer previs\u00f5es)"
+  ]
+}

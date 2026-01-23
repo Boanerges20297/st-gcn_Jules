@@ -1,0 +1,61 @@
+{
+  "timestamp": "2026-01-21T16:09:45.351008",
+  "input_file": "C:\\Users\\STI01\\Desktop\\Projetos\\st-gcn_cpraio\\data\\processed\\prisoes_normalized_deduplicated.parquet",
+  "output_file": "C:\\Users\\STI01\\Desktop\\Projetos\\st-gcn_cpraio\\data\\processed\\prisoes_with_features.parquet",
+  "input_shape": [
+    51750,
+    9
+  ],
+  "output_shape": [
+    51750,
+    32
+  ],
+  "columns": [
+    "Data",
+    "bairro_id",
+    "operacoes_diarias",
+    "drogas_gramas_total",
+    "armas_total",
+    "dinheiro_total_reais",
+    "drogas_gramas_total_norm",
+    "armas_total_norm",
+    "dinheiro_total_reais_norm",
+    "drogas_gramas_total_norm_lag1",
+    "drogas_gramas_total_norm_lag7",
+    "drogas_gramas_total_norm_lag30",
+    "armas_total_norm_lag1",
+    "armas_total_norm_lag7",
+    "armas_total_norm_lag30",
+    "dinheiro_total_reais_norm_lag1",
+    "dinheiro_total_reais_norm_lag7",
+    "dinheiro_total_reais_norm_lag30",
+    "drogas_gramas_total_norm_ma7",
+    "drogas_gramas_total_norm_ma30",
+    "armas_total_norm_ma7",
+    "armas_total_norm_ma30",
+    "dinheiro_total_reais_norm_ma7",
+    "dinheiro_total_reais_norm_ma30",
+    "intensity_score",
+    "drogas_gramas_total_norm_volatility",
+    "armas_total_norm_volatility",
+    "dinheiro_total_reais_norm_volatility",
+    "day_of_week_sin",
+    "day_of_week_cos",
+    "month_sin",
+    "month_cos"
+  ],
+  "temporal_features": 27,
+  "feature_groups": {
+    "lag_features": 9,
+    "moving_averages": 6,
+    "volatility": 3,
+    "temporal_cyclical": 4,
+    "intensity": 1
+  },
+  "unique_neighborhoods": 138,
+  "date_range": {
+    "start": "2025-01-02 00:00:00",
+    "end": "2026-01-11 00:00:00",
+    "days": 375
+  }
+}
