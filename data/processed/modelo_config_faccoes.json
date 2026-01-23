@@ -1,0 +1,58 @@
+{
+  "model_type": "STGCN_DynamicFactions",
+  "input_features": 7,
+  "features_description": {
+    "0": "CVLI (homicídios)",
+    "1": "Prisões",
+    "2": "Apreensões",
+    "3": "Mudança de controle territorial (0-1)",
+    "4": "Estabilidade do controle (dias, 0-365)",
+    "5": "Risco de conflito (0-1)",
+    "6": "Volatilidade territorial (0-1)"
+  },
+  "hyperparameters": {
+    "hidden_dim": 32,
+    "output_dim": 1,
+    "dropout": 0.4,
+    "num_nodes": 121,
+    "batch_size": 16,
+    "epochs": 200,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "cvli_weight": 5.0,
+    "faction_weight": 0.5,
+    "window_size": 14,
+    "target_window": 15
+  },
+  "loss_function": "DynamicFactionLoss",
+  "optimization": {
+    "optimizer": "Adam",
+    "scheduler": "ReduceLROnPlateau",
+    "early_stopping_patience": 25
+  },
+  "training_data": {
+    "source": "data/processed/tensor_cvli_prisoes_faccoes.npy",
+    "shape": [
+      1472,
+      121,
+      7
+    ],
+    "period": "2022-01-01 to 2026-01-11",
+    "split": {
+      "train": 0.7,
+      "val": 0.15,
+      "test": 0.15
+    }
+  },
+  "auxiliary_tasks": {
+    "faction_change_prediction": true,
+    "territorial_stability_prediction": true,
+    "conflict_risk_assessment": true
+  },
+  "inference_outputs": {
+    "cvli_forecast": "CVLI predictions for next 15 days",
+    "territorial_risk": "Risk of territorial changes",
+    "stability_score": "Territorial stability score per neighborhood",
+    "conflict_probability": "Probability of gang conflict"
+  }
+}
