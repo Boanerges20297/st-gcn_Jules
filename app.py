@@ -5,6 +5,7 @@ import pickle
 import torch
 import numpy as np
 import os
+import copy
 from shapely.geometry import shape, Point, Polygon
 from src.model import STGCN
 
@@ -151,8 +152,77 @@ def get_polygons():
 
 @app.route('/api/risk')
 def get_risk():
-    if node_features is None or norm_adj is None or nodes_gdf is None:
+    return calculate_risk()
+
+@app.route('/api/simulate', methods=['POST'])
+def simulate_risk():
+    if node_features is None or adj_matrix is None or nodes_gdf is None:
         return jsonify({'error': 'Dados não carregados.'}), 503
+
+    try:
+        data = request.get_json()
+        points = data.get('points', [])
+
+        # Copiar matriz original
+        adj_copy = copy.deepcopy(adj_matrix)
+
+        # Encontrar nós afetados e modificar pesos
+        # Assumindo que a presença da equipe (moto) suprime a difusão de risco
+        # Reduzindo pesos das arestas conectadas aos nós próximos
+
+        centroids = nodes_gdf.geometry.centroid
+
+        for pt in points:
+            # pt vem como [lat, lon], mas Leaflet envia [lat, lon].
+            # GeoJSON/Shapely usa (x=lon, y=lat).
+            # Vamos verificar o formato enviado pelo frontend.
+            # Assumiremos [lat, lon] e converteremos para Point(lon, lat)
+            if len(pt) == 2:
+                p = Point(pt[1], pt[0])
+
+                # Encontrar nó mais próximo (brute force simples para ~2000 nós é ok)
+                # Otimização possível: usar índice espacial se disponível
+                dists = centroids.distance(p)
+                nearest_idx = dists.idxmin()
+
+                # Raio de efeito? Ou apenas o nó mais próximo?
+                # Vamos afetar o nó mais próximo e seus vizinhos imediatos (distância grafo = 1)
+
+                # Reduzir pesos de entrada e saída para isolar o nó (containment)
+                # Fator de supressão
+                suppression_factor = 0.1
+
+                # Linha nearest_idx (outbound) e Coluna nearest_idx (inbound)
+                adj_copy[nearest_idx, :] *= suppression_factor
+                adj_copy[:, nearest_idx] *= suppression_factor
+
+                # Opcional: Afetar vizinhos geométricos
+                # neighbors = dists[dists < 0.005].index.tolist() # ~500m
+                # for n_idx in neighbors:
+                #    adj_copy[n_idx, :] *= 0.5
+                #    adj_copy[:, n_idx] *= 0.5
+
+        # Re-normalizar matriz
+        adj_tensor = torch.FloatTensor(adj_copy)
+        rowsum = adj_tensor.sum(1)
+        d_inv_sqrt = torch.pow(rowsum, -0.5)
+        d_inv_sqrt[torch.isinf(d_inv_sqrt)] = 0.
+        d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
+        sim_norm_adj = torch.mm(torch.mm(d_mat_inv_sqrt, adj_tensor), d_mat_inv_sqrt).to(device)
+
+        return calculate_risk(custom_norm_adj=sim_norm_adj)
+
+    except Exception as e:
+        print(f"Erro na simulação: {e}")
+        return jsonify({'error': f'Erro na simulação: {e}'}), 500
+
+def calculate_risk(custom_norm_adj=None):
+    if node_features is None or nodes_gdf is None:
+        return jsonify({'error': 'Dados não carregados.'}), 503
+
+    current_norm_adj = custom_norm_adj if custom_norm_adj is not None else norm_adj
+    if current_norm_adj is None:
+         return jsonify({'error': 'Matriz de adjacência não disponível.'}), 503
 
     try:
         # ---------------------------
@@ -167,7 +237,7 @@ def get_risk():
                 input_cvli = node_features[:, -WINDOW_CVLI:, 0:1]
                 input_tensor = torch.FloatTensor(input_cvli).permute(2, 0, 1).unsqueeze(0).to(device)
                 with torch.no_grad():
-                    pred = model_cvli(input_tensor, norm_adj)
+                    pred = model_cvli(input_tensor, current_norm_adj)
                 out_cvli = pred.squeeze(0).cpu().numpy()
 
                 daily_avg = np.mean(input_cvli, axis=1)
@@ -188,7 +258,7 @@ def get_risk():
                 input_cvp = node_features[:, -WINDOW_CVP:, 1:2]
                 input_tensor = torch.FloatTensor(input_cvp).permute(2, 0, 1).unsqueeze(0).to(device)
                 with torch.no_grad():
-                    pred = model_cvp(input_tensor, norm_adj)
+                    pred = model_cvp(input_tensor, current_norm_adj)
                 out_cvp = pred.squeeze(0).cpu().numpy()
 
                 daily_avg = np.mean(input_cvp, axis=1)
