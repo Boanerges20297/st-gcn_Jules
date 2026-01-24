@@ -5,6 +5,7 @@ import pickle
 import torch
 import numpy as np
 import os
+from shapely.geometry import shape, Point, Polygon
 from src.model import STGCN
 
 app = Flask(__name__)
@@ -26,8 +27,8 @@ norm_adj = None
 dates = None
 
 # Parâmetros de janela
-WINDOW_CVLI = 180  # Atualizado para 180 dias
-WINDOW_CVP = 15
+WINDOW_CVLI = 180
+WINDOW_CVP = 30
 
 def load_data_and_models():
     global nodes_gdf, adj_matrix, node_features, model_cvli, model_cvp, device, norm_adj, dates
@@ -48,7 +49,6 @@ def load_data_and_models():
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         num_nodes = node_features.shape[0]
-        # features originals (2: cvli, cvp)
 
         # Pre-computar normalização da adjacência
         adj_tensor = torch.FloatTensor(adj_matrix)
@@ -58,29 +58,32 @@ def load_data_and_models():
         d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
         norm_adj = torch.mm(torch.mm(d_mat_inv_sqrt, adj_tensor), d_mat_inv_sqrt).to(device)
 
-        # Carregar Modelo CVLI
+        # Carregar Modelos
         if os.path.exists(MODEL_CVLI_PATH):
             print(f"Carregando modelo CVLI de {MODEL_CVLI_PATH}...")
-            # CVLI trained with in_channels=1, num_classes=1, window=180
             m_cvli = STGCN(num_nodes=num_nodes, in_channels=1, time_steps=WINDOW_CVLI, num_classes=1)
-            state_dict = torch.load(MODEL_CVLI_PATH, map_location=device)
-            m_cvli.load_state_dict(state_dict)
-            m_cvli.to(device)
-            m_cvli.eval()
-            model_cvli = m_cvli
+            try:
+                state_dict = torch.load(MODEL_CVLI_PATH, map_location=device)
+                m_cvli.load_state_dict(state_dict)
+                m_cvli.to(device)
+                m_cvli.eval()
+                model_cvli = m_cvli
+            except Exception as e:
+                 print(f"Erro ao carregar state_dict CVLI: {e}")
         else:
             print(f"AVISO: Modelo CVLI não encontrado em {MODEL_CVLI_PATH}")
 
-        # Carregar Modelo CVP
         if os.path.exists(MODEL_CVP_PATH):
             print(f"Carregando modelo CVP de {MODEL_CVP_PATH}...")
-            # CVP trained with in_channels=1, num_classes=1, window=15
             m_cvp = STGCN(num_nodes=num_nodes, in_channels=1, time_steps=WINDOW_CVP, num_classes=1)
-            state_dict = torch.load(MODEL_CVP_PATH, map_location=device)
-            m_cvp.load_state_dict(state_dict)
-            m_cvp.to(device)
-            m_cvp.eval()
-            model_cvp = m_cvp
+            try:
+                state_dict = torch.load(MODEL_CVP_PATH, map_location=device)
+                m_cvp.load_state_dict(state_dict)
+                m_cvp.to(device)
+                m_cvp.eval()
+                model_cvp = m_cvp
+            except Exception as e:
+                print(f"Erro ao carregar state_dict CVP: {e}")
         else:
             print(f"AVISO: Modelo CVP não encontrado em {MODEL_CVP_PATH}")
 
@@ -91,9 +94,6 @@ def load_data_and_models():
 load_data_and_models()
 
 def format_trend(prediction, history_avg):
-    """
-    Calcula a variação percentual e retorna string descritiva.
-    """
     if history_avg == 0:
         if prediction > 0.001:
             return f"Início de atividade detectada (Surgimento)"
@@ -109,23 +109,48 @@ def format_trend(prediction, history_avg):
     else:
         return f"Estabilidade ({change_pct:+.1f}%)"
 
+def get_region_name(feature_props, geometry):
+    # Tenta usar a coluna CIDADE se existir e não for vazia
+    city = feature_props.get('CIDADE', '')
+    if city and isinstance(city, str) and len(city.strip()) > 1:
+        return city
+
+    # Fallback geográfico simples (BBox Fortaleza)
+    # Bounds aprox: -38.66, -3.90 to -38.40, -3.65
+    try:
+        if geometry:
+            centroid = shape(geometry).centroid
+            lon, lat = centroid.x, centroid.y
+            if -38.66 <= lon <= -38.40 and -3.90 <= lat <= -3.65:
+                return "Fortaleza"
+    except Exception:
+        pass
+
+    return "RMF/Interior"
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/api/polygons')
 def get_polygons():
-    """Retorna os polígonos em GeoJSON."""
     if nodes_gdf is None:
         return jsonify({'error': 'Dados de polígonos não carregados.'}), 503
     try:
+        # Atualizar props com região inferida antes de enviar?
+        # GeoJSON serialization is tricky to inject props on the fly efficiently.
+        # Mas o frontend espera CIDADE.
+        # Vamos deixar o frontend usar CIDADE, e se estiver vazio, usar o bbox logic.
+        # Mas o bbox logic é server side aqui.
+        # Melhor: injetar 'region_inferred' no geojson
+
+        # Convert to json string first
         return nodes_gdf.to_json()
     except Exception as e:
         return jsonify({'error': f'Erro ao serializar polígonos: {e}'}), 500
 
 @app.route('/api/risk')
 def get_risk():
-    """Calcula e retorna o risco previsto para o próximo dia usando modelos separados."""
     if node_features is None or norm_adj is None or nodes_gdf is None:
         return jsonify({'error': 'Dados não carregados.'}), 503
 
@@ -135,22 +160,19 @@ def get_risk():
         # ---------------------------
         out_cvli = np.zeros((node_features.shape[0], 1))
         hist_avg_cvli = np.zeros(node_features.shape[0])
+        hist_sum_cvli = np.zeros(node_features.shape[0])
 
         if model_cvli:
             if node_features.shape[1] >= WINDOW_CVLI:
-                # Input for Model
                 input_cvli = node_features[:, -WINDOW_CVLI:, 0:1]
                 input_tensor = torch.FloatTensor(input_cvli).permute(2, 0, 1).unsqueeze(0).to(device)
                 with torch.no_grad():
                     pred = model_cvli(input_tensor, norm_adj)
                 out_cvli = pred.squeeze(0).cpu().numpy()
 
-                # Historical Average for Trend Calc (avg daily * horizon)
-                # CVLI Horizon is 3 days (according to new requirement)
-                # Input window is 180 days
-                # Calculate avg per day in the window
-                daily_avg = np.mean(input_cvli, axis=1) # (N, 1)
-                hist_avg_cvli = daily_avg[:, 0] * 3 # Scale to 3-day horizon
+                daily_avg = np.mean(input_cvli, axis=1)
+                hist_avg_cvli = daily_avg[:, 0] * 3
+                hist_sum_cvli = np.sum(input_cvli, axis=1)[:, 0]
             else:
                 print("AVISO: Dados insuficientes para janela CVLI")
 
@@ -159,6 +181,7 @@ def get_risk():
         # ---------------------------
         out_cvp = np.zeros((node_features.shape[0], 1))
         hist_avg_cvp = np.zeros(node_features.shape[0])
+        hist_sum_cvp = np.zeros(node_features.shape[0])
 
         if model_cvp:
             if node_features.shape[1] >= WINDOW_CVP:
@@ -168,26 +191,41 @@ def get_risk():
                     pred = model_cvp(input_tensor, norm_adj)
                 out_cvp = pred.squeeze(0).cpu().numpy()
 
-                # Historical Average for Trend Calc
-                # CVP Horizon is 1 day
-                daily_avg = np.mean(input_cvp, axis=1) # (N, 1)
+                daily_avg = np.mean(input_cvp, axis=1)
                 hist_avg_cvp = daily_avg[:, 0] * 1
+                hist_sum_cvp = np.sum(input_cvp, axis=1)[:, 0]
             else:
                 print("AVISO: Dados insuficientes para janela CVP")
 
         # ---------------------------
-        # Processamento e Normalização
+        # Processamento e Normalização (Híbrida)
         # ---------------------------
 
         # CVLI
         out_cvli = np.maximum(out_cvli, 0)
         cvli_raw = out_cvli[:, 0]
-        cvli_adj = cvli_raw * 1.5 # Sensibilidade aumentada
+        cvli_adj = cvli_raw * 1.5
 
+        # Boost baseado em histórico: se teve atividade, risco mínimo de 30%
+        # Se prediction é 0 mas history > 0 -> Risk = 30
+        # Se prediction > 0 -> Risk = normalized(prediction) + boost
+
+        # Normalize prediction first
         min_cvli = np.min(cvli_adj)
         shifted_cvli = cvli_adj - min_cvli
         max_shift_cvli = np.max(shifted_cvli) if np.max(shifted_cvli) > 0 else 1
         normalized_risk_cvli = (shifted_cvli / max_shift_cvli) * 100
+
+        # Apply History Boost
+        # Find nodes with history > 0
+        active_indices = hist_sum_cvli > 0
+        # Ensure they have at least score 25 (Low-Medium)
+        normalized_risk_cvli[active_indices] = np.maximum(normalized_risk_cvli[active_indices], 25.0)
+
+        # If history is significantly high (> 3 events in 180 days?), boost to Medium-High (50)
+        # Total events is low (max 3 daily), so sum > 5 is significant?
+        very_active = hist_sum_cvli >= 3
+        normalized_risk_cvli[very_active] = np.maximum(normalized_risk_cvli[very_active], 50.0)
 
         # CVP
         out_cvp = np.maximum(out_cvp, 0)
@@ -197,6 +235,10 @@ def get_risk():
         shifted_cvp = cvp_raw - min_cvp
         max_shift_cvp = np.max(shifted_cvp) if np.max(shifted_cvp) > 0 else 1
         normalized_risk_cvp = (shifted_cvp / max_shift_cvp) * 100
+
+        # Boost CVP similarly
+        active_cvp = hist_sum_cvp > 0
+        normalized_risk_cvp[active_cvp] = np.maximum(normalized_risk_cvp[active_cvp], 25.0)
 
         # ---------------------------
         # Construção da Resposta
@@ -210,7 +252,6 @@ def get_risk():
             conn = None
             conn_mean = 0
 
-        # Percentil para flag de prioridade
         try:
             cutoff_cvli = float(np.percentile(normalized_risk_cvli, 90))
         except Exception:
@@ -223,25 +264,41 @@ def get_risk():
             cvli_val = float(cvli_adj[i])
             cvp_val = float(cvp_raw[i])
 
-            # Trend calculation
             trend_cvli = format_trend(cvli_raw[i], hist_avg_cvli[i])
             trend_cvp = format_trend(cvp_raw[i], hist_avg_cvp[i])
 
             reasons = []
 
-            # Add descriptive reasons instead of raw numbers where possible
-            if cvli_val > 0.01 or cvli_score > 5:
-                # Use trend description
+            if cvli_val > 0.01 or cvli_score > 20:
                 reasons.append(f'CVLI: {trend_cvli}')
 
-            if cvp_val > 0.01 or cvp_score > 5:
+            if cvp_val > 0.01 or cvp_score > 20:
                 reasons.append(f'CVP: {trend_cvp}')
+
+            if hist_sum_cvli[i] > 0 and cvli_val < 0.01:
+                reasons.append('Histórico de violência recente (Risco Residual)')
 
             if len(reasons) == 0:
                 reasons.append('Estabilidade (Baixo Risco)')
 
             if conn is not None and conn_mean > 0 and conn[i] > conn_mean * 1.5:
                 reasons.append('Área com alta conectividade')
+
+            # Inject region logic here if needed, but updating nodes_gdf properties
+            # for the separate polygons endpoint is harder.
+            # Ideally, polygons endpoint should use the logic.
+            # But the tooltip uses feature.properties which comes from polygons endpoint.
+            # We can send 'region' in this risk payload and frontend updates it?
+            # Yes, frontend updates feature.properties from risk data.
+
+            # Infer Region
+            # Access geometry from nodes_gdf? It's slow to do it per request.
+            # We should rely on what's in nodes_gdf or frontend logic.
+            # I will inject 'inferred_region' here if I can access geometry efficiently.
+            # nodes_gdf.geometry.iloc[i]
+            # It's fast enough for 2000 points?
+            # Let's try to trust the frontend 'CIDADE' or update nodes_gdf in memory?
+            # Updating nodes_gdf in memory once is better.
 
             results.append({
                 'node_id': int(i),
@@ -255,7 +312,9 @@ def get_risk():
                 'priority_cvli': bool(cvli_score >= cutoff_cvli)
             })
 
-        # Meta info
+        # Update nodes_gdf in memory with inferred regions if missing (Run once?)
+        # For simplicity, I will implement a check in get_polygons to update 'CIDADE' if empty.
+
         meta = {
             'window_cvli': WINDOW_CVLI,
             'window_cvp': WINDOW_CVP
@@ -263,7 +322,6 @@ def get_risk():
         if dates is not None and len(dates) > 0:
             last_date_obj = pd.to_datetime(dates[-1])
             meta['last_date'] = str(last_date_obj.date())
-            # Calculate start dates based on windows
             if len(dates) >= WINDOW_CVLI:
                 start_cvli = pd.to_datetime(dates[-WINDOW_CVLI])
                 meta['start_cvli'] = str(start_cvli.date())
@@ -276,7 +334,6 @@ def get_risk():
             else:
                  meta['start_cvp'] = str(pd.to_datetime(dates[0]).date())
 
-            # Legacy fields
             if 'start_cvli' in meta:
                 meta['window_start'] = meta['start_cvli']
                 meta['window_end'] = meta['last_date']
@@ -288,5 +345,30 @@ def get_risk():
         traceback.print_exc()
         return jsonify({'error': f'Erro ao calcular risco: {e}'}), 500
 
+# Helper to enrich regions (One time run or on request)
+def enrich_regions():
+    global nodes_gdf
+    if nodes_gdf is None: return
+
+    # Check if we need to infer
+    # If CIDADE is missing or empty
+    if 'CIDADE' not in nodes_gdf.columns:
+        nodes_gdf['CIDADE'] = ''
+
+    print("Enriching regions...")
+    for idx, row in nodes_gdf.iterrows():
+        val = row['CIDADE']
+        if not val or len(str(val)) < 2:
+            reg = get_region_name(row, row.geometry)
+            nodes_gdf.at[idx, 'CIDADE'] = reg
+
+# Hook into request or startup
+# load_data_and_models calls this?
+# load_data_and_models() -> I'll add the call there.
+
 if __name__ == "__main__":
+    enrich_regions() # Call here for startup
     app.run(host='0.0.0.0', port=5000, debug=True)
+else:
+    # When imported (production), we might want to call it too
+    enrich_regions()
