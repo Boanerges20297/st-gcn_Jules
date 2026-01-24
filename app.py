@@ -25,8 +25,8 @@ device = None
 norm_adj = None
 dates = None
 
-# Parâmetros de janela padrão para cada modelo
-WINDOW_CVLI = 30
+# Parâmetros de janela
+WINDOW_CVLI = 180  # Atualizado para 180 dias
 WINDOW_CVP = 15
 
 def load_data_and_models():
@@ -61,7 +61,7 @@ def load_data_and_models():
         # Carregar Modelo CVLI
         if os.path.exists(MODEL_CVLI_PATH):
             print(f"Carregando modelo CVLI de {MODEL_CVLI_PATH}...")
-            # CVLI trained with in_channels=1, num_classes=1, window=30
+            # CVLI trained with in_channels=1, num_classes=1, window=180
             m_cvli = STGCN(num_nodes=num_nodes, in_channels=1, time_steps=WINDOW_CVLI, num_classes=1)
             state_dict = torch.load(MODEL_CVLI_PATH, map_location=device)
             m_cvli.load_state_dict(state_dict)
@@ -90,6 +90,25 @@ def load_data_and_models():
 # Executa carregamento inicial
 load_data_and_models()
 
+def format_trend(prediction, history_avg):
+    """
+    Calcula a variação percentual e retorna string descritiva.
+    """
+    if history_avg == 0:
+        if prediction > 0.001:
+            return f"Início de atividade detectada (Surgimento)"
+        else:
+            return "Estabilidade (Baixa Atividade)"
+
+    change_pct = ((prediction - history_avg) / history_avg) * 100
+
+    if change_pct > 10:
+        return f"Tendência de Crescimento (+{change_pct:.1f}%)"
+    elif change_pct < -10:
+        return f"Tendência de Redução ({change_pct:.1f}%)"
+    else:
+        return f"Estabilidade ({change_pct:+.1f}%)"
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -111,60 +130,79 @@ def get_risk():
         return jsonify({'error': 'Dados não carregados.'}), 503
 
     try:
+        # ---------------------------
         # Previsão CVLI
+        # ---------------------------
         out_cvli = np.zeros((node_features.shape[0], 1))
+        hist_avg_cvli = np.zeros(node_features.shape[0])
+
         if model_cvli:
-            # Pegar últimos 30 dias da feature 0 (CVLI)
             if node_features.shape[1] >= WINDOW_CVLI:
+                # Input for Model
                 input_cvli = node_features[:, -WINDOW_CVLI:, 0:1]
                 input_tensor = torch.FloatTensor(input_cvli).permute(2, 0, 1).unsqueeze(0).to(device)
                 with torch.no_grad():
                     pred = model_cvli(input_tensor, norm_adj)
                 out_cvli = pred.squeeze(0).cpu().numpy()
+
+                # Historical Average for Trend Calc (avg daily * horizon)
+                # CVLI Horizon is 3 days (according to new requirement)
+                # Input window is 180 days
+                # Calculate avg per day in the window
+                daily_avg = np.mean(input_cvli, axis=1) # (N, 1)
+                hist_avg_cvli = daily_avg[:, 0] * 3 # Scale to 3-day horizon
             else:
                 print("AVISO: Dados insuficientes para janela CVLI")
 
+        # ---------------------------
         # Previsão CVP
+        # ---------------------------
         out_cvp = np.zeros((node_features.shape[0], 1))
+        hist_avg_cvp = np.zeros(node_features.shape[0])
+
         if model_cvp:
-            # Pegar últimos 15 dias da feature 1 (CVP)
             if node_features.shape[1] >= WINDOW_CVP:
                 input_cvp = node_features[:, -WINDOW_CVP:, 1:2]
                 input_tensor = torch.FloatTensor(input_cvp).permute(2, 0, 1).unsqueeze(0).to(device)
                 with torch.no_grad():
                     pred = model_cvp(input_tensor, norm_adj)
                 out_cvp = pred.squeeze(0).cpu().numpy()
+
+                # Historical Average for Trend Calc
+                # CVP Horizon is 1 day
+                daily_avg = np.mean(input_cvp, axis=1) # (N, 1)
+                hist_avg_cvp = daily_avg[:, 0] * 1
             else:
                 print("AVISO: Dados insuficientes para janela CVP")
 
-        # Processamento CVLI
+        # ---------------------------
+        # Processamento e Normalização
+        # ---------------------------
+
+        # CVLI
         out_cvli = np.maximum(out_cvli, 0)
         cvli_raw = out_cvli[:, 0]
+        cvli_adj = cvli_raw * 1.5 # Sensibilidade aumentada
 
-        # Aumentar sensibilidade de CVLI em 50% (solicitado: 1.5x)
-        cvli_adj = cvli_raw * 1.5
-
-        # Normalizar CVLI (0-100)
         min_cvli = np.min(cvli_adj)
         shifted_cvli = cvli_adj - min_cvli
         max_shift_cvli = np.max(shifted_cvli) if np.max(shifted_cvli) > 0 else 1
         normalized_risk_cvli = (shifted_cvli / max_shift_cvli) * 100
 
-        # Processamento CVP
+        # CVP
         out_cvp = np.maximum(out_cvp, 0)
         cvp_raw = out_cvp[:, 0]
 
-        # Normalizar CVP (0-100)
-        # Sem multiplicador de sensibilidade extra solicitado, mantendo raw
         min_cvp = np.min(cvp_raw)
         shifted_cvp = cvp_raw - min_cvp
         max_shift_cvp = np.max(shifted_cvp) if np.max(shifted_cvp) > 0 else 1
         normalized_risk_cvp = (shifted_cvp / max_shift_cvp) * 100
 
-        # Construir resposta
+        # ---------------------------
+        # Construção da Resposta
+        # ---------------------------
         results = []
 
-        # Conectividade
         try:
             conn = np.array(adj_matrix).sum(axis=1)
             conn_mean = float(np.mean(conn))
@@ -172,9 +210,9 @@ def get_risk():
             conn = None
             conn_mean = 0
 
-        # Percentil para flag de prioridade (baseado em CVLI)
+        # Percentil para flag de prioridade
         try:
-            cutoff_cvli = float(np.percentile(normalized_risk_cvli, 90)) # Ajustado para 90th
+            cutoff_cvli = float(np.percentile(normalized_risk_cvli, 90))
         except Exception:
             cutoff_cvli = 80.0
 
@@ -185,22 +223,29 @@ def get_risk():
             cvli_val = float(cvli_adj[i])
             cvp_val = float(cvp_raw[i])
 
+            # Trend calculation
+            trend_cvli = format_trend(cvli_raw[i], hist_avg_cvli[i])
+            trend_cvp = format_trend(cvp_raw[i], hist_avg_cvp[i])
+
             reasons = []
-            if cvli_val > 0 or cvli_score > 0:
-                reasons.append(f'CVLI Previsto (sensib. +50%): {cvli_val:.3f}')
 
-            if cvp_val > 0 or cvp_score > 0:
-                reasons.append(f'CVP Previsto: {cvp_val:.3f}')
+            # Add descriptive reasons instead of raw numbers where possible
+            if cvli_val > 0.01 or cvli_score > 5:
+                # Use trend description
+                reasons.append(f'CVLI: {trend_cvli}')
 
-            if cvli_val == 0 and cvp_val == 0:
-                reasons.append('Sem atividade prevista significativa')
+            if cvp_val > 0.01 or cvp_score > 5:
+                reasons.append(f'CVP: {trend_cvp}')
+
+            if len(reasons) == 0:
+                reasons.append('Estabilidade (Baixo Risco)')
 
             if conn is not None and conn_mean > 0 and conn[i] > conn_mean * 1.5:
                 reasons.append('Área com alta conectividade')
 
             results.append({
                 'node_id': int(i),
-                'risk_score': cvli_score, # Default legacy
+                'risk_score': cvli_score,
                 'risk_score_cvli': cvli_score,
                 'risk_score_cvp': cvp_score,
                 'cvli_pred': cvli_val,
@@ -218,15 +263,20 @@ def get_risk():
         if dates is not None and len(dates) > 0:
             last_date_obj = pd.to_datetime(dates[-1])
             meta['last_date'] = str(last_date_obj.date())
-            # Calculate start dates for both windows
+            # Calculate start dates based on windows
             if len(dates) >= WINDOW_CVLI:
                 start_cvli = pd.to_datetime(dates[-WINDOW_CVLI])
                 meta['start_cvli'] = str(start_cvli.date())
+            else:
+                 meta['start_cvli'] = str(pd.to_datetime(dates[0]).date())
+
             if len(dates) >= WINDOW_CVP:
                 start_cvp = pd.to_datetime(dates[-WINDOW_CVP])
                 meta['start_cvp'] = str(start_cvp.date())
+            else:
+                 meta['start_cvp'] = str(pd.to_datetime(dates[0]).date())
 
-            # Legacy fields for default CVLI view
+            # Legacy fields
             if 'start_cvli' in meta:
                 meta['window_start'] = meta['start_cvli']
                 meta['window_end'] = meta['last_date']
