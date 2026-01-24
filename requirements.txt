@@ -27,3 +27,6 @@ typing-extensions==4.5.0
 # Optional Intel extension (platform-specific). Uncomment and install only if you
 # have a compatible Intel build/wheel for your Python version and OS.
 # intel-extension-for-pytorch==<version>
+
+# Additional packages from incoming PRs
+playwright
