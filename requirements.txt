@@ -1,0 +1,32 @@
+# Requirements for st-gcn_jules
+# Note: some geopandas/Fiona/pyproj binaries are platform-specific on Windows
+# It is recommended to create the venv and install geopandas and its geospatial
+# binary dependencies via conda on Windows, or use the wheels from their projects.
+
+# Core libraries
+Flask==2.2.5
+pandas==2.2.2
+numpy==1.25.2
+
+# Geospatial
+geopandas==0.13.2
+shapely==2.1.1
+fiona==1.9.4
+pyproj==3.6.0
+rtree==1.0.1
+
+# PyTorch - CPU build (Windows users: use the PyTorch CPU index below when installing)
+# Install with:
+#   pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.9.1+cpu
+
+# Optional / utilities
+tqdm==4.66.1
+typing-extensions==4.5.0
+
+# Optional Intel extension (platform-specific). Uncomment and install only if you
+# have a compatible Intel build/wheel for your Python version and OS.
+# intel-extension-for-pytorch==<version>
+
+# Additional packages from incoming PRs
+playwright
