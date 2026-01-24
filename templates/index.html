@@ -9,11 +9,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { padding-top: 20px; background-color: #f8f9fa; }
-        #map { height: 600px; width: 100%; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        #map { height: 650px; width: 100%; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         .metric-card { transition: transform 0.2s; }
         .metric-card:hover { transform: translateY(-5px); }
         .legend { background: white; padding: 10px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
         .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
+        .control-panel { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -24,252 +25,351 @@
             <p class="lead text-muted">Análise de Risco em Áreas Monitoradas (CVLI & CVP)</p>
         </div>
     </div>
+
+    <!-- Painel de Controle e Filtros -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="control-panel">
+                <div class="row align-items-end g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Tipo de Crime:</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="crime-type" id="btn-cvli" autocomplete="off" checked>
+                            <label class="btn btn-outline-danger" for="btn-cvli">CVLI (Letalidade)</label>
+
+                            <input type="radio" class="btn-check" name="crime-type" id="btn-cvp" autocomplete="off">
+                            <label class="btn btn-outline-warning" for="btn-cvp">CVP (Patrimônio)</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Região:</label>
+                        <select class="form-select" id="region-filter">
+                            <option value="Todos">Todas as Regiões</option>
+                            <option value="Fortaleza">Fortaleza</option>
+                            <option value="RMF">Região Metropolitana</option>
+                            <option value="Interior">Interior</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Data da Análise:</label>
+                        <input type="date" class="form-control" id="date-filter">
+                        <small class="text-muted">Padrão: Hoje (Predição Futura)</small>
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <button class="btn btn-outline-primary me-2 mb-2" data-bs-toggle="modal" data-bs-target="#exogenousModal">
+                            <i class="fas fa-database"></i> Eventos Exógenos
+                        </button>
+                        <button class="btn btn-outline-dark mb-2" id="btn-simulation-mode">
+                            <i class="fas fa-motorcycle"></i> Simular Equipe
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards de Métricas -->
     <div class="row mb-4 justify-content-center">
         <div class="col-md-3">
             <div class="card metric-card border-danger mb-3">
                 <div class="card-body text-center">
-                    <h5 class="card-title text-danger">Áreas de Alto Risco</h5>
-                    <p class="card-text display-4 fw-bold" id="high-risk-count">-</p>
-                    <small class="text-muted">Previsão para Amanhã</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card metric-card border-warning mb-3">
-                <div class="card-body text-center">
-                    <h5 class="card-title text-warning">Áreas em Alerta</h5>
-                    <p class="card-text display-4 fw-bold" id="medium-risk-count">-</p>
-                    <small class="text-muted">Atenção Necessária</small>
+                    <h5 class="card-title text-danger">Áreas Críticas (Top 10%)</h5>
+                    <p class="card-text display-4 fw-bold" id="critical-count">-</p>
+                    <small class="text-muted" id="metric-subtitle">CVLI (Próx 30 dias)</small>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card metric-card border-success mb-3">
                 <div class="card-body text-center">
-                    <h5 class="card-title text-success">Áreas Estáveis</h5>
-                    <p class="card-text display-4 fw-bold" id="low-risk-count">-</p>
+                    <h5 class="card-title text-success">Áreas Normais</h5>
+                    <p class="card-text display-4 fw-bold" id="normal-count">-</p>
                     <small class="text-muted">Monitoramento Padrão</small>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Mapa -->
     <div class="row">
-        <div class="col-md-9">
+        <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-map-marked-alt"></i> Mapa Tático Operacional</span>
-                    <span class="badge bg-danger">Dados Atualizados: Hoje</span>
+                <div class="card-header bg-white text-dark d-flex justify-content-between align-items-center">
+                    <span class="fw-bold"><i class="fas fa-map-marked-alt"></i> Mapa Tático Operacional - Zonas de Calor</span>
+                    <span id="simulation-status" class="badge bg-warning text-dark d-none">Modo Simulação Ativo: Clique no mapa</span>
                 </div>
                 <div class="card-body p-0">
                     <div id="map"></div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <strong>Motivos de Risco</strong>
-                </div>
-                <div class="card-body">
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" id="mode-switch" checked>
-                        <label class="form-check-label" for="mode-switch" id="mode-label">Modo de Visualização: <strong>CVLI</strong></label>
+    </div>
+</div>
+
+<!-- Modal Dados Exógenos -->
+<div class="modal fade" id="exogenousModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Inserção de Dados Exógenos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="exogenousForm">
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Evento</label>
+                        <select class="form-select" name="type" required>
+                            <option value="Morte de Liderança">Morte de Liderança</option>
+                            <option value="Disputa de Território">Disputa de Território</option>
+                            <option value="Aumento CVP">Aumento CVP</option>
+                            <option value="Outro">Outro</option>
+                        </select>
                     </div>
-                    <div id="window-info" class="mb-2">
-                        <small class="text-muted">Janela de predição: —</small>
+                    <div class="mb-3">
+                        <label class="form-label">Detalhes do Evento</label>
+                        <textarea class="form-control" name="details" rows="4" placeholder="Descreva o evento detalhadamente..." required></textarea>
                     </div>
-                    <div id="selected-info">
-                        <p class="text-muted">Clique em uma área no mapa para ver os motivos de risco aqui.</p>
+                    <div class="mb-3">
+                        <label class="form-label">Data do Evento</label>
+                        <input type="date" class="form-control" name="date" required>
                     </div>
-                    <hr>
-                    <div>
-                        <h6>Top motivos gerais</h6>
-                        <ul id="top-reasons" class="small"></ul>
+                    <div class="mb-3">
+                        <label class="form-label">Criminosos Envolvidos (Nome, Facção, Endereço, etc)</label>
+                        <textarea class="form-control" name="criminals" rows="3"></textarea>
                     </div>
-                </div>
+                    <button type="submit" class="btn btn-primary">Salvar Evento</button>
+                </form>
+                <hr>
+                <h6>Eventos Registrados</h6>
+                <div id="exogenousList" class="list-group"></div>
             </div>
         </div>
     </div>
-    <div class="row mt-4">
-        <div class="col-12 text-center text-muted">
-            <small>Sistema desenvolvido para apoio à decisão tática. Baseado em modelo ST-GCN.</small>
-        </div>
-    </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    var map = L.map('map').setView([-3.7319, -38.5267], 12);
+    var map = L.map('map').setView([-3.7319, -38.5267], 10); // Zoom out a bit to see RMF/Interior
+
+    // Light/Positron Map for "Harmonic and Modern" look
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
         subdomains: 'abcd',
         maxZoom: 19
     }).addTo(map);
 
-    function getColor(d) {
-        return d > 80 ? '#800026' :
-               d > 60  ? '#BD0026' :
-               d > 40  ? '#E31A1C' :
-               d > 20  ? '#FEB24C' :
-               d > 10   ? '#FED976' :
-                          '#90EE90';
+    var currentLayer = null;
+    var simulationMode = false;
+    var currentSimulationParams = null;
+    var simulationMarker = null;
+
+    // Set today's date as default
+    document.getElementById('date-filter').valueAsDate = new Date();
+
+    function getColor(value, isCritical) {
+        // Modern Harmonic Palette
+        // Critical: Vibrant Orange/Red
+        if (isCritical) return '#f83600';
+        
+        // Gradient: Light Blue -> Soft Yellow -> Soft Pink/Red
+        return value > 80 ? '#fa709a' : // Soft Red
+               value > 60 ? '#fee140' : // Soft Yellow
+               value > 40 ? '#96e6a1' : // Soft Green
+               value > 20 ? '#84fab0' : // Light Green/Blue
+                            '#4facfe'; // Light Blue (Low Risk)
     }
 
-    function style(feature) {
-        // Decide which score to use based on current mode
-        var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
-        var score = (mode === 'CVLI') ? feature.properties.risk_score_cvli : feature.properties.risk_score_cvp;
-
-        return {
-            fillColor: getColor(score),
-            weight: 2,
-            opacity: 1,
-            color: 'white',
-            dashArray: '3',
-            fillOpacity: 0.7
-        };
-    }
-    
-    var legend = L.control({position: 'bottomright'});
-    legend.onAdd = function (map) {
-        var div = L.DomUtil.create('div', 'legend'),
-            grades = [0, 10, 20, 40, 60, 80];
-        div.innerHTML = '<strong>Nível de Risco</strong><br>';
-        for (var i = 0; i < grades.length; i++) {
-            div.innerHTML +=
-                '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+    function loadData(simulationParams = null) {
+        var type = $('#btn-cvli').is(':checked') ? 'cvli' : 'cvp';
+        var region = $('#region-filter').val();
+        var date = $('#date-filter').val();
+        
+        var url = '/api/risk?crime=' + type + '&region=' + region + '&date=' + date;
+        if (simulationParams) {
+            url += '&simulation=' + simulationParams;
         }
-        return div;
-    };
-    legend.addTo(map);
 
-    function formatDate(dateStr) {
-        if (!dateStr) return '?';
-        var parts = dateStr.split('-');
-        if (parts.length === 3) {
-            return parts[2] + '/' + parts[1] + '/' + parts[0];
-        }
-        return dateStr;
-    }
+        $.when(
+            $.getJSON('/api/polygons'),
+            $.getJSON(url)
+        ).done(function(polygonsArgs, riskArgs) {
+            var geojson = polygonsArgs[0];
+            var riskData = riskArgs[0];
+            var riskMap = {};
 
-    var geojsonLayer = null;
-    var riskDataGlobal = null;
-    var metaDataGlobal = null;
+            var criticalCount = 0;
+            var normalCount = 0;
 
-    function updateDashboard(mode) {
-        var label = (mode === 'CVLI') ? 'Modo de Visualização: <strong>CVLI</strong>' : 'Modo de Visualização: <strong>CVP</strong>';
-        $('#mode-label').html(label);
+            // Create a set of valid node IDs based on the response (which is filtered)
+            var validNodeIds = new Set();
 
-        // Update Window Info
-        var startDate = (mode === 'CVLI') ? metaDataGlobal.start_cvli : metaDataGlobal.start_cvp;
-        var endDate = metaDataGlobal.last_date;
-        var days = (mode === 'CVLI') ? metaDataGlobal.window_cvli : metaDataGlobal.window_cvp;
+            riskData.forEach(function(item) {
+                var d = item[type];
+                riskMap[item.node_id] = item; // Store full item
+                validNodeIds.add(item.node_id);
 
-        var dateText = formatDate(startDate) + ' → ' + formatDate(endDate);
-        $('#window-info').html('<small class="text-muted">Janela de predição: ' + dateText + ' (' + days + ' dias)</small>');
-
-        // Recalculate Stats
-        var highRisk = 0, mediumRisk = 0, lowRisk = 0;
-        riskDataGlobal.forEach(function(item) {
-            var score = (mode === 'CVLI') ? item.risk_score_cvli : item.risk_score_cvp;
-            if (score > 60) highRisk++;
-            else if (score > 20) mediumRisk++;
-            else lowRisk++;
-        });
-
-        $('#high-risk-count').text(highRisk);
-        $('#medium-risk-count').text(mediumRisk);
-        $('#low-risk-count').text(lowRisk);
-
-        // Update Map Style
-        if (geojsonLayer) {
-            geojsonLayer.eachLayer(function(layer) {
-                layer.setStyle(style(layer.feature));
+                if (d.is_critical) criticalCount++;
+                else normalCount++;
             });
-        }
+
+            $('#critical-count').text(criticalCount);
+            $('#normal-count').text(normalCount);
+
+            if (type === 'cvli') {
+                $('#metric-subtitle').text('CVLI (Próx 30 dias)');
+            } else {
+                $('#metric-subtitle').text('CVP (Próx 7 dias)');
+            }
+
+            if (currentLayer) map.removeLayer(currentLayer);
+
+            // Filter GeoJSON based on validNodeIds (Region Filter)
+            var filteredFeatures = geojson.features.filter(function(f) {
+                return validNodeIds.has(f.properties.node_id);
+            });
+
+            var filteredGeojson = {
+                type: "FeatureCollection",
+                features: filteredFeatures
+            };
+
+            currentLayer = L.geoJson(filteredGeojson, {
+                style: function(feature) {
+                    var item = riskMap[feature.properties.node_id];
+                    var d = item[type];
+                    var val = d ? d.normalized : 0;
+                    var isCritical = d ? d.is_critical : false;
+                    return {
+                        fillColor: getColor(val, isCritical),
+                        weight: 0, // No border for cleaner look
+                        opacity: 0,
+                        color: 'white',
+                        dashArray: '',
+                        fillOpacity: 0.6 // Glassy effect
+                    };
+                },
+                onEachFeature: function(feature, layer) {
+                    var item = riskMap[feature.properties.node_id];
+                    if (item) {
+                        var d = item[type];
+                        var statusLabel = d.is_critical ?
+                            `<span class="badge bg-danger">CRÍTICO (${type.toUpperCase()})</span>` :
+                            `<span class="badge bg-success">Normal</span>`;
+
+                        var content = `<strong>Bairro/Área:</strong> ${feature.properties.node_id}<br>
+                                       <strong>Região:</strong> ${item.region}<br>
+                                       <strong>Facção:</strong> ${item.faction}<br>
+                                       <hr>
+                                       <strong>Status:</strong> ${statusLabel}<br>
+                                       <strong>Risco (${type.toUpperCase()}):</strong> ${d.value.toFixed(2)}<br>
+                                       <small>Normalizado: ${d.normalized.toFixed(0)}%</small>`;
+                        layer.bindPopup(content);
+                    }
+                }
+            }).addTo(map);
+
+            // Adjust bounds if features exist
+            if(filteredFeatures.length > 0) {
+                map.fitBounds(currentLayer.getBounds());
+            }
+        });
     }
 
-    $.when(
-        $.getJSON('/api/polygons'),
-        $.getJSON('/api/risk')
-    ).done(function(polygonsArgs, riskArgs) {
-        var geojson = polygonsArgs[0];
-        var riskResp = riskArgs[0];
-        riskDataGlobal = riskResp.data || riskResp;
-        metaDataGlobal = riskResp.meta || {};
-        
-        var riskMapCVLI = {};
-        var riskMapCVP = {};
-        
-        riskDataGlobal.forEach(function(item) {
-            riskMapCVLI[item.node_id] = item.risk_score_cvli || 0;
-            riskMapCVP[item.node_id] = item.risk_score_cvp || 0;
-        });
-        
-        geojson.features.forEach(function(feature, index) {
-            var r = riskDataGlobal[index] || {};
-            feature.properties.risk_score_cvli = riskMapCVLI[index] || 0;
-            feature.properties.risk_score_cvp = riskMapCVP[index] || 0;
-            feature.properties.cvli_pred = (r.cvli_pred !== undefined) ? r.cvli_pred : 0;
-            feature.properties.cvp_pred = (r.cvp_pred !== undefined) ? r.cvp_pred : 0;
-            feature.properties.faction = r.faction || feature.properties.faction || null;
-            feature.properties.reasons = r.reasons || [];
-            feature.properties.name = feature.properties.name || 'Área ' + index;
-        });
+    // Event Listeners
+    $('input[name="crime-type"]').change(function() {
+        loadData(currentSimulationParams);
+    });
 
-        // Initialize Map
-        geojsonLayer = L.geoJson(geojson, {
-            style: style,
-            onEachFeature: function(feature, layer) {
-                layer.on('click', function() {
-                    // Decide content based on current mode
-                    var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
-                    var score = (mode === 'CVLI') ? feature.properties.risk_score_cvli : feature.properties.risk_score_cvp;
-                    var predVal = (mode === 'CVLI') ? feature.properties.cvli_pred : feature.properties.cvp_pred;
-                    var typeLabel = (mode === 'CVLI') ? 'CVLI' : 'CVP';
+    $('#region-filter').change(function() {
+        loadData(currentSimulationParams);
+    });
 
-                    var popupContent = `<strong>Área:</strong> ${feature.properties.name}<br>
-                                        <strong>Risco ${typeLabel}:</strong> ${score.toFixed(1)}%<br>
-                                        <span class="text-danger">Predição Bruta: ${predVal.toFixed(3)}</span>`;
+    $('#date-filter').change(function() {
+        loadData(currentSimulationParams);
+    });
 
-                    layer.bindPopup(popupContent).openPopup();
+    $('#btn-simulation-mode').click(function() {
+        simulationMode = !simulationMode;
+        if (simulationMode) {
+            $(this).addClass('active btn-primary').removeClass('btn-outline-dark');
+            $('#simulation-status').removeClass('d-none');
+            map.getContainer().style.cursor = 'crosshair';
+        } else {
+            $(this).removeClass('active btn-primary').addClass('btn-outline-dark');
+            $('#simulation-status').addClass('d-none');
+            map.getContainer().style.cursor = '';
+            currentSimulationParams = null;
+            if (simulationMarker) map.removeLayer(simulationMarker);
+            loadData();
+        }
+    });
 
-                    // Sidebar update
-                    var reasonsHtml = '<h5>' + feature.properties.name + '</h5>';
-                    reasonsHtml += '<p><strong>Facção:</strong> ' + (feature.properties.faction || 'N/A') + '</p>';
-                    reasonsHtml += '<p><strong>Risco (' + typeLabel + '):</strong> ' + score.toFixed(1) + '%</p>';
-                    reasonsHtml += '<h6>Motivos</h6><ul>';
-                    feature.properties.reasons.forEach(function(r) { reasonsHtml += '<li>' + r + '</li>'; });
-                    reasonsHtml += '</ul>';
-                    $('#selected-info').html(reasonsHtml);
-                });
+    map.on('click', function(e) {
+        if (simulationMode) {
+            var lat = e.latlng.lat;
+            var lon = e.latlng.lng;
+
+            if (simulationMarker) map.removeLayer(simulationMarker);
+            simulationMarker = L.marker([lat, lon], {
+                icon: L.divIcon({
+                    className: 'fa fa-motorcycle fa-2x text-primary',
+                    iconSize: [30, 30]
+                })
+            }).addTo(map);
+
+            currentSimulationParams = `${lat},${lon}`;
+            loadData(currentSimulationParams);
+        }
+    });
+
+    // Initial Load
+    loadData();
+
+    // Exogenous Data Form
+    $('#exogenousForm').submit(function(e) {
+        e.preventDefault();
+        var formData = {
+            type: $('select[name="type"]').val(),
+            details: $('textarea[name="details"]').val(),
+            date: $('input[name="date"]').val(),
+            criminals: $('textarea[name="criminals"]').val()
+        };
+
+        $.ajax({
+            url: '/api/exogenous',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(response) {
+                alert(response.message);
+                $('#exogenousForm')[0].reset();
+                loadExogenousList();
             }
-        }).addTo(map);
-
-        updateTopReasons(geojson.features);
-
-        // Initial State
-        updateDashboard('CVLI');
-
-        // Toggle handler
-        $('#mode-switch').on('change', function() {
-            var isCvli = $(this).is(':checked');
-            updateDashboard(isCvli ? 'CVLI' : 'CVP');
         });
     });
 
-    function updateTopReasons(features) {
-        var counter = {};
-        features.forEach(function(f) {
-            (f.properties.reasons || []).forEach(function(r) { counter[r] = (counter[r] || 0) + 1; });
+    function loadExogenousList() {
+        $.getJSON('/api/exogenous', function(data) {
+            var list = $('#exogenousList');
+            list.empty();
+            data.forEach(function(item) {
+                list.append(`
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">${item.type}</h6>
+                            <small>${item.date}</small>
+                        </div>
+                        <p class="mb-1">${item.details}</p>
+                        <small class="text-muted">Envolvidos: ${item.criminals}</small>
+                    </a>
+                `);
+            });
         });
-        var items = Object.keys(counter).sort(function(a,b){return counter[b]-counter[a];}).slice(0,10);
-        var html = '';
-        items.forEach(function(k){ html += '<li>' + k + ' <span class="text-muted">(' + counter[k] + ')</span></li>'; });
-        $('#top-reasons').html(html);
     }
+
+    $('#exogenousModal').on('show.bs.modal', loadExogenousList);
 </script>
 </body>
 </html>
