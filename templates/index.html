@@ -76,7 +76,8 @@
                         <label class="form-check-label" for="mode-switch" id="mode-label">Modo de Visualização: <strong>CVLI</strong></label>
                     </div>
                     <div id="window-info" class="mb-2">
-                        <small class="text-muted">Janela de predição: —</small>
+                        <small class="text-muted d-block">Janela Histórica: —</small>
+                        <small class="text-primary fw-bold" id="horizon-info">Horizonte: —</small>
                     </div>
                     <div id="selected-info">
                         <p class="text-muted">Clique em uma área no mapa para ver os motivos de risco aqui.</p>
@@ -168,7 +169,10 @@
         var days = (mode === 'CVLI') ? metaDataGlobal.window_cvli : metaDataGlobal.window_cvp;
 
         var dateText = formatDate(startDate) + ' → ' + formatDate(endDate);
-        $('#window-info').html('<small class="text-muted">Janela de predição: ' + dateText + ' (' + days + ' dias)</small>');
+        $('#window-info small.text-muted').text('Janela Histórica: ' + dateText + ' (' + days + ' dias)');
+
+        var horizonText = (mode === 'CVLI') ? 'Horizonte de Predição: 3 dias (72h)' : 'Horizonte de Predição: 1 dia (24h)';
+        $('#horizon-info').text(horizonText);
 
         // Recalculate Stats
         var highRisk = 0, mediumRisk = 0, lowRisk = 0;
