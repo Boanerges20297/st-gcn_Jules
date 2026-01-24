@@ -61,13 +61,10 @@ def train_one(model, loader, optimizer, device, norm_adj, logger):
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=5.0)
         optimizer.step()
         total_loss += loss.item()
-
-        # Aggressive cleanup
         del bx, by, out, loss
-
     return total_loss / len(loader)
 
-def run_training(feature_idx, history_window, horizon, out_path, epochs=10, batch_size=4, lr=1e-3):
+def run_training(feature_idx, history_window, horizon, out_path, epochs=10, batch_size=32, lr=1e-3):
     logger = setup_logger(f'train_{feature_idx}')
     logger.info(f'Starting training: window={history_window}, horizon={horizon}, batch={batch_size}')
 
@@ -98,7 +95,6 @@ def run_training(feature_idx, history_window, horizon, out_path, epochs=10, batc
     if len(X) == 0:
         return
 
-    # No validation set to save memory
     train_data = TensorDataset(torch.from_numpy(X), torch.from_numpy(Y))
     del X, Y
     gc.collect()
@@ -126,9 +122,11 @@ def run_training(feature_idx, history_window, horizon, out_path, epochs=10, batc
         train_loss = train_one(model, train_loader, optimizer, device, norm_adj, logger)
         elapsed = time.time() - t0
         logger.info(f"Epoch {epoch}/{epochs} | Loss: {train_loss:.5f} | Time: {elapsed:.1f}s")
-        # Save every epoch
         torch.save(model.state_dict(), out_path)
 
 if __name__ == "__main__":
-    # Batch size 4, 10 epochs
-    run_training(feature_idx=0, history_window=180, horizon=3, out_path=os.path.join(ROOT, 'models', 'stgcn_cvli.pth'), batch_size=4, epochs=5)
+    # CVLI: Done
+    # run_training(feature_idx=0, history_window=180, horizon=3, out_path=os.path.join(ROOT, 'models', 'stgcn_cvli.pth'), batch_size=4, epochs=5)
+
+    # CVP: Feature 1, Window 30, Horizon 1
+    run_training(feature_idx=1, history_window=30, horizon=1, out_path=os.path.join(ROOT, 'models', 'stgcn_cvp.pth'), batch_size=32, epochs=5)
