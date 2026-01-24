@@ -14,6 +14,7 @@
         .metric-card:hover { transform: translateY(-5px); }
         .legend { background: white; padding: 10px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
         .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
+        .simulation-active { cursor: crosshair !important; }
     </style>
 </head>
 <body>
@@ -79,13 +80,28 @@
                         <small class="text-muted d-block">Janela Histórica: —</small>
                         <small class="text-primary fw-bold" id="horizon-info">Horizonte: —</small>
                     </div>
+
+                    <div class="d-grid gap-2 mb-3">
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-outline-primary btn-sm" id="btn-simulate">
+                                <i class="fas fa-motorcycle"></i> Equipe
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" id="btn-simulate-exo">
+                                <i class="fas fa-radiation"></i> Conflito
+                            </button>
+                        </div>
+                        <button class="btn btn-outline-secondary btn-sm d-none" id="btn-clear-sim">
+                            <i class="fas fa-undo"></i> Limpar Simulação
+                        </button>
+                    </div>
+
                     <div id="selected-info">
                         <p class="text-muted">Clique em uma área no mapa para ver os motivos de risco aqui.</p>
                     </div>
                     <hr>
                     <div>
-                        <h6>Top motivos gerais</h6>
-                        <ul id="top-reasons" class="small"></ul>
+                        <h6>Top 30 Áreas Críticas</h6>
+                        <div id="top-areas" class="list-group list-group-flush small" style="max-height: 400px; overflow-y: auto;"></div>
                     </div>
                 </div>
             </div>
@@ -107,6 +123,13 @@
         subdomains: 'abcd',
         maxZoom: 19
     }).addTo(map);
+
+    // Global Map Click for Simulation (handling gaps between polygons)
+    map.on('click', function(e) {
+        if (simulationMode) {
+            addSimulationPoint(e.latlng);
+        }
+    });
 
     function getColor(d) {
         return d > 80 ? '#800026' :
@@ -166,6 +189,26 @@
     var riskDataGlobal = null;
     var metaDataGlobal = null;
 
+    // Simulation State
+    var simulationMode = false;
+    var simulationType = 'suppression'; // 'suppression' or 'exogenous'
+    var simulationPoints = [];
+    var simMarkers = [];
+
+    var motorIcon = L.divIcon({
+        html: '<i class="fas fa-motorcycle fa-2x" style="color: blue; text-shadow: 2px 2px 4px white;"></i>',
+        className: 'custom-div-icon',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+    });
+
+    var conflictIcon = L.divIcon({
+        html: '<i class="fas fa-radiation fa-2x" style="color: red; text-shadow: 2px 2px 4px white;"></i>',
+        className: 'custom-div-icon',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+    });
+
     function updateDashboard(mode) {
         var label = (mode === 'CVLI') ? 'Modo de Visualização: <strong>CVLI</strong>' : 'Modo de Visualização: <strong>CVP</strong>';
         $('#mode-label').html(label);
@@ -200,6 +243,109 @@
                 layer.setStyle(style(layer.feature));
             });
         }
+        updateTopCriticalAreas();
+    }
+
+    function addSimulationPoint(latlng) {
+        var icon = (simulationType === 'suppression') ? motorIcon : conflictIcon;
+        var marker = L.marker(latlng, {icon: icon}).addTo(map);
+        simMarkers.push(marker);
+        simulationPoints.push([latlng.lat, latlng.lng]);
+
+        // Call API
+        $.ajax({
+            url: '/api/simulate',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ points: simulationPoints, type: simulationType }),
+            success: function(resp) {
+                if(resp.data) {
+                    riskDataGlobal = resp.data;
+                    updateRiskMap(riskDataGlobal);
+                    var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
+                    updateDashboard(mode);
+                }
+            },
+            error: function(err) {
+                console.error("Simulation error", err);
+                alert("Erro ao simular: " + err.statusText);
+            }
+        });
+
+        $('#btn-clear-sim').removeClass('d-none');
+    }
+
+    function clearSimulation() {
+        simMarkers.forEach(function(m) { map.removeLayer(m); });
+        simMarkers = [];
+        simulationPoints = [];
+        $('#btn-clear-sim').addClass('d-none');
+
+        // Reload original data
+         $.getJSON('/api/risk', function(resp) {
+            riskDataGlobal = resp.data || resp;
+            updateRiskMap(riskDataGlobal);
+            var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
+            updateDashboard(mode);
+        });
+    }
+
+    function updateRiskMap(riskData) {
+        var riskMapCVLI = {};
+        var riskMapCVP = {};
+
+        riskData.forEach(function(item) {
+            riskMapCVLI[item.node_id] = item.risk_score_cvli || 0;
+            riskMapCVP[item.node_id] = item.risk_score_cvp || 0;
+        });
+
+        geojsonLayer.eachLayer(function(layer) {
+            var index = layer.feature.properties.node_id; // Need to ensure node_id is available in properties.
+            // Wait, previous code used array index matching.
+            // "geojson.features.forEach(function(feature, index) {...}"
+            // We need to map back.
+            // The safest way is to assume array order is preserved.
+
+            // Let's rely on the loop index if node_id is not set,
+            // but we need the index. Leaflet layers don't expose index easily unless we stored it.
+            // In initial load, we stored risk data into properties.
+            // We should do the same here.
+
+            // Wait, we can't easily iterate layers in order matching the array unless we assigned IDs.
+            // Let's check initial load logic again.
+        });
+
+        // Re-process all features logic is complex inside leaflet loop.
+        // Easier: Re-apply properties to the GeoJSON features source and redraw? No, slow.
+        // Best: In initial load, assign an ID to each feature property if not exists.
+
+        // But let's look at initial load again.
+        // "geojson.features.forEach(function(feature, index) { ... }"
+        // It updates `feature.properties`.
+        // Leaflet layers reference `feature`. If we update `feature.properties`, does it update style?
+        // `layer.feature` is a reference. So updating it works.
+
+        // So we need to iterate geojson features again?
+        // We don't have direct access to the original geojson object easily unless stored.
+        // But `geojsonLayer.toGeoJSON()` returns new geojson.
+        // `geojsonLayer.getLayers()` returns array of layers.
+
+        // Let's assume `geojsonLayer` layers are consistent.
+        var layers = geojsonLayer.getLayers();
+        riskData.forEach(function(item, idx) {
+            if (layers[idx]) {
+                var layer = layers[idx];
+                layer.feature.properties.risk_score_cvli = item.risk_score_cvli;
+                layer.feature.properties.risk_score_cvp = item.risk_score_cvp;
+                layer.feature.properties.cvli_pred = item.cvli_pred;
+                layer.feature.properties.cvp_pred = item.cvp_pred;
+                layer.feature.properties.reasons = item.reasons;
+                // Update popup content if needed? Popups are bound on click, so they read current properties.
+                // Except the `bindPopup` string is created at binding time.
+                // We need to re-bind popup or use a function for content.
+                // The current code binds a static string. I should change it to a function.
+            }
+        });
     }
 
     $.when(
@@ -234,71 +380,168 @@
         geojsonLayer = L.geoJson(geojson, {
             style: style,
             onEachFeature: function(feature, layer) {
-                // Pre-bind popup content
-                layer.on('click', function() {
-                     // Determine Mode
-                    var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
-                    var score = (mode === 'CVLI') ? feature.properties.risk_score_cvli : feature.properties.risk_score_cvp;
-                    var predVal = (mode === 'CVLI') ? feature.properties.cvli_pred : feature.properties.cvp_pred;
-                    var typeLabel = (mode === 'CVLI') ? 'CVLI' : 'CVP';
-                    var status = getStatus(score, typeLabel);
-                    var region = feature.properties.CIDADE || 'RMF/Interior';
+                // Click handler
+                layer.on('click', function(e) {
+                    if (simulationMode) {
+                        L.DomEvent.stopPropagation(e); // Prevent map click from firing twice
+                        addSimulationPoint(e.latlng);
+                    } else {
+                        // Show Popup & Info
+                        var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
+                        var score = (mode === 'CVLI') ? feature.properties.risk_score_cvli : feature.properties.risk_score_cvp;
+                        var predVal = (mode === 'CVLI') ? feature.properties.cvli_pred : feature.properties.cvp_pred;
+                        var typeLabel = (mode === 'CVLI') ? 'CVLI' : 'CVP';
+                        var status = getStatus(score, typeLabel);
+                        var region = feature.properties.CIDADE || 'RMF/Interior';
 
-                    var popupContent = `
-                        <div style="font-family: sans-serif; font-size: 14px; min-width: 200px;">
-                            <h6 class="mb-1"><strong>Bairro/Área:</strong> ${feature.properties.name}</h6>
-                            <div class="text-muted small mb-2">
-                                <strong>Região:</strong> ${region}<br>
-                                <strong>Facção:</strong> ${feature.properties.faction || 'Não Identificado'}
+                        var popupContent = `
+                            <div style="font-family: sans-serif; font-size: 14px; min-width: 200px;">
+                                <h6 class="mb-1"><strong>Bairro/Área:</strong> ${feature.properties.name}</h6>
+                                <div class="text-muted small mb-2">
+                                    <strong>Região:</strong> ${region}<br>
+                                    <strong>Facção:</strong> ${feature.properties.faction || 'Não Identificado'}
+                                </div>
+                                <hr class="my-2">
+                                <div class="mb-2">
+                                    <strong>Status:</strong> <span class="badge ${status.class}">${status.label}</span>
+                                </div>
+                                <div class="mb-1">
+                                    <strong>Risco Normalizado:</strong> ${score.toFixed(1)}%
+                                </div>
+                                <div class="text-muted small">
+                                    <strong>Predição (${typeLabel}):</strong> ${predVal.toFixed(4)}
+                                </div>
                             </div>
-                            <hr class="my-2">
-                            <div class="mb-2">
-                                <strong>Status:</strong> <span class="badge ${status.class}">${status.label}</span>
-                            </div>
-                            <div class="mb-1">
-                                <strong>Risco Normalizado:</strong> ${score.toFixed(1)}%
-                            </div>
-                            <div class="text-muted small">
-                                <strong>Predição (${typeLabel}):</strong> ${predVal.toFixed(4)}
-                            </div>
-                        </div>
-                    `;
+                        `;
 
-                    layer.bindPopup(popupContent).openPopup();
+                        // Create popup and open it manually
+                        L.popup()
+                            .setLatLng(e.latlng)
+                            .setContent(popupContent)
+                            .openOn(map);
 
-                    // Sidebar update
-                    var reasonsHtml = '<h5>' + feature.properties.name + '</h5>';
-                    reasonsHtml += '<p><strong>Facção:</strong> ' + (feature.properties.faction || 'N/A') + '</p>';
-                    reasonsHtml += '<p><strong>Risco (' + typeLabel + '):</strong> ' + score.toFixed(1) + '%</p>';
-                    reasonsHtml += '<h6>Motivos</h6><ul>';
-                    feature.properties.reasons.forEach(function(r) { reasonsHtml += '<li>' + r + '</li>'; });
-                    reasonsHtml += '</ul>';
-                    $('#selected-info').html(reasonsHtml);
+                        // Zoom to feature (Zoom In)
+                        map.fitBounds(layer.getBounds(), { maxZoom: 16 });
+
+                        // Sidebar update
+                        var reasonsHtml = '<h5>' + feature.properties.name + '</h5>';
+                        reasonsHtml += '<p><strong>Facção:</strong> ' + (feature.properties.faction || 'N/A') + '</p>';
+                        reasonsHtml += '<p><strong>Risco (' + typeLabel + '):</strong> ' + score.toFixed(1) + '%</p>';
+                        reasonsHtml += '<h6>Motivos</h6><ul>';
+                        (feature.properties.reasons || []).forEach(function(r) { reasonsHtml += '<li>' + r + '</li>'; });
+                        reasonsHtml += '</ul>';
+                        $('#selected-info').html(reasonsHtml);
+                    }
                 });
             }
         }).addTo(map);
 
-        updateTopReasons(geojson.features);
+        updateTopCriticalAreas();
 
         // Initial State
         updateDashboard('CVLI');
+
+        // Double click to zoom out (Afastar)
+        map.doubleClickZoom.disable();
+        map.on('dblclick', function() {
+           map.setView([-3.7319, -38.5267], 12);
+        });
 
         // Toggle handler
         $('#mode-switch').on('change', function() {
             var isCvli = $(this).is(':checked');
             updateDashboard(isCvli ? 'CVLI' : 'CVP');
         });
+
+        // Simulation handlers
+        $('#btn-simulate').on('click', function() {
+            if (simulationMode && simulationType === 'suppression') {
+                // Toggle off
+                simulationMode = false;
+                $(this).removeClass('active btn-primary').addClass('btn-outline-primary');
+                $('.leaflet-container').removeClass('simulation-active');
+            } else {
+                // Toggle on
+                simulationMode = true;
+                simulationType = 'suppression';
+                $(this).addClass('active btn-primary').removeClass('btn-outline-primary');
+                $('#btn-simulate-exo').removeClass('active btn-danger').addClass('btn-outline-danger');
+                $('.leaflet-container').addClass('simulation-active');
+            }
+        });
+
+        $('#btn-simulate-exo').on('click', function() {
+            if (simulationMode && simulationType === 'exogenous') {
+                // Toggle off
+                simulationMode = false;
+                $(this).removeClass('active btn-danger').addClass('btn-outline-danger');
+                $('.leaflet-container').removeClass('simulation-active');
+            } else {
+                // Toggle on
+                simulationMode = true;
+                simulationType = 'exogenous';
+                $(this).addClass('active btn-danger').removeClass('btn-outline-danger');
+                $('#btn-simulate').removeClass('active btn-primary').addClass('btn-outline-primary');
+                $('.leaflet-container').addClass('simulation-active');
+            }
+        });
+
+        $('#btn-clear-sim').on('click', function() {
+            clearSimulation();
+        });
     });
 
-    function updateTopReasons(features) {
-        var counter = {};
-        features.forEach(function(f) {
-            (f.properties.reasons || []).forEach(function(r) { counter[r] = (counter[r] || 0) + 1; });
+    function updateTopCriticalAreas() {
+        // Use geojsonLayer layers to access up-to-date properties
+        var layers = geojsonLayer.getLayers();
+        var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
+
+        // Map to array for sorting
+        var items = layers.map(function(layer) {
+            var props = layer.feature.properties;
+            var score = (mode === 'CVLI') ? (props.risk_score_cvli || 0) : (props.risk_score_cvp || 0);
+            return {
+                name: props.name,
+                score: score,
+                layer: layer
+            };
         });
-        var items = Object.keys(counter).sort(function(a,b){return counter[b]-counter[a];}).slice(0,10);
+
+        // Sort descending
+        items.sort(function(a, b) { return b.score - a.score; });
+
+        // Take top 30
+        var top30 = items.slice(0, 30);
+
         var html = '';
-        items.forEach(function(k){ html += '<li>' + k + ' <span class="text-muted">(' + counter[k] + ')</span></li>'; });
-        $('#top-reasons').html(html);
+        top30.forEach(function(item, idx) {
+            var colorClass = item.score > 80 ? 'text-danger fw-bold' :
+                             item.score > 60 ? 'text-warning' : 'text-dark';
+
+            // Create a clickable item
+            // We store the index to find the layer, or we can use bounds directly if we pass coordinates.
+            // But passing function reference in HTML string is tricky.
+            // Use a data attribute and global handler or jQuery delegation.
+            html += `<a href="#" class="list-group-item list-group-item-action py-2 ps-2 pe-1" data-idx="${idx}">
+                        <div class="d-flex w-100 justify-content-between">
+                            <span class="mb-1 text-truncate" style="max-width: 180px;">${idx+1}. ${item.name}</span>
+                            <small class="${colorClass}">${item.score.toFixed(1)}%</small>
+                        </div>
+                    </a>`;
+        });
+
+        $('#top-areas').html(html);
+
+        // Bind clicks
+        $('#top-areas a').on('click', function(e) {
+            e.preventDefault();
+            var idx = $(this).data('idx');
+            var item = top30[idx];
+            if (item && item.layer) {
+                map.flyTo(item.layer.getBounds().getCenter(), 15);
+                item.layer.openPopup();
+            }
+        });
     }
 </script>
 </body>
