@@ -22,9 +22,11 @@ class TestAPI(unittest.TestCase):
         response = self.app.get('/api/risk')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertTrue(isinstance(data, list))
-        if len(data) > 0:
-            item = data[0]
+        self.assertIn('data', data)
+        results = data['data']
+        self.assertTrue(isinstance(results, list))
+        if len(results) > 0:
+            item = results[0]
             self.assertIn('risk_score', item)
             self.assertIn('cvli_pred', item)
             self.assertIn('faction', item)
