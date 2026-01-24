@@ -99,6 +99,25 @@ def load_resources():
 
 load_resources()
 
+def format_trend(prediction, history_avg):
+    """
+    Calcula a variação percentual e retorna string descritiva.
+    """
+    if history_avg == 0:
+        if prediction > 0.001:
+            return f"Início de atividade detectada (Surgimento)"
+        else:
+            return "Estabilidade (Baixa Atividade)"
+
+    change_pct = ((prediction - history_avg) / history_avg) * 100
+
+    if change_pct > 10:
+        return f"Tendência de Crescimento (+{change_pct:.1f}%)"
+    elif change_pct < -10:
+        return f"Tendência de Redução ({change_pct:.1f}%)"
+    else:
+        return f"Estabilidade ({change_pct:+.1f}%)"
+
 @app.route('/')
 def index():
     return render_template('index.html')
