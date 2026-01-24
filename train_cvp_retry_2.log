@@ -1,0 +1,9 @@
+21:17:12 INFO: Starting training: window=30, horizon=1, batch=32
+21:17:15 INFO: Preparing dataset...
+21:17:19 INFO: Converting to numpy arrays...
+21:17:23 INFO: Dataset: X=(722, 1, 2378, 30), Y=(722, 2378, 1)
+21:17:23 INFO: Device: cpu
+21:25:37 INFO: Epoch 1/5 | Loss: 0.01364 | Time: 485.5s
+21:30:42 INFO: Epoch 2/5 | Loss: 0.00465 | Time: 304.8s
+21:35:44 INFO: Epoch 3/5 | Loss: 0.00431 | Time: 302.3s
+21:40:27 INFO: Epoch 4/5 | Loss: 0.00427 | Time: 282.5s
