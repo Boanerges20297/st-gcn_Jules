@@ -72,8 +72,8 @@
                 </div>
                 <div class="card-body">
                     <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" id="filter-cvli" checked>
-                        <label class="form-check-label" for="filter-cvli">Priorizar apenas CVLI (mostrar apenas áreas com CVLI)</label>
+                        <input class="form-check-input" type="checkbox" id="mode-switch" checked>
+                        <label class="form-check-label" for="mode-switch" id="mode-label">Modo de Visualização: <strong>CVLI</strong></label>
                     </div>
                     <div id="window-info" class="mb-2">
                         <small class="text-muted">Janela de predição: —</small>
@@ -117,8 +117,12 @@
     }
 
     function style(feature) {
+        // Decide which score to use based on current mode
+        var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
+        var score = (mode === 'CVLI') ? feature.properties.risk_score_cvli : feature.properties.risk_score_cvp;
+
         return {
-            fillColor: getColor(feature.properties.risk_score),
+            fillColor: getColor(score),
             weight: 2,
             opacity: 1,
             color: 'white',
@@ -141,8 +145,51 @@
     };
     legend.addTo(map);
 
+    function formatDate(dateStr) {
+        if (!dateStr) return '?';
+        var parts = dateStr.split('-');
+        if (parts.length === 3) {
+            return parts[2] + '/' + parts[1] + '/' + parts[0];
+        }
+        return dateStr;
+    }
+
     var geojsonLayer = null;
-    var allFeatures = null;
+    var riskDataGlobal = null;
+    var metaDataGlobal = null;
+
+    function updateDashboard(mode) {
+        var label = (mode === 'CVLI') ? 'Modo de Visualização: <strong>CVLI</strong>' : 'Modo de Visualização: <strong>CVP</strong>';
+        $('#mode-label').html(label);
+
+        // Update Window Info
+        var startDate = (mode === 'CVLI') ? metaDataGlobal.start_cvli : metaDataGlobal.start_cvp;
+        var endDate = metaDataGlobal.last_date;
+        var days = (mode === 'CVLI') ? metaDataGlobal.window_cvli : metaDataGlobal.window_cvp;
+
+        var dateText = formatDate(startDate) + ' → ' + formatDate(endDate);
+        $('#window-info').html('<small class="text-muted">Janela de predição: ' + dateText + ' (' + days + ' dias)</small>');
+
+        // Recalculate Stats
+        var highRisk = 0, mediumRisk = 0, lowRisk = 0;
+        riskDataGlobal.forEach(function(item) {
+            var score = (mode === 'CVLI') ? item.risk_score_cvli : item.risk_score_cvp;
+            if (score > 60) highRisk++;
+            else if (score > 20) mediumRisk++;
+            else lowRisk++;
+        });
+
+        $('#high-risk-count').text(highRisk);
+        $('#medium-risk-count').text(mediumRisk);
+        $('#low-risk-count').text(lowRisk);
+
+        // Update Map Style
+        if (geojsonLayer) {
+            geojsonLayer.eachLayer(function(layer) {
+                layer.setStyle(style(layer.feature));
+            });
+        }
+    }
 
     $.when(
         $.getJSON('/api/polygons'),
@@ -150,79 +197,66 @@
     ).done(function(polygonsArgs, riskArgs) {
         var geojson = polygonsArgs[0];
         var riskResp = riskArgs[0];
-        var riskData = riskResp.data || riskResp;
-        var meta = riskResp.meta || null;
-        if (meta) {
-            $('#window-info').html('<small class="text-muted">Janela de predição: ' + meta.window_start + ' → ' + meta.window_end + ' (' + meta.window_size + ' dias)</small>');
-        }
-        var riskMap = {};
-        var highRisk = 0, mediumRisk = 0, lowRisk = 0;
+        riskDataGlobal = riskResp.data || riskResp;
+        metaDataGlobal = riskResp.meta || {};
         
-        riskData.forEach(function(item) {
-            riskMap[item.node_id] = item.risk_score;
-            if (item.risk_score > 60) highRisk++;
-            else if (item.risk_score > 20) mediumRisk++;
-            else lowRisk++;
+        var riskMapCVLI = {};
+        var riskMapCVP = {};
+        
+        riskDataGlobal.forEach(function(item) {
+            riskMapCVLI[item.node_id] = item.risk_score_cvli || 0;
+            riskMapCVP[item.node_id] = item.risk_score_cvp || 0;
         });
-        
-        $('#high-risk-count').text(highRisk);
-        $('#medium-risk-count').text(mediumRisk);
-        $('#low-risk-count').text(lowRisk);
         
         geojson.features.forEach(function(feature, index) {
-            var r = riskData[index] || {};
-            feature.properties.risk_score = riskMap[index] || 0;
+            var r = riskDataGlobal[index] || {};
+            feature.properties.risk_score_cvli = riskMapCVLI[index] || 0;
+            feature.properties.risk_score_cvp = riskMapCVP[index] || 0;
             feature.properties.cvli_pred = (r.cvli_pred !== undefined) ? r.cvli_pred : 0;
+            feature.properties.cvp_pred = (r.cvp_pred !== undefined) ? r.cvp_pred : 0;
             feature.properties.faction = r.faction || feature.properties.faction || null;
             feature.properties.reasons = r.reasons || [];
-            feature.properties.priority_cvli = !!r.priority_cvli;
+            feature.properties.name = feature.properties.name || 'Área ' + index;
         });
 
-        allFeatures = geojson.features;
-
+        // Initialize Map
         geojsonLayer = L.geoJson(geojson, {
             style: style,
             onEachFeature: function(feature, layer) {
-                if (feature.properties) {
-                    var content = `<strong>Área:</strong> ${feature.properties.name || 'Sem nome'}<br>
-                                   <strong>Facção:</strong> ${feature.properties.faction || 'N/A'}<br>
-                                   <hr>
-                                   <strong>Risco CVLI Calculado:</strong> ${feature.properties.risk_score.toFixed(1)}%<br>
-                                   <span class="text-danger">Previsão CVLI (ajustada): ${feature.properties.cvli_pred.toFixed(2)}</span>`;
-                    layer.bindPopup(content);
+                layer.on('click', function() {
+                    // Decide content based on current mode
+                    var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
+                    var score = (mode === 'CVLI') ? feature.properties.risk_score_cvli : feature.properties.risk_score_cvp;
+                    var predVal = (mode === 'CVLI') ? feature.properties.cvli_pred : feature.properties.cvp_pred;
+                    var typeLabel = (mode === 'CVLI') ? 'CVLI' : 'CVP';
 
-                    layer.on('click', function() {
-                        // popular sidebar com motivos
-                        var reasonsHtml = '<h5>' + (feature.properties.name || 'Área') + '</h5>';
-                        reasonsHtml += '<p><strong>Facção:</strong> ' + (feature.properties.faction || 'N/A') + '</p>';
-                        reasonsHtml += '<p><strong>Risco CVLI Amanhã:</strong> ' + feature.properties.risk_score.toFixed(1) + '%</p>';
-                        reasonsHtml += '<h6>Motivos</h6><ul>';
-                        feature.properties.reasons.forEach(function(r) { reasonsHtml += '<li>' + r + '</li>'; });
-                        reasonsHtml += '</ul>';
-                        $('#selected-info').html(reasonsHtml);
-                    });
-                }
+                    var popupContent = `<strong>Área:</strong> ${feature.properties.name}<br>
+                                        <strong>Risco ${typeLabel}:</strong> ${score.toFixed(1)}%<br>
+                                        <span class="text-danger">Predição Bruta: ${predVal.toFixed(3)}</span>`;
+
+                    layer.bindPopup(popupContent).openPopup();
+
+                    // Sidebar update
+                    var reasonsHtml = '<h5>' + feature.properties.name + '</h5>';
+                    reasonsHtml += '<p><strong>Facção:</strong> ' + (feature.properties.faction || 'N/A') + '</p>';
+                    reasonsHtml += '<p><strong>Risco (' + typeLabel + '):</strong> ' + score.toFixed(1) + '%</p>';
+                    reasonsHtml += '<h6>Motivos</h6><ul>';
+                    feature.properties.reasons.forEach(function(r) { reasonsHtml += '<li>' + r + '</li>'; });
+                    reasonsHtml += '</ul>';
+                    $('#selected-info').html(reasonsHtml);
+                });
             }
         }).addTo(map);
 
-        updateTopReasons(allFeatures);
+        updateTopReasons(geojson.features);
+
+        // Initial State
+        updateDashboard('CVLI');
 
         // Toggle handler
-        $('#filter-cvli').on('change', function() {
-            var onlyCvli = $(this).is(':checked');
-            geojsonLayer.eachLayer(function(layer) {
-                var p = layer.feature.properties;
-                if (onlyCvli) {
-                    // mostrar apenas áreas com CVLI (escurecer as outras)
-                    if (!p.priority_cvli) {
-                        layer.setStyle({fillOpacity:0.15, opacity:0.3, color:'#cccccc'});
-                    } else {
-                        layer.setStyle(style(layer.feature));
-                    }
-                } else {
-                    layer.setStyle(style(layer.feature));
-                }
-            });
+        $('#mode-switch').on('change', function() {
+            var isCvli = $(this).is(':checked');
+            updateDashboard(isCvli ? 'CVLI' : 'CVP');
         });
     });
 
