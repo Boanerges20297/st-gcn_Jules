@@ -9,24 +9,16 @@ foreach ($remote in $branches) {
         Write-Host "Conflicts for $remote"
         $conflicts = git diff --name-only --diff-filter=U
         foreach ($f in $conflicts) {
-            Write-Host "Resolving $f"
-            $mainTime = [int](git log -1 --format=%ct main)
-            $remoteTime = [int](git log -1 --format=%ct $remote)
-            if ($remoteTime -gt $mainTime) {
-                Write-Host "Choosing theirs (newer) for $f"
-                git checkout --theirs -- $f
-            } else {
-                Write-Host "Choosing ours (main) for $f"
-                git checkout --ours -- $f
-            }
+            Write-Host "Resolving $f - preferring incoming (theirs)"
+            git checkout --theirs -- $f
             git add $f
         }
         git rm --cached --ignore-unmatch src/__pycache__/model.cpython-312.pyc
-        git commit -m "Merge $remote — auto-resolve conflicts preferring newest branch"
+        git commit -m "Merge $remote - auto-resolve conflicts preferring incoming"
         git push
     } else {
         Write-Host "Merged cleanly: $remote"
-        git commit -m "Merge $remote — merged cleanly" 2>$null
+        git commit -m "Merge $remote - merged cleanly" 2>$null
         git push
     }
 }
