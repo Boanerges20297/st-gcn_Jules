@@ -115,12 +115,11 @@ def get_risk():
         out_cvli = np.zeros((node_features.shape[0], 1))
         if model_cvli:
             # Pegar últimos 30 dias da feature 0 (CVLI)
-            # node_features shape: (N, T, F) -> queremos (N, 30, 1)
             if node_features.shape[1] >= WINDOW_CVLI:
                 input_cvli = node_features[:, -WINDOW_CVLI:, 0:1]
                 input_tensor = torch.FloatTensor(input_cvli).permute(2, 0, 1).unsqueeze(0).to(device)
                 with torch.no_grad():
-                    pred = model_cvli(input_tensor, norm_adj) # (1, N, 1)
+                    pred = model_cvli(input_tensor, norm_adj)
                 out_cvli = pred.squeeze(0).cpu().numpy()
             else:
                 print("AVISO: Dados insuficientes para janela CVLI")
@@ -133,31 +132,38 @@ def get_risk():
                 input_cvp = node_features[:, -WINDOW_CVP:, 1:2]
                 input_tensor = torch.FloatTensor(input_cvp).permute(2, 0, 1).unsqueeze(0).to(device)
                 with torch.no_grad():
-                    pred = model_cvp(input_tensor, norm_adj) # (1, N, 1)
+                    pred = model_cvp(input_tensor, norm_adj)
                 out_cvp = pred.squeeze(0).cpu().numpy()
             else:
                 print("AVISO: Dados insuficientes para janela CVP")
 
-        # Combinar: Col 0 = CVLI, Col 1 = CVP
-        prediction = np.concatenate([out_cvli, out_cvp], axis=1) # (N, 2)
+        # Processamento CVLI
+        out_cvli = np.maximum(out_cvli, 0)
+        cvli_raw = out_cvli[:, 0]
 
-        # Calcular Índice de Risco baseado APENAS em CVLI (Lógica anterior mantida/adaptada)
-        prediction = np.maximum(prediction, 0)
-        cvli_raw = prediction[:, 0]
+        # Aumentar sensibilidade de CVLI em 50% (solicitado: 1.5x)
+        cvli_adj = cvli_raw * 1.5
 
-        # Aumentar sensibilidade de CVLI em 20%
-        cvli_adj = cvli_raw * 1.2
-        # Usar apenas CVLI ajustado como risco bruto
-        risk_score = cvli_adj
+        # Normalizar CVLI (0-100)
+        min_cvli = np.min(cvli_adj)
+        shifted_cvli = cvli_adj - min_cvli
+        max_shift_cvli = np.max(shifted_cvli) if np.max(shifted_cvli) > 0 else 1
+        normalized_risk_cvli = (shifted_cvli / max_shift_cvli) * 100
 
-        # Normalizar Risco
-        min_risk = np.min(risk_score)
-        shifted = risk_score - min_risk
-        max_shift = np.max(shifted) if np.max(shifted) > 0 else 1
-        normalized_risk = (shifted / max_shift) * 100
+        # Processamento CVP
+        out_cvp = np.maximum(out_cvp, 0)
+        cvp_raw = out_cvp[:, 0]
+
+        # Normalizar CVP (0-100)
+        # Sem multiplicador de sensibilidade extra solicitado, mantendo raw
+        min_cvp = np.min(cvp_raw)
+        shifted_cvp = cvp_raw - min_cvp
+        max_shift_cvp = np.max(shifted_cvp) if np.max(shifted_cvp) > 0 else 1
+        normalized_risk_cvp = (shifted_cvp / max_shift_cvp) * 100
 
         # Construir resposta
         results = []
+
         # Conectividade
         try:
             conn = np.array(adj_matrix).sum(axis=1)
@@ -166,36 +172,42 @@ def get_risk():
             conn = None
             conn_mean = 0
 
-        # Percentil
+        # Percentil para flag de prioridade (baseado em CVLI)
         try:
-            cutoff = float(np.percentile(normalized_risk, 95))
+            cutoff_cvli = float(np.percentile(normalized_risk_cvli, 90)) # Ajustado para 90th
         except Exception:
-            cutoff = 90.0
+            cutoff_cvli = 80.0
 
-        for i, score in enumerate(normalized_risk):
-            cvli = float(cvli_adj[i])
-            cvp_val = float(prediction[i, 1])
+        for i in range(len(normalized_risk_cvli)):
+            cvli_score = float(normalized_risk_cvli[i])
+            cvp_score = float(normalized_risk_cvp[i])
+
+            cvli_val = float(cvli_adj[i])
+            cvp_val = float(cvp_raw[i])
+
             reasons = []
-            if cvli > 0 or score > 0:
-                reasons.append(f'Previsão CVLI (ajustada +20%): {cvli:.3f}')
-            if cvp_val > 0:
-                 pass # Opcional: Adicionar razão sobre CVP se desejar
+            if cvli_val > 0 or cvli_score > 0:
+                reasons.append(f'CVLI Previsto (sensib. +50%): {cvli_val:.3f}')
 
-            if cvli == 0 and score == 0:
-                reasons.append('CVLI ausente ou insignificante')
+            if cvp_val > 0 or cvp_score > 0:
+                reasons.append(f'CVP Previsto: {cvp_val:.3f}')
+
+            if cvli_val == 0 and cvp_val == 0:
+                reasons.append('Sem atividade prevista significativa')
 
             if conn is not None and conn_mean > 0 and conn[i] > conn_mean * 1.5:
-                reasons.append('Área com alta conectividade (vizinhança densa)')
+                reasons.append('Área com alta conectividade')
 
             results.append({
                 'node_id': int(i),
-                'risk_score': float(score),
-                'cvli_pred': cvli,
-                # Adicionando CVP pred apenas se útil, mas dashboard usa o que retorna
+                'risk_score': cvli_score, # Default legacy
+                'risk_score_cvli': cvli_score,
+                'risk_score_cvp': cvp_score,
+                'cvli_pred': cvli_val,
                 'cvp_pred': cvp_val,
                 'faction': nodes_gdf.iloc[i].get('faction') if 'faction' in nodes_gdf.columns else None,
                 'reasons': reasons,
-                'priority_cvli': bool(score >= cutoff)
+                'priority_cvli': bool(cvli_score >= cutoff_cvli)
             })
 
         # Meta info
@@ -206,11 +218,18 @@ def get_risk():
         if dates is not None and len(dates) > 0:
             last_date_obj = pd.to_datetime(dates[-1])
             meta['last_date'] = str(last_date_obj.date())
-            # For backward compatibility with UI that expects a window_start (using CVLI window as reference)
+            # Calculate start dates for both windows
             if len(dates) >= WINDOW_CVLI:
-                start_date_obj = pd.to_datetime(dates[-WINDOW_CVLI])
-                meta['window_start'] = str(start_date_obj.date())
-                meta['window_end'] = str(last_date_obj.date())
+                start_cvli = pd.to_datetime(dates[-WINDOW_CVLI])
+                meta['start_cvli'] = str(start_cvli.date())
+            if len(dates) >= WINDOW_CVP:
+                start_cvp = pd.to_datetime(dates[-WINDOW_CVP])
+                meta['start_cvp'] = str(start_cvp.date())
+
+            # Legacy fields for default CVLI view
+            if 'start_cvli' in meta:
+                meta['window_start'] = meta['start_cvli']
+                meta['window_end'] = meta['last_date']
 
         return jsonify({'meta': meta, 'data': results})
     except Exception as e:
