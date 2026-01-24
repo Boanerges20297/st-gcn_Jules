@@ -162,13 +162,12 @@ def simulate_risk():
     try:
         data = request.get_json()
         points = data.get('points', [])
+        sim_type = data.get('type', 'suppression') # 'suppression' or 'exogenous'
 
         # Copiar matriz original
         adj_copy = copy.deepcopy(adj_matrix)
 
         # Encontrar nós afetados e modificar pesos
-        # Assumindo que a presença da equipe (moto) suprime a difusão de risco
-        # Reduzindo pesos das arestas conectadas aos nós próximos
 
         centroids = nodes_gdf.geometry.centroid
 
@@ -185,22 +184,24 @@ def simulate_risk():
                 dists = centroids.distance(p)
                 nearest_idx = dists.idxmin()
 
-                # Raio de efeito? Ou apenas o nó mais próximo?
-                # Vamos afetar o nó mais próximo e seus vizinhos imediatos (distância grafo = 1)
+                if sim_type == 'suppression':
+                    # Reduzir pesos de entrada e saída para isolar o nó (containment)
+                    # Fator de supressão
+                    suppression_factor = 0.1
 
-                # Reduzir pesos de entrada e saída para isolar o nó (containment)
-                # Fator de supressão
-                suppression_factor = 0.1
+                    # Linha nearest_idx (outbound) e Coluna nearest_idx (inbound)
+                    adj_copy[nearest_idx, :] *= suppression_factor
+                    adj_copy[:, nearest_idx] *= suppression_factor
 
-                # Linha nearest_idx (outbound) e Coluna nearest_idx (inbound)
-                adj_copy[nearest_idx, :] *= suppression_factor
-                adj_copy[:, nearest_idx] *= suppression_factor
+                elif sim_type == 'exogenous':
+                    # Simular evento exógeno (e.g., conflito de facção)
+                    # Aumentar conectividade/difusão para espalhar risco
+                    amplification_factor = 5.0
 
-                # Opcional: Afetar vizinhos geométricos
-                # neighbors = dists[dists < 0.005].index.tolist() # ~500m
-                # for n_idx in neighbors:
-                #    adj_copy[n_idx, :] *= 0.5
-                #    adj_copy[:, n_idx] *= 0.5
+                    # Aumentar pesos de saída (influência do nó nos outros)
+                    adj_copy[nearest_idx, :] *= amplification_factor
+                    # Aumentar pesos de entrada (influência dos outros no nó - retroalimentação)
+                    adj_copy[:, nearest_idx] *= amplification_factor
 
         # Re-normalizar matriz
         adj_tensor = torch.FloatTensor(adj_copy)
@@ -300,6 +301,8 @@ def calculate_risk(custom_norm_adj=None):
         # CVP
         out_cvp = np.maximum(out_cvp, 0)
         cvp_raw = out_cvp[:, 0]
+        # Aumentar sensibilidade CVP conforme solicitado (era 1.0)
+        cvp_raw = cvp_raw * 1.5
 
         min_cvp = np.min(cvp_raw)
         shifted_cvp = cvp_raw - min_cvp

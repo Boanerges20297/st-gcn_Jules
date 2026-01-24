@@ -82,9 +82,14 @@
                     </div>
 
                     <div class="d-grid gap-2 mb-3">
-                        <button class="btn btn-outline-primary btn-sm" id="btn-simulate">
-                            <i class="fas fa-motorcycle"></i> Simular Equipe
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-outline-primary btn-sm" id="btn-simulate">
+                                <i class="fas fa-motorcycle"></i> Equipe
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" id="btn-simulate-exo">
+                                <i class="fas fa-radiation"></i> Conflito
+                            </button>
+                        </div>
                         <button class="btn btn-outline-secondary btn-sm d-none" id="btn-clear-sim">
                             <i class="fas fa-undo"></i> Limpar Simulação
                         </button>
@@ -118,6 +123,13 @@
         subdomains: 'abcd',
         maxZoom: 19
     }).addTo(map);
+
+    // Global Map Click for Simulation (handling gaps between polygons)
+    map.on('click', function(e) {
+        if (simulationMode) {
+            addSimulationPoint(e.latlng);
+        }
+    });
 
     function getColor(d) {
         return d > 80 ? '#800026' :
@@ -179,10 +191,19 @@
 
     // Simulation State
     var simulationMode = false;
+    var simulationType = 'suppression'; // 'suppression' or 'exogenous'
     var simulationPoints = [];
     var simMarkers = [];
+
     var motorIcon = L.divIcon({
         html: '<i class="fas fa-motorcycle fa-2x" style="color: blue; text-shadow: 2px 2px 4px white;"></i>',
+        className: 'custom-div-icon',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+    });
+
+    var conflictIcon = L.divIcon({
+        html: '<i class="fas fa-radiation fa-2x" style="color: red; text-shadow: 2px 2px 4px white;"></i>',
         className: 'custom-div-icon',
         iconSize: [30, 30],
         iconAnchor: [15, 15]
@@ -226,7 +247,8 @@
     }
 
     function addSimulationPoint(latlng) {
-        var marker = L.marker(latlng, {icon: motorIcon}).addTo(map);
+        var icon = (simulationType === 'suppression') ? motorIcon : conflictIcon;
+        var marker = L.marker(latlng, {icon: icon}).addTo(map);
         simMarkers.push(marker);
         simulationPoints.push([latlng.lat, latlng.lng]);
 
@@ -235,7 +257,7 @@
             url: '/api/simulate',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ points: simulationPoints }),
+            data: JSON.stringify({ points: simulationPoints, type: simulationType }),
             success: function(resp) {
                 if(resp.data) {
                     riskDataGlobal = resp.data;
@@ -361,6 +383,7 @@
                 // Click handler
                 layer.on('click', function(e) {
                     if (simulationMode) {
+                        L.DomEvent.stopPropagation(e); // Prevent map click from firing twice
                         addSimulationPoint(e.latlng);
                     } else {
                         // Show Popup & Info
@@ -397,6 +420,9 @@
                             .setContent(popupContent)
                             .openOn(map);
 
+                        // Zoom to feature (Zoom In)
+                        map.fitBounds(layer.getBounds(), { maxZoom: 16 });
+
                         // Sidebar update
                         var reasonsHtml = '<h5>' + feature.properties.name + '</h5>';
                         reasonsHtml += '<p><strong>Facção:</strong> ' + (feature.properties.faction || 'N/A') + '</p>';
@@ -415,6 +441,12 @@
         // Initial State
         updateDashboard('CVLI');
 
+        // Double click to zoom out (Afastar)
+        map.doubleClickZoom.disable();
+        map.on('dblclick', function() {
+           map.setView([-3.7319, -38.5267], 12);
+        });
+
         // Toggle handler
         $('#mode-switch').on('change', function() {
             var isCvli = $(this).is(':checked');
@@ -423,13 +455,34 @@
 
         // Simulation handlers
         $('#btn-simulate').on('click', function() {
-            simulationMode = !simulationMode;
-            if (simulationMode) {
-                $(this).addClass('active btn-primary').removeClass('btn-outline-primary');
-                $('.leaflet-container').addClass('simulation-active');
-            } else {
+            if (simulationMode && simulationType === 'suppression') {
+                // Toggle off
+                simulationMode = false;
                 $(this).removeClass('active btn-primary').addClass('btn-outline-primary');
                 $('.leaflet-container').removeClass('simulation-active');
+            } else {
+                // Toggle on
+                simulationMode = true;
+                simulationType = 'suppression';
+                $(this).addClass('active btn-primary').removeClass('btn-outline-primary');
+                $('#btn-simulate-exo').removeClass('active btn-danger').addClass('btn-outline-danger');
+                $('.leaflet-container').addClass('simulation-active');
+            }
+        });
+
+        $('#btn-simulate-exo').on('click', function() {
+            if (simulationMode && simulationType === 'exogenous') {
+                // Toggle off
+                simulationMode = false;
+                $(this).removeClass('active btn-danger').addClass('btn-outline-danger');
+                $('.leaflet-container').removeClass('simulation-active');
+            } else {
+                // Toggle on
+                simulationMode = true;
+                simulationType = 'exogenous';
+                $(this).addClass('active btn-danger').removeClass('btn-outline-danger');
+                $('#btn-simulate').removeClass('active btn-primary').addClass('btn-outline-primary');
+                $('.leaflet-container').addClass('simulation-active');
             }
         });
 
