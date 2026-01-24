@@ -1,3 +1,5 @@
+import time
+import logging
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -8,13 +10,24 @@ from src.model import STGCN
 from torch.utils.data import DataLoader, TensorDataset
 
 DATA_FILE = 'data/processed_graph_data.pkl'
-MODEL_PATH = 'models/stgcn_model.pth'
+MODEL_DIR = 'models'
+MODEL_PATH = os.path.join(MODEL_DIR, 'stgcn_model.pth')
 HISTORY_WINDOW = 7
 BATCH_SIZE = 32
 EPOCHS = 2
 LEARNING_RATE = 0.001
 
-LOSS_WEIGHTS = torch.tensor([5.0, 1.0]) 
+LOSS_WEIGHTS = torch.tensor([5.0, 1.0])
+
+
+def get_logger():
+    logger = logging.getLogger('train')
+    if not logger.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s', '%H:%M:%S'))
+        logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+    return logger
 
 def prepare_dataset(node_features):
     num_nodes, num_timesteps, num_features = node_features.shape
@@ -32,10 +45,11 @@ def weighted_mse_loss(input, target, weights):
     return torch.mean(weighted_sq_diff)
 
 def main():
-    if not os.path.exists('models'):
-        os.makedirs('models')
+    logger = get_logger()
+    if not os.path.exists(MODEL_DIR):
+        os.makedirs(MODEL_DIR)
 
-    print("Carregando dados...")
+    logger.info("Carregando dados...")
     with open(DATA_FILE, 'rb') as f:
         data_pack = pickle.load(f)
         
@@ -49,14 +63,14 @@ def main():
     d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
     norm_adj = torch.mm(torch.mm(d_mat_inv_sqrt, adj_tensor), d_mat_inv_sqrt)
     
-    print("Criando janelas temporais...")
+    logger.info("Criando janelas temporais...")
     X, Y = prepare_dataset(node_features)
     
     split_idx = int(len(X) * 0.7)
     X_train, X_val = X[:split_idx], X[split_idx:]
     Y_train, Y_val = Y[:split_idx], Y[split_idx:]
     
-    print(f"Treino: {X_train.shape}, Validação: {X_val.shape}")
+    logger.info(f"Treino: {X_train.shape}, Validação: {X_val.shape}")
     
     train_data = TensorDataset(torch.FloatTensor(X_train), torch.FloatTensor(Y_train))
     val_data = TensorDataset(torch.FloatTensor(X_val), torch.FloatTensor(Y_val))
@@ -65,7 +79,7 @@ def main():
     val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=False)
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f"Usando dispositivo: {device}")
+    logger.info(f"Usando dispositivo: {device}")
     
     num_nodes = node_features.shape[0]
     num_features = node_features.shape[2]
@@ -76,11 +90,14 @@ def main():
     
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     
-    print("Iniciando treinamento...")
+    logger.info("Iniciando treinamento...")
     for epoch in range(EPOCHS):
+        epoch_start = time.time()
         model.train()
-        train_loss = 0
-        for batch_x, batch_y in train_loader:
+        train_loss = 0.0
+        batch_times = []
+        for batch_idx, (batch_x, batch_y) in enumerate(train_loader, 1):
+            t0 = time.time()
             batch_x, batch_y = batch_x.to(device), batch_y.to(device)
             optimizer.zero_grad()
             output = model(batch_x, norm_adj)
@@ -88,20 +105,36 @@ def main():
             loss.backward()
             optimizer.step()
             train_loss += loss.item()
-            
+            bt = time.time() - t0
+            batch_times.append(bt)
+            # log every 10 batches
+            if batch_idx % 10 == 0 or batch_idx == len(train_loader):
+                avg_bt = sum(batch_times)/len(batch_times)
+                batches_left = len(train_loader) - batch_idx
+                eta = batches_left * avg_bt
+                logger.info(f'Epoch {epoch+1} Batch {batch_idx}/{len(train_loader)} - batch_loss={loss.item():.6f} ETA={eta:.1f}s')
+
         model.eval()
-        val_loss = 0
+        val_loss = 0.0
         with torch.no_grad():
-            for batch_x, batch_y in val_loader:
+            for batch_idx, (batch_x, batch_y) in enumerate(val_loader, 1):
                 batch_x, batch_y = batch_x.to(device), batch_y.to(device)
                 output = model(batch_x, norm_adj)
                 loss = weighted_mse_loss(output, batch_y, loss_weights)
                 val_loss += loss.item()
-                
-        print(f"Epoch {epoch+1}/{EPOCHS} | Train Loss: {train_loss/len(train_loader):.4f} | Val Loss: {val_loss/len(val_loader):.4f}")
+
+        epoch_time = time.time() - epoch_start
+        train_avg = train_loss / len(train_loader) if len(train_loader) else 0
+        val_avg = val_loss / len(val_loader) if len(val_loader) else 0
+        logger.info(f"Epoch {epoch+1}/{EPOCHS} completed in {epoch_time:.1f}s | Train Loss: {train_avg:.6f} | Val Loss: {val_avg:.6f}")
+        # save per-epoch checkpoint
+        epoch_path = os.path.join(MODEL_DIR, f'stgcn_epoch_{epoch+1}.pth')
+        torch.save(model.state_dict(), epoch_path)
+        logger.info(f'Checkpoint saved: {epoch_path}')
         
+    # final save
     torch.save(model.state_dict(), MODEL_PATH)
-    print(f"Modelo salvo em {MODEL_PATH}")
+    logger.info(f"Modelo salvo em {MODEL_PATH}")
 
 if __name__ == "__main__":
     main()

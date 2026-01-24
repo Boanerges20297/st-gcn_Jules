@@ -9,9 +9,10 @@ from src.model import STGCN
 
 app = Flask(__name__)
 
-# Configuração e Carregamento de Dados
-DATA_FILE = 'data/processed/processed_graph_data.pkl'
-MODEL_PATH = 'models/stgcn_model.pth'
+# Configuração e Carregamento de Dados (usar caminhos absolutos relativos a este arquivo)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_FILE = os.path.join(BASE_DIR, 'data', 'processed', 'processed_graph_data.pkl')
+MODEL_PATH = os.path.join(BASE_DIR, 'models', 'stgcn_model.pth')
 
 # Valores padrão caso arquivos não estejam presentes — evita NameError nas rotas
 nodes_gdf = None
@@ -42,8 +43,18 @@ try:
         num_nodes = node_features.shape[0]
         num_features = node_features.shape[2]
 
+        # Carregar state_dict primeiro para inspecionar a arquitetura treinada
+        state_dict = torch.load(MODEL_PATH, map_location=device)
+        
+        # Tentar inferir history_window do tamanho do kernel da camada conv_final
+        # conv_final.weight shape: (out_channels, in_channels, kernel_h, kernel_w)
+        # Onde kernel_w é o time_steps (history_window)
+        if 'conv_final.weight' in state_dict:
+            history_window = state_dict['conv_final.weight'].shape[3]
+            print(f"Detectado history_window={history_window} do arquivo de modelo.")
+
         model = STGCN(num_nodes=num_nodes, in_channels=num_features, time_steps=history_window)
-        model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
+        model.load_state_dict(state_dict)
         model.to(device)
         model.eval()
 
@@ -110,9 +121,11 @@ def get_risk():
         # Usar apenas CVLI ajustado como risco bruto
         risk_score = cvli_adj
 
-        # Normalizar Risco
-        max_risk = np.max(risk_score) if np.max(risk_score) > 0 else 1
-        normalized_risk = (risk_score / max_risk) * 100
+        # Normalizar Risco: shift para positivo antes de normalizar (lida com previsões negativas)
+        min_risk = np.min(risk_score)
+        shifted = risk_score - min_risk
+        max_shift = np.max(shifted) if np.max(shifted) > 0 else 1
+        normalized_risk = (shifted / max_shift) * 100
 
         # Construir razões de risco e sinalizadores de prioridade
         results = []
@@ -124,11 +137,16 @@ def get_risk():
             conn = None
             conn_mean = 0
 
+        # prioridade baseada em percentil (top 5%) para destacar territórios críticos
+        try:
+            cutoff = float(np.percentile(normalized_risk, 95))
+        except Exception:
+            cutoff = 90.0
+
         for i, score in enumerate(normalized_risk):
             cvli = float(cvli_adj[i])
-            # não considerar CVP — somente CVLI gera razões
             reasons = []
-            if cvli > 0.01:
+            if cvli > 0 or score > 0:
                 reasons.append(f'Previsão CVLI (ajustada +20%): {cvli:.3f}')
             else:
                 reasons.append('CVLI ausente ou insignificante')
@@ -141,7 +159,7 @@ def get_risk():
                 'cvli_pred': cvli,
                 'faction': nodes_gdf.iloc[i].get('faction') if 'faction' in nodes_gdf.columns else None,
                 'reasons': reasons,
-                'priority_cvli': bool(cvli > 0.01)
+                'priority_cvli': bool(score >= cutoff)
             })
 
         # meta info: janela usada
@@ -163,4 +181,4 @@ def get_risk():
         return jsonify({'error': f'Erro ao calcular risco: {e}'}), 500
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
