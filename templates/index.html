@@ -630,28 +630,43 @@
                             simulationPoints.push(latlng);
                         });
 
-                        // Trigger Simulation Update
-                        showLoading('Recalculando Criticidade...', 'Projetando risco com novos eventos exógenos.');
+        // SAVE changes permanently (as requested)
+                        showLoading('Registrando e Adaptando Malha...', 'Salvando eventos e recalculando modelo global.');
+
                         $.ajax({
-                            url: '/api/simulate',
+                            url: '/api/exogenous/save',
                             type: 'POST',
                             contentType: 'application/json',
-                            data: JSON.stringify({ points: simulationPoints, type: simulationType }),
-                            success: function(simResp) {
-                                if(simResp.data) {
-                                    riskDataGlobal = simResp.data;
-                                    updateRiskMap(riskDataGlobal);
-                                    var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
-                                    updateDashboard(mode);
-                                    alert(resp.points.length + ' eventos processados e mapeados com sucesso.\nRisco reavaliado.');
-                                }
+                            data: JSON.stringify({
+                                points: resp.points,
+                                original_text: text
+                            }),
+                            success: function(saveResp) {
+                                // Clear Form
+                                $('#ciops-text').val('');
+
+                                // Refresh Risk Data from Server (since server reloaded model)
+                                $.getJSON('/api/risk', function(riskResp) {
+                                     riskDataGlobal = riskResp.data || riskResp;
+                                     updateRiskMap(riskDataGlobal);
+                                     var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
+                                     updateDashboard(mode);
+
+                                     hideLoading();
+                                     alert('Eventos salvos com sucesso!\nA malha foi adaptada permanentemente e o risco recalculado.');
+
+                                     // Add markers visual feedback for this session
+                                     resp.points.forEach(function(pt) {
+                                        L.marker([pt.lat, pt.lng], {icon: conflictIcon})
+                                            .bindPopup('<strong>Evento Exógeno (Salvo)</strong><br>' + pt.description)
+                                            .addTo(map);
+                                     });
+                                });
                             },
                             error: function(err) {
-                                console.error("Simulation error", err);
-                                alert("Erro ao recalcular risco: " + err.statusText);
-                            },
-                            complete: function() {
                                 hideLoading();
+                                console.error("Save error", err);
+                                alert("Erro ao salvar eventos: " + err.statusText);
                             }
                         });
 
@@ -698,13 +713,19 @@
             var colorClass = item.score > 80 ? 'text-danger fw-bold' :
                              item.score > 60 ? 'text-warning' : 'text-dark';
 
+            // Region Display logic (Show city if not Fortaleza)
+            var props = item.layer.feature.properties;
+            var regionSuffix = '';
+            if (props.CIDADE && props.CIDADE !== 'Fortaleza' && props.CIDADE !== 'RMF/Interior') {
+                regionSuffix = ' - <small class="text-muted">' + props.CIDADE + '</small>';
+            }
+
             // Create a clickable item
-            // We store the index to find the layer, or we can use bounds directly if we pass coordinates.
-            // But passing function reference in HTML string is tricky.
-            // Use a data attribute and global handler or jQuery delegation.
             html += `<a href="#" class="list-group-item list-group-item-action py-2 ps-2 pe-1" data-idx="${idx}">
                         <div class="d-flex w-100 justify-content-between">
-                            <span class="mb-1 text-truncate" style="max-width: 180px;">${idx+1}. ${item.name}</span>
+                            <span class="mb-1 text-truncate" style="max-width: 180px;">
+                                ${idx+1}. ${item.name}${regionSuffix}
+                            </span>
                             <small class="${colorClass}">${item.score.toFixed(1)}%</small>
                         </div>
                     </a>`;
