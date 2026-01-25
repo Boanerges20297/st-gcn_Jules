@@ -819,7 +819,10 @@ def save_exogenous():
         current_events = []
         if os.path.exists(EXOGENOUS_FILE):
              with open(EXOGENOUS_FILE, 'r', encoding='utf-8') as f:
-                 current_events = json.load(f)
+                 try:
+                     current_events = json.load(f)
+                 except json.JSONDecodeError:
+                     current_events = []
 
         current_events.append(new_entry)
 
