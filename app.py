@@ -6,6 +6,7 @@ import torch
 import numpy as np
 import os
 import copy
+import re
 from shapely.geometry import shape, Point, Polygon
 from src.model import STGCN
 
@@ -28,12 +29,32 @@ device = None
 norm_adj = None
 dates = None
 
+# Static Data Cache
+ibge_bairros_cache = None
+ibge_municipios_cache = None
+
 # Parâmetros de janela
 WINDOW_CVLI = 180
 WINDOW_CVP = 30
 
 def load_data_and_models():
     global nodes_gdf, nodes_gdf_proj, adj_matrix, node_features, model_cvli, model_cvp, device, norm_adj, dates
+    global ibge_bairros_cache, ibge_municipios_cache
+
+    # Load Static Data
+    try:
+        import json
+        static_file = os.path.join(BASE_DIR, 'data', 'static', 'fortaleza_bairros_coords.json')
+        if os.path.exists(static_file):
+            with open(static_file, 'r', encoding='utf-8') as f:
+                ibge_bairros_cache = json.load(f)
+
+        static_file_mun = os.path.join(BASE_DIR, 'data', 'static', 'ceara_municipios_coords.json')
+        if os.path.exists(static_file_mun):
+            with open(static_file_mun, 'r', encoding='utf-8') as f:
+                ibge_municipios_cache = json.load(f)
+    except Exception as e:
+        print(f"Erro ao carregar dados estáticos: {e}")
 
     if not os.path.exists(DATA_FILE):
         print("AVISO: Arquivo de dados não encontrado. Execute o processamento de dados.")
@@ -497,6 +518,142 @@ def enrich_regions():
         if not val or len(str(val)) < 2:
             reg = get_region_name(row, row.geometry)
             nodes_gdf.at[idx, 'CIDADE'] = reg
+
+def parse_ciops_text(text):
+    events = []
+    lines = text.strip().split('\n')
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+
+        # Format: 01 - ID - TEAM - OFFICER - NATURE - INVOLVEMENT - LOCATION (AIS) - DP - TIME
+        # Split by ' - '
+        parts = line.split(' - ')
+        if len(parts) >= 7:
+            # Heuristic: Index 4 is nature, Index 6 is location
+            nature = parts[4].strip()
+            location = parts[6].strip()
+
+            # Clean location: remove (AIS...)
+            location = re.sub(r'\s*\(AIS\d+\)', '', location)
+
+            events.append({
+                'nature': nature,
+                'location': location,
+                'raw': line
+            })
+
+    return events
+
+def find_node_coordinates(location_str):
+    if nodes_gdf is None:
+        return None
+
+    # Normalize input
+    loc_norm = location_str.lower()
+
+    # Strategy: Check if any node name is contained in the location string
+    best_match = None
+    best_match_len = 0
+
+    for idx, row in nodes_gdf.iterrows():
+        name = str(row['name']).lower()
+        if not name or len(name) < 3:
+            continue
+
+        # Check if node name is in input location (e.g. "Timbó" in "Timbó, Maracanaú")
+        # OR if input location is in node name (e.g. "Moura Brasil" in "Morro ... Moura Brasil")
+        if name in loc_norm:
+            if len(name) > best_match_len:
+                best_match = row
+                best_match_len = len(name)
+        elif loc_norm in name and len(loc_norm) > 4: # Avoid short inputs matching long descriptions incorrectly
+             # If input is substring of node name, we consider it a match too.
+             # We prioritize the match length of the *matching segment*.
+             # Here let's just accept it if we haven't found a better one.
+             if len(loc_norm) > best_match_len:
+                best_match = row
+                best_match_len = len(loc_norm)
+
+    if best_match is not None:
+        centroid = best_match.geometry.centroid
+        return (centroid.y, centroid.x) # lat, lon
+
+    # Fallback 2: IBGE Neighborhoods Static List (Cached)
+    if ibge_bairros_cache:
+        try:
+            for bairro, coords in ibge_bairros_cache.items():
+                if bairro.lower() in loc_norm:
+                    return (coords[0], coords[1])
+        except Exception as e:
+             print(f"Erro no fallback IBGE Bairros: {e}")
+
+    # Fallback 3: Ceará Municipalities Static List (Cached)
+    if ibge_municipios_cache:
+        try:
+            for municipio, coords in ibge_municipios_cache.items():
+                if municipio.lower() in loc_norm:
+                    return (coords[0], coords[1])
+        except Exception as e:
+             print(f"Erro no fallback IBGE Municípios: {e}")
+
+    # Fallback 4: Loose City Search (Word matching)
+    # Checks if any word in the input strictly matches a known city key
+    if ibge_municipios_cache:
+        try:
+             import re
+             words = re.findall(r'\b\w+\b', loc_norm)
+             for word in words:
+                 if len(word) < 4: continue
+                 for mun, coords in ibge_municipios_cache.items():
+                     if mun.lower() == word:
+                         return (coords[0], coords[1])
+        except Exception as e:
+            print(f"Erro no fallback loose city: {e}")
+
+    # Fallback 5: Geometric Centroid from nodes_gdf (Last Resort)
+    # Search for known Cities in GDF
+    if 'CIDADE' in nodes_gdf.columns:
+        known_cities = nodes_gdf['CIDADE'].unique()
+        for city in known_cities:
+            if not isinstance(city, str) or len(city) < 3: continue
+
+            if city.lower() in loc_norm:
+                city_nodes = nodes_gdf[nodes_gdf['CIDADE'] == city]
+                if not city_nodes.empty:
+                    city_centroid_x = city_nodes.geometry.centroid.x.mean()
+                    city_centroid_y = city_nodes.geometry.centroid.y.mean()
+                    return (city_centroid_y, city_centroid_x)
+
+    return None
+
+@app.route('/api/exogenous/parse', methods=['POST'])
+def parse_exogenous():
+    data = request.get_json()
+    text = data.get('text', '')
+
+    events = parse_ciops_text(text)
+    points = []
+
+    for evt in events:
+        coords = find_node_coordinates(evt['location'])
+        if coords:
+            # Sanitize description
+            import html
+            safe_desc = html.escape(f"{evt['nature']} - {evt['location']}")
+            points.append({
+                'lat': coords[0],
+                'lng': coords[1],
+                'description': safe_desc,
+                'type': 'exogenous'
+            })
+
+    return jsonify({
+        'events_processed': len(events),
+        'points_found': len(points),
+        'points': points
+    })
 
 # Hook into request or startup
 # load_data_and_models calls this?
