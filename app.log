@@ -1,0 +1,41 @@
+/app/app.py:648: UserWarning: Geometry is in a geographic CRS. Results from 'centroid' are likely incorrect. Use 'GeoSeries.to_crs()' to re-project geometries to a projected CRS before this operation.
+
+  centroids = nodes_sub.geometry.centroid
+Carregando dados para API...
+Carregando modelo CVLI de /app/models/stgcn_cvli.pth...
+Carregando modelo CVP de /app/models/stgcn_cvp.pth...
+Enriching regions...
+Assigned Fortaleza to 1071 nodes via BBox.
+Inferred cities for 1232 nodes using proximity.
+ * Serving Flask app 'app'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.2:5000
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+/app/app.py:648: UserWarning: Geometry is in a geographic CRS. Results from 'centroid' are likely incorrect. Use 'GeoSeries.to_crs()' to re-project geometries to a projected CRS before this operation.
+
+  centroids = nodes_sub.geometry.centroid
+ * Debugger is active!
+ * Debugger PIN: 410-907-091
+127.0.0.1 - - [25/Jan/2026 13:43:29] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jan/2026 13:43:32] "GET /api/polygons HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jan/2026 13:43:34] "GET /api/risk HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jan/2026 13:43:35] "POST /api/exogenous/parse HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jan/2026 13:43:35] "[35m[1mPOST /api/exogenous/save HTTP/1.1[0m" 500 -
+ * Detected change in '/app/app.py', reloading
+Carregando dados para API...
+Carregando modelo CVLI de /app/models/stgcn_cvli.pth...
+Carregando modelo CVP de /app/models/stgcn_cvp.pth...
+Enriching regions...
+Assigned Fortaleza to 1071 nodes via BBox.
+Inferred cities for 1232 nodes using proximity.
+Erro ao salvar eventos: name 'json' is not defined
+ * Restarting with stat
+/app/app.py:649: UserWarning: Geometry is in a geographic CRS. Results from 'centroid' are likely incorrect. Use 'GeoSeries.to_crs()' to re-project geometries to a projected CRS before this operation.
+
+  centroids = nodes_sub.geometry.centroid
+ * Debugger is active!
+ * Debugger PIN: 410-907-091
