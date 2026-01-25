@@ -23,19 +23,37 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.4);
             z-index: 9999;
             display: flex;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px);
             transition: opacity 0.3s ease;
         }
         .loading-content {
-            background: white;
+            background: rgba(255, 255, 255, 0.9);
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        @keyframes pulse-text {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        .loading-text {
+            animation: pulse-text 1.5s infinite;
+        }
+        .loading-icon {
+            font-size: 3rem;
+            color: #0d6efd;
+            animation: spin-radar 2s linear infinite;
+        }
+        @keyframes spin-radar {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         .d-none { display: none !important; }
     </style>
@@ -43,11 +61,12 @@
 <body>
 <!-- Loading Overlay -->
 <div id="loading-overlay">
-    <div class="loading-content text-center">
-        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-            <span class="visually-hidden">Carregando...</span>
+    <div class="loading-content">
+        <div class="mb-3">
+             <i class="fas fa-crosshairs loading-icon"></i>
         </div>
-        <h4 class="mt-3 text-muted">Processando Inteligência Tática...</h4>
+        <h4 class="mt-3 text-muted loading-text" id="loading-message">Processando Inteligência Tática...</h4>
+        <small class="text-muted" id="loading-sub">Aguarde, analisando dados em tempo real.</small>
     </div>
 </div>
 
@@ -114,6 +133,12 @@
                         <small class="text-primary fw-bold" id="horizon-info">Horizonte: —</small>
                     </div>
 
+                    <div class="d-grid gap-2 mb-2">
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exogenousModal">
+                            <i class="fas fa-file-import"></i> Inserir Eventos (CIOPS)
+                        </button>
+                    </div>
+
                     <div class="d-grid gap-2 mb-3">
                         <div class="btn-group" role="group">
                             <button class="btn btn-outline-primary btn-sm" id="btn-simulate">
@@ -146,6 +171,27 @@
         </div>
     </div>
 </div>
+
+<!-- Modal CIOPS -->
+<div class="modal fade" id="exogenousModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Inserir Eventos Exógenos (CIOPS)</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted small">Cole os dados brutos de ocorrências (formato CIOPS) abaixo. O sistema identificará automaticamente as áreas e recalculará o risco.</p>
+        <textarea class="form-control" id="ciops-text" rows="10" placeholder="Exemplo:&#10;01 - M20260051891 - RAIO 04 CAUCAIA - ... - CENTRO DE FORTALEZA ..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="btn-process-ciops">Processar e Atualizar Mapa</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -242,7 +288,9 @@
         iconAnchor: [15, 15]
     });
 
-    function showLoading() {
+    function showLoading(msg, sub) {
+        $('#loading-message').text(msg || 'Processando Inteligência Tática...');
+        $('#loading-sub').text(sub || 'Aguarde, analisando dados em tempo real.');
         $('#loading-overlay').removeClass('d-none');
     }
 
@@ -294,7 +342,7 @@
         simulationPoints.push([latlng.lat, latlng.lng]);
 
         // Call API
-        showLoading();
+        showLoading('Simulando Cenário...', 'Projetando impacto e risco na malha.');
         $.ajax({
             url: '/api/simulate',
             type: 'POST',
@@ -327,7 +375,7 @@
         $('#btn-clear-sim').addClass('d-none');
 
         // Reload original data
-        showLoading();
+        showLoading('Restaurando Estado Original...', 'Recuperando dados históricos.');
          $.getJSON('/api/risk', function(resp) {
             riskDataGlobal = resp.data || resp;
             updateRiskMap(riskDataGlobal);
@@ -536,6 +584,88 @@
 
         $('#btn-clear-sim').on('click', function() {
             clearSimulation();
+        });
+
+        // Exogenous Data Handler
+        $('#btn-process-ciops').on('click', function() {
+            var text = $('#ciops-text').val();
+            if (!text.trim()) {
+                alert('Por favor, insira os dados.');
+                return;
+            }
+
+            // Hide Modal
+            var modalEl = document.getElementById('exogenousModal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+
+            showLoading('Geolocalizando Eventos...', 'Identificando coordenadas e bairros.');
+
+            $.ajax({
+                url: '/api/exogenous/parse',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ text: text }),
+                success: function(resp) {
+                    if (resp.points && resp.points.length > 0) {
+
+                        // Add points to simulation
+                        if (!simulationMode || simulationType !== 'exogenous') {
+                            // Activate simulation mode implicitly or switch type
+                            simulationMode = true;
+                            simulationType = 'exogenous';
+                            $('#btn-simulate-exo').addClass('active btn-danger').removeClass('btn-outline-danger');
+                            $('#btn-simulate').removeClass('active btn-primary').addClass('btn-outline-primary');
+                            $('.leaflet-container').addClass('simulation-active');
+                            $('#btn-clear-sim').removeClass('d-none');
+                        }
+
+                        // Add markers
+                        resp.points.forEach(function(pt) {
+                            var latlng = [pt.lat, pt.lng];
+                            var marker = L.marker(latlng, {icon: conflictIcon})
+                                .bindPopup('<strong>Evento Exógeno</strong><br>' + pt.description)
+                                .addTo(map);
+                            simMarkers.push(marker);
+                            simulationPoints.push(latlng);
+                        });
+
+                        // Trigger Simulation Update
+                        showLoading('Recalculando Criticidade...', 'Projetando risco com novos eventos exógenos.');
+                        $.ajax({
+                            url: '/api/simulate',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ points: simulationPoints, type: simulationType }),
+                            success: function(simResp) {
+                                if(simResp.data) {
+                                    riskDataGlobal = simResp.data;
+                                    updateRiskMap(riskDataGlobal);
+                                    var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
+                                    updateDashboard(mode);
+                                    alert(resp.points.length + ' eventos processados e mapeados com sucesso.\nRisco reavaliado.');
+                                }
+                            },
+                            error: function(err) {
+                                console.error("Simulation error", err);
+                                alert("Erro ao recalcular risco: " + err.statusText);
+                            },
+                            complete: function() {
+                                hideLoading();
+                            }
+                        });
+
+                    } else {
+                        hideLoading();
+                        alert('Nenhuma localização válida identificada nos dados fornecidos.');
+                    }
+                },
+                error: function(err) {
+                    hideLoading();
+                    console.error("Parsing error", err);
+                    alert("Erro ao processar dados: " + err.statusText);
+                }
+            });
         });
     }).always(function() {
         hideLoading();
