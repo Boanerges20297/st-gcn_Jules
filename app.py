@@ -19,6 +19,7 @@ MODEL_CVP_PATH = os.path.join(BASE_DIR, 'models', 'stgcn_cvp.pth')
 
 # Valores padrão caso arquivos não estejam presentes
 nodes_gdf = None
+nodes_gdf_proj = None
 adj_matrix = None
 node_features = None
 model_cvli = None
@@ -32,7 +33,7 @@ WINDOW_CVLI = 180
 WINDOW_CVP = 30
 
 def load_data_and_models():
-    global nodes_gdf, adj_matrix, node_features, model_cvli, model_cvp, device, norm_adj, dates
+    global nodes_gdf, nodes_gdf_proj, adj_matrix, node_features, model_cvli, model_cvp, device, norm_adj, dates
 
     if not os.path.exists(DATA_FILE):
         print("AVISO: Arquivo de dados não encontrado. Execute o processamento de dados.")
@@ -47,6 +48,14 @@ def load_data_and_models():
         adj_matrix = data_pack.get('adj_matrix')
         node_features = data_pack.get('node_features')
         dates = data_pack.get('dates')
+
+        # Create projected GeoDataFrame for metric calculations (EPSG:3857 - Web Mercator)
+        # This fixes UserWarning about geographic CRS during distance calculation
+        if nodes_gdf is not None:
+            try:
+                nodes_gdf_proj = nodes_gdf.to_crs(epsg=3857)
+            except Exception as e:
+                print(f"Erro ao projetar nodes_gdf: {e}")
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         num_nodes = node_features.shape[0]
@@ -167,41 +176,56 @@ def simulate_risk():
         # Copiar matriz original
         adj_copy = copy.deepcopy(adj_matrix)
 
-        # Encontrar nós afetados e modificar pesos
+        # Track affected nodes for post-processing
+        affected_nodes = set()
 
-        centroids = nodes_gdf.geometry.centroid
+        # Use projected centroids if available for accurate distance (Meters)
+        if nodes_gdf_proj is not None:
+             centroids = nodes_gdf_proj.geometry.centroid
+        else:
+             centroids = nodes_gdf.geometry.centroid
 
         for pt in points:
-            # pt vem como [lat, lon], mas Leaflet envia [lat, lon].
-            # GeoJSON/Shapely usa (x=lon, y=lat).
-            # Vamos verificar o formato enviado pelo frontend.
-            # Assumiremos [lat, lon] e converteremos para Point(lon, lat)
             if len(pt) == 2:
-                p = Point(pt[1], pt[0])
+                # pt is [lat, lon], Create Point(lon, lat)
+                p_geo = Point(pt[1], pt[0])
 
-                # Encontrar nó mais próximo (brute force simples para ~2000 nós é ok)
-                # Otimização possível: usar índice espacial se disponível
-                dists = centroids.distance(p)
-                nearest_idx = dists.idxmin()
+                nearby_indices = []
 
-                if sim_type == 'suppression':
-                    # Reduzir pesos de entrada e saída para isolar o nó (containment)
-                    # Fator de supressão
-                    suppression_factor = 0.1
+                if nodes_gdf_proj is not None:
+                    # Project point to 3857
+                    try:
+                        s = gpd.GeoSeries([p_geo], crs="EPSG:4326").to_crs("EPSG:3857")
+                        p_proj = s.iloc[0]
+                        dists = centroids.distance(p_proj)
+                        # Radius 500m
+                        nearby_indices = dists[dists < 500].index.tolist()
+                    except Exception as e:
+                        print(f"Erro ao projetar ponto na simulação: {e}")
+                        # Fallback
+                        dists = nodes_gdf.geometry.centroid.distance(p_geo)
+                        nearby_indices = [dists.idxmin()]
+                else:
+                    # Fallback (degrees)
+                    dists = centroids.distance(p_geo)
+                    # Approx 0.005 degrees ~ 500m
+                    nearby_indices = dists[dists < 0.005].index.tolist()
+                    if not nearby_indices:
+                        nearby_indices = [dists.idxmin()]
 
-                    # Linha nearest_idx (outbound) e Coluna nearest_idx (inbound)
-                    adj_copy[nearest_idx, :] *= suppression_factor
-                    adj_copy[:, nearest_idx] *= suppression_factor
-
-                elif sim_type == 'exogenous':
-                    # Simular evento exógeno (e.g., conflito de facção)
-                    # Aumentar conectividade/difusão para espalhar risco
-                    amplification_factor = 5.0
-
-                    # Aumentar pesos de saída (influência do nó nos outros)
-                    adj_copy[nearest_idx, :] *= amplification_factor
-                    # Aumentar pesos de entrada (influência dos outros no nó - retroalimentação)
-                    adj_copy[:, nearest_idx] *= amplification_factor
+                # Modify Adjacency
+                for idx in nearby_indices:
+                    affected_nodes.add(idx)
+                    if sim_type == 'suppression':
+                        # Reduzir pesos drasticamente (isolamento)
+                        suppression_factor = 0.05
+                        adj_copy[idx, :] *= suppression_factor
+                        adj_copy[:, idx] *= suppression_factor
+                    elif sim_type == 'exogenous':
+                        # Amplificar difusão
+                        amplification_factor = 5.0
+                        adj_copy[idx, :] *= amplification_factor
+                        adj_copy[:, idx] *= amplification_factor
 
         # Re-normalizar matriz
         adj_tensor = torch.FloatTensor(adj_copy)
@@ -211,7 +235,46 @@ def simulate_risk():
         d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
         sim_norm_adj = torch.mm(torch.mm(d_mat_inv_sqrt, adj_tensor), d_mat_inv_sqrt).to(device)
 
-        return calculate_risk(custom_norm_adj=sim_norm_adj)
+        # Calculate Risk with modified graph
+        response = calculate_risk(custom_norm_adj=sim_norm_adj)
+
+        # Post-Process Result for Immediate Visual Feedback
+        if response.status_code == 200:
+            result_json = response.get_json()
+            data_list = result_json.get('data', [])
+
+            for item in data_list:
+                nid = item['node_id']
+                if nid in affected_nodes:
+                    if sim_type == 'suppression':
+                        # Force risk down significantly (Mitigation)
+                        factor = 0.15
+                        item['risk_score'] = item['risk_score'] * factor
+                        item['risk_score_cvli'] = item['risk_score_cvli'] * factor
+                        item['risk_score_cvp'] = item['risk_score_cvp'] * factor
+
+                        # Add descriptive reason
+                        item['reasons'].insert(0, "Presença de Equipe Tática (Risco Mitigado)")
+
+                        # Adjust visual prediction values
+                        item['cvli_pred'] *= factor
+                        item['cvp_pred'] *= factor
+
+                    elif sim_type == 'exogenous':
+                        # Force risk up (Conflict)
+                        boost = 1.5
+                        # Ensure at least 80 (Critical) or boost existing
+                        new_score = max(item['risk_score'] * boost, 80.0)
+                        item['risk_score'] = min(new_score, 100.0)
+
+                        item['risk_score_cvli'] = min(max(item['risk_score_cvli'] * boost, 80.0), 100.0)
+                        item['risk_score_cvp'] = min(max(item['risk_score_cvp'] * boost, 80.0), 100.0)
+
+                        item['reasons'].insert(0, "Conflito Ativo Detectado (Simulação)")
+
+            return jsonify(result_json)
+        else:
+            return response
 
     except Exception as e:
         print(f"Erro na simulação: {e}")
