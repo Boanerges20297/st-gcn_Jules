@@ -49,7 +49,9 @@ def test_find_node_coordinates():
         # Case 1: Partial match "CENTRO DE FORTALEZA" should match "Centro"
         # Logic: "Centro" is in "CENTRO DE FORTALEZA"
         coords = app.find_node_coordinates("CENTRO DE FORTALEZA")
-        assert coords == (0.5, 0.5)
+        assert coords is not None
+        assert coords[0] == 0.5
+        assert coords[1] == 0.5
 
         # Case 2: "TIMBÓ, MARACANAÚ" should match "Conjunto Timbó" or similar logic?
         # If the node name is "Conjunto Timbó", and input is "TIMBÓ, MARACANAÚ".
@@ -80,7 +82,9 @@ def test_find_node_coordinates():
 
         with patch('app.nodes_gdf', gdf_simple):
             coords = app.find_node_coordinates("TIMBÓ, MARACANAÚ")
-            assert coords == (10.5, 10.5)
+            assert coords is not None
+            assert coords[0] == 10.5
+            assert coords[1] == 10.5
 
             # Case 3: Input is substring of Node Name
             # Node: "Morro do Oitão Preto ou Moura brasil"
@@ -107,7 +111,9 @@ def test_find_node_coordinates_reverse_match():
 
     with patch('app.nodes_gdf', gdf):
         coords = app.find_node_coordinates("MOURA BRASIL")
-        assert coords == (0.5, 0.5)
+        assert coords is not None
+        assert coords[0] == 0.5
+        assert coords[1] == 0.5
 
 def test_find_node_coordinates_fallback_city():
     """Test fallback to city centroid when specific area is not found."""
@@ -154,7 +160,9 @@ def test_find_node_coordinates_ibge_fallback():
 
     with patch('app.ibge_bairros_cache', mock_ibge_data):
         coords = app.find_node_coordinates("Ocorrência no Bairro Fantasma")
-        assert coords == (-3.555, -38.555)
+        assert coords is not None
+        assert coords[0] == -3.555
+        assert coords[1] == -38.555
 
 def test_find_node_coordinates_ibge_fallback_integration():
     """Integration test checking if real file is read."""
