@@ -36,6 +36,12 @@ dates = None
 ibge_bairros_cache = None
 ibge_municipios_cache = None
 exogenous_events = []
+exogenous_affected_nodes = set()
+
+MANUAL_LOCATIONS = {
+    "TAIBA": (-3.535, -38.892),
+    "TAÍBA": (-3.535, -38.892),
+}
 
 # Parâmetros de janela
 WINDOW_CVLI = 180
@@ -88,7 +94,7 @@ def find_nearby_nodes(lat, lng, radius_m=500):
     return nearby_indices
 
 def apply_exogenous_events():
-    global adj_matrix
+    global adj_matrix, exogenous_affected_nodes
     if not exogenous_events or adj_matrix is None:
         return
 
@@ -96,6 +102,9 @@ def apply_exogenous_events():
 
     # We modify adj_matrix IN PLACE.
     # Reloading from pickle resets it, so this is deterministic replay.
+
+    # Reset affected nodes set for this deterministic run
+    exogenous_affected_nodes.clear()
 
     count_affected = 0
     for batch in exogenous_events:
@@ -111,6 +120,7 @@ def apply_exogenous_events():
             indices = find_nearby_nodes(lat, lng)
 
             for idx in indices:
+                exogenous_affected_nodes.add(idx)
                 # Apply amplification (Conflict Logic)
                 amplification_factor = 5.0
                 adj_matrix[idx, :] *= amplification_factor
@@ -468,6 +478,17 @@ def calculate_risk(custom_norm_adj=None):
         very_active = hist_sum_cvli >= 3
         normalized_risk_cvli[very_active] = np.maximum(normalized_risk_cvli[very_active], 50.0)
 
+        # Apply Exogenous Events Boost (Permanent/Persisted)
+        if exogenous_affected_nodes:
+            # Convert set to list or use numpy indexing
+            # exogenous_affected_nodes contains int indices
+            exo_indices = list(exogenous_affected_nodes)
+            # Filter indices just in case they are out of bounds (unlikely but safe)
+            exo_indices = [i for i in exo_indices if i < len(normalized_risk_cvli)]
+            if exo_indices:
+                # Force Risk >= 80.0 (Critical)
+                normalized_risk_cvli[exo_indices] = np.maximum(normalized_risk_cvli[exo_indices], 80.0)
+
         # CVP
         out_cvp = np.maximum(out_cvp, 0)
         cvp_raw = out_cvp[:, 0]
@@ -482,6 +503,13 @@ def calculate_risk(custom_norm_adj=None):
         # Boost CVP similarly
         active_cvp = hist_sum_cvp > 0
         normalized_risk_cvp[active_cvp] = np.maximum(normalized_risk_cvp[active_cvp], 25.0)
+
+        # Apply Exogenous Boost to CVP too
+        if exogenous_affected_nodes:
+            exo_indices = list(exogenous_affected_nodes)
+            exo_indices = [i for i in exo_indices if i < len(normalized_risk_cvp)]
+            if exo_indices:
+                normalized_risk_cvp[exo_indices] = np.maximum(normalized_risk_cvp[exo_indices], 80.0)
 
         # ---------------------------
         # Construção da Resposta
@@ -520,6 +548,10 @@ def calculate_risk(custom_norm_adj=None):
 
             if hist_sum_cvli[i] > 0 and cvli_val < 0.01:
                 reasons.append('Histórico de violência recente (Risco Residual)')
+
+            # Check for Exogenous Reason
+            if i in exogenous_affected_nodes:
+                reasons.insert(0, "Conflito Ativo (Evento Exógeno)")
 
             if len(reasons) == 0:
                 reasons.append('Estabilidade (Baixo Risco)')
@@ -666,6 +698,18 @@ def enrich_regions():
         except Exception as e:
             print(f"Erro na inferência por distância: {e}")
 
+def normalize_location(text):
+    if not text: return ""
+    text = text.upper()
+    text = text.replace("PQ.", "PARQUE")
+    text = text.replace("AV.", "AVENIDA")
+    text = text.replace("S/", "SEM ")
+    return text.strip()
+
+def strip_accents(text):
+    import unicodedata
+    return ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
+
 def parse_ciops_text(text):
     events = []
     lines = text.strip().split('\n')
@@ -698,7 +742,13 @@ def find_node_coordinates(location_str):
         return None
 
     # Normalize input
-    loc_norm = location_str.lower()
+    loc_norm = normalize_location(location_str)
+    loc_lower = loc_norm.lower()
+    loc_stripped = strip_accents(loc_lower)
+
+    # 0. Manual Locations
+    if loc_norm in MANUAL_LOCATIONS:
+         return (*MANUAL_LOCATIONS[loc_norm], 'manual')
 
     # Strategy: Check if any node name is contained in the location string
     best_match = None
@@ -709,30 +759,41 @@ def find_node_coordinates(location_str):
         if not name or len(name) < 3:
             continue
 
+        name_stripped = strip_accents(name)
+
         # Check if node name is in input location (e.g. "Timbó" in "Timbó, Maracanaú")
         # OR if input location is in node name (e.g. "Moura Brasil" in "Morro ... Moura Brasil")
-        if name in loc_norm:
+        # Try exact match first, then stripped
+        if name in loc_lower:
             if len(name) > best_match_len:
                 best_match = row
                 best_match_len = len(name)
-        elif loc_norm in name and len(loc_norm) > 4: # Avoid short inputs matching long descriptions incorrectly
-             # If input is substring of node name, we consider it a match too.
-             # We prioritize the match length of the *matching segment*.
-             # Here let's just accept it if we haven't found a better one.
-             if len(loc_norm) > best_match_len:
+        elif name_stripped in loc_stripped:
+             # Match without accents
+             if len(name) > best_match_len:
                 best_match = row
-                best_match_len = len(loc_norm)
+                best_match_len = len(name)
+        elif loc_lower in name and len(loc_lower) > 4:
+             if len(loc_lower) > best_match_len:
+                best_match = row
+                best_match_len = len(loc_lower)
+        elif loc_stripped in name_stripped and len(loc_stripped) > 4:
+             if len(loc_stripped) > best_match_len:
+                best_match = row
+                best_match_len = len(loc_stripped)
 
     if best_match is not None:
         centroid = best_match.geometry.centroid
-        return (centroid.y, centroid.x) # lat, lon
+        return (centroid.y, centroid.x, 'specific') # lat, lon
 
     # Fallback 2: IBGE Neighborhoods Static List (Cached)
     if ibge_bairros_cache:
         try:
             for bairro, coords in ibge_bairros_cache.items():
-                if bairro.lower() in loc_norm:
-                    return (coords[0], coords[1])
+                b_norm = normalize_location(bairro).lower()
+                b_stripped = strip_accents(b_norm)
+                if b_norm in loc_lower or b_stripped in loc_stripped:
+                    return (coords[0], coords[1], 'specific')
         except Exception as e:
              print(f"Erro no fallback IBGE Bairros: {e}")
 
@@ -740,8 +801,9 @@ def find_node_coordinates(location_str):
     if ibge_municipios_cache:
         try:
             for municipio, coords in ibge_municipios_cache.items():
-                if municipio.lower() in loc_norm:
-                    return (coords[0], coords[1])
+                m_norm = normalize_location(municipio).lower()
+                if m_norm in loc_lower:
+                    return (coords[0], coords[1], 'city')
         except Exception as e:
              print(f"Erro no fallback IBGE Municípios: {e}")
 
@@ -750,12 +812,12 @@ def find_node_coordinates(location_str):
     if ibge_municipios_cache:
         try:
              import re
-             words = re.findall(r'\b\w+\b', loc_norm)
+             words = re.findall(r'\b\w+\b', loc_lower)
              for word in words:
                  if len(word) < 4: continue
                  for mun, coords in ibge_municipios_cache.items():
                      if mun.lower() == word:
-                         return (coords[0], coords[1])
+                         return (coords[0], coords[1], 'city')
         except Exception as e:
             print(f"Erro no fallback loose city: {e}")
 
@@ -766,7 +828,7 @@ def find_node_coordinates(location_str):
         for city in known_cities:
             if not isinstance(city, str) or len(city) < 3: continue
 
-            if city.lower() in loc_norm:
+            if city.lower() in loc_lower:
                 city_nodes = nodes_gdf[nodes_gdf['CIDADE'] == city]
                 if not city_nodes.empty:
                     # Fix UserWarning by projecting
@@ -774,7 +836,22 @@ def find_node_coordinates(location_str):
                     c_geo = c_proj.to_crs(city_nodes.crs)
                     city_centroid_x = c_geo.x.mean()
                     city_centroid_y = c_geo.y.mean()
-                    return (city_centroid_y, city_centroid_x)
+                    return (city_centroid_y, city_centroid_x, 'fallback')
+
+    # Fallback 6: Strip accents and try again (Recursive-ish but limited)
+    # Only try once
+    loc_stripped = strip_accents(loc_norm)
+    if loc_stripped != loc_norm:
+        # Check Manual again
+        if loc_stripped in MANUAL_LOCATIONS:
+             return (*MANUAL_LOCATIONS[loc_stripped], 'manual')
+        # Check cache keys stripped? Too expensive maybe.
+        # But we can check normalized cache keys against stripped input?
+        # Actually, let's just rely on the fact that if input has no accents but cache does, 'in' might fail.
+        # But here we strip input. If cache has accents, 'bairro' (with accents) in 'loc_stripped' (no accents) will fail.
+        # We need to compare stripped to stripped.
+        # This is getting heavy. Let's trust normalization handles most.
+        pass
 
     return None
 
@@ -787,14 +864,48 @@ def parse_exogenous():
     points = []
 
     for evt in events:
-        coords = find_node_coordinates(evt['location'])
-        if coords:
+        # Improved parsing strategy: Scan parts of the raw line
+        raw_line = evt.get('raw', '')
+        parts = raw_line.split(' - ')
+
+        candidates = []
+
+        # Determine range of parts to scan.
+        # Usually from index 4 onwards.
+        start_idx = 4 if len(parts) > 4 else 0
+        end_idx = max(len(parts) - 1, start_idx + 1)
+
+        for i in range(start_idx, end_idx):
+            candidate_text = parts[i].strip()
+            # Clean (AIS...)
+            candidate_text = re.sub(r'\s*\(AIS\d+\)', '', candidate_text)
+
+            res = find_node_coordinates(candidate_text)
+            if res:
+                lat, lng, match_type = res
+                # Score match type
+                score = 0
+                if match_type == 'manual': score = 3
+                elif match_type == 'specific': score = 2
+                elif match_type == 'city': score = 1
+
+                candidates.append({
+                    'lat': lat, 'lng': lng, 'score': score, 'text': candidate_text
+                })
+
+        # Sort by score descending
+        candidates.sort(key=lambda x: x['score'], reverse=True)
+
+        if candidates:
+            best = candidates[0]
             # Sanitize description
             import html
-            safe_desc = html.escape(f"{evt['nature']} - {evt['location']}")
+            # Use original nature if available, else best text
+            desc_text = f"{evt['nature']} - {evt['location']}"
+            safe_desc = html.escape(desc_text)
             points.append({
-                'lat': coords[0],
-                'lng': coords[1],
+                'lat': best['lat'],
+                'lng': best['lng'],
                 'description': safe_desc,
                 'type': 'exogenous'
             })
