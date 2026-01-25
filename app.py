@@ -51,6 +51,8 @@ def load_exogenous_events():
         except Exception as e:
             print(f"Erro ao carregar eventos exógenos: {e}")
             exogenous_events = []
+    else:
+        print(f"AVISO: Arquivo de eventos exógenos não encontrado: {EXOGENOUS_FILE}")
 
 def find_nearby_nodes(lat, lng, radius_m=500):
     # Helper to find nodes within radius
@@ -123,7 +125,7 @@ def load_data_and_models():
 
     # Load Static Data
     try:
-        import json
+        # json is imported globally
         static_file = os.path.join(BASE_DIR, 'data', 'static', 'fortaleza_bairros_coords.json')
         if os.path.exists(static_file):
             with open(static_file, 'r', encoding='utf-8') as f:
@@ -646,7 +648,9 @@ def enrich_regions():
 
             # Prepare Node Arrays
             # Geometry centroid (lon, lat) -> Need (lat, lon)
-            centroids = nodes_sub.geometry.centroid
+            # Fix UserWarning about centroid on geographic CRS by projecting first
+            centroids_proj = nodes_sub.to_crs(epsg=3857).geometry.centroid
+            centroids = centroids_proj.to_crs(nodes_sub.crs)
             node_coords = np.column_stack((centroids.y.values, centroids.x.values))
 
             # Calculate Distances
@@ -765,8 +769,11 @@ def find_node_coordinates(location_str):
             if city.lower() in loc_norm:
                 city_nodes = nodes_gdf[nodes_gdf['CIDADE'] == city]
                 if not city_nodes.empty:
-                    city_centroid_x = city_nodes.geometry.centroid.x.mean()
-                    city_centroid_y = city_nodes.geometry.centroid.y.mean()
+                    # Fix UserWarning by projecting
+                    c_proj = city_nodes.to_crs(epsg=3857).geometry.centroid
+                    c_geo = c_proj.to_crs(city_nodes.crs)
+                    city_centroid_x = c_geo.x.mean()
+                    city_centroid_y = c_geo.y.mean()
                     return (city_centroid_y, city_centroid_x)
 
     return None
@@ -800,6 +807,7 @@ def parse_exogenous():
 
 @app.route('/api/exogenous/save', methods=['POST'])
 def save_exogenous():
+    import json # Safeguard
     data = request.get_json()
     points = data.get('points', [])
     original_text = data.get('original_text', '')
