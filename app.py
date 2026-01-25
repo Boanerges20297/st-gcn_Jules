@@ -7,7 +7,9 @@ import numpy as np
 import os
 import copy
 import re
+import json
 from shapely.geometry import shape, Point, Polygon
+from scipy.spatial.distance import cdist
 from src.model import STGCN
 
 app = Flask(__name__)
@@ -17,6 +19,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, 'data', 'processed', 'processed_graph_data.pkl')
 MODEL_CVLI_PATH = os.path.join(BASE_DIR, 'models', 'stgcn_cvli.pth')
 MODEL_CVP_PATH = os.path.join(BASE_DIR, 'models', 'stgcn_cvp.pth')
+EXOGENOUS_FILE = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
 
 # Valores padrão caso arquivos não estejam presentes
 nodes_gdf = None
@@ -32,10 +35,87 @@ dates = None
 # Static Data Cache
 ibge_bairros_cache = None
 ibge_municipios_cache = None
+exogenous_events = []
 
 # Parâmetros de janela
 WINDOW_CVLI = 180
 WINDOW_CVP = 30
+
+def load_exogenous_events():
+    global exogenous_events
+    if os.path.exists(EXOGENOUS_FILE):
+        try:
+            with open(EXOGENOUS_FILE, 'r', encoding='utf-8') as f:
+                exogenous_events = json.load(f)
+            print(f"Carregados {len(exogenous_events)} lotes de eventos exógenos.")
+        except Exception as e:
+            print(f"Erro ao carregar eventos exógenos: {e}")
+            exogenous_events = []
+
+def find_nearby_nodes(lat, lng, radius_m=500):
+    # Helper to find nodes within radius
+    nearby_indices = []
+    try:
+        p_geo = Point(lng, lat)
+
+        if nodes_gdf_proj is not None:
+             # Project point to 3857 for meters distance
+             s = gpd.GeoSeries([p_geo], crs="EPSG:4326").to_crs("EPSG:3857")
+             p_proj = s.iloc[0]
+             centroids = nodes_gdf_proj.geometry.centroid
+             dists = centroids.distance(p_proj)
+             nearby_indices = dists[dists < radius_m].index.tolist()
+        else:
+             # Fallback (degrees)
+             centroids = nodes_gdf.geometry.centroid
+             dists = centroids.distance(p_geo)
+             nearby_indices = dists[dists < 0.005].index.tolist() # Approx 0.005 deg ~ 500m
+
+        if not nearby_indices:
+             # Find at least one closest
+             if nodes_gdf is not None:
+                 if nodes_gdf_proj is not None:
+                     dists = nodes_gdf_proj.geometry.centroid.distance(p_proj)
+                 else:
+                     dists = nodes_gdf.geometry.centroid.distance(p_geo)
+                 nearby_indices = [dists.idxmin()]
+
+    except Exception as e:
+        print(f"Erro ao buscar nodes próximos: {e}")
+
+    return nearby_indices
+
+def apply_exogenous_events():
+    global adj_matrix
+    if not exogenous_events or adj_matrix is None:
+        return
+
+    print("Aplicando eventos exógenos na malha...")
+
+    # We modify adj_matrix IN PLACE.
+    # Reloading from pickle resets it, so this is deterministic replay.
+
+    count_affected = 0
+    for batch in exogenous_events:
+        points = batch.get('points', [])
+
+        for pt in points:
+            # Support both format {lat, lng} and [lat, lng] just in case
+            lat = pt.get('lat') if isinstance(pt, dict) else (pt[0] if isinstance(pt, list) and len(pt)>0 else None)
+            lng = pt.get('lng') if isinstance(pt, dict) else (pt[1] if isinstance(pt, list) and len(pt)>1 else None)
+
+            if lat is None or lng is None: continue
+
+            indices = find_nearby_nodes(lat, lng)
+
+            for idx in indices:
+                # Apply amplification (Conflict Logic)
+                amplification_factor = 5.0
+                adj_matrix[idx, :] *= amplification_factor
+                adj_matrix[:, idx] *= amplification_factor
+                count_affected += 1
+
+    print(f"Malha adaptada: {count_affected} modificações aplicadas.")
 
 def load_data_and_models():
     global nodes_gdf, nodes_gdf_proj, adj_matrix, node_features, model_cvli, model_cvp, device, norm_adj, dates
@@ -81,7 +161,11 @@ def load_data_and_models():
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         num_nodes = node_features.shape[0]
 
-        # Pre-computar normalização da adjacência
+        # Load and Apply Exogenous Events (Permanent Adaptation)
+        load_exogenous_events()
+        apply_exogenous_events()
+
+        # Pre-computar normalização da adjacência (com modificações)
         adj_tensor = torch.FloatTensor(adj_matrix)
         rowsum = adj_tensor.sum(1)
         d_inv_sqrt = torch.pow(rowsum, -0.5)
@@ -513,11 +597,70 @@ def enrich_regions():
         nodes_gdf['CIDADE'] = ''
 
     print("Enriching regions...")
-    for idx, row in nodes_gdf.iterrows():
-        val = row['CIDADE']
-        if not val or len(str(val)) < 2:
-            reg = get_region_name(row, row.geometry)
+
+    # 1. First Pass: Apply existing BBox logic (Fortaleza) for empty entries
+    # Iterating is acceptable for the first pass or we can vectorize bbox too, but let's keep it simple for now as it handles Geometry logic.
+    # Actually, let's optimize the existing loop to only touch empty ones.
+
+    # We can try to do a bulk update for "Fortaleza" based on BBox if possible, but the loop is fine for now.
+    # However, to support the "Whole Ceara", we need the distance fallback.
+
+    mask_empty = (nodes_gdf['CIDADE'].isna()) | (nodes_gdf['CIDADE'].astype(str).str.len() < 2)
+
+    if not mask_empty.any():
+        return
+
+    # Prepare indices to update
+    indices_to_update = nodes_gdf[mask_empty].index
+
+    # Optimization: Use vectorization for BBox check?
+    # Bounds aprox: -38.66, -3.90 to -38.40, -3.65
+    # Let's just run the loop for BBox check first.
+
+    count_fortaleza = 0
+    for idx in indices_to_update:
+        # Use existing get_region_name logic which prioritizes BBox for Fortaleza
+        # But get_region_name returns "RMF/Interior" if not in BBox.
+        # We only want to set "Fortaleza" if it matches BBox.
+
+        # We can reuse get_region_name but check return value.
+        row = nodes_gdf.loc[idx]
+        reg = get_region_name(row, row.geometry)
+        if reg == "Fortaleza":
             nodes_gdf.at[idx, 'CIDADE'] = reg
+            count_fortaleza += 1
+
+    print(f"Assigned Fortaleza to {count_fortaleza} nodes via BBox.")
+
+    # 2. Second Pass: Distance-based lookup for remaining empty entries (Whole Ceará)
+    mask_still_empty = (nodes_gdf['CIDADE'].isna()) | (nodes_gdf['CIDADE'].astype(str).str.len() < 2) | (nodes_gdf['CIDADE'] == 'RMF/Interior')
+
+    if mask_still_empty.any() and ibge_municipios_cache:
+        try:
+            nodes_sub = nodes_gdf[mask_still_empty]
+
+            # Prepare Cache Arrays
+            mun_names = list(ibge_municipios_cache.keys())
+            mun_coords = list(ibge_municipios_cache.values()) # [[lat, lon], ...]
+            mun_coords_arr = np.array(mun_coords)
+
+            # Prepare Node Arrays
+            # Geometry centroid (lon, lat) -> Need (lat, lon)
+            centroids = nodes_sub.geometry.centroid
+            node_coords = np.column_stack((centroids.y.values, centroids.x.values))
+
+            # Calculate Distances
+            dists = cdist(node_coords, mun_coords_arr)
+            nearest_indices = np.argmin(dists, axis=1)
+
+            # Assign
+            assigned_cities = [mun_names[i] for i in nearest_indices]
+            nodes_gdf.loc[mask_still_empty, 'CIDADE'] = assigned_cities
+
+            print(f"Inferred cities for {len(assigned_cities)} nodes using proximity.")
+
+        except Exception as e:
+            print(f"Erro na inferência por distância: {e}")
 
 def parse_ciops_text(text):
     events = []
@@ -654,6 +797,46 @@ def parse_exogenous():
         'points_found': len(points),
         'points': points
     })
+
+@app.route('/api/exogenous/save', methods=['POST'])
+def save_exogenous():
+    data = request.get_json()
+    points = data.get('points', [])
+    original_text = data.get('original_text', '')
+
+    if not points:
+        return jsonify({'error': 'Nenhum ponto para salvar.'}), 400
+
+    new_entry = {
+        'id': str(len(exogenous_events) + 1),
+        'timestamp': pd.Timestamp.now().isoformat(),
+        'original_text': original_text,
+        'points': points
+    }
+
+    try:
+        # Load existing first to append correctly (race condition possible but low risk here)
+        current_events = []
+        if os.path.exists(EXOGENOUS_FILE):
+             with open(EXOGENOUS_FILE, 'r', encoding='utf-8') as f:
+                 current_events = json.load(f)
+
+        current_events.append(new_entry)
+
+        with open(EXOGENOUS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(current_events, f, ensure_ascii=False, indent=2)
+
+        # Trigger Reload/Re-apply
+        # We need to reload data to reset adj_matrix and re-apply ALL events including this new one.
+        # This is expensive but ensures consistency.
+        # load_data_and_models handles full reload.
+        load_data_and_models()
+
+        return jsonify({'status': 'success', 'message': 'Eventos salvos e malha atualizada.'})
+
+    except Exception as e:
+        print(f"Erro ao salvar eventos: {e}")
+        return jsonify({'error': f'Erro ao salvar: {e}'}), 500
 
 # Hook into request or startup
 # load_data_and_models calls this?
