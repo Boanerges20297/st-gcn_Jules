@@ -213,11 +213,11 @@ def main():
     
     grouped = joined_gdf.groupby(['index_right', 'data', 'tipo']).size().reset_index(name='count')
     
-    for _, row in grouped.iterrows():
-        node_idx = int(row['index_right'])
-        date = row['data']
-        crime_type = row['tipo']
-        count = row['count']
+    for row in grouped.itertuples():
+        node_idx = int(row.index_right)
+        date = row.data
+        crime_type = row.tipo
+        count = row.count
         
         time_idx = (date - min_date).days
         
