@@ -30,14 +30,17 @@ def process_exogenous_text(text: str) -> List[Dict[str, Any]]:
         model = genai.GenerativeModel('gemini-1.5-flash')
 
         prompt = f"""
-        Analise o seguinte texto de relatório de segurança pública (formato CIOPS ou similar).
+        Analise o seguinte texto de relatório de segurança pública (formato CIOPS).
+        O formato padrão dos dados é: "01 - CODIGO - TIPO DA OCORRENCIA - DESCRIÇÃO - LOCAL - DATA".
+        Exemplo: "01 - M20260051891 - HOMICIDIO A BALA - VITIMA LESIONADA... - RUA A, BAIRRO X - 01/01/2025"
+
         Identifique eventos distintos. Para cada evento, extraia e normalize os seguintes dados em formato JSON:
 
-        - "natureza": Tipo do crime ou evento (ex: HOMICIDIO, ROUBO, DISPARO).
-        - "localizacao_completa": O endereço mais completo possível encontrado.
-        - "bairro": O nome do bairro (inferido ou explícito).
-        - "municipio": O município (ex: FORTALEZA).
-        - "resumo": Uma descrição curta e direta do evento.
+        - "natureza": O TIPO DA OCORRÊNCIA (geralmente o terceiro campo separado por hifens). Extraia exatamente como está.
+        - "localizacao_completa": O endereço mais completo possível encontrado (geralmente após a descrição).
+        - "bairro": O nome do bairro (inferido ou explícito no endereço).
+        - "municipio": O município (ex: FORTALEZA, CAUCAIA). Se não explícito, tente inferir pelo bairro.
+        - "resumo": Uma descrição curta baseada no campo DESCRIÇÃO.
         - "raw_text": O trecho original do texto que gerou este evento.
 
         Texto:
@@ -85,19 +88,30 @@ def _mock_response(text: str) -> List[Dict[str, Any]]:
     events = []
     lines = text.strip().split('\n')
     for line in lines:
-        if " - " in line:
-            parts = line.split(" - ")
-            if len(parts) >= 5:
-                # Heuristic attempt to mimic structured output from raw line
-                nature = parts[4].strip() if len(parts) > 4 else "EVENTO"
-                loc = parts[6].strip() if len(parts) > 6 else "LOCAL DESCONHECIDO"
+        # Regex heuristic for "01 - CODE - TYPE - DESC - LOC"
+        # Split by " - "
+        parts = line.split(" - ")
+        if len(parts) >= 3:
+            # Try to grab the 3rd element as Nature if available, else 2nd
+            # Format: Index - Code - Nature - Desc - Loc
+            # Example: 01 - M123 - HOMICIDIO - ...
+            nature = "EVENTO"
+            loc = "LOCAL DESCONHECIDO"
 
-                events.append({
-                    'natureza': nature,
-                    'localizacao_completa': loc,
-                    'bairro': '', # Can't guess easily without LLM
-                    'municipio': 'FORTALEZA',
-                    'resumo': f"{nature} em {loc}",
-                    'raw': line
-                })
+            if len(parts) >= 3:
+                nature = parts[2].strip()
+
+            if len(parts) >= 5:
+                loc = parts[4].strip()
+            elif len(parts) >= 4:
+                loc = parts[3].strip()
+
+            events.append({
+                'natureza': nature,
+                'localizacao_completa': loc,
+                'bairro': '',
+                'municipio': 'FORTALEZA',
+                'resumo': f"{nature} - {loc}",
+                'raw': line
+            })
     return events
