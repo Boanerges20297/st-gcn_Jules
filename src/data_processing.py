@@ -2,7 +2,6 @@ import json
 import os
 import geopandas as gpd
 import pandas as pd
-from shapely.geometry import Point
 import pickle
 import numpy as np
 
@@ -118,8 +117,7 @@ def load_occurrences(filepath):
 
     df = df.dropna(subset=['data'])
 
-    geometry = [Point(xy) for xy in zip(df.longitude, df.latitude)]
-    gdf_occurrences = gpd.GeoDataFrame(df, geometry=geometry, crs="EPSG:4326")
+    gdf_occurrences = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.longitude, df.latitude), crs="EPSG:4326")
 
     print(f"Total de ocorrências válidas: {len(gdf_occurrences)}")
     return gdf_occurrences
