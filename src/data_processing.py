@@ -213,19 +213,32 @@ def main():
     
     grouped = joined_gdf.groupby(['index_right', 'data', 'tipo']).size().reset_index(name='count')
     
-    for _, row in grouped.iterrows():
-        node_idx = int(row['index_right'])
-        date = row['data']
-        crime_type = row['tipo']
-        count = row['count']
-        
-        time_idx = (date - min_date).days
-        
-        if 0 <= time_idx < num_timesteps:
-            if 'cvli' in crime_type:
-                node_features[node_idx, time_idx, 0] += count
-            elif 'cvp' in crime_type:
-                node_features[node_idx, time_idx, 1] += count
+    # Otimização vetorizada para preencher node_features
+    df = grouped.copy()
+    df['time_idx'] = (df['data'] - min_date).dt.days
+
+    # Filtrar índices temporais válidos
+    valid_time_mask = (df['time_idx'] >= 0) & (df['time_idx'] < num_timesteps)
+    df = df[valid_time_mask]
+
+    # Mapear tipo para índice da feature: cvli -> 0, cvp -> 1
+    conditions = [
+        df['tipo'].str.contains('cvli', na=False),
+        df['tipo'].str.contains('cvp', na=False)
+    ]
+    choices = [0, 1]
+    df['feature_idx'] = np.select(conditions, choices, default=-1)
+
+    # Filtrar features válidas
+    df = df[df['feature_idx'] != -1]
+
+    # Atribuição acumulada vetorizada
+    # np.add.at realiza soma unbuffered no lugar, tratando duplicatas corretamente
+    np.add.at(node_features,
+              (df['index_right'].values.astype(int),
+               df['time_idx'].values.astype(int),
+               df['feature_idx'].values.astype(int)),
+              df['count'].values)
     
     print("Criando matriz de adjacência...")
     adj_matrix = create_adjacency_matrix(nodes_gdf)
