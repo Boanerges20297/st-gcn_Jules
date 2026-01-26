@@ -241,21 +241,29 @@ def load_data_and_models():
 # Executa carregamento inicial
 load_data_and_models()
 
-def format_trend(prediction, history_avg):
+def format_trend(prediction, history_avg, risk_score=None):
     if history_avg == 0:
         if prediction > 0.001:
-            return f"Início de atividade detectada (Surgimento)"
+            return "Início de atividade criminal"
         else:
-            return "Estabilidade (Baixa Atividade)"
+            return "Estabilidade (Baixo Risco)"
 
     change_pct = ((prediction - history_avg) / history_avg) * 100
 
-    if change_pct > 10:
-        return f"Tendência de Crescimento (+{change_pct:.1f}%)"
-    elif change_pct < -10:
-        return f"Tendência de Redução ({change_pct:.1f}%)"
+    # Limiares de 15% para variação significativa
+    if change_pct > 15:
+        return "Tendência de agravamento recente"
+    elif change_pct < -15:
+        return "Tendência de redução da atividade"
     else:
-        return f"Estabilidade ({change_pct:+.1f}%)"
+        # Estabilidade: verificar o nível do risco absoluto
+        if risk_score is not None:
+            if risk_score > 60:
+                return "Valor histórico alto para o período"
+            elif risk_score > 20:
+                return "Manutenção do padrão de risco médio"
+
+        return "Estabilidade (Baixo Risco)"
 
 def get_region_name(feature_props, geometry):
     # Tenta usar a coluna CIDADE se existir e não for vazia
@@ -570,8 +578,8 @@ def calculate_risk(custom_norm_adj=None):
             cvli_val = float(cvli_adj[i])
             cvp_val = float(cvp_raw[i])
 
-            trend_cvli = format_trend(cvli_raw[i], hist_avg_cvli[i])
-            trend_cvp = format_trend(cvp_raw[i], hist_avg_cvp[i])
+            trend_cvli = format_trend(cvli_raw[i], hist_avg_cvli[i], risk_score=cvli_score)
+            trend_cvp = format_trend(cvp_raw[i], hist_avg_cvp[i], risk_score=cvp_score)
 
             reasons = []
 
