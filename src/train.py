@@ -5,6 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 import pickle
 import numpy as np
+from numpy.lib.stride_tricks import sliding_window_view
 import os
 from src.model import STGCN
 from torch.utils.data import DataLoader, TensorDataset
@@ -30,14 +31,28 @@ def get_logger():
     return logger
 
 def prepare_dataset(node_features):
-    num_nodes, num_timesteps, num_features = node_features.shape
-    X, Y = [], []
-    for i in range(num_timesteps - HISTORY_WINDOW):
-        window = node_features[:, i:i+HISTORY_WINDOW, :]
-        target = node_features[:, i+HISTORY_WINDOW, :]
-        X.append(np.transpose(window, (2, 0, 1)))
-        Y.append(target)
-    return np.array(X), np.array(Y)
+    # Optimized using sliding_window_view to avoid loop and list appending
+
+    # Create windows along the time axis (axis 1)
+    # shape: (num_nodes, num_windows, num_features, HISTORY_WINDOW)
+    windows = sliding_window_view(node_features, HISTORY_WINDOW, axis=1)
+
+    # Discard the last window because we need a target for each window,
+    # and the last window's target would be out of bounds.
+    X = windows[:, :-1, :, :]
+
+    # Transpose to match model input shape: (num_samples, num_features, num_nodes, HISTORY_WINDOW)
+    # Current shape: (N, S, F, H) -> Transpose (1, 2, 0, 3)
+    X = X.transpose(1, 2, 0, 3)
+
+    # Targets correspond to the timestep immediately following each window
+    # Shape: (num_nodes, num_samples, num_features)
+    Y = node_features[:, HISTORY_WINDOW:, :]
+
+    # Transpose to (num_samples, num_nodes, num_features)
+    Y = Y.transpose(1, 0, 2)
+
+    return X, Y
 
 def weighted_mse_loss(input, target, weights):
     sq_diff = (input - target) ** 2
