@@ -528,6 +528,9 @@ def calculate_risk(custom_norm_adj=None):
         except Exception:
             cutoff_cvli = 80.0
 
+        # Pre-fetch 'faction' column to avoid .iloc access inside the loop (Optimization)
+        factions = nodes_gdf['faction'].tolist() if 'faction' in nodes_gdf.columns else [None] * len(nodes_gdf)
+
         for i in range(len(normalized_risk_cvli)):
             cvli_score = float(normalized_risk_cvli[i])
             cvp_score = float(normalized_risk_cvp[i])
@@ -582,7 +585,7 @@ def calculate_risk(custom_norm_adj=None):
                 'risk_score_cvp': cvp_score,
                 'cvli_pred': cvli_val,
                 'cvp_pred': cvp_val,
-                'faction': nodes_gdf.iloc[i].get('faction') if 'faction' in nodes_gdf.columns else None,
+                'faction': factions[i],
                 'reasons': reasons,
                 'priority_cvli': bool(cvli_score >= cutoff_cvli)
             })
