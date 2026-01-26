@@ -291,7 +291,7 @@ def simulate_risk():
         sim_type = data.get('type', 'suppression') # 'suppression' or 'exogenous'
 
         # Copiar matriz original
-        adj_copy = copy.deepcopy(adj_matrix)
+        adj_copy = adj_matrix.copy()
 
         # Track affected nodes for post-processing
         affected_nodes = set()
