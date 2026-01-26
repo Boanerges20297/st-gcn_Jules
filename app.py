@@ -24,9 +24,11 @@ EXOGENOUS_FILE = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
 
 # Valores padrão caso arquivos não estejam presentes
 nodes_gdf = None
+polygons_json_cache = None
 nodes_gdf_proj = None
 nodes_centroids_proj = None
 adj_matrix = None
+original_adj_matrix = None
 node_features = None
 model_cvli = None
 model_cvp = None
@@ -159,52 +161,36 @@ def apply_exogenous_events():
 
     print(f"Malha adaptada: {count_affected} modificações aplicadas.")
 
-def normalize_location(text):
-    if not text: return ""
-    text = text.upper()
-    text = text.replace("PQ.", "PARQUE")
-    text = text.replace("AV.", "AVENIDA")
-    text = text.replace("S/", "SEM ")
-    return text.strip()
+def compute_norm_adj(adj_matrix_input):
+    if adj_matrix_input is None: return None
+    adj_tensor = torch.FloatTensor(adj_matrix_input)
+    rowsum = adj_tensor.sum(1)
+    d_inv_sqrt = torch.pow(rowsum, -0.5)
+    d_inv_sqrt[torch.isinf(d_inv_sqrt)] = 0.
+    d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
+    return torch.mm(torch.mm(d_mat_inv_sqrt, adj_tensor), d_mat_inv_sqrt).to(device)
 
-def strip_accents(text):
-    import unicodedata
-    return ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
+def update_exogenous_state():
+    global adj_matrix, norm_adj, original_adj_matrix
 
-def build_node_search_index():
-    global node_search_index
-    if nodes_gdf is None:
+    if original_adj_matrix is None:
+        print("AVISO: Matriz original não disponível para atualização incremental. Recarregando tudo.")
+        load_data_and_models()
         return
 
-    print("Construindo índice de busca de nós...")
-    node_search_index.clear()
+    print("Atualizando estado exógeno incrementalmente...")
 
-    try:
-        # Check if geometry is valid? Assuming yes for processed data.
-        centroids = nodes_gdf.geometry.centroid
+    # 1. Restore clean state
+    adj_matrix = original_adj_matrix.copy()
 
-        names = nodes_gdf['name'].astype(str).tolist()
-        lats = centroids.y.tolist()
-        lngs = centroids.x.tolist()
+    # 2. Apply all events
+    apply_exogenous_events()
 
-        count = 0
-        for name, lat, lng in zip(names, lats, lngs):
-            if not name or len(name) < 3:
-                continue
-
-            name_lower = name.lower()
-            name_stripped = strip_accents(name_lower)
-
-            node_search_index.append(NodeSearchItem(name, name_lower, name_stripped, lat, lng))
-            count += 1
-
-        print(f"Índice de busca construído com {count} nós.")
-
-    except Exception as e:
-        print(f"Erro ao construir índice de busca: {e}")
+    # 3. Recompute normalization
+    norm_adj = compute_norm_adj(adj_matrix)
 
 def load_data_and_models():
-    global nodes_gdf, nodes_gdf_proj, nodes_centroids_proj, adj_matrix, node_features, model_cvli, model_cvp, device, norm_adj, dates
+    global nodes_gdf, polygons_json_cache, nodes_gdf_proj, nodes_centroids_proj, adj_matrix, node_features, model_cvli, model_cvp, device, norm_adj, dates
     global ibge_bairros_cache, ibge_municipios_cache
 
     # Load Static Data
@@ -232,6 +218,7 @@ def load_data_and_models():
             data_pack = pickle.load(f)
 
         nodes_gdf = data_pack.get('nodes_gdf')
+        polygons_json_cache = None
         adj_matrix = data_pack.get('adj_matrix')
         node_features = data_pack.get('node_features')
         dates = data_pack.get('dates')
@@ -253,17 +240,16 @@ def load_data_and_models():
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         num_nodes = node_features.shape[0]
 
+        # Capture original matrix before modifications
+        if adj_matrix is not None:
+            original_adj_matrix = adj_matrix.copy()
+
         # Load and Apply Exogenous Events (Permanent Adaptation)
         load_exogenous_events()
         apply_exogenous_events()
 
         # Pre-computar normalização da adjacência (com modificações)
-        adj_tensor = torch.FloatTensor(adj_matrix)
-        rowsum = adj_tensor.sum(1)
-        d_inv_sqrt = torch.pow(rowsum, -0.5)
-        d_inv_sqrt[torch.isinf(d_inv_sqrt)] = 0.
-        d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
-        norm_adj = torch.mm(torch.mm(d_mat_inv_sqrt, adj_tensor), d_mat_inv_sqrt).to(device)
+        norm_adj = compute_norm_adj(adj_matrix)
 
         # Carregar Modelos
         if os.path.exists(MODEL_CVLI_PATH):
@@ -349,9 +335,13 @@ def index():
 
 @app.route('/api/polygons')
 def get_polygons():
+    global polygons_json_cache
     if nodes_gdf is None:
         return jsonify({'error': 'Dados de polígonos não carregados.'}), 503
     try:
+        if polygons_json_cache is not None:
+            return polygons_json_cache
+
         # Atualizar props com região inferida antes de enviar?
         # GeoJSON serialization is tricky to inject props on the fly efficiently.
         # Mas o frontend espera CIDADE.
@@ -360,7 +350,8 @@ def get_polygons():
         # Melhor: injetar 'region_inferred' no geojson
 
         # Convert to json string first
-        return nodes_gdf.to_json()
+        polygons_json_cache = nodes_gdf.to_json()
+        return polygons_json_cache
     except Exception as e:
         return jsonify({'error': f'Erro ao serializar polígonos: {e}'}), 500
 
@@ -724,7 +715,7 @@ def calculate_risk(custom_norm_adj=None):
 
 # Helper to enrich regions (One time run or on request)
 def enrich_regions():
-    global nodes_gdf
+    global nodes_gdf, polygons_json_cache
     if nodes_gdf is None: return
 
     # Check if we need to infer
@@ -799,6 +790,20 @@ def enrich_regions():
 
         except Exception as e:
             print(f"Erro na inferência por distância: {e}")
+
+    polygons_json_cache = None
+
+def normalize_location(text):
+    if not text: return ""
+    text = text.upper()
+    text = text.replace("PQ.", "PARQUE")
+    text = text.replace("AV.", "AVENIDA")
+    text = text.replace("S/", "SEM ")
+    return text.strip()
+
+def strip_accents(text):
+    import unicodedata
+    return ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
 
 def find_node_coordinates(location_str):
     if nodes_gdf is None:
@@ -980,6 +985,7 @@ def parse_exogenous():
 
 @app.route('/api/exogenous/save', methods=['POST'])
 def save_exogenous():
+    global exogenous_events
     import json # Safeguard
     data = request.get_json()
     points = data.get('points', [])
@@ -1011,10 +1017,10 @@ def save_exogenous():
             json.dump(current_events, f, ensure_ascii=False, indent=2)
 
         # Trigger Reload/Re-apply
-        # We need to reload data to reset adj_matrix and re-apply ALL events including this new one.
-        # This is expensive but ensures consistency.
-        # load_data_and_models handles full reload.
-        load_data_and_models()
+        # We update the in-memory state efficiently without reloading everything.
+        exogenous_events.append(new_entry)
+
+        update_exogenous_state()
 
         return jsonify({'status': 'success', 'message': 'Eventos salvos e malha atualizada.'})
 
