@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { padding-top: 20px; background-color: #f8f9fa; }
-        #map { height: 600px; width: 100%; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        #map { min-height: 600px; width: 100%; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         .metric-card { transition: transform 0.2s; }
         .metric-card:hover { transform: translateY(-5px); }
         .legend { background: white; padding: 10px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
@@ -106,20 +106,20 @@
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-9">
-            <div class="card shadow-sm">
+    <div class="row align-items-stretch">
+        <div class="col-md-9 d-flex flex-column">
+            <div class="card shadow-sm h-100 w-100">
                 <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                     <span><i class="fas fa-map-marked-alt"></i> Mapa Tático Operacional</span>
                     <span class="badge bg-danger">Dados Atualizados: Hoje</span>
                 </div>
-                <div class="card-body p-0">
-                    <div id="map"></div>
+                <div class="card-body p-0 d-flex flex-column">
+                    <div id="map" class="flex-grow-1"></div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm">
+        <div class="col-md-3 d-flex flex-column">
+            <div class="card shadow-sm h-100 w-100">
                 <div class="card-header">
                     <strong>Motivos de Risco</strong>
                 </div>
@@ -158,15 +158,18 @@
                     </div>
                     <hr>
                     <div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="mb-0" id="top-list-title">Top 30 Áreas Críticas</h6>
+                        <div class="mb-2">
+                            <label for="region-filter" class="form-label small fw-bold text-muted">Filtrar Região:</label>
+                            <select class="form-select form-select-sm" id="region-filter">
+                                <option value="all">Todas as Regiões</option>
+                                <option value="capital">Capital (Fortaleza)</option>
+                                <option value="rmf">Região Metropolitana (RMF)</option>
+                                <option value="interior">Interior do Estado</option>
+                            </select>
                         </div>
-                        <select class="form-select form-select-sm mb-2" id="region-filter">
-                            <option value="all">Todas as Regiões</option>
-                            <option value="capital">Capital (Fortaleza)</option>
-                            <option value="rmf">Região Metropolitana (RMF)</option>
-                            <option value="interior">Interior do Estado</option>
-                        </select>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0 fw-bold" id="top-list-title">Top 30 Áreas Críticas</h6>
+                        </div>
                         <div id="top-areas" class="list-group list-group-flush small" style="max-height: 400px; overflow-y: auto;"></div>
                     </div>
                 </div>
