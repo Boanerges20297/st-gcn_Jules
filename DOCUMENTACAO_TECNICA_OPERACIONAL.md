@@ -42,28 +42,34 @@ O sistema aplica uma normalização híbrida sobre as predições brutas da IA:
 *   **Sensibilidade (Boost):** Aplicação de multiplicadores (1.5x) para garantir que sinais fracos em áreas críticas não sejam ignorados.
 *   **Histórico Mínimo:** Áreas com atividade criminal recente recebem um "piso" de risco (mínimo 25-30%) para evitar falsos negativos (risco zero) em zonas ativas.
 
-### 3.3. Gatilhos de Alerta (Triggers)
-O sistema categoriza o risco em quatro níveis visuais:
-*   🔴 **CRÍTICO (> 80%):** Ação imediata recomendada. Saturação tática.
-*   🟠 **ALTO (> 60%):** Alerta elevado. Patrulhamento direcionado.
-*   🔵 **MÉDIO (> 20%):** Atenção. Monitoramento padrão.
+### 3.3. Gatilhos de Alerta e Comunicação
+O sistema categoriza o risco em quatro níveis visuais, utilizando linguagem gerencial para facilitar a compreensão:
+
+*   🔴 **CRÍTICO (> 80%):** Ação imediata recomendada.
+    *   *Descrição:* "Tendência de agravamento recente".
+*   🟠 **ALTO (> 60%):** Alerta elevado.
+    *   *Descrição:* "Valor histórico alto para o período" (quando estável) ou alta probabilidade preditiva.
+*   🔵 **MÉDIO (> 20%):** Atenção.
+    *   *Descrição:* "Manutenção do padrão de risco médio".
 *   🟢 **BAIXO (<= 20%):** Estabilidade.
+    *   *Descrição:* "Estabilidade (Baixo Risco)".
+
+> **Nota:** O sistema não exibe mais percentuais estatísticos complexos nos motivos, focando em descrições qualitativas diretas.
 
 ## 4. Funcionalidades Dinâmicas
 
-### 4.1. Inserção de Dados Exógenos (Novo)
-O sistema permite a ingestão direta de "blocos" de texto da CIOPS (Coordenadoria Integrada de Operações de Segurança) para reavaliação instantânea do risco.
+### 4.1. Inserção de Dados Exógenos (IA Generativa)
+O sistema permite a ingestão direta de relatórios não estruturados da CIOPS (Coordenadoria Integrada de Operações de Segurança) e utiliza **Inteligência Artificial Generativa (Google Gemini)** para estruturar e localizar os eventos.
 
 **Fluxo:**
 1.  O operador cola o texto bruto das ocorrências (ex: despachos de rádio, relatórios de campo).
-2.  **Processamento NLP:** O sistema utiliza Regex e heurísticas para extrair:
-    *   Natureza do evento.
-    *   Localização (Bairro, Rua, AIS).
-3.  **Geolocalização:**
-    *   Tenta associar a localização a um nó conhecido do grafo (Área monitorada/Bairro).
-    *   *Fallback 1 (Bairros de Fortaleza):* Se não encontrar no grafo, busca em uma base estática de bairros oficiais de Fortaleza (IBGE).
-    *   *Fallback 2 (Municípios do Ceará):* Se não encontrar o bairro, busca na lista de 184 municípios do Ceará (IBGE) e utiliza as coordenadas da sede municipal.
-    *   *Fallback 3 (Geométrico):* Último recurso, calcula o centróide geométrico dos nós pertencentes à cidade detectada (se houver correspondência parcial de nome).
+2.  **Processamento LLM (Gemini 1.5):**
+    *   O sistema envia o texto para a nuvem do Google Gemini (requer chave de API configurada).
+    *   A IA extrai e estrutura: **Natureza**, **Localização Completa**, **Bairro** e **Município**.
+3.  **Geolocalização Inteligente (Hierárquica):**
+    *   *Nível 1 (Endereço Completo):* Busca correspondência do endereço específico na malha viária/nós.
+    *   *Nível 2 (Bairro):* Se falhar, utiliza o bairro extraído pela IA para centralizar no nó correspondente.
+    *   *Nível 3 (Município):* Em último caso, centraliza na sede do município identificado.
 4.  **Reavaliação (Simulação):**
     *   Os eventos são tratados como "Conflitos Ativos".
     *   O sistema simula uma "explosão" de risco nos nós afetados, aumentando artificialmente a conectividade e o score de risco para refletir a instabilidade em tempo real.
