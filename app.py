@@ -12,6 +12,9 @@ from shapely.geometry import shape, Point, Polygon
 from scipy.spatial.distance import cdist
 from src.model import STGCN
 from src.llm_service import process_exogenous_text
+import threading
+import time
+import unicodedata
 
 app = Flask(__name__)
 
@@ -41,6 +44,9 @@ ibge_bairros_cache = None
 ibge_municipios_cache = None
 exogenous_events = []
 exogenous_affected_nodes = set()
+# Periodic update status flags (used by frontend polling)
+app._periodic_update_in_progress = False
+app._periodic_last_update = None
 
 class NodeSearchItem:
     __slots__ = ('name', 'name_lower', 'name_stripped', 'lat', 'lng')
@@ -57,6 +63,51 @@ MANUAL_LOCATIONS = {
     "TAIBA": (-3.535, -38.892),
     "TAÍBA": (-3.535, -38.892),
 }
+
+
+def strip_accents(text: str) -> str:
+    try:
+        return ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
+    except Exception:
+        return text
+
+
+def build_node_search_index():
+    """Populate global `node_search_index` from `nodes_gdf`.
+
+    Each item contains original name, lowercased name, stripped name (no accents),
+    and centroid coordinates (lat, lng).
+    """
+    global node_search_index
+    node_search_index = []
+    if nodes_gdf is None:
+        return
+
+    def _get_name_from_row(row):
+        for col in ('name', 'NAME', 'NOME', 'nome'):
+            if col in row and isinstance(row[col], str) and row[col].strip():
+                return row[col].strip()
+        return None
+
+    try:
+        for _, row in nodes_gdf.reset_index(drop=True).iterrows():
+            name = _get_name_from_row(row)
+            if not name:
+                continue
+            geom = row.get('geometry') if 'geometry' in row else None
+            if geom is None:
+                continue
+            centroid = geom.centroid
+            lat = centroid.y
+            lng = centroid.x
+
+            name_lower = name.lower()
+            name_stripped = strip_accents(name_lower)
+
+            item = NodeSearchItem(name=name, name_lower=name_lower, name_stripped=name_stripped, lat=lat, lng=lng)
+            node_search_index.append(item)
+    except Exception as e:
+        print(f"Erro ao construir node_search_index: {e}")
 
 # Parâmetros de janela
 WINDOW_CVLI = 180
@@ -285,6 +336,58 @@ def load_data_and_models():
 
 # Executa carregamento inicial
 load_data_and_models()
+
+
+def _periodic_reload_loop(interval_minutes: int):
+    interval = max(1, int(interval_minutes)) * 60
+    while True:
+        try:
+            print("[PeriodicReload] Scheduled reload starting...")
+            try:
+                app._periodic_update_in_progress = True
+            except Exception:
+                pass
+
+            # Reuse the same load procedure used at startup
+            load_data_and_models()
+
+            try:
+                app._periodic_last_update = datetime.now(timezone.utc).isoformat()
+            except Exception:
+                pass
+
+            try:
+                app._periodic_update_in_progress = False
+            except Exception:
+                pass
+
+            print("[PeriodicReload] Scheduled reload finished.")
+        except Exception as e:
+            print(f"[PeriodicReload] Error during scheduled reload: {e}")
+        time.sleep(interval)
+
+
+def start_periodic_reload(interval_minutes: int = 30):
+    if getattr(app, '_periodic_reload_started', False):
+        return
+    t = threading.Thread(target=_periodic_reload_loop, args=(interval_minutes,), daemon=True)
+    t.start()
+    app._periodic_reload_started = True
+
+
+@app.route('/api/periodic_status')
+def periodic_status():
+    try:
+        return jsonify({
+            'in_progress': bool(getattr(app, '_periodic_update_in_progress', False)),
+            'last_update': getattr(app, '_periodic_last_update', None)
+        })
+    except Exception:
+        return jsonify({'in_progress': False, 'last_update': None})
+
+
+# Start periodic reloads (30 minutes)
+start_periodic_reload(30)
 
 def format_trend(prediction, history_avg, risk_score=None):
     if history_avg == 0:
