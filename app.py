@@ -24,6 +24,7 @@ EXOGENOUS_FILE = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
 # Valores padrão caso arquivos não estejam presentes
 nodes_gdf = None
 nodes_gdf_proj = None
+nodes_centroids_proj = None
 adj_matrix = None
 node_features = None
 model_cvli = None
@@ -70,23 +71,40 @@ def find_nearby_nodes(lat, lng, radius_m=500):
              # Project point to 3857 for meters distance
              s = gpd.GeoSeries([p_geo], crs="EPSG:4326").to_crs("EPSG:3857")
              p_proj = s.iloc[0]
-             centroids = nodes_gdf_proj.geometry.centroid
-             dists = centroids.distance(p_proj)
-             nearby_indices = dists[dists < radius_m].index.tolist()
+
+             if nodes_centroids_proj is not None:
+                 # Spatial Index Search
+                 search_buffer = p_proj.buffer(radius_m)
+                 candidate_ilocs = list(nodes_centroids_proj.sindex.intersection(search_buffer.bounds))
+                 if candidate_ilocs:
+                     candidates = nodes_centroids_proj.iloc[candidate_ilocs]
+                     dists = candidates.distance(p_proj)
+                     nearby_indices = dists[dists < radius_m].index.tolist()
+             else:
+                 centroids = nodes_gdf_proj.geometry.centroid
+                 dists = centroids.distance(p_proj)
+                 nearby_indices = dists[dists < radius_m].index.tolist()
         else:
              # Fallback (degrees)
-             centroids = nodes_gdf.geometry.centroid
-             dists = centroids.distance(p_geo)
-             nearby_indices = dists[dists < 0.005].index.tolist() # Approx 0.005 deg ~ 500m
+             if nodes_gdf is not None:
+                 centroids = nodes_gdf.geometry.centroid
+                 dists = centroids.distance(p_geo)
+                 nearby_indices = dists[dists < 0.005].index.tolist() # Approx 0.005 deg ~ 500m
 
         if not nearby_indices:
              # Find at least one closest
              if nodes_gdf is not None:
                  if nodes_gdf_proj is not None:
-                     dists = nodes_gdf_proj.geometry.centroid.distance(p_proj)
+                     if nodes_centroids_proj is not None:
+                         # Fallback to linear search for robustness (sindex.nearest showed inconsistencies in tests)
+                         dists = nodes_centroids_proj.distance(p_proj)
+                         nearby_indices = [dists.idxmin()]
+                     else:
+                         dists = nodes_gdf_proj.geometry.centroid.distance(p_proj)
+                         nearby_indices = [dists.idxmin()]
                  else:
                      dists = nodes_gdf.geometry.centroid.distance(p_geo)
-                 nearby_indices = [dists.idxmin()]
+                     nearby_indices = [dists.idxmin()]
 
     except Exception as e:
         print(f"Erro ao buscar nodes próximos: {e}")
@@ -130,7 +148,7 @@ def apply_exogenous_events():
     print(f"Malha adaptada: {count_affected} modificações aplicadas.")
 
 def load_data_and_models():
-    global nodes_gdf, nodes_gdf_proj, adj_matrix, node_features, model_cvli, model_cvp, device, norm_adj, dates
+    global nodes_gdf, nodes_gdf_proj, nodes_centroids_proj, adj_matrix, node_features, model_cvli, model_cvp, device, norm_adj, dates
     global ibge_bairros_cache, ibge_municipios_cache
 
     # Load Static Data
@@ -167,6 +185,9 @@ def load_data_and_models():
         if nodes_gdf is not None:
             try:
                 nodes_gdf_proj = nodes_gdf.to_crs(epsg=3857)
+                nodes_centroids_proj = nodes_gdf_proj.geometry.centroid
+                # Force spatial index build
+                _ = nodes_centroids_proj.sindex
             except Exception as e:
                 print(f"Erro ao projetar nodes_gdf: {e}")
 
@@ -297,8 +318,10 @@ def simulate_risk():
         affected_nodes = set()
 
         # Use projected centroids if available for accurate distance (Meters)
+        centroids = None
         if nodes_gdf_proj is not None:
-             centroids = nodes_gdf_proj.geometry.centroid
+             if nodes_centroids_proj is None:
+                 centroids = nodes_gdf_proj.geometry.centroid
         else:
              centroids = nodes_gdf.geometry.centroid
 
@@ -314,9 +337,18 @@ def simulate_risk():
                     try:
                         s = gpd.GeoSeries([p_geo], crs="EPSG:4326").to_crs("EPSG:3857")
                         p_proj = s.iloc[0]
-                        dists = centroids.distance(p_proj)
-                        # Radius 500m
-                        nearby_indices = dists[dists < 500].index.tolist()
+
+                        if nodes_centroids_proj is not None:
+                             # Spatial Index Search
+                             search_buffer = p_proj.buffer(500)
+                             candidate_ilocs = list(nodes_centroids_proj.sindex.intersection(search_buffer.bounds))
+                             if candidate_ilocs:
+                                 candidates = nodes_centroids_proj.iloc[candidate_ilocs]
+                                 dists = candidates.distance(p_proj)
+                                 nearby_indices = dists[dists < 500].index.tolist()
+                        else:
+                             dists = centroids.distance(p_proj)
+                             nearby_indices = dists[dists < 500].index.tolist()
                     except Exception as e:
                         print(f"Erro ao projetar ponto na simulação: {e}")
                         # Fallback
