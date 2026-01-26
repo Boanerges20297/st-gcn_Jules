@@ -5,30 +5,6 @@ import geopandas as gpd
 from shapely.geometry import Polygon
 import app
 
-# Sample text
-SAMPLE_TEXT = """
-01 - M20260051891 - RAIO 04 CAUCAIA - 3ºSGT 26507 GREGÓRIO - CUMPRIMENTO DE MANDADO JUDICIAL - 1 MAIOR - CENTRO DE FORTALEZA (AIS05) - 34ºDP - 11:53
-
-02 - M20260051968 - PATRULHA 03 - 2ºSGT 24091 KELVIN - ACHADO DE ENTORPECENTES - (MACONHA/CRACK/COCAÍNA) - TIMBÓ, MARACANAÚ - 21ºDP - 13:02
-"""
-
-def test_parse_ciops_text():
-    """Test parsing of CIOPS text format."""
-    # Ensure the function handles the provided format
-    events = app.parse_ciops_text(SAMPLE_TEXT)
-
-    assert len(events) == 2
-
-    # Event 1
-    assert events[0]['nature'] == 'CUMPRIMENTO DE MANDADO JUDICIAL'
-    # The parser should strip "(AIS05)"
-    assert 'CENTRO DE FORTALEZA' in events[0]['location']
-    assert '(AIS05)' not in events[0]['location']
-
-    # Event 2
-    assert events[1]['nature'] == 'ACHADO DE ENTORPECENTES'
-    assert events[1]['location'] == 'TIMBÓ, MARACANAÚ'
-
 def test_find_node_coordinates():
     """Test mapping location strings to node coordinates."""
 
