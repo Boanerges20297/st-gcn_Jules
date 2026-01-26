@@ -11,6 +11,7 @@ import json
 from shapely.geometry import shape, Point, Polygon
 from scipy.spatial.distance import cdist
 from src.model import STGCN
+from src.llm_service import process_exogenous_text
 
 app = Flask(__name__)
 
@@ -753,33 +754,6 @@ def strip_accents(text):
     import unicodedata
     return ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
 
-def parse_ciops_text(text):
-    events = []
-    lines = text.strip().split('\n')
-    for line in lines:
-        line = line.strip()
-        if not line:
-            continue
-
-        # Format: 01 - ID - TEAM - OFFICER - NATURE - INVOLVEMENT - LOCATION (AIS) - DP - TIME
-        # Split by ' - '
-        parts = line.split(' - ')
-        if len(parts) >= 7:
-            # Heuristic: Index 4 is nature, Index 6 is location
-            nature = parts[4].strip()
-            location = parts[6].strip()
-
-            # Clean location: remove (AIS...)
-            location = re.sub(r'\s*\(AIS\d+\)', '', location)
-
-            events.append({
-                'nature': nature,
-                'location': location,
-                'raw': line
-            })
-
-    return events
-
 def find_node_coordinates(location_str):
     if nodes_gdf is None:
         return None
@@ -903,54 +877,56 @@ def parse_exogenous():
     data = request.get_json()
     text = data.get('text', '')
 
-    events = parse_ciops_text(text)
+    # Use LLM Service (Gemini)
+    events = process_exogenous_text(text)
     points = []
 
     for evt in events:
-        # Improved parsing strategy: Scan parts of the raw line
-        raw_line = evt.get('raw', '')
-        parts = raw_line.split(' - ')
+        found_lat = None
+        found_lng = None
+        match_quality = 0 # 1=City, 2=Bairro, 3=Specific
 
-        candidates = []
-
-        # Determine range of parts to scan.
-        # Usually from index 4 onwards.
-        start_idx = 4 if len(parts) > 4 else 0
-        end_idx = max(len(parts) - 1, start_idx + 1)
-
-        for i in range(start_idx, end_idx):
-            candidate_text = parts[i].strip()
-            # Clean (AIS...)
-            candidate_text = re.sub(r'\s*\(AIS\d+\)', '', candidate_text)
-
-            res = find_node_coordinates(candidate_text)
+        # 1. Try Full Address / Location
+        if evt.get('localizacao_completa'):
+            res = find_node_coordinates(evt['localizacao_completa'])
             if res:
-                lat, lng, match_type = res
-                # Score match type
-                score = 0
-                if match_type == 'manual': score = 3
-                elif match_type == 'specific': score = 2
-                elif match_type == 'city': score = 1
+                found_lat, found_lng, mtype = res
+                match_quality = 3 if mtype == 'specific' else 2
 
-                candidates.append({
-                    'lat': lat, 'lng': lng, 'score': score, 'text': candidate_text
-                })
+        # 2. Try Neighborhood (Bairro) if not found or low quality
+        if (not found_lat or match_quality < 2) and evt.get('bairro'):
+            res = find_node_coordinates(evt['bairro'])
+            if res:
+                # If we found nothing before, take this.
+                # If we found something before (e.g. city match), take this as it is likely better (neighborhood).
+                # find_node_coordinates usually returns 'specific' for neighborhoods.
+                lat_b, lng_b, mtype_b = res
+                if mtype_b == 'specific':
+                     found_lat, found_lng = lat_b, lng_b
+                     match_quality = 3
 
-        # Sort by score descending
-        candidates.sort(key=lambda x: x['score'], reverse=True)
+        # 3. Try City (Municipio)
+        if not found_lat and evt.get('municipio'):
+            res = find_node_coordinates(evt['municipio'])
+            if res:
+                found_lat, found_lng, _ = res
+                match_quality = 1
 
-        if candidates:
-            best = candidates[0]
-            # Sanitize description
+        if found_lat is not None and found_lng is not None:
             import html
-            # Use original nature if available, else best text
-            desc_text = f"{evt['nature']} - {evt['location']}"
-            safe_desc = html.escape(desc_text)
+            # Construct description from LLM fields
+            desc = f"{evt.get('natureza', 'EVENTO')} - {evt.get('resumo', '')}"
+            if not evt.get('resumo'):
+                desc = f"{evt.get('natureza', 'EVENTO')} - {evt.get('localizacao_completa', '')}"
+
+            safe_desc = html.escape(desc)
+
             points.append({
-                'lat': best['lat'],
-                'lng': best['lng'],
+                'lat': found_lat,
+                'lng': found_lng,
                 'description': safe_desc,
-                'type': 'exogenous'
+                'type': 'exogenous',
+                'raw_event': evt
             })
 
     return jsonify({
