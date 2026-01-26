@@ -19,6 +19,7 @@ graph TD
         STGCN[Modelo IA: ST-GCN (PyTorch)]
         Flask[Servidor Flask (API)]
         GeoLoc[Motor de Geolocalização]
+        LLM[LLM Service (Google Gemini)]
     end
 
     subgraph "Frontend (Web)"
@@ -105,25 +106,23 @@ sequenceDiagram
     Front->>User: Exibe Painel Atualizado
 ```
 
-### 3.3. Ingestão de Dados Exógenos (Novo Recurso)
-O fluxo complexo de interpretar texto livre e atualizar o mapa.
+### 3.3. Ingestão de Dados Exógenos (IA Integrada)
+O fluxo complexo de interpretar texto livre, estruturar via LLM e atualizar o mapa.
 
 ```mermaid
 flowchart TD
     A[Operador cola texto da CIOPS] -->|Submit| B(Frontend envia p/ /api/exogenous/parse)
-    B --> C{Parser Regex}
-    C -->|Extrai| D[Lista de Eventos: Natureza + Local]
+    B --> C[LLM Service: Gemini API]
+    C -->|Extrai JSON| D[Eventos Estruturados: Natureza, Endereço, Bairro, Cidade]
 
-    subgraph "Motor de Geolocalização (4 Camadas)"
-    D --> E{Busca Nó exato no Grafo?}
-    E -- Sim --> F[Coordenada do Nó]
-    E -- Não --> G{Busca Bairro IBGE?}
+    subgraph "Geolocalização Inteligente (Hierárquica)"
+    D --> E{Busca Endereço Completo?}
+    E -- Sim --> F[Coordenada Específica]
+    E -- Não --> G{Busca Bairro da IA?}
     G -- Sim --> F
-    G -- Não --> H{Busca Município Ceará?}
+    G -- Não --> H{Busca Município da IA?}
     H -- Sim --> F
-    H -- Não --> I{Busca Palavra-chave Cidade?}
-    I -- Sim --> F
-    I -- Não --> J[Descartar Evento]
+    H -- Não --> J[Descartar Evento]
     end
 
     F --> K[Lista de Pontos Confirmados]
