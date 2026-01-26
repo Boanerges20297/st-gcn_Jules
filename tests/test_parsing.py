@@ -22,6 +22,7 @@ def test_find_node_coordinates():
 
     # Patch the global nodes_gdf in app module
     with patch('app.nodes_gdf', gdf):
+        app.build_node_search_index()
         # Case 1: Partial match "CENTRO DE FORTALEZA" should match "Centro"
         # Logic: "Centro" is in "CENTRO DE FORTALEZA"
         coords = app.find_node_coordinates("CENTRO DE FORTALEZA")
@@ -57,6 +58,7 @@ def test_find_node_coordinates():
         gdf_simple = gpd.GeoDataFrame(data_simple, crs="EPSG:4326")
 
         with patch('app.nodes_gdf', gdf_simple):
+            app.build_node_search_index()
             coords = app.find_node_coordinates("TIMBÓ, MARACANAÚ")
             assert coords is not None
             assert coords[0] == 10.5
@@ -86,6 +88,7 @@ def test_find_node_coordinates_reverse_match():
     gdf = gpd.GeoDataFrame(data, crs="EPSG:4326")
 
     with patch('app.nodes_gdf', gdf):
+        app.build_node_search_index()
         coords = app.find_node_coordinates("MOURA BRASIL")
         assert coords is not None
         assert coords[0] == 0.5
@@ -106,12 +109,13 @@ def test_find_node_coordinates_fallback_city():
     gdf = gpd.GeoDataFrame(data, crs="EPSG:4326")
 
     with patch('app.nodes_gdf', gdf):
+        app.build_node_search_index()
         # Input has no "Area A" but has "Fortaleza"
         # Since the app now loads a REAL static file for Fortaleza, it takes precedence
         # over the geometric centroid calculation in this mock unless we patch the static cache.
         # But if we patch cache to None, it falls back to geometric.
 
-        with patch('app.ibge_municipios_cache', None):
+        with patch('app.ibge_municipios_cache', {}):
              # Force geometric calc for "Fortaleza" if "Fortaleza" is not in neighborhood list (it is in Muni list)
              # "Fortaleza" is in ceara_municipios_coords.json, so it will hit Fallback 3.
              # We must patch that cache too.
@@ -122,7 +126,16 @@ def test_find_node_coordinates_fallback_city():
             # The failure showed it hit real data.
             # Let's adjust the test to accept the REAL data or patch the cache to empty.
             # Patching to empty dict is safer to test logic 5.
-            pass
+            if coords is None:
+                # Should find by city fallback
+                assert False, "Should find coordinate via city fallback"
+
+            # Centroid of Fortaleza in mock data:
+            # Area A (Fortaleza): (0.5, 0.5)
+            # Area B (Fortaleza): (2.5, 0.5)
+            # Avg: (1.5, 0.5)
+            assert coords[0] == pytest.approx(0.5, abs=1e-3)
+            assert coords[1] == pytest.approx(1.5, abs=1e-3)
 
 def test_find_node_coordinates_ibge_fallback():
     """Test fallback to static IBGE list."""

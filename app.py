@@ -42,6 +42,17 @@ ibge_municipios_cache = None
 exogenous_events = []
 exogenous_affected_nodes = set()
 
+class NodeSearchItem:
+    __slots__ = ('name', 'name_lower', 'name_stripped', 'lat', 'lng')
+    def __init__(self, name, name_lower, name_stripped, lat, lng):
+        self.name = name
+        self.name_lower = name_lower
+        self.name_stripped = name_stripped
+        self.lat = lat
+        self.lng = lng
+
+node_search_index = []
+
 MANUAL_LOCATIONS = {
     "TAIBA": (-3.535, -38.892),
     "TAÍBA": (-3.535, -38.892),
@@ -222,6 +233,9 @@ def load_data_and_models():
                 _ = nodes_centroids_proj.sindex
             except Exception as e:
                 print(f"Erro ao projetar nodes_gdf: {e}")
+
+            # Build search index
+            build_node_search_index()
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         num_nodes = node_features.shape[0]
@@ -805,40 +819,37 @@ def find_node_coordinates(location_str):
          return (*MANUAL_LOCATIONS[loc_norm], 'manual')
 
     # Strategy: Check if any node name is contained in the location string
-    best_match = None
+    best_match_item = None
     best_match_len = 0
 
-    for idx, row in nodes_gdf.iterrows():
-        name = str(row['name']).lower()
-        if not name or len(name) < 3:
-            continue
-
-        name_stripped = strip_accents(name)
+    # Optimization: Use pre-computed index
+    for item in node_search_index:
+        name = item.name_lower
+        name_stripped = item.name_stripped
 
         # Check if node name is in input location (e.g. "Timbó" in "Timbó, Maracanaú")
         # OR if input location is in node name (e.g. "Moura Brasil" in "Morro ... Moura Brasil")
         # Try exact match first, then stripped
         if name in loc_lower:
             if len(name) > best_match_len:
-                best_match = row
+                best_match_item = item
                 best_match_len = len(name)
         elif name_stripped in loc_stripped:
              # Match without accents
              if len(name) > best_match_len:
-                best_match = row
+                best_match_item = item
                 best_match_len = len(name)
         elif loc_lower in name and len(loc_lower) > 4:
              if len(loc_lower) > best_match_len:
-                best_match = row
+                best_match_item = item
                 best_match_len = len(loc_lower)
         elif loc_stripped in name_stripped and len(loc_stripped) > 4:
              if len(loc_stripped) > best_match_len:
-                best_match = row
+                best_match_item = item
                 best_match_len = len(loc_stripped)
 
-    if best_match is not None:
-        centroid = best_match.geometry.centroid
-        return (centroid.y, centroid.x, 'specific') # lat, lon
+    if best_match_item is not None:
+        return (best_match_item.lat, best_match_item.lng, 'specific') # lat, lon
 
     # Fallback 2: IBGE Neighborhoods Static List (Cached)
     if ibge_bairros_cache:
