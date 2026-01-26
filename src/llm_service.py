@@ -14,6 +14,27 @@ def process_exogenous_text(text: str) -> List[Dict[str, Any]]:
 
     Args:
         text (str): Raw text (e.g., CIOPS report).
+from typing import List, Dict, Any
+
+# Load .env if present
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception:
+    pass
+
+# Prefer new `google.genai` package; fall back to deprecated `google.generativeai` if needed.
+GENAI_BACKEND = None
+genai = None
+try:
+    import google.genai as genai
+    GENAI_BACKEND = 'genai'
+except Exception:
+    try:
+        import google.generativeai as genai
+        GENAI_BACKEND = 'generativeai'
+    except Exception:
+        genai = None
 
     Returns:
         List[Dict]: A list of event dictionaries with keys:
