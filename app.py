@@ -28,6 +28,7 @@ polygons_json_cache = None
 nodes_gdf_proj = None
 nodes_centroids_proj = None
 adj_matrix = None
+original_adj_matrix = None
 node_features = None
 model_cvli = None
 model_cvp = None
@@ -149,6 +150,34 @@ def apply_exogenous_events():
 
     print(f"Malha adaptada: {count_affected} modificações aplicadas.")
 
+def compute_norm_adj(adj_matrix_input):
+    if adj_matrix_input is None: return None
+    adj_tensor = torch.FloatTensor(adj_matrix_input)
+    rowsum = adj_tensor.sum(1)
+    d_inv_sqrt = torch.pow(rowsum, -0.5)
+    d_inv_sqrt[torch.isinf(d_inv_sqrt)] = 0.
+    d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
+    return torch.mm(torch.mm(d_mat_inv_sqrt, adj_tensor), d_mat_inv_sqrt).to(device)
+
+def update_exogenous_state():
+    global adj_matrix, norm_adj, original_adj_matrix
+
+    if original_adj_matrix is None:
+        print("AVISO: Matriz original não disponível para atualização incremental. Recarregando tudo.")
+        load_data_and_models()
+        return
+
+    print("Atualizando estado exógeno incrementalmente...")
+
+    # 1. Restore clean state
+    adj_matrix = original_adj_matrix.copy()
+
+    # 2. Apply all events
+    apply_exogenous_events()
+
+    # 3. Recompute normalization
+    norm_adj = compute_norm_adj(adj_matrix)
+
 def load_data_and_models():
     global nodes_gdf, polygons_json_cache, nodes_gdf_proj, nodes_centroids_proj, adj_matrix, node_features, model_cvli, model_cvp, device, norm_adj, dates
     global ibge_bairros_cache, ibge_municipios_cache
@@ -197,17 +226,16 @@ def load_data_and_models():
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         num_nodes = node_features.shape[0]
 
+        # Capture original matrix before modifications
+        if adj_matrix is not None:
+            original_adj_matrix = adj_matrix.copy()
+
         # Load and Apply Exogenous Events (Permanent Adaptation)
         load_exogenous_events()
         apply_exogenous_events()
 
         # Pre-computar normalização da adjacência (com modificações)
-        adj_tensor = torch.FloatTensor(adj_matrix)
-        rowsum = adj_tensor.sum(1)
-        d_inv_sqrt = torch.pow(rowsum, -0.5)
-        d_inv_sqrt[torch.isinf(d_inv_sqrt)] = 0.
-        d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
-        norm_adj = torch.mm(torch.mm(d_mat_inv_sqrt, adj_tensor), d_mat_inv_sqrt).to(device)
+        norm_adj = compute_norm_adj(adj_matrix)
 
         # Carregar Modelos
         if os.path.exists(MODEL_CVLI_PATH):
@@ -946,6 +974,7 @@ def parse_exogenous():
 
 @app.route('/api/exogenous/save', methods=['POST'])
 def save_exogenous():
+    global exogenous_events
     import json # Safeguard
     data = request.get_json()
     points = data.get('points', [])
@@ -977,10 +1006,10 @@ def save_exogenous():
             json.dump(current_events, f, ensure_ascii=False, indent=2)
 
         # Trigger Reload/Re-apply
-        # We need to reload data to reset adj_matrix and re-apply ALL events including this new one.
-        # This is expensive but ensures consistency.
-        # load_data_and_models handles full reload.
-        load_data_and_models()
+        # We update the in-memory state efficiently without reloading everything.
+        exogenous_events.append(new_entry)
+
+        update_exogenous_state()
 
         return jsonify({'status': 'success', 'message': 'Eventos salvos e malha atualizada.'})
 
