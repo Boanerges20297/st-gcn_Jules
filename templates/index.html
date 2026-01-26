@@ -493,51 +493,9 @@
                         L.DomEvent.stopPropagation(e); // Prevent map click from firing twice
                         addSimulationPoint(e.latlng);
                     } else {
-                        // Show Popup & Info
-                        var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
-                        var score = (mode === 'CVLI') ? feature.properties.risk_score_cvli : feature.properties.risk_score_cvp;
-                        var predVal = (mode === 'CVLI') ? feature.properties.cvli_pred : feature.properties.cvp_pred;
-                        var typeLabel = (mode === 'CVLI') ? 'CVLI' : 'CVP';
-                        var status = getStatus(score, typeLabel);
-                        var region = feature.properties.CIDADE || 'RMF/Interior';
-
-                        var popupContent = `
-                            <div style="font-family: sans-serif; font-size: 14px; min-width: 200px;">
-                                <h6 class="mb-1"><strong>Bairro/Área:</strong> ${feature.properties.name}</h6>
-                                <div class="text-muted small mb-2">
-                                    <strong>Região:</strong> ${region}<br>
-                                    <strong>Facção:</strong> ${feature.properties.faction || 'Não Identificado'}
-                                </div>
-                                <hr class="my-2">
-                                <div class="mb-2">
-                                    <strong>Status:</strong> <span class="badge ${status.class}">${status.label}</span>
-                                </div>
-                                <div class="mb-1">
-                                    <strong>Risco Normalizado:</strong> ${score.toFixed(1)}%
-                                </div>
-                                <div class="text-muted small">
-                                    <strong>Predição (${typeLabel}):</strong> ${predVal.toFixed(4)}
-                                </div>
-                            </div>
-                        `;
-
-                        // Create popup and open it manually
-                        L.popup()
-                            .setLatLng(e.latlng)
-                            .setContent(popupContent)
-                            .openOn(map);
-
+                        showFeatureDetails(layer, e.latlng);
                         // Zoom to feature (Zoom In)
                         map.fitBounds(layer.getBounds(), { maxZoom: 16 });
-
-                        // Sidebar update
-                        var reasonsHtml = '<h5>' + feature.properties.name + '</h5>';
-                        reasonsHtml += '<p><strong>Facção:</strong> ' + (feature.properties.faction || 'N/A') + '</p>';
-                        reasonsHtml += '<p><strong>Risco (' + typeLabel + '):</strong> ' + score.toFixed(1) + '%</p>';
-                        reasonsHtml += '<h6>Motivos</h6><ul>';
-                        (feature.properties.reasons || []).forEach(function(r) { reasonsHtml += '<li>' + r + '</li>'; });
-                        reasonsHtml += '</ul>';
-                        $('#selected-info').html(reasonsHtml);
                     }
                 });
             }
@@ -714,6 +672,58 @@
         return 'interior';
     }
 
+    function getRiskLevel(score) {
+        if (score > 80) return { label: 'Crítico', class: 'text-danger' };
+        if (score > 60) return { label: 'Alto', class: 'text-warning' };
+        if (score > 20) return { label: 'Médio', class: 'text-info' };
+        return { label: 'Normal', class: 'text-success' };
+    }
+
+    function showFeatureDetails(layer, latlng) {
+        var feature = layer.feature;
+        var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
+        var score = (mode === 'CVLI') ? feature.properties.risk_score_cvli : feature.properties.risk_score_cvp;
+        var predVal = (mode === 'CVLI') ? feature.properties.cvli_pred : feature.properties.cvp_pred;
+        var typeLabel = (mode === 'CVLI') ? 'CVLI' : 'CVP';
+        var status = getStatus(score, typeLabel);
+        var region = feature.properties.CIDADE || 'RMF/Interior';
+
+        var popupContent = `
+            <div style="font-family: sans-serif; font-size: 14px; min-width: 200px;">
+                <h6 class="mb-1"><strong>Bairro/Área:</strong> ${feature.properties.name}</h6>
+                <div class="text-muted small mb-2">
+                    <strong>Região:</strong> ${region}<br>
+                    <strong>Facção:</strong> ${feature.properties.faction || 'Não Identificado'}
+                </div>
+                <hr class="my-2">
+                <div class="mb-2">
+                    <strong>Status:</strong> <span class="badge ${status.class}">${status.label}</span>
+                </div>
+                <div class="mb-1">
+                    <strong>Risco Normalizado:</strong> ${score.toFixed(1)}%
+                </div>
+                <div class="text-muted small">
+                    <strong>Predição (${typeLabel}):</strong> ${predVal.toFixed(4)}
+                </div>
+            </div>
+        `;
+
+        // Create popup and open it manually
+        L.popup()
+            .setLatLng(latlng)
+            .setContent(popupContent)
+            .openOn(map);
+
+        // Sidebar update
+        var reasonsHtml = '<h5>' + feature.properties.name + '</h5>';
+        reasonsHtml += '<p><strong>Facção:</strong> ' + (feature.properties.faction || 'N/A') + '</p>';
+        reasonsHtml += '<p><strong>Risco (' + typeLabel + '):</strong> ' + score.toFixed(1) + '%</p>';
+        reasonsHtml += '<h6>Motivos</h6><ul>';
+        (feature.properties.reasons || []).forEach(function(r) { reasonsHtml += '<li>' + r + '</li>'; });
+        reasonsHtml += '</ul>';
+        $('#selected-info').html(reasonsHtml);
+    }
+
     function updateTopCriticalAreas() {
         // Use geojsonLayer layers to access up-to-date properties
         var layers = geojsonLayer.getLayers();
@@ -761,8 +771,7 @@
         }
 
         top30.forEach(function(item, idx) {
-            var colorClass = item.score > 80 ? 'text-danger fw-bold' :
-                             item.score > 60 ? 'text-warning' : 'text-dark';
+            var riskInfo = getRiskLevel(item.score);
 
             // Region Display logic (Show city if not Fortaleza)
             var regionSuffix = '';
@@ -772,11 +781,14 @@
 
             // Create a clickable item
             html += `<a href="#" class="list-group-item list-group-item-action py-2 ps-2 pe-1" data-idx="${idx}">
-                        <div class="d-flex w-100 justify-content-between">
-                            <span class="mb-1 text-truncate" style="max-width: 180px;">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <span class="mb-1">
                                 ${idx+1}. ${item.name}${regionSuffix}
                             </span>
-                            <small class="${colorClass}">${item.score.toFixed(1)}%</small>
+                            <div class="text-end ms-2" style="min-width: 70px;">
+                                <small class="d-block text-muted" style="font-size: 0.7rem; line-height: 1;">Risco</small>
+                                <span class="${riskInfo.class} fw-bold" style="font-size: 0.85rem;">${riskInfo.label}</span>
+                            </div>
                         </div>
                     </a>`;
         });
@@ -790,7 +802,7 @@
             var item = top30[idx];
             if (item && item.layer) {
                 map.flyTo(item.layer.getBounds().getCenter(), 15);
-                item.layer.openPopup();
+                showFeatureDetails(item.layer, item.layer.getBounds().getCenter());
             }
         });
     }
