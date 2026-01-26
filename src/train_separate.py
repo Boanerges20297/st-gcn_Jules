@@ -80,7 +80,7 @@ def run_training(feature_idx, history_window, horizon, out_path, epochs=10, batc
         dates = list(dates)
         start_idx = 0
         for idx, d in enumerate(dates):
-            if str(d) >= '2024-01-01':
+            if str(d) >= '2025-01-01':
                 start_idx = idx
                 break
         if start_idx > 0:
@@ -125,8 +125,8 @@ def run_training(feature_idx, history_window, horizon, out_path, epochs=10, batc
         torch.save(model.state_dict(), out_path)
 
 if __name__ == "__main__":
-    # CVLI: Done
-    # run_training(feature_idx=0, history_window=180, horizon=3, out_path=os.path.join(ROOT, 'models', 'stgcn_cvli.pth'), batch_size=4, epochs=5)
+    # CVLI: Feature 0, Window 90, Horizon 7
+    run_training(feature_idx=0, history_window=90, horizon=7, out_path=os.path.join(ROOT, 'models', 'stgcn_cvli.pth'), batch_size=4, epochs=5)
 
     # CVP: Feature 1, Window 30, Horizon 1
-    run_training(feature_idx=1, history_window=30, horizon=1, out_path=os.path.join(ROOT, 'models', 'stgcn_cvp.pth'), batch_size=32, epochs=5)
+    # run_training(feature_idx=1, history_window=30, horizon=1, out_path=os.path.join(ROOT, 'models', 'stgcn_cvp.pth'), batch_size=32, epochs=5)
