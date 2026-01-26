@@ -245,26 +245,26 @@ load_data_and_models()
 def format_trend(prediction, history_avg, risk_score=None):
     if history_avg == 0:
         if prediction > 0.001:
-            return "Início de atividade criminal"
+            return "Nova atividade criminal detectada"
         else:
-            return "Estabilidade (Baixo Risco)"
+            return "Situação estável (Baixo Risco)"
 
     change_pct = ((prediction - history_avg) / history_avg) * 100
 
     # Limiares de 15% para variação significativa
     if change_pct > 15:
-        return "Tendência de agravamento recente"
+        return "Aumento recente da criminalidade"
     elif change_pct < -15:
-        return "Tendência de redução da atividade"
+        return "Redução da atividade criminal"
     else:
         # Estabilidade: verificar o nível do risco absoluto
         if risk_score is not None:
             if risk_score > 60:
                 return "Valor histórico alto para o período"
             elif risk_score > 20:
-                return "Manutenção do padrão de risco médio"
+                return "Atividade criminal moderada"
 
-        return "Estabilidade (Baixo Risco)"
+        return "Situação estável (Baixo Risco)"
 
 def get_region_name(feature_props, geometry):
     # Tenta usar a coluna CIDADE se existir e não for vazia
@@ -412,7 +412,7 @@ def simulate_risk():
                         item['risk_score_cvp'] = item['risk_score_cvp'] * factor
 
                         # Add descriptive reason
-                        item['reasons'].insert(0, "Presença de Equipe Tática (Risco Mitigado)")
+                        item['reasons'].insert(0, "Área sob controle (Equipe Tática)")
 
                         # Adjust visual prediction values
                         item['cvli_pred'] *= factor
@@ -428,7 +428,7 @@ def simulate_risk():
                         item['risk_score_cvli'] = min(max(item['risk_score_cvli'] * boost, 80.0), 100.0)
                         item['risk_score_cvp'] = min(max(item['risk_score_cvp'] * boost, 80.0), 100.0)
 
-                        item['reasons'].insert(0, "Conflito Ativo Detectado (Simulação)")
+                        item['reasons'].insert(0, "Conflito Ativo (Simulação)")
 
             return jsonify(result_json)
         else:
@@ -591,17 +591,17 @@ def calculate_risk(custom_norm_adj=None):
                 reasons.append(f'CVP: {trend_cvp}')
 
             if hist_sum_cvli[i] > 0 and cvli_val < 0.01:
-                reasons.append('Histórico de violência recente (Risco Residual)')
+                reasons.append('Histórico recente de violência')
 
             # Check for Exogenous Reason
             if i in exogenous_affected_nodes:
-                reasons.insert(0, "Conflito Ativo (Evento Exógeno)")
+                reasons.insert(0, "Conflito Ativo")
 
             if len(reasons) == 0:
-                reasons.append('Estabilidade (Baixo Risco)')
+                reasons.append('Situação estável (Baixo Risco)')
 
             if conn is not None and conn_mean > 0 and conn[i] > conn_mean * 1.5:
-                reasons.append('Área com alta conectividade')
+                reasons.append('Alta conectividade (Rota de fuga/acesso)')
 
             # Inject region logic here if needed, but updating nodes_gdf properties
             # for the separate polygons endpoint is harder.
