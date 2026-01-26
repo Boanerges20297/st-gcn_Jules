@@ -158,7 +158,15 @@
                     </div>
                     <hr>
                     <div>
-                        <h6>Top 30 Áreas Críticas</h6>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0" id="top-list-title">Top 30 Áreas Críticas</h6>
+                        </div>
+                        <select class="form-select form-select-sm mb-2" id="region-filter">
+                            <option value="all">Todas as Regiões</option>
+                            <option value="capital">Capital (Fortaleza)</option>
+                            <option value="rmf">Região Metropolitana (RMF)</option>
+                            <option value="interior">Interior do Estado</option>
+                        </select>
                         <div id="top-areas" class="list-group list-group-flush small" style="max-height: 400px; overflow-y: auto;"></div>
                     </div>
                 </div>
@@ -686,38 +694,77 @@
         hideLoading();
     });
 
+    // RMF Cities Definition (Excluding Fortaleza)
+    var rmfCities = [
+        "Aquiraz", "Cascavel", "Caucaia", "Chorozinho", "Eusébio",
+        "Guaiúba", "Horizonte", "Itaitinga", "Maracanaú", "Maranguape",
+        "Pacajus", "Pacatuba", "Paracuru", "Paraipaba", "Pindoretama",
+        "São Gonçalo do Amarante", "São Luís do Curu", "Trairi"
+    ];
+
+    function getRegionType(cidade) {
+        if (!cidade) return 'unknown';
+        var c = cidade.trim();
+        if (c === 'Fortaleza') return 'capital';
+        if (rmfCities.includes(c)) return 'rmf';
+        if (c === 'RMF/Interior') return 'unknown'; // Fallback
+        return 'interior';
+    }
+
     function updateTopCriticalAreas() {
         // Use geojsonLayer layers to access up-to-date properties
         var layers = geojsonLayer.getLayers();
         var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
+        var regionFilter = $('#region-filter').val();
 
         // Map to array for sorting
-        var items = layers.map(function(layer) {
+        var items = [];
+        layers.forEach(function(layer) {
             var props = layer.feature.properties;
             var score = (mode === 'CVLI') ? (props.risk_score_cvli || 0) : (props.risk_score_cvp || 0);
-            return {
-                name: props.name,
-                score: score,
-                layer: layer
-            };
+
+            // Filter Logic
+            var regionType = getRegionType(props.CIDADE);
+            var include = false;
+
+            if (regionFilter === 'all') include = true;
+            else if (regionFilter === 'capital' && regionType === 'capital') include = true;
+            else if (regionFilter === 'rmf' && regionType === 'rmf') include = true;
+            else if (regionFilter === 'interior' && regionType === 'interior') include = true;
+
+            if (include) {
+                items.push({
+                    name: props.name,
+                    score: score,
+                    layer: layer,
+                    cidade: props.CIDADE
+                });
+            }
         });
 
         // Sort descending
         items.sort(function(a, b) { return b.score - a.score; });
 
+        // Update Title Count
+        var countText = items.length > 30 ? 'Top 30' : 'Total ' + items.length;
+        $('#top-list-title').text(countText + ' Áreas Críticas');
+
         // Take top 30
         var top30 = items.slice(0, 30);
 
         var html = '';
+        if (top30.length === 0) {
+            html = '<div class="text-muted text-center py-3">Nenhuma área encontrada nesta região.</div>';
+        }
+
         top30.forEach(function(item, idx) {
             var colorClass = item.score > 80 ? 'text-danger fw-bold' :
                              item.score > 60 ? 'text-warning' : 'text-dark';
 
             // Region Display logic (Show city if not Fortaleza)
-            var props = item.layer.feature.properties;
             var regionSuffix = '';
-            if (props.CIDADE && props.CIDADE !== 'Fortaleza' && props.CIDADE !== 'RMF/Interior') {
-                regionSuffix = ' - <small class="text-muted">' + props.CIDADE + '</small>';
+            if (item.cidade && item.cidade !== 'Fortaleza' && item.cidade !== 'RMF/Interior') {
+                regionSuffix = ' - <small class="text-muted">' + item.cidade + '</small>';
             }
 
             // Create a clickable item
@@ -744,6 +791,11 @@
             }
         });
     }
+
+    // Filter Handler
+    $('#region-filter').on('change', function() {
+        updateTopCriticalAreas();
+    });
 </script>
 </body>
 </html>

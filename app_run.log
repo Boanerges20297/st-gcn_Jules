@@ -1,0 +1,62 @@
+/app/src/llm_service.py:4: FutureWarning:
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+Carregando dados para API...
+Carregados 1 lotes de eventos exógenos.
+Aplicando eventos exógenos na malha...
+Malha adaptada: 20 modificações aplicadas.
+Carregando modelo CVLI de /app/models/stgcn_cvli.pth...
+Carregando modelo CVP de /app/models/stgcn_cvp.pth...
+Enriching regions...
+Assigned Fortaleza to 1071 nodes via BBox.
+Inferred cities for 1232 nodes using proximity.
+ * Serving Flask app 'app'
+ * Debug mode: on
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.0.2:5000
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+/app/src/llm_service.py:4: FutureWarning:
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 410-907-091
+INFO:werkzeug: * Detected change in '/app/src/llm_service.py', reloading
+Carregando dados para API...
+Carregados 1 lotes de eventos exógenos.
+Aplicando eventos exógenos na malha...
+Malha adaptada: 20 modificações aplicadas.
+Carregando modelo CVLI de /app/models/stgcn_cvli.pth...
+Carregando modelo CVP de /app/models/stgcn_cvp.pth...
+Enriching regions...
+Assigned Fortaleza to 1071 nodes via BBox.
+Inferred cities for 1232 nodes using proximity.
+INFO:werkzeug: * Restarting with stat
+/app/src/llm_service.py:4: FutureWarning:
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 410-907-091
+INFO:werkzeug:127.0.0.1 - - [26/Jan/2026 14:28:20] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Jan/2026 14:28:23] "GET /api/polygons HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/Jan/2026 14:28:25] "GET /api/risk HTTP/1.1" 200 -
