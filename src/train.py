@@ -69,14 +69,24 @@ def main():
         data_pack = pickle.load(f)
 
     node_features = data_pack['node_features']
-    adj_matrix = data_pack['adj_matrix']
-    
-    adj_tensor = torch.FloatTensor(adj_matrix)
-    rowsum = adj_tensor.sum(1)
-    d_inv_sqrt = torch.pow(rowsum, -0.5)
-    d_inv_sqrt[torch.isinf(d_inv_sqrt)] = 0.
-    d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
-    norm_adj = torch.mm(torch.mm(d_mat_inv_sqrt, adj_tensor), d_mat_inv_sqrt)
+    # carregar ambas as adjacências (geo + faccional)
+    adj_geo = data_pack.get('adj_geo')
+    adj_faction = data_pack.get('adj_faction')
+
+    if adj_geo is None or adj_faction is None:
+        raise RuntimeError('Adjacency matrices adj_geo and adj_faction not found in data_pack')
+
+    def normalize_adj(adj_np):
+        adj_t = torch.FloatTensor(adj_np)
+        rowsum = adj_t.sum(1)
+        d_inv_sqrt = torch.pow(rowsum, -0.5)
+        d_inv_sqrt[torch.isinf(d_inv_sqrt)] = 0.
+        d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
+        return torch.mm(torch.mm(d_mat_inv_sqrt, adj_t), d_mat_inv_sqrt)
+
+    norm_adj_geo = normalize_adj(adj_geo)
+    norm_adj_faction = normalize_adj(adj_faction)
+    norm_adj_list = [norm_adj_geo, norm_adj_faction]
     
     logger.info("Criando janelas temporais...")
     X, Y = prepare_dataset(node_features)
@@ -99,8 +109,8 @@ def main():
     num_nodes = node_features.shape[0]
     num_features = node_features.shape[2]
     
-    model = STGCN(num_nodes=num_nodes, in_channels=num_features, time_steps=HISTORY_WINDOW).to(device)
-    norm_adj = norm_adj.to(device)
+    model = STGCN(num_nodes=num_nodes, in_channels=num_features, time_steps=HISTORY_WINDOW, num_graphs=len(norm_adj_list)).to(device)
+    norm_adj_list = [a.to(device) for a in norm_adj_list]
     loss_weights = LOSS_WEIGHTS.to(device)
     
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
@@ -115,7 +125,7 @@ def main():
             t0 = time.time()
             batch_x, batch_y = batch_x.to(device), batch_y.to(device)
             optimizer.zero_grad()
-            output = model(batch_x, norm_adj)
+            output = model(batch_x, norm_adj_list)
             loss = weighted_mse_loss(output, batch_y, loss_weights)
             loss.backward()
             optimizer.step()
@@ -134,7 +144,7 @@ def main():
         with torch.no_grad():
             for batch_idx, (batch_x, batch_y) in enumerate(val_loader, 1):
                 batch_x, batch_y = batch_x.to(device), batch_y.to(device)
-                output = model(batch_x, norm_adj)
+                output = model(batch_x, norm_adj_list)
                 loss = weighted_mse_loss(output, batch_y, loss_weights)
                 val_loss += loss.item()
 
