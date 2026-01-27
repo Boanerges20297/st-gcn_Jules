@@ -14,40 +14,62 @@ except Exception:
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-try:
-    import google.genai as genai
-except Exception:
-    genai = None
-
+import google.generativeai as genai
 
 def _call_model(prompt: str, api_key: str) -> str:
-    if genai is None:
-        raise RuntimeError("google.genai not installed")
-    if hasattr(genai, 'generate_text'):
-        try:
-            resp = genai.generate_text(model='models/gemini-1.5', input=prompt)
-        except TypeError:
-            resp = genai.generate_text(model='models/gemini-1.5', prompt=prompt)
-        if hasattr(resp, 'text'):
-            return resp.text
-        if isinstance(resp, dict) and 'output' in resp:
-            return str(resp['output'])
-        return str(resp)
-    if hasattr(genai, 'ModelsClient'):
-        client = genai.ModelsClient()
-        resp = client.generate(model='models/gemini-1.5', input=prompt)
-        if hasattr(resp, 'text'):
-            return resp.text
-        if hasattr(resp, 'output'):
-            return str(resp.output)
-        return str(resp)
-    if hasattr(genai, 'Client'):
-        client = genai.Client()
-        resp = client.generate_text(model='models/gemini-1.5', prompt=prompt)
-        if hasattr(resp, 'text'):
-            return resp.text
-        return str(resp)
-    raise RuntimeError('No supported genai entrypoint found')
+    """Call the generative model using google-generativeai SDK.
+    Uses the GEMINI_API_KEY from .env file.
+    """
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel('gemini-2.5-flash')
+    response = model.generate_content(
+        prompt,
+        generation_config={
+            'temperature': 0.0,
+            'max_output_tokens': 8192
+        }
+    )
+    return response.text
+
+
+def _call_model_rest(prompt: str, api_key: str, model: str = 'gemini-2.5-flash') -> str:
+    """Fallback REST call to Google Generative Language API using an API key.
+    Uses urllib from the standard library so no extra dependency is required.
+    Returns the model output text or raises on failure.
+    """
+    try:
+        import urllib.request, urllib.parse
+        url = f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={urllib.parse.quote(api_key)}'
+        payload = {
+            "contents": [{
+                "parts": [{"text": prompt}]
+            }],
+            "generationConfig": {
+                "temperature": 0.0,
+                "maxOutputTokens": 8192
+            }
+        }
+        data = json.dumps(payload).encode('utf-8')
+        req = urllib.request.Request(url, data=data, headers={'Content-Type':'application/json'})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            body = resp.read().decode('utf-8')
+            j = json.loads(body)
+            if isinstance(j, dict) and 'candidates' in j:
+                candidates = j['candidates']
+                if isinstance(candidates, list) and len(candidates) > 0:
+                    candidate = candidates[0]
+                    if isinstance(candidate, dict) and 'content' in candidate:
+                        content = candidate['content']
+                        if isinstance(content, dict) and 'parts' in content:
+                            parts = content['parts']
+                            if isinstance(parts, list) and len(parts) > 0:
+                                part = parts[0]
+                                if isinstance(part, dict) and 'text' in part:
+                                    return part['text']
+            raise RuntimeError('No usable text in REST response')
+    except Exception as e:
+        logger.exception('REST call to Generative API failed')
+        raise
 
 
 def _extract_json_from_text(text: str):
@@ -139,7 +161,7 @@ def process_exogenous_text(text: str) -> List[Dict[str, Any]]:
             'raw_text': line
         }
 
-    api_key = os.environ.get('GEMINI_API_KEY')
+    api_key = os.environ.get('GEMINI_API_KEY') or os.environ.get('GOOGLE_API_KEY')
 
     # Deterministic path (no API key): parse line-by-line and enrich
     if not api_key:
@@ -173,7 +195,15 @@ def process_exogenous_text(text: str) -> List[Dict[str, Any]]:
         "You will receive multiple lines of police log text. For each line return a JSON array where each element has these keys exactly: natureza, descricao, sexo, localizacao_completa, bairro, municipio, timestamp, resumo, raw_text.\n\n" + text
     )
     try:
-        out = _call_model(prompt, api_key)
+        try:
+            out = _call_model(prompt, api_key)
+        except Exception:
+            # try REST fallback if an API key env var exists
+            rest_key = os.environ.get('GOOGLE_API_KEY') or os.environ.get('GEMINI_API_KEY') or os.environ.get('GEMINI_KEY')
+            if rest_key:
+                out = _call_model_rest(prompt, rest_key)
+            else:
+                raise
         if isinstance(out, str) and out.startswith('```'):
             idx = out.find('\n')
             if idx != -1:
