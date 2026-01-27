@@ -241,7 +241,7 @@ def update_exogenous_state():
     norm_adj = compute_norm_adj(adj_matrix)
 
 def load_data_and_models():
-    global nodes_gdf, polygons_json_cache, nodes_gdf_proj, nodes_centroids_proj, adj_matrix, node_features, model_cvli, model_cvp, device, norm_adj, dates
+    global nodes_gdf, polygons_json_cache, nodes_gdf_proj, nodes_centroids_proj, adj_matrix, node_features, model_cvli, model_cvp, device, norm_adj, dates, original_adj_matrix
     global ibge_bairros_cache, ibge_municipios_cache
 
     # Load Static Data

@@ -78,7 +78,7 @@ def process_exogenous_text(text: str) -> List[Dict[str, Any]]:
     if not api_key:
         logger.warning('GEMINI_API_KEY not set — returning mock parse')
         return _mock_response(text)
-    prompt = f"""Analise o texto e retorne uma lista JSON de ocorrências seguindo estritamente ESTA ORDEM de extração para cada linha:
+    prompt = ("""Analise o texto e retorne uma lista JSON de ocorrências seguindo estritamente ESTA ORDEM de extração para cada linha:
 
 - (contador) - IGNORAR
 - (codigo da ciops) - IGNORAR
@@ -94,7 +94,7 @@ Retorne uma lista JSON de objetos com chaves: `natureza`, `descricao`, `sexo`, `
 Exemplo de entrada: 02 - M20260066103 - LESAO A BALA - VITIMA DO SEXO MASCULINO - DEU ENTRADA NO HOSPITAL MUNICIPAL - SOLEDADE, CAUCAIA (AIS12) - 11:58
 Exemplo de saída (JSON): [{"natureza":"LESÃO A BALA", "sexo":"MASCULINO", "descricao":"DEU ENTRADA NO HOSPITAL MUNICIPAL", "localizacao_completa":"SOLEDADE, CAUCAIA (AIS12)", "bairro":"SOLEDADE", "municipio":"CAUCAIA", "timestamp":"11:58", "resumo":"LESÃO A BALA - SOLEDADE, CAUCAIA (AIS12)", "raw_text":"..."}]
 
-Agora processe o texto abaixo e retorne apenas o JSON requisitado:\n\n{text}"""
+Agora processe o texto abaixo e retorne apenas o JSON requisitado:\n\n""") + "\n\n" + text
     try:
         out = _call_model(prompt, api_key)
         # strip fences
