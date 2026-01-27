@@ -11,7 +11,210 @@
         "type": "exogenous"
       },
       {
-        [
+        "description": "HOMICÍDIO EM VIA PUBLICA, SOCORRIDO PARA O IJF - PICI",
+        "lat": -3.750601866082262,
+        "lng": -38.58050059366798,
+        "type": "exogenous"
+      },
+      {
+        "description": "HOMICÍDIO EM VIA PUBLICA - AQUIRAZ",
+        "lat": -3.8840912599530277,
+        "lng": -38.50744878979003,
+        "type": "exogenous"
+      },
+      {
+        "description": "HOMICÍDIO EM VIA PUBLICA - PQ. LEBLON",
+        "lat": -3.697336532227048,
+        "lng": -38.598514865186594,
+        "type": "exogenous"
+      },
+      {
+        "description": "HOMICÍDIO DENTRO DA RESIDÊNCIA - AIS16",
+        "lat": -3.84,
+        "lng": -38.46,
+        "type": "exogenous"
+      },
+      {
+        "description": "LESIONADO EM VIA PUBLICA E OUTRO INDIVIDUO DO SEXO MASCULINO LESIONADO A BALA FOI SOCORRIDO POR MEIOS PROPRIOS AO IJF CENTRO - BARROSO",
+        "lat": -3.0182286675981294,
+        "lng": -41.13687701210792,
+        "type": "exogenous"
+      },
+      {
+        "description": "LESIONADO EM VIA PUBLICA E OUTRO INDIVIDUO DO SEXO MASCULINO LESIONADO A BALA FOI SOCORRIDO POR MEIOS PROPRIOS AO IJF CENTRO - BARROSO",
+        "lat": -3.0182286675981294,
+        "lng": -41.13687701210792,
+        "type": "exogenous"
+      },
+      {
+        "description": "LESAO NA PERNA -EM VIA PUBLICA - CASCAVEL",
+        "lat": -4.139595963909024,
+        "lng": -38.23407230223702,
+        "type": "exogenous"
+      },
+      {
+        "description": "LESAO EM VIA PUBLICA - SAPIRANGA",
+        "lat": -3.789841675392758,
+        "lng": -38.4685056476241,
+        "type": "exogenous"
+      },
+      {
+        "description": "LESAO EM VIA PUBLICA - BONSUCESSO",
+        "lat": -3.785557825744014,
+        "lng": -38.5870690583825,
+        "type": "exogenous"
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "timestamp": "2026-01-26T11:15:59.557080",
+    "original_text": "01 - M20260065649 - LESÃO A BALA - VITIMA DO SEXO MASCULINO - EM VIA PUBLICA - MULTIPLAS LESOES - SOCORRIDO PARA UPA, TRANSFIRIDO PARA O IJF - RUA BOM JESUS N 1899 - GRANJA LISBOA (AIS17) - 04:40",
+    "points": [
+      {
+        "description": "EM VIA PUBLICA - EM VIA PUBLICA em SOCORRIDO PARA UPA, TRANSFIRIDO PARA O IJF",
+        "lat": -3.8337811009041616,
+        "lng": -38.576029928373735,
+        "raw_event": {
+          "bairro": "",
+          "localizacao_completa": "SOCORRIDO PARA UPA, TRANSFIRIDO PARA O IJF",
+          "municipio": "FORTALEZA",
+          "natureza": "Lesão a bala",
+          "raw": "01 - M20260065649 - LESÃO A BALA - VITIMA DO SEXO MASCULINO - EM VIA PUBLICA - MULTIPLAS LESOES - SOCORRIDO PARA UPA, TRANSFIRIDO PARA O IJF - RUA BOM JESUS N 1899 - GRANJA LISBOA (AIS17) - 04:40",
+          "resumo": "EM VIA PUBLICA em SOCORRIDO PARA UPA, TRANSFIRIDO PARA O IJF"
+        },
+        "type": "exogenous"
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "timestamp": "2026-01-26T13:29:39.115431",
+    "original_text": "02 - M20260066103 - LESAO A BALA - VITIMA DO SEXO MASCULINO - DEU ENTRADA NO HOSPITAL MUNICIPAL - SOLEDADE, CAUCAIA (AIS12) - 11:58",
+    "points": [
+      {
+        "description": "LESAO A BALA - LESAO A BALA - DEU ENTRADA NO HOSPITAL MUNICIPAL",
+        "lat": -3.8337811009041616,
+        "lng": -38.576029928373735,
+        "raw_event": {
+          "bairro": "",
+          "localizacao_completa": "SOLEDADE, CAUCAIA (AIS12)",
+          "municipio": "Caucaia",
+          "natureza": "LESAO A BALA",
+          "raw": "02 - M20260066103 - LESAO A BALA - VITIMA DO SEXO MASCULINO - DEU ENTRADA NO HOSPITAL MUNICIPAL -  - 11:58",
+          "resumo": "LESAO A BALA - DEU ENTRADA NO HOSPITAL MUNICIPAL"
+        },
+        "type": "exogenous"
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "timestamp": "2026-01-26T21:37:48.815385",
+    "original_text": "01 - M20260066591 - HOMICÍDIO A BALA - VITIMA DO SEXO FEMININO - NO LOCAL UM HOMEM LESIONADO E SOCORRIDO PARA O IJF - PASSARÉ - 18:02",
+    "points": [
+      {
+        "description": "HOMICÍDIO A BALA - HOMICÍDIO A BALA - PASSARÉ",
+        "lat": -3.792531551663916,
+        "lng": -38.538951816975846,
+        "raw_event": {
+          "bairro": "",
+          "descricao": "NO LOCAL UM HOMEM LESIONADO E SOCORRIDO PARA O IJF",
+          "localizacao_completa": "PASSARÉ",
+          "municipio": "FORTALEZA",
+          "natureza": "HOMICÍDIO A BALA",
+          "raw": "01 - M20260066591 - HOMICÍDIO A BALA - VITIMA DO SEXO FEMININO - NO LOCAL UM HOMEM LESIONADO E SOCORRIDO PARA O IJF - PASSARÉ - 18:02",
+          "resumo": "HOMICÍDIO A BALA - PASSARÉ",
+          "sexo": "FEMININO",
+          "timestamp": "18:02"
+        },
+        "type": "exogenous"
+      }
+    ]
+  },
+  {
+    "id": "7",
+    "timestamp": "2026-01-27T14:57:47.227182",
+    "original_text": "\n01 - M20260067382 - ACHADO DE CADÁVER - VITIMA DO SEXO MASCULINO - MARCAS DE VIOLÊNCIA - RUA PEDRO CAETANO DA SILVA - PAJUÇARA - MARACANAÚ) - AIS12 - 07:05",
+    "points": [
+      {
+        "description": "ACHADO DE CADÁVER - ACHADO DE CADÁVER - LOCAL DESCONHECIDO",
+        "lat": -3.8337811009041616,
+        "lng": -38.576029928373735,
+        "raw_event": {
+          "bairro": "",
+          "descricao": "MARCAS DE VIOLÊNCIA - RUA PEDRO CAETANO DA SILVA - PAJUÇARA)",
+          "localizacao_completa": "",
+          "municipio": "MARACANAÚ",
+          "natureza": "ACHADO DE CADÁVER",
+          "raw_text": "01 - M20260067382 - ACHADO DE CADÁVER - VITIMA DO SEXO MASCULINO - MARCAS DE VIOLÊNCIA - RUA PEDRO CAETANO DA SILVA - PAJUÇARA - MARACANAÚ) - AIS12 - 07:05",
+          "resumo": "ACHADO DE CADÁVER - LOCAL DESCONHECIDO",
+          "sexo": "MASCULINO",
+          "timestamp": "07:05"
+        },
+        "type": "exogenous"
+      }
+    ]
+  },
+  {
+    "id": "6",
+    "timestamp": "2026-01-27T15:12:29.650622",
+    "original_text": "02 - M20260067386 - ACHADO DE CADÁVER - VITIMA DO SEXO MASCULINO - MARCAS DE VIOLÊNCIA - RUA MANOEL NICOLAU - PIRAPORA - CAUCAIA - AIS11 - 07:10",
+    "points": [
+      {
+        "description": "ACHADO DE CADÁVER - ACHADO DE CADÁVER - LOCAL DESCONHECIDO",
+        "lat": -3.781815299688344,
+        "lng": -38.67440417796269,
+        "raw_event": {
+          "bairro": "PIRAPORA",
+          "descricao": "MARCAS DE VIOLÊNCIA - RUA MANOEL NICOLAU - CAUCAIA",
+          "localizacao_completa": "",
+          "municipio": "CAUCAIA",
+          "natureza": "ACHADO DE CADÁVER",
+          "raw_text": "02 - M20260067386 - ACHADO DE CADÁVER - VITIMA DO SEXO MASCULINO - MARCAS DE VIOLÊNCIA - RUA MANOEL NICOLAU - PIRAPORA - CAUCAIA - AIS11 - 07:10",
+          "resumo": "ACHADO DE CADÁVER - LOCAL DESCONHECIDO",
+          "sexo": "MASCULINO",
+          "timestamp": "07:10"
+        },
+        "type": "exogenous"
+      }
+    ]
+  },
+  {
+    "id": "7",
+    "timestamp": "2026-01-27T15:36:08.734802",
+    "original_text": "01 - M20260067706 - LESAO A BALA - VITIMA DO SEXO MASCULINO - VIA PUBLICA - MARACANAU - AIS12 - 13:06",
+    "points": [
+      {
+        "description": "LESAO A BALA - LESAO A BALA - LOCAL DESCONHECIDO",
+        "lat": -3.8885911072553565,
+        "lng": -38.593137064379185,
+        "raw_event": {
+          "bairro": "",
+          "descricao": "VIA PUBLICA - MARACANAU",
+          "localizacao_completa": "",
+          "municipio": "Maracanaú",
+          "natureza": "LESAO A BALA",
+          "raw_text": "01 - M20260067706 - LESAO A BALA - VITIMA DO SEXO MASCULINO - VIA PUBLICA - MARACANAU - AIS12 - 13:06",
+          "resumo": "LESAO A BALA - LOCAL DESCONHECIDO",
+          "sexo": "MASCULINO",
+          "timestamp": "13:06"
+        },
+        "type": "exogenous"
+      }
+    ]
+  }
+]
+    "id": "1",
+    "timestamp": "2026-01-25T20:34:14.375890",
+    "original_text": "01 - M20260051350 - LESÃO A BALA - VITIMA DO SEXO MASCULINO - DEU ENTRADA NA UPA DA PAJUÇARA - LESIONADO NAS COSTAS - RUA JOÃO HENRIQUE DA SILVA SN - PAJUÇARA, MARACANAÚ - 00:25\n\n01 - M20260052352 - HOMICÍDIO A BALA - VÍTIMA DE SEXO MASCULINO - TABUBA, CAUCAIA - 18:50\n\n01 - M20260053079 - LESÃO A BALA - VITIMA DO SEXO MASCULINO - EM VIA PUBLICA, SOCORRIDO PARA O IJF - RUA PLANALTO PICI N 1570 - PICI (AIS18) - 01:54\n\n01 - M20260053243 - ACHADO DE CADAVER - VITIMA DO SEXO MASCULINO - EM VIA PUBLICA - LESOES A FACA E PEDRAS, MEMBROS INFERIORES AMARRADOS - AQUIRAZ (AIS15) - 06:27\n\n02 - M20260053982 - ACHADO DE CADAVER - VITIMA DO SEXO MASCULINO - EM VIA PUBLICA - COM SINAIS DE VIOLENCIA - PQ. LEBLON - CAUCAIA - 17:57\n\n01 - M20260054938 - DUPLO HOMICÍDIO À BALA - VÍTIMAS DO SEXO MASCULINO - DENTRO DA RESIDÊNCIA - R. SEIS,93,CURIÓ - AIS16 - 03:38\n\n01 - M20260059350 - HOMICIDIO A BALA - VITIMA DO SEXO MASCULINO - LESIONADO EM VIA PUBLICA E OUTRO INDIVIDUO DO SEXO MASCULINO LESIONADO A BALA FOI SOCORRIDO POR MEIOS PROPRIOS AO IJF CENTRO - AV. CAPITÃO HUGO BEZERRA, 221 - BARROSO - 20:37\n\n02 - M20260059910 - HOMICIDIO A BALA - VITIMA DO SEXO FEMININO - DEU ENTRADA NO FROTINHA DA MESSEJANA JUNTO COM UMA VITIMA DO SEXO MASCULINO LESIONADO A BALA - 22:17 \n\n01 - M20260059350 - HOMICIDIO A BALA - VITIMA DO SEXO MASCULINO - LESIONADO EM VIA PUBLICA E OUTRO INDIVIDUO DO SEXO MASCULINO LESIONADO A BALA FOI SOCORRIDO POR MEIOS PROPRIOS AO IJF CENTRO - AV. CAPITÃO HUGO BEZERRA, 221 - BARROSO - 20:37\n\n02 - M20260059910 - HOMICIDIO A BALA - VITIMA DO SEXO FEMININO - DEU ENTRADA NO FROTINHA DA MESSEJANA JUNTO COM UMA VITIMA DO SEXO MASCULINO LESIONADO A BALA - 22:17 \n\n01 - M20260062052 - LESÃO A BALA - VITIMA DO SEXO MASCULINO - EM VIA PUBLICA - LESAO NA PERNA - CASCAVEL (AIS15) - 04:59\n\n02 - M20260062232 - LESAO A BALA - VITIMA DO SEXO MASCULINO - EM VIA PUBLICA - LESAO NAS COSTELAS - SAPIRANGA (AIS19) - 06:58\n\n01 - M20260062580 - HOMICIDIO A BALA - VITIMA DO SEXO MASCULINO - EM VIA PUBLICA - R. ARAÇÁ, 572 - BONSUCESSO - 11:25\n\n",
+    "points": [
+      {
+        "description": "LESÃO A BALA - DEU ENTRADA NA UPA DA PAJUÇARA - RUA JOÃO HENRIQUE DA SILVA SN",
+        "lat": -3.856879042797388,
+        "lng": -38.582613559783795,
+        "type": "exogenous"
+      },
           {
             "id": "1",
             "timestamp": "2026-01-25T20:34:14.375890",
@@ -218,3 +421,9 @@
             ]
           }
         ]
+      }
+    ] 
+  
+
+ 
+
