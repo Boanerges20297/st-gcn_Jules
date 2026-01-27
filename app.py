@@ -462,6 +462,88 @@ def get_polygons():
 def get_risk():
     return calculate_risk()
 
+@app.route('/connections')
+def connections_view():
+    return render_template('connections.html')
+
+@app.route('/api/network-graph')
+def get_network_graph():
+    if adj_matrix is None:
+        return jsonify({'error': 'Matriz de adjacência não carregada.'}), 503
+
+    # Reuse calculate_risk to get fresh data
+    # calculate_risk returns a Flask Response object
+    response = calculate_risk()
+    if response.status_code != 200:
+        return response
+
+    risk_data = response.get_json()
+    all_nodes = risk_data.get('data', [])
+
+    # Sort by risk score descending
+    sorted_nodes = sorted(all_nodes, key=lambda x: x['risk_score'], reverse=True)
+
+    # Take Top 30
+    top_30 = sorted_nodes[:30]
+
+    # Build Nodes List
+    graph_nodes = []
+    top_indices = set()
+
+    for item in top_30:
+        nid = item['node_id']
+        top_indices.add(nid)
+
+        # Get name from nodes_gdf if possible, or use ID
+        name = f"Area {nid}"
+        if nodes_gdf is not None and nid < len(nodes_gdf):
+            name = nodes_gdf.iloc[nid].get('name') or nodes_gdf.iloc[nid].get('nome') or name
+
+        graph_nodes.append({
+            'id': nid,
+            'name': name,
+            'risk': item['risk_score'],
+            'faction': item.get('faction'),
+            'reasons': item.get('reasons', [])
+        })
+
+    # Build Links List
+    links = []
+
+    # 1. Spatial/Influence Links (from Adjacency Matrix)
+    # Iterate only through the top 30 nodes to find connections BETWEEN them
+    for source in top_30:
+        u = source['node_id']
+        for target in top_30:
+            v = target['node_id']
+            if u == v: continue
+
+            # Check adjacency weight
+            # adj_matrix is numpy array
+            try:
+                weight = float(adj_matrix[u, v])
+                # Threshold: usually normalized matrix has small values.
+                # If it's the raw matrix, values are 0 or 1 (or distance based).
+                # If it's loaded from 'processed_graph_data.pkl', it usually contains 1 for connection + self loops.
+                # Let's check if weight > 0.
+                if weight > 0:
+                    links.append({
+                        'source': u,
+                        'target': v,
+                        'weight': weight,
+                        'type': 'influence' # Influence direction u -> v
+                    })
+            except Exception:
+                pass
+
+    # 2. Faction Links (Optional: Connect nodes of same faction if they are not already connected?)
+    # Visual clutter risk. Let's rely on node color for faction and links for influence as requested.
+
+    return jsonify({
+        'nodes': graph_nodes,
+        'links': links
+    })
+
 @app.route('/api/simulate', methods=['POST'])
 def simulate_risk():
     if node_features is None or adj_matrix is None or nodes_gdf is None:
