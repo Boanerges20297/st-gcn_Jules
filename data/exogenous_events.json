@@ -125,59 +125,75 @@
           "natureza": "HOMICÍDIO A BALA",
           "raw": "01 - M20260066591 - HOMICÍDIO A BALA - VITIMA DO SEXO FEMININO - NO LOCAL UM HOMEM LESIONADO E SOCORRIDO PARA O IJF - PASSARÉ - 18:02",
           "resumo": "HOMICÍDIO A BALA - PASSARÉ",
-          "sexo": "FEMININO",
-          "timestamp": "18:02"
-        },
-        "type": "exogenous"
-      }
-    ]
-  },
-  {
-    "id": "5",
-    "timestamp": "2026-01-27T08:43:01.484572",
-    "original_text": "01 - M20260067382 -ACHADO DE CADÁVER (MASC. MARCAS DE VIOLÊNCIA - RUA PEDRO CAETANO DA SILVA - PAJUÇARA - MARACANAÚ) - AIS12 - 07H05 - RP14661",
-    "points": [
-      {
-        "description": "RUA PEDRO CAETANO DA SILVA - RUA PEDRO CAETANO DA SILVA - AIS12",
-        "lat": -3.7108574056331465,
-        "lng": -38.595213445432606,
-        "raw_event": {
-          "bairro": "",
-          "descricao": "MARACANAÚ",
-          "localizacao_completa": "AIS12",
-          "municipio": "MARACANAÚ",
-          "natureza": "RUA PEDRO CAETANO DA SILVA",
-          "raw": "01 - M20260067382 -ACHADO DE CADÁVER (MASC. MARCAS DE VIOLÊNCIA - RUA PEDRO CAETANO DA SILVA - PAJUÇARA - MARACANAÚ) - AIS12 - 07H05 - RP14661",
-          "resumo": "RUA PEDRO CAETANO DA SILVA - AIS12",
-          "sexo": "",
-          "timestamp": "RP14661"
-        },
-        "type": "exogenous"
-      }
-    ]
-  },
-  {
-    "id": "6",
-    "timestamp": "2026-01-27T08:43:22.845131",
-    "original_text": "02 - M20260067386 - ACHADO DE CADÁVER (MASC. MARCAS DE VIOLÊNCIA - RUA MANOEL NICOLAU - PIRAPORA - CAUCAIA)\tAIS11 - 07H10 - R116",
-    "points": [
-      {
-        "description": "ACHADO DE CADÁVER (MASC. MARCAS DE VIOLÊNCIA - ACHADO DE CADÁVER (MASC. MARCAS DE VIOLÊNCIA - CAUCAIA)\tAIS11",
-        "lat": -3.014392673076197,
-        "lng": -41.13028491712109,
-        "raw_event": {
-          "bairro": "",
-          "descricao": "PIRAPORA",
-          "localizacao_completa": "CAUCAIA)\tAIS11",
-          "municipio": "CAUCAIA",
-          "natureza": "ACHADO DE CADÁVER (MASC. MARCAS DE VIOLÊNCIA",
-          "raw": "02 - M20260067386 - ACHADO DE CADÁVER (MASC. MARCAS DE VIOLÊNCIA - RUA MANOEL NICOLAU - PIRAPORA - CAUCAIA)\tAIS11 - 07H10 - R116",
-          "resumo": "ACHADO DE CADÁVER (MASC. MARCAS DE VIOLÊNCIA - CAUCAIA)\tAIS11",
-          "sexo": "",
-          "timestamp": "R116"
-        },
-        "type": "exogenous"
-      }
-    ]
-  }
-]
+          {
+            "id": "7",
+            "timestamp": "2026-01-27T14:57:47.227182",
+            "original_text": "\n01 - M20260067382 - ACHADO DE CADÁVER - VITIMA DO SEXO MASCULINO - MARCAS DE VIOLÊNCIA - RUA PEDRO CAETANO DA SILVA - PAJUÇARA - MARACANAÚ) - AIS12 - 07:05",
+            "points": [
+              {
+                "description": "ACHADO DE CADÁVER - ACHADO DE CADÁVER - LOCAL DESCONHECIDO",
+                "lat": -3.8337811009041616,
+                "lng": -38.576029928373735,
+                "raw_event": {
+                  "bairro": "",
+                  "descricao": "MARCAS DE VIOLÊNCIA - RUA PEDRO CAETANO DA SILVA - PAJUÇARA)",
+                  "localizacao_completa": "",
+                  "municipio": "MARACANAÚ",
+                  "natureza": "ACHADO DE CADÁVER",
+                  "raw_text": "01 - M20260067382 - ACHADO DE CADÁVER - VITIMA DO SEXO MASCULINO - MARCAS DE VIOLÊNCIA - RUA PEDRO CAETANO DA SILVA - PAJUÇARA - MARACANAÚ) - AIS12 - 07:05",
+                  "resumo": "ACHADO DE CADÁVER - LOCAL DESCONHECIDO",
+                  "sexo": "MASCULINO",
+                  "timestamp": "07:05"
+                },
+                "type": "exogenous"
+              }
+            ]
+          },
+          {
+            "id": "6",
+            "timestamp": "2026-01-27T15:12:29.650622",
+            "original_text": "02 - M20260067386 - ACHADO DE CADÁVER - VITIMA DO SEXO MASCULINO - MARCAS DE VIOLÊNCIA - RUA MANOEL NICOLAU - PIRAPORA - CAUCAIA - AIS11 - 07:10",
+            "points": [
+              {
+                "description": "ACHADO DE CADÁVER - ACHADO DE CADÁVER - LOCAL DESCONHECIDO",
+                "lat": -3.781815299688344,
+                "lng": -38.67440417796269,
+                "raw_event": {
+                  "bairro": "PIRAPORA",
+                  "descricao": "MARCAS DE VIOLÊNCIA - RUA MANOEL NICOLAU - CAUCAIA",
+                  "localizacao_completa": "",
+                  "municipio": "CAUCAIA",
+                  "natureza": "ACHADO DE CADÁVER",
+                  "raw_text": "02 - M20260067386 - ACHADO DE CADÁVER - VITIMA DO SEXO MASCULINO - MARCAS DE VIOLÊNCIA - RUA MANOEL NICOLAU - PIRAPORA - CAUCAIA - AIS11 - 07:10",
+                  "resumo": "ACHADO DE CADÁVER - LOCAL DESCONHECIDO",
+                  "sexo": "MASCULINO",
+                  "timestamp": "07:10"
+                },
+                "type": "exogenous"
+              }
+            ]
+          },
+          {
+            "id": "7",
+            "timestamp": "2026-01-27T15:36:08.734802",
+            "original_text": "01 - M20260067706 - LESAO A BALA - VITIMA DO SEXO MASCULINO - VIA PUBLICA - MARACANAU - AIS12 - 13:06",
+            "points": [
+              {
+                "description": "LESAO A BALA - LESAO A BALA - LOCAL DESCONHECIDO",
+                "lat": -3.8885911072553565,
+                "lng": -38.593137064379185,
+                "raw_event": {
+                  "bairro": "",
+                  "descricao": "VIA PUBLICA - MARACANAU",
+                  "localizacao_completa": "",
+                  "municipio": "Maracanaú",
+                  "natureza": "LESAO A BALA",
+                  "raw_text": "01 - M20260067706 - LESAO A BALA - VITIMA DO SEXO MASCULINO - VIA PUBLICA - MARACANAU - AIS12 - 13:06",
+                  "resumo": "LESAO A BALA - LOCAL DESCONHECIDO",
+                  "sexo": "MASCULINO",
+                  "timestamp": "13:06"
+                },
+                "type": "exogenous"
+              }
+            ]
+          }
