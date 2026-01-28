@@ -1,0 +1,41 @@
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/geopandas/io/file.py:576: UserWarning: Could not parse column 'tessellate' as JSON; leaving as string
+  return pyogrio.read_dataframe(path_or_bytes, bbox=bbox, **kwargs)
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/geopandas/io/file.py:576: UserWarning: Could not parse column 'extrude' as JSON; leaving as string
+  return pyogrio.read_dataframe(path_or_bytes, bbox=bbox, **kwargs)
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/geopandas/io/file.py:576: UserWarning: Could not parse column 'name' as JSON; leaving as string
+  return pyogrio.read_dataframe(path_or_bytes, bbox=bbox, **kwargs)
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/geopandas/io/file.py:576: UserWarning: Could not parse column 'tessellate' as JSON; leaving as string
+  return pyogrio.read_dataframe(path_or_bytes, bbox=bbox, **kwargs)
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/geopandas/io/file.py:576: UserWarning: Could not parse column 'extrude' as JSON; leaving as string
+  return pyogrio.read_dataframe(path_or_bytes, bbox=bbox, **kwargs)
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/geopandas/io/file.py:576: UserWarning: Could not parse column 'str:bm9tZQ==' as JSON; leaving as string
+  return pyogrio.read_dataframe(path_or_bytes, bbox=bbox, **kwargs)
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/geopandas/io/file.py:576: UserWarning: Could not parse column 'name' as JSON; leaving as string
+  return pyogrio.read_dataframe(path_or_bytes, bbox=bbox, **kwargs)
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/geopandas/io/file.py:576: UserWarning: Could not parse column 'tessellate' as JSON; leaving as string
+  return pyogrio.read_dataframe(path_or_bytes, bbox=bbox, **kwargs)
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/geopandas/io/file.py:576: UserWarning: Could not parse column 'extrude' as JSON; leaving as string
+  return pyogrio.read_dataframe(path_or_bytes, bbox=bbox, **kwargs)
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/geopandas/io/file.py:576: UserWarning: Could not parse column 'str:bm9tZQ==' as JSON; leaving as string
+  return pyogrio.read_dataframe(path_or_bytes, bbox=bbox, **kwargs)
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/geopandas/io/file.py:576: UserWarning: Could not parse column 'tessellate' as JSON; leaving as string
+  return pyogrio.read_dataframe(path_or_bytes, bbox=bbox, **kwargs)
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/geopandas/io/file.py:576: UserWarning: Could not parse column 'extrude' as JSON; leaving as string
+  return pyogrio.read_dataframe(path_or_bytes, bbox=bbox, **kwargs)
+Usando arquivo de ocorrências: data/raw/dados_status_ocorrencias_gerais.json
+Lendo ocorrências de data/raw/dados_status_ocorrencias_gerais.json...
+Total de ocorrências válidas: 73998
+Tentando carregar GeoJSONs de data/raw/inteligencia...
+Lendo GeoJSONs de data/raw/inteligencia...
+Total de polígonos carregados: 2378
+Realizando Spatial Join...
+Ocorrências dentro das áreas monitoradas: 23721
+Intervalo temporal: 2022-01-01 a 2026-01-12
+Agregando dados temporais: 2378 nós, 1473 dias, 2 features...
+Criando matrizes de adjacência (geo + faccional) usando projeção métrica (2000 m)...
+Calculando matrizes de adjacência (geo + faccional)...
+✓ Dados processados salvos em data/processed/processed_graph_data.pkl
+  - Nós: 2378
+  - Timesteps (dias): 1473
+  - Features: 2
+  - Shape node_features: (2378, 1473, 2)
