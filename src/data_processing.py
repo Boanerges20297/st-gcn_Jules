@@ -7,7 +7,7 @@ import numpy as np
 
 # Configuração
 GEOJSON_DIR = 'data/raw/inteligencia'
-OCORRENCIAS_CSV = 'data/raw/View_Ocorrencias_2022_ENRIQUECIDO.csv'
+OCORRENCIAS_FILE = 'data/raw/dados_status_ocorrencias_gerais.json'
 OUTPUT_FILE = 'data/processed/processed_graph_data.pkl'
 
 def load_geometries(directory):
@@ -92,6 +92,11 @@ def load_occurrences(filepath):
         if not isinstance(val, str):
             return 'cvp'
         v = val.lower()
+
+        # Se já estiver classificado corretamente, retorna o valor
+        if v in ('cvli', 'cvp'):
+            return v
+
         # Crimes violentos (cvli)
         violent_keywords = ['homic', 'roubo', 'latroc', 'lesão', 'lesao', 'sequestro', 'estupro', 'homicid', 'latrocinio']
         # Crimes patrimoniais e drogas (cvp)
@@ -181,12 +186,12 @@ def main():
     # Criar diretório de output se não existir
     os.makedirs(os.path.dirname(OUTPUT_FILE) or '.', exist_ok=True)
 
-    # Carregar ocorrências (prefere CSV se presente)
-    if os.path.exists(OCORRENCIAS_CSV):
-        print(f"Usando CSV: {OCORRENCIAS_CSV}")
-        occurrences_gdf = load_occurrences(OCORRENCIAS_CSV)
+    # Carregar ocorrências
+    if os.path.exists(OCORRENCIAS_FILE):
+        print(f"Usando arquivo de ocorrências: {OCORRENCIAS_FILE}")
+        occurrences_gdf = load_occurrences(OCORRENCIAS_FILE)
     else:
-        print(f"CSV não encontrado: {OCORRENCIAS_CSV}")
+        print(f"Arquivo de ocorrências não encontrado: {OCORRENCIAS_FILE}")
         return
 
     if occurrences_gdf.empty:
