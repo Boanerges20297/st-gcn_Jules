@@ -270,12 +270,32 @@
     legend.addTo(map);
 
     function formatDate(dateStr) {
-        if (!dateStr) return '?';
-        var parts = dateStr.split('-');
-        if (parts.length === 3) {
-            return parts[2] + '/' + parts[1] + '/' + parts[0];
+        // Preserve explicit em-dash fallback
+        if (!dateStr || dateStr === '—') return '—';
+
+        // If already in dd/mm/yyyy, return as-is (quick heuristic)
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) return dateStr;
+
+        // Try ISO-like date (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)
+        try {
+            var iso = dateStr.trim();
+            // Extract leading YYYY-MM-DD if present
+            var m = iso.match(/(\d{4})-(\d{2})-(\d{2})/);
+            if (m) {
+                return m[3] + '/' + m[2] + '/' + m[1];
+            }
+            // Fallback: try Date parsing and format
+            var d = new Date(dateStr);
+            if (!isNaN(d.getTime())) {
+                var dd = String(d.getDate()).padStart(2, '0');
+                var mm = String(d.getMonth() + 1).padStart(2, '0');
+                var yyyy = d.getFullYear();
+                return dd + '/' + mm + '/' + yyyy;
+            }
+        } catch (e) {
+            // ignore and fallthrough
         }
-        return dateStr;
+        return dateStr || '—';
     }
 
     var geojsonLayer = null;
@@ -609,18 +629,9 @@
                 success: function(resp) {
                     if (resp.points && resp.points.length > 0) {
 
-                        // Add points to simulation
-                        if (!simulationMode || simulationType !== 'exogenous') {
-                            // Activate simulation mode implicitly or switch type
-                            simulationMode = true;
-                            simulationType = 'exogenous';
-                            $('#btn-simulate-exo').addClass('active btn-danger').removeClass('btn-outline-danger');
-                            $('#btn-simulate').removeClass('active btn-primary').addClass('btn-outline-primary');
-                            $('.leaflet-container').addClass('simulation-active');
-                            $('#btn-clear-sim').removeClass('d-none');
-                        }
-
-                        // Add markers
+                        // Add markers visually but DO NOT implicitly toggle global simulationMode.
+                        // This prevents the simulation buttons from being activated automatically
+                        // when the malha is adapted, avoiding unexpected UX side-effects.
                         resp.points.forEach(function(pt) {
                             var latlng = [pt.lat, pt.lng];
                             var marker = L.marker(latlng, {icon: conflictIcon})
@@ -629,6 +640,8 @@
                             simMarkers.push(marker);
                             simulationPoints.push(latlng);
                         });
+                        // Show the clear control so the user can remove these visual markers if desired
+                        $('#btn-clear-sim').removeClass('d-none');
 
         // SAVE changes permanently (as requested)
                         showLoading('Registrando e Adaptando Malha...', 'Salvando eventos e recalculando modelo global.');
@@ -655,7 +668,15 @@
                                      hideLoading();
                                      alert('Eventos salvos com sucesso!\nA malha foi adaptada permanentemente e o risco recalculado.');
 
-                                     // Add markers visual feedback for this session
+                                     // Ensure simulation mode is NOT left active after malha adaptation.
+                                     simulationMode = false;
+                                     simulationType = 'suppression';
+                                     // Reset button visual states
+                                     $('#btn-simulate').removeClass('active btn-primary').addClass('btn-outline-primary');
+                                     $('#btn-simulate-exo').removeClass('active btn-danger').addClass('btn-outline-danger');
+                                     $('.leaflet-container').removeClass('simulation-active');
+
+                                     // Add markers visual feedback for this session (saved)
                                      resp.points.forEach(function(pt) {
                                         L.marker([pt.lat, pt.lng], {icon: conflictIcon})
                                             .bindPopup('<strong>Evento Exógeno (Salvo)</strong><br>' + pt.description)

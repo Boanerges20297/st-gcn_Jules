@@ -412,6 +412,35 @@ def load_data_and_models():
             adj_matrix = adj_geo
         node_features = data_pack.get('node_features')
         dates = data_pack.get('dates')
+        # Fallback: if dates missing from the package, try to load from graph_data/dates.pkl or dates.json
+        if not dates:
+            try:
+                graph_dir = os.path.join(BASE_DIR, 'data', 'processed', 'graph_data')
+                dpkl = os.path.join(graph_dir, 'dates.pkl')
+                djson = os.path.join(graph_dir, 'dates.json')
+                if os.path.exists(dpkl):
+                    try:
+                        with open(dpkl, 'rb') as fh:
+                            loaded = pickle.load(fh)
+                            if (loaded is not None) and (hasattr(loaded, '__len__') and len(loaded) > 0):
+                                dates = loaded
+                                print(f"[load_data_and_models] Fallback loaded dates from {dpkl}: type={type(dates)}, len={len(dates)}")
+                    except Exception as e:
+                        print(f"[load_data_and_models] Failed to load dates.pkl fallback: {e}")
+                elif os.path.exists(djson):
+                    try:
+                        with open(djson, 'r', encoding='utf-8') as fh:
+                            loaded = json.load(fh)
+                            if (loaded is not None) and (hasattr(loaded, '__len__') and len(loaded) > 0):
+                                try:
+                                    dates = pd.to_datetime(loaded)
+                                except Exception:
+                                    dates = loaded
+                                print(f"[load_data_and_models] Fallback loaded dates from {djson}: type={type(dates)}, len={(len(dates) if hasattr(dates,'__len__') else 'unknown')}")
+                    except Exception as e:
+                        print(f"[load_data_and_models] Failed to load dates.json fallback: {e}")
+            except Exception:
+                pass
 
         # Create projected GeoDataFrame for metric calculations (EPSG:3857 - Web Mercator)
         # This fixes UserWarning about geographic CRS during distance calculation
@@ -857,6 +886,7 @@ def simulate_risk():
         return jsonify({'error': f'Erro na simulação: {e}'}), 500
 
 def calculate_risk(custom_norm_adj=None):
+    global dates
     if node_features is None or nodes_gdf is None:
         return jsonify({'error': 'Dados não carregados.'}), 503
 
@@ -1130,28 +1160,74 @@ def calculate_risk(custom_norm_adj=None):
         # Update nodes_gdf in memory with inferred regions if missing (Run once?)
         # For simplicity, I will implement a check in get_polygons to update 'CIDADE' if empty.
 
+        # Ensure we have `dates` available: try a best-effort fallback to load from graph_data
+        try:
+            if (dates is None) or (hasattr(dates, '__len__') and len(dates) == 0):
+                graph_dir = os.path.join(BASE_DIR, 'data', 'processed', 'graph_data')
+                dpkl = os.path.join(graph_dir, 'dates.pkl')
+                djson = os.path.join(graph_dir, 'dates.json')
+                # Prefer pickle (preserves DatetimeIndex)
+                if os.path.exists(dpkl):
+                    try:
+                        with open(dpkl, 'rb') as fh:
+                            loaded = pickle.load(fh)
+                            if (loaded is not None) and (hasattr(loaded, '__len__') and len(loaded) > 0):
+                                dates = loaded
+                                print(f"[calculate_risk] Loaded dates from {dpkl}: type={type(dates)}, len={len(dates)}")
+                    except Exception as e:
+                        print(f"[calculate_risk] Failed loading dates.pkl: {e}")
+                elif os.path.exists(djson):
+                    try:
+                        with open(djson, 'r', encoding='utf-8') as fh:
+                            loaded = json.load(fh)
+                            if (loaded is not None) and (hasattr(loaded, '__len__') and len(loaded) > 0):
+                                # Attempt to parse JSON date list to DatetimeIndex
+                                try:
+                                    dates = pd.to_datetime(loaded)
+                                except Exception:
+                                    dates = loaded
+                                print(f"[calculate_risk] Loaded dates from {djson}: type={type(dates)}, len={(len(dates) if hasattr(dates,'__len__') else 'unknown')}" )
+                    except Exception as e:
+                        print(f"[calculate_risk] Failed loading dates.json: {e}")
+        except Exception as e:
+            print(f"[calculate_risk] Exception while attempting fallback load of dates: {e}")
+
+        # Build meta object with safe defaults to avoid undefined values in the frontend
+        # Use a visible fallback (em dash) so frontend doesn't render '?' for missing dates
         meta = {
             'window_cvli': WINDOW_CVLI,
-            'window_cvp': WINDOW_CVP
+            'window_cvp': WINDOW_CVP,
+            'start_cvli': '—',
+            'start_cvp': '—',
+            'last_date': '—',
+            'window_start': '—',
+            'window_end': '—'
         }
-        if dates is not None and len(dates) > 0:
-            last_date_obj = pd.to_datetime(dates[-1])
-            meta['last_date'] = str(last_date_obj.date())
-            if len(dates) >= WINDOW_CVLI:
-                start_cvli = pd.to_datetime(dates[-WINDOW_CVLI])
-                meta['start_cvli'] = str(start_cvli.date())
-            else:
-                 meta['start_cvli'] = str(pd.to_datetime(dates[0]).date())
 
-            if len(dates) >= WINDOW_CVP:
-                start_cvp = pd.to_datetime(dates[-WINDOW_CVP])
-                meta['start_cvp'] = str(start_cvp.date())
-            else:
-                 meta['start_cvp'] = str(pd.to_datetime(dates[0]).date())
+        # Populate meta from available `dates` if present
+        if dates is not None and hasattr(dates, '__len__') and len(dates) > 0:
+            try:
+                last_date_obj = pd.to_datetime(dates[-1])
+                meta['last_date'] = str(last_date_obj.date())
 
-            if 'start_cvli' in meta:
-                meta['window_start'] = meta['start_cvli']
-                meta['window_end'] = meta['last_date']
+                if len(dates) >= WINDOW_CVLI:
+                    start_cvli = pd.to_datetime(dates[-WINDOW_CVLI])
+                    meta['start_cvli'] = str(start_cvli.date())
+                else:
+                    meta['start_cvli'] = str(pd.to_datetime(dates[0]).date())
+
+                if len(dates) >= WINDOW_CVP:
+                    start_cvp = pd.to_datetime(dates[-WINDOW_CVP])
+                    meta['start_cvp'] = str(start_cvp.date())
+                else:
+                    meta['start_cvp'] = str(pd.to_datetime(dates[0]).date())
+
+                # Provide window_start/window_end for convenience to frontend
+                meta['window_start'] = meta.get('start_cvli', '')
+                meta['window_end'] = meta.get('last_date', '')
+            except Exception:
+                # If parsing fails, keep safe defaults (em dash)
+                pass
 
         return jsonify({'meta': meta, 'data': results})
     except Exception as e:

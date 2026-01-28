@@ -20,6 +20,9 @@ def _call_model(prompt: str, api_key: str) -> str:
     """Call the generative model using google-generativeai SDK.
     Uses the GEMINI_API_KEY from .env file.
     """
+    if genai is None:
+        raise RuntimeError('google.generativeai SDK not available')
+
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel('gemini-2.5-flash')
     response = model.generate_content(
@@ -29,7 +32,7 @@ def _call_model(prompt: str, api_key: str) -> str:
             'max_output_tokens': 8192
         }
     )
-    return response.text
+    return getattr(response, 'text', response)
 
 
 def _call_model_rest(prompt: str, api_key: str, model: str = 'gemini-2.5-flash') -> str:
@@ -70,6 +73,63 @@ def _call_model_rest(prompt: str, api_key: str, model: str = 'gemini-2.5-flash')
     except Exception as e:
         logger.exception('REST call to Generative API failed')
         raise
+
+
+def get_gemini_api_keys() -> List[str]:
+    """Return a list of Gemini API keys found in environment variables.
+    Supports a comma-separated `GEMINI_API_KEYS` or individual `GEMINI_API_KEY`,
+    `GEMINI_API_KEY_1`...`GEMINI_API_KEY_4`, and a fallback `GOOGLE_API_KEY`.
+    """
+    keys = []
+    env = os.environ
+    if env.get('GEMINI_API_KEYS'):
+        keys = [k.strip() for k in env['GEMINI_API_KEYS'].split(',') if k.strip()]
+    else:
+        for name in ('GEMINI_API_KEY', 'GEMINI_API_KEY_1', 'GEMINI_API_KEY_2', 'GEMINI_API_KEY_3', 'GEMINI_API_KEY_4', 'GOOGLE_API_KEY'):
+            v = env.get(name)
+            if v:
+                keys.append(v)
+    return keys
+
+
+def _call_model_with_rotation(prompt: str, keys: List[str]) -> str:
+    """Attempt to call the model rotating through provided keys when quota is exhausted (HTTP 429).
+    Raises the last exception if all keys fail.
+    """
+    if not keys:
+        raise RuntimeError('No API keys available for model call')
+    last_exc = None
+    for idx, key in enumerate(keys):
+        try:
+            logger.debug('Trying Gemini API key %d/%d', idx+1, len(keys))
+            return _call_model(prompt, key)
+        except Exception as e:
+            last_exc = e
+            msg = str(e).lower()
+            exhausted = False
+            try:
+                from google.api_core.exceptions import ResourceExhausted
+                if isinstance(e, ResourceExhausted):
+                    exhausted = True
+            except Exception:
+                if '429' in msg or 'resourceexhausted' in msg or 'quota' in msg or 'exceeded' in msg:
+                    exhausted = True
+
+            if exhausted:
+                logger.warning('API key %d/%d quota exhausted (429). Rotating to next key.', idx+1, len(keys))
+                continue
+
+            # For explicit permission errors or leaked-key detection, re-raise so caller can handle.
+            if '403' in msg or 'permissiondenied' in msg or 'leaked' in msg:
+                logger.error('API key %d/%d failed with permission error: %s', idx+1, len(keys), msg)
+                raise
+
+            # Otherwise log and try next key (network/timeouts can be transient)
+            logger.warning('API key %d/%d failed with error: %s; trying next key', idx+1, len(keys), msg)
+            continue
+
+    logger.exception('All API keys exhausted or failed; last error: %s', last_exc)
+    raise last_exc
 
 
 def _extract_json_from_text(text: str):
@@ -161,10 +221,14 @@ def process_exogenous_text(text: str) -> List[Dict[str, Any]]:
             'raw_text': line
         }
 
-    api_key = os.environ.get('GEMINI_API_KEY') or os.environ.get('GOOGLE_API_KEY')
+    # Gather API keys (support rotating multiple keys)
+    keys = get_gemini_api_keys()
+    # Allow tests or CI to force-disable GenAI even if keys exist in .env
+    if os.environ.get('DISABLE_GENAI_FOR_TESTS') == '1':
+        keys = []
 
-    # Deterministic path (no API key): parse line-by-line and enrich
-    if not api_key:
+    # Deterministic path (no API keys): parse line-by-line and enrich
+    if not keys:
         parsed = []
         for line in text.splitlines():
             line = line.strip()
@@ -192,83 +256,69 @@ def process_exogenous_text(text: str) -> List[Dict[str, Any]]:
 
     # LLM path: call model, extract JSON, then enrich
     prompt = (
-        "You will receive multiple lines of police log text. For each line return a JSON array where each element has these keys exactly: natureza, descricao, sexo, localizacao_completa, bairro, municipio, timestamp, resumo, raw_text.\n\n" + text
+        "You will receive multiple lines of police log text. For each line return a JSON array where each element has these keys exactly: natureza, descricao, sexo, localizacao_completa, bairro, municipio, timestamp, resumo, raw_text.\n\n"
+        "Important rules (follow exactly):\n"
+        "1) Extract 'bairro' and 'municipio' when present. Do NOT invent municipality names. If you cannot confidently extract a municipality from the text, return an empty string for 'municipio'.\n"
+        "2) If the provided text does not contain a street AND does not contain a bairro (neighborhood) — i.e. address is incomplete or missing both street and neighborhood — then set 'bairro' to the literal string 'CENTRO' of the same city. For 'municipio', extract the city if it appears in the text; if the city is not present, leave 'municipio' empty.\n"
+        "3) Keep values concise: use the canonical neighborhood name when available; otherwise use 'CENTRO' as described.\n"
+        "4) 'localizacao_completa' should contain whatever location text is available (may be empty).\n\n"
+        + text
     )
     try:
-        try:
-            out = _call_model(prompt, api_key)
-        except Exception as e_call:
-            # If the call fails, inspect the error message for leaked/permission issues
-            msg = str(e_call)
-            if 'leaked' in msg.lower() or 'permissiondenied' in msg.replace(' ', '').lower() or '403' in msg:
-                logger.error('LLM API key appears invalid or leaked (403). Rotate the key and remove it from the repository.')
-                raise
-            # try REST fallback if an API key env var exists
-            rest_key = os.environ.get('GOOGLE_API_KEY') or os.environ.get('GEMINI_API_KEY') or os.environ.get('GEMINI_KEY')
-            if rest_key:
-                try:
-                    out = _call_model_rest(prompt, rest_key)
-                except Exception as e_rest:
-                    msg2 = str(e_rest)
-                    if '403' in msg2 or 'leaked' in msg2.lower() or 'permissiondenied' in msg2.replace(' ', '').lower():
-                        logger.error('REST LLM call failed with 403/PermissionDenied; API key may have been reported as leaked. Rotate the key and do NOT commit it to the repo.')
-                        raise
-                    raise
-            else:
-                raise
-        if isinstance(out, str) and out.startswith('```'):
-            idx = out.find('\n')
-            if idx != -1:
-                out = out[idx+1:]
-        if isinstance(out, str) and out.endswith('```'):
-            out = out[:-3]
-        events = _extract_json_from_text(out)
-        normalized = []
-        for evt in events:
-            if not isinstance(evt, dict):
-                continue
-            natureza = evt.get('natureza', evt.get('type', 'DESCONHECIDO'))
-            descricao = evt.get('descricao', evt.get('description', ''))
-            sexo = evt.get('sexo', evt.get('sex', ''))
-            localizacao_completa = evt.get('localizacao_completa', evt.get('location', ''))
-            bairro = evt.get('bairro', evt.get('neighborhood', '')) or ''
-            municipio = (evt.get('municipio') or '').strip()
-            timestamp = evt.get('timestamp', '')
-            resumo = evt.get('resumo', evt.get('summary', ''))
-            raw_text = evt.get('raw_text', evt.get('raw', ''))
-            try:
-                loc_search = ' '.join([str(descricao or ''), str(localizacao_completa or ''), str(raw_text or '')])
-                b = busca_bairro(loc_search)
-                if b:
-                    bairro = b
-                    if not municipio:
-                        municipio = 'FORTALEZA'
-                else:
-                    m = busca_municipio(loc_search)
-                    if m:
-                        municipio = m
-            except Exception:
-                pass
-            normalized.append({
-                'natureza': natureza,
-                'descricao': descricao,
-                'sexo': sexo,
-                'localizacao_completa': localizacao_completa,
-                'bairro': bairro,
-                'municipio': municipio or '',
-                'timestamp': timestamp,
-                'resumo': resumo,
-                'raw_text': raw_text
-            })
-        return normalized
-    except Exception as e:
-        # Provide clearer guidance when a leaked/invalid key is detected
-        msg = str(e)
+        out = _call_model_with_rotation(prompt, keys)
+    except Exception as e_call:
+        msg = str(e_call)
         if 'leaked' in msg.lower() or 'permissiondenied' in msg.replace(' ', '').lower() or '403' in msg:
-            logger.error('GenAI requests failing due to invalid/leaked API key. Remove the key from the repository, rotate it in the Google Cloud console, and set a new key in the environment (GEMINI_API_KEY or GOOGLE_API_KEY). Falling back to mock parser.')
-        else:
-            logger.exception('GenAI failed; using mock')
+            logger.error('LLM API key appears invalid or leaked (403). Rotate the key and remove it from the repository.')
+            raise
+        logger.exception('GenAI SDK call failed after trying available keys; falling back to local mock parser')
         return _mock_response(text)
+
+    if isinstance(out, str) and out.startswith('```'):
+        idx = out.find('\n')
+        if idx != -1:
+            out = out[idx+1:]
+    if isinstance(out, str) and out.endswith('```'):
+        out = out[:-3]
+    events = _extract_json_from_text(out)
+    normalized = []
+    for evt in events:
+        if not isinstance(evt, dict):
+            continue
+        natureza = evt.get('natureza', evt.get('type', 'DESCONHECIDO'))
+        descricao = evt.get('descricao', evt.get('description', ''))
+        sexo = evt.get('sexo', evt.get('sex', ''))
+        localizacao_completa = evt.get('localizacao_completa', evt.get('location', ''))
+        bairro = evt.get('bairro', evt.get('neighborhood', '')) or ''
+        municipio = (evt.get('municipio') or '').strip()
+        timestamp = evt.get('timestamp', '')
+        resumo = evt.get('resumo', evt.get('summary', ''))
+        raw_text = evt.get('raw_text', evt.get('raw', ''))
+        try:
+            loc_search = ' '.join([str(descricao or ''), str(localizacao_completa or ''), str(raw_text or '')])
+            b = busca_bairro(loc_search)
+            if b:
+                bairro = b
+                if not municipio:
+                    municipio = 'FORTALEZA'
+            else:
+                m = busca_municipio(loc_search)
+                if m:
+                    municipio = m
+        except Exception:
+            pass
+        normalized.append({
+            'natureza': natureza,
+            'descricao': descricao,
+            'sexo': sexo,
+            'localizacao_completa': localizacao_completa,
+            'bairro': bairro,
+            'municipio': municipio or '',
+            'timestamp': timestamp,
+            'resumo': resumo,
+            'raw_text': raw_text
+        })
+    return normalized
 
 
 def _normalize_text(s: str) -> str:
