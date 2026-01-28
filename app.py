@@ -322,14 +322,84 @@ def load_data_and_models():
     except Exception as e:
         print(f"Erro ao carregar dados estáticos: {e}")
 
+    # Prefer single-file package, but support split 'graph_data' directory when the pkl is absent
+    data_pack = None
     if not os.path.exists(DATA_FILE):
-        print("AVISO: Arquivo de dados não encontrado. Execute o processamento de dados.")
-        return
+        graph_dir = os.path.join(BASE_DIR, 'data', 'processed', 'graph_data')
+        if os.path.exists(graph_dir) and os.path.isdir(graph_dir):
+            print("AVISO: processed_graph_data.pkl não encontrado — tentando carregar chunks em data/processed/graph_data/")
+            try:
+                data_pack = {}
+                # nodes_gdf: prefer pickle backup
+                ng_path_pkl = os.path.join(graph_dir, 'nodes_gdf.pkl')
+                ng_path_json = os.path.join(graph_dir, 'nodes_gdf.json')
+                if os.path.exists(ng_path_pkl):
+                    with open(ng_path_pkl, 'rb') as f:
+                        data_pack['nodes_gdf'] = pickle.load(f)
+                elif os.path.exists(ng_path_json):
+                    # load geojson as GeoDataFrame
+                    try:
+                        data_pack['nodes_gdf'] = gpd.read_file(ng_path_json)
+                    except Exception:
+                        with open(ng_path_json, 'r', encoding='utf8') as f:
+                            geojson = json.load(f)
+                        data_pack['nodes_gdf'] = gpd.GeoDataFrame.from_features(geojson['features'])
+
+                # adjacencies: .npz or .npy
+                for name in ('adj_geo', 'adj_faction', 'adj_matrix'):
+                    p_npz = os.path.join(graph_dir, f"{name}.npz")
+                    p_npy = os.path.join(graph_dir, f"{name}.npy")
+                    if os.path.exists(p_npz):
+                        try:
+                            import scipy.sparse as sp
+                            data_pack[name] = sp.load_npz(p_npz).toarray()
+                        except Exception:
+                            data_pack[name] = np.load(p_npz, allow_pickle=True)
+                    elif os.path.exists(p_npy):
+                        data_pack[name] = np.load(p_npy, allow_pickle=True)
+
+                # node_features
+                nf = os.path.join(graph_dir, 'node_features.npy')
+                if os.path.exists(nf):
+                    data_pack['node_features'] = np.load(nf, allow_pickle=True)
+
+                # dates (json or pickle)
+                djson = os.path.join(graph_dir, 'dates.json')
+                dpkl = os.path.join(graph_dir, 'dates.pkl')
+                if os.path.exists(djson):
+                    try:
+                        with open(djson, 'r', encoding='utf8') as f:
+                            data_pack['dates'] = json.load(f)
+                    except Exception:
+                        pass
+                elif os.path.exists(dpkl):
+                    try:
+                        with open(dpkl, 'rb') as f:
+                            data_pack['dates'] = pickle.load(f)
+                    except Exception:
+                        pass
+
+                # If we found nothing useful, fall back to warning
+                if not data_pack:
+                    print("AVISO: Nenhum chunk foi encontrado em data/processed/graph_data/")
+                    return
+
+                print("Carregado pacote a partir de chunks com chaves:", list(data_pack.keys()))
+            except Exception as e:
+                print(f"Erro ao reconstruir a partir de chunks: {e}")
+                import traceback
+                traceback.print_exc()
+                return
+        else:
+            print("AVISO: Arquivo de dados não encontrado. Execute o processamento de dados.")
+            return
 
     print("Carregando dados para API...")
     try:
-        with open(DATA_FILE, 'rb') as f:
-            data_pack = pickle.load(f)
+        # If not already reconstructed from chunks, load the single-file package
+        if data_pack is None:
+            with open(DATA_FILE, 'rb') as f:
+                data_pack = pickle.load(f)
 
         nodes_gdf = data_pack.get('nodes_gdf')
         polygons_json_cache = None

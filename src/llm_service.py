@@ -197,11 +197,23 @@ def process_exogenous_text(text: str) -> List[Dict[str, Any]]:
     try:
         try:
             out = _call_model(prompt, api_key)
-        except Exception:
+        except Exception as e_call:
+            # If the call fails, inspect the error message for leaked/permission issues
+            msg = str(e_call)
+            if 'leaked' in msg.lower() or 'permissiondenied' in msg.replace(' ', '').lower() or '403' in msg:
+                logger.error('LLM API key appears invalid or leaked (403). Rotate the key and remove it from the repository.')
+                raise
             # try REST fallback if an API key env var exists
             rest_key = os.environ.get('GOOGLE_API_KEY') or os.environ.get('GEMINI_API_KEY') or os.environ.get('GEMINI_KEY')
             if rest_key:
-                out = _call_model_rest(prompt, rest_key)
+                try:
+                    out = _call_model_rest(prompt, rest_key)
+                except Exception as e_rest:
+                    msg2 = str(e_rest)
+                    if '403' in msg2 or 'leaked' in msg2.lower() or 'permissiondenied' in msg2.replace(' ', '').lower():
+                        logger.error('REST LLM call failed with 403/PermissionDenied; API key may have been reported as leaked. Rotate the key and do NOT commit it to the repo.')
+                        raise
+                    raise
             else:
                 raise
         if isinstance(out, str) and out.startswith('```'):
@@ -249,8 +261,13 @@ def process_exogenous_text(text: str) -> List[Dict[str, Any]]:
                 'raw_text': raw_text
             })
         return normalized
-    except Exception:
-        logger.exception('GenAI failed; using mock')
+    except Exception as e:
+        # Provide clearer guidance when a leaked/invalid key is detected
+        msg = str(e)
+        if 'leaked' in msg.lower() or 'permissiondenied' in msg.replace(' ', '').lower() or '403' in msg:
+            logger.error('GenAI requests failing due to invalid/leaked API key. Remove the key from the repository, rotate it in the Google Cloud console, and set a new key in the environment (GEMINI_API_KEY or GOOGLE_API_KEY). Falling back to mock parser.')
+        else:
+            logger.exception('GenAI failed; using mock')
         return _mock_response(text)
 
 
