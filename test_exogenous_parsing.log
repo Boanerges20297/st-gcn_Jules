@@ -1,0 +1,123 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.12, pytest-9.0.2, pluggy-1.6.0 -- /home/jules/.pyenv/versions/3.12.12/bin/python
+cachedir: .pytest_cache
+rootdir: /app
+collecting ... collected 1 item
+
+tests/test_exogenous_parsing.py::test_exogenous_parsing_cases FAILED     [100%]
+
+=================================== FAILURES ===================================
+_________________________ test_exogenous_parsing_cases _________________________
+
+    def test_exogenous_parsing_cases():
+        p = os.path.join(os.path.dirname(__file__), '..', 'data', 'exogenous_events.json')
+        with open(p, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+
+        cases = {
+            # id -> expected fields
+            '2': {'bairro': 'Granja Lisboa', 'municipio': 'FORTALEZA'},
+            '3': {'municipio': 'Caucaia'},
+            '4': {'bairro': 'Passaré', 'municipio': 'FORTALEZA'},
+            '7': {'municipio': 'Maracanaú'}
+        }
+
+        for cid, expected in cases.items():
+            item = next((it for it in data if it.get('id') == cid), None)
+            assert item is not None, f"Event id {cid} not found in exogenous_events.json"
+            res = process_exogenous_text(item.get('original_text', ''))
+            assert isinstance(res, list) and len(res) >= 1
+            evt = res[0]
+            for k, v in expected.items():
+                val = evt.get(k) or ''
+>               assert val.strip().upper() == v.strip().upper(), f"id={cid} expected {k}={v}, got {val}"
+E               AssertionError: id=2 expected bairro=Granja Lisboa, got SOCORRIDO PARA UPA
+E               assert 'SOCORRIDO PARA UPA' == 'GRANJA LISBOA'
+E
+E                 - GRANJA LISBOA
+E                 + SOCORRIDO PARA UPA
+
+tests/test_exogenous_parsing.py:28: AssertionError
+------------------------------ Captured log call -------------------------------
+WARNING  src.llm_service:llm_service.py:128 API key 1/1 failed with error: 400 api key not found. please pass a valid api key. [reason: "api_key_invalid"
+domain: "googleapis.com"
+metadata {
+  key: "service"
+  value: "generativelanguage.googleapis.com"
+}
+, locale: "en-us"
+message: "api key not found. please pass a valid api key."
+]; trying next key
+ERROR    src.llm_service:llm_service.py:131 All API keys exhausted or failed; last error: 400 API Key not found. Please pass a valid API key. [reason: "API_KEY_INVALID"
+domain: "googleapis.com"
+metadata {
+  key: "service"
+  value: "generativelanguage.googleapis.com"
+}
+, locale: "en-US"
+message: "API Key not found. Please pass a valid API key."
+]
+NoneType: None
+ERROR    src.llm_service:llm_service.py:274 GenAI SDK call failed after trying available keys; falling back to local mock parser
+Traceback (most recent call last):
+  File "/app/src/llm_service.py", line 268, in process_exogenous_text
+    out = _call_model_with_rotation(prompt, keys)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/src/llm_service.py", line 132, in _call_model_with_rotation
+    raise last_exc
+  File "/app/src/llm_service.py", line 105, in _call_model_with_rotation
+    return _call_model(prompt, key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/src/llm_service.py", line 28, in _call_model
+    response = model.generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/google/generativeai/generative_models.py", line 331, in generate_content
+    response = self._client.generate_content(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/google/ai/generativelanguage_v1beta/services/generative_service/client.py", line 835, in generate_content
+    response = rpc(
+               ^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/google/api_core/gapic_v1/method.py", line 131, in __call__
+    return wrapped_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/google/api_core/retry/retry_unary.py", line 294, in retry_wrapped_func
+    return retry_target(
+           ^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/google/api_core/retry/retry_unary.py", line 156, in retry_target
+    next_sleep = _retry_error_helper(
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/google/api_core/retry/retry_base.py", line 214, in _retry_error_helper
+    raise final_exc from source_exc
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/google/api_core/retry/retry_unary.py", line 147, in retry_target
+    result = target()
+             ^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/google/api_core/timeout.py", line 130, in func_with_timeout
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/google/api_core/grpc_helpers.py", line 77, in error_remapped_callable
+    raise exceptions.from_grpc_error(exc) from exc
+google.api_core.exceptions.InvalidArgument: 400 API Key not found. Please pass a valid API key. [reason: "API_KEY_INVALID"
+domain: "googleapis.com"
+metadata {
+  key: "service"
+  value: "generativelanguage.googleapis.com"
+}
+, locale: "en-US"
+message: "API Key not found. Please pass a valid API key."
+]
+=============================== warnings summary ===============================
+src/llm_service.py:17
+  /app/src/llm_service.py:17: FutureWarning:
+
+  All support for the `google.generativeai` package has ended. It will no longer be receiving
+  updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+  See README for more details:
+
+  https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+    import google.generativeai as genai
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_exogenous_parsing.py::test_exogenous_parsing_cases - Assert...
+========================= 1 failed, 1 warning in 1.95s =========================

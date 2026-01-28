@@ -1,0 +1,40 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.12, pytest-9.0.2, pluggy-1.6.0 -- /home/jules/.pyenv/versions/3.12.12/bin/python
+cachedir: .pytest_cache
+rootdir: /app
+collecting ... collected 1 item
+
+tests/test_cvli_accuracy.py::test_run_eval_cvli FAILED                   [100%]
+
+=================================== FAILURES ===================================
+______________________________ test_run_eval_cvli ______________________________
+
+    def test_run_eval_cvli():
+        """Run the CVLI evaluation script (smoke test)."""
+        if not os.path.exists(SCRIPT):
+            pytest.skip('eval script not found')
+        # If model is missing, skip to avoid heavy failures
+        model_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'models', 'stgcn_cvli.pth')
+        if not os.path.exists(model_path):
+            import pytest
+            pytest.skip('model checkpoint not present; skipping CVLI evaluation')
+
+        proc = subprocess.run([sys.executable, SCRIPT], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=300)
+        print(proc.stdout)
+        if proc.returncode != 0:
+            print('STDERR:', proc.stderr)
+>       assert proc.returncode == 0
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/home/jules/.pyenv/versions/3.12.12/bin/python', '/app/scripts/eval_cvli.py'], returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File "/app/scripts/eval_cvli.py", line 15, in <module>\n    from src.model import STGCN\nModuleNotFoundError: No module named \'src\'\n').returncode
+
+tests/test_cvli_accuracy.py:21: AssertionError
+----------------------------- Captured stdout call -----------------------------
+
+STDERR: Traceback (most recent call last):
+  File "/app/scripts/eval_cvli.py", line 15, in <module>
+    from src.model import STGCN
+ModuleNotFoundError: No module named 'src'
+
+=========================== short test summary info ============================
+FAILED tests/test_cvli_accuracy.py::test_run_eval_cvli - assert 1 == 0
+============================== 1 failed in 4.70s ===============================

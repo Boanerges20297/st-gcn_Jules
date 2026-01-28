@@ -194,7 +194,7 @@ def run_training(feature_idx, history_window, horizon, out_path, epochs=10, batc
 
     for epoch in range(1, epochs+1):
         t0 = time.time()
-        train_loss = train_one(model, train_loader, optimizer, device, norm_adj, logger)
+        train_loss = train_one(model, train_loader, optimizer, device, adj_list, logger)
         elapsed = time.time() - t0
         logger.info(f"Epoch {epoch}/{epochs} | Loss: {train_loss:.5f} | Time: {elapsed:.1f}s")
         torch.save(model.state_dict(), out_path)
@@ -204,4 +204,4 @@ if __name__ == "__main__":
     run_training(feature_idx=0, history_window=90, horizon=7, out_path=os.path.join(ROOT, 'models', 'stgcn_cvli.pth'), batch_size=4, epochs=5)
 
     # CVP: Feature 1, Window 30, Horizon 1
-    # run_training(feature_idx=1, history_window=30, horizon=1, out_path=os.path.join(ROOT, 'models', 'stgcn_cvp.pth'), batch_size=32, epochs=5)
+    run_training(feature_idx=1, history_window=30, horizon=1, out_path=os.path.join(ROOT, 'models', 'stgcn_cvp.pth'), batch_size=32, epochs=5)
