@@ -9,6 +9,7 @@ import numpy as np
 import pickle
 import math
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+import argparse
 import torch
 import pandas as pd
 
@@ -20,6 +21,34 @@ MODEL_PATH = os.path.join(BASE_DIR, 'models', 'stgcn_cvli.pth')
 
 WINDOW = 180
 EVAL_STEPS = 50
+
+def parse_args():
+    p = argparse.ArgumentParser(description='Evaluate CVLI model')
+    p.add_argument('--auto-desscale', action='store_true', help='Fit linear mapping from preds->true and desscale predictions')
+    return p.parse_args()
+
+def load_desscale_mapping():
+    # look for a mapping saved by diagnostics
+    path = os.path.join(BASE_DIR, 'reports', 'desscale_mapping.txt')
+    if os.path.exists(path):
+        try:
+            a = None
+            b = None
+            with open(path, 'r', encoding='utf-8') as fh:
+                for line in fh:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    if line.startswith('a='):
+                        a = float(line.split('=',1)[1])
+                    elif line.startswith('b='):
+                        b = float(line.split('=',1)[1])
+            if a is not None and b is not None:
+                print(f'Loaded desscale mapping from {path}: a={a}, b={b}')
+                return a, b
+        except Exception:
+            pass
+    return None
 
 def load_arrays():
     nf_path = os.path.join(DATA_DIR, 'node_features.npy')
@@ -53,6 +82,7 @@ def normalize_adj(a):
     return torch.mm(torch.mm(D, A), D)
 
 def main():
+    args = parse_args()
     node_features, adj, dates = load_arrays()
     N, T, C = node_features.shape
     print(f"Loaded node_features shape: {node_features.shape}")
@@ -95,6 +125,9 @@ def main():
     all_rmses = []
     all_r2s = []
 
+    all_true = []
+    all_pred = []
+
     for t in eval_points:
         # input window: [t-WINDOW : t)
         X = node_features[:, t-WINDOW:t, 0:1]  # (N, WINDOW, 1)
@@ -104,6 +137,17 @@ def main():
         with torch.no_grad():
             pred = model(inp, [norm_adj])  # (1, N, 1)
         pred_np = pred.squeeze(0).cpu().numpy().reshape(-1)
+
+        # try load mapping once and apply (if exists)
+        if t == eval_points[0]:
+            mapping = load_desscale_mapping()
+            if mapping is not None:
+                a_map, b_map = mapping
+            else:
+                a_map = None
+                b_map = None
+        if a_map is not None:
+            pred_np = (a_map * pred_np) + b_map
 
         mae = mean_absolute_error(y_true, pred_np)
         rmse = math.sqrt(mean_squared_error(y_true, pred_np))
@@ -115,6 +159,54 @@ def main():
         all_maes.append(mae)
         all_rmses.append(rmse)
         all_r2s.append(r2)
+
+        all_true.append(y_true)
+        all_pred.append(pred_np)
+
+    # handle desscale mapping
+    mapping = load_desscale_mapping()
+    if mapping is not None:
+        a_map, b_map = mapping
+        # already applied per-step; report desscaled global metrics
+        Y = np.concatenate(all_true).ravel()
+        P = np.concatenate(all_pred).ravel()
+        P_d = (a_map * P) + b_map
+        mae_d = mean_absolute_error(Y, P_d)
+        rmse_d = math.sqrt(mean_squared_error(Y, P_d))
+        try:
+            r2_d = r2_score(Y, P_d)
+        except Exception:
+            r2_d = float('nan')
+        print(f"Loaded desscale mapping used for reporting: y = {a_map:.6f} * pred + {b_map:.6f}")
+        print(f"DESSCALED MAE (global): {mae_d:.4f}")
+        print(f"DESSCALED RMSE (global): {rmse_d:.4f}")
+        print(f"DESSCALED R2 (global): {r2_d:.6f}")
+    elif args.auto_desscale:
+        try:
+            Y = np.concatenate(all_true).ravel()
+            P = np.concatenate(all_pred).ravel()
+            # fit slope/intercept
+            a, b = np.polyfit(P, Y, 1)
+            print(f"Auto-desscale mapping: y = {a:.6f} * pred + {b:.6f}")
+            # recompute metrics using desscaled preds
+            desscaled_maes = []
+            desscaled_rmses = []
+            desscaled_r2s = []
+            for true, pred in zip(all_true, all_pred):
+                pred2 = (a * pred) + b
+                desscaled_maes.append(mean_absolute_error(true, pred2))
+                desscaled_rmses.append(math.sqrt(mean_squared_error(true, pred2)))
+                try:
+                    desscaled_r2s.append(r2_score(true, pred2))
+                except Exception:
+                    desscaled_r2s.append(float('nan'))
+            print(f"DESSCALED MAE (mean over steps): {np.mean(desscaled_maes):.4f}")
+            print(f"DESSCALED RMSE (mean over steps): {np.mean(desscaled_rmses):.4f}")
+            valid_dr2 = [v for v in desscaled_r2s if not (v is None or (isinstance(v,float) and np.isnan(v)))]
+            if valid_dr2:
+                print(f"DESSCALED R2 (mean over steps): {np.mean(valid_dr2):.4f}")
+        except Exception as e:
+            print('Auto-dessale failed:', e)
 
     print(f"Evaluated {len(eval_points)} steps (last index {eval_points[-1]})")
     print(f"MAE (mean over steps): {np.mean(all_maes):.4f}")

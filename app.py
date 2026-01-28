@@ -16,6 +16,39 @@ import threading
 import time
 import unicodedata
 
+# Desscale mapping (loaded from diagnostics report if present)
+_DESSCALE_A = None
+_DESSCALE_B = None
+
+def load_desscale_mapping():
+    global _DESSCALE_A, _DESSCALE_B
+    path = os.path.join(BASE_DIR, 'reports', 'desscale_mapping.txt')
+    if os.path.exists(path):
+        try:
+            a = None
+            b = None
+            with open(path, 'r', encoding='utf-8') as fh:
+                for line in fh:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    if line.startswith('a='):
+                        a = float(line.split('=',1)[1])
+                    elif line.startswith('b='):
+                        b = float(line.split('=',1)[1])
+            if a is not None and b is not None:
+                _DESSCALE_A = a
+                _DESSCALE_B = b
+                print(f'Loaded desscale mapping: a={a}, b={b}')
+        except Exception:
+            pass
+
+# attempt to load mapping at startup (silently)
+try:
+    load_desscale_mapping()
+except Exception:
+    pass
+
 app = Flask(__name__)
 
 # Configuração e Carregamento de Dados (usar caminhos absolutos relativos a este arquivo)
@@ -921,6 +954,12 @@ def calculate_risk(custom_norm_adj=None):
                 with torch.no_grad():
                     pred = model_cvli(input_tensor, adj_for_model)
                 out_cvli = pred.squeeze(0).cpu().numpy()
+                # apply desscale mapping if available
+                try:
+                    if _DESSCALE_A is not None:
+                        out_cvli = (_DESSCALE_A * out_cvli) + _DESSCALE_B
+                except Exception:
+                    pass
 
                 daily_avg = np.mean(input_cvli, axis=1)
                 hist_avg_cvli = daily_avg[:, 0] * 3
