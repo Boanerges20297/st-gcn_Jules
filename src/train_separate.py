@@ -14,6 +14,7 @@ if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
 from src.model import STGCN
+from torch.utils.data import Dataset
 
 def setup_logger(name):
     logger = logging.getLogger(name)
@@ -46,6 +47,35 @@ def prepare_dataset(node_features, history_window, horizon, feature_idx, logger)
     gc.collect()
     return X_arr, Y_arr
 
+
+    class NodeFeatureWindowDataset(Dataset):
+        """Dataset that reads `node_features.npy` with mmap and yields window/target pairs.
+
+        Each item is (X, Y) where X has shape (channels, N, history) and Y has shape (N, 1).
+        """
+        def __init__(self, npy_path, history_window, horizon, feature_idx, start_idx=0):
+            self.npy_path = npy_path
+            self.history = history_window
+            self.horizon = horizon
+            self.feature_idx = feature_idx
+            # memory-map the file (read-only)
+            self.node_features = np.load(self.npy_path, mmap_mode='r')
+            self.N, self.T, self.C = self.node_features.shape
+            self.start_idx = start_idx
+            self.valid_range = self.T - history_window - horizon + 1 - self.start_idx
+
+        def __len__(self):
+            return max(0, self.valid_range)
+
+        def __getitem__(self, idx):
+            i = idx + self.start_idx
+            # slice features for selected feature_idx, keep last dim
+            window = self.node_features[:, i:i+self.history, self.feature_idx:self.feature_idx+1]
+            target = np.sum(self.node_features[:, i+self.history:i+self.history+self.horizon, self.feature_idx:self.feature_idx+1], axis=1, keepdims=True)
+            X = np.transpose(window, (2, 0, 1)).astype(np.float32)
+            Y = target.astype(np.float32)
+            return torch.from_numpy(X), torch.from_numpy(Y)
+
 def weighted_mse_loss(input, target):
     return torch.mean((input - target) ** 2)
 
@@ -72,9 +102,23 @@ def run_training(feature_idx, history_window, horizon, out_path, epochs=10, batc
     with open(data_file, 'rb') as f:
         pack = pickle.load(f)
 
-    node_features = pack['node_features']
-    adj = pack['adj_matrix']
-    dates = pack.get('dates')
+    # prefer to load node_features via memmap from `data/processed/graph_data/node_features.npy`
+    node_features = None
+    adj = None
+    dates = None
+    try:
+        nf_np = os.path.join(os.path.dirname(data_file), 'graph_data', 'node_features.npy')
+        if os.path.exists(nf_np):
+            # use memmap-based Dataset later in training loop
+            node_features = nf_np
+        else:
+            node_features = pack.get('node_features')
+        adj = pack.get('adj_matrix')
+        dates = pack.get('dates')
+    except Exception:
+        node_features = pack.get('node_features')
+        adj = pack.get('adj_matrix')
+        dates = pack.get('dates')
 
     if dates is not None:
         dates = list(dates)
@@ -89,15 +133,22 @@ def run_training(feature_idx, history_window, horizon, out_path, epochs=10, batc
     del pack
     gc.collect()
 
-    X, Y = prepare_dataset(node_features, history_window, horizon, feature_idx, logger)
-    logger.info(f"Dataset: X={X.shape}, Y={Y.shape}")
-
-    if len(X) == 0:
-        return
-
-    train_data = TensorDataset(torch.from_numpy(X), torch.from_numpy(Y))
-    del X, Y
-    gc.collect()
+    # If node_features is a path (npy memmap), use streaming Dataset to avoid large memory usage
+    if isinstance(node_features, str) and os.path.exists(node_features):
+        dataset = NodeFeatureWindowDataset(node_features, history_window, horizon, feature_idx)
+        logger.info(f"Using memmap dataset from {node_features}, samples={len(dataset)}")
+        if len(dataset) == 0:
+            return
+        train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    else:
+        X, Y = prepare_dataset(node_features, history_window, horizon, feature_idx, logger)
+        logger.info(f"Dataset: X={X.shape}, Y={Y.shape}")
+        if len(X) == 0:
+            return
+        train_data = TensorDataset(torch.from_numpy(X), torch.from_numpy(Y))
+        del X, Y
+        gc.collect()
+        train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logger.info(f"Device: {device}")
