@@ -37,6 +37,9 @@ model_cvli = None
 model_cvp = None
 device = None
 norm_adj = None
+adj_geo = None
+adj_faction = None
+norm_adj_list = None
 dates = None
 
 # Static Data Cache
@@ -44,6 +47,7 @@ ibge_bairros_cache = None
 ibge_municipios_cache = None
 exogenous_events = []
 exogenous_affected_nodes = set()
+exogenous_critical_nodes = set()
 # Periodic update status flags (used by frontend polling)
 app._periodic_update_in_progress = False
 app._periodic_last_update = None
@@ -177,7 +181,7 @@ def find_nearby_nodes(lat, lng, radius_m=500):
     return nearby_indices
 
 def apply_exogenous_events():
-    global adj_matrix, exogenous_affected_nodes
+    global adj_matrix, exogenous_affected_nodes, adj_geo, adj_faction, exogenous_critical_nodes
     if not exogenous_events or adj_matrix is None:
         return
 
@@ -188,6 +192,7 @@ def apply_exogenous_events():
 
     # Reset affected nodes set for this deterministic run
     exogenous_affected_nodes.clear()
+    exogenous_critical_nodes.clear()
 
     count_affected = 0
     for batch in exogenous_events:
@@ -200,14 +205,48 @@ def apply_exogenous_events():
 
             if lat is None or lng is None: continue
 
+            # detect if this point's raw_event indicates a critical (lethal) event
+            def _is_critical_event(pt_item):
+                try:
+                    evt = None
+                    if isinstance(pt_item, dict):
+                        evt = pt_item.get('raw_event') or pt_item
+                    if not evt:
+                        return False
+                    text_fields = []
+                    for k in ('natureza','nature','resumo','description'):
+                        v = evt.get(k) if isinstance(evt, dict) else None
+                        if v:
+                            text_fields.append(str(v).lower())
+                    txt = ' '.join(text_fields)
+                    keywords = ['homic', 'homicídio', 'morte', 'morto', 'tiro', 'lesão a bala', 'lesao a bala', 'lesão', 'lesao', 'ferido', 'assassin']
+                    return any(k in txt for k in keywords)
+                except Exception:
+                    return False
+
             indices = find_nearby_nodes(lat, lng)
 
             for idx in indices:
                 exogenous_affected_nodes.add(idx)
                 # Apply amplification (Conflict Logic)
-                amplification_factor = 5.0
+                critical_flag = _is_critical_event(pt)
+                amplification_factor = 10.0 if critical_flag else 5.0
                 adj_matrix[idx, :] *= amplification_factor
                 adj_matrix[:, idx] *= amplification_factor
+                # Track critical nodes
+                if critical_flag:
+                    exogenous_critical_nodes.add(idx)
+
+                # Also apply to geo/faction matrices if present
+                try:
+                    if adj_geo is not None:
+                        adj_geo[idx, :] *= amplification_factor
+                        adj_geo[:, idx] *= amplification_factor
+                    if adj_faction is not None:
+                        adj_faction[idx, :] *= amplification_factor
+                        adj_faction[:, idx] *= amplification_factor
+                except Exception:
+                    pass
                 count_affected += 1
 
     print(f"Malha adaptada: {count_affected} modificações aplicadas.")
@@ -221,8 +260,17 @@ def compute_norm_adj(adj_matrix_input):
     d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
     return torch.mm(torch.mm(d_mat_inv_sqrt, adj_tensor), d_mat_inv_sqrt).to(device)
 
+def compute_norm_adj_list(adj_list):
+    if adj_list is None:
+        return None
+    res = []
+    for a in adj_list:
+        res.append(compute_norm_adj(a))
+    return res
+
 def update_exogenous_state():
     global adj_matrix, norm_adj, original_adj_matrix
+    global adj_geo, adj_faction, norm_adj_list
 
     if original_adj_matrix is None:
         print("AVISO: Matriz original não disponível para atualização incremental. Recarregando tudo.")
@@ -231,17 +279,32 @@ def update_exogenous_state():
 
     print("Atualizando estado exógeno incrementalmente...")
 
-    # 1. Restore clean state
+    # 1. Restore clean state for all matrices
     adj_matrix = original_adj_matrix.copy()
+    if adj_geo is not None:
+        try:
+            adj_geo = original_adj_matrix.copy()
+        except Exception:
+            pass
+    if adj_faction is not None:
+        try:
+            adj_faction = original_adj_matrix.copy()
+        except Exception:
+            pass
 
     # 2. Apply all events
     apply_exogenous_events()
 
     # 3. Recompute normalization
-    norm_adj = compute_norm_adj(adj_matrix)
+    if adj_geo is not None and adj_faction is not None:
+        norm_adj_list = compute_norm_adj_list([adj_geo, adj_faction])
+        norm_adj = norm_adj_list[0] if norm_adj_list else None
+    else:
+        norm_adj = compute_norm_adj(adj_matrix)
 
 def load_data_and_models():
     global nodes_gdf, polygons_json_cache, nodes_gdf_proj, nodes_centroids_proj, adj_matrix, node_features, model_cvli, model_cvp, device, norm_adj, dates, original_adj_matrix
+    global adj_geo, adj_faction, norm_adj_list
     global ibge_bairros_cache, ibge_municipios_cache
 
     # Load Static Data
@@ -270,7 +333,13 @@ def load_data_and_models():
 
         nodes_gdf = data_pack.get('nodes_gdf')
         polygons_json_cache = None
+        # Load both adjacencies if available
+        adj_geo = data_pack.get('adj_geo')
+        adj_faction = data_pack.get('adj_faction')
+        # Backward compat: prefer explicit adj_matrix if present, else use adj_geo
         adj_matrix = data_pack.get('adj_matrix')
+        if adj_matrix is None:
+            adj_matrix = adj_geo
         node_features = data_pack.get('node_features')
         dates = data_pack.get('dates')
 
@@ -294,21 +363,52 @@ def load_data_and_models():
         # Capture original matrix before modifications
         if adj_matrix is not None:
             original_adj_matrix = adj_matrix.copy()
+        # If we have both adj_geo and adj_faction, compute normalized list later
 
         # Load and Apply Exogenous Events (Permanent Adaptation)
         load_exogenous_events()
         apply_exogenous_events()
 
-        # Pre-computar normalização da adjacência (com modificações)
-        norm_adj = compute_norm_adj(adj_matrix)
+        # Pre-computar normalização das adjacências (com modificações)
+        if adj_geo is not None and adj_faction is not None:
+            try:
+                norm_adj_list = compute_norm_adj_list([adj_geo, adj_faction])
+                norm_adj = norm_adj_list[0] if norm_adj_list else None
+            except Exception as e:
+                print(f"Erro ao normalizar adjacências: {e}")
+                norm_adj = compute_norm_adj(adj_matrix)
+        else:
+            norm_adj = compute_norm_adj(adj_matrix)
 
         # Carregar Modelos
+        def _adapt_state_dict_for_multigraph(state_dict, num_graphs):
+            # If checkpoint was saved with single-graph GCN (`gcn.weight`), expand into
+            # multiple `gcn.weights.{i}` entries expected by current MultiGraphConvolution.
+            try:
+                sd = dict(state_dict)
+            except Exception:
+                sd = state_dict
+            keys = list(sd.keys())
+            for k in keys:
+                if k.endswith('.gcn.weight'):
+                    base = k[:-len('.gcn.weight')]
+                    # replicate the single weight across all graph slots
+                    w = sd[k]
+                    for i in range(num_graphs):
+                        newk = f"{base}.gcn.weights.{i}"
+                        sd[newk] = w
+                    # remove old key to avoid unexpected-key warnings
+                    del sd[k]
+            return sd
+
         if os.path.exists(MODEL_CVLI_PATH):
             print(f"Carregando modelo CVLI de {MODEL_CVLI_PATH}...")
-            m_cvli = STGCN(num_nodes=num_nodes, in_channels=1, time_steps=WINDOW_CVLI, num_classes=1)
+            num_graphs = len(norm_adj_list) if norm_adj_list is not None else 1
+            m_cvli = STGCN(num_nodes=num_nodes, in_channels=1, time_steps=WINDOW_CVLI, num_classes=1, num_graphs=num_graphs)
             try:
                 state_dict = torch.load(MODEL_CVLI_PATH, map_location=device)
-                m_cvli.load_state_dict(state_dict)
+                state_dict = _adapt_state_dict_for_multigraph(state_dict, num_graphs)
+                m_cvli.load_state_dict(state_dict, strict=False)
                 m_cvli.to(device)
                 m_cvli.eval()
                 model_cvli = m_cvli
@@ -319,10 +419,12 @@ def load_data_and_models():
 
         if os.path.exists(MODEL_CVP_PATH):
             print(f"Carregando modelo CVP de {MODEL_CVP_PATH}...")
-            m_cvp = STGCN(num_nodes=num_nodes, in_channels=1, time_steps=WINDOW_CVP, num_classes=1)
+            num_graphs = len(norm_adj_list) if norm_adj_list is not None else 1
+            m_cvp = STGCN(num_nodes=num_nodes, in_channels=1, time_steps=WINDOW_CVP, num_classes=1, num_graphs=num_graphs)
             try:
                 state_dict = torch.load(MODEL_CVP_PATH, map_location=device)
-                m_cvp.load_state_dict(state_dict)
+                state_dict = _adapt_state_dict_for_multigraph(state_dict, num_graphs)
+                m_cvp.load_state_dict(state_dict, strict=False)
                 m_cvp.to(device)
                 m_cvp.eval()
                 model_cvp = m_cvp
@@ -333,6 +435,8 @@ def load_data_and_models():
 
     except Exception as e:
         print(f"Erro ao carregar dados/modelos: {e}")
+        import traceback
+        traceback.print_exc()
 
 # Executa carregamento inicial
 load_data_and_models()
@@ -620,15 +724,25 @@ def simulate_risk():
                         adj_copy[:, idx] *= amplification_factor
 
         # Re-normalizar matriz
-        adj_tensor = torch.FloatTensor(adj_copy)
-        rowsum = adj_tensor.sum(1)
-        d_inv_sqrt = torch.pow(rowsum, -0.5)
-        d_inv_sqrt[torch.isinf(d_inv_sqrt)] = 0.
-        d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
-        sim_norm_adj = torch.mm(torch.mm(d_mat_inv_sqrt, adj_tensor), d_mat_inv_sqrt).to(device)
+        if adj_geo is not None and adj_faction is not None:
+            # Apply same modifications to copies of geo/faction matrices
+            adj_geo_copy = adj_geo.copy()
+            adj_faction_copy = adj_faction.copy()
+            # If we modified adj_copy earlier, propagate the same changes to both copies
+            # (adj_copy was modified in place for affected indices)
+            # For simplicity, if adj_copy differs we will recompute geo/faction normalized lists from their copies
+            sim_norm_list = compute_norm_adj_list([adj_geo_copy, adj_faction_copy])
+            response = calculate_risk(custom_norm_adj=sim_norm_list)
+        else:
+            adj_tensor = torch.FloatTensor(adj_copy)
+            rowsum = adj_tensor.sum(1)
+            d_inv_sqrt = torch.pow(rowsum, -0.5)
+            d_inv_sqrt[torch.isinf(d_inv_sqrt)] = 0.
+            d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
+            sim_norm_adj = torch.mm(torch.mm(d_mat_inv_sqrt, adj_tensor), d_mat_inv_sqrt).to(device)
 
-        # Calculate Risk with modified graph
-        response = calculate_risk(custom_norm_adj=sim_norm_adj)
+            # Calculate Risk with modified graph
+            response = calculate_risk(custom_norm_adj=sim_norm_adj)
 
         # Post-Process Result for Immediate Visual Feedback
         if response.status_code == 200:
@@ -677,7 +791,19 @@ def calculate_risk(custom_norm_adj=None):
         return jsonify({'error': 'Dados não carregados.'}), 503
 
     current_norm_adj = custom_norm_adj if custom_norm_adj is not None else norm_adj
-    if current_norm_adj is None:
+    # Helper to ensure we pass a list of normalized adjacencies to the model
+    def _ensure_adj_list(adj):
+        if adj is None:
+            return None
+        if isinstance(adj, (list, tuple)):
+            return list(adj)
+        # If global norm_adj_list exists, prefer it
+        if norm_adj_list is not None:
+            return norm_adj_list
+        return [adj]
+
+    adj_for_model = _ensure_adj_list(current_norm_adj)
+    if adj_for_model is None:
          return jsonify({'error': 'Matriz de adjacência não disponível.'}), 503
 
     try:
@@ -693,7 +819,7 @@ def calculate_risk(custom_norm_adj=None):
                 input_cvli = node_features[:, -WINDOW_CVLI:, 0:1]
                 input_tensor = torch.FloatTensor(input_cvli).permute(2, 0, 1).unsqueeze(0).to(device)
                 with torch.no_grad():
-                    pred = model_cvli(input_tensor, current_norm_adj)
+                    pred = model_cvli(input_tensor, adj_for_model)
                 out_cvli = pred.squeeze(0).cpu().numpy()
 
                 daily_avg = np.mean(input_cvli, axis=1)
@@ -714,7 +840,7 @@ def calculate_risk(custom_norm_adj=None):
                 input_cvp = node_features[:, -WINDOW_CVP:, 1:2]
                 input_tensor = torch.FloatTensor(input_cvp).permute(2, 0, 1).unsqueeze(0).to(device)
                 with torch.no_grad():
-                    pred = model_cvp(input_tensor, current_norm_adj)
+                    pred = model_cvp(input_tensor, adj_for_model)
                 out_cvp = pred.squeeze(0).cpu().numpy()
 
                 daily_avg = np.mean(input_cvp, axis=1)
@@ -763,6 +889,72 @@ def calculate_risk(custom_norm_adj=None):
             if exo_indices:
                 # Force Risk >= 80.0 (Critical)
                 normalized_risk_cvli[exo_indices] = np.maximum(normalized_risk_cvli[exo_indices], 80.0)
+
+            # Force absolute critical for explicitly flagged lethal exogenous nodes
+            try:
+                if exogenous_critical_nodes:
+                    crit_idxs = [i for i in exogenous_critical_nodes if i < len(normalized_risk_cvli)]
+                    if crit_idxs:
+                        normalized_risk_cvli[crit_idxs] = np.maximum(normalized_risk_cvli[crit_idxs], 95.0)
+                        # Propagate to up to top_k faction neighbors that are geographically close (<=2000m)
+                        top_k = 10
+                        try:
+                            if adj_faction is not None:
+                                # prepare centroids in metric CRS if possible
+                                centroids_metric = None
+                                try:
+                                    if nodes_gdf is not None:
+                                        centroids_metric = nodes_gdf.to_crs(epsg=3857).geometry.centroid
+                                except Exception:
+                                    centroids_metric = None
+
+                                for ci in crit_idxs:
+                                    neigh = np.where(np.array(adj_faction[ci]) > 0)[0]
+                                    neigh = [n for n in neigh if n != ci]
+                                    if not neigh:
+                                        continue
+
+                                    # If we have metric centroids, compute distances and select nearby top_k
+                                    selected = []
+                                    if centroids_metric is not None:
+                                        try:
+                                            ci_pt = centroids_metric.iloc[ci]
+                                            neigh_pts = centroids_metric.iloc[neigh]
+                                            dists = neigh_pts.distance(ci_pt).values
+                                            # keep those within 2000m
+                                            close_idx = [neigh[i] for i, d in enumerate(dists) if d <= 2000]
+                                            if not close_idx:
+                                                # if none within 2000m, pick nearest top_k
+                                                order = np.argsort(dists)
+                                                selected = [neigh[i] for i in order[:top_k]]
+                                            else:
+                                                # if more than top_k, pick nearest among them
+                                                if len(close_idx) > top_k:
+                                                    close_pts = centroids_metric.loc[close_idx]
+                                                    d_close = close_pts.distance(ci_pt).values
+                                                    order = np.argsort(d_close)
+                                                    selected = [close_idx[i] for i in order[:top_k]]
+                                                else:
+                                                    selected = close_idx
+                                        except Exception:
+                                            selected = neigh[:top_k]
+                                    else:
+                                        # Fallback: restrict to those that are also geo-neighbors (if adj_matrix/adj_geo available)
+                                        try:
+                                            if adj_geo is not None:
+                                                geo_neigh = [n for n in neigh if adj_geo[ci, n] > 0]
+                                                selected = geo_neigh[:top_k]
+                                            else:
+                                                selected = neigh[:top_k]
+                                        except Exception:
+                                            selected = neigh[:top_k]
+
+                                    if selected:
+                                        normalized_risk_cvli[selected] = np.maximum(normalized_risk_cvli[selected], 90.0)
+                        except Exception:
+                            pass
+            except Exception:
+                pass
 
         # CVP
         out_cvp = np.maximum(out_cvp, 0)

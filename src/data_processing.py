@@ -122,7 +122,7 @@ def load_occurrences(filepath):
     print(f"Total de ocorrências válidas: {len(gdf_occurrences)}")
     return gdf_occurrences
 
-def create_dual_adjacency_matrices(gdf, threshold_degrees=0.018):
+def create_dual_adjacency_matrices(gdf, threshold_degrees=0.018, use_metric=False, threshold_meters=2000):
     """
     Cria duas matrizes de adjacência:
     - adj_geo: conexão se distância < threshold_degrees (graus, EPSG:4326 aprox.).
@@ -134,16 +134,31 @@ def create_dual_adjacency_matrices(gdf, threshold_degrees=0.018):
     adj_geo = np.zeros((n, n), dtype=float)
     adj_faction = np.zeros((n, n), dtype=float)
     print("Calculando matrizes de adjacência (geo + faccional)...")
-    centroids = gdf.geometry.centroid
+    if use_metric:
+        try:
+            metric_crs = gdf.estimate_utm_crs()
+        except Exception:
+            metric_crs = 'EPSG:3857'
+        gdf_metric = gdf.to_crs(metric_crs)
+        centroids = gdf_metric.geometry.centroid
+    else:
+        centroids = gdf.geometry.centroid
     factions = gdf['faction'].values if 'faction' in gdf.columns else np.array([''] * n)
 
-    # Geographical edges
-    for i in range(n):
-        for j in range(i + 1, n):
-            dist = centroids.iloc[i].distance(centroids.iloc[j])
-            if dist <= threshold_degrees:
-                adj_geo[i, j] = 1
-                adj_geo[j, i] = 1
+    # Geographical edges (vectorized)
+    # Use centroids.x / centroids.y arrays to compute pairwise distances in degrees
+    xs = centroids.x.values
+    ys = centroids.y.values
+    dx = xs[:, None] - xs[None, :]
+    dy = ys[:, None] - ys[None, :]
+    dist2 = dx ** 2 + dy ** 2
+    if use_metric:
+        thresh2 = (threshold_meters ** 2)
+    else:
+        thresh2 = threshold_degrees ** 2
+    mask = dist2 <= thresh2
+    # mask is symmetric; set adj_geo where mask is True
+    adj_geo[mask] = 1
 
     # Faction edges (connect all nodes that share the same faction)
     unique_factions = {}
@@ -262,8 +277,8 @@ def main():
                df['feature_idx'].values.astype(int)),
               df['count'].values)
     
-    print("Criando matrizes de adjacência (geo + faccional)...")
-    adj_geo, adj_faction = create_dual_adjacency_matrices(nodes_gdf)
+    print("Criando matrizes de adjacência (geo + faccional) usando projeção métrica (2000 m)...")
+    adj_geo, adj_faction = create_dual_adjacency_matrices(nodes_gdf, use_metric=True, threshold_meters=2000)
 
     data_pack = {
         'node_features': node_features,

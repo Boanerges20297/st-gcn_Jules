@@ -1,5 +1,8 @@
 import time
 import logging
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -10,12 +13,12 @@ import os
 from src.model import STGCN
 from torch.utils.data import DataLoader, TensorDataset
 
-DATA_FILE = 'data/processed_graph_data.pkl'
+DATA_FILE = 'data/processed/processed_graph_data.pkl'
 MODEL_DIR = 'models'
 MODEL_PATH = os.path.join(MODEL_DIR, 'stgcn_model.pth')
 HISTORY_WINDOW = 7
 BATCH_SIZE = 32
-EPOCHS = 2
+EPOCHS = 3
 LEARNING_RATE = 0.001
 
 LOSS_WEIGHTS = torch.tensor([5.0, 1.0])
@@ -87,6 +90,30 @@ def main():
     norm_adj_geo = normalize_adj(adj_geo)
     norm_adj_faction = normalize_adj(adj_faction)
     norm_adj_list = [norm_adj_geo, norm_adj_faction]
+
+    # adjacency diagnostics
+    try:
+        os.makedirs('plots', exist_ok=True)
+        adj_counts = {
+            'geo_edges': int((adj_geo > 0).sum() // 2),
+            'faction_edges': int((adj_faction > 0).sum() // 2)
+        }
+        print(f"Adjacency counts: {adj_counts}")
+        # plot degree histograms
+        deg_geo = adj_geo.sum(axis=1)
+        deg_faction = adj_faction.sum(axis=1)
+        plt.figure(figsize=(8,4))
+        plt.hist(deg_geo, bins=50, alpha=0.6, label='geo')
+        plt.hist(deg_faction, bins=50, alpha=0.6, label='faction')
+        plt.legend()
+        plt.title('Degree distribution (geo vs faction)')
+        plt.xlabel('Degree')
+        plt.ylabel('Count')
+        plt.tight_layout()
+        plt.savefig('plots/adjacency_degree_hist.png')
+        plt.close()
+    except Exception as e:
+        print(f"Warning: failed to save adjacency diagnostics: {e}")
     
     logger.info("Criando janelas temporais...")
     X, Y = prepare_dataset(node_features)
@@ -116,6 +143,8 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     
     logger.info("Iniciando treinamento...")
+    train_history = []
+    val_history = []
     for epoch in range(EPOCHS):
         epoch_start = time.time()
         model.train()
@@ -152,6 +181,8 @@ def main():
         train_avg = train_loss / len(train_loader) if len(train_loader) else 0
         val_avg = val_loss / len(val_loader) if len(val_loader) else 0
         logger.info(f"Epoch {epoch+1}/{EPOCHS} completed in {epoch_time:.1f}s | Train Loss: {train_avg:.6f} | Val Loss: {val_avg:.6f}")
+        train_history.append(train_avg)
+        val_history.append(val_avg)
         # save per-epoch checkpoint
         epoch_path = os.path.join(MODEL_DIR, f'stgcn_epoch_{epoch+1}.pth')
         torch.save(model.state_dict(), epoch_path)
@@ -160,6 +191,22 @@ def main():
     # final save
     torch.save(model.state_dict(), MODEL_PATH)
     logger.info(f"Modelo salvo em {MODEL_PATH}")
+
+    # save training curves
+    try:
+        plt.figure()
+        plt.plot(range(1, len(train_history)+1), train_history, label='train')
+        plt.plot(range(1, len(val_history)+1), val_history, label='val')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.title('Training and Validation Loss')
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig('plots/training_loss.png')
+        plt.close()
+        logger.info('Saved training loss plot to plots/training_loss.png')
+    except Exception as e:
+        logger.warning(f'Failed to save training plot: {e}')
 
 if __name__ == "__main__":
     main()

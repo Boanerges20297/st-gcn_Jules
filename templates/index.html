@@ -310,6 +310,15 @@
 
     function hideLoading() {
         $('#loading-overlay').addClass('d-none');
+        // Remove overlay from DOM after a short delay to avoid covering map and allow CSS repaint
+        try {
+            setTimeout(function() {
+                if (map && map.invalidateSize) map.invalidateSize();
+                $('#loading-overlay').remove();
+            }, 200);
+        } catch(e) {
+            console.warn('invalidateSize/remove overlay failed', e);
+        }
     }
 
     function updateDashboard(mode) {
@@ -503,6 +512,25 @@
                 });
             }
         }).addTo(map);
+
+        // Ensure Leaflet recalculates container size now that the geojson layer is added
+        try {
+            setTimeout(function() { if (map && map.invalidateSize) map.invalidateSize(); }, 200);
+        } catch(e) {
+            console.warn('invalidateSize after geojson failed', e);
+        }
+
+    // As a final fallback, ensure the overlay is removed and map resized on full window load
+    $(window).on('load', function() {
+        try {
+            setTimeout(function() {
+                if (map && map.invalidateSize) map.invalidateSize();
+                $('#loading-overlay').remove();
+            }, 300);
+        } catch(e) {
+            console.warn('window.load invalidateSize failed', e);
+        }
+    });
 
         updateTopCriticalAreas();
 
