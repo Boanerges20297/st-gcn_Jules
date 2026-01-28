@@ -310,14 +310,14 @@
 
     function hideLoading() {
         $('#loading-overlay').addClass('d-none');
-        // Remove overlay from DOM after a short delay to avoid covering map and allow CSS repaint
+        // Hide overlay (keep element in DOM so it can be shown again)
         try {
             setTimeout(function() {
                 if (map && map.invalidateSize) map.invalidateSize();
-                $('#loading-overlay').remove();
+                $('#loading-overlay').addClass('d-none');
             }, 200);
         } catch(e) {
-            console.warn('invalidateSize/remove overlay failed', e);
+            console.warn('invalidateSize/hide overlay failed', e);
         }
     }
 
@@ -525,7 +525,7 @@
         try {
             setTimeout(function() {
                 if (map && map.invalidateSize) map.invalidateSize();
-                $('#loading-overlay').remove();
+                $('#loading-overlay').addClass('d-none');
             }, 300);
         } catch(e) {
             console.warn('window.load invalidateSize failed', e);

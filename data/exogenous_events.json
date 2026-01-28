@@ -445,5 +445,29 @@
         "type": "exogenous"
       }
     ]
+  },
+  {
+    "id": "10",
+    "timestamp": "2026-01-28T09:53:01.433511",
+    "original_text": "02 -  M20260068136 - HOMICIDIO A BALA - VITIMA DO SEXO MASCULINO - AV RECREIO, 1384 - LAGOA REDONDA - MESSEJANA - SOCORRIDO A UPA, MAS VEIO A ÓBITO - 19:04",
+    "points": [
+      {
+        "description": "HOMICIDIO A BALA - SOCORRIDO A UPA, MAS VEIO A ÓBITO",
+        "lat": -3.786381983572066,
+        "lng": -38.62895873092309,
+        "raw_event": {
+          "bairro": "LAGOA REDONDA",
+          "descricao": "HOMICIDIO A BALA",
+          "localizacao_completa": "AV RECREIO, 1384",
+          "municipio": "FORTALEZA",
+          "natureza": "HOMICIDIO A BALA",
+          "raw_text": "02 - M20260068136 - HOMICIDIO A BALA - VITIMA DO SEXO MASCULINO - AV RECREIO, 1384 - LAGOA REDONDA - MESSEJANA - SOCORRIDO A UPA, MAS VEIO A ÓBITO - 19:04",
+          "resumo": "SOCORRIDO A UPA, MAS VEIO A ÓBITO",
+          "sexo": "MASCULINO",
+          "timestamp": "19:04"
+        },
+        "type": "exogenous"
+      }
+    ]
   }
 ]
