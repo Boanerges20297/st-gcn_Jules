@@ -78,6 +78,8 @@ dates = None
 # Static Data Cache
 ibge_bairros_cache = None
 ibge_municipios_cache = None
+ibge_municipios_gdf = None
+GEOCODING_ENABLED = True  # Set True to enable Nominatim geocoding fallback (be polite: use for batch jobs)
 exogenous_events = []
 exogenous_affected_nodes = set()
 exogenous_critical_nodes = set()
@@ -107,6 +109,16 @@ def strip_accents(text: str) -> str:
         return ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
     except Exception:
         return text
+
+
+def normalize_city_label(name: str) -> str:
+    if not name or not isinstance(name, str):
+        return name
+    try:
+        s = strip_accents(name).strip()
+        return s.title()
+    except Exception:
+        return name
 
 
 def build_node_search_index():
@@ -338,7 +350,7 @@ def update_exogenous_state():
 def load_data_and_models():
     global nodes_gdf, polygons_json_cache, nodes_gdf_proj, nodes_centroids_proj, adj_matrix, node_features, model_cvli, model_cvp, device, norm_adj, dates, original_adj_matrix
     global adj_geo, adj_faction, norm_adj_list
-    global ibge_bairros_cache, ibge_municipios_cache
+    global ibge_bairros_cache, ibge_municipios_cache, ibge_municipios_gdf
 
     # Load Static Data
     try:
@@ -352,6 +364,26 @@ def load_data_and_models():
         if os.path.exists(static_file_mun):
             with open(static_file_mun, 'r', encoding='utf-8') as f:
                 ibge_municipios_cache = json.load(f)
+        # Attempt to load municipality polygons (GeoJSON/shapefile) for point-in-polygon
+        try:
+            possible_paths = [
+                os.path.join(BASE_DIR, 'data', 'static', 'ceara_municipios.geojson'),
+                os.path.join(BASE_DIR, 'data', 'static', 'ceara_municipios.json'),
+                os.path.join(BASE_DIR, 'data', 'static', 'municipios_ceara.geojson'),
+                os.path.join(BASE_DIR, 'data', 'static', 'municipios_ceara.json')
+            ]
+            for p in possible_paths:
+                if os.path.exists(p):
+                    try:
+                        ibge_municipios_gdf = gpd.read_file(p)
+                        if ibge_municipios_gdf.crs is None:
+                            ibge_municipios_gdf.set_crs(epsg=4326, inplace=True)
+                        print(f"Loaded municipality polygons from {p}")
+                        break
+                    except Exception as e:
+                        print(f"Failed to read municipalities polygons {p}: {e}")
+        except Exception:
+            pass
     except Exception as e:
         print(f"Erro ao carregar dados estáticos: {e}")
 
@@ -488,6 +520,15 @@ def load_data_and_models():
 
             # Build search index
             build_node_search_index()
+
+            # Enrich regions (populate 'CIDADE') now that nodes_gdf is loaded
+            try:
+                enrich_regions()
+                # Normalize city labels for consistency
+                if 'CIDADE' in nodes_gdf.columns:
+                    nodes_gdf['CIDADE'] = nodes_gdf['CIDADE'].apply(lambda v: normalize_city_label(v) if isinstance(v, str) and v.strip() else v)
+            except Exception as e:
+                print(f"Erro ao enriquecer regiões no carregamento: {e}")
 
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         num_nodes = node_features.shape[0]
@@ -692,17 +733,44 @@ def get_region_name(feature_props, geometry):
     city = feature_props.get('CIDADE', '')
     if city and isinstance(city, str) and len(city.strip()) > 1:
         return city
-
-    # Fallback geográfico simples (BBox Fortaleza)
-    # Bounds aprox: -38.66, -3.90 to -38.40, -3.65
+    # Fallback geográfico: prefer point-in-polygon against loaded municipality polygons
     try:
-        if geometry:
+        from shapely.geometry import Point
+    except Exception:
+        Point = None
+
+    if geometry is not None:
+        try:
             centroid = shape(geometry).centroid
             lon, lat = centroid.x, centroid.y
-            if -38.66 <= lon <= -38.40 and -3.90 <= lat <= -3.65:
-                return "Fortaleza"
-    except Exception:
-        pass
+        except Exception:
+            lon = lat = None
+
+        if lon is not None and lat is not None and Point is not None:
+            pt = Point(lon, lat)
+
+            # If municipality polygons are available, search for a containing polygon
+            if ibge_municipios_gdf is not None and getattr(ibge_municipios_gdf, 'geometry', None) is not None:
+                possible_idx = []
+                try:
+                    possible_idx = list(ibge_municipios_gdf.sindex.intersection(pt.bounds))
+                except Exception:
+                    possible_idx = []
+
+                if possible_idx:
+                    candidates = ibge_municipios_gdf.iloc[possible_idx]
+                    for _, mun_row in candidates.iterrows():
+                        poly = mun_row.geometry if 'geometry' in mun_row else None
+                        if poly is not None and poly.contains(pt):
+                            for col in ('name', 'NAME', 'NOME', 'nome', 'municipio', 'NM_MUNICIP'):
+                                if col in mun_row and isinstance(mun_row[col], str) and mun_row[col].strip():
+                                    return mun_row[col].strip()
+                            return str(mun_row.name)
+
+            # Legacy bbox for Fortaleza if polygons not available
+            if lon is not None and lat is not None:
+                if -38.66 <= lon <= -38.40 and -3.90 <= lat <= -3.65:
+                    return "Fortaleza"
 
     return "RMF/Interior"
 
@@ -1545,22 +1613,14 @@ def find_node_coordinates(location_str):
         except Exception as e:
             print(f"Erro no fallback loose city: {e}")
 
-    # Fallback 5: Geometric Centroid from nodes_gdf (Last Resort)
-    # Search for known Cities in GDF
-    if 'CIDADE' in nodes_gdf.columns:
-        known_cities = nodes_gdf['CIDADE'].unique()
-        for city in known_cities:
-            if not isinstance(city, str) or len(city) < 3: continue
-
-            if city.lower() in loc_lower:
-                city_nodes = nodes_gdf[nodes_gdf['CIDADE'] == city]
-                if not city_nodes.empty:
-                    # Fix UserWarning by projecting
-                    c_proj = city_nodes.to_crs(epsg=3857).geometry.centroid
-                    c_geo = c_proj.to_crs(city_nodes.crs)
-                    city_centroid_x = c_geo.x.mean()
-                    city_centroid_y = c_geo.y.mean()
-                    return (city_centroid_y, city_centroid_x, 'fallback')
+    # Fallback 5: Optional Geocoding (Nominatim) - only if enabled and no other match
+    if GEOCODING_ENABLED:
+        try:
+            geo_res = geocode_address(loc_norm)
+            if geo_res:
+                return (*geo_res, 'geocode')
+        except Exception:
+            pass
 
     # Fallback 6: Strip accents and try again (Recursive-ish but limited)
     # Only try once
@@ -1577,6 +1637,27 @@ def find_node_coordinates(location_str):
         # This is getting heavy. Let's trust normalization handles most.
         pass
 
+    return None
+
+
+def geocode_address(location_str, timeout=10):
+    """Try to geocode `location_str` using Nominatim (geopy). Returns (lat,lng) or None.
+
+    Note: offline or missing dependency will cause this to return None.
+    """
+    try:
+        from geopy.geocoders import Nominatim
+    except Exception:
+        return None
+
+    try:
+        geolocator = Nominatim(user_agent="st-gcn-geocoder", timeout=timeout)
+        # Prefer full input; caller may append city/BR context if needed
+        loc = geolocator.geocode(location_str)
+        if loc:
+            return (loc.latitude, loc.longitude)
+    except Exception:
+        return None
     return None
 
 @app.route('/api/exogenous/parse', methods=['POST'])
