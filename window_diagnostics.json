@@ -1,0 +1,89 @@
+{
+  "generated_at": 1769645267.479567,
+  "N": 2378,
+  "T": 1482,
+  "feature_index": 0,
+  "results": {
+    "30": {
+      "window": 30,
+      "has_enough_timesteps": true,
+      "timesteps_total": 1482,
+      "per_node_sum_mean": 0.006307821698906644,
+      "per_node_sum_median": 0.0,
+      "per_node_sum_p90": 0.0,
+      "fraction_nodes_with_any": 0.0021026072329688814,
+      "global_sparsity_fraction": 0.9998177740398093,
+      "autocorr_lag1_mean": -3.276144846864956e-05,
+      "predictive_corr_total": 0.06566500872994731,
+      "predictive_corr_samples": 1452,
+      "elapsed_seconds": 0.27727317810058594
+    },
+    "60": {
+      "window": 60,
+      "has_enough_timesteps": true,
+      "timesteps_total": 1482,
+      "per_node_sum_mean": 0.013036164844407064,
+      "per_node_sum_median": 0.0,
+      "per_node_sum_p90": 0.0,
+      "fraction_nodes_with_any": 0.005887300252312868,
+      "global_sparsity_fraction": 0.9998037566582563,
+      "autocorr_lag1_mean": -8.225739837143235e-05,
+      "predictive_corr_total": 0.0763481138412413,
+      "predictive_corr_samples": 1422,
+      "elapsed_seconds": 0.35051727294921875
+    },
+    "90": {
+      "window": 90,
+      "has_enough_timesteps": true,
+      "timesteps_total": 1482,
+      "per_node_sum_mean": 0.023549201009251473,
+      "per_node_sum_median": 0.0,
+      "per_node_sum_p90": 0.0,
+      "fraction_nodes_with_any": 0.00672834314550042,
+      "global_sparsity_fraction": 0.9997710494346322,
+      "autocorr_lag1_mean": -4.104473849270232e-05,
+      "predictive_corr_total": 0.09333394560750466,
+      "predictive_corr_samples": 1392,
+      "elapsed_seconds": 0.332625150680542
+    },
+    "180": {
+      "window": 180,
+      "has_enough_timesteps": true,
+      "timesteps_total": 1482,
+      "per_node_sum_mean": 0.042472666105971404,
+      "per_node_sum_median": 0.0,
+      "per_node_sum_p90": 0.0,
+      "fraction_nodes_with_any": 0.010513036164844407,
+      "global_sparsity_fraction": 0.9997874030464443,
+      "autocorr_lag1_mean": -6.081521127893414e-05,
+      "predictive_corr_total": 0.09433494493215297,
+      "predictive_corr_samples": 1302,
+      "elapsed_seconds": 0.6292827129364014
+    },
+    "365": {
+      "window": 365,
+      "has_enough_timesteps": true,
+      "timesteps_total": 1482,
+      "per_node_sum_mean": 0.08788898233809925,
+      "per_node_sum_median": 0.0,
+      "per_node_sum_p90": 0.0,
+      "fraction_nodes_with_any": 0.014297729184188394,
+      "global_sparsity_fraction": 0.9997776420844038,
+      "autocorr_lag1_mean": 9.807637230532534e-05,
+      "predictive_corr_total": -0.000718739810832633,
+      "predictive_corr_samples": 1117,
+      "elapsed_seconds": 1.2445650100708008
+    }
+  },
+  "recommendation": {
+    "best_window": 180,
+    "best_corr": 0.09433494493215297,
+    "reason": "Maior correlação entre soma da janela e total do dia seguinte."
+  },
+  "coverage": {
+    "T": 1482,
+    "sufficient_for_365": true,
+    "sufficient_for_180": true,
+    "sufficient_for_90": true
+  }
+}

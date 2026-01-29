@@ -536,26 +536,64 @@ def load_data_and_models():
         if os.path.exists(MODEL_CVLI_PATH):
             print(f"Carregando modelo CVLI de {MODEL_CVLI_PATH}...")
             num_graphs = len(norm_adj_list) if norm_adj_list is not None else 1
-            m_cvli = STGCN(num_nodes=num_nodes, in_channels=1, time_steps=WINDOW_CVLI, num_classes=1, num_graphs=num_graphs)
             try:
-                state_dict = torch.load(MODEL_CVLI_PATH, map_location=device)
+                raw_state = torch.load(MODEL_CVLI_PATH, map_location=device)
+                # normalize DataParallel keys (module.) if present
+                state_dict = {}
+                for k,v in dict(raw_state).items():
+                    nk = k[7:] if k.startswith('module.') else k
+                    state_dict[nk] = v
+
+                # adapt single-graph weight layout if needed
                 state_dict = _adapt_state_dict_for_multigraph(state_dict, num_graphs)
+
+                # If checkpoint conv_final temporal kernel differs from expected WINDOW_CVLI,
+                # instantiate model with the checkpoint time_steps so shapes match.
+                ck_time_steps = None
+                if 'conv_final.weight' in state_dict:
+                    try:
+                        ck_time_steps = state_dict['conv_final.weight'].shape[-1]
+                    except Exception:
+                        ck_time_steps = None
+
+                instantiate_ts = WINDOW_CVLI if ck_time_steps is None else ck_time_steps
+                if instantiate_ts != WINDOW_CVLI:
+                    print(f"Checkpoint time_steps={ck_time_steps} != WINDOW_CVLI={WINDOW_CVLI}, adapting model instantiation.")
+
+                m_cvli = STGCN(num_nodes=num_nodes, in_channels=1, time_steps=instantiate_ts, num_classes=1, num_graphs=num_graphs)
                 m_cvli.load_state_dict(state_dict, strict=False)
                 m_cvli.to(device)
                 m_cvli.eval()
                 model_cvli = m_cvli
             except Exception as e:
-                 print(f"Erro ao carregar state_dict CVLI: {e}")
+                print(f"Erro ao carregar state_dict CVLI: {e}")
         else:
             print(f"AVISO: Modelo CVLI não encontrado em {MODEL_CVLI_PATH}")
 
         if os.path.exists(MODEL_CVP_PATH):
             print(f"Carregando modelo CVP de {MODEL_CVP_PATH}...")
             num_graphs = len(norm_adj_list) if norm_adj_list is not None else 1
-            m_cvp = STGCN(num_nodes=num_nodes, in_channels=1, time_steps=WINDOW_CVP, num_classes=1, num_graphs=num_graphs)
             try:
-                state_dict = torch.load(MODEL_CVP_PATH, map_location=device)
+                raw_state = torch.load(MODEL_CVP_PATH, map_location=device)
+                state_dict = {}
+                for k,v in dict(raw_state).items():
+                    nk = k[7:] if k.startswith('module.') else k
+                    state_dict[nk] = v
+
                 state_dict = _adapt_state_dict_for_multigraph(state_dict, num_graphs)
+
+                ck_time_steps = None
+                if 'conv_final.weight' in state_dict:
+                    try:
+                        ck_time_steps = state_dict['conv_final.weight'].shape[-1]
+                    except Exception:
+                        ck_time_steps = None
+
+                instantiate_ts = WINDOW_CVP if ck_time_steps is None else ck_time_steps
+                if instantiate_ts != WINDOW_CVP:
+                    print(f"Checkpoint time_steps={ck_time_steps} != WINDOW_CVP={WINDOW_CVP}, adapting model instantiation.")
+
+                m_cvp = STGCN(num_nodes=num_nodes, in_channels=1, time_steps=instantiate_ts, num_classes=1, num_graphs=num_graphs)
                 m_cvp.load_state_dict(state_dict, strict=False)
                 m_cvp.to(device)
                 m_cvp.eval()
@@ -948,8 +986,16 @@ def calculate_risk(custom_norm_adj=None):
         hist_sum_cvli = np.zeros(node_features.shape[0])
 
         if model_cvli:
-            if node_features.shape[1] >= WINDOW_CVLI:
-                input_cvli = node_features[:, -WINDOW_CVLI:, 0:1]
+            # Ensure we slice the input to the temporal kernel the model expects so conv_final
+            # reduces the temporal dimension to 1. If the checkpoint/model was instantiated
+            # with a different time_steps than WINDOW_CVLI, use the model's conv_final kernel.
+            try:
+                model_ts = model_cvli.conv_final.kernel_size[-1]
+            except Exception:
+                model_ts = WINDOW_CVLI
+
+            if node_features.shape[1] >= model_ts:
+                input_cvli = node_features[:, -model_ts:, 0:1]
                 input_tensor = torch.FloatTensor(input_cvli).permute(2, 0, 1).unsqueeze(0).to(device)
                 with torch.no_grad():
                     pred = model_cvli(input_tensor, adj_for_model)
@@ -975,8 +1021,13 @@ def calculate_risk(custom_norm_adj=None):
         hist_sum_cvp = np.zeros(node_features.shape[0])
 
         if model_cvp:
-            if node_features.shape[1] >= WINDOW_CVP:
-                input_cvp = node_features[:, -WINDOW_CVP:, 1:2]
+            try:
+                model_ts_cvp = model_cvp.conv_final.kernel_size[-1]
+            except Exception:
+                model_ts_cvp = WINDOW_CVP
+
+            if node_features.shape[1] >= model_ts_cvp:
+                input_cvp = node_features[:, -model_ts_cvp:, 1:2]
                 input_tensor = torch.FloatTensor(input_cvp).permute(2, 0, 1).unsqueeze(0).to(device)
                 with torch.no_grad():
                     pred = model_cvp(input_tensor, adj_for_model)
@@ -1184,6 +1235,36 @@ def calculate_risk(custom_norm_adj=None):
             # Let's try to trust the frontend 'CIDADE' or update nodes_gdf in memory?
             # Updating nodes_gdf in memory once is better.
 
+            # Human-friendly labels for non-statistical users
+            def _status_label(score: float) -> str:
+                if score >= 90:
+                    return 'Crítico'
+                if score >= 70:
+                    return 'Alto'
+                if score >= 40:
+                    return 'Médio'
+                return 'Baixo'
+
+            def _prediction_text(val: float, kind: str='CVLI') -> str:
+                # val is model output (aggregated prediction). Produce simple phrases.
+                try:
+                    if val <= 0.01:
+                        return 'Sem novas ocorrências previstas'
+                    if val < 1.0:
+                        return 'Menos de 1 ocorrência prevista'
+                    # round to one decimal for readability
+                    rounded = round(val, 1)
+                    unit = 'ocorrência' if rounded == 1 else 'ocorrências'
+                    # For CVLI we usually predict a short horizon (dias/semana), keep generic
+                    return f'Estimativa: ~{rounded} {unit} previstas'
+                except Exception:
+                    return 'Estimativa indisponível'
+
+            status_label = _status_label(cvli_score)
+            risk_text = f"{int(round(cvli_score))}% — {status_label}"
+            cvli_pred_text = _prediction_text(cvli_val, 'CVLI')
+            cvp_pred_text = _prediction_text(cvp_val, 'CVP')
+
             results.append({
                 'node_id': int(i),
                 'risk_score': cvli_score,
@@ -1193,7 +1274,12 @@ def calculate_risk(custom_norm_adj=None):
                 'cvp_pred': cvp_val,
                 'faction': factions[i],
                 'reasons': reasons,
-                'priority_cvli': bool(cvli_score >= cutoff_cvli)
+                'priority_cvli': bool(cvli_score >= cutoff_cvli),
+                # friendly fields for UI
+                'status_label': status_label,
+                'risk_text': risk_text,
+                'cvli_prediction_text': cvli_pred_text,
+                'cvp_prediction_text': cvp_pred_text
             })
 
         # Update nodes_gdf in memory with inferred regions if missing (Run once?)
@@ -1267,6 +1353,17 @@ def calculate_risk(custom_norm_adj=None):
             except Exception:
                 # If parsing fails, keep safe defaults (em dash)
                 pass
+
+        # Include which temporal window the loaded models expect (helps UI explain differences)
+        try:
+            meta['model_window_cvli'] = model_cvli.conv_final.kernel_size[-1] if model_cvli is not None else WINDOW_CVLI
+        except Exception:
+            meta['model_window_cvli'] = WINDOW_CVLI
+
+        try:
+            meta['model_window_cvp'] = model_cvp.conv_final.kernel_size[-1] if model_cvp is not None else WINDOW_CVP
+        except Exception:
+            meta['model_window_cvp'] = WINDOW_CVP
 
         return jsonify({'meta': meta, 'data': results})
     except Exception as e:

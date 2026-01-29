@@ -740,6 +740,12 @@
         var status = getStatus(score, typeLabel);
         var region = feature.properties.CIDADE || 'RMF/Interior';
 
+        // Friendly fields provided by backend: status_label, risk_text, cvli_prediction_text, cvp_prediction_text
+        var friendlyLabel = feature.properties.status_label || status.label;
+        var level = getRiskLevel(score);
+        var riskText = feature.properties.risk_text || (Math.round(score) + '% — ' + friendlyLabel);
+        var predText = (mode === 'CVLI') ? (feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('Estimativa: ~' + predVal.toFixed(1) + ' ocorrências') : 'Sem novas ocorrências previstas')) : (feature.properties.cvp_prediction_text || (predVal && predVal > 0 ? ('Estimativa: ~' + predVal.toFixed(1) + ' ocorrências') : 'Sem novas ocorrências previstas'));
+
         var popupContent = `
             <div style="font-family: sans-serif; font-size: 14px; min-width: 200px;">
                 <h6 class="mb-1"><strong>Bairro/Área:</strong> ${feature.properties.name}</h6>
@@ -749,16 +755,34 @@
                 </div>
                 <hr class="my-2">
                 <div class="mb-2">
-                    <strong>Status:</strong> <span class="badge ${status.class}">${status.label}</span>
+                    <strong>Status:</strong> <span class="badge ${level.class}">${friendlyLabel}</span>
                 </div>
                 <div class="mb-1">
-                    <strong>Risco Normalizado:</strong> ${score.toFixed(1)}%
+                    <strong>Risco:</strong> ${riskText}
                 </div>
                 <div class="text-muted small">
-                    <strong>Predição (${typeLabel}):</strong> ${predVal.toFixed(4)}
+                    <strong>Previsão (${typeLabel}):</strong> ${predText}
+                </div>
+                <div class="text-muted small mt-2">
+                    <em id="model-note-${feature.properties.node_id}"></em>
                 </div>
             </div>
         `;
+
+        // Inject model-note based on global meta if available
+        try {
+            var modelWindow = metaDataGlobal && metaDataGlobal.model_window_cvli ? metaDataGlobal.model_window_cvli : null;
+            if (modelWindow) {
+                var note = `Modelo atualizado — previsões baseadas em janela de ${modelWindow} dias`;
+                // element with dynamic id will exist in popup DOM once opened; use setTimeout to set it
+                setTimeout(function() {
+                    var el = document.getElementById('model-note-' + feature.properties.node_id);
+                    if (el) el.textContent = note;
+                }, 10);
+            }
+        } catch (e) {
+            // ignore
+        }
 
         // Create popup and open it manually
         L.popup()
@@ -769,7 +793,10 @@
         // Sidebar update
         var reasonsHtml = '<h5>' + feature.properties.name + '</h5>';
         reasonsHtml += '<p><strong>Facção:</strong> ' + (feature.properties.faction || 'N/A') + '</p>';
-        reasonsHtml += '<p><strong>Risco (' + typeLabel + '):</strong> ' + score.toFixed(1) + '%</p>';
+        var sideStatus = feature.properties.status_label || status.label;
+        var sidePred = (mode === 'CVLI') ? (feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('~' + predVal.toFixed(1) + ' ocorrências') : 'Sem novas ocorrências previstas')) : (feature.properties.cvp_prediction_text || (predVal && predVal > 0 ? ('~' + predVal.toFixed(1) + ' ocorrências') : 'Sem novas ocorrências previstas'));
+        reasonsHtml += '<p><strong>Status:</strong> ' + sideStatus + '</p>';
+        reasonsHtml += '<p><strong>Previsão (' + typeLabel + '):</strong> ' + sidePred + '</p>';
         reasonsHtml += '<h6>Motivos</h6><ul>';
         (feature.properties.reasons || []).forEach(function(r) { reasonsHtml += '<li>' + r + '</li>'; });
         reasonsHtml += '</ul>';
