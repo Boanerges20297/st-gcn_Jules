@@ -147,8 +147,8 @@ def build_node_search_index():
         print(f"Erro ao construir node_search_index: {e}")
 
 # Parâmetros de janela
-WINDOW_CVLI = 180
-WINDOW_CVP = 30
+WINDOW_CVLI = 120
+WINDOW_CVP = 90
 
 def load_exogenous_events():
     global exogenous_events

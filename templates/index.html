@@ -353,7 +353,7 @@
         var dateText = formatDate(startDate) + ' → ' + formatDate(endDate);
         $('#window-info small.text-muted').text('Janela Histórica: ' + dateText + ' (' + days + ' dias)');
 
-        var horizonText = (mode === 'CVLI') ? 'Horizonte de Predição: 3 dias (72h)' : 'Horizonte de Predição: 1 dia (24h)';
+        var horizonText = (mode === 'CVLI') ? 'Horizonte de Predição: 7 dias (168h)' : 'Horizonte de Predição: 1 dia (24h)';
         $('#horizon-info').text(horizonText);
 
         // Recalculate Stats
