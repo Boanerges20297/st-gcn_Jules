@@ -1667,6 +1667,21 @@ def parse_exogenous():
 
     # Use LLM Service (Gemini)
     events = process_exogenous_text(text)
+    # Enforce that LLM must extract municipality; if any event lacks 'municipio',
+    # inform the client so user can edit the exogenous form.
+    missing_city = []
+    for idx, evt in enumerate(events):
+        muni = evt.get('municipio') if isinstance(evt, dict) else None
+        if not muni or (isinstance(muni, str) and muni.strip() == ''):
+            # collect minimal info to show to user
+            missing_city.append({'index': idx, 'natureza': evt.get('natureza'), 'resumo': evt.get('resumo'), 'localizacao_completa': evt.get('localizacao_completa')})
+
+    if missing_city:
+        return jsonify({
+            'error': 'Falta a cidade na sua ocorrência!',
+            'message': 'Por favor preencha o município nas ocorrências indicadas antes de prosseguir.',
+            'missing_city': missing_city
+        }), 400
     points = []
 
     for evt in events:

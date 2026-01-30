@@ -131,6 +131,7 @@
                     <div id="window-info" class="mb-2">
                         <small class="text-muted d-block">Janela Histórica: —</small>
                         <small class="text-primary fw-bold" id="horizon-info">Horizonte: —</small>
+                        <small class="text-secondary d-block" id="model-window-info">Modelo: —</small>
                     </div>
 
                     <div class="d-grid gap-2 mb-2">
@@ -355,6 +356,18 @@
 
         var horizonText = (mode === 'CVLI') ? 'Horizonte de Predição: 7 dias (168h)' : 'Horizonte de Predição: 1 dia (24h)';
         $('#horizon-info').text(horizonText);
+
+        // Show model's internal window (from backend meta)
+        try {
+            var modelWindow = (mode === 'CVLI') ? (metaDataGlobal && metaDataGlobal.model_window_cvli) : (metaDataGlobal && metaDataGlobal.model_window_cvp);
+            if (modelWindow) {
+                $('#model-window-info').text('Janela do Modelo: ' + modelWindow + ' dias');
+            } else {
+                $('#model-window-info').text('Modelo: —');
+            }
+        } catch (e) {
+            $('#model-window-info').text('Modelo: —');
+        }
 
         // Recalculate Stats
         var highRisk = 0, mediumRisk = 0, lowRisk = 0;
@@ -696,10 +709,29 @@
                         alert('Nenhuma localização válida identificada nos dados fornecidos.');
                     }
                 },
-                error: function(err) {
+                error: function(jqXHR) {
                     hideLoading();
-                    console.error("Parsing error", err);
-                    alert("Erro ao processar dados: " + err.statusText);
+                    console.error("Parsing error", jqXHR);
+                    try {
+                        var body = jqXHR.responseJSON || {};
+                        if (jqXHR.status === 400 && body.error) {
+                            // If server provided missing_city details, show them to user
+                            if (body.missing_city && Array.isArray(body.missing_city) && body.missing_city.length > 0) {
+                                var msg = body.error + "\n\nOcorrências faltando cidade:\n";
+                                body.missing_city.forEach(function(it, i) {
+                                    var raw = it.raw || (it.description || JSON.stringify(it));
+                                    msg += (i+1) + '. ' + raw + '\n';
+                                });
+                                alert(msg);
+                                return;
+                            }
+                            alert('Erro: ' + body.error);
+                            return;
+                        }
+                    } catch (e) {
+                        console.warn('Error handling parse error', e);
+                    }
+                    alert("Erro ao processar dados: " + (jqXHR.statusText || 'Erro desconhecido'));
                 }
             });
         });
@@ -707,20 +739,20 @@
         hideLoading();
     });
 
-    // RMF Cities Definition (Excluding Fortaleza)
+    // RMF Cities Definition (Excluding Fortaleza) - normalized to lower-case for robust matching
     var rmfCities = [
         "Aquiraz", "Cascavel", "Caucaia", "Chorozinho", "Eusébio",
         "Guaiúba", "Horizonte", "Itaitinga", "Maracanaú", "Maranguape",
         "Pacajus", "Pacatuba", "Paracuru", "Paraipaba", "Pindoretama",
         "São Gonçalo do Amarante", "São Luís do Curu", "Trairi"
-    ];
+    ].map(function(s){ return s.toLowerCase(); });
 
     function getRegionType(cidade) {
         if (!cidade) return 'unknown';
-        var c = cidade.trim();
-        if (c === 'Fortaleza') return 'capital';
-        if (rmfCities.includes(c)) return 'rmf';
-        if (c === 'RMF/Interior') return 'unknown'; // Fallback
+        var c = String(cidade).trim().toLowerCase();
+        if (c.indexOf('fortalez') === 0) return 'capital';
+        if (rmfCities.indexOf(c) !== -1) return 'rmf';
+        if (c === 'rmf/interior') return 'unknown';
         return 'interior';
     }
 
@@ -738,7 +770,8 @@
         var predVal = (mode === 'CVLI') ? feature.properties.cvli_pred : feature.properties.cvp_pred;
         var typeLabel = (mode === 'CVLI') ? 'CVLI' : 'CVP';
         var status = getStatus(score, typeLabel);
-        var region = feature.properties.CIDADE || 'RMF/Interior';
+        // Prefer server-provided normalized region if present, else CIDADE
+        var region = feature.properties.region_type || feature.properties.CIDADE || feature.properties.city || 'RMF/Interior';
 
         // Friendly fields provided by backend: status_label, risk_text, cvli_prediction_text, cvp_prediction_text
         var friendlyLabel = feature.properties.status_label || status.label;
@@ -771,14 +804,20 @@
 
         // Inject model-note based on global meta if available
         try {
-            var modelWindow = metaDataGlobal && metaDataGlobal.model_window_cvli ? metaDataGlobal.model_window_cvli : null;
-            if (modelWindow) {
-                var note = `Modelo atualizado — previsões baseadas em janela de ${modelWindow} dias`;
-                // element with dynamic id will exist in popup DOM once opened; use setTimeout to set it
-                setTimeout(function() {
-                    var el = document.getElementById('model-note-' + feature.properties.node_id);
-                    if (el) el.textContent = note;
-                }, 10);
+            try {
+                var modelWindow = null;
+                if (metaDataGlobal) {
+                    modelWindow = (mode === 'CVLI') ? metaDataGlobal.model_window_cvli : metaDataGlobal.model_window_cvp;
+                }
+                if (modelWindow) {
+                    var note = `Modelo atualizado — previsões baseadas em janela de ${modelWindow} dias`;
+                    setTimeout(function() {
+                        var el = document.getElementById('model-note-' + feature.properties.node_id);
+                        if (el) el.textContent = note;
+                    }, 10);
+                }
+            } catch (e) {
+                // ignore
             }
         } catch (e) {
             // ignore
