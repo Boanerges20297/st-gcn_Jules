@@ -375,15 +375,47 @@ def load_data_and_models():
             with open(DATA_FILE, 'rb') as f:
                 data_pack = pickle.load(f)
 
-        nodes_gdf = data_pack.get('nodes_gdf')
+        # Use temporary local variables to allow validation before assignment
+        _nodes_gdf = data_pack.get('nodes_gdf')
         polygons_json_cache = None
-        adj_geo = data_pack.get('adj_geo')
-        adj_faction = data_pack.get('adj_faction')
-        adj_matrix = data_pack.get('adj_matrix')
-        if adj_matrix is None:
-            adj_matrix = adj_geo
-        node_features = data_pack.get('node_features')
-        dates = data_pack.get('dates')
+        _adj_geo = data_pack.get('adj_geo')
+        _adj_faction = data_pack.get('adj_faction')
+        _adj_matrix = data_pack.get('adj_matrix')
+        if _adj_matrix is None:
+            _adj_matrix = _adj_geo
+        _node_features = data_pack.get('node_features')
+        _dates = data_pack.get('dates')
+
+        # --- VALIDATION: Check Data Integrity (Paradigm Shift) ---
+        if _node_features is not None:
+            # Check Node Count (Expected ~319 for Admin boundaries, NOT ~2378 for Grid)
+            if _node_features.shape[0] > 1000:
+                err_msg = (
+                    f"CRITICAL: Dados obsoletos detectados! (Nós: {_node_features.shape[0]}). "
+                    "O sistema agora usa limites administrativos (~319 nós). "
+                    "Por favor, execute 'python src/data_processing.py' para regenerar os dados."
+                )
+                print(err_msg)
+                raise RuntimeError(err_msg)
+
+            # Check Channels (Expected 3: CVLI, CVP, Tension)
+            if len(_node_features.shape) < 3 or _node_features.shape[2] != 3:
+                channels = _node_features.shape[2] if len(_node_features.shape) > 2 else 1
+                err_msg = (
+                    f"CRITICAL: Dados obsoletos detectados! (Canais: {channels}). "
+                    "O sistema requer 3 canais (CVLI, CVP, Tensão). "
+                    "Por favor, execute 'python src/data_processing.py' para regenerar os dados."
+                )
+                print(err_msg)
+                raise RuntimeError(err_msg)
+
+        # Validation Passed - Assign to Globals
+        nodes_gdf = _nodes_gdf
+        adj_geo = _adj_geo
+        adj_faction = _adj_faction
+        adj_matrix = _adj_matrix
+        node_features = _node_features
+        dates = _dates
 
         # --- FIXED: Node Paradigm Loading ---
         if nodes_gdf is not None:
@@ -478,8 +510,10 @@ def load_data_and_models():
 
     except Exception as e:
         print(f"Erro ao carregar dados/modelos: {e}")
-        import traceback
-        traceback.print_exc()
+        # Only print stack trace if it's NOT the expected validation error
+        if "CRITICAL" not in str(e):
+            import traceback
+            traceback.print_exc()
 
 
 def _periodic_reload_loop(interval_minutes: int):
@@ -825,6 +859,16 @@ def calculate_risk(custom_norm_adj=None):
             if node_features.shape[1] >= model_ts:
                 # --- FIXED: Slice all 3 channels ---
                 input_slice = node_features[:, -model_ts:, :] # (N, T, 3)
+
+                # Check for channel mismatch (Runtime Safety)
+                if input_slice.shape[2] != 3:
+                    # Pad or trim if desperate (should be caught by startup check, but for robustness)
+                    if input_slice.shape[2] == 2:
+                        # Append zero tension channel
+                        zeros = np.zeros((input_slice.shape[0], input_slice.shape[1], 1), dtype=input_slice.dtype)
+                        input_slice = np.concatenate([input_slice, zeros], axis=2)
+                        print("AVISO: Adicionado canal de Tensão (zeros) dinamicamente para prevenir crash.")
+
                 input_tensor = torch.FloatTensor(input_slice).permute(2, 0, 1).unsqueeze(0).to(device) # (1, 3, N, T)
 
                 with torch.no_grad():
