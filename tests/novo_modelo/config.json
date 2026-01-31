@@ -1,0 +1,11 @@
+{
+  "neighborhoods": ["BARROSO","BONSUCESSO","GRANJA PORTUGAL"],
+  "start_year": 2022,
+  "end_year": 2025,
+  "epochs": 5,
+  "history_window": 120,
+  "predict_horizon": 30,
+  "feature": "CVLI",
+  "use_factions": true,
+  "device": "cpu"
+}
