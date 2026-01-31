@@ -161,6 +161,9 @@ def build_node_search_index():
 # Parâmetros de janela
 WINDOW_CVLI = 120
 WINDOW_CVP = 90
+# Parâmetros de Horizonte (apenas para referência de UI, treinamento define isso)
+HORIZON_CVLI = 14
+HORIZON_CVP = 7
 
 def load_exogenous_events():
     global exogenous_events
@@ -478,7 +481,7 @@ def load_data_and_models():
         node_features = data_pack.get('node_features')
         dates = data_pack.get('dates')
         # Fallback: if dates missing from the package, try to load from graph_data/dates.pkl or dates.json
-        if not dates:
+        if (dates is None) or (hasattr(dates, '__len__') and len(dates) == 0):
             try:
                 graph_dir = os.path.join(BASE_DIR, 'data', 'processed', 'graph_data')
                 dpkl = os.path.join(graph_dir, 'dates.pkl')
@@ -523,8 +526,13 @@ def load_data_and_models():
 
             # Enrich regions (populate 'CIDADE') now that nodes_gdf is loaded
             try:
-                enrich_regions()
-                # Normalize city labels for consistency
+                # We can't call enrich_regions directly here because it might not be defined yet (defined below)
+                # But python functions are late-bound. If enrich_regions is defined in global scope later, it should work IF called at runtime.
+                # However, load_data_and_models is called at the END of the file (for initial load).
+                # But inside the function body, it refers to global.
+                # The issue is likely that load_data_and_models is called before enrich_regions definition.
+                # We should move the initial call to the end of the file or ensure definition order.
+                pass
                 if 'CIDADE' in nodes_gdf.columns:
                     nodes_gdf['CIDADE'] = nodes_gdf['CIDADE'].apply(lambda v: normalize_city_label(v) if isinstance(v, str) and v.strip() else v)
             except Exception as e:
@@ -649,8 +657,8 @@ def load_data_and_models():
         import traceback
         traceback.print_exc()
 
-# Executa carregamento inicial
-load_data_and_models()
+# Executa carregamento inicial (Moved to end or called explicitly)
+# load_data_and_models()
 
 
 def _periodic_reload_loop(interval_minutes: int):
@@ -1315,16 +1323,16 @@ def calculate_risk(custom_norm_adj=None):
 
             def _prediction_text(val: float, kind: str='CVLI') -> str:
                 # val is model output (aggregated prediction). Produce simple phrases.
+                horizon_days = 14 if kind == 'CVLI' else 7
                 try:
                     if val <= 0.01:
-                        return 'Sem novas ocorrências previstas'
+                        return f'Sem novas ocorrências previstas (próx. {horizon_days} dias)'
                     if val < 1.0:
-                        return 'Menos de 1 ocorrência prevista'
+                        return f'Menos de 1 ocorrência prevista (próx. {horizon_days} dias)'
                     # round to one decimal for readability
                     rounded = round(val, 1)
                     unit = 'ocorrência' if rounded == 1 else 'ocorrências'
-                    # For CVLI we usually predict a short horizon (dias/semana), keep generic
-                    return f'Estimativa: ~{rounded} {unit} previstas'
+                    return f'Estimativa: ~{rounded} {unit} previstas (próx. {horizon_days} dias)'
                 except Exception:
                     return 'Estimativa indisponível'
 
@@ -1787,9 +1795,12 @@ def save_exogenous():
 # load_data_and_models calls this?
 # load_data_and_models() -> I'll add the call there.
 
-if __name__ == "__main__":
-    enrich_regions() # Call here for startup
-    app.run(host='0.0.0.0', port=5000, debug=True)
-else:
-    # When imported (production), we might want to call it too
+# Initial Load at the end of file to ensure all functions are defined
+try:
+    load_data_and_models()
     enrich_regions()
+except Exception as e:
+    print(f"Startup error: {e}")
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000, debug=True)
