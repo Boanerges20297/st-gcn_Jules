@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-01-29T12:00:45.868258",
+  "windows": [
+    30,
+    60,
+    90,
+    180
+  ],
+  "results": {
+    "30": {
+      "corr_cvli": -0.008595033084603163,
+      "corr_cvp": 0.015288220921848918,
+      "corr_train_cvli": null,
+      "corr_test_cvli": 0.01583242290541169,
+      "corr_train_cvp": null,
+      "corr_test_cvp": 0.017501498653704102
+    },
+    "60": {
+      "corr_cvli": 0.0011816799297151514,
+      "corr_cvp": 0.01317530503115875,
+      "corr_train_cvli": null,
+      "corr_test_cvli": 0.01583242290541169,
+      "corr_train_cvp": null,
+      "corr_test_cvp": 0.017501498653704102
+    },
+    "90": {
+      "corr_cvli": 0.011264311070273647,
+      "corr_cvp": 0.010553365051559882,
+      "corr_train_cvli": null,
+      "corr_test_cvli": 0.01583242290541169,
+      "corr_train_cvp": null,
+      "corr_test_cvp": 0.017501498653704102
+    },
+    "180": {
+      "corr_cvli": 0.010849687309084708,
+      "corr_cvp": 0.014327640247134898,
+      "corr_train_cvli": null,
+      "corr_test_cvli": 0.01583242290541169,
+      "corr_train_cvp": null,
+      "corr_test_cvp": 0.017501498653704102
+    }
+  }
+}
