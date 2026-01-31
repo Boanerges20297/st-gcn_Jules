@@ -11,18 +11,16 @@ import numpy as np
 from numpy.lib.stride_tricks import sliding_window_view
 import os
 from src.model import STGCN
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader, Dataset, TensorDataset
 
 DATA_FILE = 'data/processed/processed_graph_data.pkl'
 MODEL_DIR = 'models'
 MODEL_PATH = os.path.join(MODEL_DIR, 'stgcn_model.pth')
 HISTORY_WINDOW = 7
 BATCH_SIZE = 32
-EPOCHS = 3
+EPOCHS = 10
 LEARNING_RATE = 0.001
-
-LOSS_WEIGHTS = torch.tensor([5.0, 1.0])
-
+GAMMA = 2.0
 
 def get_logger():
     logger = logging.getLogger('train')
@@ -33,34 +31,85 @@ def get_logger():
     logger.setLevel(logging.INFO)
     return logger
 
-def prepare_dataset(node_features):
-    # Optimized using sliding_window_view to avoid loop and list appending
+class BalancedWindowDataset(Dataset):
+    def __init__(self, X, Y):
+        # Ensure writable copies
+        if isinstance(X, np.ndarray):
+            X = X.copy()
+        if isinstance(Y, np.ndarray):
+            Y = Y.copy()
 
-    # Create windows along the time axis (axis 1)
-    # shape: (num_nodes, num_windows, num_features, HISTORY_WINDOW)
+        self.X = torch.FloatTensor(X)
+        self.Y = torch.FloatTensor(Y)
+        self.num_samples = self.X.shape[0]
+
+        # Identify positive windows (any CVLI in the target day)
+        total_events = self.Y.sum(dim=(1, 2))
+        self.positive_indices = torch.where(total_events > 0)[0]
+        self.all_indices = torch.arange(self.num_samples)
+
+        print(f"Total Samples: {self.num_samples}")
+        print(f"Positive Samples: {len(self.positive_indices)}")
+
+    def __len__(self):
+        return self.num_samples
+
+    def __getitem__(self, idx):
+        if torch.rand(1).item() < 0.5 and len(self.positive_indices) > 0:
+            rand_pos_idx = self.positive_indices[torch.randint(0, len(self.positive_indices), (1,)).item()]
+            return self.X[rand_pos_idx], self.Y[rand_pos_idx]
+        else:
+            rand_idx = self.all_indices[torch.randint(0, self.num_samples, (1,)).item()]
+            return self.X[rand_idx], self.Y[rand_idx]
+
+class WeightedFocalMSELoss(nn.Module):
+    def __init__(self, weight_zero=1.0, weight_hotspot=500.0, gamma=2.0):
+        super(WeightedFocalMSELoss, self).__init__()
+        self.weight_zero = weight_zero
+        self.weight_hotspot = weight_hotspot
+        self.gamma = gamma
+
+    def forward(self, pred, target):
+        squared_error = (pred - target) ** 2
+
+        weights = torch.ones_like(target) * self.weight_zero
+        weights[target > 0] = self.weight_hotspot
+
+        abs_error = torch.abs(pred - target)
+        focal_term = (1 + abs_error) ** self.gamma
+
+        loss = weights * focal_term * squared_error
+        return torch.mean(loss)
+
+def prepare_dataset(node_features):
     windows = sliding_window_view(node_features, HISTORY_WINDOW, axis=1)
 
-    # Discard the last window because we need a target for each window,
-    # and the last window's target would be out of bounds.
-    X = windows[:, :-1, :, :]
+    X = windows[:, :-1, :, :] # (Nodes, Samples, Features, WindowSize)
+    target_data = node_features[:, HISTORY_WINDOW:, 0:1] # (Nodes, Samples, 1)
 
-    # Transpose to match model input shape: (num_samples, num_features, num_nodes, HISTORY_WINDOW)
-    # Current shape: (N, S, F, H) -> Transpose (1, 2, 0, 3)
-    X = X.transpose(1, 2, 0, 3)
+    X = X.transpose(1, 2, 0, 3) # (Samples, Features, Nodes, WindowSize)
+    Y = target_data.transpose(1, 0, 2) # (Samples, Nodes, 1)
 
-    # Targets correspond to the timestep immediately following each window
-    # Shape: (num_nodes, num_samples, num_features)
-    Y = node_features[:, HISTORY_WINDOW:, :]
-
-    # Transpose to (num_samples, num_nodes, num_features)
-    Y = Y.transpose(1, 0, 2)
+    # Ensure numpy arrays are contiguous and writable
+    X = np.ascontiguousarray(X)
+    Y = np.ascontiguousarray(Y)
 
     return X, Y
 
-def weighted_mse_loss(input, target, weights):
-    sq_diff = (input - target) ** 2
-    weighted_sq_diff = sq_diff * weights.view(1, 1, -1)
-    return torch.mean(weighted_sq_diff)
+def precision_at_k(pred, target, k=5):
+    batch_size = pred.shape[0]
+    p_k_sum = 0.0
+
+    for i in range(batch_size):
+        p = pred[i, :, 0]
+        t = target[i, :, 0]
+
+        _, top_k_indices = torch.topk(p, k)
+
+        hits = (t[top_k_indices] > 0).float().sum()
+        p_k_sum += (hits / k).item()
+
+    return p_k_sum / batch_size
 
 def main():
     logger = get_logger()
@@ -72,12 +121,8 @@ def main():
         data_pack = pickle.load(f)
 
     node_features = data_pack['node_features']
-    # carregar ambas as adjacências (geo + faccional)
-    adj_geo = data_pack.get('adj_geo')
-    adj_faction = data_pack.get('adj_faction')
-
-    if adj_geo is None or adj_faction is None:
-        raise RuntimeError('Adjacency matrices adj_geo and adj_faction not found in data_pack')
+    adj_geo = data_pack['adj_geo']
+    adj_conflict = data_pack['adj_conflict']
 
     def normalize_adj(adj_np):
         adj_t = torch.FloatTensor(adj_np)
@@ -88,47 +133,28 @@ def main():
         return torch.mm(torch.mm(d_mat_inv_sqrt, adj_t), d_mat_inv_sqrt)
 
     norm_adj_geo = normalize_adj(adj_geo)
-    norm_adj_faction = normalize_adj(adj_faction)
-    norm_adj_list = [norm_adj_geo, norm_adj_faction]
+    norm_adj_conflict = normalize_adj(adj_conflict)
+    norm_adj_list = [norm_adj_geo, norm_adj_conflict]
 
-    # adjacency diagnostics
-    try:
-        os.makedirs('plots', exist_ok=True)
-        adj_counts = {
-            'geo_edges': int((adj_geo > 0).sum() // 2),
-            'faction_edges': int((adj_faction > 0).sum() // 2)
-        }
-        print(f"Adjacency counts: {adj_counts}")
-        # plot degree histograms
-        deg_geo = adj_geo.sum(axis=1)
-        deg_faction = adj_faction.sum(axis=1)
-        plt.figure(figsize=(8,4))
-        plt.hist(deg_geo, bins=50, alpha=0.6, label='geo')
-        plt.hist(deg_faction, bins=50, alpha=0.6, label='faction')
-        plt.legend()
-        plt.title('Degree distribution (geo vs faction)')
-        plt.xlabel('Degree')
-        plt.ylabel('Count')
-        plt.tight_layout()
-        plt.savefig('plots/adjacency_degree_hist.png')
-        plt.close()
-    except Exception as e:
-        print(f"Warning: failed to save adjacency diagnostics: {e}")
-    
     logger.info("Criando janelas temporais...")
     X, Y = prepare_dataset(node_features)
     
-    split_idx = int(len(X) * 0.7)
+    split_idx = int(len(X) * 0.8)
     X_train, X_val = X[:split_idx], X[split_idx:]
     Y_train, Y_val = Y[:split_idx], Y[split_idx:]
     
     logger.info(f"Treino: {X_train.shape}, Validação: {X_val.shape}")
     
-    train_data = TensorDataset(torch.FloatTensor(X_train), torch.FloatTensor(Y_train))
-    val_data = TensorDataset(torch.FloatTensor(X_val), torch.FloatTensor(Y_val))
+    # Datasets
+    train_dataset = BalancedWindowDataset(X_train, Y_train)
+    # Ensure validation data is also writable/contiguous before TensorDataset
+    val_dataset = TensorDataset(
+        torch.FloatTensor(X_val.copy()),
+        torch.FloatTensor(Y_val.copy())
+    )
     
-    train_loader = DataLoader(train_data, batch_size=BATCH_SIZE, shuffle=True)
-    val_loader = DataLoader(val_data, batch_size=BATCH_SIZE, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logger.info(f"Usando dispositivo: {device}")
@@ -136,77 +162,56 @@ def main():
     num_nodes = node_features.shape[0]
     num_features = node_features.shape[2]
     
-    model = STGCN(num_nodes=num_nodes, in_channels=num_features, time_steps=HISTORY_WINDOW, num_graphs=len(norm_adj_list)).to(device)
+    model = STGCN(num_nodes=num_nodes, in_channels=num_features, time_steps=HISTORY_WINDOW, num_classes=1, num_graphs=len(norm_adj_list)).to(device)
     norm_adj_list = [a.to(device) for a in norm_adj_list]
-    loss_weights = LOSS_WEIGHTS.to(device)
     
+    criterion = WeightedFocalMSELoss(weight_zero=1.0, weight_hotspot=500.0, gamma=GAMMA).to(device)
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     
     logger.info("Iniciando treinamento...")
-    train_history = []
-    val_history = []
+    best_p5 = 0.0
+
     for epoch in range(EPOCHS):
         epoch_start = time.time()
         model.train()
         train_loss = 0.0
-        batch_times = []
-        for batch_idx, (batch_x, batch_y) in enumerate(train_loader, 1):
-            t0 = time.time()
+
+        for batch_x, batch_y in train_loader:
             batch_x, batch_y = batch_x.to(device), batch_y.to(device)
             optimizer.zero_grad()
             output = model(batch_x, norm_adj_list)
-            loss = weighted_mse_loss(output, batch_y, loss_weights)
+            loss = criterion(output, batch_y)
             loss.backward()
+
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+
             optimizer.step()
             train_loss += loss.item()
-            bt = time.time() - t0
-            batch_times.append(bt)
-            # log every 10 batches
-            if batch_idx % 10 == 0 or batch_idx == len(train_loader):
-                avg_bt = sum(batch_times)/len(batch_times)
-                batches_left = len(train_loader) - batch_idx
-                eta = batches_left * avg_bt
-                logger.info(f'Epoch {epoch+1} Batch {batch_idx}/{len(train_loader)} - batch_loss={loss.item():.6f} ETA={eta:.1f}s')
 
         model.eval()
         val_loss = 0.0
+        val_p5 = 0.0
         with torch.no_grad():
-            for batch_idx, (batch_x, batch_y) in enumerate(val_loader, 1):
+            for batch_x, batch_y in val_loader:
                 batch_x, batch_y = batch_x.to(device), batch_y.to(device)
                 output = model(batch_x, norm_adj_list)
-                loss = weighted_mse_loss(output, batch_y, loss_weights)
+                loss = criterion(output, batch_y)
                 val_loss += loss.item()
+                val_p5 += precision_at_k(output, batch_y, k=5)
+
+        train_avg_loss = train_loss / len(train_loader)
+        val_avg_loss = val_loss / len(val_loader)
+        val_avg_p5 = val_p5 / len(val_loader)
 
         epoch_time = time.time() - epoch_start
-        train_avg = train_loss / len(train_loader) if len(train_loader) else 0
-        val_avg = val_loss / len(val_loader) if len(val_loader) else 0
-        logger.info(f"Epoch {epoch+1}/{EPOCHS} completed in {epoch_time:.1f}s | Train Loss: {train_avg:.6f} | Val Loss: {val_avg:.6f}")
-        train_history.append(train_avg)
-        val_history.append(val_avg)
-        # save per-epoch checkpoint
-        epoch_path = os.path.join(MODEL_DIR, f'stgcn_epoch_{epoch+1}.pth')
-        torch.save(model.state_dict(), epoch_path)
-        logger.info(f'Checkpoint saved: {epoch_path}')
+        logger.info(f"Epoch {epoch+1}/{EPOCHS} | Time: {epoch_time:.1f}s | Train Loss: {train_avg_loss:.4f} | Val Loss: {val_avg_loss:.4f} | Val P@5: {val_avg_p5:.4f}")
 
-    # final save
-    torch.save(model.state_dict(), MODEL_PATH)
-    logger.info(f"Modelo salvo em {MODEL_PATH}")
-
-    # save training curves
-    try:
-        plt.figure()
-        plt.plot(range(1, len(train_history)+1), train_history, label='train')
-        plt.plot(range(1, len(val_history)+1), val_history, label='val')
-        plt.xlabel('Epoch')
-        plt.ylabel('Loss')
-        plt.title('Training and Validation Loss')
-        plt.legend()
-        plt.tight_layout()
-        plt.savefig('plots/training_loss.png')
-        plt.close()
-        logger.info('Saved training loss plot to plots/training_loss.png')
-    except Exception as e:
-        logger.warning(f'Failed to save training plot: {e}')
+        if val_avg_p5 > best_p5:
+            best_p5 = val_avg_p5
+            torch.save(model.state_dict(), MODEL_PATH)
+            logger.info(f"  -> Novo melhor modelo salvo! (P@5: {best_p5:.4f})")
+        elif epoch == 0:
+             torch.save(model.state_dict(), MODEL_PATH)
 
 if __name__ == "__main__":
     main()
