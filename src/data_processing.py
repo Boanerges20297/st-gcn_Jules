@@ -7,7 +7,7 @@ import numpy as np
 
 # Configuração
 GEOJSON_DIR = 'data/raw/inteligencia'
-OCORRENCIAS_FILE = 'data/raw/dados_status_ocorrencias_gerais.json'
+OCORRENCIAS_FILE = 'data/raw/dados_merged.json'
 OUTPUT_FILE = 'data/processed/processed_graph_data.pkl'
 
 def load_geometries(directory):

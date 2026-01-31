@@ -565,5 +565,53 @@
         "type": "exogenous"
       }
     ]
+  },
+  {
+    "id": "15",
+    "timestamp": "2026-01-30T15:31:01.052191",
+    "original_text": "01 - M20260072278 - LESÃO Á BALA - VITIMA DO SEXO MASCULINO - SOCORRIDA P/ UPA DE CASCAVEL - LESIONADO NOS GLUTEOS - CAPONGA, CASCAVEL (AIS15) - 02:29",
+    "points": [
+      {
+        "description": "LESÃO Á BALA - LESÃO Á BALA. Vítima MASCULINO socorrida p/ UPA de CASCAVEL, lesionada nos glúteos. Local: CAPONGA, CASCAVEL.",
+        "lat": -4.04335843892691,
+        "lng": -38.19871369843822,
+        "raw_event": {
+          "bairro": "CAPONGA",
+          "descricao": "SOCORRIDA P/ UPA DE CASCAVEL - LESIONADO NOS GLUTEOS",
+          "localizacao_completa": "CAPONGA, CASCAVEL (AIS15)",
+          "municipio": "Cascavel",
+          "natureza": "LESÃO Á BALA",
+          "raw_text": "01 - M20260072278 - LESÃO Á BALA - VITIMA DO SEXO MASCULINO - SOCORRIDA P/ UPA DE CASCAVEL - LESIONADO NOS GLUTEOS - CAPONGA, CASCAVEL (AIS15) - 02:29",
+          "resumo": "LESÃO Á BALA. Vítima MASCULINO socorrida p/ UPA de CASCAVEL, lesionada nos glúteos. Local: CAPONGA, CASCAVEL.",
+          "sexo": "MASCULINO",
+          "timestamp": "02:29"
+        },
+        "type": "exogenous"
+      }
+    ]
+  },
+  {
+    "id": "16",
+    "timestamp": "2026-01-30T15:32:58.456934",
+    "original_text": "\n01 - M20260072402 - ACHADO DE CADAVER - VITIMA DO SEXO MASCULINO - EM VIA PUBLICA - MARCAS DE PERFURAÇÃO A BALA, PAULADAS E PEDRADAS (MÃOS AMARRADAS) - PASSARE (AIS19) - 06:35",
+    "points": [
+      {
+        "description": "ACHADO DE CADAVER - Achado de cadáver de vítima masculina em via pública, com marcas de perfuração a bala, pauladas e pedradas, mãos amarradas.",
+        "lat": -3.792531551663916,
+        "lng": -38.538951816975846,
+        "raw_event": {
+          "bairro": "Passaré",
+          "descricao": "VITIMA DO SEXO MASCULINO - EM VIA PUBLICA - MARCAS DE PERFURAÇÃO A BALA, PAULADAS E PEDRADAS (MÃOS AMARRADAS)",
+          "localizacao_completa": "PASSARE",
+          "municipio": "FORTALEZA",
+          "natureza": "ACHADO DE CADAVER",
+          "raw_text": "01 - M20260072402 - ACHADO DE CADAVER - VITIMA DO SEXO MASCULINO - EM VIA PUBLICA - MARCAS DE PERFURAÇÃO A BALA, PAULADAS E PEDRADAS (MÃOS AMARRADAS) - PASSARE (AIS19) - 06:35",
+          "resumo": "Achado de cadáver de vítima masculina em via pública, com marcas de perfuração a bala, pauladas e pedradas, mãos amarradas.",
+          "sexo": "MASCULINO",
+          "timestamp": "06:35"
+        },
+        "type": "exogenous"
+      }
+    ]
   }
 ]
