@@ -29,6 +29,7 @@ def load_polygon_cache(filepath):
     cache = {}
     if not os.path.exists(filepath):
         print(f"AVISO: Arquivo de polígonos não encontrado: {filepath}")
+        print(f"       -> Para visualizar polígonos no mapa, adicione este arquivo em data/raw/.")
         return cache
 
     try:
@@ -96,6 +97,12 @@ def enrich_node_geometries(nodes_gdf):
 
     nodes_gdf['geometry'] = new_geoms
     print(f"Polígonos atribuídos: {count_merged}/{len(nodes_gdf)}")
+
+    if count_merged == 0:
+        print("\n!!! ALERTA: Nenhum nó recebeu geometria de polígono. O mapa exibirá apenas pontos (círculos).")
+        print("    Certifique-se de que os arquivos 'ceara_municipios.geojson' e 'fortaleza_bairros.geojson' estão em data/raw/.")
+        print("    Sem esses arquivos, a visualização permanecerá como pontos.\n")
+
     return nodes_gdf
 
 def load_nodes_from_json(filepath):
