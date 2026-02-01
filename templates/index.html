@@ -240,6 +240,7 @@
         var score = (mode === 'CVLI') ? feature.properties.risk_score_cvli : feature.properties.risk_score_cvp;
 
         return {
+            radius: 10,
             fillColor: getColor(score),
             weight: 2,
             opacity: 1,
@@ -531,6 +532,9 @@
         // Initialize Map
         geojsonLayer = L.geoJson(geojson, {
             style: style,
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, style(feature));
+            },
             onEachFeature: function(feature, layer) {
                 // Click handler
                 layer.on('click', function(e) {
@@ -540,7 +544,11 @@
                     } else {
                         showFeatureDetails(layer, e.latlng);
                         // Zoom to feature (Zoom In)
-                        map.fitBounds(layer.getBounds(), { maxZoom: 16 });
+                        if (layer.getBounds) {
+                            map.fitBounds(layer.getBounds(), { maxZoom: 16 });
+                        } else {
+                            map.flyTo(layer.getLatLng(), 16);
+                        }
                     }
                 });
             }
@@ -919,8 +927,9 @@
             var idx = $(this).data('idx');
             var item = top30[idx];
             if (item && item.layer) {
-                map.flyTo(item.layer.getBounds().getCenter(), 15);
-                showFeatureDetails(item.layer, item.layer.getBounds().getCenter());
+                var center = item.layer.getBounds ? item.layer.getBounds().getCenter() : item.layer.getLatLng();
+                map.flyTo(center, 15);
+                showFeatureDetails(item.layer, center);
             }
         });
     }
