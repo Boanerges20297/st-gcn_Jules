@@ -24,6 +24,80 @@ def normalize_text(text):
         return ""
     return unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('ASCII').upper().strip()
 
+def load_polygon_cache(filepath):
+    """Carrega GeoJSON e retorna dict {normalized_name: geometry}."""
+    cache = {}
+    if not os.path.exists(filepath):
+        print(f"AVISO: Arquivo de polígonos não encontrado: {filepath}")
+        return cache
+
+    try:
+        print(f"Carregando polígonos de {filepath}...")
+        gdf = gpd.read_file(filepath)
+        if gdf.crs is None:
+            gdf.set_crs(epsg=4326, inplace=True)
+        # Converter para 4326 se não estiver
+        else:
+            gdf = gdf.to_crs(epsg=4326)
+
+        # Check common columns
+        name_col = None
+        for col in ['name', 'NAME', 'nome', 'NOME', 'NM_MUN', 'NM_BAIRRO', 'bairro', 'municipio']:
+            if col in gdf.columns:
+                name_col = col
+                break
+
+        if name_col:
+            for idx, row in gdf.iterrows():
+                name = normalize_text(str(row[name_col]))
+                if name:
+                    cache[name] = row.geometry
+
+        print(f"  - Carregados {len(cache)} polígonos.")
+    except Exception as e:
+        print(f"Erro ao carregar {filepath}: {e}")
+
+    return cache
+
+def enrich_node_geometries(nodes_gdf):
+    """Tenta substituir Ponto por Polígono usando arquivos externos."""
+    print("Enriquecendo geometrias dos nós (Merge Polygons)...")
+
+    mun_file = os.path.join(DATA_DIR, 'ceara_municipios.geojson')
+    bairro_file = os.path.join(DATA_DIR, 'fortaleza_bairros.geojson')
+    interior_file = os.path.join(DATA_DIR, 'ceara_interior.geojson') # Metadata hint
+
+    # Carregar caches
+    caches = []
+    caches.append(load_polygon_cache(mun_file))
+    caches.append(load_polygon_cache(bairro_file))
+    caches.append(load_polygon_cache(interior_file))
+
+    count_merged = 0
+    new_geoms = []
+
+    for idx, row in nodes_gdf.iterrows():
+        name = normalize_text(row['name'])
+
+        poly = None
+
+        # Tentar encontrar em qualquer cache (prioridade implícita pela ordem de caches?)
+        # Vamos varrer todos
+        for cache in caches:
+            if name in cache:
+                poly = cache[name]
+                break
+
+        if poly is not None:
+            new_geoms.append(poly)
+            count_merged += 1
+        else:
+            new_geoms.append(row.geometry)
+
+    nodes_gdf['geometry'] = new_geoms
+    print(f"Polígonos atribuídos: {count_merged}/{len(nodes_gdf)}")
+    return nodes_gdf
+
 def load_nodes_from_json(filepath):
     """Carrega os bairros do JSON e converte para GeoDataFrame (Centróides)."""
     print(f"Carregando nós de {filepath}...")
@@ -359,6 +433,11 @@ def main():
     # 1. Carregar Nós
     nodes_gdf, nodes_proj = load_nodes_from_json(BAIRROS_FILE)
     
+    # 1.1 Merge Polygons (Enrich)
+    nodes_gdf = enrich_node_geometries(nodes_gdf)
+    # Reprojetar nodes_proj pois a geometria mudou para Polígono (potencialmente)
+    nodes_proj = nodes_gdf.to_crs(epsg=3857)
+
     # 2. Carregar Camadas
     layers = load_faction_layers(INTELIGENCIA_DIR)
     
