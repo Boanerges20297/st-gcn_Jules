@@ -1091,6 +1091,13 @@ def enrich_regions():
     if 'CIDADE' not in nodes_gdf.columns:
         nodes_gdf['CIDADE'] = ''
 
+    # Ensure region_type is available for frontend filters
+    if 'regiao' in nodes_gdf.columns:
+        # Normalize 'fortaleza' to 'capital' for frontend consistency
+        nodes_gdf['region_type'] = nodes_gdf['regiao'].replace('fortaleza', 'capital')
+    else:
+        nodes_gdf['region_type'] = 'interior' # Fallback default
+
     print("Enriching regions...")
 
     # --- FIXED: Use node_type to enforce City names ---
