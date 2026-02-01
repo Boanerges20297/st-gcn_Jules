@@ -755,7 +755,8 @@
         "São Gonçalo do Amarante", "São Luís do Curu", "Trairi"
     ].map(function(s){ return s.toLowerCase(); });
 
-    function getRegionType(cidade) {
+    function getRegionType(cidade, regionProp) {
+        if (regionProp) return regionProp.toLowerCase();
         if (!cidade) return 'unknown';
         var c = String(cidade).trim().toLowerCase();
         if (c.indexOf('fortalez') === 0) return 'capital';
@@ -863,7 +864,7 @@
             var score = (mode === 'CVLI') ? (props.risk_score_cvli || 0) : (props.risk_score_cvp || 0);
 
             // Filter Logic
-            var regionType = getRegionType(props.CIDADE);
+            var regionType = getRegionType(props.CIDADE, props.region_type || props.regiao);
             var include = false;
 
             if (regionFilter === 'all') include = true;
