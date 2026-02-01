@@ -301,6 +301,7 @@
     }
 
     var geojsonLayer = null;
+    var markerLayer = null;
     var riskDataGlobal = null;
     var metaDataGlobal = null;
 
@@ -383,10 +384,31 @@
         $('#medium-risk-count').text(mediumRisk);
         $('#low-risk-count').text(lowRisk);
 
-        // Update Map Style
+        // Update Map Style (guard for non-path layers like Markers)
         if (geojsonLayer) {
             geojsonLayer.eachLayer(function(layer) {
-                layer.setStyle(style(layer.feature));
+                try {
+                    if (typeof layer.setStyle === 'function') {
+                        layer.setStyle(style(layer.feature));
+                    }
+                } catch (e) {
+                    console.warn('Failed to set style on layer', e);
+                }
+            });
+        }
+
+        // Update marker colors based on current mode
+        if (markerLayer) {
+            markerLayer.eachLayer(function(m) {
+                try {
+                    var props = (m.feature && m.feature.properties) || {};
+                    var score = (mode === 'CVLI') ? (props.risk_score_cvli || 0) : (props.risk_score_cvp || 0);
+                    if (typeof m.setStyle === 'function') {
+                        m.setStyle({ fillColor: getColor(score) });
+                    }
+                } catch (e) {
+                    // ignore
+                }
             });
         }
         updateTopCriticalAreas();
@@ -512,29 +534,32 @@
 
         var riskMapCVLI = {};
         var riskMapCVP = {};
+        var riskById = {};
 
         riskDataGlobal.forEach(function(item) {
-            riskMapCVLI[item.node_id] = item.risk_score_cvli || 0;
-            riskMapCVP[item.node_id] = item.risk_score_cvp || 0;
+            var id = String(item.node_id);
+            riskMapCVLI[id] = item.risk_score_cvli || 0;
+            riskMapCVP[id] = item.risk_score_cvp || 0;
+            riskById[id] = item;
         });
 
         geojson.features.forEach(function(feature, index) {
-            var r = riskDataGlobal[index] || {};
-            feature.properties.risk_score_cvli = riskMapCVLI[index] || 0;
-            feature.properties.risk_score_cvp = riskMapCVP[index] || 0;
+            var fid = feature.id || (feature.properties && feature.properties.node_id) || String(index);
+            fid = String(fid);
+            var r = riskById[fid] || {};
+            feature.properties.node_id = fid;
+            feature.properties.risk_score_cvli = riskMapCVLI[fid] || 0;
+            feature.properties.risk_score_cvp = riskMapCVP[fid] || 0;
             feature.properties.cvli_pred = (r.cvli_pred !== undefined) ? r.cvli_pred : 0;
             feature.properties.cvp_pred = (r.cvp_pred !== undefined) ? r.cvp_pred : 0;
             feature.properties.faction = r.faction || feature.properties.faction || null;
             feature.properties.reasons = r.reasons || [];
-            feature.properties.name = feature.properties.name || 'Área ' + index;
+            feature.properties.name = feature.properties.name || ('Área ' + fid);
         });
 
         // Initialize Map
         geojsonLayer = L.geoJson(geojson, {
             style: style,
-            pointToLayer: function (feature, latlng) {
-                return L.circleMarker(latlng, style(feature));
-            },
             onEachFeature: function(feature, layer) {
                 // Click handler
                 layer.on('click', function(e) {
@@ -553,6 +578,35 @@
                 });
             }
         }).addTo(map);
+
+        // Create marker layer for point pins colored by criticality
+        markerLayer = L.layerGroup().addTo(map);
+        markerLayer.clearLayers();
+        geojson.features.forEach(function(feature, index) {
+            var props = feature.properties || {};
+            var fid = props.node_id || feature.id || String(index);
+            var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
+            var score = (mode === 'CVLI') ? (props.risk_score_cvli || 0) : (props.risk_score_cvp || 0);
+            var lat = props.latitude || (feature.geometry && feature.geometry.coordinates && feature.geometry.coordinates[1]);
+            var lng = props.longitude || (feature.geometry && feature.geometry.coordinates && feature.geometry.coordinates[0]);
+            if (lat !== undefined && lng !== undefined && !isNaN(lat) && !isNaN(lng)) {
+                var circle = L.circleMarker([lat, lng], {
+                    radius: 6,
+                    fillColor: getColor(score),
+                    color: 'white',
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.95,
+                    className: 'node-pin node-' + fid
+                });
+                // attach feature for consistency with polygon layers
+                circle.feature = feature;
+                circle.on('click', function(e) {
+                    showFeatureDetails(circle, e.latlng);
+                });
+                markerLayer.addLayer(circle);
+            }
+        });
 
         // Ensure Leaflet recalculates container size now that the geojson layer is added
         try {
@@ -862,8 +916,8 @@
             var props = layer.feature.properties;
             var score = (mode === 'CVLI') ? (props.risk_score_cvli || 0) : (props.risk_score_cvp || 0);
 
-            // Filter Logic
-            var regionType = getRegionType(props.CIDADE);
+            // Filter Logic: prefer server-provided region hints
+            var regionType = props.region_type || props.regiao || getRegionType(props.CIDADE);
             var include = false;
 
             if (regionFilter === 'all') include = true;
@@ -919,6 +973,9 @@
                     </a>`;
         });
 
+        // Also apply the region filter to the visible map layers
+        applyRegionFilter(regionFilter);
+
         $('#top-areas').html(html);
 
         // Bind clicks
@@ -936,8 +993,49 @@
 
     // Filter Handler
     $('#region-filter').on('change', function() {
+        var val = $(this).val();
+        applyRegionFilter(val);
         updateTopCriticalAreas();
     });
+
+    // Apply region filter to map layers (show/hide)
+    function applyRegionFilter(regionFilter) {
+        if (!geojsonLayer) return;
+        geojsonLayer.eachLayer(function(layer) {
+            var props = (layer.feature && layer.feature.properties) || {};
+            var regionType = props.region_type || props.regiao || getRegionType(props.CIDADE);
+            var show = (regionFilter === 'all') || (regionFilter === regionType);
+            try {
+                if (show) {
+                    // restore style and ensure layer is on map
+                    if (layer.setStyle) layer.setStyle(style(layer.feature));
+                    if (!map.hasLayer(layer)) map.addLayer(layer);
+                } else {
+                    // hide layer
+                    if (layer.setStyle) layer.setStyle({opacity:0, fillOpacity:0});
+                    if (map.hasLayer(layer)) map.removeLayer(layer);
+                }
+            } catch (e) {
+                // ignore individual layer errors
+            }
+        });
+
+        // Apply same filter to markerLayer
+        if (markerLayer) {
+            markerLayer.eachLayer(function(m) {
+                var props = (m.feature && m.feature.properties) || {};
+                var regionType = props.region_type || props.regiao || getRegionType(props.CIDADE);
+                var show = (regionFilter === 'all') || (regionFilter === regionType);
+                try {
+                    if (show) {
+                        if (!map.hasLayer(m)) map.addLayer(m);
+                    } else {
+                        if (map.hasLayer(m)) map.removeLayer(m);
+                    }
+                } catch (e) {}
+            });
+        }
+    }
 </script>
 </body>
 </html>
