@@ -366,7 +366,18 @@ def load_data_and_models():
 
     data_pack = None
     if not os.path.exists(DATA_FILE):
-        print("AVISO: processed_graph_data.pkl não encontrado!")
+        print("AVISO: processed_graph_data.pkl não encontrado! Tentando regenerar dados...")
+        try:
+            from src import data_processing
+            data_processing.main()
+        except Exception as e:
+            print(f"ERRO CRÍTICO: Falha ao regenerar dados: {e}")
+            # Continue to see if it works or return? If failed, likely return.
+            # But let the next check handle it.
+            pass
+
+    if not os.path.exists(DATA_FILE):
+        print("AVISO: processed_graph_data.pkl não encontrado (falha na regeneração ou caminho incorreto)!")
         return
 
     print("Carregando dados para API...")
