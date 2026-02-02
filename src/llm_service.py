@@ -264,8 +264,9 @@ def process_exogenous_text(text: str) -> List[Dict[str, Any]]:
         "4) 'localizacao_completa' should contain whatever location text is available (may be empty).\n"
         "5) NEW: Add 'conflict_severity' field with values: 'HIGH', 'MEDIUM', or 'LOW':\n"
         "   - HIGH: Signs of execution/confrontation (amarrados, mãos amarradas, pés amarrados, tortura, sinais de execução, carbonizado, enterrado, múltiplas vítimas, duplo homicídio, triplo homicídio, chacina, emboscada, disputa territorial)\n"
-        "   - MEDIUM: Armed violence (bala, tiro, disparos, fuzilamento, confronto, troca de tiros)\n"
-        "   - LOW: Other cases (faca, lesão corporal, acidente, etc)\n\n"
+        "   - MEDIUM: Armed violence AND forced displacement (bala, tiro, disparos, fuzilamento, confronto, troca de tiros, ameaças de grupo criminoso, expulsão de moradores, deslocamento forçado, precisa fazer mudança por ameaça, forçado a sair)\n"
+        "   - LOW: Other cases (faca, lesão corporal, acidente, etc)\n"
+        "   IMPORTANT: If the text mentions threats from criminal groups forcing people to move/leave (ameaças + mudança, expulsão, deslocamento forçado), classify as MEDIUM as it indicates territorial conflict preparation or retaliation setup.\n\n"
         + text
     )
     try:

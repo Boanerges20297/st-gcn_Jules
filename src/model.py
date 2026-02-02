@@ -124,7 +124,7 @@ class STGCNLayer(nn.Module):
         self.temporal_conv = nn.Conv2d(in_channels, out_channels, (1, kernel_size), padding=(0, kernel_size//2))
         self.gcn = MultiGraphConvolution(out_channels, out_channels, num_graphs=num_graphs)
         self.relu = nn.ReLU()
-        self.dropout = nn.Dropout(0.3)
+        self.dropout = nn.Dropout(0.5)  # Aumentado de 0.3 para 0.5 (anti-overfitting)
         self.bn = nn.BatchNorm2d(out_channels)
 
         # Atenção Temporal
@@ -148,6 +148,16 @@ class STGCNLayer(nn.Module):
         return self.dropout(self.relu(x))
 
 class STGCN(nn.Module):
+    """ST-GCN com 4 canais de entrada (Opção 3 - Implementado).
+    
+    Canais:
+    0: CVLI (homicídios)
+    1: CVP (crimes contra patrimônio) 
+    2: Tension (índice de tensão)
+    3: Exogenous Presence (eventos exógenos críticos, 0-1)
+    
+    Sem amplificação! Modelo aprende quando/como usar cada canal.
+    """
     def __init__(self, num_nodes, in_channels, time_steps, num_classes=1, num_graphs=2):
         super(STGCN, self).__init__()
         # Layer 1

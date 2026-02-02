@@ -808,7 +808,7 @@
         "lng": -38.493391259954635,
         "raw_event": {
           "bairro": "Messejana",
-          "conflict_severity": "LOW",
+          "conflict_severity": "MEDIUM",
           "descricao": "SOLICITANTE INFORMA QUE ESTÁ SOFRENDO AMEAÇAS DE GRUPO CRIMINOSO E PRECISA FAZER A MUDANÇA",
           "localizacao_completa": "R. ALBERTO TORRES 108, MESSEJANA",
           "municipio": "FORTALEZA",
@@ -818,7 +818,8 @@
           "sexo": "",
           "timestamp": "08:46"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       }
     ]
   }

@@ -8,6 +8,14 @@ import os
 import copy
 import re
 import json
+import hashlib
+import warnings
+
+# Suprimir warnings desnecessários
+warnings.filterwarnings('ignore', category=FutureWarning, module='google.api_core')
+warnings.filterwarnings('ignore', message='All support for the.*google.generativeai')
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+
 from shapely.geometry import shape, Point, Polygon
 from scipy.spatial.distance import cdist
 from src.model import STGCN
@@ -20,6 +28,11 @@ from datetime import datetime, timezone
 # Desscale mapping (loaded from diagnostics report if present)
 _DESSCALE_A = None
 _DESSCALE_B = None
+
+# Cache de eventos exógenos - evita reamplificação em reinicializações
+exogenous_events_hash = None
+exogenous_cache_file = None  # Será setado em load_data_and_models()
+events_amplified = False  # Flag para rastrear se eventos foram amplificados
 
 def load_desscale_mapping():
     global _DESSCALE_A, _DESSCALE_B
@@ -163,7 +176,11 @@ WINDOW_CVLI = 14
 WINDOW_CVP = 14
 
 def load_exogenous_events():
-    global exogenous_events
+    global exogenous_events, exogenous_cache_file
+    
+    # Inicializar caminho do cache
+    exogenous_cache_file = os.path.join(BASE_DIR, 'data', 'processed', 'exogenous_events_cache.json')
+    
     if os.path.exists(EXOGENOUS_FILE):
         try:
             with open(EXOGENOUS_FILE, 'r', encoding='utf-8') as f:
@@ -220,16 +237,35 @@ def find_nearby_nodes(lat, lng, radius_m=500):
     return nearby_indices
 
 def apply_exogenous_events():
+    """
+    Aplica amplificação de eventos exógenos com cache para evitar reamplificação.
+    
+    Estratégia:
+    1. Verifica se eventos foram atualizados (via hash)
+    2. Se SÃO NOVOS: aplica amplificação + marca como amplificado no cache
+    3. Se IGUAIS + já amplificados: pula reamplificação, apenas marca nodes críticos
+    
+    Isso previne o bug de oscilação (24 → 130 → 63 → 24) causado por reamplificar
+    a mesma matriz adjacência múltiplas vezes em reinicializações.
+    """
     global adj_matrix, exogenous_affected_nodes, adj_geo, adj_faction, exogenous_critical_nodes
+    global exogenous_events_hash, events_amplified
+    
     if not exogenous_events or adj_matrix is None:
         return
 
     print("Aplicando eventos exógenos na malha...")
 
+    # Verificar se é uma atualização nova ou apenas reload
+    is_new_update = check_exogenous_update()
+    print(f"[EXOGENOUS] Novos eventos? {is_new_update} | Já amplificados? {events_amplified}")
+
     exogenous_affected_nodes.clear()
     exogenous_critical_nodes.clear()
 
     count_affected = 0
+    count_amplified = 0
+    
     for batch in exogenous_events:
         points = batch.get('points', [])
 
@@ -261,17 +297,25 @@ def apply_exogenous_events():
                     txt = ' '.join(text_fields)
                     
                     # HIGH severity - sinais de execução/confronto
-                    high_keywords = ['amarrado', 'mãos amarradas', 'pés amarrados', 'tortura', 
+                    high_keywords = ['amarrado', 'mãos amarradas', 'pés amarradas', 'tortura', 
                                     'execução', 'executado', 'carbonizado', 'enterrado',
                                     'duplo homicídio', 'duplo homicidio', 'triplo', 'chacina',
                                     'emboscada', 'disputa territorial']
                     if any(k in txt for k in high_keywords):
                         return True, 'HIGH'
                     
-                    # MEDIUM severity - violência armada
+                    # MEDIUM severity - violência armada + deslocamento forçado
                     medium_keywords = ['homic', 'homicídio', 'morte', 'morto', 'tiro', 
                                       'lesão a bala', 'lesao a bala', 'disparos', 'fuzil']
+                    # Deslocamento forçado/expulsão - indica preparação para conflito ou revide
+                    displacement_keywords = ['ameaças de grupo criminoso', 'expulsão', 'expulsao',
+                                           'deslocamento forçado', 'deslocamento forcado',
+                                           'precisa fazer a mudança', 'precisa fazer mudanca',
+                                           'forçado a sair', 'forcado a sair', 'obrigado a sair']
+                    
                     if any(k in txt for k in medium_keywords):
+                        return True, 'MEDIUM'
+                    if any(k in txt for k in displacement_keywords):
                         return True, 'MEDIUM'
                     
                     return False, 'LOW'
@@ -284,34 +328,95 @@ def apply_exogenous_events():
                 exogenous_affected_nodes.add(idx)
                 critical_flag, severity = _is_critical_event(pt)
                 
-                # Amplificação baseada em severidade
-                if severity == 'HIGH':
-                    amplification_factor = 20.0  # Execuções/confrontos = peso 20x
-                elif severity == 'MEDIUM':
-                    amplification_factor = 10.0  # Violência armada = peso 10x
-                else:
-                    amplification_factor = 5.0   # Outros = peso 5x
+                # AMPLIFICAÇÃO ULTRALEVE (1.1-1.2x):
+                # Apenas amplifica se é uma ATUALIZAÇÃO NOVA de eventos
+                if is_new_update and adj_matrix is not None:
+                    # Amplificação muito leve - apenas sinaliza presença
+                    amplification_map = {'HIGH': 1.2, 'MEDIUM': 1.0, 'LOW': 0.7}
+                    amp_factor = amplification_map.get(severity, 1.05)
+                    
+                    adj_matrix[idx, :] *= amp_factor
+                    adj_matrix[:, idx] *= amp_factor
+                    count_amplified += 1
                 
-                adj_matrix[idx, :] *= amplification_factor
-                adj_matrix[:, idx] *= amplification_factor
+                # Sempre marca nodes críticos para UI (independente da amplificação)
                 if critical_flag:
                     exogenous_critical_nodes.add(idx)
 
-                try:
-                    if adj_geo is not None:
-                        adj_geo[idx, :] *= amplification_factor
-                        adj_geo[:, idx] *= amplification_factor
-                    if adj_faction is not None:
-                        adj_faction[idx, :] *= amplification_factor
-                        adj_faction[:, idx] *= amplification_factor
-                except Exception:
-                    pass
                 count_affected += 1
 
-    print(f"Malha adaptada: {count_affected} modificações aplicadas.")
+    # Atualizar flag de amplificação se foi uma atualização nova
+    if is_new_update:
+        events_amplified = True
+        print(f"[EXOGENOUS] OK - {count_affected} eventos amplificados")
+    else:
+        print(f"[EXOGENOUS] OK - {count_affected} eventos (cache: sem reamplificação)")
+
+def compute_exogenous_hash(events_list):
+    """Calcula hash dos eventos exógenos para detecção de mudanças"""
+    if not events_list:
+        return None
+    
+    # Serializar eventos em ordem determinística
+    events_str = json.dumps(events_list, sort_keys=True, default=str)
+    return hashlib.md5(events_str.encode()).hexdigest()
+
+def check_exogenous_update():
+    """Verifica se os eventos exógenos foram atualizados desde última execução"""
+    global exogenous_events_hash, exogenous_cache_file, events_amplified
+    
+    current_hash = compute_exogenous_hash(exogenous_events)
+    
+    # Tentar carregar hash anterior do cache
+    previous_hash = None
+    previous_amplified = False
+    if exogenous_cache_file and os.path.exists(exogenous_cache_file):
+        try:
+            with open(exogenous_cache_file, 'r', encoding='utf-8') as f:
+                cache_data = json.load(f)
+                previous_hash = cache_data.get('hash')
+                previous_amplified = cache_data.get('amplified', False)
+        except Exception as e:
+            print(f"[CACHE] Erro ao ler cache anterior: {e}")
+    
+    # Determinar se é uma atualização nova
+    is_new_update = (current_hash != previous_hash)
+    
+    # Se o hash é igual mas a amplificação anterior estava ativada, 
+    # considera como "novo" se precisamos reaplicar com novos parâmetros
+    # (comentar if line 362 para forçar reaplicação mesmo com hash igual)
+    if not is_new_update and previous_amplified:
+        # Hash igual e já amplificado = pular
+        events_amplified = True
+    else:
+        # Hash diferente ou primeira vez = aplicar
+        events_amplified = False  # Reset para aplicar novamente
+    
+    # Atualizar cache com novo hash
+    if exogenous_cache_file and current_hash:
+        try:
+            cache_data = {
+                'hash': current_hash,
+                'amplified': events_amplified,
+                'timestamp': datetime.now().isoformat(),
+                'event_count': len(exogenous_events)
+            }
+            os.makedirs(os.path.dirname(exogenous_cache_file), exist_ok=True)
+            with open(exogenous_cache_file, 'w', encoding='utf-8') as f:
+                json.dump(cache_data, f, indent=2)
+        except Exception as e:
+            print(f"[CACHE] Erro ao escrever cache: {e}")
+    
+    exogenous_events_hash = current_hash
+    
+    return is_new_update
+
 
 def compute_norm_adj(adj_matrix_input):
-    if adj_matrix_input is None: return None
+    """Normaliza matriz de adjacência usando random walk normalization"""
+    if adj_matrix_input is None:
+        return None
+    
     adj_tensor = torch.FloatTensor(adj_matrix_input)
     rowsum = adj_tensor.sum(1)
     d_inv_sqrt = torch.pow(rowsum, -0.5)
@@ -415,17 +520,85 @@ def load_data_and_models():
 
     data_pack = None
     if not os.path.exists(DATA_FILE):
-        print("AVISO: processed_graph_data.pkl não encontrado!")
-        return
+        print(f"AVISO: processed_graph_data.pkl não encontrado em: {DATA_FILE}")
+        print("Executando data_processing.py para gerar os dados...")
+        
+        try:
+            import subprocess
+            import sys
+            
+            # Executa o script de processamento de dados
+            result = subprocess.run(
+                [sys.executable, os.path.join(BASE_DIR, 'src', 'data_processing.py')],
+                capture_output=True,
+                text=True,
+                cwd=BASE_DIR
+            )
+            
+            if result.returncode == 0:
+                print("✓ Dados processados com sucesso!")
+                print(result.stdout)
+            else:
+                print(f"ERRO ao processar dados: {result.stderr}")
+                return
+                
+            # Verifica se o arquivo foi criado
+            if not os.path.exists(DATA_FILE):
+                print(f"ERRO: Arquivo ainda não foi criado após processamento!")
+                return
+                
+        except Exception as e:
+            print(f"ERRO ao executar data_processing.py: {e}")
+            import traceback
+            traceback.print_exc()
+            return
 
     print("Carregando dados para API...")
     try:
         if data_pack is None:
             with open(DATA_FILE, 'rb') as f:
                 data_pack = pickle.load(f)
+            print(f"[DEBUG] Data pack carregado com sucesso. Keys: {list(data_pack.keys())}")
 
         # Use temporary local variables to allow validation before assignment
         _nodes_gdf = data_pack.get('nodes_gdf')
+        
+        # Se nodes_gdf não está no pickle, carregar do JSON
+        if _nodes_gdf is None:
+            try:
+                bairros_file = os.path.join(BASE_DIR, 'data', 'raw', 'bairros_centros_latlong.json')
+                if os.path.exists(bairros_file):
+                    with open(bairros_file, 'r', encoding='utf-8') as f:
+                        bairros_data = json.load(f)
+                    
+                    records = []
+                    for name, info in bairros_data.items():
+                        if name in ["Nome", "null", "None", ""] or name is None:
+                            continue
+                        regiao = info.get('regiao', 'desconhecido').lower()
+                        node_type = 'bairro' if regiao in ['fortaleza', 'rmf'] else 'cidade'
+                        
+                        records.append({
+                            'name': name,
+                            'latitude': info['lat'],
+                            'longitude': info['long'],
+                            'regiao': regiao,
+                            'node_type': node_type
+                        })
+                    
+                    if records:
+                        df = pd.DataFrame(records)
+                        _nodes_gdf = gpd.GeoDataFrame(
+                            df,
+                            geometry=gpd.points_from_xy(df.longitude, df.latitude),
+                            crs="EPSG:4326"
+                        )
+                        print(f"[INFO] Carregados {len(_nodes_gdf)} nós do JSON (bairros_centros_latlong.json)")
+            except Exception as e:
+                print(f"[ERROR] Falha ao carregar nodes_gdf do JSON: {e}")
+        
+        print(f"[DEBUG] nodes_gdf: {len(_nodes_gdf) if _nodes_gdf is not None else 'None'} nós")
+        
         polygons_json_cache = None
         _adj_geo = data_pack.get('adj_geo')
         _adj_faction = data_pack.get('adj_faction')
@@ -433,6 +606,8 @@ def load_data_and_models():
         if _adj_matrix is None:
             _adj_matrix = _adj_geo
         _node_features = data_pack.get('node_features')
+        print(f"[DEBUG] node_features shape: {_node_features.shape if _node_features is not None else 'None'}")
+        
         _dates = data_pack.get('dates')
 
         # --- VALIDATION: Check Data Integrity (Paradigm Shift) ---
@@ -465,6 +640,11 @@ def load_data_and_models():
         adj_matrix = _adj_matrix
         node_features = _node_features
         dates = _dates
+        
+        print(f"[DEBUG] Variáveis globais atribuídas:")
+        print(f"  - nodes_gdf: {len(nodes_gdf) if nodes_gdf is not None else 'None'}")
+        print(f"  - node_features: {node_features.shape if node_features is not None else 'None'}")
+        print(f"  - adj_matrix: {adj_matrix.shape if adj_matrix is not None else 'None'}")
 
         # --- FIXED: Node Paradigm Loading ---
         if nodes_gdf is not None:
@@ -552,10 +732,15 @@ def load_data_and_models():
                 m_cvli.to(device)
                 m_cvli.eval()
                 model_cvli = m_cvli
+                print(f"[DEBUG] Modelo CVLI carregado com sucesso!")
             except Exception as e:
                 print(f"Erro ao carregar state_dict CVLI: {e}")
         else:
             print(f"AVISO: Modelo CVLI não encontrado em {MODEL_CVLI_PATH}")
+        
+        print(f"[SUCESSO] Dados e modelos carregados com sucesso!")
+        print(f"  - {num_nodes} nós carregados")
+        print(f"  - Modelo CVLI: {'OK' if model_cvli is not None else 'NÃO CARREGADO'}")
 
     except Exception as e:
         print(f"Erro ao carregar dados/modelos: {e}")
@@ -596,7 +781,12 @@ def _periodic_reload_loop(interval_minutes: int):
 def start_periodic_reload(interval_minutes: int = 30):
     if getattr(app, '_periodic_reload_started', False):
         return
-    t = threading.Thread(target=_periodic_reload_loop, args=(interval_minutes,), daemon=True)
+    # Aumentar intervalo de 30 para 60 minutos para evitar oscilações frequentes
+    # A oscilação observada (26→141→63→24) é causada por recarregamentos frequentes
+    # que alteram a topologia da rede via apply_exogenous_events()
+    adjusted_interval = max(60, int(interval_minutes))  # Mínimo 60 minutos
+    print(f"[SETUP] Recarregamento periódico ajustado para {adjusted_interval} minutos (evita oscilações)")
+    t = threading.Thread(target=_periodic_reload_loop, args=(adjusted_interval,), daemon=True)
     t.start()
     app._periodic_reload_started = True
 
@@ -773,13 +963,17 @@ def get_network_graph():
 
 @app.route('/api/simulate', methods=['POST'])
 def simulate_risk():
+    print("[SIMULAÇÃO] Função chamada!")
     if node_features is None or adj_matrix is None or nodes_gdf is None:
+        print("[SIMULAÇÃO] Erro: Dados não carregados!")
         return jsonify({'error': 'Dados não carregados.'}), 503
 
     try:
         data = request.get_json()
+        print(f"[SIMULAÇÃO] Dados recebidos: {data}")
         points = data.get('points', [])
         sim_type = data.get('type', 'suppression')
+        print(f"[SIMULAÇÃO] Points: {points}, Type: {sim_type}")
 
         adj_copy = adj_matrix.copy()
         affected_nodes = set()
@@ -794,34 +988,49 @@ def simulate_risk():
             if len(pt) == 2:
                 p_geo = Point(pt[1], pt[0])
                 nearby_indices = []
+                
+                print(f"[SIMULAÇÃO] Ponto recebido: lat={pt[0]}, lon={pt[1]} -> Point({pt[1]}, {pt[0]})")
 
                 if nodes_gdf_proj is not None:
                     try:
                         s = gpd.GeoSeries([p_geo], crs="EPSG:4326").to_crs("EPSG:3857")
                         p_proj = s.iloc[0]
+                        print(f"[SIMULAÇÃO] Ponto projetado (EPSG:3857): {p_proj}")
 
                         if nodes_centroids_proj is not None:
-                             search_buffer = p_proj.buffer(500)
-                             candidate_ilocs = list(nodes_centroids_proj.sindex.intersection(search_buffer.bounds))
-                             if candidate_ilocs:
-                                 candidates = nodes_centroids_proj.iloc[candidate_ilocs]
-                                 dists = candidates.distance(p_proj)
-                                 nearby_indices = dists[dists < 500].index.tolist()
+                             # Tentar com buffer de 5km primeiro, depois 10km se não encontrar nada
+                             for buffer_m in [5000, 10000, 50000]:
+                                 search_buffer = p_proj.buffer(buffer_m)
+                                 candidate_ilocs = list(nodes_centroids_proj.sindex.intersection(search_buffer.bounds))
+                                 print(f"[SIMULAÇÃO] Candidatos no buffer {buffer_m}m: {len(candidate_ilocs)}")
+                                 if candidate_ilocs:
+                                     candidates = nodes_centroids_proj.iloc[candidate_ilocs]
+                                     dists = candidates.distance(p_proj)
+                                     nearby_indices = dists[dists < buffer_m].index.tolist()
+                                     print(f"[SIMULAÇÃO] Nodes dentro de {buffer_m}m: {len(nearby_indices)}")
+                                     if nearby_indices:
+                                         break
                         else:
                              dists = centroids.distance(p_proj)
-                             nearby_indices = dists[dists < 500].index.tolist()
+                             nearby_indices = dists[dists < 5000].index.tolist()
+                             print(f"[SIMULAÇÃO] Nodes (fallback centroid): {len(nearby_indices)}")
                     except Exception as e:
                         print(f"Erro ao projetar ponto na simulação: {e}")
+                        import traceback
+                        traceback.print_exc()
                         dists = nodes_gdf.geometry.centroid.distance(p_geo)
                         nearby_indices = [dists.idxmin()]
+                        print(f"[SIMULAÇÃO] Fallback - Node mais próximo: {nearby_indices}")
                 else:
                     dists = centroids.distance(p_geo)
                     nearby_indices = dists[dists < 0.005].index.tolist()
                     if not nearby_indices:
                         nearby_indices = [dists.idxmin()]
+                    print(f"[SIMULAÇÃO] Nodes (sem projeção): {nearby_indices}")
 
                 for idx in nearby_indices:
                     affected_nodes.add(idx)
+                    print(f"[SIMULAÇÃO] Adicionado node {idx} aos afetados")
                     if sim_type == 'suppression':
                         suppression_factor = 0.05
                         adj_copy[idx, :] *= suppression_factor
@@ -879,8 +1088,17 @@ def simulate_risk():
 
 def calculate_risk(custom_norm_adj=None):
     global dates
-    if node_features is None or nodes_gdf is None:
-        return jsonify({'error': 'Dados não carregados.'}), 503
+    
+    # Diagnóstico detalhado dos dados
+    if node_features is None:
+        print("ERRO: node_features não foi carregado!")
+        return jsonify({'error': 'Features dos nós não carregadas. Execute python src/data_processing.py'}), 503
+    
+    if nodes_gdf is None:
+        print("ERRO: nodes_gdf não foi carregado!")
+        return jsonify({'error': 'GeoDataFrame dos nós não carregado. Verifique processed_graph_data.pkl'}), 503
+    
+    print(f"[DEBUG] calculate_risk chamado - nodes: {len(nodes_gdf)}, features shape: {node_features.shape}")
 
     current_norm_adj = custom_norm_adj if custom_norm_adj is not None else norm_adj
     def _ensure_adj_list(adj):
@@ -935,10 +1153,13 @@ def calculate_risk(custom_norm_adj=None):
                 with torch.no_grad():
                     pred = model_cvli(input_tensor, adj_for_model)
                 out_cvli = pred.squeeze(0).cpu().numpy() # (N, 1)
+                
+                print(f"[DEBUG] Predição do modelo - Min: {out_cvli.min():.4f}, Max: {out_cvli.max():.4f}, Mean: {out_cvli.mean():.4f}")
 
                 try:
                     if _DESSCALE_A is not None:
                         out_cvli = (_DESSCALE_A * out_cvli) + _DESSCALE_B
+                        print(f"[DEBUG] Após desscale - Min: {out_cvli.min():.4f}, Max: {out_cvli.max():.4f}")
                 except Exception:
                     pass
 

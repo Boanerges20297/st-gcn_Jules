@@ -10,6 +10,11 @@ import pickle
 import numpy as np
 from numpy.lib.stride_tricks import sliding_window_view
 import os
+import sys
+
+# Add parent directory to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from src.model import STGCN
 from torch.utils.data import DataLoader, Dataset, TensorDataset
 
@@ -17,10 +22,11 @@ DATA_FILE = 'data/processed/processed_graph_data.pkl'
 MODEL_DIR = 'models'
 MODEL_PATH = os.path.join(MODEL_DIR, 'stgcn_model.pth')
 HISTORY_WINDOW = 7
-BATCH_SIZE = 32
-EPOCHS = 10
-LEARNING_RATE = 0.001
+BATCH_SIZE = 64
+EPOCHS = 50
+LEARNING_RATE = 0.0001
 GAMMA = 2.0
+WEIGHT_DECAY = 1e-5
 
 def get_logger():
     logger = logging.getLogger('train')
@@ -55,18 +61,14 @@ class BalancedWindowDataset(Dataset):
         return self.num_samples
 
     def __getitem__(self, idx):
-        if torch.rand(1).item() < 0.5 and len(self.positive_indices) > 0:
-            rand_pos_idx = self.positive_indices[torch.randint(0, len(self.positive_indices), (1,)).item()]
-            return self.X[rand_pos_idx], self.Y[rand_pos_idx]
-        else:
-            rand_idx = self.all_indices[torch.randint(0, self.num_samples, (1,)).item()]
-            return self.X[rand_idx], self.Y[rand_idx]
+        return self.X[idx], self.Y[idx]
 
 class WeightedFocalMSELoss(nn.Module):
-    def __init__(self, weight_zero=1.0, weight_hotspot=500.0, gamma=2.0):
+    """Loss com foco em hotspots COM amplificação."""
+    def __init__(self, weight_zero=1.0, weight_hotspot=50.0, gamma=2.0):
         super(WeightedFocalMSELoss, self).__init__()
         self.weight_zero = weight_zero
-        self.weight_hotspot = weight_hotspot
+        self.weight_hotspot = weight_hotspot  # Amplificação: 50.0
         self.gamma = gamma
 
     def forward(self, pred, target):
@@ -97,19 +99,31 @@ def prepare_dataset(node_features):
     return X, Y
 
 def precision_at_k(pred, target, k=5):
+    """Precision@K: entre os top-k nós com MAIS eventos reais,
+    quantos o modelo predisse corretamente?
+    """
     batch_size = pred.shape[0]
     p_k_sum = 0.0
 
     for i in range(batch_size):
-        p = pred[i, :, 0]
-        t = target[i, :, 0]
+        p = pred[i, :, 0].detach().cpu().numpy()
+        t = target[i, :, 0].detach().cpu().numpy()
 
-        _, top_k_indices = torch.topk(p, k)
+        # Top-K com MAIS eventos reais
+        if t.max() == 0:
+            # Se não há eventos reais neste dia, skip
+            continue
+            
+        _, true_top_k_indices = torch.topk(torch.FloatTensor(t), min(k, len(t)))
+        true_top_k_indices = true_top_k_indices.numpy()
+        
+        # Quantas vezes o modelo predisse alta também para esses nós?
+        pred_top_k = torch.topk(torch.FloatTensor(p), min(k, len(p)))[1].numpy()
+        
+        hits = len(set(true_top_k_indices) & set(pred_top_k))
+        p_k_sum += (hits / min(k, (t > 0).sum()))
 
-        hits = (t[top_k_indices] > 0).float().sum()
-        p_k_sum += (hits / k).item()
-
-    return p_k_sum / batch_size
+    return p_k_sum / max(1, batch_size)
 
 def main():
     logger = get_logger()
@@ -165,11 +179,14 @@ def main():
     model = STGCN(num_nodes=num_nodes, in_channels=num_features, time_steps=HISTORY_WINDOW, num_classes=1, num_graphs=len(norm_adj_list)).to(device)
     norm_adj_list = [a.to(device) for a in norm_adj_list]
     
-    criterion = WeightedFocalMSELoss(weight_zero=1.0, weight_hotspot=500.0, gamma=GAMMA).to(device)
-    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    criterion = WeightedFocalMSELoss(weight_zero=1.0, weight_hotspot=50.0, gamma=GAMMA).to(device)
+    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=5)
     
     logger.info("Iniciando treinamento...")
     best_p5 = 0.0
+    patience = 15  # Early stopping: 15 epochs sem melhora
+    patience_counter = 0
 
     for epoch in range(EPOCHS):
         epoch_start = time.time()
@@ -206,12 +223,19 @@ def main():
         epoch_time = time.time() - epoch_start
         logger.info(f"Epoch {epoch+1}/{EPOCHS} | Time: {epoch_time:.1f}s | Train Loss: {train_avg_loss:.4f} | Val Loss: {val_avg_loss:.4f} | Val P@5: {val_avg_p5:.4f}")
 
+        # Early stopping
         if val_avg_p5 > best_p5:
             best_p5 = val_avg_p5
+            patience_counter = 0
             torch.save(model.state_dict(), MODEL_PATH)
             logger.info(f"  -> Novo melhor modelo salvo! (P@5: {best_p5:.4f})")
-        elif epoch == 0:
-             torch.save(model.state_dict(), MODEL_PATH)
+        else:
+            patience_counter += 1
+            if patience_counter >= patience:
+                logger.info(f"  -> Early stopping! ({patience_counter} epochs sem melhora)")
+                break
+        
+        scheduler.step(val_avg_p5)
 
 if __name__ == "__main__":
     main()

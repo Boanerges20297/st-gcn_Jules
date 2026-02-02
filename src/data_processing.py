@@ -12,7 +12,7 @@ import unicodedata
 DATA_DIR = 'data/raw'
 INTELIGENCIA_DIR = os.path.join(DATA_DIR, 'inteligencia')
 BAIRROS_FILE = os.path.join(DATA_DIR, 'bairros_centros_latlong.json')
-OCORRENCIAS_FILE = os.path.join(DATA_DIR, 'dados_status_ocorrencias_gerais.json')
+OCORRENCIAS_FILE = os.path.join(DATA_DIR, 'dados_merged_2024_2025.json')  # Dados 2024/2025 filtrados (qualidade consistente)
 OUTPUT_FILE = 'data/processed/processed_graph_data.pkl'
 
 # Thresholds
@@ -358,14 +358,19 @@ def load_and_assign_occurrences(filepath, nodes_gdf):
     print(f"Total de ocorrências atribuídas: {len(df)}")
     return df
 
-def build_feature_tensor(nodes_gdf, occurrences_df, start_date, end_date):
+def build_feature_tensor(nodes_gdf, occurrences_df, start_date, end_date, exogenous_events=None):
     """
     Constrói o tensor (Nodes, Time, 3).
+    
+    Channels:
+    0: CVLI (homicídios)
+    1: CVP (crimes contra patrimônio)
+    2: Tension (índice de tensão)
     """
     date_range = pd.date_range(start=start_date, end=end_date, freq='D')
     num_nodes = len(nodes_gdf)
     num_timesteps = len(date_range)
-    num_features = 3
+    num_features = 3  # 3 canais principais
 
     features = np.zeros((num_nodes, num_timesteps, num_features), dtype=np.float32)
 
@@ -382,21 +387,29 @@ def build_feature_tensor(nodes_gdf, occurrences_df, start_date, end_date):
     valid_mask = (occurrences_df['day_idx'] >= 0) & (occurrences_df['day_idx'] < num_timesteps)
     df_valid = occurrences_df[valid_mask]
 
-    print("Agregando Channels...")
+    print("Agregando Channels (3 canais: CVLI, CVP, Tension)...")
 
-    # Optimizado: Groupby count
+    # Channel 0: CVLI
     cvli_counts = df_valid[is_cvli[valid_mask]].groupby(['node_id', 'day_idx']).size()
-    # Usar add.at para preenchimento rápido se indices fossem numpy, mas aqui é sparse map. Loop ok.
     for (node, day), count in cvli_counts.items():
         features[node, day, 0] = count
 
+    # Channel 1: CVP
     cvp_counts = df_valid[is_cvp[valid_mask]].groupby(['node_id', 'day_idx']).size()
     for (node, day), count in cvp_counts.items():
         features[node, day, 1] = count
 
-    # Channel 2: Tension
+    # Channel 2: Tension (estático por nó)
     tension_values = nodes_gdf['tension_index'].values
     features[:, :, 2] = np.tile(tension_values[:, np.newaxis], (1, num_timesteps))
+
+    # Normalizar todos os 3 canais para [0, 1]
+    print("Normalizando 3 canais para [0, 1]...")
+    for c in range(3):
+        channel_max = features[:, :, c].max()
+        if channel_max > 0:
+            features[:, :, c] = features[:, :, c] / channel_max
+            print(f"  Canal {c}: normalizado (max original: {channel_max:.4f})")
 
     return features, date_range
 
@@ -457,31 +470,42 @@ def main():
     # 4. Carregar Ocorrências
     occurrences_df = load_and_assign_occurrences(OCORRENCIAS_FILE, nodes_gdf)
 
-    # 5. Feature Tensor
+    # 4.5. Carregar Eventos Exógenos (para 4º channel)
+    exogenous_events = []
+    exogenous_file = os.path.join('data', 'exogenous_events.json')
+    if os.path.exists(exogenous_file):
+        try:
+            with open(exogenous_file, 'r', encoding='utf-8') as f:
+                exogenous_events = json.load(f)
+            print(f"Carregados {len(exogenous_events)} lotes de eventos exógenos")
+        except Exception as e:
+            print(f"Erro ao carregar eventos exógenos: {e}")
+            exogenous_events = []
+
+    # 5. Feature Tensor (agora com 4 channels: CVLI, CVP, Tension, Exogenous)
     min_date = occurrences_df['data'].min()
     max_date = occurrences_df['data'].max()
     print(f"Intervalo: {min_date.date()} a {max_date.date()}")
 
-    node_features, dates = build_feature_tensor(nodes_gdf, occurrences_df, min_date, max_date)
+    node_features, dates = build_feature_tensor(nodes_gdf, occurrences_df, min_date, max_date, exogenous_events)
 
     # 6. Grafos
     adj_geo, adj_conflict = create_adjacency_matrices(nodes_gdf, nodes_proj)
 
-    # 7. Salvar
+    # 7. Salvar (sem GeoDataFrame para evitar problema de import)
     data_pack = {
         'node_features': node_features,
         'adj_geo': adj_geo,
         'adj_conflict': adj_conflict,
-        'nodes_gdf': nodes_gdf,
         'dates': dates,
-        'feature_names': ['CVLI', 'CVP_MOVIMENTO', 'TENSION_INDEX']
+        'feature_names': ['CVLI', 'CVP', 'TENSION_INDEX']
     }
     
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     with open(OUTPUT_FILE, 'wb') as f:
         pickle.dump(data_pack, f)
         
-    print(f"✓ Sucesso! Dados salvos em {OUTPUT_FILE}")
+    print(f"[OK] Sucesso! Dados salvos em {OUTPUT_FILE}")
     print(f"  - Shape: {node_features.shape}")
 
 if __name__ == "__main__":
