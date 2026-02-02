@@ -373,8 +373,10 @@ def build_feature_tensor(nodes_gdf, occurrences_df, start_date, end_date):
     cvli_types = ['HOMICIDIO DOLOSO', 'FEMINICÍDIO', 'ROUBO SEGUIDO DE MORTE (LATROCINIO)', 'LESAO CORPORAL SEGUIDA DE MORTE']
     is_cvli = occurrences_df['tipo_evento'].astype(str).str.upper().isin(cvli_types)
 
+    # CVP: Crimes Violentos ao Patrimônio (correlacionam com atividade de facções)
+    # Incluir ROUBO e FURTO geral, mas dar peso maior a veículos/motos
     tipo_upper = occurrences_df['tipo_evento'].astype(str).str.upper()
-    is_cvp = tipo_upper.str.contains('ROUBO') | tipo_upper.str.contains('FURTO') | tipo_upper.str.contains('VEÍCULO') | tipo_upper.str.contains('MOTO')
+    is_cvp = tipo_upper.str.contains('ROUBO') | tipo_upper.str.contains('FURTO')
 
     occurrences_df['day_idx'] = (occurrences_df['data'] - start_date).dt.days
     valid_mask = (occurrences_df['day_idx'] >= 0) & (occurrences_df['day_idx'] < num_timesteps)

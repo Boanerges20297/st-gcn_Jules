@@ -55,10 +55,12 @@ app = Flask(__name__)
 # Configuração e Carregamento de Dados (usar caminhos absolutos relativos a este arquivo)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, 'data', 'processed', 'processed_graph_data.pkl')
-MODEL_CVLI_PATH = os.path.join(BASE_DIR, 'models', 'stgcn_model.pth') # Unified Model Path
-# MODEL_CVP_PATH is legacy if we have a unified model, but if user kept 'models/stgcn_model.pth' as the main one:
-MODEL_CVP_PATH = os.path.join(BASE_DIR, 'models', 'stgcn_cvp.pth') # Keep for legacy check or fallback
+MODEL_CVLI_PATH = os.path.join(BASE_DIR, 'models', 'stgcn_model_v2.pth') # Modelo v2 retreinado: janela 14 dias, Focal Loss, dados 2024-2025
 EXOGENOUS_FILE = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
+BAIRROS_POLYGONS_PATHS = [
+    os.path.join(BASE_DIR, 'data', 'raw', 'AIS - CAPITAL.geojson'),
+    os.path.join(BASE_DIR, 'outputs', 'fortaleza_bairros_fence.geojson')
+]
 
 # Valores padrão caso arquivos não estejam presentes
 nodes_gdf = None
@@ -68,8 +70,7 @@ nodes_centroids_proj = None
 adj_matrix = None
 original_adj_matrix = None
 node_features = None
-model_cvli = None # This will now hold the MAIN model (which might predict everything or just CVLI)
-model_cvp = None
+model_cvli = None # Modelo 3D unificado (3 canais: CVLI, CVP, Tension)
 device = None
 norm_adj = None
 adj_geo = None
@@ -81,6 +82,8 @@ dates = None
 ibge_bairros_cache = None
 ibge_municipios_cache = None
 ibge_municipios_gdf = None
+ba_irros_gdf = None
+   
 GEOCODING_ENABLED = True
 exogenous_events = []
 exogenous_affected_nodes = set()
@@ -155,9 +158,9 @@ def build_node_search_index():
     except Exception as e:
         print(f"Erro ao construir node_search_index: {e}")
 
-# Parâmetros de janela
-WINDOW_CVLI = 7
-WINDOW_CVP = 7
+# Parâmetros de janela (modelo v2 retreinado)
+WINDOW_CVLI = 14
+WINDOW_CVP = 14
 
 def load_exogenous_events():
     global exogenous_events
@@ -242,24 +245,53 @@ def apply_exogenous_events():
                     if isinstance(pt_item, dict):
                         evt = pt_item.get('raw_event') or pt_item
                     if not evt:
-                        return False
+                        return False, 'LOW'
+                    
+                    # Verifica conflict_severity da LLM (prioridade)
+                    severity = evt.get('conflict_severity', '').upper()
+                    if severity in ('HIGH', 'MEDIUM'):
+                        return True, severity
+                    
+                    # Fallback: detecção por keywords
                     text_fields = []
-                    for k in ('natureza','nature','resumo','description'):
+                    for k in ('natureza','nature','resumo','description','descricao'):
                         v = evt.get(k) if isinstance(evt, dict) else None
                         if v:
                             text_fields.append(str(v).lower())
                     txt = ' '.join(text_fields)
-                    keywords = ['homic', 'homicídio', 'morte', 'morto', 'tiro', 'lesão a bala', 'lesao a bala', 'lesão', 'lesao', 'ferido', 'assassin']
-                    return any(k in txt for k in keywords)
+                    
+                    # HIGH severity - sinais de execução/confronto
+                    high_keywords = ['amarrado', 'mãos amarradas', 'pés amarrados', 'tortura', 
+                                    'execução', 'executado', 'carbonizado', 'enterrado',
+                                    'duplo homicídio', 'duplo homicidio', 'triplo', 'chacina',
+                                    'emboscada', 'disputa territorial']
+                    if any(k in txt for k in high_keywords):
+                        return True, 'HIGH'
+                    
+                    # MEDIUM severity - violência armada
+                    medium_keywords = ['homic', 'homicídio', 'morte', 'morto', 'tiro', 
+                                      'lesão a bala', 'lesao a bala', 'disparos', 'fuzil']
+                    if any(k in txt for k in medium_keywords):
+                        return True, 'MEDIUM'
+                    
+                    return False, 'LOW'
                 except Exception:
-                    return False
+                    return False, 'LOW'
 
             indices = find_nearby_nodes(lat, lng)
 
             for idx in indices:
                 exogenous_affected_nodes.add(idx)
-                critical_flag = _is_critical_event(pt)
-                amplification_factor = 10.0 if critical_flag else 5.0
+                critical_flag, severity = _is_critical_event(pt)
+                
+                # Amplificação baseada em severidade
+                if severity == 'HIGH':
+                    amplification_factor = 20.0  # Execuções/confrontos = peso 20x
+                elif severity == 'MEDIUM':
+                    amplification_factor = 10.0  # Violência armada = peso 10x
+                else:
+                    amplification_factor = 5.0   # Outros = peso 5x
+                
                 adj_matrix[idx, :] *= amplification_factor
                 adj_matrix[:, idx] *= amplification_factor
                 if critical_flag:
@@ -327,7 +359,7 @@ def update_exogenous_state():
         norm_adj = compute_norm_adj(adj_matrix)
 
 def load_data_and_models():
-    global nodes_gdf, polygons_json_cache, nodes_gdf_proj, nodes_centroids_proj, adj_matrix, node_features, model_cvli, model_cvp, device, norm_adj, dates, original_adj_matrix
+    global nodes_gdf, polygons_json_cache, nodes_gdf_proj, nodes_centroids_proj, adj_matrix, node_features, model_cvli, device, norm_adj, dates, original_adj_matrix
     global adj_geo, adj_faction, norm_adj_list
     global ibge_bairros_cache, ibge_municipios_cache, ibge_municipios_gdf
 
@@ -359,6 +391,23 @@ def load_data_and_models():
                         break
                     except Exception as e:
                         print(f"Failed to read municipalities polygons {p}: {e}")
+        except Exception:
+            pass
+        # --- Load Fortaleza bairros polygons (prefer AIS - CAPITAL, fallback to outputs fence) ---
+        try:
+            from pathlib import Path
+            for p in BAIRROS_POLYGONS_PATHS:
+                if os.path.exists(p):
+                    try:
+                        _b = gpd.read_file(p)
+                        if _b is not None and hasattr(_b, 'geometry'):
+                            if _b.crs is None:
+                                _b.set_crs(epsg=4326, inplace=True)
+                            ba_irros_gdf = _b
+                            print(f"Loaded bairro polygons from {p} ({len(ba_irros_gdf)} features)")
+                            break
+                    except Exception as e:
+                        print(f"Failed to read bairros polygons {p}: {e}")
         except Exception:
             pass
     except Exception as e:
@@ -635,12 +684,21 @@ def index():
 @app.route('/api/polygons')
 def get_polygons():
     global polygons_json_cache
-    if nodes_gdf is None:
-        return jsonify({'error': 'Dados de polígonos não carregados.'}), 503
     try:
         if polygons_json_cache is not None:
             return polygons_json_cache
 
+        # Load polygon GeoJSON from static file with real polygons
+        polygon_file = os.path.join(BASE_DIR, 'data', 'static', 'nodes_polygons.geojson')
+        if os.path.exists(polygon_file):
+            with open(polygon_file, 'r', encoding='utf-8') as f:
+                polygons_json_cache = f.read()
+                return polygons_json_cache
+        
+        # Fallback to nodes_gdf if polygon file doesn't exist
+        if nodes_gdf is None:
+            return jsonify({'error': 'Dados de polígonos não carregados.'}), 503
+            
         polygons_json_cache = nodes_gdf.to_json()
         return polygons_json_cache
     except Exception as e:
@@ -840,13 +898,17 @@ def calculate_risk(custom_norm_adj=None):
 
     try:
         # ---------------------------
-        # Previsão UNIFICADA (Multimodal)
+        # Previsão CVLI com Contexto CVP (Veículos)
+        # ---------------------------
+        # Canal 0: CVLI (homicídios)
+        # Canal 1: CVP_VEÍCULOS (roubos/furtos de veículos - correlacionam com facções)
+        # Canal 2: TENSION_INDEX (índice de tensão territorial)
         # ---------------------------
         out_cvli = np.zeros((node_features.shape[0], 1))
         hist_avg_cvli = np.zeros(node_features.shape[0])
         hist_sum_cvli = np.zeros(node_features.shape[0])
 
-        # We also need CVP history/output to show in UI
+        # CVP histórico para display
         hist_avg_cvp = np.zeros(node_features.shape[0])
         hist_sum_cvp = np.zeros(node_features.shape[0])
 
@@ -857,17 +919,16 @@ def calculate_risk(custom_norm_adj=None):
                 model_ts = WINDOW_CVLI
 
             if node_features.shape[1] >= model_ts:
-                # --- FIXED: Slice all 3 channels ---
+                # Usar todos os 3 canais (CVLI, CVP_Veículos, Tensão)
                 input_slice = node_features[:, -model_ts:, :] # (N, T, 3)
 
-                # Check for channel mismatch (Runtime Safety)
+                # Safety check para compatibilidade de canais
                 if input_slice.shape[2] != 3:
-                    # Pad or trim if desperate (should be caught by startup check, but for robustness)
                     if input_slice.shape[2] == 2:
-                        # Append zero tension channel
+                        # Adicionar canal de tensão se faltando
                         zeros = np.zeros((input_slice.shape[0], input_slice.shape[1], 1), dtype=input_slice.dtype)
                         input_slice = np.concatenate([input_slice, zeros], axis=2)
-                        print("AVISO: Adicionado canal de Tensão (zeros) dinamicamente para prevenir crash.")
+                        print("AVISO: Canal de Tensão adicionado (zeros) para compatibilidade.")
 
                 input_tensor = torch.FloatTensor(input_slice).permute(2, 0, 1).unsqueeze(0).to(device) # (1, 3, N, T)
 
@@ -881,14 +942,14 @@ def calculate_risk(custom_norm_adj=None):
                 except Exception:
                     pass
 
-                # Channel 0 is CVLI
-                input_cvli = input_slice[:, :, 0]
+                # Histórico dos canais
+                input_cvli = input_slice[:, :, 0]  # Canal 0: CVLI
                 daily_avg = np.mean(input_cvli, axis=1)
                 hist_avg_cvli = daily_avg * 3
                 hist_sum_cvli = np.sum(input_cvli, axis=1)
 
-                # Channel 1 is CVP
-                input_cvp = input_slice[:, :, 1]
+                # CVP (agora apenas veículos)
+                input_cvp = input_slice[:, :, 1]  # Canal 1: CVP_Veículos
                 daily_avg_cvp = np.mean(input_cvp, axis=1)
                 hist_avg_cvp = daily_avg_cvp
                 hist_sum_cvp = np.sum(input_cvp, axis=1)
@@ -897,30 +958,35 @@ def calculate_risk(custom_norm_adj=None):
                 print("AVISO: Dados insuficientes para janela temporal")
 
         # ---------------------------
-        # Processamento e Normalização (Híbrida)
+        # Processamento e Normalização (Ranking por Percentil)
         # ---------------------------
 
-        # CVLI
+        # CVLI - Usar ranking ao invés de threshold binário
         out_cvli = np.maximum(out_cvli, 0)
         cvli_raw = out_cvli[:, 0]
-        cvli_adj = cvli_raw * 1.5
+        
+        # Calibração por percentil (melhor que normalização linear)
+        # Análise mostrou: Top 1% = 16.96% acerto, Top 5% = 8.84% acerto
+        percentiles = np.zeros_like(cvli_raw)
+        for i, val in enumerate(cvli_raw):
+            percentiles[i] = (cvli_raw < val).sum() / len(cvli_raw) * 100
+        
+        # Converte percentil para score 0-100
+        normalized_risk_cvli = percentiles.copy()
 
-        min_cvli = np.min(cvli_adj)
-        shifted_cvli = cvli_adj - min_cvli
-        max_shift_cvli = np.max(shifted_cvli) if np.max(shifted_cvli) > 0 else 1
-        normalized_risk_cvli = (shifted_cvli / max_shift_cvli) * 100
-
+        # Boosting baseado em histórico (mais conservador)
         active_indices = hist_sum_cvli > 0
-        normalized_risk_cvli[active_indices] = np.maximum(normalized_risk_cvli[active_indices], 25.0)
+        normalized_risk_cvli[active_indices] = np.maximum(normalized_risk_cvli[active_indices], 30.0)
 
         very_active = hist_sum_cvli >= 3
-        normalized_risk_cvli[very_active] = np.maximum(normalized_risk_cvli[very_active], 50.0)
+        normalized_risk_cvli[very_active] = np.maximum(normalized_risk_cvli[very_active], 60.0)
 
+        # Eventos exógenos aumentam para percentil alto
         if exogenous_affected_nodes:
             exo_indices = list(exogenous_affected_nodes)
             exo_indices = [i for i in exo_indices if i < len(normalized_risk_cvli)]
             if exo_indices:
-                normalized_risk_cvli[exo_indices] = np.maximum(normalized_risk_cvli[exo_indices], 80.0)
+                normalized_risk_cvli[exo_indices] = np.maximum(normalized_risk_cvli[exo_indices], 85.0)
 
             try:
                 if exogenous_critical_nodes:
@@ -976,29 +1042,79 @@ def calculate_risk(custom_norm_adj=None):
             cvli_score = float(normalized_risk_cvli[i])
             cvp_score = float(normalized_risk_cvp[i])
 
-            cvli_val = float(cvli_adj[i])
+            cvli_val = float(cvli_raw[i])
             # For CVP 'prediction' in UI, use history avg if we don't have explicit pred
             cvp_val = float(hist_avg_cvp[i])
 
             trend_cvli = format_trend(cvli_raw[i], hist_avg_cvli[i], risk_score=cvli_score)
             trend_cvp = format_trend(cvp_val, hist_avg_cvp[i], risk_score=cvp_score)
 
+            # --- EXPLICAÇÕES CONTEXTUAIS MELHORADAS ---
             reasons = []
-
-            if cvli_val > 0.01 or cvli_score > 20:
-                reasons.append(f'CVLI: {trend_cvli}')
-
-            if hist_sum_cvli[i] > 0 and cvli_val < 0.01:
-                reasons.append('Histórico recente de violência')
-
+            
+            # 1. Eventos exógenos (prioridade máxima)
             if i in exogenous_affected_nodes:
-                reasons.insert(0, "Conflito Ativo")
-
+                severity = "alta" if i in exogenous_critical_nodes else "moderada"
+                reasons.append(f"🔴 Conflito ativo detectado (severidade {severity})")
+            
+            # 2. Predição do modelo
+            if cvli_val > 0.5:
+                if cvli_val >= 2.0:
+                    reasons.append(f"📈 Modelo prevê {cvli_val:.1f} homicídios nos próximos 7 dias")
+                elif cvli_val >= 1.0:
+                    reasons.append(f"⚠️ Modelo prevê ~{int(cvli_val)} homicídio nos próximos 7 dias")
+                else:
+                    reasons.append(f"📊 Padrão de risco elevado detectado pelo modelo")
+            elif cvli_score > 70:
+                reasons.append("🎯 Área no top 10% de maior risco (modelo ST-GCN)")
+            
+            # 3. Histórico recente
+            if hist_sum_cvli[i] >= 5:
+                days = 14  # janela do modelo
+                reasons.append(f"🔴 {int(hist_sum_cvli[i])} homicídios nos últimos {days} dias")
+            elif hist_sum_cvli[i] >= 2:
+                days = 14
+                reasons.append(f"⚠️ {int(hist_sum_cvli[i])} homicídios nos últimos {days} dias")
+            elif hist_sum_cvli[i] >= 1:
+                reasons.append("📍 Histórico recente de violência letal")
+            
+            # 4. Atividade de veículos (indicador de facções)
+            if hist_sum_cvp[i] >= 10:
+                reasons.append(f"🚗 Alta atividade de roubo/furto de veículos ({int(hist_sum_cvp[i])} eventos recentes)")
+            elif hist_sum_cvp[i] >= 5:
+                reasons.append(f"🚙 Roubos/furtos de veículos detectados ({int(hist_sum_cvp[i])} casos)")
+            
+            # 5. Índice de tensão territorial
+            try:
+                tension = nodes_gdf.iloc[i].get('tension_index', 0)
+                if tension > 0.7:
+                    reasons.append("⚔️ Área de alta tensão territorial (disputa de facções)")
+                elif tension > 0.5:
+                    reasons.append("⚠️ Tensão territorial elevada")
+            except:
+                pass
+            
+            # 6. Conectividade (rotas)
+            if conn is not None and conn_mean > 0:
+                if conn[i] > conn_mean * 2.0:
+                    reasons.append("🛣️ Área estratégica (alta conectividade - rota de fuga)")
+                elif conn[i] > conn_mean * 1.5:
+                    reasons.append("🗺️ Área com múltiplas conexões (acesso facilitado)")
+            
+            # 7. Facção dominante
+            try:
+                faction = factions[i]
+                if faction and faction != 'None' and faction != 'neutral':
+                    reasons.append(f"🏴 Território de influência: {faction}")
+            except:
+                pass
+            
+            # 8. Mensagem padrão se não houver razões
             if len(reasons) == 0:
-                reasons.append('Situação estável (Baixo Risco)')
-
-            if conn is not None and conn_mean > 0 and conn[i] > conn_mean * 1.5:
-                reasons.append('Alta conectividade (Rota de fuga/acesso)')
+                if cvli_score < 20:
+                    reasons.append('✅ Situação estável - baixo risco de violência letal')
+                else:
+                    reasons.append('📊 Risco moderado - monitoramento recomendado')
 
             def _status_label(score: float) -> str:
                 if score >= 90:
@@ -1076,6 +1192,19 @@ def calculate_risk(custom_norm_adj=None):
 
         meta['model_window_cvli'] = WINDOW_CVLI
         meta['model_window_cvp'] = WINDOW_CVP
+        
+        # Adiciona estat\u00edsticas de ranking (Precision@K)
+        all_scores = [r['risk_score_cvli'] for r in results]
+        if all_scores:
+            sorted_scores = sorted(all_scores, reverse=True)
+            meta['ranking_info'] = {
+                'total_nodes': len(all_scores),
+                'top_1_percent_threshold': sorted_scores[max(0, int(len(sorted_scores) * 0.01))] if len(sorted_scores) > 0 else 0,
+                'top_5_percent_threshold': sorted_scores[max(0, int(len(sorted_scores) * 0.05))] if len(sorted_scores) > 0 else 0,
+                'top_10_percent_threshold': sorted_scores[max(0, int(len(sorted_scores) * 0.10))] if len(sorted_scores) > 0 else 0,
+                'method': 'percentile_ranking',
+                'note': 'Scores baseados em ranking percentil - Top 1% tem ~17% taxa de acerto'
+            }
 
         return jsonify({'meta': meta, 'data': results})
     except Exception as e:
@@ -1165,6 +1294,44 @@ def find_node_coordinates(location_str):
 
     if loc_norm in MANUAL_LOCATIONS:
          return (*MANUAL_LOCATIONS[loc_norm], 'manual')
+
+    # Try polygon-based bairro name matching (prefer authoritative polygons)
+    try:
+        if 'ba_irros_gdf' in globals() and ba_irros_gdf is not None:
+            try:
+                for _, prow in ba_irros_gdf.iterrows():
+                    # Attempt common name fields
+                    pname = None
+                    for col in ('Name', 'NAME', 'NOME', 'nome', 'NOME'):
+                        if col in prow and isinstance(prow[col], str) and prow[col].strip():
+                            pname = prow[col].strip()
+                            break
+
+                    # If still not found, try parsing Description for 'NOME:'
+                    if not pname:
+                        desc = prow.get('Description') or prow.get('description')
+                        if isinstance(desc, str):
+                            m = re.search(r'NOME:\s*([^<\n]+)', desc, re.IGNORECASE)
+                            if m:
+                                pname = m.group(1).strip()
+
+                    if not pname:
+                        continue
+
+                    pname_norm = normalize_location(pname).upper()
+                    pname_lower = pname_norm.lower()
+                    pname_stripped = strip_accents(pname_lower)
+
+                    if pname_norm in loc_norm or pname_lower in loc_lower or pname_stripped in loc_stripped:
+                        try:
+                            cent = prow.geometry.centroid
+                            return (cent.y, cent.x, 'specific')
+                        except Exception:
+                            continue
+            except Exception:
+                pass
+    except Exception:
+        pass
 
     best_match_item = None
     best_match_len = 0

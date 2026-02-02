@@ -56,6 +56,10 @@
             100% { transform: rotate(360deg); }
         }
         .d-none { display: none !important; }
+        
+        /* Polygon interaction styles */
+        .leaflet-interactive { cursor: pointer; }
+        .leaflet-container { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     </style>
 </head>
 <body>
@@ -74,7 +78,7 @@
     <div class="row mb-4">
         <div class="col-12 text-center">
             <h1 class="display-6 fw-bold text-primary"><i class="fas fa-shield-alt"></i> Dashboard de Inteligência Preditiva</h1>
-            <p class="lead text-muted">Análise de Risco em Áreas Monitoradas (CVLI & CVP)</p>
+            <p class="lead text-muted">Análise de Risco em Áreas Monitoradas (CVLI)</p>
         </div>
     </div>
     <div class="row mb-4 justify-content-center">
@@ -124,14 +128,14 @@
                     <strong>Motivos de Risco</strong>
                 </div>
                 <div class="card-body">
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" id="mode-switch" checked>
-                        <label class="form-check-label" for="mode-switch" id="mode-label">Modo de Visualização: <strong>CVLI</strong></label>
-                    </div>
                     <div id="window-info" class="mb-2">
                         <small class="text-muted d-block">Janela Histórica: —</small>
                         <small class="text-primary fw-bold" id="horizon-info">Horizonte: —</small>
                         <small class="text-secondary d-block" id="model-window-info">Modelo: —</small>
+                        <div class="alert alert-info alert-sm mt-2 mb-2 p-2" id="ranking-info" style="display:none;">
+                            <small><strong>Sistema de Ranking:</strong></small><br>
+                            <small id="ranking-details" class="text-muted"></small>
+                        </div>
                     </div>
 
                     <div class="d-grid gap-2 mb-2">
@@ -165,8 +169,8 @@
                         <div class="mb-2">
                             <label for="region-filter" class="form-label small fw-bold text-muted">Filtrar Região:</label>
                             <select class="form-select form-select-sm" id="region-filter">
+                                <option value="capital" selected>Capital (Fortaleza)</option>
                                 <option value="all">Todas as Regiões</option>
-                                <option value="capital">Capital (Fortaleza)</option>
                                 <option value="rmf">Região Metropolitana (RMF)</option>
                                 <option value="interior">Interior do Estado</option>
                             </select>
@@ -246,7 +250,7 @@
             opacity: 1,
             color: 'white',
             dashArray: '3',
-            fillOpacity: 0.7
+            fillOpacity: 0.35
         };
     }
 
@@ -301,7 +305,6 @@
     }
 
     var geojsonLayer = null;
-    var markerLayer = null;
     var riskDataGlobal = null;
     var metaDataGlobal = null;
 
@@ -325,6 +328,24 @@
         iconAnchor: [15, 15]
     });
 
+    function coloredPinIcon(score, size) {
+        size = size || 12;
+        var color = getColor(score);
+        var height = Math.round(size * 1.4);
+        var svg = '' +
+            '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + height + '" viewBox="0 0 24 34">' +
+            '<path d="M12 0C7 0 3.5 3.6 3.5 8c0 5.9 8.5 14 8.5 14s8.5-8.1 8.5-14C20.5 3.6 17 0 12 0z" fill="' + color + '" stroke="white" stroke-width="1.8"/>' +
+            '<circle cx="12" cy="8" r="3" fill="rgba(255,255,255,0.4)" />' +
+            '</svg>';
+
+        return L.divIcon({
+            html: svg,
+            className: 'colored-pin-icon',
+            iconSize: [size, height],
+            iconAnchor: [Math.round(size/2), height]
+        });
+    }
+
     function showLoading(msg, sub) {
         $('#loading-message').text(msg || 'Processando Inteligência Tática...');
         $('#loading-sub').text(sub || 'Aguarde, analisando dados em tempo real.');
@@ -345,36 +366,49 @@
     }
 
     function updateDashboard(mode) {
-        var label = (mode === 'CVLI') ? 'Modo de Visualização: <strong>CVLI</strong>' : 'Modo de Visualização: <strong>CVP</strong>';
-        $('#mode-label').html(label);
-
+        // Mode is always CVLI - CVP is only a prediction criterion
+        mode = 'CVLI';
+        
         // Update Window Info
-        var startDate = (mode === 'CVLI') ? metaDataGlobal.start_cvli : metaDataGlobal.start_cvp;
+        var startDate = metaDataGlobal.start_cvli;
         var endDate = metaDataGlobal.last_date;
-        var days = (mode === 'CVLI') ? metaDataGlobal.window_cvli : metaDataGlobal.window_cvp;
+        var days = metaDataGlobal.window_cvli;
 
         var dateText = formatDate(startDate) + ' → ' + formatDate(endDate);
         $('#window-info small.text-muted').text('Janela Histórica: ' + dateText + ' (' + days + ' dias)');
 
-        var horizonText = (mode === 'CVLI') ? 'Horizonte de Predição: 14 dias (336h)' : 'Horizonte de Predição: 7 dias (168h)';
+        var horizonText = 'Horizonte de Predição: 14 dias (336h)';
         $('#horizon-info').text(horizonText);
 
         // Show model's internal window (from backend meta)
         try {
-            var modelWindow = (mode === 'CVLI') ? (metaDataGlobal && metaDataGlobal.model_window_cvli) : (metaDataGlobal && metaDataGlobal.model_window_cvp);
+            var modelWindow = metaDataGlobal && metaDataGlobal.model_window_cvli;
             if (modelWindow) {
                 $('#model-window-info').text('Janela do Modelo: ' + modelWindow + ' dias');
             } else {
                 $('#model-window-info').text('Modelo: —');
             }
+            
+            // Mostra informações de ranking se disponível
+            if (metaDataGlobal && metaDataGlobal.ranking_info) {
+                var rankInfo = metaDataGlobal.ranking_info;
+                var rankText = 'Top 1%: >' + rankInfo.top_1_percent_threshold.toFixed(0) + '% | ' +
+                              'Top 5%: >' + rankInfo.top_5_percent_threshold.toFixed(0) + '% | ' +
+                              'Top 10%: >' + rankInfo.top_10_percent_threshold.toFixed(0) + '%';
+                $('#ranking-details').text(rankText);
+                $('#ranking-info').show();
+            } else {
+                $('#ranking-info').hide();
+            }
         } catch (e) {
             $('#model-window-info').text('Modelo: —');
+            $('#ranking-info').hide();
         }
 
         // Recalculate Stats
         var highRisk = 0, mediumRisk = 0, lowRisk = 0;
         riskDataGlobal.forEach(function(item) {
-            var score = (mode === 'CVLI') ? item.risk_score_cvli : item.risk_score_cvp;
+            var score = item.risk_score_cvli;
             if (score > 60) highRisk++;
             else if (score > 20) mediumRisk++;
             else lowRisk++;
@@ -397,26 +431,14 @@
             });
         }
 
-        // Update marker colors based on current mode
-        if (markerLayer) {
-            markerLayer.eachLayer(function(m) {
-                try {
-                    var props = (m.feature && m.feature.properties) || {};
-                    var score = (mode === 'CVLI') ? (props.risk_score_cvli || 0) : (props.risk_score_cvp || 0);
-                    if (typeof m.setStyle === 'function') {
-                        m.setStyle({ fillColor: getColor(score) });
-                    }
-                } catch (e) {
-                    // ignore
-                }
-            });
-        }
+        // Polygons are updated via geojsonLayer.eachLayer above - no markers needed
         updateTopCriticalAreas();
     }
 
     function addSimulationPoint(latlng) {
         var icon = (simulationType === 'suppression') ? motorIcon : conflictIcon;
-        var marker = L.marker(latlng, {icon: icon}).addTo(map);
+        var marker = L.marker(latlng, {icon: icon});
+        marker.addTo(map);
         simMarkers.push(marker);
         simulationPoints.push([latlng.lat, latlng.lng]);
 
@@ -431,8 +453,7 @@
                 if(resp.data) {
                     riskDataGlobal = resp.data;
                     updateRiskMap(riskDataGlobal);
-                    var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
-                    updateDashboard(mode);
+                    updateDashboard('CVLI');
                 }
             },
             error: function(err) {
@@ -448,10 +469,20 @@
     }
 
     function clearSimulation() {
-        simMarkers.forEach(function(m) { map.removeLayer(m); });
+        simMarkers.forEach(function(m) {
+            try {
+                if (map && map.hasLayer && map.hasLayer(m)) {
+                    map.removeLayer(m);
+                }
+            } catch (e) {
+                try { map.removeLayer(m); } catch (e2) {}
+            }
+        });
         simMarkers = [];
         simulationPoints = [];
         $('#btn-clear-sim').addClass('d-none');
+
+        // Exogenous markers will be cleaned up automatically during map update
 
         // Reload original data
         showLoading('Restaurando Estado Original...', 'Recuperando dados históricos.');
@@ -560,7 +591,32 @@
         // Initialize Map
         geojsonLayer = L.geoJson(geojson, {
             style: style,
+            // Prevent default Point->Marker creation to avoid duplicate markers
+            pointToLayer: function(feature, latlng) {
+                return L.circleMarker(latlng, { radius: 0, opacity: 0, fillOpacity: 0, interactive: false });
+            },
             onEachFeature: function(feature, layer) {
+                // Hover effects for better UX
+                layer.on('mouseover', function(e) {
+                    if (!simulationMode) {
+                        var targetLayer = e.target;
+                        targetLayer.setStyle({
+                            weight: 4,
+                            color: '#fff',
+                            fillOpacity: 0.6
+                        });
+                        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                            targetLayer.bringToFront();
+                        }
+                    }
+                });
+                
+                layer.on('mouseout', function(e) {
+                    if (!simulationMode) {
+                        geojsonLayer.resetStyle(e.target);
+                    }
+                });
+                
                 // Click handler
                 layer.on('click', function(e) {
                     if (simulationMode) {
@@ -579,34 +635,36 @@
             }
         }).addTo(map);
 
-        // Create marker layer for point pins colored by criticality
-        markerLayer = L.layerGroup().addTo(map);
-        markerLayer.clearLayers();
-        geojson.features.forEach(function(feature, index) {
-            var props = feature.properties || {};
-            var fid = props.node_id || feature.id || String(index);
-            var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
-            var score = (mode === 'CVLI') ? (props.risk_score_cvli || 0) : (props.risk_score_cvp || 0);
-            var lat = props.latitude || (feature.geometry && feature.geometry.coordinates && feature.geometry.coordinates[1]);
-            var lng = props.longitude || (feature.geometry && feature.geometry.coordinates && feature.geometry.coordinates[0]);
-            if (lat !== undefined && lng !== undefined && !isNaN(lat) && !isNaN(lng)) {
-                var circle = L.circleMarker([lat, lng], {
-                    radius: 6,
-                    fillColor: getColor(score),
-                    color: 'white',
-                    weight: 1,
-                    opacity: 1,
-                    fillOpacity: 0.95,
-                    className: 'node-pin node-' + fid
+        // Polygons provide all visualization - no markers/clusters needed
+        
+        // Remove any remaining exogenous-event markers (icons like fa-radiation, fa-motorcycle)
+        function cleanupExogenousMarkers() {
+            try {
+                var markersToRemove = [];
+                map.eachLayer(function(l) {
+                    try {
+                        if (!(l instanceof L.Marker)) return;
+                        var html = (l.options && l.options.icon && l.options.icon.options && l.options.icon.options.html) || '';
+                        // Detect exogenous event markers (radiation, motorcycle icons)
+                        if (String(html).indexOf('fa-radiation') !== -1 || String(html).indexOf('fa-motorcycle') !== -1) {
+                            markersToRemove.push(l);
+                        }
+                    } catch (e) {}
                 });
-                // attach feature for consistency with polygon layers
-                circle.feature = feature;
-                circle.on('click', function(e) {
-                    showFeatureDetails(circle, e.latlng);
+                
+                // Remove identified markers
+                markersToRemove.forEach(function(marker) {
+                    try {
+                        if (map && map.hasLayer && map.hasLayer(marker)) {
+                            map.removeLayer(marker);
+                        }
+                    } catch (e) {}
                 });
-                markerLayer.addLayer(circle);
+            } catch (e) { 
+                console.warn('cleanupExogenousMarkers failed', e); 
             }
-        });
+        }
+        cleanupExogenousMarkers();
 
         // Ensure Leaflet recalculates container size now that the geojson layer is added
         try {
@@ -629,6 +687,9 @@
 
         updateTopCriticalAreas();
 
+        // Aplicar filtro inicial: apenas Capital (Fortaleza)
+        applyRegionFilter('capital');
+
         // Initial State
         updateDashboard('CVLI');
 
@@ -636,12 +697,6 @@
         map.doubleClickZoom.disable();
         map.on('dblclick', function() {
            map.setView([-3.7319, -38.5267], 12);
-        });
-
-        // Toggle handler
-        $('#mode-switch').on('change', function() {
-            var isCvli = $(this).is(':checked');
-            updateDashboard(isCvli ? 'CVLI' : 'CVP');
         });
 
         // Simulation handlers
@@ -703,22 +758,18 @@
                 data: JSON.stringify({ text: text }),
                 success: function(resp) {
                     if (resp.points && resp.points.length > 0) {
-
-                        // Add markers visually but DO NOT implicitly toggle global simulationMode.
-                        // This prevents the simulation buttons from being activated automatically
-                        // when the malha is adapted, avoiding unexpected UX side-effects.
+                        // Register exogenous events for server-side processing only
+                        // IMPORTANT: Exogenous events (like conflicts, arrests, etc.) should NOT appear as 
+                        // visual markers on the map. They are processed server-side and only surface as 
+                        // explanatory text in the sidebar's "motivos" section when justifying critical states.
+                        // This prevents map clutter while maintaining data transparency.
                         resp.points.forEach(function(pt) {
                             var latlng = [pt.lat, pt.lng];
-                            var marker = L.marker(latlng, {icon: conflictIcon})
-                                .bindPopup('<strong>Evento Exógeno</strong><br>' + pt.description)
-                                .addTo(map);
-                            simMarkers.push(marker);
+                            // Register for server-side processing only - NO visual marker creation
                             simulationPoints.push(latlng);
                         });
-                        // Show the clear control so the user can remove these visual markers if desired
-                        $('#btn-clear-sim').removeClass('d-none');
 
-        // SAVE changes permanently (as requested)
+                        // SAVE changes permanently (as requested)
                         showLoading('Registrando e Adaptando Malha...', 'Salvando eventos e recalculando modelo global.');
 
                         $.ajax({
@@ -737,8 +788,7 @@
                                 $.getJSON('/api/risk', function(riskResp) {
                                      riskDataGlobal = riskResp.data || riskResp;
                                      updateRiskMap(riskDataGlobal);
-                                     var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
-                                     updateDashboard(mode);
+                                     updateDashboard('CVLI');
 
                                      hideLoading();
                                      alert('Eventos salvos com sucesso!\nA malha foi adaptada permanentemente e o risco recalculado.');
@@ -751,12 +801,11 @@
                                      $('#btn-simulate-exo').removeClass('active btn-danger').addClass('btn-outline-danger');
                                      $('.leaflet-container').removeClass('simulation-active');
 
-                                     // Add markers visual feedback for this session (saved)
-                                     resp.points.forEach(function(pt) {
-                                        L.marker([pt.lat, pt.lng], {icon: conflictIcon})
-                                            .bindPopup('<strong>Evento Exógeno (Salvo)</strong><br>' + pt.description)
-                                            .addTo(map);
-                                     });
+                                     // Clean up any exogenous markers that may have been added
+                                     cleanupExogenousMarkers();
+                                     
+                                     // Exogenous events are saved server-side and will surface in the 'motivos' UI
+                                     // when justifying critical states - no visual markers needed.
                                 });
                             },
                             error: function(err) {
@@ -828,19 +877,18 @@
 
     function showFeatureDetails(layer, latlng) {
         var feature = layer.feature;
-        var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
-        var score = (mode === 'CVLI') ? feature.properties.risk_score_cvli : feature.properties.risk_score_cvp;
-        var predVal = (mode === 'CVLI') ? feature.properties.cvli_pred : feature.properties.cvp_pred;
-        var typeLabel = (mode === 'CVLI') ? 'CVLI' : 'CVP';
+        var score = feature.properties.risk_score_cvli;
+        var predVal = feature.properties.cvli_pred;
+        var typeLabel = 'CVLI';
         var status = getStatus(score, typeLabel);
         // Prefer server-provided normalized region if present, else CIDADE
         var region = feature.properties.region_type || feature.properties.CIDADE || feature.properties.city || 'RMF/Interior';
 
-        // Friendly fields provided by backend: status_label, risk_text, cvli_prediction_text, cvp_prediction_text
+        // Friendly fields provided by backend: status_label, risk_text, cvli_prediction_text
         var friendlyLabel = feature.properties.status_label || status.label;
         var level = getRiskLevel(score);
         var riskText = feature.properties.risk_text || (Math.round(score) + '% — ' + friendlyLabel);
-        var predText = (mode === 'CVLI') ? (feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('Estimativa: ~' + predVal.toFixed(1) + ' ocorrências') : 'Sem novas ocorrências previstas')) : (feature.properties.cvp_prediction_text || (predVal && predVal > 0 ? ('Estimativa: ~' + predVal.toFixed(1) + ' ocorrências') : 'Sem novas ocorrências previstas'));
+        var predText = feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('Estimativa: ~' + predVal.toFixed(1) + ' ocorrências') : 'Sem novas ocorrências previstas');
 
         var popupContent = `
             <div style="font-family: sans-serif; font-size: 14px; min-width: 200px;">
@@ -896,7 +944,7 @@
         var reasonsHtml = '<h5>' + feature.properties.name + '</h5>';
         reasonsHtml += '<p><strong>Facção:</strong> ' + (feature.properties.faction || 'N/A') + '</p>';
         var sideStatus = feature.properties.status_label || status.label;
-        var sidePred = (mode === 'CVLI') ? (feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('~' + predVal.toFixed(1) + ' ocorrências') : 'Sem novas ocorrências previstas')) : (feature.properties.cvp_prediction_text || (predVal && predVal > 0 ? ('~' + predVal.toFixed(1) + ' ocorrências') : 'Sem novas ocorrências previstas'));
+        var sidePred = feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('~' + predVal.toFixed(1) + ' ocorrências') : 'Sem novas ocorrências previstas');
         reasonsHtml += '<p><strong>Status:</strong> ' + sideStatus + '</p>';
         reasonsHtml += '<p><strong>Previsão (' + typeLabel + '):</strong> ' + sidePred + '</p>';
         reasonsHtml += '<h6>Motivos</h6><ul>';
@@ -908,14 +956,13 @@
     function updateTopCriticalAreas() {
         // Use geojsonLayer layers to access up-to-date properties
         var layers = geojsonLayer.getLayers();
-        var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
         var regionFilter = $('#region-filter').val();
 
         // Map to array for sorting
         var items = [];
         layers.forEach(function(layer) {
             var props = layer.feature.properties;
-            var score = (mode === 'CVLI') ? (props.risk_score_cvli || 0) : (props.risk_score_cvp || 0);
+            var score = props.risk_score_cvli || 0;
 
             // Filter Logic: prefer server-provided region hints
             var regionType = props.region_type || props.regiao || getRegionType(props.CIDADE);
@@ -1021,21 +1068,7 @@
             }
         });
 
-        // Apply same filter to markerLayer
-        if (markerLayer) {
-            markerLayer.eachLayer(function(m) {
-                var props = (m.feature && m.feature.properties) || {};
-                var regionType = props.region_type || props.regiao || getRegionType(props.CIDADE);
-                var show = (regionFilter === 'all') || (regionFilter === regionType);
-                try {
-                    if (show) {
-                        if (!map.hasLayer(m)) map.addLayer(m);
-                    } else {
-                        if (map.hasLayer(m)) map.removeLayer(m);
-                    }
-                } catch (e) {}
-            });
-        }
+        // Polygons are filtered above - no markers to filter
     }
 </script>
 </body>

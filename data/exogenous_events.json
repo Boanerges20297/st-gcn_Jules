@@ -8,61 +8,71 @@
         "description": "LESÃO A BALA - DEU ENTRADA NA UPA DA PAJUÇARA - RUA JOÃO HENRIQUE DA SILVA SN",
         "lat": -3.856879042797388,
         "lng": -38.582613559783795,
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       },
       {
         "description": "HOMICÍDIO EM VIA PUBLICA, SOCORRIDO PARA O IJF - PICI",
         "lat": -3.750601866082262,
         "lng": -38.58050059366798,
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       },
       {
         "description": "HOMICÍDIO EM VIA PUBLICA - AQUIRAZ",
         "lat": -3.8840912599530277,
         "lng": -38.50744878979003,
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       },
       {
         "description": "HOMICÍDIO EM VIA PUBLICA - PQ. LEBLON",
         "lat": -3.697336532227048,
         "lng": -38.598514865186594,
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       },
       {
         "description": "HOMICÍDIO DENTRO DA RESIDÊNCIA - AIS16",
         "lat": -3.84,
         "lng": -38.46,
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       },
       {
         "description": "LESIONADO EM VIA PUBLICA E OUTRO INDIVIDUO DO SEXO MASCULINO LESIONADO A BALA FOI SOCORRIDO POR MEIOS PROPRIOS AO IJF CENTRO - BARROSO",
         "lat": -3.0182286675981294,
         "lng": -41.13687701210792,
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       },
       {
         "description": "LESIONADO EM VIA PUBLICA E OUTRO INDIVIDUO DO SEXO MASCULINO LESIONADO A BALA FOI SOCORRIDO POR MEIOS PROPRIOS AO IJF CENTRO - BARROSO",
         "lat": -3.0182286675981294,
         "lng": -41.13687701210792,
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       },
       {
         "description": "LESAO NA PERNA -EM VIA PUBLICA - CASCAVEL",
         "lat": -4.139595963909024,
         "lng": -38.23407230223702,
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "LOW"
       },
       {
         "description": "LESAO EM VIA PUBLICA - SAPIRANGA",
         "lat": -3.789841675392758,
         "lng": -38.4685056476241,
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "LOW"
       },
       {
         "description": "LESAO EM VIA PUBLICA - BONSUCESSO",
         "lat": -3.785557825744014,
         "lng": -38.5870690583825,
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "LOW"
       }
     ]
   },
@@ -83,7 +93,8 @@
           "raw": "01 - M20260065649 - LESÃO A BALA - VITIMA DO SEXO MASCULINO - EM VIA PUBLICA - MULTIPLAS LESOES - SOCORRIDO PARA UPA, TRANSFIRIDO PARA O IJF - RUA BOM JESUS N 1899 - GRANJA LISBOA (AIS17) - 04:40",
           "resumo": "EM VIA PUBLICA em SOCORRIDO PARA UPA, TRANSFIRIDO PARA O IJF"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       }
     ]
   },
@@ -104,7 +115,8 @@
           "raw": "02 - M20260066103 - LESAO A BALA - VITIMA DO SEXO MASCULINO - DEU ENTRADA NO HOSPITAL MUNICIPAL -  - 11:58",
           "resumo": "LESAO A BALA - DEU ENTRADA NO HOSPITAL MUNICIPAL"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       }
     ]
   },
@@ -128,7 +140,8 @@
           "sexo": "FEMININO",
           "timestamp": "18:02"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       }
     ]
   },
@@ -152,7 +165,8 @@
           "sexo": "MASCULINO",
           "timestamp": "07:05"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "LOW"
       }
     ]
   },
@@ -176,7 +190,8 @@
           "sexo": "MASCULINO",
           "timestamp": "07:10"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "LOW"
       }
     ]
   },
@@ -200,7 +215,8 @@
           "sexo": "MASCULINO",
           "timestamp": "13:06"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       }
     ]
   },
@@ -213,7 +229,8 @@
         "description": "LESÃO A BALA - DEU ENTRADA NA UPA DA PAJUÇARA - RUA JOÃO HENRIQUE DA SILVA SN",
         "lat": -3.856879042797388,
         "lng": -38.582613559783795,
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       },
       {
         "id": "1",
@@ -280,7 +297,8 @@
             "lng": -38.5870690583825,
             "type": "exogenous"
           }
-        ]
+        ],
+        "conflict_severity": "LOW"
       },
       {
         "id": "2",
@@ -301,7 +319,8 @@
             },
             "type": "exogenous"
           }
-        ]
+        ],
+        "conflict_severity": "LOW"
       },
       {
         "id": "3",
@@ -322,7 +341,8 @@
             },
             "type": "exogenous"
           }
-        ]
+        ],
+        "conflict_severity": "LOW"
       },
       {
         "id": "4",
@@ -346,7 +366,8 @@
             },
             "type": "exogenous"
           }
-        ]
+        ],
+        "conflict_severity": "LOW"
       },
       {
         "id": "7",
@@ -370,7 +391,8 @@
             },
             "type": "exogenous"
           }
-        ]
+        ],
+        "conflict_severity": "LOW"
       },
       {
         "id": "6",
@@ -394,7 +416,8 @@
             },
             "type": "exogenous"
           }
-        ]
+        ],
+        "conflict_severity": "LOW"
       },
       {
         "id": "7",
@@ -418,7 +441,8 @@
             },
             "type": "exogenous"
           }
-        ]
+        ],
+        "conflict_severity": "LOW"
       }
     ]
   },
@@ -442,7 +466,8 @@
           "sexo": "MASCULINO",
           "timestamp": "20:49"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       }
     ]
   },
@@ -466,7 +491,8 @@
           "sexo": "MASCULINO",
           "timestamp": "19:04"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       }
     ]
   },
@@ -490,7 +516,8 @@
           "sexo": "MASCULINO",
           "timestamp": "10:46"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "HIGH"
       }
     ]
   },
@@ -514,7 +541,8 @@
           "sexo": "MASCULINO",
           "timestamp": "04:40"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       }
     ]
   },
@@ -538,7 +566,8 @@
           "sexo": "FEMININO",
           "timestamp": "13:47"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       }
     ]
   },
@@ -562,7 +591,8 @@
           "sexo": "MASCULINO",
           "timestamp": "06:31"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       }
     ]
   },
@@ -586,7 +616,8 @@
           "sexo": "MASCULINO",
           "timestamp": "02:29"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       }
     ]
   },
@@ -610,7 +641,8 @@
           "sexo": "MASCULINO",
           "timestamp": "06:35"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "HIGH"
       }
     ]
   },
@@ -634,7 +666,8 @@
           "sexo": "MASCULINO",
           "timestamp": "17:55"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       }
     ]
   },
@@ -658,7 +691,8 @@
           "sexo": "MASCULINO",
           "timestamp": "19:53"
         },
-        "type": "exogenous"
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
       }
     ]
   },
@@ -681,6 +715,108 @@
           "resumo": "LESAO A BALA NA PERNA - VITIMA DO SEXO MASCULINO",
           "sexo": "MASCULINO",
           "timestamp": "14:29"
+        },
+        "type": "exogenous",
+        "conflict_severity": "MEDIUM"
+      }
+    ]
+  },
+  {
+    "id": "20",
+    "timestamp": "2026-02-01T21:24:07.962963",
+    "original_text": "01 - M20260080952 - ACHADO DE CADÁVER - VITIMA DO SEXO MASCULINO - AMARRADO - BOM JARDIM - 15:20",
+    "points": [
+      {
+        "description": "ACHADO DE CADÁVER - Achado de cadáver de vítima masculina amarrada no bairro Bom Jardim.",
+        "lat": -3.7945629195802537,
+        "lng": -38.60185868076689,
+        "raw_event": {
+          "bairro": "Bom Jardim",
+          "conflict_severity": "HIGH",
+          "descricao": "VITIMA DO SEXO MASCULINO - AMARRADO",
+          "localizacao_completa": "BOM JARDIM",
+          "municipio": "FORTALEZA",
+          "natureza": "ACHADO DE CADÁVER",
+          "raw_text": "01 - M20260080952 - ACHADO DE CADÁVER - VITIMA DO SEXO MASCULINO - AMARRADO - BOM JARDIM - 15:20",
+          "resumo": "Achado de cadáver de vítima masculina amarrada no bairro Bom Jardim.",
+          "sexo": "MASCULINO",
+          "timestamp": "15:20"
+        },
+        "type": "exogenous",
+        "conflict_severity": "HIGH"
+      }
+    ]
+  },
+  {
+    "id": "21",
+    "timestamp": "2026-02-02T11:51:18.623090",
+    "original_text": "02 - M20260083695 - HOMICÍDIO A ABALA - VÍTIMA DE SEXO MASCULINO - LOCALIDADE DE ANGELIM, TRAIRI - 04:54",
+    "points": [
+      {
+        "description": "HOMICÍDIO - Homicídio de vítima de sexo masculino na localidade de Angelim, Trairi.",
+        "lat": -3.3376972359696597,
+        "lng": -39.3530335333813,
+        "raw_event": {
+          "bairro": "ANGELIM",
+          "conflict_severity": "MEDIUM",
+          "descricao": "HOMICÍDIO A ABALA",
+          "localizacao_completa": "LOCALIDADE DE ANGELIM, TRAIRI",
+          "municipio": "Trairi",
+          "natureza": "HOMICÍDIO",
+          "raw_text": "02 - M20260083695 - HOMICÍDIO A ABALA - VÍTIMA DE SEXO MASCULINO - LOCALIDADE DE ANGELIM, TRAIRI - 04:54",
+          "resumo": "Homicídio de vítima de sexo masculino na localidade de Angelim, Trairi.",
+          "sexo": "MASCULINO",
+          "timestamp": "04:54"
+        },
+        "type": "exogenous"
+      }
+    ]
+  },
+  {
+    "id": "22",
+    "timestamp": "2026-02-02T11:51:50.567524",
+    "original_text": "01 - M20260083501 - HOMICÍDIO A ABALA - VÍTIMA DE SEXO MASCULINO - NOVA METRÓPOLE, CAUCAIA - 02:07\n",
+    "points": [
+      {
+        "description": "HOMICÍDIO - Homicídio de vítima de sexo masculino em Nova Metrópole, Caucaia.",
+        "lat": -3.7825416160202074,
+        "lng": -38.81082788878969,
+        "raw_event": {
+          "bairro": "NOVA METRÓPOLE",
+          "conflict_severity": "MEDIUM",
+          "descricao": "HOMICÍDIO A ABALA",
+          "localizacao_completa": "NOVA METRÓPOLE, CAUCAIA",
+          "municipio": "Caucaia",
+          "natureza": "HOMICÍDIO",
+          "raw_text": "01 - M20260083501 - HOMICÍDIO A ABALA - VÍTIMA DE SEXO MASCULINO - NOVA METRÓPOLE, CAUCAIA - 02:07",
+          "resumo": "Homicídio de vítima de sexo masculino em Nova Metrópole, Caucaia.",
+          "sexo": "MASCULINO",
+          "timestamp": "02:07"
+        },
+        "type": "exogenous"
+      }
+    ]
+  },
+  {
+    "id": "23",
+    "timestamp": "2026-02-02T11:52:21.271869",
+    "original_text": "01 - M20260083922 - R. ALBERTO TORRES 108, MESSEJANA - 08:46 - SOLICITANTE INFORMA QUE ESTÁ SOFRENDO AMEAÇAS DE GRUPO CRIMINOSO E PRECISA FAZER A MUDANÇA",
+    "points": [
+      {
+        "description": "Ameaça - Solicitante informa estar sofrendo ameaças de grupo criminoso e necessita de mudança.",
+        "lat": -3.8267063527232037,
+        "lng": -38.493391259954635,
+        "raw_event": {
+          "bairro": "Messejana",
+          "conflict_severity": "LOW",
+          "descricao": "SOLICITANTE INFORMA QUE ESTÁ SOFRENDO AMEAÇAS DE GRUPO CRIMINOSO E PRECISA FAZER A MUDANÇA",
+          "localizacao_completa": "R. ALBERTO TORRES 108, MESSEJANA",
+          "municipio": "FORTALEZA",
+          "natureza": "Ameaça",
+          "raw_text": "01 - M20260083922 - R. ALBERTO TORRES 108, MESSEJANA - 08:46 - SOLICITANTE INFORMA QUE ESTÁ SOFRENDO AMEAÇAS DE GRUPO CRIMINOSO E PRECISA FAZER A MUDANÇA",
+          "resumo": "Solicitante informa estar sofrendo ameaças de grupo criminoso e necessita de mudança.",
+          "sexo": "",
+          "timestamp": "08:46"
         },
         "type": "exogenous"
       }

@@ -1,0 +1,45 @@
+{
+  "config": {
+    "window_size": 14,
+    "data_start": "2024-01-01",
+    "data_end": "2025-12-31",
+    "train_end": "2024-09-30",
+    "val_end": "2024-12-31",
+    "test_start": "2025-01-01",
+    "learning_rate": 0.001,
+    "batch_size": 32,
+    "epochs": 50,
+    "patience": 10,
+    "use_focal_loss": true,
+    "focal_alpha": 0.25,
+    "focal_gamma": 2.0,
+    "pos_weight": 40.0,
+    "device": "cpu"
+  },
+  "results": {
+    "test_loss": 0.002637679839209571,
+    "test_mae": 0.3061535954475403,
+    "test_rmse": 0.3282681561581757,
+    "test_r2": -2.3542966842651367,
+    "precision_at_k": {
+      "10": 1.0,
+      "50": 1.0,
+      "100": 1.0
+    },
+    "percentiles": {
+      "99": {
+        "threshold": 0.41323617100715637,
+        "crime_rate": 0.21071428571428572
+      },
+      "95": {
+        "threshold": 0.35839927196502686,
+        "crime_rate": 0.10448294338274691
+      },
+      "90": {
+        "threshold": 0.3391011953353882,
+        "crime_rate": 0.07263965732643227
+      }
+    }
+  },
+  "timestamp": "2026-02-01T19:58:19.963247"
+}

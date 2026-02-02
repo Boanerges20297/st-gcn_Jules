@@ -256,12 +256,16 @@ def process_exogenous_text(text: str) -> List[Dict[str, Any]]:
 
     # LLM path: call model, extract JSON, then enrich
     prompt = (
-        "You will receive multiple lines of police log text. For each line return a JSON array where each element has these keys exactly: natureza, descricao, sexo, localizacao_completa, bairro, municipio, timestamp, resumo, raw_text.\n\n"
+        "You will receive multiple lines of police log text. For each line return a JSON array where each element has these keys exactly: natureza, descricao, sexo, localizacao_completa, bairro, municipio, timestamp, resumo, raw_text, conflict_severity.\n\n"
         "Important rules (follow exactly):\n"
         "1) Extract 'bairro' and 'municipio' when present. Do NOT invent municipality names. If you cannot confidently extract a municipality from the text, return an empty string for 'municipio'.\n"
         "2) If the provided text does not contain a street AND does not contain a bairro (neighborhood) — i.e. address is incomplete or missing both street and neighborhood — then set 'bairro' to the literal string 'CENTRO' of the same city. For 'municipio', extract the city if it appears in the text; if the city is not present, leave 'municipio' empty.\n"
         "3) Keep values concise: use the canonical neighborhood name when available; otherwise use 'CENTRO' as described.\n"
-        "4) 'localizacao_completa' should contain whatever location text is available (may be empty).\n\n"
+        "4) 'localizacao_completa' should contain whatever location text is available (may be empty).\n"
+        "5) NEW: Add 'conflict_severity' field with values: 'HIGH', 'MEDIUM', or 'LOW':\n"
+        "   - HIGH: Signs of execution/confrontation (amarrados, mãos amarradas, pés amarrados, tortura, sinais de execução, carbonizado, enterrado, múltiplas vítimas, duplo homicídio, triplo homicídio, chacina, emboscada, disputa territorial)\n"
+        "   - MEDIUM: Armed violence (bala, tiro, disparos, fuzilamento, confronto, troca de tiros)\n"
+        "   - LOW: Other cases (faca, lesão corporal, acidente, etc)\n\n"
         + text
     )
     try:
@@ -294,6 +298,8 @@ def process_exogenous_text(text: str) -> List[Dict[str, Any]]:
         timestamp = evt.get('timestamp', '')
         resumo = evt.get('resumo', evt.get('summary', ''))
         raw_text = evt.get('raw_text', evt.get('raw', ''))
+        conflict_severity = evt.get('conflict_severity', 'LOW')  # Novo campo
+        
         try:
             loc_search = ' '.join([str(descricao or ''), str(localizacao_completa or ''), str(raw_text or '')])
             b = busca_bairro(loc_search)
@@ -316,7 +322,8 @@ def process_exogenous_text(text: str) -> List[Dict[str, Any]]:
             'municipio': municipio or '',
             'timestamp': timestamp,
             'resumo': resumo,
-            'raw_text': raw_text
+            'raw_text': raw_text,
+            'conflict_severity': conflict_severity  # Novo campo
         })
     return normalized
 
