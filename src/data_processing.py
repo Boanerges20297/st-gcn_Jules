@@ -12,7 +12,7 @@ import unicodedata
 DATA_DIR = 'data/raw'
 INTELIGENCIA_DIR = os.path.join(DATA_DIR, 'inteligencia')
 BAIRROS_FILE = os.path.join(DATA_DIR, 'bairros_centros_latlong.json')
-OCORRENCIAS_FILE = os.path.join(DATA_DIR, 'dados_merged_2024_2025.json')  # Dados 2024/2025 filtrados (qualidade consistente)
+OCORRENCIAS_FILE = os.path.join(DATA_DIR, 'dados_status_ocorrencias_gerais.json')  # Dados atualizados com 2026
 OUTPUT_FILE = 'data/processed/processed_graph_data.pkl'
 
 # Thresholds
@@ -360,17 +360,22 @@ def load_and_assign_occurrences(filepath, nodes_gdf):
 
 def build_feature_tensor(nodes_gdf, occurrences_df, start_date, end_date, exogenous_events=None):
     """
-    Constrói o tensor (Nodes, Time, 3).
+    Constrói o tensor (Nodes, Time, 8).
     
     Channels:
     0: CVLI (homicídios)
     1: CVP (crimes contra patrimônio)
     2: Tension (índice de tensão)
+    3: Day of Week (sin) - padrão semanal
+    4: Day of Week (cos) - padrão semanal
+    5: Month (sin) - padrão mensal/sazonal
+    6: Month (cos) - padrão mensal/sazonal
+    7: Is Weekend - fim de semana (0 ou 1)
     """
     date_range = pd.date_range(start=start_date, end=end_date, freq='D')
     num_nodes = len(nodes_gdf)
     num_timesteps = len(date_range)
-    num_features = 3  # 3 canais principais
+    num_features = 8  # 3 canais base + 5 temporais
 
     features = np.zeros((num_nodes, num_timesteps, num_features), dtype=np.float32)
 
@@ -387,7 +392,7 @@ def build_feature_tensor(nodes_gdf, occurrences_df, start_date, end_date, exogen
     valid_mask = (occurrences_df['day_idx'] >= 0) & (occurrences_df['day_idx'] < num_timesteps)
     df_valid = occurrences_df[valid_mask]
 
-    print("Agregando Channels (3 canais: CVLI, CVP, Tension)...")
+    print("Agregando Channels (8 canais: CVLI, CVP, Tension, DOW sin/cos, Month sin/cos, Weekend)...")
 
     # Channel 0: CVLI
     cvli_counts = df_valid[is_cvli[valid_mask]].groupby(['node_id', 'day_idx']).size()
@@ -403,13 +408,29 @@ def build_feature_tensor(nodes_gdf, occurrences_df, start_date, end_date, exogen
     tension_values = nodes_gdf['tension_index'].values
     features[:, :, 2] = np.tile(tension_values[:, np.newaxis], (1, num_timesteps))
 
-    # Normalizar todos os 3 canais para [0, 1]
-    print("Normalizando 3 canais para [0, 1]...")
+    # Channels 3-7: Features Temporais (calculadas automaticamente das datas)
+    for day_idx, date in enumerate(date_range):
+        # Day of Week (0=Monday, 6=Sunday) -> encoding cíclico sin/cos
+        dow = date.dayofweek
+        features[:, day_idx, 3] = np.sin(2 * np.pi * dow / 7)  # DOW_SIN
+        features[:, day_idx, 4] = np.cos(2 * np.pi * dow / 7)  # DOW_COS
+        
+        # Month (1-12) -> encoding cíclico sin/cos
+        month = date.month
+        features[:, day_idx, 5] = np.sin(2 * np.pi * month / 12)  # MONTH_SIN
+        features[:, day_idx, 6] = np.cos(2 * np.pi * month / 12)  # MONTH_COS
+        
+        # Is Weekend (Sábado=5, Domingo=6)
+        features[:, day_idx, 7] = 1.0 if dow >= 5 else 0.0  # IS_WEEKEND
+
+    # REMOVER NORMALIZAÇÃO - preservar valores brutos para melhor aprendizado
+    print("⚠️  NORMALIZAÇÃO DESABILITADA - usando valores brutos")
+    print("📊 Estatísticas dos canais (valores brutos):")
     for c in range(3):
         channel_max = features[:, :, c].max()
-        if channel_max > 0:
-            features[:, :, c] = features[:, :, c] / channel_max
-            print(f"  Canal {c}: normalizado (max original: {channel_max:.4f})")
+        channel_mean = features[:, :, c].mean()
+        print(f"  Canal {c}: max={channel_max:.4f}, mean={channel_mean:.6f}")
+    print("✓ Features temporais (canais 3-7) adicionadas automaticamente das datas")
 
     return features, date_range
 
@@ -498,7 +519,7 @@ def main():
         'adj_geo': adj_geo,
         'adj_conflict': adj_conflict,
         'dates': dates,
-        'feature_names': ['CVLI', 'CVP', 'TENSION_INDEX']
+        'feature_names': ['CVLI', 'CVP', 'TENSION_INDEX', 'DOW_SIN', 'DOW_COS', 'MONTH_SIN', 'MONTH_COS', 'IS_WEEKEND']
     }
     
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)

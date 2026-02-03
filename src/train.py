@@ -20,11 +20,11 @@ from torch.utils.data import DataLoader, Dataset, TensorDataset
 
 DATA_FILE = 'data/processed/processed_graph_data.pkl'
 MODEL_DIR = 'models'
-MODEL_PATH = os.path.join(MODEL_DIR, 'stgcn_model.pth')
-HISTORY_WINDOW = 7
+MODEL_PATH = os.path.join(MODEL_DIR, 'stgcn_model_v2.pth')
+HISTORY_WINDOW = 30
 BATCH_SIZE = 64
-EPOCHS = 50
-LEARNING_RATE = 0.0001
+EPOCHS = 30
+LEARNING_RATE = 0.0003
 GAMMA = 2.0
 WEIGHT_DECAY = 1e-5
 
@@ -65,7 +65,7 @@ class BalancedWindowDataset(Dataset):
 
 class WeightedFocalMSELoss(nn.Module):
     """Loss com foco em hotspots COM amplificação."""
-    def __init__(self, weight_zero=1.0, weight_hotspot=50.0, gamma=2.0):
+    def __init__(self, weight_zero=1.0, weight_hotspot=20.0, gamma=2.0):
         super(WeightedFocalMSELoss, self).__init__()
         self.weight_zero = weight_zero
         self.weight_hotspot = weight_hotspot  # Amplificação: 50.0
@@ -179,7 +179,7 @@ def main():
     model = STGCN(num_nodes=num_nodes, in_channels=num_features, time_steps=HISTORY_WINDOW, num_classes=1, num_graphs=len(norm_adj_list)).to(device)
     norm_adj_list = [a.to(device) for a in norm_adj_list]
     
-    criterion = WeightedFocalMSELoss(weight_zero=1.0, weight_hotspot=50.0, gamma=GAMMA).to(device)
+    criterion = WeightedFocalMSELoss(weight_zero=1.0, weight_hotspot=15.0, gamma=GAMMA).to(device)
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=5)
     

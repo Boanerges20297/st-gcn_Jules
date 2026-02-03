@@ -124,7 +124,7 @@ class STGCNLayer(nn.Module):
         self.temporal_conv = nn.Conv2d(in_channels, out_channels, (1, kernel_size), padding=(0, kernel_size//2))
         self.gcn = MultiGraphConvolution(out_channels, out_channels, num_graphs=num_graphs)
         self.relu = nn.ReLU()
-        self.dropout = nn.Dropout(0.5)  # Aumentado de 0.3 para 0.5 (anti-overfitting)
+        self.dropout = nn.Dropout(0.6)  # Aumentado para 0.6 (maior regularização)
         self.bn = nn.BatchNorm2d(out_channels)
 
         # Atenção Temporal

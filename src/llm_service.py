@@ -157,7 +157,315 @@ def _extract_json_from_text(text: str):
     raise ValueError('No JSON found')
 
 
-def process_exogenous_text(text: str) -> List[Dict[str, Any]]:
+def parse_ciops_report(report_text: str, use_llm: bool = True) -> List[Dict[str, Any]]:
+    """Parse CIOPS report with multiple blocks (OCORRÊNCIAS, HOMICÍDIOS, etc).
+    Detects block headers (=== BLOCK NAME ===) and extracts lines for each.
+    
+    If use_llm=True and GEMINI_API_KEY available: uses LLM for enrichment
+    Otherwise: uses deterministic parser
+    
+    Returns list of events with block type and event_type classification.
+    """
+    # Detect block boundaries (=== ... ===)
+    block_pattern = r'^[\s=]{3,}\s*([A-Z\s/À-Ÿ]+?)\s*[\s=]{3,}$'
+    lines = report_text.split('\n')
+    
+    blocks = []
+    current_block = None
+    current_lines = []
+    
+    for line in lines:
+        block_match = re.match(block_pattern, line, re.MULTILINE)
+        if block_match:
+            # Save previous block
+            if current_block and current_lines:
+                blocks.append({
+                    'block_type': current_block.strip(),
+                    'lines': [l.strip() for l in current_lines if l.strip() and not re.match(r'^[\s=]', l)]
+                })
+            current_block = block_match.group(1).strip()
+            current_lines = []
+        elif current_block and line.strip() and not re.match(r'^[\s=]', line):
+            current_lines.append(line)
+    
+    # Save last block
+    if current_block and current_lines:
+        blocks.append({
+            'block_type': current_block.strip(),
+            'lines': [l.strip() for l in current_lines if l.strip() and not re.match(r'^[\s=]', l)]
+        })
+    
+    # Try LLM path first if enabled
+    if use_llm and not os.environ.get('DISABLE_GENAI_FOR_TESTS') == '1':
+        keys = get_gemini_api_keys()
+        if keys:
+            try:
+                all_events_llm = _parse_ciops_with_llm(report_text, keys)
+                if all_events_llm:
+                    return all_events_llm
+            except Exception as e:
+                logger.warning(f'LLM parsing failed, falling back to deterministic: {e}')
+    
+    # Fallback: deterministic path
+    all_events = []
+    for block in blocks:
+        block_type = block['block_type']
+        event_type = _classify_block_type(block_type)
+        
+        # Filter out "S/A" or "Sem ocorrências"
+        block_lines = block['lines']
+        if len(block_lines) == 1 and ('S/A' in block_lines[0] or 'sem' in block_lines[0].lower()):
+            continue
+        
+        # Parse each line in block
+        for line in block_lines:
+            if not line or line == 'S/A' or line.upper() == 'SEM OCORRÊNCIAS':
+                continue
+            
+            # Extract line number (01 -, 02 -, etc)
+            if re.match(r'^\d{2}\s*-', line):
+                evt = _parse_ciops_line(line, block_type, event_type)
+                if evt:
+                    all_events.append(evt)
+    
+    return all_events
+
+
+def _parse_ciops_with_llm(report_text: str, api_keys: List[str]) -> List[Dict[str, Any]]:
+    """Use LLM to parse CIOPS report with better context understanding.
+    Falls back to deterministic if LLM fails.
+    """
+    prompt = (
+        "You will receive a CIOPS (Centro Integrado de Operações de Segurança) report with multiple blocks.\n"
+        "Extract EACH event line and return a JSON array where each element has these keys:\n"
+        "incident_id, block_type, event_type, natureza, bairro, municipio, timestamp, "
+        "conflict_severity, num_arrested, has_drugs, has_weapons, enforcement_intensity\n\n"
+        "CRITICAL RULES:\n"
+        "1) event_type values ONLY:\n"
+        "   - 'ENFORCEMENT_OPERATION' for police operations (raids, arrests, drug seizures)\n"
+        "   - 'CRIME_HOMICIDE' for homicídios\n"
+        "   - 'CRIME_INJURY' for lesão à bala\n"
+        "   - 'CRIME_BODY' for achado de cadáver\n"
+        "   - 'CRIME_DISPLACEMENT' for deslocamento forçado/expulsão (this is CRIME, not enforcement)\n\n"
+        "2) conflict_severity (HIGH/MEDIUM/LOW):\n"
+        "   - HIGH: Homicídios, lesão à bala, cadáver, deslocamento forçado\n"
+        "   - MEDIUM: Operações com drogas+armas OU múltiplos presos\n"
+        "   - LOW: Rotina (veículo, situação suspeita)\n\n"
+        "3) enforcement_intensity (0.0-1.0, ONLY for ENFORCEMENT_OPERATION):\n"
+        "   - 0 presos = 0.0, 1 preso = 0.2, 2 = 0.4, 3 = 0.6, 5+ = 1.0\n"
+        "   - Has drugs OR weapons = max(0.7, intensity)\n"
+        "   - For CRIME events: enforcement_intensity MUST be 0.0\n\n"
+        "4) Extract bairro and municipio accurately. Use 'FORTALEZA' as default municipality.\n"
+        "5) num_arrested: extract numbers (0, 1, 2, etc)\n"
+        "6) has_drugs: true/false (detect DROGA, ENTORPECENTE, CRACK, COCAÍNA)\n"
+        "7) has_weapons: true/false (detect ARMA, PISTOLA, ESPINGARDA, FUZIL)\n\n"
+        "EXAMPLE OUTPUT:\n"
+        '[{\n'
+        '  "incident_id": "M20260083825",\n'
+        '  "block_type": "OCORRÊNCIAS",\n'
+        '  "event_type": "ENFORCEMENT_OPERATION",\n'
+        '  "natureza": "PESSOA/SITUAÇÃO SUSPEITA",\n'
+        '  "bairro": "BARROSO",\n'
+        '  "municipio": "FORTALEZA",\n'
+        '  "timestamp": "07:37",\n'
+        '  "conflict_severity": "LOW",\n'
+        '  "num_arrested": 0,\n'
+        '  "has_drugs": false,\n'
+        '  "has_weapons": false,\n'
+        '  "enforcement_intensity": 0.0\n'
+        '}]\n\n'
+        + report_text
+    )
+    
+    try:
+        out = _call_model_with_rotation(prompt, api_keys)
+        events = _extract_json_from_text(out)
+        
+        normalized = []
+        for evt in events:
+            if not isinstance(evt, dict):
+                continue
+            
+            # Validate and normalize
+            event_type = evt.get('event_type', 'ENFORCEMENT_OPERATION')
+            if event_type not in ['ENFORCEMENT_OPERATION', 'CRIME_HOMICIDE', 'CRIME_INJURY', 'CRIME_BODY', 'CRIME_DISPLACEMENT']:
+                event_type = 'ENFORCEMENT_OPERATION'
+            
+            enforcement_intensity = evt.get('enforcement_intensity', 0.0)
+            if isinstance(enforcement_intensity, str):
+                try:
+                    enforcement_intensity = float(enforcement_intensity)
+                except:
+                    enforcement_intensity = 0.0
+            
+            # CRITICAL: CRIME events must have 0 intensity
+            if 'CRIME' in event_type:
+                enforcement_intensity = 0.0
+            
+            # Enrich with location lookups
+            bairro = evt.get('bairro', '')
+            municipio = (evt.get('municipio') or 'FORTALEZA').strip()
+            localizacao = f"{bairro}, {municipio}" if bairro else municipio
+            
+            try:
+                b = busca_bairro(localizacao)
+                if b:
+                    bairro = b
+            except:
+                pass
+            
+            normalized.append({
+                'incident_id': evt.get('incident_id', ''),
+                'block_type': evt.get('block_type', ''),
+                'event_type': event_type,
+                'natureza': evt.get('natureza', ''),
+                'descricao': '',
+                'sexo': '',
+                'localizacao_completa': localizacao,
+                'bairro': bairro,
+                'municipio': municipio,
+                'timestamp': evt.get('timestamp', ''),
+                'resumo': f"{evt.get('natureza', 'EVENTO')} - {localizacao}",
+                'raw_text': '',
+                'conflict_severity': evt.get('conflict_severity', 'LOW'),
+                'num_arrested': int(evt.get('num_arrested', 0)) if isinstance(evt.get('num_arrested'), (int, str)) else 0,
+                'has_drugs': bool(evt.get('has_drugs', False)),
+                'has_weapons': bool(evt.get('has_weapons', False)),
+                'enforcement_intensity': float(enforcement_intensity)
+            })
+        
+        return normalized
+    except Exception as e:
+        logger.exception(f'LLM CIOPS parsing failed: {e}')
+        return None
+
+
+
+def _classify_block_type(block_name: str) -> str:
+    """Classify CIOPS block into event_type for canal 9 (enforcement vs crime)."""
+    block_upper = block_name.upper()
+    
+    if 'HOMICÍDIO' in block_upper:
+        return 'CRIME_HOMICIDE'
+    elif 'LESÃO' in block_upper and 'BALA' in block_upper:
+        return 'CRIME_INJURY'
+    elif 'CADÁVER' in block_upper or 'CORPO' in block_upper:
+        return 'CRIME_BODY'
+    elif 'DESLOCAMENTO' in block_upper or 'EXPULSÃO' in block_upper or 'DESALOJAMENTO' in block_upper:
+        return 'CRIME_DISPLACEMENT'  # CRIME: expulsão forçada/desalojamento
+    elif 'OCORRÊNCIA' in block_upper and 'POLICIAL' in block_upper:
+        return 'ENFORCEMENT_OPERATION'
+    else:
+        # Default to ENFORCEMENT for generic "OCORRÊNCIAS"
+        return 'ENFORCEMENT_OPERATION'
+
+
+def _parse_ciops_line(line: str, block_type: str, event_type: str) -> Dict[str, Any]:
+    """Parse single CIOPS line like:
+    01 - M20260083825 - RAIO 01 - ST * JEFFERSON - PESSOA/SITUAÇÃO SUSPEITA - BARROSO - 07:37 - UM CONDUZIDO - 6º DP
+    """
+    parts = [p.strip() for p in line.split(' - ') if p.strip()]
+    if len(parts) < 3:
+        return None
+    
+    # Extract fields
+    line_num = parts[0]  # 01
+    incident_id = parts[1] if len(parts) > 1 else ''  # M20260083825
+    
+    # Find natureza (typically after incident_id or raio/grupo)
+    natureza_idx = 2
+    for idx, part in enumerate(parts[2:], start=2):
+        if not re.match(r'^(RAIO|ST|SGT|2ºSGT|3ºSGT)\s', part):
+            natureza_idx = idx
+            break
+    
+    natureza = parts[natureza_idx] if natureza_idx < len(parts) else ''
+    
+    # Find timestamp (HH:MM at end)
+    timestamp = ''
+    timestamp_idx = None
+    for idx in range(len(parts)-1, -1, -1):
+        if re.search(r'\d{1,2}:\d{2}', parts[idx]):
+            timestamp = parts[idx]
+            timestamp_idx = idx
+            break
+    
+    # Extract location (usually penultimate or ante-penultimate)
+    bairro = ''
+    municipio = ''
+    localizacao_completa = ''
+    
+    if timestamp_idx and timestamp_idx >= 2:
+        # Location is usually before timestamp
+        loc_candidates = parts[natureza_idx+1:timestamp_idx]
+        if loc_candidates:
+            # Last location candidate is usually bairro/location
+            if len(loc_candidates) >= 1:
+                bairro = loc_candidates[-1]
+            if len(loc_candidates) >= 2:
+                municipio = loc_candidates[-2]
+            localizacao_completa = ', '.join(loc_candidates[-2:]) if len(loc_candidates) >= 2 else bairro
+    
+    # Check for arrests ("PRESO", "PRESOS")
+    num_arrested = 0
+    for part in parts:
+        match = re.search(r'(\d+)\s+PRESO', part.upper())
+        if match:
+            num_arrested = int(match.group(1))
+            break
+    
+    # Check for drugs/weapons ("DROGA", "ENTORPECENTES", "ARMA", "PISTOLA", "ESPINGARDA")
+    has_drugs = any(w in ' '.join(parts).upper() for w in ['DROGA', 'ENTORPECENTE', 'CRACK', 'COCAÍNA'])
+    has_weapons = any(w in ' '.join(parts).upper() for w in ['ARMA', 'PISTOLA', 'ESPINGARDA', 'FUZIL'])
+    
+    # Determine enforcement_intensity (0-1) - ONLY for ENFORCEMENT events
+    enforcement_intensity = 0.0
+    if 'ENFORCEMENT' in event_type:
+        if num_arrested > 0:
+            enforcement_intensity = min(1.0, num_arrested / 5.0)  # 5+ arrests = 1.0
+        if has_drugs or has_weapons:
+            enforcement_intensity = max(enforcement_intensity, 0.7)
+    
+    # Build resumo
+    resumo = f"{natureza} - {localizacao_completa or 'LOCAL DESC.'}"
+    if num_arrested > 0:
+        resumo += f" ({num_arrested} PRESO{'S' if num_arrested > 1 else ''})"
+    
+    return {
+        'incident_id': incident_id,
+        'block_type': block_type,
+        'event_type': event_type,
+        'natureza': natureza,
+        'descricao': '',
+        'sexo': '',
+        'localizacao_completa': localizacao_completa,
+        'bairro': bairro,
+        'municipio': municipio or 'FORTALEZA',
+        'timestamp': timestamp,
+        'resumo': resumo,
+        'raw_text': line,
+        'num_arrested': num_arrested,
+        'has_drugs': has_drugs,
+        'has_weapons': has_weapons,
+        'enforcement_intensity': enforcement_intensity,
+        'conflict_severity': _assign_severity(event_type, num_arrested, has_drugs, has_weapons)
+    }
+
+
+def _assign_severity(event_type: str, num_arrested: int, has_drugs: bool, has_weapons: bool) -> str:
+    """Assign conflict severity based on event type and characteristics."""
+    if 'HOMICIDE' in event_type or 'INJURY' in event_type or 'BODY' in event_type:
+        return 'HIGH'
+    elif 'DISPLACEMENT' in event_type:
+        return 'HIGH'  # CRIME: expulsão forçada = conflito territorial severo
+    elif 'ENFORCEMENT' in event_type:
+        if has_weapons or (has_drugs and num_arrested >= 2):
+            return 'MEDIUM'
+        return 'LOW'
+    return 'LOW'
+
+
+def process_exogenous_text(text: str, block_type: str = None) -> List[Dict[str, Any]]:
     """Parse exogenous event lines. Use deterministic parsing by default;
     if GEMINI_API_KEY is present, call the model and then enrich results
     using `busca_bairro` and `busca_municipio`.

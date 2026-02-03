@@ -19,7 +19,7 @@ warnings.filterwarnings('ignore', category=DeprecationWarning)
 from shapely.geometry import shape, Point, Polygon
 from scipy.spatial.distance import cdist
 from src.model import STGCN
-from src.llm_service import process_exogenous_text
+from src.llm_service import process_exogenous_text, parse_ciops_report
 import threading
 import time
 import unicodedata
@@ -171,9 +171,9 @@ def build_node_search_index():
     except Exception as e:
         print(f"Erro ao construir node_search_index: {e}")
 
-# Parâmetros de janela (modelo v2 retreinado)
-WINDOW_CVLI = 14
-WINDOW_CVP = 14
+# Parâmetros de janela (modelo v2 retreinado com 30 dias + 8 features)
+WINDOW_CVLI = 30
+WINDOW_CVP = 30
 
 def load_exogenous_events():
     global exogenous_events, exogenous_cache_file
@@ -622,12 +622,12 @@ def load_data_and_models():
                 print(err_msg)
                 raise RuntimeError(err_msg)
 
-            # Check Channels (Expected 3: CVLI, CVP, Tension)
-            if len(_node_features.shape) < 3 or _node_features.shape[2] != 3:
+            # Check Channels (Expected 8: CVLI, CVP, Tension, DOW sin/cos, Month sin/cos, Weekend)
+            if len(_node_features.shape) < 3 or _node_features.shape[2] != 8:
                 channels = _node_features.shape[2] if len(_node_features.shape) > 2 else 1
                 err_msg = (
                     f"CRITICAL: Dados obsoletos detectados! (Canais: {channels}). "
-                    "O sistema requer 3 canais (CVLI, CVP, Tensão). "
+                    "O sistema requer 8 canais (CVLI, CVP, Tension + 5 features temporais). "
                     "Por favor, execute 'python src/data_processing.py' para regenerar os dados."
                 )
                 print(err_msg)
@@ -1638,12 +1638,81 @@ def geocode_address(location_str, timeout=10):
         return None
     return None
 
+@app.route('/api/ciops/parse-report', methods=['POST'])
+def parse_ciops_report_endpoint():
+    """Parse CIOPS daily report with multiple blocks (OCORRÊNCIAS, HOMICÍDIOS, etc).
+    Returns events classified as ENFORCEMENT or CRIME, with severity levels.
+    """
+    data = request.get_json()
+    report_text = data.get('report', '')
+    
+    if not report_text or not report_text.strip():
+        return jsonify({'error': 'Relatório vazio'}), 400
+    
+    try:
+        # Parse report blocks
+        events = parse_ciops_report(report_text)
+        
+        if not events:
+            return jsonify({
+                'status': 'success',
+                'events': [],
+                'summary': {'total': 0, 'enforcement': 0, 'crime': 0, 'with_arrests': 0}
+            })
+        
+        # Enrich with location lookups
+        enriched = []
+        for evt in events:
+            try:
+                # Try to find coordinates by bairro first
+                loc = evt.get('localizacao_completa', '') or evt.get('bairro', '')
+                res = find_node_coordinates(loc)
+                if res:
+                    evt['lat'], evt['lng'], evt['match_quality'] = res
+                else:
+                    # Fallback to municipio
+                    res = find_node_coordinates(evt.get('municipio', 'FORTALEZA'))
+                    if res:
+                        evt['lat'], evt['lng'] = res[0], res[1]
+                        evt['match_quality'] = 'city_level'
+            except Exception as e:
+                logger.exception(f"Error enriching event: {e}")
+            
+            # Add classification for canal 9 integration
+            evt['canal_9_intensity'] = evt.get('enforcement_intensity', 0.0)
+            evt['canal_9_type'] = 'ENFORCEMENT' if 'ENFORCEMENT' in evt.get('event_type', '') else 'CRIME'
+            
+            enriched.append(evt)
+        
+        # Summary statistics
+        enforcement_count = len([e for e in enriched if 'ENFORCEMENT' in e.get('event_type', '')])
+        crime_count = len([e for e in enriched if 'CRIME' in e.get('event_type', '')])
+        arrests_count = sum(e.get('num_arrested', 0) for e in enriched)
+        
+        return jsonify({
+            'status': 'success',
+            'events': enriched,
+            'summary': {
+                'total': len(enriched),
+                'enforcement': enforcement_count,
+                'crime': crime_count,
+                'with_arrests': arrests_count,
+                'high_severity': len([e for e in enriched if e.get('conflict_severity') == 'HIGH']),
+                'medium_severity': len([e for e in enriched if e.get('conflict_severity') == 'MEDIUM']),
+                'low_severity': len([e for e in enriched if e.get('conflict_severity') == 'LOW'])
+            }
+        })
+    except Exception as e:
+        logger.exception('Error parsing CIOPS report')
+        return jsonify({'error': f'Erro ao processar: {str(e)}'}), 500
+
 @app.route('/api/exogenous/parse', methods=['POST'])
 def parse_exogenous():
     data = request.get_json()
     text = data.get('text', '')
 
     events = process_exogenous_text(text)
+
     missing_city = []
     for idx, evt in enumerate(events):
         muni = evt.get('municipio') if isinstance(evt, dict) else None
