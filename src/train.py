@@ -20,12 +20,12 @@ from torch.utils.data import DataLoader, Dataset, TensorDataset
 
 DATA_FILE = 'data/processed/processed_graph_data.pkl'
 MODEL_DIR = 'models'
-MODEL_PATH = os.path.join(MODEL_DIR, 'stgcn_model_v2.pth')
-HISTORY_WINDOW = 30
-BATCH_SIZE = 64
-EPOCHS = 30
-LEARNING_RATE = 0.0003
-GAMMA = 2.0
+MODEL_PATH = os.path.join(MODEL_DIR, 'stgcn_model_v3.pth')  # v3: 26 canais categóricos
+HISTORY_WINDOW = 14  # Reduzido de 30: captura padrões mais recentes e relevantes
+BATCH_SIZE = 64  # 1. Ajuste fino: 16-32 para gradientes mais estáveis
+EPOCHS = 60  # 5. Ajuste fino: 50+ para convergência completa
+LEARNING_RATE = 0.0002  # 2. Ajuste fino: Manter 0.0001 (dados em escala original)
+GAMMA = 1.5  # 3. Ajuste fino: Testar 1.5-2.0 (amplificação moderada)
 WEIGHT_DECAY = 1e-5
 
 def get_logger():
@@ -65,10 +65,10 @@ class BalancedWindowDataset(Dataset):
 
 class WeightedFocalMSELoss(nn.Module):
     """Loss com foco em hotspots COM amplificação."""
-    def __init__(self, weight_zero=1.0, weight_hotspot=20.0, gamma=2.0):
+    def __init__(self, weight_zero=1.0, weight_hotspot=20.0, gamma=1.5):
         super(WeightedFocalMSELoss, self).__init__()
         self.weight_zero = weight_zero
-        self.weight_hotspot = weight_hotspot  # Amplificação: 50.0
+        self.weight_hotspot = weight_hotspot  # Amplificação: 30.0
         self.gamma = gamma
 
     def forward(self, pred, target):
@@ -84,6 +84,7 @@ class WeightedFocalMSELoss(nn.Module):
         return torch.mean(loss)
 
 def prepare_dataset(node_features):
+    """Prepara dataset ORIGINAL - sem balanceamento."""
     windows = sliding_window_view(node_features, HISTORY_WINDOW, axis=1)
 
     X = windows[:, :-1, :, :] # (Nodes, Samples, Features, WindowSize)
@@ -101,9 +102,11 @@ def prepare_dataset(node_features):
 def precision_at_k(pred, target, k=5):
     """Precision@K: entre os top-k nós com MAIS eventos reais,
     quantos o modelo predisse corretamente?
+    CORRIGIDO: Contar apenas dias com eventos
     """
     batch_size = pred.shape[0]
     p_k_sum = 0.0
+    valid_days = 0  # Dias com eventos reais
 
     for i in range(batch_size):
         p = pred[i, :, 0].detach().cpu().numpy()
@@ -113,17 +116,24 @@ def precision_at_k(pred, target, k=5):
         if t.max() == 0:
             # Se não há eventos reais neste dia, skip
             continue
+        
+        valid_days += 1
+        num_events = (t > 0).sum()
+        k_actual = min(k, num_events, len(t))
+        
+        if k_actual <= 0:
+            continue
             
-        _, true_top_k_indices = torch.topk(torch.FloatTensor(t), min(k, len(t)))
+        _, true_top_k_indices = torch.topk(torch.FloatTensor(t), k_actual)
         true_top_k_indices = true_top_k_indices.numpy()
         
         # Quantas vezes o modelo predisse alta também para esses nós?
-        pred_top_k = torch.topk(torch.FloatTensor(p), min(k, len(p)))[1].numpy()
+        pred_top_k = torch.topk(torch.FloatTensor(p), k_actual)[1].numpy()
         
         hits = len(set(true_top_k_indices) & set(pred_top_k))
-        p_k_sum += (hits / min(k, (t > 0).sum()))
+        p_k_sum += (hits / k_actual)
 
-    return p_k_sum / max(1, batch_size)
+    return p_k_sum / max(1, valid_days)  # Dividir apenas por dias com eventos
 
 def main():
     logger = get_logger()
@@ -176,10 +186,10 @@ def main():
     num_nodes = node_features.shape[0]
     num_features = node_features.shape[2]
     
-    model = STGCN(num_nodes=num_nodes, in_channels=num_features, time_steps=HISTORY_WINDOW, num_classes=1, num_graphs=len(norm_adj_list)).to(device)
+    model = STGCN(num_nodes=num_nodes, in_channels=26, time_steps=HISTORY_WINDOW, num_classes=1, num_graphs=len(norm_adj_list)).to(device)
     norm_adj_list = [a.to(device) for a in norm_adj_list]
     
-    criterion = WeightedFocalMSELoss(weight_zero=1.0, weight_hotspot=15.0, gamma=GAMMA).to(device)
+    criterion = WeightedFocalMSELoss(weight_zero=1.0, weight_hotspot=20.0, gamma=GAMMA).to(device)  # 4. Ajuste fino: 15-25 para foco em eventos raros
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=5)
     
@@ -221,14 +231,14 @@ def main():
         val_avg_p5 = val_p5 / len(val_loader)
 
         epoch_time = time.time() - epoch_start
-        logger.info(f"Epoch {epoch+1}/{EPOCHS} | Time: {epoch_time:.1f}s | Train Loss: {train_avg_loss:.4f} | Val Loss: {val_avg_loss:.4f} | Val P@5: {val_avg_p5:.4f}")
+        logger.info(f"Epoch {epoch+1}/{EPOCHS} | Time: {epoch_time:.1f}s | Train Loss: {train_avg_loss:.4f} | Val Loss: {val_avg_loss:.4f} | Val P@10: {val_avg_p5:.4f}")
 
         # Early stopping
         if val_avg_p5 > best_p5:
             best_p5 = val_avg_p5
             patience_counter = 0
             torch.save(model.state_dict(), MODEL_PATH)
-            logger.info(f"  -> Novo melhor modelo salvo! (P@5: {best_p5:.4f})")
+            logger.info(f"  -> Novo melhor modelo salvo! (P@10: {best_p5:.4f})")
         else:
             patience_counter += 1
             if patience_counter >= patience:

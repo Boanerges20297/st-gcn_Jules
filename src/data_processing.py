@@ -360,22 +360,26 @@ def load_and_assign_occurrences(filepath, nodes_gdf):
 
 def build_feature_tensor(nodes_gdf, occurrences_df, start_date, end_date, exogenous_events=None):
     """
-    Constrói o tensor (Nodes, Time, 8).
+    Constrói o tensor (Nodes, Time, 26) - VERSÃO 3 COM ONE-HOT CATEGÓRICO.
     
-    Channels:
+    Channels 0-2: Eventos
     0: CVLI (homicídios)
     1: CVP (crimes contra patrimônio)
     2: Tension (índice de tensão)
-    3: Day of Week (sin) - padrão semanal
-    4: Day of Week (cos) - padrão semanal
-    5: Month (sin) - padrão mensal/sazonal
-    6: Month (cos) - padrão mensal/sazonal
-    7: Is Weekend - fim de semana (0 ou 1)
+    
+    Channels 3-9: Day-of-Week ONE-HOT (7D)
+    3: Monday, 4: Tuesday, 5: Wednesday, 6: Thursday, 7: Friday, 8: Saturday, 9: Sunday
+    
+    Channels 10-21: Month ONE-HOT (12D)
+    10: Jan, 11: Feb, ..., 21: Dec
+    
+    Channels 22-25: Reservados
+    22: Is-Weekend, 23-25: Future
     """
     date_range = pd.date_range(start=start_date, end=end_date, freq='D')
     num_nodes = len(nodes_gdf)
     num_timesteps = len(date_range)
-    num_features = 8  # 3 canais base + 5 temporais
+    num_features = 26  # 3 base + 7 DOW + 12 Month + 4 extra
 
     features = np.zeros((num_nodes, num_timesteps, num_features), dtype=np.float32)
 
@@ -384,7 +388,6 @@ def build_feature_tensor(nodes_gdf, occurrences_df, start_date, end_date, exogen
     is_cvli = occurrences_df['tipo_evento'].astype(str).str.upper().isin(cvli_types)
 
     # CVP: Crimes Violentos ao Patrimônio (correlacionam com atividade de facções)
-    # Incluir ROUBO e FURTO geral, mas dar peso maior a veículos/motos
     tipo_upper = occurrences_df['tipo_evento'].astype(str).str.upper()
     is_cvp = tipo_upper.str.contains('ROUBO') | tipo_upper.str.contains('FURTO')
 
@@ -392,7 +395,7 @@ def build_feature_tensor(nodes_gdf, occurrences_df, start_date, end_date, exogen
     valid_mask = (occurrences_df['day_idx'] >= 0) & (occurrences_df['day_idx'] < num_timesteps)
     df_valid = occurrences_df[valid_mask]
 
-    print("Agregando Channels (8 canais: CVLI, CVP, Tension, DOW sin/cos, Month sin/cos, Weekend)...")
+    print("Agregando 26 Canais: CVLI, CVP, Tension + 7 DOW one-hot + 12 Month one-hot + extras...")
 
     # Channel 0: CVLI
     cvli_counts = df_valid[is_cvli[valid_mask]].groupby(['node_id', 'day_idx']).size()
@@ -408,29 +411,31 @@ def build_feature_tensor(nodes_gdf, occurrences_df, start_date, end_date, exogen
     tension_values = nodes_gdf['tension_index'].values
     features[:, :, 2] = np.tile(tension_values[:, np.newaxis], (1, num_timesteps))
 
-    # Channels 3-7: Features Temporais (calculadas automaticamente das datas)
+    # Channels 3-9: Day-of-Week ONE-HOT (Monday=0, Sunday=6)
     for day_idx, date in enumerate(date_range):
-        # Day of Week (0=Monday, 6=Sunday) -> encoding cíclico sin/cos
-        dow = date.dayofweek
-        features[:, day_idx, 3] = np.sin(2 * np.pi * dow / 7)  # DOW_SIN
-        features[:, day_idx, 4] = np.cos(2 * np.pi * dow / 7)  # DOW_COS
-        
-        # Month (1-12) -> encoding cíclico sin/cos
-        month = date.month
-        features[:, day_idx, 5] = np.sin(2 * np.pi * month / 12)  # MONTH_SIN
-        features[:, day_idx, 6] = np.cos(2 * np.pi * month / 12)  # MONTH_COS
-        
-        # Is Weekend (Sábado=5, Domingo=6)
-        features[:, day_idx, 7] = 1.0 if dow >= 5 else 0.0  # IS_WEEKEND
+        dow = date.weekday()  # 0=Monday, 6=Sunday
+        features[:, day_idx, 3 + dow] = 1.0
+    
+    # Channels 10-21: Month ONE-HOT (January=0, December=11)
+    for day_idx, date in enumerate(date_range):
+        month = date.month - 1  # 0=January, 11=December
+        features[:, day_idx, 10 + month] = 1.0
+    
+    # Channel 22: Is-Weekend (Saturday=5, Sunday=6)
+    for day_idx, date in enumerate(date_range):
+        dow = date.weekday()
+        if dow >= 5:
+            features[:, day_idx, 22] = 1.0
+    
+    # Channels 23-25: Reserved for future use
 
-    # REMOVER NORMALIZAÇÃO - preservar valores brutos para melhor aprendizado
-    print("⚠️  NORMALIZAÇÃO DESABILITADA - usando valores brutos")
+    print("✓ Features categóricas geradas (26 canais)")
     print("📊 Estatísticas dos canais (valores brutos):")
     for c in range(3):
         channel_max = features[:, :, c].max()
         channel_mean = features[:, :, c].mean()
         print(f"  Canal {c}: max={channel_max:.4f}, mean={channel_mean:.6f}")
-    print("✓ Features temporais (canais 3-7) adicionadas automaticamente das datas")
+    print("✓ Features categóricas one-hot (canais 3-22) adicionadas automaticamente das datas")
 
     return features, date_range
 

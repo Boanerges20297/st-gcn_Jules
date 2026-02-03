@@ -147,6 +147,28 @@ def _extract_json_from_text(text: str):
             return json.loads(m.group(1))
         except Exception:
             pass
+def _extract_json_from_text(s: str):
+    """Extract JSON (array or object) from text. First try direct parse, then regex."""
+    if not s or not isinstance(s, str):
+        raise ValueError('No JSON found')
+    
+    # Try direct JSON parse first
+    try:
+        parsed = json.loads(s.strip())
+        return parsed if isinstance(parsed, list) else [parsed]
+    except Exception:
+        pass
+    
+    # Try array first [...]
+    m = re.search(r"(\[.*\])", s, re.S)
+    if m:
+        try:
+            parsed = json.loads(m.group(1))
+            return parsed if isinstance(parsed, list) else [parsed]
+        except Exception:
+            pass
+    
+    # Then try object {...}
     m = re.search(r"(\{.*\})", s, re.S)
     if m:
         try:
@@ -933,3 +955,143 @@ def _mock_response(text: str) -> List[Dict[str, Any]]:
             'raw': line
         })
     return events
+
+
+# ============================================================================
+# PHASE 2: SEMANTIC EMBEDDINGS FOR NEIGHBORHOODS
+# ============================================================================
+
+def _get_bairro_description(bairro_name: str) -> str:
+    """Create semantic description of neighborhood for embedding generation."""
+    descriptions = {
+        'Aldeota': 'Upscale neighborhood in south zone, commerce and high-standard residential, near downtown',
+        'Barroso': 'Peripheral west zone, popular residential area',
+        'Parangaba': 'Downtown Fortaleza, commercial and historic, busy',
+        'Meireles': 'Beachfront neighborhood, middle-class, tourism',
+        'Praia de Iracema': 'Tourist zone, commerce, nightlife',
+        'Joquei Clube': 'South zone, residential, upper-middle class',
+        'Lagoa': 'Residential area with natural lagoon, middle class',
+        'Varjota': 'South zone, commerce and residential',
+        'Centro': 'Downtown commercial center, high density',
+        'Mucuripe': 'Beachfront, industrial port area',
+        'Cocó': 'Residential south, middle to upper class',
+        'Salinas': 'Salt production area, industrial',
+        'Pirambu': 'Peripheral north, lower income',
+        'Bom Meigo': 'Peripheral, residential',
+        'Carlito Pamplona': 'Peripheral zone',
+        'Henrique Jorge': 'Peripheral residential',
+        'Pedra Mole': 'Peripheral zone, industrial',
+        'Barrinha': 'Peripheral east',
+        'Taboca': 'Peripheral south',
+        'Pici': 'University area, residential',
+        'Antônio Bezerra': 'Peripheral, residential',
+        'Damas': 'Peripheral west',
+        'Quintino Cunha': 'Peripheral, residential',
+        'Siqueira': 'Peripheral residential',
+        'Castelão': 'Sports complex area',
+        'Vila União': 'Peripheral neighborhood',
+        'Granja Portugal': 'Peripheral residential',
+        'Vila Velha': 'Historic peripheral neighborhood',
+        'Sabiazinho': 'Peripheral zone',
+        'Messejana': 'Peripheral east, residential',
+        'Ancuri': 'Peripheral zone',
+        'Sapata': 'Peripheral residential',
+    }
+    return descriptions.get(bairro_name, f'Neighborhood {bairro_name} in Fortaleza, Ceará, Brazil')
+
+
+def _mock_embedding_for_bairro(bairro_name: str) -> List[float]:
+    """Generate deterministic mock embedding based on neighborhood name."""
+    import hashlib
+    import numpy as np
+    
+    hash_obj = hashlib.md5(bairro_name.encode())
+    seed = int(hash_obj.hexdigest(), 16) % (2**32)
+    
+    rng = np.random.RandomState(seed)
+    embedding = rng.randn(384).astype(np.float32) * 0.1
+    
+    logger.debug(f'Generated mock embedding for {bairro_name}')
+    return embedding.tolist()
+
+
+def _mock_semantic_embeddings(bairro_names: List[str]) -> Dict[str, List[float]]:
+    """Generate mock embeddings for all neighborhoods when no API keys available."""
+    logger.warning(f'No API keys; using mock semantic embeddings for {len(bairro_names)} neighborhoods')
+    return {b: _mock_embedding_for_bairro(b) for b in bairro_names}
+
+
+def get_semantic_embeddings_batch(
+    bairro_names: List[str],
+    cache_file: str = None,
+    api_keys: List[str] = None,
+    rate_limit_delay: float = 1.5
+) -> Dict[str, List[float]]:
+    """
+    Generate semantic embeddings (384D) for neighborhoods using Google Generative AI.
+    
+    With 4 API keys in rotation, failures are extremely rare.
+    Cache-first: avoids redundant API calls.
+    """
+    import time
+    
+    if cache_file is None:
+        cache_file = 'data/processed/bairro_embeddings.json'
+    
+    if api_keys is None:
+        api_keys = get_gemini_api_keys()
+    
+    if not api_keys:
+        logger.error('No API keys found; cannot generate embeddings')
+        raise RuntimeError('No GEMINI_API_KEY configured')
+    
+    # Load existing cache
+    embeddings = {}
+    if os.path.exists(cache_file):
+        try:
+            with open(cache_file, 'r') as f:
+                embeddings = json.load(f)
+            logger.info(f'Loaded {len(embeddings)} cached embeddings')
+        except Exception as e:
+            logger.warning(f'Failed to load cache: {e}; starting fresh')
+    
+    # Generate missing embeddings
+    bairros_to_fetch = [b for b in bairro_names if b not in embeddings]
+    
+    if bairros_to_fetch:
+        logger.info(f'Generating embeddings for {len(bairros_to_fetch)}/{len(bairro_names)} neighborhoods')
+        
+        for idx, bairro in enumerate(bairros_to_fetch):
+            description = _get_bairro_description(bairro)
+            prompt = (
+                f"Generate semantic embedding for this neighborhood:\n\n"
+                f"Neighborhood: {bairro}, Fortaleza, Ceará, Brazil\n"
+                f"Description: {description}\n\n"
+                f"Respond with ONLY a JSON array of 384 floating-point numbers "
+                f"(no markdown, no explanation):\n"
+                f"[-0.123, 0.456, ..., 0.789]"
+            )
+            
+            # Call with API key rotation - with 4 keys, failures extremely rare
+            response = _call_model_with_rotation(prompt, api_keys)
+            embedding = _extract_json_from_text(response)
+            
+            if isinstance(embedding, list) and len(embedding) == 384:
+                embeddings[bairro] = embedding
+                logger.info(f'[{idx+1}/{len(bairros_to_fetch)}] Generated for {bairro}')
+            else:
+                raise ValueError(f'Invalid embedding format for {bairro}')
+            
+            if idx < len(bairros_to_fetch) - 1:
+                time.sleep(rate_limit_delay)
+        
+        # Save cache
+        try:
+            os.makedirs(os.path.dirname(cache_file) or '.', exist_ok=True)
+            with open(cache_file, 'w') as f:
+                json.dump(embeddings, f)
+            logger.info(f'Saved {len(embeddings)} embeddings to cache')
+        except Exception as e:
+            logger.error(f'Failed to save cache: {e}')
+    
+    return {b: embeddings[b] for b in bairro_names}

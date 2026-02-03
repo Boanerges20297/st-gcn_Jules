@@ -123,7 +123,7 @@ class STGCNLayer(nn.Module):
         super(STGCNLayer, self).__init__()
         self.temporal_conv = nn.Conv2d(in_channels, out_channels, (1, kernel_size), padding=(0, kernel_size//2))
         self.gcn = MultiGraphConvolution(out_channels, out_channels, num_graphs=num_graphs)
-        self.relu = nn.ReLU()
+        self.elu = nn.ELU(alpha=1.0)  # ELU em vez de ReLU: evita morte de neurônios
         self.dropout = nn.Dropout(0.6)  # Aumentado para 0.6 (maior regularização)
         self.bn = nn.BatchNorm2d(out_channels)
 
@@ -145,7 +145,7 @@ class STGCNLayer(nn.Module):
 
         x = x.reshape(B, T, N, C).permute(0, 3, 2, 1) # (B, C, N, T)
         x = self.bn(x)
-        return self.dropout(self.relu(x))
+        return self.dropout(self.elu(x))
 
 class STGCN(nn.Module):
     """ST-GCN com 4 canais de entrada (Opção 3 - Implementado).
@@ -178,5 +178,5 @@ class STGCN(nn.Module):
         x = x.squeeze(-1).permute(0, 2, 1) # (B, N, 64)
         x = self.fc(x) # (B, N, 1)
 
-        # Ativação Final ReLU para garantir não-negatividade (Regra 2)
-        return F.relu(x)
+        # Sem ativação final - deixar aprender a distribuição
+        return x

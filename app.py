@@ -68,7 +68,7 @@ app = Flask(__name__)
 # Configuração e Carregamento de Dados (usar caminhos absolutos relativos a este arquivo)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, 'data', 'processed', 'processed_graph_data.pkl')
-MODEL_CVLI_PATH = os.path.join(BASE_DIR, 'models', 'stgcn_model_v2.pth') # Modelo v2 retreinado: janela 14 dias, Focal Loss, dados 2024-2025
+MODEL_CVLI_PATH = os.path.join(BASE_DIR, 'models', 'stgcn_model_v3.pth') # Modelo v3: 26 canais categóricos (one-hot dia/mês)
 EXOGENOUS_FILE = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
 BAIRROS_POLYGONS_PATHS = [
     os.path.join(BASE_DIR, 'data', 'raw', 'AIS - CAPITAL.geojson'),
@@ -83,7 +83,7 @@ nodes_centroids_proj = None
 adj_matrix = None
 original_adj_matrix = None
 node_features = None
-model_cvli = None # Modelo 3D unificado (3 canais: CVLI, CVP, Tension)
+model_cvli = None # Modelo 3D unificado (8 canais)
 device = None
 norm_adj = None
 adj_geo = None
@@ -726,8 +726,8 @@ def load_data_and_models():
 
                 instantiate_ts = WINDOW_CVLI if ck_time_steps is None else ck_time_steps
 
-                # FIXED: in_channels=3
-                m_cvli = STGCN(num_nodes=num_nodes, in_channels=3, time_steps=instantiate_ts, num_classes=1, num_graphs=num_graphs)
+                # FIXED: in_channels=26 (modelo v3 com features categóricas)
+                m_cvli = STGCN(num_nodes=num_nodes, in_channels=26, time_steps=instantiate_ts, num_classes=1, num_graphs=num_graphs)
                 m_cvli.load_state_dict(state_dict, strict=False)
                 m_cvli.to(device)
                 m_cvli.eval()
