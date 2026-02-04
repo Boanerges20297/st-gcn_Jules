@@ -24,6 +24,7 @@ import threading
 import time
 import unicodedata
 from datetime import datetime, timezone
+from collections.abc import Mapping
 
 # Desscale mapping (loaded from diagnostics report if present)
 _DESSCALE_A = None
@@ -711,7 +712,24 @@ def load_data_and_models():
             print(f"Carregando modelo UNIFICADO de {MODEL_CVLI_PATH}...")
             num_graphs = len(norm_adj_list) if norm_adj_list is not None else 1
             try:
-                raw_state = torch.load(MODEL_CVLI_PATH, map_location=device)
+                # Prefer safe loading mode when available to avoid executing arbitrary pickle code.
+                try:
+                    raw_state = torch.load(MODEL_CVLI_PATH, map_location=device, weights_only=True)
+                    print("[SECURE LOAD] torch.load used with weights_only=True")
+                except TypeError:
+                    raw_state = torch.load(MODEL_CVLI_PATH, map_location=device)
+                    print(
+                        "[SECURE LOAD] WARNING: torch.load(..., weights_only=True) not supported by this PyTorch.\n"
+                        "Ensure the checkpoint file is trusted. Consider upgrading PyTorch to enable safer loading."
+                    )
+
+                # Validate that the loaded object is a mapping-like state dict. If it's not, abort to
+                # avoid interacting with arbitrary objects that may have been unpickled.
+                if not isinstance(raw_state, Mapping):
+                    raise RuntimeError(
+                        f"Unsafe checkpoint format: expected a mapping (state_dict), got {type(raw_state)}.\n"
+                        "Aborting load to avoid executing untrusted code."
+                    )
                 state_dict = {}
                 for k,v in dict(raw_state).items():
                     nk = k[7:] if k.startswith('module.') else k
@@ -728,13 +746,26 @@ def load_data_and_models():
 
                 instantiate_ts = WINDOW_CVLI if ck_time_steps is None else ck_time_steps
 
-                # FIXED: in_channels=8 (modelo v2 retreinado com 8 features temporais)
-                m_cvli = STGCN(num_nodes=num_nodes, in_channels=8, time_steps=instantiate_ts, num_classes=1, num_graphs=num_graphs)
+                # Determine expected input channels from checkpoint (fallback to data)
+                ck_in_channels = None
+                if 'layer1.temporal_conv.weight' in state_dict:
+                    try:
+                        ck_in_channels = state_dict['layer1.temporal_conv.weight'].shape[1]
+                    except Exception:
+                        ck_in_channels = None
+
+                if ck_in_channels is None:
+                    try:
+                        ck_in_channels = node_features.shape[2]
+                    except Exception:
+                        ck_in_channels = 8
+
+                m_cvli = STGCN(num_nodes=num_nodes, in_channels=ck_in_channels, time_steps=instantiate_ts, num_classes=1, num_graphs=num_graphs)
                 m_cvli.load_state_dict(state_dict, strict=False)
                 m_cvli.to(device)
                 m_cvli.eval()
                 model_cvli = m_cvli
-                print(f"[DEBUG] Modelo CVLI carregado com sucesso!")
+                print(f"[DEBUG] Modelo CVLI carregado com sucesso! (in_channels={ck_in_channels}, time_steps={instantiate_ts})")
                 # Tentar carregar artefato de ranking (pickle com 'scores')
                 try:
                     if os.path.exists(RANKING_MODEL_PATH):
@@ -928,12 +959,13 @@ def get_network_graph():
     all_nodes = risk_data.get('data', [])
 
     sorted_nodes = sorted(all_nodes, key=lambda x: x['risk_score'], reverse=True)
-    top_30 = sorted_nodes[:30]
+    top_k = 10
+    top_nodes = sorted_nodes[:top_k]
 
     graph_nodes = []
     top_indices = set()
 
-    for item in top_30:
+    for item in top_nodes:
         nid = item['node_id']
         top_indices.add(nid)
 
@@ -951,9 +983,9 @@ def get_network_graph():
 
     links = []
 
-    for source in top_30:
+    for source in top_nodes:
         u = source['node_id']
-        for target in top_30:
+        for target in top_nodes:
             v = target['node_id']
             if u == v: continue
 
@@ -1220,12 +1252,21 @@ def calculate_risk(custom_norm_adj=None):
         # Converte percentil para score 0-100
         normalized_risk_cvli = percentiles.copy()
 
+        # Provenance flags for debugging why a node's score was raised
+        provenance_history = np.zeros_like(normalized_risk_cvli, dtype=bool)
+        provenance_very_active = np.zeros_like(normalized_risk_cvli, dtype=bool)
+        provenance_exogenous = np.zeros_like(normalized_risk_cvli, dtype=bool)
+        provenance_exo_critical = np.zeros_like(normalized_risk_cvli, dtype=bool)
+        provenance_neighbor_boost = np.zeros_like(normalized_risk_cvli, dtype=bool)
+
         # Boosting baseado em histórico (mais conservador)
         active_indices = hist_sum_cvli > 0
         normalized_risk_cvli[active_indices] = np.maximum(normalized_risk_cvli[active_indices], 30.0)
+        provenance_history[active_indices] = True
 
         very_active = hist_sum_cvli >= 3
         normalized_risk_cvli[very_active] = np.maximum(normalized_risk_cvli[very_active], 60.0)
+        provenance_very_active[very_active] = True
 
         # Eventos exógenos aumentam para percentil alto
         if exogenous_affected_nodes:
@@ -1233,12 +1274,14 @@ def calculate_risk(custom_norm_adj=None):
             exo_indices = [i for i in exo_indices if i < len(normalized_risk_cvli)]
             if exo_indices:
                 normalized_risk_cvli[exo_indices] = np.maximum(normalized_risk_cvli[exo_indices], 85.0)
+                provenance_exogenous[exo_indices] = True
 
             try:
                 if exogenous_critical_nodes:
                     crit_idxs = [i for i in exogenous_critical_nodes if i < len(normalized_risk_cvli)]
                     if crit_idxs:
                         normalized_risk_cvli[crit_idxs] = np.maximum(normalized_risk_cvli[crit_idxs], 95.0)
+                        provenance_exo_critical[crit_idxs] = True
                         top_k = 10
                         try:
                             if adj_faction is not None:
@@ -1249,6 +1292,7 @@ def calculate_risk(custom_norm_adj=None):
                                     selected = neigh[:top_k]
                                     if selected:
                                         normalized_risk_cvli[selected] = np.maximum(normalized_risk_cvli[selected], 90.0)
+                                        provenance_neighbor_boost[selected] = True
                         except Exception:
                             pass
             except Exception:
@@ -1260,7 +1304,21 @@ def calculate_risk(custom_norm_adj=None):
         # But for UI 'risk_score_cvp', we can use the history as proxy or just copy main risk.
         # Let's derive CVP Risk from CVP history + Context for now to populate the UI field.
         # Or even better, assume CVP Risk correlates with Main Risk (since it's a precursor).
+        # CVP proxy for UI
         normalized_risk_cvp = normalized_risk_cvli.copy()
+
+        # Prepare ranking-derived signals if artifact available
+        ranking_scores_arr = None
+        ranking_top10_threshold = None
+        try:
+            if model_ranking_scores is not None and len(model_ranking_scores) == len(normalized_risk_cvli):
+                ranking_scores_arr = np.array(model_ranking_scores)
+                # threshold for top 10% (used to validate ST-GCN top10 candidates)
+                ranking_top10_threshold = float(np.percentile(ranking_scores_arr, 90))
+                print(f"[DEBUG] Ranking artifact present. top10_threshold={ranking_top10_threshold}")
+        except Exception:
+            ranking_scores_arr = None
+            ranking_top10_threshold = None
         # But CVP is raw count, not risk.
         # Let's just normalize CVP History for visualization?
         # Actually, let's leave it as copy of main risk, but potentially modified by local CVP intensity.
@@ -1363,13 +1421,21 @@ def calculate_risk(custom_norm_adj=None):
                     reasons.append('📊 Risco moderado - monitoramento recomendado')
 
             def _status_label(score: float) -> str:
-                if score >= 90:
-                    return 'Crítico'
-                if score >= 70:
-                    return 'Alto'
-                if score >= 40:
-                    return 'Médio'
-                return 'Baixo'
+                    # New classification bands (aligned with frontend request):
+                    # crítico: >=90, alto: [80,90), moderado: [50,80), baixo: [20,50), sem risco: [0,20)
+                    try:
+                        s = float(score)
+                    except Exception:
+                        s = 0.0
+                    if s >= 90:
+                        return 'Crítico'
+                    if s >= 80:
+                        return 'Alto'
+                    if s >= 50:
+                        return 'Moderado'
+                    if s >= 20:
+                        return 'Baixo'
+                    return 'Sem Risco'
 
             def _prediction_text(val: float, kind: str='CVLI') -> str:
                 horizon_days = 7
@@ -1389,6 +1455,22 @@ def calculate_risk(custom_norm_adj=None):
             cvli_pred_text = _prediction_text(cvli_val, 'CVLI')
             cvp_pred_text = _prediction_text(cvp_val, 'CVP')
 
+            # Build provenance list for this node
+            prov = []
+            if provenance_history[i]: prov.append('history')
+            if provenance_very_active[i]: prov.append('very_active')
+            if provenance_exogenous[i]: prov.append('exogenous')
+            if provenance_exo_critical[i]: prov.append('exogenous_critical')
+            if provenance_neighbor_boost[i]: prov.append('neighbor_boost')
+
+            # ranking_score (optional) from precomputed ranking artifact
+            rk_score = None
+            try:
+                if model_ranking_scores is not None and len(model_ranking_scores) == len(normalized_risk_cvli):
+                    rk_score = float(model_ranking_scores[i])
+            except Exception:
+                rk_score = None
+
             results.append({
                 'node_id': int(i),
                 'risk_score': cvli_score,
@@ -1403,6 +1485,9 @@ def calculate_risk(custom_norm_adj=None):
                 'risk_text': risk_text,
                 'cvli_prediction_text': cvli_pred_text,
                 'cvp_prediction_text': cvp_pred_text
+            ,
+                'ranking_score': rk_score,
+                'score_provenance': prov
             })
 
         try:
@@ -1437,6 +1522,114 @@ def calculate_risk(custom_norm_adj=None):
                 pass
 
         meta['model_window_cvli'] = WINDOW_CVLI
+        # Summary counts for dashboard debugging
+        # --- Cross-validate top candidates from CVLI with ranking artifact ---
+        try:
+            # If ranking artifact available, validate top-K CVLI candidates and demote when ranking disagrees
+            TOP_K_VALIDATION = 10
+            if ranking_scores_arr is not None and len(results) >= TOP_K_VALIDATION:
+                sorted_by_cvli_idx = sorted(range(len(results)), key=lambda x: results[x].get('risk_score', 0), reverse=True)
+                top_candidates = sorted_by_cvli_idx[:TOP_K_VALIDATION]
+                for cid in top_candidates:
+                    try:
+                        rk = ranking_scores_arr[cid]
+                    except Exception:
+                        rk = None
+                    # If ranking score exists but is below top-10 threshold, demote the CVLI priority
+                    if rk is not None and ranking_top10_threshold is not None and float(rk) < ranking_top10_threshold:
+                        # Demote: cap risk to 80 (Alto) and annotate reason/provenance
+                        old = results[cid]['risk_score']
+                        results[cid]['risk_score'] = min(float(results[cid]['risk_score']), 80.0)
+                        results[cid]['reasons'].insert(0, '🔎 Validação de ranking: prioridade reduzida')
+                        # preserve original cvli field but mark that ranking demoted
+                        prov = results[cid].get('score_provenance', []) or []
+                        if 'ranking_demoted' not in prov:
+                            prov.append('ranking_demoted')
+                        results[cid]['score_provenance'] = prov
+                        results[cid]['ranking_score'] = float(rk)
+
+            # Compute counts using final numeric `risk_score` and agreed bands
+            counts = {'crítico':0, 'alto':0, 'moderado':0, 'baixo':0, 'sem risco':0}
+            for r in results:
+                try:
+                    sv = float(r.get('risk_score', 0) or 0)
+                except Exception:
+                    sv = 0.0
+                if sv >= 90:
+                    counts['crítico'] += 1
+                elif sv >= 80:
+                    counts['alto'] += 1
+                elif sv >= 50:
+                    counts['moderado'] += 1
+                elif sv >= 20:
+                    counts['baixo'] += 1
+                else:
+                    counts['sem risco'] += 1
+
+            meta['counts'] = counts
+            meta['cutoff_cvli'] = float(cutoff_cvli)
+            # indicate if ranking artifact was used
+            meta['ranking_source'] = os.path.basename(RANKING_MODEL_PATH) if model_ranking_scores is not None else 'stgcn_percentile'
+            # Detailed provenance lists: nodes influenced by each rule
+            prov_lists = {'history': [], 'very_active': [], 'exogenous': [], 'exogenous_critical': [], 'neighbor_boost': []}
+            try:
+                for r in results:
+                    nid = int(r.get('node_id'))
+                    for p in r.get('score_provenance', []):
+                        if p in prov_lists:
+                            prov_lists[p].append(nid)
+                meta['provenance_lists'] = prov_lists
+            except Exception:
+                meta['provenance_lists'] = prov_lists
+
+            # Distribution summary and percentiles
+            try:
+                arr_raw = np.array(cvli_raw)
+                arr_norm = np.array(normalized_risk_cvli)
+                meta['distribution'] = {
+                    'raw_min': float(np.min(arr_raw)),
+                    'raw_max': float(np.max(arr_raw)),
+                    'raw_mean': float(np.mean(arr_raw)),
+                    'raw_percentiles': {p: float(np.percentile(arr_raw, p)) for p in [50,75,90,95,99]},
+                    'norm_min': float(np.min(arr_norm)),
+                    'norm_max': float(np.max(arr_norm)),
+                    'norm_mean': float(np.mean(arr_norm)),
+                    'norm_percentiles': {p: float(np.percentile(arr_norm, p)) for p in [50,75,90,95,99]}
+                }
+            except Exception:
+                meta['distribution'] = {}
+
+            # hist_sum_cvli summary
+            try:
+                arr_hist = np.array(hist_sum_cvli)
+                meta['history_stats'] = {
+                    'hist_min': int(np.min(arr_hist)),
+                    'hist_max': int(np.max(arr_hist)),
+                    'hist_mean': float(np.mean(arr_hist)),
+                    'hist_percentiles': {p: int(np.percentile(arr_hist, p)) for p in [50,75,90,95]}
+                }
+            except Exception:
+                meta['history_stats'] = {}
+
+            # Top nodes debug: both risk_score and ranking_score and provenance
+            try:
+                topk = 20
+                sorted_by_risk = sorted(results, key=lambda x: x.get('risk_score', 0), reverse=True)
+                meta['top_nodes_debug'] = [
+                    {
+                        'node_id': int(r.get('node_id')),
+                        'risk_score': float(r.get('risk_score') or 0),
+                        'ranking_score': r.get('ranking_score'),
+                        'provenance': r.get('score_provenance'),
+                        'reasons': r.get('reasons')[:3] if isinstance(r.get('reasons'), list) else r.get('reasons')
+                    }
+                    for r in sorted_by_risk[:topk]
+                ]
+            except Exception:
+                meta['top_nodes_debug'] = []
+
+        except Exception:
+            pass
         meta['model_window_cvp'] = WINDOW_CVP
         
         # Adiciona estat\u00edsticas de ranking (Precision@K)

@@ -143,7 +143,7 @@
                             <i class="fas fa-file-import"></i> Inserir Eventos (CIOPS)
                         </button>
                         <a href="/connections" class="btn btn-outline-dark btn-sm">
-                            <i class="fas fa-project-diagram"></i> Grafo de Influência (Top 30)
+                            <i class="fas fa-project-diagram"></i> Grafo de Influência (Top 10)
                         </a>
                     </div>
 
@@ -176,7 +176,7 @@
                             </select>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="mb-0 fw-bold" id="top-list-title">Top 30 Áreas Críticas</h6>
+                            <h6 class="mb-0 fw-bold" id="top-list-title">Top 10 Áreas Críticas</h6>
                         </div>
                         <div id="top-areas" class="list-group list-group-flush small" style="max-height: 400px; overflow-y: auto;"></div>
                     </div>
@@ -230,18 +230,23 @@
     });
 
     function getColor(d) {
-        return d > 80 ? '#800026' :
-               d > 60  ? '#BD0026' :
-               d > 40  ? '#E31A1C' :
-               d > 20  ? '#FEB24C' :
-               d > 10   ? '#FED976' :
-                          '#90EE90';
+        // Align color thresholds with backend five risk bands
+         // Critico: dark red, Alto: orange, Moderado: red, Baixo: amber, Sem Risco: green
+         return d >= 90 ? '#8B0000' :
+             d >= 80 ? '#FF8C00' :
+             d >= 50 ? '#E31A1C' :
+             d >= 20 ? '#FEB24C' :
+                     '#90EE90';
     }
 
     function style(feature) {
-        // Decide which score to use based on current mode
+        // Use final `risk_score` provided by backend (post-processing + ranking) when available
+        // Fallback to CVLI/CVP raw percentiles if final score missing.
         var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
-        var score = (mode === 'CVLI') ? feature.properties.risk_score_cvli : feature.properties.risk_score_cvp;
+        var score = feature.properties.risk_score;
+        if (typeof score === 'undefined' || score === null) {
+            score = (mode === 'CVLI') ? feature.properties.risk_score_cvli : feature.properties.risk_score_cvp;
+        }
 
         return {
             radius: 10,
@@ -255,21 +260,24 @@
     }
 
     function getStatus(score, type) {
-        if (score > 80) return { label: 'CRÍTICO (' + type + ')', class: 'bg-danger' };
-        if (score > 60) return { label: 'ALTO (' + type + ')', class: 'bg-warning text-dark' };
-        if (score > 20) return { label: 'MÉDIO (' + type + ')', class: 'bg-info text-dark' };
-        return { label: 'BAIXO (' + type + ')', class: 'bg-success' };
+        // Align with backend thresholds (five bands)
+        if (score >= 90) return { label: 'CRÍTICO (' + type + ')', class: 'bg-danger' };
+        if (score >= 80) return { label: 'ALTO (' + type + ')', class: 'bg-warning text-dark' };
+        if (score >= 50) return { label: 'MODERADO (' + type + ')', class: 'bg-info text-dark' };
+        if (score >= 20) return { label: 'BAIXO (' + type + ')', class: 'bg-secondary text-dark' };
+        return { label: 'SEM RISCO (' + type + ')', class: 'bg-success text-white' };
     }
 
     var legend = L.control({position: 'bottomright'});
     legend.onAdd = function (map) {
         var div = L.DomUtil.create('div', 'legend'),
-            grades = [0, 10, 20, 40, 60, 80];
+            grades = [0, 20, 50, 80, 90];
         div.innerHTML = '<strong>Nível de Risco</strong><br>';
         for (var i = 0; i < grades.length; i++) {
+            var next = grades[i + 1] ? grades[i + 1] - 1 : 100;
             div.innerHTML +=
                 '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+                grades[i] + (grades[i + 1] ? '&ndash;' + next + '<br>' : '+');
         }
         return div;
     };
@@ -405,18 +413,34 @@
             $('#ranking-info').hide();
         }
 
-        // Recalculate Stats
-        var highRisk = 0, mediumRisk = 0, lowRisk = 0;
-        riskDataGlobal.forEach(function(item) {
-            var score = item.risk_score_cvli;
-            if (score > 60) highRisk++;
-            else if (score > 20) mediumRisk++;
-            else lowRisk++;
-        });
-
-        $('#high-risk-count').text(highRisk);
-        $('#medium-risk-count').text(mediumRisk);
-        $('#low-risk-count').text(lowRisk);
+        // Recalculate Stats: prefer backend-provided summary counts (meta) to avoid mismatches.
+        try {
+            if (metaDataGlobal && metaDataGlobal.counts) {
+                var c = metaDataGlobal.counts;
+                // Map to dashboard boxes: High Risk = crítico + alto; Medium = moderado; Low = baixo
+                var highRisk = (c['crítico'] || 0) + (c['alto'] || 0);
+                var mediumRisk = (c['moderado'] || 0);
+                var lowRisk = (c['baixo'] || 0) + (c['sem risco'] || 0);
+                $('#high-risk-count').text(highRisk);
+                $('#medium-risk-count').text(mediumRisk);
+                $('#low-risk-count').text(lowRisk);
+            } else {
+                // Fallback: compute from per-node final `risk_score` if available
+                var highRisk = 0, mediumRisk = 0, lowRisk = 0;
+                riskDataGlobal.forEach(function(item) {
+                    var score = typeof item.risk_score !== 'undefined' && item.risk_score !== null ? item.risk_score : item.risk_score_cvli || 0;
+                    if (score >= 90) highRisk++;
+                    else if (score >= 70) highRisk++; // count Alto also as High dashboard box
+                    else if (score >= 40) mediumRisk++;
+                    else lowRisk++;
+                });
+                $('#high-risk-count').text(highRisk);
+                $('#medium-risk-count').text(mediumRisk);
+                $('#low-risk-count').text(lowRisk);
+            }
+        } catch (e) {
+            console.warn('Failed to compute summary counts', e);
+        }
 
         // Update Map Style (guard for non-path layers like Markers)
         if (geojsonLayer) {
@@ -869,15 +893,19 @@
     }
 
     function getRiskLevel(score) {
-        if (score > 80) return { label: 'Crítico', class: 'text-danger' };
-        if (score > 60) return { label: 'Alto', class: 'text-warning' };
-        if (score > 20) return { label: 'Médio', class: 'text-info' };
-        return { label: 'Normal', class: 'text-success' };
+        // Align frontend display thresholds with backend (`risk_score`): five bands
+        // >=90 -> Crítico, >=80 -> Alto, >=50 -> Moderado, >=20 -> Baixo, else Sem Risco
+        if (score >= 90) return { label: 'Crítico', class: 'text-danger' };
+        if (score >= 80) return { label: 'Alto', class: 'text-warning' };
+        if (score >= 50) return { label: 'Moderado', class: 'text-info' };
+        if (score >= 20) return { label: 'Baixo', class: 'text-secondary' };
+        return { label: 'Sem Risco', class: 'text-success' };
     }
 
     function showFeatureDetails(layer, latlng) {
         var feature = layer.feature;
-        var score = feature.properties.risk_score_cvli;
+        // Prefer final backend `risk_score` (post-ranking). Fallback to CVLI raw percentiles.
+        var score = typeof feature.properties.risk_score !== 'undefined' && feature.properties.risk_score !== null ? feature.properties.risk_score : feature.properties.risk_score_cvli;
         var predVal = feature.properties.cvli_pred;
         var typeLabel = 'CVLI';
         var status = getStatus(score, typeLabel);
@@ -962,7 +990,7 @@
         var items = [];
         layers.forEach(function(layer) {
             var props = layer.feature.properties;
-            var score = props.risk_score_cvli || 0;
+            var score = typeof props.risk_score !== 'undefined' && props.risk_score !== null ? props.risk_score : (props.risk_score_cvli || 0);
 
             // Filter Logic: prefer server-provided region hints
             var regionType = props.region_type || props.regiao || getRegionType(props.CIDADE);
@@ -987,18 +1015,18 @@
         items.sort(function(a, b) { return b.score - a.score; });
 
         // Update Title Count
-        var countText = items.length > 30 ? 'Top 30' : 'Total ' + items.length;
+        var countText = items.length > 10 ? 'Top 10' : 'Total ' + items.length;
         $('#top-list-title').text(countText + ' Áreas Críticas');
 
-        // Take top 30
-        var top30 = items.slice(0, 30);
+        // Take top 10
+        var top10 = items.slice(0, 10);
 
         var html = '';
-        if (top30.length === 0) {
+        if (top10.length === 0) {
             html = '<div class="text-muted text-center py-3">Nenhuma área encontrada nesta região.</div>';
         }
 
-        top30.forEach(function(item, idx) {
+        top10.forEach(function(item, idx) {
             var riskInfo = getRiskLevel(item.score);
 
             // Region Display logic (Show city if not Fortaleza)
@@ -1030,7 +1058,7 @@
         $('#top-areas a').on('click', function(e) {
             e.preventDefault();
             var idx = $(this).data('idx');
-            var item = top30[idx];
+            var item = top10[idx];
             if (item && item.layer) {
                 var center = item.layer.getBounds ? item.layer.getBounds().getCenter() : item.layer.getLatLng();
                 map.flyTo(center, 15);

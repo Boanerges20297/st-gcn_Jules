@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grafo de Influência - Top 30 Áreas Críticas</title>
+    <title>Grafo de Influência - Top 10 Áreas Críticas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="//unpkg.com/force-graph"></script>
@@ -63,9 +63,9 @@
         </div>
         <div class="card-glass interactive">
             <h5 class="mb-2"><i class="fas fa-project-diagram"></i> Rede de Influência</h5>
-            <p class="small text-muted mb-2">Top 30 Áreas Críticas</p>
+            <p class="small text-muted mb-2">Top 10 Áreas Críticas</p>
             <div class="small">
-                <span class="d-inline-block me-2"><i class="fas fa-circle" style="color: #ff4444;"></i> Risco Alto</span>
+                <span class="d-inline-block me-2"><i class="fas fa-circle" style="color: #FF8C00;"></i> Risco Alto</span>
                 <span class="d-inline-block"><i class="fas fa-circle" style="color: #00bcd4;"></i> Conexões</span>
             </div>
             <div class="mt-2 text-muted" style="font-size: 0.8rem;">
@@ -91,9 +91,12 @@
         const elem = document.getElementById('graph');
 
         function getColor(score) {
-            if (score >= 80) return '#ff4444'; // Red
-            if (score >= 60) return '#ffbb33'; // Orange
-            return '#00C851'; // Green
+            // Align with backend five bands and use distinct Critico/Alto colors
+            if (score >= 90) return '#8B0000';
+            if (score >= 80) return '#FF8C00';
+            if (score >= 50) return '#E31A1C';
+            if (score >= 20) return '#FEB24C';
+            return '#00C851';
         }
 
         // Faction color mapping (deterministic)
