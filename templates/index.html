@@ -230,13 +230,11 @@
     });
 
     function getColor(d) {
-        // Align color thresholds with backend five risk bands
-         // Critico: dark red, Alto: orange, Moderado: red, Baixo: amber, Sem Risco: green
-         return d >= 90 ? '#8B0000' :
-             d >= 80 ? '#FF8C00' :
-             d >= 50 ? '#E31A1C' :
-             d >= 20 ? '#FEB24C' :
-                     '#90EE90';
+        // Frontend visualization: only highlight Alto (>=80) and Crítico (>=90).
+        // Outras faixas permanecem no backend para auditoria, mas ficam invisíveis/no palco neutro.
+        return d >= 90 ? '#8B0000' :
+               d >= 80 ? '#FF8C00' :
+                        '#CCCCCC';
     }
 
     function style(feature) {
@@ -248,14 +246,18 @@
             score = (mode === 'CVLI') ? feature.properties.risk_score_cvli : feature.properties.risk_score_cvp;
         }
 
+        var fill = getColor(score);
+        var isHigh = (score >= 80);
+
         return {
             radius: 10,
-            fillColor: getColor(score),
-            weight: 2,
-            opacity: 1,
-            color: 'white',
-            dashArray: '3',
-            fillOpacity: 0.35
+            fillColor: fill,
+            weight: isHigh ? 2 : 0,
+            opacity: isHigh ? 1 : 0,
+            color: isHigh ? 'white' : 'transparent',
+            dashArray: isHigh ? '3' : null,
+            fillOpacity: isHigh ? 0.6 : 0,
+            interactive: isHigh
         };
     }
 
@@ -270,15 +272,11 @@
 
     var legend = L.control({position: 'bottomright'});
     legend.onAdd = function (map) {
-        var div = L.DomUtil.create('div', 'legend'),
-            grades = [0, 20, 50, 80, 90];
+        var div = L.DomUtil.create('div', 'legend');
         div.innerHTML = '<strong>Nível de Risco</strong><br>';
-        for (var i = 0; i < grades.length; i++) {
-            var next = grades[i + 1] ? grades[i + 1] - 1 : 100;
-            div.innerHTML +=
-                '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-                grades[i] + (grades[i + 1] ? '&ndash;' + next + '<br>' : '+');
-        }
+        // Only show Alto and Crítico in the map legend (visualization simplified)
+        div.innerHTML += '<i style="background:' + getColor(90) + '"></i> Crítico (>= 90)<br>';
+        div.innerHTML += '<i style="background:' + getColor(80) + '"></i> Alto (80–89)<br>';
         return div;
     };
     legend.addTo(map);

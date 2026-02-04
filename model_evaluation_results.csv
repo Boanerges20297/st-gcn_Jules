@@ -1,0 +1,12 @@
+model,error
+ranking_model_best_Config_01_Small.pkl,unknown object type: <class 'dict'>
+ranking_model_best_Config_02_SmallLR.pkl,unknown object type: <class 'dict'>
+ranking_model_v1.pkl,unknown object type: <class 'dict'>
+ranking_model_v2.pkl,unknown object type: <class 'dict'>
+ranking_model_v2_best.pth,unknown object type: <class 'collections.OrderedDict'>
+stgcn_model_v2.pth,"failed to load: Error(s) in loading state_dict for STGCN:
+	size mismatch for layer1.temp_att.fc.weight: copying a param with shape torch.Size([14, 14]) from checkpoint, the shape in current model is torch.Size([30, 30]).
+	size mismatch for layer1.temp_att.fc.bias: copying a param with shape torch.Size([14]) from checkpoint, the shape in current model is torch.Size([30]).
+	size mismatch for layer2.temp_att.fc.weight: copying a param with shape torch.Size([14, 14]) from checkpoint, the shape in current model is torch.Size([30, 30]).
+	size mismatch for layer2.temp_att.fc.bias: copying a param with shape torch.Size([14]) from checkpoint, the shape in current model is torch.Size([30]).
+	size mismatch for conv_final.weight: copying a param with shape torch.Size([64, 32, 1, 14]) from checkpoint, the shape in current model is torch.Size([64, 32, 1, 30])."
