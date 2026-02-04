@@ -68,8 +68,9 @@ app = Flask(__name__)
 # Configuração e Carregamento de Dados (usar caminhos absolutos relativos a este arquivo)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, 'data', 'processed', 'processed_graph_data.pkl')
-MODEL_CVLI_PATH = os.path.join(BASE_DIR, 'models', 'stgcn_model_v3.pth') # Modelo v3: 26 canais categóricos (one-hot dia/mês)
+MODEL_CVLI_PATH = os.path.join(BASE_DIR, 'models', 'stgcn_model_v2.pth') # Modelo v2: 26 canais categóricos (one-hot dia/mês)
 EXOGENOUS_FILE = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
+RANKING_MODEL_PATH = os.path.join(BASE_DIR, 'models', 'ranking_model_v2.pkl')
 BAIRROS_POLYGONS_PATHS = [
     os.path.join(BASE_DIR, 'data', 'raw', 'AIS - CAPITAL.geojson'),
     os.path.join(BASE_DIR, 'outputs', 'fortaleza_bairros_fence.geojson')
@@ -83,7 +84,8 @@ nodes_centroids_proj = None
 adj_matrix = None
 original_adj_matrix = None
 node_features = None
-model_cvli = None # Modelo 3D unificado (8 canais)
+model_cvli = None # Modelo 3D unificado (26 canais: CVLI, CVP, Tension + one-hot features)
+model_ranking_scores = None
 device = None
 norm_adj = None
 adj_geo = None
@@ -622,12 +624,12 @@ def load_data_and_models():
                 print(err_msg)
                 raise RuntimeError(err_msg)
 
-            # Check Channels (Expected 8: CVLI, CVP, Tension, DOW sin/cos, Month sin/cos, Weekend)
-            if len(_node_features.shape) < 3 or _node_features.shape[2] != 8:
+            # Check Channels (Expected 26: CVLI, CVP, Tension + 7 DOW one-hot + 12 Month one-hot + 4 extras)
+            if len(_node_features.shape) < 3 or _node_features.shape[2] != 26:
                 channels = _node_features.shape[2] if len(_node_features.shape) > 2 else 1
                 err_msg = (
                     f"CRITICAL: Dados obsoletos detectados! (Canais: {channels}). "
-                    "O sistema requer 8 canais (CVLI, CVP, Tension + 5 features temporais). "
+                    "O sistema requer 26 canais (CVLI, CVP, Tension + one-hot features categóricas). "
                     "Por favor, execute 'python src/data_processing.py' para regenerar os dados."
                 )
                 print(err_msg)
@@ -726,13 +728,24 @@ def load_data_and_models():
 
                 instantiate_ts = WINDOW_CVLI if ck_time_steps is None else ck_time_steps
 
-                # FIXED: in_channels=26 (modelo v3 com features categóricas)
-                m_cvli = STGCN(num_nodes=num_nodes, in_channels=26, time_steps=instantiate_ts, num_classes=1, num_graphs=num_graphs)
+                # FIXED: in_channels=8 (modelo v2 retreinado com 8 features temporais)
+                m_cvli = STGCN(num_nodes=num_nodes, in_channels=8, time_steps=instantiate_ts, num_classes=1, num_graphs=num_graphs)
                 m_cvli.load_state_dict(state_dict, strict=False)
                 m_cvli.to(device)
                 m_cvli.eval()
                 model_cvli = m_cvli
                 print(f"[DEBUG] Modelo CVLI carregado com sucesso!")
+                # Tentar carregar artefato de ranking (pickle com 'scores')
+                try:
+                    if os.path.exists(RANKING_MODEL_PATH):
+                        with open(RANKING_MODEL_PATH, 'rb') as fh:
+                            rk = pickle.load(fh)
+                        # artefato esperado: dict with 'scores' numpy array
+                        if isinstance(rk, dict) and 'scores' in rk:
+                            model_ranking_scores = rk.get('scores')
+                            print(f"[DEBUG] Ranking scores carregados ({getattr(model_ranking_scores,'shape',None)}) from {RANKING_MODEL_PATH}")
+                except Exception as e:
+                    print(f"Erro ao carregar artefato de ranking: {e}")
             except Exception as e:
                 print(f"Erro ao carregar state_dict CVLI: {e}")
         else:
@@ -1100,6 +1113,18 @@ def calculate_risk(custom_norm_adj=None):
     
     print(f"[DEBUG] calculate_risk chamado - nodes: {len(nodes_gdf)}, features shape: {node_features.shape}")
 
+    # Lazy-load ranking artifact if available (handles server restarts)
+    global model_ranking_scores
+    try:
+        if model_ranking_scores is None and os.path.exists(RANKING_MODEL_PATH):
+            with open(RANKING_MODEL_PATH, 'rb') as fh:
+                rk = pickle.load(fh)
+            if isinstance(rk, dict) and 'scores' in rk:
+                model_ranking_scores = rk.get('scores')
+                print(f"[DEBUG] Loaded ranking scores lazily ({getattr(model_ranking_scores,'shape',None)}) from {RANKING_MODEL_PATH}")
+    except Exception as e:
+        print(f"[WARN] Falha ao carregar artefato de ranking: {e}")
+
     current_norm_adj = custom_norm_adj if custom_norm_adj is not None else norm_adj
     def _ensure_adj_list(adj):
         if adj is None:
@@ -1415,7 +1440,14 @@ def calculate_risk(custom_norm_adj=None):
         meta['model_window_cvp'] = WINDOW_CVP
         
         # Adiciona estat\u00edsticas de ranking (Precision@K)
-        all_scores = [r['risk_score_cvli'] for r in results]
+        # Preferir scores pré-computados do artefato de ranking se disponíveis
+        if model_ranking_scores is not None and len(model_ranking_scores) == len(results):
+            all_scores = list(map(float, model_ranking_scores.tolist()))
+            meta['ranking_source'] = os.path.basename(RANKING_MODEL_PATH)
+        else:
+            all_scores = [r['risk_score_cvli'] for r in results]
+            meta['ranking_source'] = 'stgcn_percentile'
+
         if all_scores:
             sorted_scores = sorted(all_scores, reverse=True)
             meta['ranking_info'] = {
@@ -1423,8 +1455,8 @@ def calculate_risk(custom_norm_adj=None):
                 'top_1_percent_threshold': sorted_scores[max(0, int(len(sorted_scores) * 0.01))] if len(sorted_scores) > 0 else 0,
                 'top_5_percent_threshold': sorted_scores[max(0, int(len(sorted_scores) * 0.05))] if len(sorted_scores) > 0 else 0,
                 'top_10_percent_threshold': sorted_scores[max(0, int(len(sorted_scores) * 0.10))] if len(sorted_scores) > 0 else 0,
-                'method': 'percentile_ranking',
-                'note': 'Scores baseados em ranking percentil - Top 1% tem ~17% taxa de acerto'
+                'method': meta.get('ranking_source', 'percentile_ranking'),
+                'note': 'Scores baseados em ranking (artefato) ou percentile do ST-GCN'
             }
 
         return jsonify({'meta': meta, 'data': results})

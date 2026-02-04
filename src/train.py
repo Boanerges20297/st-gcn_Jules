@@ -20,7 +20,7 @@ from torch.utils.data import DataLoader, Dataset, TensorDataset
 
 DATA_FILE = 'data/processed/processed_graph_data.pkl'
 MODEL_DIR = 'models'
-MODEL_PATH = os.path.join(MODEL_DIR, 'stgcn_model_v3.pth')  # v3: 26 canais categóricos
+MODEL_PATH = os.path.join(MODEL_DIR, 'stgcn_model_v2.pth')  # v2: 26 canais categóricos (one-hot)
 HISTORY_WINDOW = 14  # Reduzido de 30: captura padrões mais recentes e relevantes
 BATCH_SIZE = 64  # 1. Ajuste fino: 16-32 para gradientes mais estáveis
 EPOCHS = 60  # 5. Ajuste fino: 50+ para convergência completa

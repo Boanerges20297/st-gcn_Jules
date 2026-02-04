@@ -524,7 +524,17 @@ def main():
         'adj_geo': adj_geo,
         'adj_conflict': adj_conflict,
         'dates': dates,
-        'feature_names': ['CVLI', 'CVP', 'TENSION_INDEX', 'DOW_SIN', 'DOW_COS', 'MONTH_SIN', 'MONTH_COS', 'IS_WEEKEND']
+        'feature_names': [
+            # 0-2: Events / indices
+            'CVLI', 'CVP', 'TENSION_INDEX',
+            # 3-9: Day-of-Week one-hot (Mon..Sun)
+            'DOW_MON', 'DOW_TUE', 'DOW_WED', 'DOW_THU', 'DOW_FRI', 'DOW_SAT', 'DOW_SUN',
+            # 10-21: Month one-hot (Jan..Dec)
+            'MONTH_JAN', 'MONTH_FEB', 'MONTH_MAR', 'MONTH_APR', 'MONTH_MAY', 'MONTH_JUN',
+            'MONTH_JUL', 'MONTH_AUG', 'MONTH_SEP', 'MONTH_OCT', 'MONTH_NOV', 'MONTH_DEC',
+            # 22-25: Extras / reserved
+            'IS_WEEKEND', 'RESERVED_23', 'RESERVED_24', 'RESERVED_25'
+        ]
     }
     
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
