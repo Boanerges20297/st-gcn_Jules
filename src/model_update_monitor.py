@@ -32,6 +32,12 @@ DATA_RAW_DIR = os.path.join(BASE_DIR, 'data', 'raw')
 DATA_PROCESSED_DIR = os.path.join(BASE_DIR, 'data', 'processed')
 MODELS_DIR = os.path.join(BASE_DIR, 'models')
 CHECKSUM_FILE = os.path.join(BASE_DIR, '.data_checksum')
+LAST_ID_FILE = os.path.join(BASE_DIR, '.data_last_ids.json')
+# Lista de arquivos a serem monitorados dentro de data/raw.
+# Se vazia, monitora todo o diretório. Caso contrário, monitora apenas os nomes listados.
+WATCH_FILES = [
+    'dados_status_ocorrencias_gerais.json'
+]
 
 def get_directory_hash(directory):
     """Calcula hash MD5 de todos os arquivos em um diretório."""
@@ -39,18 +45,88 @@ def get_directory_hash(directory):
         return None
     
     hasher = hashlib.md5()
-    for root, dirs, files in os.walk(directory):
-        for file in sorted(files):
-            if file.startswith('.'):
+    # If WATCH_FILES is configured and non-empty, only include those files (if present)
+    if WATCH_FILES:
+        for fname in sorted(WATCH_FILES):
+            if fname.startswith('.'):
                 continue
-            filepath = os.path.join(root, file)
+            filepath = os.path.join(directory, fname)
+            if not os.path.exists(filepath):
+                continue
             try:
                 with open(filepath, 'rb') as f:
                     hasher.update(f.read())
-            except:
-                pass
+            except Exception:
+                # skip files that can't be read (transient write)
+                continue
+    else:
+        for root, dirs, files in os.walk(directory):
+            for file in sorted(files):
+                if file.startswith('.'):
+                    continue
+                filepath = os.path.join(root, file)
+                try:
+                    with open(filepath, 'rb') as f:
+                        hasher.update(f.read())
+                except Exception:
+                    pass
     
     return hasher.hexdigest()
+
+
+def load_last_ids():
+    """Carrega dicionário com últimos ids conhecidos por arquivo."""
+    if os.path.exists(LAST_ID_FILE):
+        try:
+            with open(LAST_ID_FILE, 'r', encoding='utf-8') as fh:
+                return json.load(fh)
+        except Exception:
+            return {}
+    return {}
+
+
+def save_last_ids(d):
+    try:
+        with open(LAST_ID_FILE, 'w', encoding='utf-8') as fh:
+            json.dump(d, fh)
+    except Exception:
+        pass
+
+
+def extract_max_id_from_json(filepath):
+    """Tenta extrair o maior valor de id num arquivo JSON.
+
+    Procura chaves terminando em 'id' (case-insensitive) e retorna o maior inteiro encontrado.
+    Retorna None se não encontrar ids válidos ou ocorrer erro.
+    """
+    try:
+        with open(filepath, 'r', encoding='utf-8') as fh:
+            data = json.load(fh)
+    except Exception:
+        return None
+
+    max_id = None
+
+    def scan(obj):
+        nonlocal max_id
+        if isinstance(obj, dict):
+            for k, v in obj.items():
+                if isinstance(v, (int, float)) and k and k.lower().endswith('id'):
+                    try:
+                        iv = int(v)
+                        if max_id is None or iv > max_id:
+                            max_id = iv
+                    except Exception:
+                        pass
+                else:
+                    scan(v)
+        elif isinstance(obj, list):
+            for item in obj:
+                scan(item)
+        # ignore primitives otherwise
+
+    scan(data)
+    return max_id
 
 def save_checksum(checksum):
     """Salva o checksum atual."""
@@ -157,34 +233,64 @@ def run_model_training():
 def check_and_update():
     """Verifica mudanças e dispara atualização se necessário."""
     try:
-        current_hash = get_directory_hash(DATA_RAW_DIR)
-        previous_hash = load_checksum()
-        
         with STATE_LOCK:
             UPDATE_STATE['last_check'] = datetime.now().isoformat()
-        
-        if current_hash != previous_hash:
-            print(f"[MONITOR] Mudanças detectadas em {DATA_RAW_DIR}")
-            
-            # Executa pipeline de atualização
-            if run_data_processing() and run_model_training():
-                save_checksum(current_hash)
-                
-                with STATE_LOCK:
-                    UPDATE_STATE['status'] = 'updating_models'
-                    UPDATE_STATE['progress'] = 95
-                    UPDATE_STATE['message'] = 'Sincronizando modelos...'
-                    UPDATE_STATE['last_update'] = datetime.now().isoformat()
-                
-                # Aguarda modelo ser recarregado (app.py detecta automaticamente)
-                time.sleep(2)
-                
-                update_state(status='idle', progress=100, message='Atualização concluída!')
-                print("[MONITOR] Atualização concluída com sucesso!")
+
+        # If WATCH_FILES configured, use ID-based detection for those files (preferred)
+        if WATCH_FILES:
+            last_ids = load_last_ids()
+            changed = False
+            new_last_ids = dict(last_ids)
+            for fname in WATCH_FILES:
+                filepath = os.path.join(DATA_RAW_DIR, fname)
+                if not os.path.exists(filepath):
+                    continue
+                max_id = extract_max_id_from_json(filepath)
+                prev = last_ids.get(fname)
+                # If we can extract an id and it's greater than previous -> change
+                if max_id is not None:
+                    if prev is None or int(max_id) > int(prev):
+                        print(f"[MONITOR] Novo id detectado em {fname}: {prev} -> {max_id}")
+                        new_last_ids[fname] = int(max_id)
+                        changed = True
+
+            if changed:
+                # Execute pipeline
+                if run_data_processing() and run_model_training():
+                    save_last_ids(new_last_ids)
+                    with STATE_LOCK:
+                        UPDATE_STATE['status'] = 'updating_models'
+                        UPDATE_STATE['progress'] = 95
+                        UPDATE_STATE['message'] = 'Sincronizando modelos...'
+                        UPDATE_STATE['last_update'] = datetime.now().isoformat()
+                    time.sleep(2)
+                    update_state(status='idle', progress=100, message='Atualização concluída!')
+                    print("[MONITOR] Atualização concluída com sucesso!")
+                else:
+                    update_state(status='error', progress=0)
             else:
-                update_state(status='error', progress=0)
+                update_state(message='Sem mudanças detectadas (ids)')
         else:
-            update_state(message='Sem mudanças detectadas')
+            # Fallback: directory hash check
+            current_hash = get_directory_hash(DATA_RAW_DIR)
+            previous_hash = load_checksum()
+            if current_hash != previous_hash:
+                print(f"[MONITOR] Mudanças detectadas em {DATA_RAW_DIR}")
+                # Executa pipeline de atualização
+                if run_data_processing() and run_model_training():
+                    save_checksum(current_hash)
+                    with STATE_LOCK:
+                        UPDATE_STATE['status'] = 'updating_models'
+                        UPDATE_STATE['progress'] = 95
+                        UPDATE_STATE['message'] = 'Sincronizando modelos...'
+                        UPDATE_STATE['last_update'] = datetime.now().isoformat()
+                    time.sleep(2)
+                    update_state(status='idle', progress=100, message='Atualização concluída!')
+                    print("[MONITOR] Atualização concluída com sucesso!")
+                else:
+                    update_state(status='error', progress=0)
+            else:
+                update_state(message='Sem mudanças detectadas')
     except Exception as e:
         print(f"[MONITOR ERROR] {e}")
         traceback.print_exc()

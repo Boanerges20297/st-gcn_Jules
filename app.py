@@ -648,6 +648,69 @@ def load_data_and_models():
                  )
                  print("Applied Node Paradigm logic: Cities assigned to CIDADE column.")
 
+        # --- Load facção from pre-processed mapping GeoJSON ---
+        try:
+            faction_geojson = os.path.join(BASE_DIR, 'outputs', 'nodes_with_faction_assigned.geojson')
+            if os.path.exists(faction_geojson):
+                faction_gdf = gpd.read_file(faction_geojson)
+                if faction_gdf is not None and not faction_gdf.empty and 'faction' in faction_gdf.columns:
+                    # faction_gdf has 'bairro' column; nodes_gdf has 'name' column
+                    # Merge by name == bairro
+                    merge_col = 'name' if 'name' in nodes_gdf.columns else 'bairro'
+                    faction_map = dict(zip(faction_gdf['bairro'], faction_gdf['faction']))
+                    nodes_gdf['faction'] = nodes_gdf[merge_col].map(faction_map).fillna('N/A')
+                    assigned = (nodes_gdf['faction'] != 'N/A').sum()
+                    print(f'Loaded faction mapping: {assigned}/{len(nodes_gdf)} nodes assigned')
+                else:
+                    nodes_gdf['faction'] = 'N/A'
+            else:
+                nodes_gdf['faction'] = 'N/A'
+        except Exception as e:
+            nodes_gdf['faction'] = 'N/A'
+            print(f'Warning: faction loading failed: {e}')
+
+        # --- Load AIS from data/static ---
+        try:
+            ais_dir = os.path.join(BASE_DIR, 'data', 'static')
+            ais_files = [
+                os.path.join(ais_dir, 'AIS - CAPITAL.geojson'),
+                os.path.join(ais_dir, 'AIS - METROPOLITANA.geojson'),
+                os.path.join(ais_dir, 'AIS - INTERIOR.geojson')
+            ]
+            ais_gdfs = []
+            for af in ais_files:
+                if os.path.exists(af):
+                    try:
+                        ag = gpd.read_file(af)
+                        if ag is None or ag.empty:
+                            continue
+                        if ag.crs is None:
+                            ag.set_crs(epsg=4326, inplace=True)
+                        if 'Name' in ag.columns:
+                            ag['ais_name'] = ag['Name']
+                        elif 'NAME' in ag.columns:
+                            ag['ais_name'] = ag['NAME']
+                        else:
+                            ag['ais_name'] = ag.index.astype(str)
+                        ais_gdfs.append(ag[['geometry', 'ais_name']])
+                    except Exception:
+                        continue
+
+            if ais_gdfs:
+                ais_all = pd.concat(ais_gdfs, ignore_index=True)
+                ais_all = gpd.GeoDataFrame(ais_all, geometry='geometry', crs='EPSG:4326')
+                try:
+                    nodes_with_ais = gpd.sjoin(nodes_gdf, ais_all, how='left', predicate='within')
+                    ais_map = nodes_with_ais.reset_index().groupby('index').first()['ais_name'].to_dict()
+                    nodes_gdf['AIS'] = nodes_gdf.index.map(lambda i: ais_map.get(i, None))
+                except Exception:
+                    nodes_gdf['AIS'] = None
+            else:
+                nodes_gdf['AIS'] = None
+        except Exception:
+            nodes_gdf['AIS'] = None
+            pass
+
         if nodes_gdf is not None:
             try:
                 nodes_gdf_proj = nodes_gdf.to_crs(epsg=3857)
@@ -966,54 +1029,117 @@ def get_network_graph():
 
     risk_data = response.get_json()
     all_nodes = risk_data.get('data', [])
+    # Accept optional filters via query params:
+    #   region: fortaleza | rmf | interior | all (default all)
+    #   critical_only: true|false (default false)
+    #   risk_threshold: numeric percent (default 90)
+    region = (request.args.get('region') or 'all').strip().lower()
+    critical_only = str(request.args.get('critical_only', 'false')).lower() in ['1', 'true', 'yes']
+    try:
+        risk_threshold = float(request.args.get('risk_threshold', 90.0))
+    except Exception:
+        risk_threshold = 90.0
 
-    sorted_nodes = sorted(all_nodes, key=lambda x: x['risk_score'], reverse=True)
-    top_k = 10
-    top_nodes = sorted_nodes[:top_k]
+    # Build mapping node_id -> risk item
+    node_map = {item['node_id']: item for item in all_nodes}
 
-    graph_nodes = []
-    top_indices = set()
-
-    for item in top_nodes:
-        nid = item['node_id']
-        top_indices.add(nid)
-
+    # Helper to get name from nodes_gdf or fallback
+    def node_name(nid):
         name = f"Area {nid}"
-        if nodes_gdf is not None and nid < len(nodes_gdf):
-            name = nodes_gdf.iloc[nid].get('name') or nodes_gdf.iloc[nid].get('nome') or name
+        try:
+            if nodes_gdf is not None and nid < len(nodes_gdf):
+                name = nodes_gdf.iloc[nid].get('name') or nodes_gdf.iloc[nid].get('nome') or name
+        except Exception:
+            pass
+        return name
 
+    selected_ids = set()
+
+    # If filters are default (no critical_only and region=all), keep previous behavior: top 10
+    if not critical_only and region == 'all':
+        sorted_nodes = sorted(all_nodes, key=lambda x: x['risk_score'], reverse=True)
+        top_k = 10
+        top_nodes = sorted_nodes[:top_k]
+        for item in top_nodes:
+            selected_ids.add(item['node_id'])
+    else:
+        # Filter nodes by region first
+        region_ids = set()
+        if nodes_gdf is not None and region != 'all':
+            # Normalize regiao column if present
+            try:
+                rg = nodes_gdf.get('regiao') if 'regiao' in nodes_gdf.columns else None
+                if rg is not None:
+                    for idx, row in nodes_gdf.reset_index().iterrows():
+                        nid = idx
+                        r = str(row.get('regiao', '')).lower()
+                        node_type = str(row.get('node_type', '')).lower()
+                        # region matching rules
+                        if region == 'fortaleza' and (r == 'fortaleza' or (node_type == 'bairro' and row.get('CIDADE','').lower() == 'fortaleza')):
+                            region_ids.add(nid)
+                        elif region == 'rmf' and r == 'rmf':
+                            region_ids.add(nid)
+                        elif region == 'interior' and node_type == 'cidade' and str(row.get('CIDADE','')).lower() != 'fortaleza':
+                            region_ids.add(nid)
+                else:
+                    # Fallback: consider all nodes if region filter not resolvable
+                    region_ids = set([item['node_id'] for item in all_nodes])
+            except Exception:
+                region_ids = set([item['node_id'] for item in all_nodes])
+        else:
+            region_ids = set([item['node_id'] for item in all_nodes])
+
+        # If critical_only: select nodes in region with risk >= threshold
+        if critical_only:
+            for nid in list(region_ids):
+                item = node_map.get(nid)
+                if item and float(item.get('risk_score', 0)) >= risk_threshold:
+                    selected_ids.add(nid)
+
+            # Add influents (nodes that influence selected critical nodes) regardless of region
+            for v in list(selected_ids):
+                try:
+                    for u in range(adj_matrix.shape[0]):
+                        try:
+                            w = float(adj_matrix[u, v])
+                            if w > 0:
+                                selected_ids.add(u)
+                        except Exception:
+                            continue
+                except Exception:
+                    continue
+        else:
+            # Not critical_only but a region filter: include top nodes within region sorted by risk
+            region_items = [node_map[nid] for nid in region_ids if nid in node_map]
+            sorted_region = sorted(region_items, key=lambda x: x['risk_score'], reverse=True)
+            top_k = 10
+            for item in sorted_region[:top_k]:
+                selected_ids.add(item['node_id'])
+
+    # Build response nodes and links
+    graph_nodes = []
+    for nid in sorted(selected_ids):
+        item = node_map.get(nid, {})
         graph_nodes.append({
             'id': nid,
-            'name': name,
-            'risk': item['risk_score'],
+            'name': node_name(nid),
+            'risk': float(item.get('risk_score', 0)),
             'faction': item.get('faction'),
             'reasons': item.get('reasons', [])
         })
 
     links = []
-
-    for source in top_nodes:
-        u = source['node_id']
-        for target in top_nodes:
-            v = target['node_id']
+    for u in selected_ids:
+        for v in selected_ids:
             if u == v: continue
-
             try:
                 weight = float(adj_matrix[u, v])
                 if weight > 0:
-                    links.append({
-                        'source': u,
-                        'target': v,
-                        'weight': weight,
-                        'type': 'influence'
-                    })
+                    links.append({'source': u, 'target': v, 'weight': weight, 'type': 'influence'})
             except Exception:
                 pass
 
-    return jsonify({
-        'nodes': graph_nodes,
-        'links': links
-    })
+    return jsonify({'nodes': graph_nodes, 'links': links})
 
 @app.route('/api/simulate', methods=['POST'])
 def simulate_risk():

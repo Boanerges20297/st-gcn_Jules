@@ -6,6 +6,7 @@
     <title>Grafo de Influência - Top 10 Áreas Críticas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="//unpkg.com/force-graph"></script>
     <style>
         body { margin: 0; background-color: #f8f9fa; color: #212529; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -143,6 +144,28 @@
                     <li><strong>Partículas:</strong> Fluxo de atividade criminal</li>
                 </ul>
             </div>
+            <div class="mt-3">
+                <label class="form-label small mb-1">Filtro de Região</label>
+                <select id="filter-region" class="form-select form-select-sm mb-2">
+                    <option value="all">Todas</option>
+                    <option value="fortaleza" selected>Fortaleza</option>
+                    <option value="rmf">RMF</option>
+                    <option value="interior">Interior</option>
+                </select>
+
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="" id="filter-critical">
+                    <label class="form-check-label small" for="filter-critical">
+                        Mostrar somente CRÍTICOS e seus influentes
+                    </label>
+                </div>
+
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text">Limiar crítico</span>
+                    <input type="number" id="critical-threshold" class="form-control" value="90" min="0" max="100">
+                    <button id="apply-filters" class="btn btn-glass">Aplicar</button>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -215,7 +238,6 @@
         const elem = document.getElementById('graph');
 
         function getColor(score) {
-            // Align with backend five bands and use distinct Critico/Alto colors
             if (score >= 90) return '#8B0000';
             if (score >= 80) return '#FF8C00';
             if (score >= 50) return '#E31A1C';
@@ -223,16 +245,32 @@
             return '#00C851';
         }
 
-        // Faction color mapping (deterministic)
         const factionColors = {};
         const colors = ['#FF8800', '#9933CC', '#0099CC', '#CC0000', '#007E33', '#33b5e5'];
         let colorIdx = 0;
 
-        function// Update stats
+        function getFactionColor(faction) {
+            if (!faction || faction === 'N/A' || faction === 'None') return '#6c757d';
+            if (!factionColors[faction]) {
+                factionColors[faction] = colors[colorIdx % colors.length];
+                colorIdx++;
+            }
+            return factionColors[faction];
+        }
+
+        // Graph loader with filters
+        function loadGraph(opts = {}){
+            const params = new URLSearchParams();
+            if(opts.region) params.set('region', opts.region);
+            if(opts.critical_only) params.set('critical_only', opts.critical_only);
+            if(opts.risk_threshold) params.set('risk_threshold', opts.risk_threshold);
+
+            fetch('/api/network-graph?' + params.toString())
+                .then(res => res.json())
+                .then(data => {
                 document.getElementById('total-nodes').textContent = data.nodes.length;
                 document.getElementById('total-links').textContent = data.links.length;
                 
-                // Build incoming/outgoing maps for quick lookup
                 const incomingMap = {};
                 const outgoingMap = {};
                 data.nodes.forEach(n => {
@@ -244,11 +282,10 @@
                     incomingMap[link.target].push({source: link.source, weight: link.weight});
                 });
                 
-                // Link color based on weight
                 function getLinkColor(weight) {
-                    if (weight > 0.7) return 'rgba(139, 0, 0, 0.6)'; // Strong: dark red
-                    if (weight > 0.3) return 'rgba(255, 140, 0, 0.5)'; // Medium: orange
-                    return 'rgba(0, 0, 0, 0.25)'; // Weak: grey
+                    if (weight > 0.7) return 'rgba(139, 0, 0, 0.6)';
+                    if (weight > 0.3) return 'rgba(255, 140, 0, 0.5)';
+                    return 'rgba(0, 0, 0, 0.25)';
                 }
                 
                 const Graph = ForceGraph()(elem)
@@ -256,16 +293,29 @@
                     .backgroundColor('#f8f9fa')
                     .nodeLabel(node => `${node.name} (${node.risk.toFixed(1)}%)`)
                     .nodeColor(node => getFactionColor(node.faction))
-                    .nodeRelSize(8)5, 1500);
+                    .nodeRelSize(8)
+                    .linkColor(link => getLinkColor(link.weight))
+                    .linkDirectionalArrowLength(5)
+                    .linkDirectionalArrowRelPos(1)
+                    .linkDirectionalParticles(link => link.weight > 0.5 ? 4 : 2)
+                    .linkDirectionalParticleColor(link => getLinkColor(link.weight))
+                    .linkDirectionalParticleSpeed(d => 0.003 + d.weight * 0.004)
+                    .linkWidth(d => Math.max(1, Math.min(4, d.weight * 5)))
+                    .linkLabel(link => {
+                        const sourceName = typeof link.source === 'object' ? link.source.name : link.source;
+                        const targetName = typeof link.target === 'object' ? link.target.name : link.target;
+                        return `${sourceName} → ${targetName}: ${(link.weight * 100).toFixed(1)}%`;
+                    })
+                    .onNodeClick(node => {
+                        Graph.centerAt(node.x, node.y, 1000);
+                        Graph.zoom(5, 1500);
 
-                        // Show Details
                         document.getElementById('d-name').textContent = node.name;
                         document.getElementById('d-faction').textContent = node.faction || 'Não Identificado';
                         document.getElementById('d-faction').style.backgroundColor = getFactionColor(node.faction);
                         document.getElementById('d-risk').textContent = 'Risco: ' + node.risk.toFixed(1) + '%';
                         document.getElementById('d-risk').className = 'badge ' + (node.risk >= 90 ? 'bg-danger' : node.risk >= 80 ? 'bg-warning text-dark' : 'bg-secondary');
 
-                        // Incoming influences
                         const incoming = incomingMap[node.id];
                         const inDiv = document.getElementById('d-incoming');
                         if (incoming && incoming.length > 0) {
@@ -281,79 +331,20 @@
                             inDiv.innerHTML = '<em>Nenhuma influência recebida</em>';
                         }
                         
-                        // Outgoing influences
-                        const outgo and collision
-                Graph.d3Force('charge').strength(-180);
-                Graph.d3Force('collide', d3.forceCollide(25));
-
-                // Enhanced node visualization
-                Graph.nodeCanvasObject((node, ctx, globalScale) => {
-                    const label = node.name;
-                    const fontSize = 13/globalScale;
-                    const r = 5;
-
-                    // Draw outer glow for high risk
-                    if (node.risk >= 80) {
-                        ctx.beginPath();
-                        ctx.arc(node.x, node.y, r + 3, 0, 2 * Math.PI, false);
-                        const gradient = ctx.createRadialGradient(node.x, node.y, r, node.x, node.y, r + 3);
-                        gradient.addColorStop(0, getColor(node.risk) + '40');
-                        gradient.addColorStop(1, getColor(node.risk) + '00');
-                        ctx.fillStyle = gradient;
-                        ctx.fill();
-                    }
-
-                    // Draw node with faction color
-                    ctx.beginPath();
-                    ctx.arc(node.x, node.y, r, 0, 2 * Math.PI, false);
-                    ctx.fillStyle = getFactionColor(node.faction);
-                    ctx.fill();
-
-                    // Ring for risk level (thicker)
-                    ctx.beginPath();
-                    ctx.arc(node.x, node.y, r + 1.5, 0, 2 * Math.PI, false);
-                    ctx.strokeStyle = getColor(node.risk);
-                    ctx.lineWidth = 2/globalScale;
-                    ctx.stroke();
-
-                    // Label background for readability
-                    const textWidth = ctx.measureText(label).width;
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-                    ctx.fillRect(
-                        node.x - textWidth/2 - 4, 
-                        node.y + r + fontSize - 2, 
-                        textWidth + 8, 
-                        fontSize + 4
-                    );
-
-                    // Text label
-                    ctx.font = `bold ${fontSize}px Sans-Serif`;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillStyle = '#212529';
-                    ctx.fillText(label, node.x, node.y + r + fontSize + 2);
-                    
-                    // Risk percentage below name
-                    const riskText = node.risk.toFixed(0) + '%';
-                    const riskFontSize = 10/globalScale;
-                    ctx.font = `${riskFontSize}px Sans-Serif`;
-                    ctx.fillStyle = getColor(node.risk);
-                    ctx.fillText(riskText, node.x, node.y + r + fontSize + riskFontSize + 6
-                    .linkDirectionalArrowRelPos(1)
-                    .linkDirectionalParticles(2)
-                    .linkDirectionalParticleColor(() => '#495057') // Darker particle
-                    .linkDirectionalParticleSpeed(d => Math.min(0.05, d.weight * 0.005))
-                    .linkWidth(d => Math.min(3, Math.max(1, d.weight * 0.5))) // Cap width
-                    .onNodeClick(node => {
-                        // Zoom to node
-                        Graph.centerAt(node.x, node.y, 1000);
-                        Graph.zoom(8, 2000);
-
-                        // Show Details
-                        document.getElementById('d-name').textContent = node.name;
-                        document.getElementById('d-faction').textContent = node.faction || 'Não Identificado';
-                        document.getElementById('d-faction').style.backgroundColor = getFactionColor(node.faction);
-                        document.getElementById('d-risk').textContent = 'Risco: ' + node.risk.toFixed(1) + '%';
+                        const outgoing = outgoingMap[node.id];
+                        const outDiv = document.getElementById('d-outgoing');
+                        if (outgoing && outgoing.length > 0) {
+                            const sorted = outgoing.sort((a,b) => b.weight - a.weight);
+                            const items = sorted.map(o => {
+                                const targetName = data.nodes.find(n => n.id === o.target)?.name || o.target;
+                                const pct = (o.weight * 100).toFixed(1);
+                                const intensity = o.weight > 0.7 ? '🔴' : o.weight > 0.3 ? '🟠' : '⚪';
+                                return `${intensity} <strong>${targetName}</strong> (${pct}%)`;
+                            }).join('<br>');
+                            outDiv.innerHTML = items;
+                        } else {
+                            outDiv.innerHTML = '<em>Não influencia outras áreas</em>';
+                        }
 
                         const list = document.getElementById('d-reasons');
                         list.innerHTML = '';
@@ -373,37 +364,75 @@
                         document.getElementById('node-details').style.display = 'none';
                     });
 
-                // Add nice gravity
-                Graph.d3Force('charge').strength(-120);
+                Graph.d3Force('charge').strength(-180);
+                Graph.d3Force('collide', d3.forceCollide(25));
 
-                // Add ring for Risk Level
                 Graph.nodeCanvasObject((node, ctx, globalScale) => {
+                    // Guard: simulation may call before node positions are initialized
+                    if (!isFinite(node.x) || !isFinite(node.y)) return;
                     const label = node.name;
-                    const fontSize = 12/globalScale;
+                    const fontSize = 13 / (globalScale || 1);
+                    const r = 5;
 
-                    // Draw node
-                    const r = 4;
+                    if (Number(node.risk) >= 80) {
+                        ctx.beginPath();
+                        ctx.arc(node.x, node.y, r + 3, 0, 2 * Math.PI, false);
+                        const gradient = ctx.createRadialGradient(node.x, node.y, r, node.x, node.y, r + 3);
+                        gradient.addColorStop(0, getColor(node.risk) + '40');
+                        gradient.addColorStop(1, getColor(node.risk) + '00');
+                        ctx.fillStyle = gradient;
+                        ctx.fill();
+                    }
+
                     ctx.beginPath();
                     ctx.arc(node.x, node.y, r, 0, 2 * Math.PI, false);
                     ctx.fillStyle = getFactionColor(node.faction);
                     ctx.fill();
 
-                    // Ring for risk
                     ctx.beginPath();
-                    ctx.arc(node.x, node.y, r + 1, 0, 2 * Math.PI, false);
+                    ctx.arc(node.x, node.y, r + 1.5, 0, 2 * Math.PI, false);
                     ctx.strokeStyle = getColor(node.risk);
-                    ctx.lineWidth = 0.5;
+                    ctx.lineWidth = 2/globalScale;
                     ctx.stroke();
 
-                    // Text (Dark for Light Theme)
-                    ctx.font = `${fontSize}px Sans-Serif`;
+                    const textWidth = ctx.measureText(label).width;
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+                    ctx.fillRect(
+                        node.x - textWidth/2 - 4, 
+                        node.y + r + fontSize - 2, 
+                        textWidth + 8, 
+                        fontSize + 4
+                    );
+
+                    ctx.font = `bold ${fontSize}px Sans-Serif`;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'; // Dark Text
-                    ctx.fillText(label, node.x, node.y + r + fontSize);
+                    ctx.fillStyle = '#212529';
+                    ctx.fillText(label, node.x, node.y + r + fontSize + 2);
+                    
+                    const riskText = node.risk.toFixed(0) + '%';
+                    const riskFontSize = 10/globalScale;
+                    ctx.font = `${riskFontSize}px Sans-Serif`;
+                    ctx.fillStyle = getColor(node.risk);
+                    ctx.fillText(riskText, node.x, node.y + r + fontSize + riskFontSize + 6);
                 });
-            })
-            .catch(err => console.error(err));
+                })
+                .catch(err => console.error(err));
+        }
+
+        // Initial load (Fortaleza default)
+        const defaultOpts = { region: 'fortaleza', critical_only: false, risk_threshold: 90 };
+        loadGraph(defaultOpts);
+
+        // Hook apply button
+        document.getElementById('apply-filters').addEventListener('click', () => {
+            const region = document.getElementById('filter-region').value;
+            const critical_only = document.getElementById('filter-critical').checked;
+            const risk_threshold = Number(document.getElementById('critical-threshold').value) || 90;
+            // Clear previous graph by re-initializing
+            document.getElementById('graph').innerHTML = '';
+            loadGraph({ region, critical_only, risk_threshold });
+        });
     </script>
 </body>
 </html>

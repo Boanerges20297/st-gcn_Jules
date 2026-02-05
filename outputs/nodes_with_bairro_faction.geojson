@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "nodes_with_bairro_faction",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "bairro_normalized": "", "bairro_node": "0", "faction_spatial": "N/A", "faction_existing": null, "faction_final": "N/A" }, "geometry": { "type": "Point", "coordinates": [ -39.612239799080861, -5.093769316308781 ] } },
+{ "type": "Feature", "properties": { "bairro_normalized": "CEARÁ", "bairro_node": "0", "faction_spatial": "N/A", "faction_existing": null, "faction_final": "N/A" }, "geometry": { "type": "Point", "coordinates": [ -39.574385092533056, -4.96119596392761 ] } }
+]
+}
