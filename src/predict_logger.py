@@ -19,18 +19,33 @@ import numpy as np
 class PredictLogger:
     """Logger para predictions do modelo ST-GCN com ranking validation."""
     
-    def __init__(self, base_dir: str):
+    def __init__(self, base_dir: str, nodes_gdf=None):
         """
         Inicializa o logger de predictions.
         
         Args:
             base_dir: Diretório raiz do projeto
+            nodes_gdf: GeoDataFrame com informações dos nodes (opcional)
         """
         self.base_dir = base_dir
         self.predicts_dir = os.path.join(base_dir, 'predicts')
+        self.nodes_gdf = nodes_gdf
         
         # Garantir que o diretório existe
         os.makedirs(self.predicts_dir, exist_ok=True)
+    
+    def get_node_name(self, node_id: int) -> str:
+        """Obtém o nome do node a partir do node_id."""
+        try:
+            if self.nodes_gdf is not None and node_id < len(self.nodes_gdf):
+                row = self.nodes_gdf.iloc[node_id]
+                name = row.get('name') if hasattr(row, 'get') else None
+                if name is None:
+                    name = row['name'] if 'name' in row else None
+                return str(name) if name else f"Area {node_id}"
+        except Exception:
+            pass
+        return f"Area {node_id}"
     
     def generate_timestamp_filename(self) -> str:
         """Gera nome de arquivo com timestamp no formato predict_YYYYMMDD_HHMMSS.txt"""
@@ -182,11 +197,13 @@ class PredictLogger:
         # Sort by risk_score
         sorted_results = sorted(results, key=lambda x: x.get('risk_score', 0), reverse=True)
         
-        lines.append(f"{'Rank':<5} {'Node':<6} {'CVLI%':<7} {'Ranking%':<9} {'Status':<12} {'Provenance':<40}")
-        lines.append("-" * 80)
+        lines.append(f"{'Rank':<5} {'Node':<35} {'CVLI%':<7} {'Ranking%':<9} {'Status':<12} {'Provenance':<40}")
+        lines.append("-" * 110)
         
         for idx, result in enumerate(sorted_results[:20], 1):
             node_id = result.get('node_id', '?')
+            node_name = self.get_node_name(node_id) if isinstance(node_id, int) else str(node_id)
+            node_display = f"{node_id} ({node_name})"
             risk_score = result.get('risk_score', 0)
             ranking_score = result.get('ranking_score', None)
             status = result.get('status_label', '?')
@@ -198,7 +215,7 @@ class PredictLogger:
                 ranking_str = "—"
             
             lines.append(
-                f"{idx:<5} {node_id:<6} {risk_score:>6.1f}% {ranking_str:>8} {status:<12} {provenance:<40}"
+                f"{idx:<5} {node_display:<35} {risk_score:>6.1f}% {ranking_str:>8} {status:<12} {provenance:<40}"
             )
         
         return lines
@@ -375,12 +392,13 @@ class PredictLogger:
         
         for result in exo_nodes[:10]:
             node_id = result.get('node_id', '?')
+            node_name = self.get_node_name(node_id) if isinstance(node_id, int) else str(node_id)
             risk_score = result.get('risk_score', 0)
             reasons = result.get('reasons', [])
             is_critical = 'exogenous_critical' in result.get('score_provenance', [])
             
             severity = "🚨 CRÍTICO" if is_critical else "⚠️ MODERADO"
-            lines.append(f"Node {node_id} - {severity} ({risk_score:.1f}%)")
+            lines.append(f"Node {node_id} ({node_name}) - {severity} ({risk_score:.1f}%)")
             
             # Mostrar razões
             for reason in reasons[:2]:
@@ -407,12 +425,13 @@ class PredictLogger:
         
         for idx, result in enumerate(sorted_critical[:10], 1):
             node_id = result.get('node_id', '?')
+            node_name = self.get_node_name(node_id) if isinstance(node_id, int) else str(node_id)
             risk_score = result.get('risk_score', 0)
             cvli_pred = result.get('cvli_pred', 0)
             faction = result.get('faction', 'N/A')
             reasons = result.get('reasons', [])
             
-            lines.append(f"{idx}. Node {node_id} - {risk_score:.1f}% | CVLI Pred: {cvli_pred:.1f} | Facção: {faction}")
+            lines.append(f"{idx}. Node {node_id} ({node_name}) - {risk_score:.1f}% | CVLI Pred: {cvli_pred:.1f} | Facção: {faction}")
             for reason in reasons[:3]:
                 lines.append(f"   • {reason}")
             lines.append("")

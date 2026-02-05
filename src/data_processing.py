@@ -423,13 +423,13 @@ def build_feature_tensor(nodes_gdf, occurrences_df, start_date, end_date, exogen
     
     # Channels 23-25: Reserved for future use
 
-    print("✓ Features categóricas geradas (26 canais)")
-    print("📊 Estatísticas dos canais (valores brutos):")
+    print("[OK] Features categoricas geradas (26 canais)")
+    print("Estatisticas dos canais (valores brutos):")
     for c in range(3):
         channel_max = features[:, :, c].max()
         channel_mean = features[:, :, c].mean()
         print(f"  Canal {c}: max={channel_max:.4f}, mean={channel_mean:.6f}")
-    print("✓ Features categóricas one-hot (canais 3-22) adicionadas automaticamente das datas")
+    print("[OK] Features categoricas one-hot (canais 3-22) adicionadas automaticamente das datas")
 
     return features, date_range
 

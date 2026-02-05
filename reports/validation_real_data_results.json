@@ -1,0 +1,52 @@
+{
+  "validation_period": "\u00daltimos 30 dias de dados hist\u00f3ricos",
+  "timestamp": "2026-02-05T15:38:01.518574",
+  "models": {
+    "ST-GCN": {
+      "p_at_5": 0.2,
+      "spearman": 0.12197572412687797,
+      "top_5": [
+        286,
+        19,
+        185,
+        21,
+        63
+      ]
+    },
+    "RankingModel": {
+      "p_at_5": 0.0,
+      "spearman": 0.17801048797882746,
+      "top_5": [
+        146,
+        82,
+        46,
+        19,
+        124
+      ]
+    },
+    "Ensemble": {
+      "p_at_5": 0.0,
+      "spearman": 0.1786767388986536,
+      "top_5": [
+        286,
+        19,
+        74,
+        21,
+        69
+      ]
+    }
+  },
+  "real_top_5": [
+    244,
+    63,
+    191,
+    253,
+    205
+  ],
+  "concordance": {
+    "ST-GCN_vs_RankingModel": 0.2,
+    "ST-GCN_vs_Ensemble": 0.6,
+    "RankingModel_vs_Ensemble": 0.2,
+    "Ensemble_vs_Real": 0.0
+  }
+}

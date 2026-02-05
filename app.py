@@ -10,17 +10,23 @@ import re
 import json
 import hashlib
 import warnings
+import logging
 
 # Suprimir warnings desnecessários
 warnings.filterwarnings('ignore', category=FutureWarning, module='google.api_core')
 warnings.filterwarnings('ignore', message='All support for the.*google.generativeai')
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
+# Suprimir logs excessivos do Werkzeug
+logging.getLogger('werkzeug').setLevel(logging.ERROR)
+logging.getLogger('werkzeug.serving').setLevel(logging.ERROR)
+
 from shapely.geometry import shape, Point, Polygon
 from scipy.spatial.distance import cdist
 from src.model import STGCN
 from src.llm_service import process_exogenous_text, parse_ciops_report
 from src.ranking_inference import RankingInference
+from src.ranking_correction_system import get_ranking_system
 from src.model_update_monitor import start_monitor, get_state as get_monitor_state
 from src.predict_logger import PredictLogger
 import threading
@@ -101,7 +107,7 @@ predict_logger = None  # PredictLogger para logs de predictions
 
 # Inicializar PredictLogger de forma segura (apenas se BASE_DIR estiver definido)
 try:
-    predict_logger = PredictLogger(BASE_DIR)
+    predict_logger = PredictLogger(BASE_DIR, nodes_gdf=None)  # nodes_gdf será atualizado depois
     print("✅ PredictLogger inicializado com sucesso")
 except Exception:
     predict_logger = None
@@ -545,7 +551,6 @@ def load_data_and_models():
             print(f"ERRO ao executar data_processing.py: {e}")
             return
 
-    print("Carregando dados para API...")
     try:
         if data_pack is None:
             with open(DATA_FILE, 'rb') as f:
@@ -586,8 +591,6 @@ def load_data_and_models():
                         )
             except Exception:
                 pass
-        
-        print(f"[DEBUG] nodes_gdf: {len(_nodes_gdf) if _nodes_gdf is not None else 'None'} nós")
         
         polygons_json_cache = None
         _adj_geo = data_pack.get('adj_geo')
@@ -630,10 +633,14 @@ def load_data_and_models():
         node_features = _node_features
         dates = _dates
         
-        print(f"[DEBUG] Variáveis globais atribuídas:")
-        print(f"  - nodes_gdf: {len(nodes_gdf) if nodes_gdf is not None else 'None'}")
-        print(f"  - node_features: {node_features.shape if node_features is not None else 'None'}")
-        print(f"  - adj_matrix: {adj_matrix.shape if adj_matrix is not None else 'None'}")
+        # Atualizar nodes_gdf no PredictLogger para nomes dos nodes
+        try:
+            if predict_logger is not None and nodes_gdf is not None:
+                predict_logger.nodes_gdf = nodes_gdf
+        except Exception:
+            pass
+        
+        # Variáveis globais atribuídas
 
         # --- FIXED: Node Paradigm Loading ---
         if nodes_gdf is not None:
@@ -654,13 +661,17 @@ def load_data_and_models():
             if os.path.exists(faction_geojson):
                 faction_gdf = gpd.read_file(faction_geojson)
                 if faction_gdf is not None and not faction_gdf.empty and 'faction' in faction_gdf.columns:
-                    # faction_gdf has 'bairro' column; nodes_gdf has 'name' column
-                    # Merge by name == bairro
-                    merge_col = 'name' if 'name' in nodes_gdf.columns else 'bairro'
-                    faction_map = dict(zip(faction_gdf['bairro'], faction_gdf['faction']))
-                    nodes_gdf['faction'] = nodes_gdf[merge_col].map(faction_map).fillna('N/A')
+                    # faction_gdf has 'name' and 'faction' columns
+                    # Merge by name == name
+                    faction_map = dict(zip(faction_gdf['name'], faction_gdf['faction']))
+                    nodes_gdf['faction'] = nodes_gdf['name'].map(faction_map).fillna('N/A')
                     assigned = (nodes_gdf['faction'] != 'N/A').sum()
                     print(f'Loaded faction mapping: {assigned}/{len(nodes_gdf)} nodes assigned')
+                    
+                    # Also load faction_source for debugging
+                    if 'faction_source' in faction_gdf.columns:
+                        faction_source_map = dict(zip(faction_gdf['name'], faction_gdf['faction_source']))
+                        nodes_gdf['faction_source'] = nodes_gdf['name'].map(faction_source_map)
                 else:
                     nodes_gdf['faction'] = 'N/A'
             else:
@@ -808,7 +819,7 @@ def load_data_and_models():
                 m_cvli.to(device)
                 m_cvli.eval()
                 model_cvli = m_cvli
-                print(f"[DEBUG] Modelo CVLI carregado com sucesso! (in_channels={ck_in_channels}, time_steps={instantiate_ts})")
+                print(f"[OK] Modelo STGCN v2 carregado (in_channels={ck_in_channels}, time_steps={instantiate_ts})")
                 
                 # Carregar modelo de ranking para validação em tempo de execução
                 global ranking_validator
@@ -1362,6 +1373,49 @@ def calculate_risk(custom_norm_adj=None):
         
         # Converte percentil para score 0-100
         normalized_risk_cvli = percentiles.copy()
+        
+        # ===== INTEGRAÇÃO DO SISTEMA DE CORREÇÃO POR RANKING =====
+        try:
+            ranking_system = get_ranking_system()
+            
+            # Obter dia da semana
+            if dates is not None and len(dates) > 0:
+                current_date = dates[-1]
+                day_of_week = current_date.weekday()
+            else:
+                day_of_week = None
+            
+            # Obter scores do ranking
+            ranking_scores, ranking_confidence = ranking_system.get_ranking_scores(
+                node_features[:, -30:, 0],  # Usar últimos 30 dias de CVLI
+                day_of_week=day_of_week
+            )
+            
+            # Se ranking é confiável (confidence > 0.6), usar para validação/correção
+            if ranking_confidence > 0.6:
+                # Encontrar top-5 do ST-GCN
+                stgcn_top5 = np.argsort(-cvli_raw)[:5]
+                
+                # Corrigir com ranking
+                corrected_top5, conf, was_corrected = ranking_system.correct_stgcn_prediction(
+                    stgcn_top5, 
+                    node_features[:, -30:, 0],
+                    day_of_week=day_of_week,
+                    confidence_threshold=0.5
+                )
+                
+                # Aplicar correção: aumentar score dos nós corrigidos
+                if was_corrected:
+                    for node_id in corrected_top5:
+                        if node_id not in stgcn_top5:
+                            # Nó foi adicionado pelo ranking, aumentar seu score
+                            normalized_risk_cvli[node_id] = np.maximum(
+                                normalized_risk_cvli[node_id], 
+                                75.0  # Pelo menos "Alto"
+                            )
+        except Exception as e:
+            print(f"[RANKING] Erro ao aplicar correção: {e}")
+            ranking_confidence = 0.0
 
         # Provenance flags for debugging why a node's score was raised
         provenance_history = np.zeros_like(normalized_risk_cvli, dtype=bool)
@@ -1763,6 +1817,9 @@ def calculate_risk(custom_norm_adj=None):
         # ==================== LOG DE PREDICTION ====================
         try:
             if predict_logger is not None:
+                # Garantir que nodes_gdf está atualizado no logger
+                if nodes_gdf is not None:
+                    predict_logger.nodes_gdf = nodes_gdf
                 log_file = predict_logger.log_prediction(meta, results, timestamp=datetime.now())
                 print(f"✅ Log de prediction salvo em: {log_file}")
                 meta['log_file'] = os.path.basename(log_file)
@@ -2176,4 +2233,4 @@ if __name__ == "__main__":
     print("[STARTUP] Iniciando monitor de atualizações de modelos...")
     start_monitor(check_interval=300)
     
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
