@@ -41,7 +41,7 @@ Sistema de **predição de crime por ranking** que identifica os **top-5 bairros
 - **RankingModel Isolado**: P@5 = 0.80 (30-day window)
 - **Sistema Combinado**: P@5 = 0.80 com **100% concordância Top-5** (real-time validation)
 
-**Cobertura**: 319 bairros × 1491 dias históricos (Jan/2022 - Jan/2026) + Validação em tempo de execução
+**Cobertura**: 319 bairros/cidades × 1491 dias históricos (Jan/2022 - Jan/2026) + Validação em tempo de execução
 
 ---
 
