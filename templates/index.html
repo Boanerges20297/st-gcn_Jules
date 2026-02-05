@@ -158,6 +158,19 @@
                         <small class="text-primary fw-bold" id="horizon-info">Horizonte: —</small>
                         <small class="text-success d-block" id="validity-info">📅 Previsão válida até: —</small>
                         <small class="text-secondary d-block" id="model-window-info">Modelo: —</small>
+                        
+                        <!-- Indicador de Áreas Estáveis -->
+                        <div class="alert alert-success mt-2 mb-2 p-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="mb-0">
+                                    <i class="fas fa-check-circle me-1"></i>
+                                    <strong>Áreas Estáveis:</strong>
+                                </small>
+                                <span class="badge bg-success" id="stable-areas-count">-</span>
+                            </div>
+                            <small class="text-muted d-block" style="font-size: 0.75rem;">Baixo + Sem Risco (&lt;50)</small>
+                        </div>
+                        
                         <div class="alert alert-info alert-sm mt-2 mb-2 p-2" id="ranking-info" style="display:none;">
                             <small><strong>Sistema de Ranking:</strong></small><br>
                             <small id="ranking-details" class="text-muted"></small>
@@ -463,26 +476,30 @@
         try {
             if (metaDataGlobal && metaDataGlobal.counts) {
                 var c = metaDataGlobal.counts;
-                // Map to dashboard boxes: High Risk = crítico + alto; Medium = moderado; Low = baixo
-                var highRisk = (c['crítico'] || 0) + (c['alto'] || 0);
-                var mediumRisk = (c['moderado'] || 0);
-                var lowRisk = (c['baixo'] || 0) + (c['sem risco'] || 0);
-                $('#high-risk-count').text(highRisk);
-                $('#medium-risk-count').text(mediumRisk);
-                $('#low-risk-count').text(lowRisk);
+                // Exibir categorias EXATAS sem agrupamento
+                var criticalRisk = c['crítico'] || 0;      // SOMENTE Crítico (≥90)
+                var highRisk = c['alto'] || 0;              // SOMENTE Alto (80-89)
+                var mediumRisk = c['moderado'] || 0;       // SOMENTE Moderado (50-79)
+                var stableAreas = (c['baixo'] || 0) + (c['sem risco'] || 0);  // Estáveis (<50)
+                
+                $('#high-risk-count').text(criticalRisk);   // Box vermelho = Crítico
+                $('#medium-risk-count').text(highRisk);     // Box laranja = Alto
+                $('#low-risk-count').text(mediumRisk);      // Box azul = Moderado
+                $('#stable-areas-count').text(stableAreas); // Badge verde = Estáveis
             } else {
                 // Fallback: compute from per-node final `risk_score` if available
-                var highRisk = 0, mediumRisk = 0, lowRisk = 0;
+                var criticalRisk = 0, highRisk = 0, mediumRisk = 0, stableAreas = 0;
                 riskDataGlobal.forEach(function(item) {
                     var score = typeof item.risk_score !== 'undefined' && item.risk_score !== null ? item.risk_score : item.risk_score_cvli || 0;
-                    if (score >= 90) highRisk++;
-                    else if (score >= 70) highRisk++; // count Alto also as High dashboard box
-                    else if (score >= 40) mediumRisk++;
-                    else lowRisk++;
+                    if (score >= 90) criticalRisk++;
+                    else if (score >= 80) highRisk++;
+                    else if (score >= 50) mediumRisk++;
+                    else stableAreas++;
                 });
-                $('#high-risk-count').text(highRisk);
-                $('#medium-risk-count').text(mediumRisk);
-                $('#low-risk-count').text(lowRisk);
+                $('#high-risk-count').text(criticalRisk);
+                $('#medium-risk-count').text(highRisk);
+                $('#low-risk-count').text(mediumRisk);
+                $('#stable-areas-count').text(stableAreas);
             }
         } catch (e) {
             console.warn('Failed to compute summary counts', e);
@@ -1167,7 +1184,7 @@
                             location.reload();
                         }, 3000);
                     }
-                } else if (data.status === 'error') {
+                } else if (data.status === 'error' && data.error) {
                     console.error("Erro na atualização:", data.error);
                     hideLoading();
                 } else {

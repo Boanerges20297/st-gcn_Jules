@@ -28,16 +28,12 @@ def load_polygon_cache(filepath):
     """Carrega GeoJSON e retorna dict {normalized_name: geometry}."""
     cache = {}
     if not os.path.exists(filepath):
-        print(f"AVISO: Arquivo de polígonos não encontrado: {filepath}")
-        print(f"       -> Para visualizar polígonos no mapa, adicione este arquivo em data/raw/.")
         return cache
 
     try:
-        print(f"Carregando polígonos de {filepath}...")
         gdf = gpd.read_file(filepath)
         if gdf.crs is None:
             gdf.set_crs(epsg=4326, inplace=True)
-        # Converter para 4326 se não estiver
         else:
             gdf = gdf.to_crs(epsg=4326)
 
@@ -53,10 +49,8 @@ def load_polygon_cache(filepath):
                 name = normalize_text(str(row[name_col]))
                 if name:
                     cache[name] = row.geometry
-
-        print(f"  - Carregados {len(cache)} polígonos.")
-    except Exception as e:
-        print(f"Erro ao carregar {filepath}: {e}")
+    except Exception:
+        pass
 
     return cache
 

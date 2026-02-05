@@ -22,6 +22,7 @@ from src.model import STGCN
 from src.llm_service import process_exogenous_text, parse_ciops_report
 from src.ranking_inference import RankingInference
 from src.model_update_monitor import start_monitor, get_state as get_monitor_state
+from src.predict_logger import PredictLogger
 import threading
 import time
 import unicodedata
@@ -56,7 +57,6 @@ def load_desscale_mapping():
             if a is not None and b is not None:
                 _DESSCALE_A = a
                 _DESSCALE_B = b
-                print(f'Loaded desscale mapping: a={a}, b={b}')
         except Exception:
             pass
 
@@ -97,6 +97,14 @@ adj_geo = None
 adj_faction = None
 norm_adj_list = None
 dates = None
+predict_logger = None  # PredictLogger para logs de predictions
+
+# Inicializar PredictLogger de forma segura (apenas se BASE_DIR estiver definido)
+try:
+    predict_logger = PredictLogger(BASE_DIR)
+    print("✅ PredictLogger inicializado com sucesso")
+except Exception:
+    predict_logger = None
 
 # Static Data Cache
 ibge_bairros_cache = None
@@ -192,12 +200,8 @@ def load_exogenous_events():
         try:
             with open(EXOGENOUS_FILE, 'r', encoding='utf-8') as f:
                 exogenous_events = json.load(f)
-            print(f"Carregados {len(exogenous_events)} lotes de eventos exógenos.")
-        except Exception as e:
-            print(f"Erro ao carregar eventos exógenos: {e}")
+        except Exception:
             exogenous_events = []
-    else:
-        print(f"AVISO: Arquivo de eventos exógenos não encontrado: {EXOGENOUS_FILE}")
 
 def find_nearby_nodes(lat, lng, radius_m=500):
     nearby_indices = []
@@ -238,8 +242,8 @@ def find_nearby_nodes(lat, lng, radius_m=500):
                      dists = nodes_gdf.geometry.centroid.distance(p_geo)
                      nearby_indices = [dists.idxmin()]
 
-    except Exception as e:
-        print(f"Erro ao buscar nodes próximos: {e}")
+    except Exception:
+        pass
 
     return nearby_indices
 
@@ -261,11 +265,8 @@ def apply_exogenous_events():
     if not exogenous_events or adj_matrix is None:
         return
 
-    print("Aplicando eventos exógenos na malha...")
-
     # Verificar se é uma atualização nova ou apenas reload
     is_new_update = check_exogenous_update()
-    print(f"[EXOGENOUS] Novos eventos? {is_new_update} | Já amplificados? {events_amplified}")
 
     exogenous_affected_nodes.clear()
     exogenous_critical_nodes.clear()
@@ -355,9 +356,6 @@ def apply_exogenous_events():
     # Atualizar flag de amplificação se foi uma atualização nova
     if is_new_update:
         events_amplified = True
-        print(f"[EXOGENOUS] OK - {count_affected} eventos amplificados")
-    else:
-        print(f"[EXOGENOUS] OK - {count_affected} eventos (cache: sem reamplificação)")
 
 def compute_exogenous_hash(events_list):
     """Calcula hash dos eventos exógenos para detecção de mudanças"""
@@ -383,8 +381,8 @@ def check_exogenous_update():
                 cache_data = json.load(f)
                 previous_hash = cache_data.get('hash')
                 previous_amplified = cache_data.get('amplified', False)
-        except Exception as e:
-            print(f"[CACHE] Erro ao ler cache anterior: {e}")
+        except Exception:
+            pass
     
     # Determinar se é uma atualização nova
     is_new_update = (current_hash != previous_hash)
@@ -411,8 +409,8 @@ def check_exogenous_update():
             os.makedirs(os.path.dirname(exogenous_cache_file), exist_ok=True)
             with open(exogenous_cache_file, 'w', encoding='utf-8') as f:
                 json.dump(cache_data, f, indent=2)
-        except Exception as e:
-            print(f"[CACHE] Erro ao escrever cache: {e}")
+        except Exception:
+            pass
     
     exogenous_events_hash = current_hash
     
@@ -444,11 +442,8 @@ def update_exogenous_state():
     global adj_geo, adj_faction, norm_adj_list
 
     if original_adj_matrix is None:
-        print("AVISO: Matriz original não disponível para atualização incremental. Recarregando tudo.")
         load_data_and_models()
         return
-
-    print("Atualizando estado exógeno incrementalmente...")
 
     adj_matrix = original_adj_matrix.copy()
     if adj_geo is not None:
@@ -499,10 +494,9 @@ def load_data_and_models():
                         ibge_municipios_gdf = gpd.read_file(p)
                         if ibge_municipios_gdf.crs is None:
                             ibge_municipios_gdf.set_crs(epsg=4326, inplace=True)
-                        print(f"Loaded municipality polygons from {p}")
                         break
-                    except Exception as e:
-                        print(f"Failed to read municipalities polygons {p}: {e}")
+                    except Exception:
+                        pass
         except Exception:
             pass
         # --- Load Fortaleza bairros polygons (prefer AIS - CAPITAL, fallback to outputs fence) ---
@@ -516,25 +510,22 @@ def load_data_and_models():
                             if _b.crs is None:
                                 _b.set_crs(epsg=4326, inplace=True)
                             ba_irros_gdf = _b
-                            print(f"Loaded bairro polygons from {p} ({len(ba_irros_gdf)} features)")
                             break
-                    except Exception as e:
-                        print(f"Failed to read bairros polygons {p}: {e}")
+                    except Exception:
+                        pass
         except Exception:
             pass
-    except Exception as e:
-        print(f"Erro ao carregar dados estáticos: {e}")
+    except Exception:
+        pass
 
     data_pack = None
     if not os.path.exists(DATA_FILE):
-        print(f"AVISO: processed_graph_data.pkl não encontrado em: {DATA_FILE}")
-        print("Executando data_processing.py para gerar os dados...")
+        print(f"Regenerando dados (data_processing.py)...")
         
         try:
             import subprocess
             import sys
             
-            # Executa o script de processamento de dados
             result = subprocess.run(
                 [sys.executable, os.path.join(BASE_DIR, 'src', 'data_processing.py')],
                 capture_output=True,
@@ -542,22 +533,16 @@ def load_data_and_models():
                 cwd=BASE_DIR
             )
             
-            if result.returncode == 0:
-                print("✓ Dados processados com sucesso!")
-                print(result.stdout)
-            else:
-                print(f"ERRO ao processar dados: {result.stderr}")
+            if result.returncode != 0:
+                print(f"ERRO ao processar dados!")
                 return
                 
-            # Verifica se o arquivo foi criado
             if not os.path.exists(DATA_FILE):
-                print(f"ERRO: Arquivo ainda não foi criado após processamento!")
+                print(f"ERRO: Dados não foram criados!")
                 return
                 
         except Exception as e:
             print(f"ERRO ao executar data_processing.py: {e}")
-            import traceback
-            traceback.print_exc()
             return
 
     print("Carregando dados para API...")
@@ -565,7 +550,6 @@ def load_data_and_models():
         if data_pack is None:
             with open(DATA_FILE, 'rb') as f:
                 data_pack = pickle.load(f)
-            print(f"[DEBUG] Data pack carregado com sucesso. Keys: {list(data_pack.keys())}")
 
         # Use temporary local variables to allow validation before assignment
         _nodes_gdf = data_pack.get('nodes_gdf')
@@ -600,9 +584,8 @@ def load_data_and_models():
                             geometry=gpd.points_from_xy(df.longitude, df.latitude),
                             crs="EPSG:4326"
                         )
-                        print(f"[INFO] Carregados {len(_nodes_gdf)} nós do JSON (bairros_centros_latlong.json)")
-            except Exception as e:
-                print(f"[ERROR] Falha ao carregar nodes_gdf do JSON: {e}")
+            except Exception:
+                pass
         
         print(f"[DEBUG] nodes_gdf: {len(_nodes_gdf) if _nodes_gdf is not None else 'None'} nós")
         
@@ -613,7 +596,6 @@ def load_data_and_models():
         if _adj_matrix is None:
             _adj_matrix = _adj_geo
         _node_features = data_pack.get('node_features')
-        print(f"[DEBUG] node_features shape: {_node_features.shape if _node_features is not None else 'None'}")
         
         _dates = data_pack.get('dates')
 
@@ -671,8 +653,8 @@ def load_data_and_models():
                 nodes_gdf_proj = nodes_gdf.to_crs(epsg=3857)
                 nodes_centroids_proj = nodes_gdf_proj.geometry.centroid
                 _ = nodes_centroids_proj.sindex
-            except Exception as e:
-                print(f"Erro ao projetar nodes_gdf: {e}")
+            except Exception:
+                pass
 
             build_node_search_index()
 
@@ -689,8 +671,7 @@ def load_data_and_models():
             try:
                 norm_adj_list = compute_norm_adj_list([adj_geo, adj_faction])
                 norm_adj = norm_adj_list[0] if norm_adj_list else None
-            except Exception as e:
-                print(f"Erro ao normalizar adjacências: {e}")
+            except Exception:
                 norm_adj = compute_norm_adj(adj_matrix)
         else:
             norm_adj = compute_norm_adj(adj_matrix)
@@ -719,13 +700,8 @@ def load_data_and_models():
                 # Prefer safe loading mode when available to avoid executing arbitrary pickle code.
                 try:
                     raw_state = torch.load(MODEL_CVLI_PATH, map_location=device, weights_only=True)
-                    print("[SECURE LOAD] torch.load used with weights_only=True")
                 except TypeError:
                     raw_state = torch.load(MODEL_CVLI_PATH, map_location=device)
-                    print(
-                        "[SECURE LOAD] WARNING: torch.load(..., weights_only=True) not supported by this PyTorch.\n"
-                        "Ensure the checkpoint file is trusted. Consider upgrading PyTorch to enable safer loading."
-                    )
 
                 # Validate that the loaded object is a mapping-like state dict. If it's not, abort to
                 # avoid interacting with arbitrary objects that may have been unpickled.
@@ -776,9 +752,7 @@ def load_data_and_models():
                 try:
                     if os.path.exists(RANKING_MODEL_PATH):
                         ranking_validator = RankingInference(RANKING_MODEL_PATH, device=device)
-                        print(f"[DEBUG] Ranking validator carregado para validação em tempo de execução")
-                except Exception as e:
-                    print(f"[WARNING] Falha ao carregar ranking validator: {e}")
+                except Exception:
                     ranking_validator = None
                 
                 # Tentar carregar artefato de ranking (pickle com 'scores') - fallback
@@ -789,24 +763,20 @@ def load_data_and_models():
                         # artefato esperado: dict with 'scores' numpy array
                         if isinstance(rk, dict) and 'scores' in rk:
                             model_ranking_scores = rk.get('scores')
-                            print(f"[DEBUG] Ranking scores carregados ({getattr(model_ranking_scores,'shape',None)}) from {RANKING_MODEL_PATH}")
-                except Exception as e:
-                    print(f"Erro ao carregar artefato de ranking: {e}")
+                except Exception:
+                    pass
             except Exception as e:
                 print(f"Erro ao carregar state_dict CVLI: {e}")
-        else:
-            print(f"AVISO: Modelo CVLI não encontrado em {MODEL_CVLI_PATH}")
-        
-        print(f"[SUCESSO] Dados e modelos carregados com sucesso!")
-        print(f"  - {num_nodes} nós carregados")
-        print(f"  - Modelo CVLI: {'OK' if model_cvli is not None else 'NÃO CARREGADO'}")
 
+    
     except Exception as e:
         print(f"Erro ao carregar dados/modelos: {e}")
         # Only print stack trace if it's NOT the expected validation error
         if "CRITICAL" not in str(e):
             import traceback
             traceback.print_exc()
+    finally:
+        pass
 
 
 def _periodic_reload_loop(interval_minutes: int):
@@ -868,13 +838,21 @@ def model_update_status():
         return jsonify({
             'status': state.get('status', 'idle'),
             'progress': state.get('progress', 0),
-            'message': state.get('message', ''),
-            'error': state.get('error_message'),
-            'last_check': state.get('last_check'),
-            'last_update': state.get('last_update')
+            'message': state.get('message', '') or '',
+            'error': state.get('error_message') or '',
+            'last_check': state.get('last_check') or None,
+            'last_update': state.get('last_update') or None
         })
     except Exception:
-        return jsonify({'in_progress': False, 'last_update': None})
+        # Ensure consistent schema even on error to avoid frontend seeing `null`
+        return jsonify({
+            'status': 'idle',
+            'progress': 0,
+            'message': '',
+            'error': '',
+            'last_check': None,
+            'last_update': None
+        })
 
 start_periodic_reload(30)
 
@@ -1039,17 +1017,13 @@ def get_network_graph():
 
 @app.route('/api/simulate', methods=['POST'])
 def simulate_risk():
-    print("[SIMULAÇÃO] Função chamada!")
     if node_features is None or adj_matrix is None or nodes_gdf is None:
-        print("[SIMULAÇÃO] Erro: Dados não carregados!")
         return jsonify({'error': 'Dados não carregados.'}), 503
 
     try:
         data = request.get_json()
-        print(f"[SIMULAÇÃO] Dados recebidos: {data}")
         points = data.get('points', [])
         sim_type = data.get('type', 'suppression')
-        print(f"[SIMULAÇÃO] Points: {points}, Type: {sim_type}")
 
         adj_copy = adj_matrix.copy()
         affected_nodes = set()
@@ -1064,49 +1038,39 @@ def simulate_risk():
             if len(pt) == 2:
                 p_geo = Point(pt[1], pt[0])
                 nearby_indices = []
-                
-                print(f"[SIMULAÇÃO] Ponto recebido: lat={pt[0]}, lon={pt[1]} -> Point({pt[1]}, {pt[0]})")
 
                 if nodes_gdf_proj is not None:
                     try:
                         s = gpd.GeoSeries([p_geo], crs="EPSG:4326").to_crs("EPSG:3857")
                         p_proj = s.iloc[0]
-                        print(f"[SIMULAÇÃO] Ponto projetado (EPSG:3857): {p_proj}")
 
                         if nodes_centroids_proj is not None:
                              # Tentar com buffer de 5km primeiro, depois 10km se não encontrar nada
                              for buffer_m in [5000, 10000, 50000]:
                                  search_buffer = p_proj.buffer(buffer_m)
                                  candidate_ilocs = list(nodes_centroids_proj.sindex.intersection(search_buffer.bounds))
-                                 print(f"[SIMULAÇÃO] Candidatos no buffer {buffer_m}m: {len(candidate_ilocs)}")
                                  if candidate_ilocs:
                                      candidates = nodes_centroids_proj.iloc[candidate_ilocs]
                                      dists = candidates.distance(p_proj)
                                      nearby_indices = dists[dists < buffer_m].index.tolist()
-                                     print(f"[SIMULAÇÃO] Nodes dentro de {buffer_m}m: {len(nearby_indices)}")
                                      if nearby_indices:
                                          break
                         else:
                              dists = centroids.distance(p_proj)
                              nearby_indices = dists[dists < 5000].index.tolist()
-                             print(f"[SIMULAÇÃO] Nodes (fallback centroid): {len(nearby_indices)}")
                     except Exception as e:
-                        print(f"Erro ao projetar ponto na simulação: {e}")
                         import traceback
                         traceback.print_exc()
                         dists = nodes_gdf.geometry.centroid.distance(p_geo)
                         nearby_indices = [dists.idxmin()]
-                        print(f"[SIMULAÇÃO] Fallback - Node mais próximo: {nearby_indices}")
                 else:
                     dists = centroids.distance(p_geo)
                     nearby_indices = dists[dists < 0.005].index.tolist()
                     if not nearby_indices:
                         nearby_indices = [dists.idxmin()]
-                    print(f"[SIMULAÇÃO] Nodes (sem projeção): {nearby_indices}")
 
                 for idx in nearby_indices:
                     affected_nodes.add(idx)
-                    print(f"[SIMULAÇÃO] Adicionado node {idx} aos afetados")
                     if sim_type == 'suppression':
                         # Equipe cobre 20km² - suprime 80% do risco local (mantém 20%)
                         suppression_factor = 0.20
@@ -1166,7 +1130,6 @@ def simulate_risk():
 def calculate_risk(custom_norm_adj=None):
     global dates
     
-    # Diagnóstico detalhado dos dados
     if node_features is None:
         print("ERRO: node_features não foi carregado!")
         return jsonify({'error': 'Features dos nós não carregadas. Execute python src/data_processing.py'}), 503
@@ -1174,8 +1137,6 @@ def calculate_risk(custom_norm_adj=None):
     if nodes_gdf is None:
         print("ERRO: nodes_gdf não foi carregado!")
         return jsonify({'error': 'GeoDataFrame dos nós não carregado. Verifique processed_graph_data.pkl'}), 503
-    
-    print(f"[DEBUG] calculate_risk chamado - nodes: {len(nodes_gdf)}, features shape: {node_features.shape}")
 
     # Lazy-load ranking artifact if available (handles server restarts)
     global model_ranking_scores
@@ -1185,9 +1146,8 @@ def calculate_risk(custom_norm_adj=None):
                 rk = pickle.load(fh)
             if isinstance(rk, dict) and 'scores' in rk:
                 model_ranking_scores = rk.get('scores')
-                print(f"[DEBUG] Loaded ranking scores lazily ({getattr(model_ranking_scores,'shape',None)}) from {RANKING_MODEL_PATH}")
-    except Exception as e:
-        print(f"[WARN] Falha ao carregar artefato de ranking: {e}")
+    except Exception:
+        pass
 
     current_norm_adj = custom_norm_adj if custom_norm_adj is not None else norm_adj
     def _ensure_adj_list(adj):
@@ -1243,12 +1203,9 @@ def calculate_risk(custom_norm_adj=None):
                     pred = model_cvli(input_tensor, adj_for_model)
                 out_cvli = pred.squeeze(0).cpu().numpy() # (N, 1)
                 
-                print(f"[DEBUG] Predição do modelo - Min: {out_cvli.min():.4f}, Max: {out_cvli.max():.4f}, Mean: {out_cvli.mean():.4f}")
-
                 try:
                     if _DESSCALE_A is not None:
                         out_cvli = (_DESSCALE_A * out_cvli) + _DESSCALE_B
-                        print(f"[DEBUG] Após desscale - Min: {out_cvli.min():.4f}, Max: {out_cvli.max():.4f}")
                 except Exception:
                     pass
 
@@ -1266,10 +1223,6 @@ def calculate_risk(custom_norm_adj=None):
 
             else:
                 print("AVISO: Dados insuficientes para janela temporal")
-
-        # ---------------------------
-        # Processamento e Normalização (Ranking por Percentil)
-        # ---------------------------
 
         # CVLI - Usar ranking ao invés de threshold binário
         out_cvli = np.maximum(out_cvli, 0)
@@ -1345,12 +1298,9 @@ def calculate_risk(custom_norm_adj=None):
         try:
             if model_ranking_scores is not None and len(model_ranking_scores) == len(normalized_risk_cvli):
                 ranking_scores_arr = np.array(model_ranking_scores)
-                # threshold for top 10% (used to validate ST-GCN top10 candidates)
                 ranking_top10_threshold = float(np.percentile(ranking_scores_arr, 90))
-                print(f"[DEBUG] Ranking artifact present. top10_threshold={ranking_top10_threshold}")
         except Exception:
-            ranking_scores_arr = None
-            ranking_top10_threshold = None
+            pass
         # But CVP is raw count, not risk.
         # Let's just normalize CVP History for visualization?
         # Actually, let's leave it as copy of main risk, but potentially modified by local CVP intensity.
@@ -1684,6 +1634,15 @@ def calculate_risk(custom_norm_adj=None):
                 'note': 'Scores baseados em ranking (artefato) ou percentile do ST-GCN'
             }
 
+        # ==================== LOG DE PREDICTION ====================
+        try:
+            if predict_logger is not None:
+                log_file = predict_logger.log_prediction(meta, results, timestamp=datetime.now())
+                print(f"✅ Log de prediction salvo em: {log_file}")
+                meta['log_file'] = os.path.basename(log_file)
+        except Exception as e:
+            print(f"⚠️ Erro ao salvar log de prediction: {e}")
+
         return jsonify({'meta': meta, 'data': results})
     except Exception as e:
         print(f"ERROR details: {e}")
@@ -1705,8 +1664,6 @@ def enrich_regions():
     else:
         nodes_gdf['region_type'] = 'interior' # Fallback default
 
-    print("Enriching regions...")
-
     # --- FIXED: Use node_type to enforce City names ---
     if 'node_type' in nodes_gdf.columns:
         # If node is city, its name IS the city.
@@ -1726,7 +1683,6 @@ def enrich_regions():
             if reg == "Fortaleza":
                 nodes_gdf.at[idx, 'CIDADE'] = reg
                 count_fortaleza += 1
-        print(f"Assigned Fortaleza to {count_fortaleza} nodes via BBox.")
 
     mask_still_empty = (nodes_gdf['CIDADE'].isna()) | (nodes_gdf['CIDADE'].astype(str).str.len() < 2) | (nodes_gdf['CIDADE'] == 'RMF/Interior')
 
@@ -1747,11 +1703,8 @@ def enrich_regions():
             assigned_cities = [mun_names[i] for i in nearest_indices]
             nodes_gdf.loc[mask_still_empty, 'CIDADE'] = assigned_cities
 
-            print(f"Inferred cities for {len(assigned_cities)} nodes using proximity.")
-
-        except Exception as e:
-            print(f"Erro na inferência por distância: {e}")
-
+        except Exception:
+            pass
     polygons_json_cache = None
 
 def normalize_location(text):
@@ -1965,10 +1918,23 @@ def parse_ciops_report_endpoint():
 
 @app.route('/api/exogenous/parse', methods=['POST'])
 def parse_exogenous():
-    data = request.get_json()
-    text = data.get('text', '')
+    # Segurança: validar JSON de entrada e tratar casos de payload inválido
+    try:
+        data = request.get_json(force=False, silent=True)
+        if data is None:
+            return jsonify({'error': 'JSON inválido ou cabecalho Content-Type ausente.'}), 400
+        text = data.get('text', '') if isinstance(data, dict) else ''
+    except Exception as e:
+        return jsonify({'error': 'Falha ao ler payload JSON.', 'details': str(e)}), 400
 
-    events = process_exogenous_text(text)
+    try:
+        events = process_exogenous_text(text)
+        if events is None:
+            return jsonify({'error': 'Nenhum evento retornado pelo parser.'}), 500
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': 'Erro ao processar texto exógeno.', 'details': str(e)}), 500
 
     missing_city = []
     for idx, evt in enumerate(events):
