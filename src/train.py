@@ -21,7 +21,8 @@ from torch.utils.data import DataLoader, Dataset, TensorDataset
 DATA_FILE = 'data/processed/processed_graph_data.pkl'
 MODEL_DIR = 'models'
 MODEL_PATH = os.path.join(MODEL_DIR, 'stgcn_model_v2.pth')  # v2: 26 canais categóricos (one-hot)
-HISTORY_WINDOW = 14  # Reduzido de 30: captura padrões mais recentes e relevantes
+HISTORY_WINDOW = 30  # Use 30 days history for input (matches production training)
+HORIZON = 7  # Predict next 7 days
 BATCH_SIZE = 64  # 1. Ajuste fino: 16-32 para gradientes mais estáveis
 EPOCHS = 60  # 5. Ajuste fino: 50+ para convergência completa
 LEARNING_RATE = 0.0002  # 2. Ajuste fino: Manter 0.0001 (dados em escala original)
@@ -84,16 +85,30 @@ class WeightedFocalMSELoss(nn.Module):
         return torch.mean(loss)
 
 def prepare_dataset(node_features):
-    """Prepara dataset ORIGINAL - sem balanceamento."""
-    windows = sliding_window_view(node_features, HISTORY_WINDOW, axis=1)
+    """Prepara dataset - janelas de `HISTORY_WINDOW` e alvo somado em `HORIZON`."""
+    num_nodes, num_timesteps, num_features = node_features.shape
 
-    X = windows[:, :-1, :, :] # (Nodes, Samples, Features, WindowSize)
-    target_data = node_features[:, HISTORY_WINDOW:, 0:1] # (Nodes, Samples, 1)
+    valid_range = num_timesteps - HISTORY_WINDOW - HORIZON + 1
+    X_list = []
+    Y_list = []
 
-    X = X.transpose(1, 2, 0, 3) # (Samples, Features, Nodes, WindowSize)
-    Y = target_data.transpose(1, 0, 2) # (Samples, Nodes, 1)
+    for s in range(valid_range):
+        window = node_features[:, s:s+HISTORY_WINDOW, :]
+        target = np.sum(node_features[:, s+HISTORY_WINDOW:s+HISTORY_WINDOW+HORIZON, 0:1], axis=1)
 
-    # Ensure numpy arrays are contiguous and writable
+        # Transpose X to (Features, Nodes, Window)
+        X_list.append(np.transpose(window, (2, 0, 1)).astype(np.float32))
+        Y_list.append(target.astype(np.float32))
+
+    if len(X_list) == 0:
+        return np.zeros((0,)), np.zeros((0,))
+
+    X = np.array(X_list)  # (Samples, Features, Nodes, Window)
+    Y = np.array(Y_list)  # (Samples, Nodes, 1) actually (Samples, Nodes, 1?)
+    # Ensure shapes: Y -> (Samples, Nodes, 1)
+    if Y.ndim == 2:
+        Y = Y[:, :, None]
+
     X = np.ascontiguousarray(X)
     Y = np.ascontiguousarray(Y)
 

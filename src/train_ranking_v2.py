@@ -11,7 +11,10 @@ import numpy as np
 import torch
 from pathlib import Path
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '.'))
+# Ensure project root is on sys.path so `src` imports resolve when running script
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
 
 from src.ranking_model_v2 import RankingModel, RankingTrainerV2
 from src.ranking_features import extract_ranking_features
@@ -43,11 +46,11 @@ def load_data():
     
     return data['node_features'], data.get('dates', None), data
 
-def extract_features_and_targets(node_features, dates):
-    """Extrai features de ranking"""
+def extract_features_and_targets(node_features, dates, horizon_days=7):
+    """Extrai features de ranking (targets = mean dos últimos `horizon_days`)."""
     print("\n[EXTRACT] Extraindo features...")
     
-    X, Y = extract_ranking_features(node_features, dates)
+    X, Y = extract_ranking_features(node_features, dates, horizon_days)
     
     print("[OK] Features extraidas")
     print(f"  - X shape: {X.shape}")
@@ -56,16 +59,17 @@ def extract_features_and_targets(node_features, dates):
     
     return X, Y
 
-def train_ranking_model_v2(X, Y, epochs=20, batch_size=8, device='cpu'):
+def train_ranking_model_v2(X, Y, epochs=20, batch_size=8, device='cpu', model=None, trainer=None):
     """Treina modelo de ranking com pairwise loss"""
     print(f"\n[TRAIN] Iniciando treinamento v2...")
     print(f"  - Epochs: {epochs}")
     print(f"  - Batch size: {batch_size}")
     print(f"  - Device: {device}")
     
-    # Criar modelo
-    model = RankingModel(input_dim=X.shape[1], hidden_dim=128)
-    trainer = RankingTrainerV2(model, device=device, lr=0.01)
+    # Criar modelo se nao fornecido
+    if model is None or trainer is None:
+        model = RankingModel(input_dim=X.shape[1], hidden_dim=512)
+        trainer = RankingTrainerV2(model, device=device, lr=0.01)
     
     # Preparar dados
     print(f"  - Preparando batches...")
@@ -145,26 +149,48 @@ def evaluate_rankings(model, trainer, X, Y, top_k=5):
 
 def main():
     """Main"""
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Train ranking v2')
+    parser.add_argument('--epochs', type=int, default=20)
+    parser.add_argument('--batch-size', type=int, default=8)
+    parser.add_argument('--device', type=str, default=None)
+    parser.add_argument('--hidden-dim', type=int, default=128)
+    parser.add_argument('--dropout-main', type=float, default=0.3)
+    parser.add_argument('--dropout-small', type=float, default=0.2)
+    parser.add_argument('--lr', type=float, default=0.01)
+    parser.add_argument('--weight-decay', type=float, default=1e-4)
+    args = parser.parse_args()
+
     print("=" * 60)
     print("RankingLoss V2 Training - Pairwise Loss Approach")
     print("=" * 60)
-    
+
     # Detectar device
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    if args.device:
+        device = args.device
+    else:
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"Device: {device}\n")
-    
+
     # Carregar dados
     node_features, dates, full_data = load_data()
     if node_features is None:
         return
-    
-    # Extrair features
-    X, Y = extract_features_and_targets(node_features, dates)
-    
+
+    # Extrair features (usar histórico de 14 dias para features -> prever 7 dias)
+    history_window = 14
+    X, Y = extract_ranking_features(node_features, dates, horizon_days=7, history_window=history_window)
+
     # Treinar modelo
-    model, trainer, history, best_p5 = train_ranking_model_v2(
-        X, Y, epochs=20, batch_size=8, device=device
-    )
+    # Create model with provided hyperparams
+    def train_with_args():
+        model = RankingModel(input_dim=X.shape[1], hidden_dim=args.hidden_dim,
+                             dropout_main=args.dropout_main, dropout_small=args.dropout_small)
+        trainer = RankingTrainerV2(model, device=device, lr=args.lr, weight_decay=args.weight_decay)
+
+        return train_ranking_model_v2(X, Y, epochs=args.epochs, batch_size=args.batch_size, device=device, model=model, trainer=trainer)
+    model, trainer, history, best_p5 = train_with_args()
     
     # Avaliar
     ranking, scores, p_at_5 = evaluate_rankings(model, trainer, X, Y, top_k=5)

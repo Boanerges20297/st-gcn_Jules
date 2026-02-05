@@ -4,6 +4,7 @@ if not os.path.exists(p):
     print('MISSING')
 else:
     d = pickle.load(open(p, 'rb'))
+    print('ALL KEYS:', list(d.keys()))
     ng = d.get('nodes_gdf')
     print('nodes_gdf type:', type(ng))
     try:

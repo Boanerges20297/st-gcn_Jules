@@ -20,6 +20,8 @@ from shapely.geometry import shape, Point, Polygon
 from scipy.spatial.distance import cdist
 from src.model import STGCN
 from src.llm_service import process_exogenous_text, parse_ciops_report
+from src.ranking_inference import RankingInference
+from src.model_update_monitor import start_monitor, get_state as get_monitor_state
 import threading
 import time
 import unicodedata
@@ -71,7 +73,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, 'data', 'processed', 'processed_graph_data.pkl')
 MODEL_CVLI_PATH = os.path.join(BASE_DIR, 'models', 'stgcn_model_v2.pth') # Modelo v2: 26 canais categóricos (one-hot dia/mês)
 EXOGENOUS_FILE = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
-RANKING_MODEL_PATH = os.path.join(BASE_DIR, 'models', 'ranking_model_v2.pkl')
+# Updated: Use recovered ranking model with P@5 >= 0.80 (30-day window, hidden=512)
+RANKING_MODEL_PATH = os.path.join(BASE_DIR, 'models', 'ranking_model_window30_final.pkl')
 BAIRROS_POLYGONS_PATHS = [
     os.path.join(BASE_DIR, 'data', 'raw', 'AIS - CAPITAL.geojson'),
     os.path.join(BASE_DIR, 'outputs', 'fortaleza_bairros_fence.geojson')
@@ -86,6 +89,7 @@ adj_matrix = None
 original_adj_matrix = None
 node_features = None
 model_cvli = None # Modelo 3D unificado (26 canais: CVLI, CVP, Tension + one-hot features)
+ranking_validator = None  # RankingInference for real-time validation
 model_ranking_scores = None
 device = None
 norm_adj = None
@@ -766,7 +770,18 @@ def load_data_and_models():
                 m_cvli.eval()
                 model_cvli = m_cvli
                 print(f"[DEBUG] Modelo CVLI carregado com sucesso! (in_channels={ck_in_channels}, time_steps={instantiate_ts})")
-                # Tentar carregar artefato de ranking (pickle com 'scores')
+                
+                # Carregar modelo de ranking para validação em tempo de execução
+                global ranking_validator
+                try:
+                    if os.path.exists(RANKING_MODEL_PATH):
+                        ranking_validator = RankingInference(RANKING_MODEL_PATH, device=device)
+                        print(f"[DEBUG] Ranking validator carregado para validação em tempo de execução")
+                except Exception as e:
+                    print(f"[WARNING] Falha ao carregar ranking validator: {e}")
+                    ranking_validator = None
+                
+                # Tentar carregar artefato de ranking (pickle com 'scores') - fallback
                 try:
                     if os.path.exists(RANKING_MODEL_PATH):
                         with open(RANKING_MODEL_PATH, 'rb') as fh:
@@ -841,6 +856,22 @@ def periodic_status():
         return jsonify({
             'in_progress': bool(getattr(app, '_periodic_update_in_progress', False)),
             'last_update': getattr(app, '_periodic_last_update', None)
+        })
+    except Exception:
+        return jsonify({'error': 'Erro ao obter status'}), 500
+
+@app.route('/api/model-update-status')
+def model_update_status():
+    """Retorna status da atualização de modelos."""
+    try:
+        state = get_monitor_state()
+        return jsonify({
+            'status': state.get('status', 'idle'),
+            'progress': state.get('progress', 0),
+            'message': state.get('message', ''),
+            'error': state.get('error_message'),
+            'last_check': state.get('last_check'),
+            'last_update': state.get('last_update')
         })
     except Exception:
         return jsonify({'in_progress': False, 'last_update': None})
@@ -1077,7 +1108,8 @@ def simulate_risk():
                     affected_nodes.add(idx)
                     print(f"[SIMULAÇÃO] Adicionado node {idx} aos afetados")
                     if sim_type == 'suppression':
-                        suppression_factor = 0.05
+                        # Equipe cobre 20km² - suprime 80% do risco local (mantém 20%)
+                        suppression_factor = 0.20
                         adj_copy[idx, :] *= suppression_factor
                         adj_copy[:, idx] *= suppression_factor
                     elif sim_type == 'exogenous':
@@ -2048,4 +2080,8 @@ except Exception as e:
     print(f"Startup error: {e}")
 
 if __name__ == "__main__":
+    # Inicia o monitor de atualização de modelos (verifica a cada 5 min)
+    print("[STARTUP] Iniciando monitor de atualizações de modelos...")
+    start_monitor(check_interval=300)
+    
     app.run(host='0.0.0.0', port=5000, debug=True)

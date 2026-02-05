@@ -9,7 +9,7 @@ import pandas as pd
 from datetime import datetime
 from typing import Dict, List
 
-def extract_ranking_features(node_features, dates):
+def extract_ranking_features(node_features, dates, horizon_days: int = 7, history_window: int = 30):
     """
     Extrai features para ranking a partir dos dados brutos.
     
@@ -75,8 +75,9 @@ def extract_ranking_features(node_features, dates):
         temporal_features[node_id, 2] = node_ts.max()       # Máximo
         temporal_features[node_id, 3] = (node_ts > 0).mean() # % dias com eventos
         # Tendência (últimos 30 vs primeiros 30 dias)
-        if len(node_ts) > 60:
-            temporal_features[node_id, 4] = node_ts[-30:].mean() - node_ts[:30].mean()
+        # Tendência: últimos `history_window` vs anteriores `history_window`
+        if len(node_ts) > history_window * 2:
+            temporal_features[node_id, 4] = node_ts[-history_window:].mean() - node_ts[:history_window].mean()
     
     print(f"  [OK] Features temporais (5D)")
     
@@ -87,9 +88,56 @@ def extract_ranking_features(node_features, dates):
         weekend_features,       # 2D
         temporal_features       # 5D
     ])  # Total: 26D
+
+    # ========== FEATUREs de Vizinhança (adjacências se possível) ==========
+    # Tenta usar matrizes de adjacência presentes no pacote processado
+    try:
+        adj_geo = getattr(node_features, 'adj_geo', None)
+    except Exception:
+        adj_geo = None
+
+    # If caller provided adjacency inside a dict-like package, try to extract
+    # (handled by scripts that pass full data dict)
+    if adj_geo is None and hasattr(node_features, '__array__') is False:
+        adj_geo = None
+
+    # Fallback: if node_features was passed as the raw array, try to load
+    # adjacency from disk (data/processed) to compute neighborhood aggregates.
+    if adj_geo is None:
+        try:
+            import pickle, os
+            p = os.path.join('data', 'processed', 'processed_graph_data.pkl')
+            if os.path.exists(p):
+                pack = pickle.load(open(p, 'rb'))
+                adj_geo = pack.get('adj_geo')
+        except Exception:
+            adj_geo = None
+
+    if adj_geo is not None:
+        try:
+            # adj_geo expected shape: (N, N) or similar
+            adj = np.array(adj_geo)
+            # Normalize rows
+            row_sums = adj.sum(axis=1, keepdims=True) + 1e-6
+            adj_norm = adj / row_sums
+
+            # Compute neighbor-averaged recent CVLI (last `history_window` days)
+            recent = cvli_data[:, -history_window:]
+            neigh_mean = adj_norm.dot(recent.mean(axis=1))
+            neigh_sum = adj_norm.dot(recent.sum(axis=1))
+            neigh_feats = np.stack([neigh_mean, neigh_sum], axis=1)
+            X = np.hstack([X, neigh_feats])
+            print('  [OK] Neighbor features added (2D)')
+        except Exception:
+            print('  [WARN] Failed to add neighbor features')
+
     
-    # ========== Target: CVLI médio por nó ==========
-    Y = cvli_data.mean(axis=1)  # (num_nodes,)
+    # ========== Target: CVLI médio por nó (últimos `horizon_days`) ==========
+    if hasattr(node_features, 'shape') and node_features.shape[1] >= horizon_days:
+        # Use sum over horizon to create stronger targets for ranking
+        Y = cvli_data[:, -horizon_days:].sum(axis=1)
+    else:
+        Y = cvli_data.mean(axis=1)
     
     print(f"\n[STATS] Features Extraidas:")
     print(f"  Shape X: {X.shape} (nos, features)")

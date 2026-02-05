@@ -334,8 +334,8 @@ if __name__ == "__main__":
     os.makedirs('plots', exist_ok=True)
 
     # CVLI Analysis
-    # Reduced window to 30 for analysis speed (demonstration purpose)
-    run_analysis_for_task('CVLI', feature_idx=0, history_window=30, horizon=3, epochs=20, batch_size=8)
+    # Use 30-day history window to predict next 7 days (analysis default)
+    run_analysis_for_task('CVLI', feature_idx=0, history_window=30, horizon=7, epochs=20, batch_size=8)
 
     # CVP Analysis
     run_analysis_for_task('CVP', feature_idx=1, history_window=30, horizon=1, epochs=20, batch_size=8)
