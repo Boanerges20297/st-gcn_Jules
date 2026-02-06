@@ -1,0 +1,44 @@
+{
+  "model": "ranking_tune_best_h128_lr0.01_b8.pth",
+  "test_date": "2026-02-05 20:18:24.931110",
+  "test_window_days": 30,
+  "metrics": {
+    "precision_at_5": 1.0,
+    "spearman_correlation": 0.0,
+    "model_confidence": 0.9850988388061523,
+    "top5_overlap": 5
+  },
+  "predictions": {
+    "p_at_k": 1.0,
+    "spearman": 0.0,
+    "confidence": 0.9850988388061523,
+    "real_top5": [
+      303,
+      302,
+      301,
+      300,
+      299
+    ],
+    "pred_top5": [
+      303,
+      302,
+      301,
+      300,
+      299
+    ],
+    "real_scores": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "pred_scores": [
+      -0.16841700673103333,
+      -0.16841700673103333,
+      -0.16841700673103333,
+      -0.16841700673103333,
+      -0.16841700673103333
+    ]
+  }
+}

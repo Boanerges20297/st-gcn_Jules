@@ -269,10 +269,14 @@
     });
 
     function getColor(d) {
-        // Frontend visualization: only highlight Alto (>=80) and Crítico (>=90).
-        // Outras faixas permanecem no backend para auditoria, mas ficam invisíveis/no palco neutro.
+        // Frontend visualization with color bands:
+        // Crítico (>=90): Vermelho escuro
+        // Alto (80-89): Vermelho claro
+        // Moderado (50-79): Laranja
+        // Baixo/Sem Risco: Cinza (invisível)
         return d >= 90 ? '#8B0000' :
-               d >= 80 ? '#FF8C00' :
+               d >= 80 ? '#FF6B6B' :
+               d >= 50 ? '#FFA500' :
                         '#CCCCCC';
     }
 
@@ -286,17 +290,18 @@
         }
 
         var fill = getColor(score);
-        var isHigh = (score >= 80);
+        // Mostrar Alto (>=80) e Moderado (>=50) no mapa
+        var isVisible = (score >= 50);
 
         return {
             radius: 10,
             fillColor: fill,
-            weight: isHigh ? 2 : 0,
-            opacity: isHigh ? 1 : 0,
-            color: isHigh ? 'white' : 'transparent',
-            dashArray: isHigh ? '3' : null,
-            fillOpacity: isHigh ? 0.6 : 0,
-            interactive: isHigh
+            weight: isVisible ? 2 : 0,
+            opacity: isVisible ? 1 : 0,
+            color: isVisible ? 'white' : 'transparent',
+            dashArray: isVisible ? '3' : null,
+            fillOpacity: isVisible ? 0.6 : 0,
+            interactive: isVisible
         };
     }
 
@@ -313,9 +318,10 @@
     legend.onAdd = function (map) {
         var div = L.DomUtil.create('div', 'legend');
         div.innerHTML = '<strong>Nível de Risco (Próximos 7d)</strong><br>';
-        // Only show Alto and Crítico in the map legend (visualization simplified)
-        div.innerHTML += '<i style="background:' + getColor(90) + '"></i> Crítico (>= 90)<br>';
-        div.innerHTML += '<i style="background:' + getColor(80) + '"></i> Alto (80–89)<br>';
+        // Mostra Crítico, Alto e Moderado na legenda
+        div.innerHTML += '<i style="background:' + getColor(95) + '"></i> Crítico (≥ 90)<br>';
+        div.innerHTML += '<i style="background:' + getColor(85) + '"></i> Alto (80–89)<br>';
+        div.innerHTML += '<i style="background:' + getColor(65) + '"></i> Moderado (50–79)<br>';
         div.innerHTML += '<hr style="margin: 5px 0; opacity: 0.5;"><small style="color: #666;">🕐 <strong>Agregação:</strong> Próximos 7 dias<br/><strong>⚠️ Probabilística:</strong> P@5 > 80%</small>';
         return div;
     };

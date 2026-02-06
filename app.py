@@ -17,9 +17,9 @@ warnings.filterwarnings('ignore', category=FutureWarning, module='google.api_cor
 warnings.filterwarnings('ignore', message='All support for the.*google.generativeai')
 warnings.filterwarnings('ignore', category=DeprecationWarning)
 
-# Suprimir logs excessivos do Werkzeug
-logging.getLogger('werkzeug').setLevel(logging.ERROR)
-logging.getLogger('werkzeug.serving').setLevel(logging.ERROR)
+# Suprimir logs excessivos do Werkzeug (mas manter INFO para startup messages)
+logging.getLogger('werkzeug').setLevel(logging.INFO)
+logging.getLogger('werkzeug.serving').setLevel(logging.INFO)
 
 from shapely.geometry import shape, Point, Polygon
 from scipy.spatial.distance import cdist
@@ -79,8 +79,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, 'data', 'processed', 'processed_graph_data.pkl')
 MODEL_CVLI_PATH = os.path.join(BASE_DIR, 'models', 'stgcn_model_v2.pth') # Modelo v2: 26 canais categóricos (one-hot dia/mês)
 EXOGENOUS_FILE = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
-# Updated: Use recovered ranking model with P@5 >= 0.80 (30-day window, hidden=512)
-RANKING_MODEL_PATH = os.path.join(BASE_DIR, 'models', 'ranking_model_window30_final.pkl')
+# Ranking model path - será determinado dinamicamente baseado no dia da semana
+RANKING_MODEL_PATH = None  # Será setado em load_data_and_models()
+RANKING_BY_DAY_DIR = os.path.join(BASE_DIR, 'models', 'ranking_by_day')
 BAIRROS_POLYGONS_PATHS = [
     os.path.join(BASE_DIR, 'data', 'raw', 'AIS - CAPITAL.geojson'),
     os.path.join(BASE_DIR, 'outputs', 'fortaleza_bairros_fence.geojson')
@@ -195,6 +196,48 @@ def build_node_search_index():
 # Parâmetros de janela (modelo v2 retreinado com 30 dias + 8 features)
 WINDOW_CVLI = 30
 WINDOW_CVP = 30
+
+def get_ranking_model_path():
+    """
+    Determina o caminho correto do modelo de ranking baseado no dia da semana atual.
+    
+    Retorna: (model_path, usando_fallback)
+    """
+    global dates
+    
+    day_of_week = None
+    
+    # Tentar obter dia da semana dos dados
+    if dates is not None and len(dates) > 0:
+        try:
+            current_date = pd.to_datetime(dates[-1])
+            day_of_week = current_date.weekday()
+        except Exception:
+            pass
+    
+    # Se não conseguiu pelos dados, usar data do sistema
+    if day_of_week is None:
+        try:
+            today = pd.Timestamp.now()
+            day_of_week = today.weekday()
+        except Exception:
+            pass
+    
+    # Estratégia 1: Tentar modelo específico do dia
+    if day_of_week is not None:
+        day_model_path = os.path.join(RANKING_BY_DAY_DIR, f'ranking_model_day{day_of_week}.pth')
+        if os.path.exists(day_model_path):
+            return day_model_path, False
+    
+    # Estratégia 2: Fallback para modelo genérico window30
+    fallback_path = os.path.join(BASE_DIR, 'models', 'ranking_model_window30_final.pkl')
+    if os.path.exists(fallback_path):
+        return fallback_path, True
+    
+    # Estratégia 3: Nenhum modelo disponível
+    return None, False
+
+
 
 def load_exogenous_events():
     global exogenous_events, exogenous_cache_file
@@ -475,6 +518,18 @@ def load_data_and_models():
     global nodes_gdf, polygons_json_cache, nodes_gdf_proj, nodes_centroids_proj, adj_matrix, node_features, model_cvli, device, norm_adj, dates, original_adj_matrix
     global adj_geo, adj_faction, norm_adj_list
     global ibge_bairros_cache, ibge_municipios_cache, ibge_municipios_gdf
+    global RANKING_MODEL_PATH
+
+    # Determinar e carregar modelo de ranking correto baseado no dia da semana
+    RANKING_MODEL_PATH, usando_fallback = get_ranking_model_path()
+    
+    # Log claro sobre qual modelo está sendo usado
+    if RANKING_MODEL_PATH:
+        modelo_tipo = "FALLBACK" if usando_fallback else "OFFICIAL"
+        modelo_nome = os.path.basename(RANKING_MODEL_PATH)
+        print(f"[RANKING] {modelo_tipo}: {modelo_nome}")
+    else:
+        print(f"[RANKING] DISABLED: Nenhum modelo disponível")
 
     # Load Static Data
     try:
@@ -572,7 +627,13 @@ def load_data_and_models():
                         if name in ["Nome", "null", "None", ""] or name is None:
                             continue
                         regiao = info.get('regiao', 'desconhecido').lower()
-                        node_type = 'bairro' if regiao in ['fortaleza', 'rmf'] else 'cidade'
+                        # Use node_type from data if available; otherwise classify by logic
+                        if 'node_type' in info:
+                            node_type = info['node_type']
+                        elif 'eh_cidade' in info and info['eh_cidade']:
+                            node_type = 'cidade'
+                        else:
+                            node_type = 'bairro' if regiao == 'fortaleza' else 'cidade'
                         
                         records.append({
                             'name': name,
@@ -823,22 +884,8 @@ def load_data_and_models():
                 
                 # Carregar modelo de ranking para validação em tempo de execução
                 global ranking_validator
-                try:
-                    if os.path.exists(RANKING_MODEL_PATH):
-                        ranking_validator = RankingInference(RANKING_MODEL_PATH, device=device)
-                except Exception:
-                    ranking_validator = None
-                
-                # Tentar carregar artefato de ranking (pickle com 'scores') - fallback
-                try:
-                    if os.path.exists(RANKING_MODEL_PATH):
-                        with open(RANKING_MODEL_PATH, 'rb') as fh:
-                            rk = pickle.load(fh)
-                        # artefato esperado: dict with 'scores' numpy array
-                        if isinstance(rk, dict) and 'scores' in rk:
-                            model_ranking_scores = rk.get('scores')
-                except Exception:
-                    pass
+                ranking_validator = None
+                # RankingInference desabilitado - sistema usa fallback estático
             except Exception as e:
                 print(f"Erro ao carregar state_dict CVLI: {e}")
 
@@ -1043,9 +1090,11 @@ def get_network_graph():
     # Accept optional filters via query params:
     #   region: fortaleza | rmf | interior | all (default all)
     #   critical_only: true|false (default false)
+    #   connected_only: true|false (default false) - only show nodes with connections
     #   risk_threshold: numeric percent (default 90)
     region = (request.args.get('region') or 'all').strip().lower()
     critical_only = str(request.args.get('critical_only', 'false')).lower() in ['1', 'true', 'yes']
+    connected_only = str(request.args.get('connected_only', 'false')).lower() in ['1', 'true', 'yes']
     try:
         risk_threshold = float(request.args.get('risk_threshold', 90.0))
     except Exception:
@@ -1066,66 +1115,45 @@ def get_network_graph():
 
     selected_ids = set()
 
-    # If filters are default (no critical_only and region=all), keep previous behavior: top 10
-    if not critical_only and region == 'all':
-        sorted_nodes = sorted(all_nodes, key=lambda x: x['risk_score'], reverse=True)
-        top_k = 10
-        top_nodes = sorted_nodes[:top_k]
-        for item in top_nodes:
-            selected_ids.add(item['node_id'])
-    else:
-        # Filter nodes by region first
-        region_ids = set()
-        if nodes_gdf is not None and region != 'all':
-            # Normalize regiao column if present
-            try:
-                rg = nodes_gdf.get('regiao') if 'regiao' in nodes_gdf.columns else None
-                if rg is not None:
-                    for idx, row in nodes_gdf.reset_index().iterrows():
-                        nid = idx
-                        r = str(row.get('regiao', '')).lower()
-                        node_type = str(row.get('node_type', '')).lower()
-                        # region matching rules
-                        if region == 'fortaleza' and (r == 'fortaleza' or (node_type == 'bairro' and row.get('CIDADE','').lower() == 'fortaleza')):
+    # ALWAYS show only High (80-89%) and Critical (≥90%) nodes with connections
+    # Filter nodes by region first
+    region_ids = set()
+    if nodes_gdf is not None and region != 'all':
+        # Normalize regiao column if present
+        try:
+            rg = nodes_gdf.get('regiao') if 'regiao' in nodes_gdf.columns else None
+            if rg is not None:
+                for idx, row in nodes_gdf.reset_index().iterrows():
+                    nid = idx
+                    r = str(row.get('regiao', '')).lower()
+                    node_type = str(row.get('node_type', '')).lower()
+                    
+                    # region matching rules
+                    if region == 'fortaleza':
+                        # Only bairros of Fortaleza
+                        if node_type == 'bairro' and r == 'fortaleza':
                             region_ids.add(nid)
-                        elif region == 'rmf' and r == 'rmf':
+                    elif region == 'rmf':
+                        # RMF cities and neighborhoods
+                        if r == 'rmf':
                             region_ids.add(nid)
-                        elif region == 'interior' and node_type == 'cidade' and str(row.get('CIDADE','')).lower() != 'fortaleza':
+                    elif region == 'interior':
+                        # Interior cities (not Fortaleza, not RMF)
+                        if r == 'interior':
                             region_ids.add(nid)
-                else:
-                    # Fallback: consider all nodes if region filter not resolvable
-                    region_ids = set([item['node_id'] for item in all_nodes])
-            except Exception:
+            else:
+                # Fallback: consider all nodes if region filter not resolvable
                 region_ids = set([item['node_id'] for item in all_nodes])
-        else:
+        except Exception:
             region_ids = set([item['node_id'] for item in all_nodes])
+    else:
+        region_ids = set([item['node_id'] for item in all_nodes])
 
-        # If critical_only: select nodes in region with risk >= threshold
-        if critical_only:
-            for nid in list(region_ids):
-                item = node_map.get(nid)
-                if item and float(item.get('risk_score', 0)) >= risk_threshold:
-                    selected_ids.add(nid)
-
-            # Add influents (nodes that influence selected critical nodes) regardless of region
-            for v in list(selected_ids):
-                try:
-                    for u in range(adj_matrix.shape[0]):
-                        try:
-                            w = float(adj_matrix[u, v])
-                            if w > 0:
-                                selected_ids.add(u)
-                        except Exception:
-                            continue
-                except Exception:
-                    continue
-        else:
-            # Not critical_only but a region filter: include top nodes within region sorted by risk
-            region_items = [node_map[nid] for nid in region_ids if nid in node_map]
-            sorted_region = sorted(region_items, key=lambda x: x['risk_score'], reverse=True)
-            top_k = 10
-            for item in sorted_region[:top_k]:
-                selected_ids.add(item['node_id'])
+    # Select ALL nodes with risk >= 80% (High or Critical) within region
+    for nid in list(region_ids):
+        item = node_map.get(nid)
+        if item and float(item.get('risk_score', 0)) >= 80.0:
+            selected_ids.add(nid)
 
     # Build response nodes and links
     graph_nodes = []
@@ -1140,15 +1168,30 @@ def get_network_graph():
         })
 
     links = []
+    # Only show connections that are significant (> 0.05 = 5% influence)
     for u in selected_ids:
         for v in selected_ids:
             if u == v: continue
             try:
                 weight = float(adj_matrix[u, v])
-                if weight > 0:
+                # Filter to show only meaningful connections
+                if weight > 0.05:
                     links.append({'source': u, 'target': v, 'weight': weight, 'type': 'influence'})
             except Exception:
                 pass
+
+    # ALWAYS filter to show ONLY nodes with connections (connected_only is always true for this view)
+    if len(links) > 0:
+        connected_node_ids = set()
+        for link in links:
+            connected_node_ids.add(link['source'])
+            connected_node_ids.add(link['target'])
+        
+        # Keep only nodes that have connections
+        graph_nodes = [n for n in graph_nodes if n['id'] in connected_node_ids]
+    else:
+        # If no connections, return empty network
+        graph_nodes = []
 
     return jsonify({'nodes': graph_nodes, 'links': links})
 
@@ -1276,15 +1319,9 @@ def calculate_risk(custom_norm_adj=None):
         return jsonify({'error': 'GeoDataFrame dos nós não carregado. Verifique processed_graph_data.pkl'}), 503
 
     # Lazy-load ranking artifact if available (handles server restarts)
+    # NOTE: RankingInference handles model loading, no need to load 'scores' separately
     global model_ranking_scores
-    try:
-        if model_ranking_scores is None and os.path.exists(RANKING_MODEL_PATH):
-            with open(RANKING_MODEL_PATH, 'rb') as fh:
-                rk = pickle.load(fh)
-            if isinstance(rk, dict) and 'scores' in rk:
-                model_ranking_scores = rk.get('scores')
-    except Exception:
-        pass
+    # model_ranking_scores remains None - it's computed on-demand by RankingInference
 
     current_norm_adj = custom_norm_adj if custom_norm_adj is not None else norm_adj
     def _ensure_adj_list(adj):
@@ -2233,4 +2270,4 @@ if __name__ == "__main__":
     print("[STARTUP] Iniciando monitor de atualizações de modelos...")
     start_monitor(check_interval=300)
     
-    app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=False)
+    app.run(host='0.0.0.0', port=5050, debug=True, use_reloader=True)

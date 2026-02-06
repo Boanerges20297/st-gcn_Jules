@@ -20,7 +20,7 @@ class RankingInference:
         Initialize ranking model for inference
         
         Args:
-            model_path: Path to ranking_model_window30_final.pkl
+            model_path: Path to ranking model (.pth or .pkl)
             device: 'cpu' or 'cuda'
         """
         self.device = device
@@ -35,8 +35,14 @@ class RankingInference:
             return
         
         try:
-            with open(model_path, 'rb') as f:
-                data = pickle.load(f)
+            # Determine file type and load accordingly
+            if model_path.endswith('.pth'):
+                # Load PyTorch .pth file
+                data = torch.load(model_path, map_location='cpu', weights_only=False)
+            else:
+                # Load pickle file
+                with open(model_path, 'rb') as f:
+                    data = pickle.load(f)
             
             # Import model class
             from src.ranking_model_v2 import RankingModel
@@ -63,7 +69,7 @@ class RankingInference:
             self.model.eval()
             
             metrics = data.get('metrics', {})
-            print(f"[OK] Ranking model loaded")
+            print(f"[OK] Ranking model loaded from {os.path.basename(model_path)}")
             print(f"      Config: input={self.input_dim}, hidden={self.config.get('hidden_dim')}")
             print(f"      Performance: P@5={metrics.get('p5', 'N/A')}")
             

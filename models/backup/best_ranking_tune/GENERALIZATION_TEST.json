@@ -1,0 +1,48 @@
+{
+  "model": "ranking_tune_best_h128_lr0.01_b8.pth",
+  "num_windows": 10,
+  "p_at_5": {
+    "mean": 0.24,
+    "std": 0.3072458299147443,
+    "min": 0.0,
+    "max": 1.0,
+    "all_values": [
+      0.2,
+      0.4,
+      0.4,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.4,
+      1.0
+    ]
+  },
+  "spearman": {
+    "mean": 0.0,
+    "std": 0.0,
+    "min": 0.0,
+    "max": 0.0,
+    "all_values": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "overfitting_detected": true,
+  "issues": [
+    "  [ALERT] Alta variancia em P@5: 0.3072",
+    "         Diferenca Max-Min: 100.00%",
+    "  [ALERT] Desempenho muito inconsistente",
+    "         Min: 0.00%, Max: 100.00%"
+  ],
+  "recommendation": "DO NOT DEPLOY"
+}

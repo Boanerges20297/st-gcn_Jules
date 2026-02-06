@@ -1,0 +1,117 @@
+{
+  "model": "ranking_tune_best_h128_lr0.01_b8.pth",
+  "analysis_date": "2026-02-05 20:21:50.672879",
+  "overfitting_detected": false,
+  "test_1_recent": {
+    "p_at_5": 0.0,
+    "spearman": 0.0,
+    "confidence": NaN,
+    "real_top5": [
+      303,
+      302,
+      301,
+      300,
+      299
+    ],
+    "pred_top5": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "real_scores": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "pred_scores": [
+      NaN,
+      NaN,
+      NaN,
+      NaN,
+      NaN
+    ],
+    "mean_pred": NaN,
+    "std_pred": NaN
+  },
+  "test_2_mid": {
+    "p_at_5": 0.0,
+    "spearman": 0.0,
+    "confidence": NaN,
+    "real_top5": [
+      202,
+      185,
+      31,
+      310,
+      247
+    ],
+    "pred_top5": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "real_scores": [
+      3.0,
+      2.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "pred_scores": [
+      NaN,
+      NaN,
+      NaN,
+      NaN,
+      NaN
+    ],
+    "mean_pred": NaN,
+    "std_pred": NaN
+  },
+  "test_3_far": {
+    "p_at_5": 0.2,
+    "spearman": 0.0,
+    "confidence": NaN,
+    "real_top5": [
+      211,
+      150,
+      4,
+      303,
+      302
+    ],
+    "pred_top5": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "real_scores": [
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    "pred_scores": [
+      NaN,
+      NaN,
+      NaN,
+      NaN,
+      NaN
+    ],
+    "mean_pred": NaN,
+    "std_pred": NaN
+  },
+  "degradation_metrics": {
+    "p_at_5_drop_30_60": 0.0,
+    "confidence_drop_30_60": NaN,
+    "p_at_5_drop_60_90": -0.2,
+    "confidence_drop_60_90": NaN
+  },
+  "issues": []
+}
