@@ -12,6 +12,11 @@ import torch
 from pathlib import Path
 from typing import Tuple, Optional
 
+# Garante determinismo ao importar este módulo
+SEED_VALUE = 42
+np.random.seed(SEED_VALUE)
+torch.manual_seed(SEED_VALUE)
+
 class RankingInference:
     """Carregar e executar modelo de ranking para validar predições de ST-GCN"""
     

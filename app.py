@@ -11,6 +11,7 @@ import json
 import hashlib
 import warnings
 import logging
+import asyncio
 
 # Suprimir warnings desnecessários
 warnings.filterwarnings('ignore', category=FutureWarning, module='google.api_core')
@@ -71,6 +72,35 @@ import time
 import unicodedata
 from datetime import datetime, timezone
 from collections.abc import Mapping
+
+# ============================================================================
+# DETERMINISMO GLOBAL - Garante mesmas predições em múltiplas execuções
+# ============================================================================
+SEED_VALUE = 42
+
+def set_deterministic_mode():
+    """Força modo determinístico para reprodutibilidade exata."""
+    # NumPy
+    np.random.seed(SEED_VALUE)
+    
+    # PyTorch
+    torch.manual_seed(SEED_VALUE)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(SEED_VALUE)
+        torch.cuda.manual_seed_all(SEED_VALUE)
+    
+    # Força algoritmos determinísticos (pode afetar performance)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    
+    # Python
+    import random
+    random.seed(SEED_VALUE)
+    
+    print(f"[DETERMINISM] Seed fixo: {SEED_VALUE} | Determinístico: ON")
+
+# Aplica imediatamente no import
+set_deterministic_mode()
 
 # Desscale mapping (loaded from diagnostics report if present)
 _DESSCALE_A = None
@@ -160,6 +190,20 @@ GEOCODING_ENABLED = True
 exogenous_events = []
 exogenous_affected_nodes = set()
 exogenous_critical_nodes = set()
+
+# Lock para garantir que pesos exógenos sejam aplicados apenas uma vez
+exogenous_weights_lock = threading.Lock()
+exogenous_weights_initialized = False
+
+# Lock para proteger adj_matrix durante predições (evita race conditions/variações)
+prediction_lock = threading.Lock()
+
+# ===== EXPERIMENTAL: Enhanced Exogenous Events =====
+# Flag para ativar/desativar versão melhorada (com severity + decay temporal)
+# Defina como True para testar improved version, False para versão original
+USE_ENHANCED_EXOGENOUS = False
+# ===== FIM EXPERIMENTAL =====
+
 # Periodic update status flags (used by frontend polling)
 app._periodic_update_in_progress = False
 app._periodic_last_update = None
@@ -344,6 +388,8 @@ def apply_exogenous_events():
     
     Isso previne o bug de oscilação (24 → 130 → 63 → 24) causado por reamplificar
     a mesma matriz adjacência múltiplas vezes em reinicializações.
+    
+    PROTEGIDO com lock para evitar race conditions durante predições.
     """
     global adj_matrix, exogenous_affected_nodes, adj_geo, adj_faction, exogenous_critical_nodes
     global exogenous_events_hash, events_amplified
@@ -351,97 +397,100 @@ def apply_exogenous_events():
     if not exogenous_events or adj_matrix is None:
         return
 
-    # Verificar se é uma atualização nova ou apenas reload
-    is_new_update = check_exogenous_update()
+    # Protege modificação de adj_matrix durante aplicação de eventos
+    with prediction_lock:
+        # Verificar se é uma atualização nova ou apenas reload
+        is_new_update = check_exogenous_update()
 
-    exogenous_affected_nodes.clear()
-    exogenous_critical_nodes.clear()
+        exogenous_affected_nodes.clear()
+        exogenous_critical_nodes.clear()
 
-    count_affected = 0
-    count_amplified = 0
-    
-    for batch in exogenous_events:
-        points = batch.get('points', [])
+        count_affected = 0
+        count_amplified = 0
+        
+        for batch in exogenous_events:
+            points = batch.get('points', [])
 
-        for pt in points:
-            lat = pt.get('lat') if isinstance(pt, dict) else (pt[0] if isinstance(pt, list) and len(pt)>0 else None)
-            lng = pt.get('lng') if isinstance(pt, dict) else (pt[1] if isinstance(pt, list) and len(pt)>1 else None)
+            for pt in points:
+                lat = pt.get('lat') if isinstance(pt, dict) else (pt[0] if isinstance(pt, list) and len(pt)>0 else None)
+                lng = pt.get('lng') if isinstance(pt, dict) else (pt[1] if isinstance(pt, list) and len(pt)>1 else None)
 
-            if lat is None or lng is None: continue
+                if lat is None or lng is None: continue
 
-            def _is_critical_event(pt_item):
-                try:
-                    evt = None
-                    if isinstance(pt_item, dict):
-                        evt = pt_item.get('raw_event') or pt_item
-                    if not evt:
+                def _is_critical_event(pt_item):
+                    try:
+                        evt = None
+                        if isinstance(pt_item, dict):
+                            evt = pt_item.get('raw_event') or pt_item
+                        if not evt:
+                            return False, 'LOW'
+                        
+                        # Verifica conflict_severity da LLM (prioridade)
+                        severity = evt.get('conflict_severity', '').upper()
+                        if severity in ('HIGH', 'MEDIUM'):
+                            return True, severity
+                        
+                        # Fallback: detecção por keywords
+                        text_fields = []
+                        for k in ('natureza','nature','resumo','description','descricao'):
+                            v = evt.get(k) if isinstance(evt, dict) else None
+                            if v:
+                                text_fields.append(str(v).lower())
+                        txt = ' '.join(text_fields)
+                        
+                        # HIGH severity - sinais de execução/confronto
+                        high_keywords = ['amarrado', 'mãos amarradas', 'pés amarradas', 'tortura', 
+                                        'execução', 'executado', 'carbonizado', 'enterrado',
+                                        'duplo homicídio', 'duplo homicidio', 'triplo', 'chacina',
+                                        'emboscada', 'disputa territorial']
+                        if any(k in txt for k in high_keywords):
+                            return True, 'HIGH'
+                        
+                        # MEDIUM severity - violência armada + deslocamento forçado
+                        medium_keywords = ['homic', 'homicídio', 'morte', 'morto', 'tiro', 
+                                          'lesão a bala', 'lesao a bala', 'disparos', 'fuzil']
+                        # Deslocamento forçado/expulsão - indica preparação para conflito ou revide
+                        displacement_keywords = ['ameaças de grupo criminoso', 'expulsão', 'expulsao',
+                                               'deslocamento forçado', 'deslocamento forcado',
+                                               'precisa fazer a mudança', 'precisa fazer mudanca',
+                                               'forçado a sair', 'forcado a sair', 'obrigado a sair']
+                        
+                        if any(k in txt for k in medium_keywords):
+                            return True, 'MEDIUM'
+                        if any(k in txt for k in displacement_keywords):
+                            return True, 'MEDIUM'
+                        
                         return False, 'LOW'
-                    
-                    # Verifica conflict_severity da LLM (prioridade)
-                    severity = evt.get('conflict_severity', '').upper()
-                    if severity in ('HIGH', 'MEDIUM'):
-                        return True, severity
-                    
-                    # Fallback: detecção por keywords
-                    text_fields = []
-                    for k in ('natureza','nature','resumo','description','descricao'):
-                        v = evt.get(k) if isinstance(evt, dict) else None
-                        if v:
-                            text_fields.append(str(v).lower())
-                    txt = ' '.join(text_fields)
-                    
-                    # HIGH severity - sinais de execução/confronto
-                    high_keywords = ['amarrado', 'mãos amarradas', 'pés amarradas', 'tortura', 
-                                    'execução', 'executado', 'carbonizado', 'enterrado',
-                                    'duplo homicídio', 'duplo homicidio', 'triplo', 'chacina',
-                                    'emboscada', 'disputa territorial']
-                    if any(k in txt for k in high_keywords):
-                        return True, 'HIGH'
-                    
-                    # MEDIUM severity - violência armada + deslocamento forçado
-                    medium_keywords = ['homic', 'homicídio', 'morte', 'morto', 'tiro', 
-                                      'lesão a bala', 'lesao a bala', 'disparos', 'fuzil']
-                    # Deslocamento forçado/expulsão - indica preparação para conflito ou revide
-                    displacement_keywords = ['ameaças de grupo criminoso', 'expulsão', 'expulsao',
-                                           'deslocamento forçado', 'deslocamento forcado',
-                                           'precisa fazer a mudança', 'precisa fazer mudanca',
-                                           'forçado a sair', 'forcado a sair', 'obrigado a sair']
-                    
-                    if any(k in txt for k in medium_keywords):
-                        return True, 'MEDIUM'
-                    if any(k in txt for k in displacement_keywords):
-                        return True, 'MEDIUM'
-                    
-                    return False, 'LOW'
-                except Exception:
-                    return False, 'LOW'
+                    except Exception:
+                        return False, 'LOW'
 
-            indices = find_nearby_nodes(lat, lng)
+                indices = find_nearby_nodes(lat, lng)
 
-            for idx in indices:
-                exogenous_affected_nodes.add(idx)
-                critical_flag, severity = _is_critical_event(pt)
-                
-                # AMPLIFICAÇÃO ULTRALEVE (1.1-1.2x):
-                # Apenas amplifica se é uma ATUALIZAÇÃO NOVA de eventos
-                if is_new_update and adj_matrix is not None:
-                    # Amplificação muito leve - apenas sinaliza presença
-                    amplification_map = {'HIGH': 1.2, 'MEDIUM': 1.0, 'LOW': 0.7}
-                    amp_factor = amplification_map.get(severity, 1.05)
+                for idx in indices:
+                    exogenous_affected_nodes.add(idx)
+                    critical_flag, severity = _is_critical_event(pt)
                     
-                    adj_matrix[idx, :] *= amp_factor
-                    adj_matrix[:, idx] *= amp_factor
-                    count_amplified += 1
-                
-                # Sempre marca nodes críticos para UI (independente da amplificação)
-                if critical_flag:
-                    exogenous_critical_nodes.add(idx)
+                    # AMPLIFICAÇÃO ULTRALEVE (1.1-1.2x):
+                    # Apenas amplifica se é uma ATUALIZAÇÃO NOVA de eventos
+                    if is_new_update and adj_matrix is not None:
+                        # Amplificação muito leve - apenas sinaliza presença
+                        amplification_map = {'HIGH': 1.2, 'MEDIUM': 1.0, 'LOW': 0.7}
+                        amp_factor = amplification_map.get(severity, 1.05)
+                        
+                        adj_matrix[idx, :] *= amp_factor
+                        adj_matrix[:, idx] *= amp_factor
+                        count_amplified += 1
+                    
+                    # Sempre marca nodes críticos para UI (independente da amplificação)
+                    if critical_flag:
+                        exogenous_critical_nodes.add(idx)
 
-                count_affected += 1
+                    count_affected += 1
 
-    # Atualizar flag de amplificação se foi uma atualização nova
-    if is_new_update:
-        events_amplified = True
+        # Atualizar flag de amplificação se foi uma atualização nova
+        if is_new_update:
+            events_amplified = True
+
 
 def compute_exogenous_hash(events_list):
     """Calcula hash dos eventos exógenos para detecção de mudanças"""
@@ -503,6 +552,205 @@ def check_exogenous_update():
     return is_new_update
 
 
+async def apply_exogenous_events_async():
+    """
+    Aplica pesos exógenos de forma assíncrona.
+    APENAS uma vez durante a inicialização, usando lock para evitar duplicação.
+    
+    Usa versão ENHANCED se USE_ENHANCED_EXOGENOUS=True, caso contrário usa versão original.
+    """
+    global exogenous_weights_initialized
+    
+    # Usa lock para garantir execução segura e única
+    with exogenous_weights_lock:
+        # Se já foi inicializado, pula
+        if exogenous_weights_initialized:
+            print("[EXOGENOUS] Pesos já foram inicializados - pulando aplicação duplicada")
+            return True
+        
+        try:
+            version = "ENHANCED (com severity + decay)" if USE_ENHANCED_EXOGENOUS else "PADRÃO"
+            print(f"[EXOGENOUS] Iniciando aplicação assíncrona de pesos ({version})... (UMA ÚNICA VEZ)")
+            
+            # Carrega eventos exógenos
+            load_exogenous_events()
+            
+            # Aguarda um pequeno delay para garantir que os dados estão prontos
+            await asyncio.sleep(0.5)
+            
+            # Aplica amplificação de eventos - versão selecionada
+            if USE_ENHANCED_EXOGENOUS:
+                apply_exogenous_events_enhanced()
+                print("[EXOGENOUS-ENH] ✓ Versão ENHANCED utilizada")
+            else:
+                apply_exogenous_events()
+                print("[EXOGENOUS] ✓ Versão PADRÃO utilizada")
+            
+            # Marca como inicializado
+            exogenous_weights_initialized = True
+            
+            print("[EXOGENOUS] Pesos exógenos aplicados com sucesso ✓")
+            return True
+        except Exception as e:
+            print(f"[EXOGENOUS] Erro ao aplicar pesos: {e}")
+            import traceback
+            traceback.print_exc()
+            return False
+
+
+def apply_exogenous_events_enhanced():
+    """
+    Versão MELHORADA de apply_exogenous_events() com:
+    1. Severity mapping (HIGH=1.3x, MEDIUM=1.15x, LOW=1.05x)
+    2. Temporal decay (eventos antigos pesam menos: e^(-days/7))
+    3. Raio variável (HIGH=1000m, MEDIUM=750m, LOW=500m)
+    
+    EXPERIMENTAL: Use este para validação antes de integrar à versão principal.
+    Ativado quando: USE_ENHANCED_EXOGENOUS = True
+    
+    Diferenças da versão original:
+    - Original: Todos eventos têm mesmo peso (1.0-1.2x)
+    - Enhanced: Peso proporcional à severity + decay temporal
+    """
+    global adj_matrix, exogenous_affected_nodes, adj_geo, adj_faction, exogenous_critical_nodes
+    global exogenous_events_hash, events_amplified
+    
+    if not exogenous_events or adj_matrix is None:
+        print("[EXOGENOUS-ENH] Nenhum evento ou matriz indisponível")
+        return
+
+    # Verificar se é uma atualização nova
+    is_new_update = check_exogenous_update()
+
+    exogenous_affected_nodes.clear()
+    exogenous_critical_nodes.clear()
+
+    count_affected = 0
+    count_amplified = 0
+    count_high_severity = 0
+    
+    # Mapeamento: severidade → (raio_metros, multiplicador_base)
+    severity_config = {
+        'HIGH': {'radius': 1000, 'amp_factor': 1.3, 'description': 'Execução/Confronto'},
+        'MEDIUM': {'radius': 750, 'amp_factor': 1.15, 'description': 'Violência Armada'},
+        'LOW': {'radius': 500, 'amp_factor': 1.05, 'description': 'Atividade Padrão'}
+    }
+    
+    now = datetime.now()
+    
+    for batch_idx, batch in enumerate(exogenous_events):
+        points = batch.get('points', [])
+        batch_timestamp = batch.get('timestamp')
+        
+        # Parse timestamp se necessário
+        try:
+            if isinstance(batch_timestamp, str):
+                batch_timestamp = pd.Timestamp(batch_timestamp)
+            else:
+                batch_timestamp = pd.Timestamp(now)
+        except Exception:
+            batch_timestamp = pd.Timestamp(now)
+        
+        # Calcular decay temporal
+        days_old = (now - batch_timestamp).days
+        temporal_decay = np.exp(-days_old / 7.0)  # Decai para ~37% em 7 dias, ~13% em 14 dias
+        
+        for pt_idx, pt in enumerate(points):
+            lat = pt.get('lat') if isinstance(pt, dict) else (pt[0] if isinstance(pt, list) and len(pt) > 0 else None)
+            lng = pt.get('lng') if isinstance(pt, dict) else (pt[1] if isinstance(pt, list) and len(pt) > 1 else None)
+
+            if lat is None or lng is None:
+                continue
+
+            # Determinar severidade
+            def _detect_severity(pt_item):
+                """Retorna (is_critical, severity_level, description)"""
+                try:
+                    evt = None
+                    if isinstance(pt_item, dict):
+                        evt = pt_item.get('raw_event') or pt_item
+                    if not evt:
+                        return False, 'LOW', 'Desconhecido'
+                    
+                    # Verificar conflict_severity da LLM (primeira prioridade)
+                    severity = evt.get('conflict_severity', '').upper()
+                    if severity in ('HIGH', 'MEDIUM', 'LOW'):
+                        return severity == 'HIGH', severity, severity_config[severity]['description']
+                    
+                    # Fallback: detectar por keywords
+                    text_fields = []
+                    for k in ('natureza', 'nature', 'resumo', 'description', 'descricao'):
+                        v = evt.get(k) if isinstance(evt, dict) else None
+                        if v:
+                            text_fields.append(str(v).lower())
+                    txt = ' '.join(text_fields)
+                    
+                    # HIGH severity - execução/confronto
+                    high_keywords = ['amarrado', 'mãos amarradas', 'pés amarradas', 'tortura',
+                                    'execução', 'executado', 'carbonizado', 'enterrado',
+                                    'duplo homicídio', 'duplo homicidio', 'triplo', 'chacina',
+                                    'emboscada', 'disputa territorial']
+                    if any(k in txt for k in high_keywords):
+                        return True, 'HIGH', 'Execução/Confronto Detectado'
+                    
+                    # MEDIUM severity - violência armada + deslocamento
+                    medium_keywords = ['homic', 'homicídio', 'morte', 'morto', 'tiro',
+                                      'lesão a bala', 'lesao a bala', 'disparos', 'fuzil']
+                    displacement_keywords = ['ameaças de grupo criminoso', 'expulsão', 'expulsao',
+                                           'deslocamento forçado', 'deslocamento forcado',
+                                           'precisa fazer a mudança', 'precisa fazer mudanca',
+                                           'forçado a sair', 'forcado a sair', 'obrigado a sair']
+                    
+                    if any(k in txt for k in medium_keywords) or any(k in txt for k in displacement_keywords):
+                        return True, 'MEDIUM', 'Violência Detectada'
+                    
+                    return False, 'LOW', 'Atividade Padrão'
+                except Exception:
+                    return False, 'LOW', 'Erro na Detecção'
+
+            is_critical, severity, desc = _detect_severity(pt)
+            
+            # Aplicar amplificação apenas em atualização nova
+            if is_new_update and adj_matrix is not None:
+                config = severity_config.get(severity, severity_config['LOW'])
+                
+                # Amplificador final = base * decay_temporal
+                amp_factor = config['amp_factor'] * temporal_decay
+                radius = config['radius']
+                
+                # Encontrar nós próximos com raio baseado em severity
+                indices = find_nearby_nodes(lat, lng, radius_m=radius)
+                
+                for idx in indices:
+                    exogenous_affected_nodes.add(idx)
+                    
+                    # Amplificar matriz
+                    adj_matrix[idx, :] *= amp_factor
+                    adj_matrix[:, idx] *= amp_factor
+                    
+                    count_amplified += 1
+                    
+                    if severity == 'HIGH':
+                        count_high_severity += 1
+                
+                # Log detalhado
+                if count_amplified % 10 == 0:
+                    print(f"[EXOGENOUS-ENH] Event #{batch_idx}.{pt_idx}: {severity} - {desc} | Decay: {temporal_decay:.2f} | Factor: {amp_factor:.3f}x | Raio: {radius}m | Nós: {len(indices)}")
+            
+            # Sempre marcar nodes críticos para UI
+            if is_critical:
+                exogenous_critical_nodes.add(idx)
+
+            count_affected += 1
+
+    # Marcar como amplificado se foi feita atualizacao nova
+    if is_new_update:
+        events_amplified = True
+    
+    # Log de resumo
+    print(f"[EXOGENOUS-ENH] ✓ Amplificação concluída: {count_affected} eventos | {count_amplified} amplificadores | {count_high_severity} HIGH | Decay aplicado")
+
+
 def compute_norm_adj(adj_matrix_input):
     """Normaliza matriz de adjacência usando random walk normalization"""
     if adj_matrix_input is None:
@@ -524,6 +772,7 @@ def compute_norm_adj_list(adj_list):
     return res
 
 def update_exogenous_state():
+    """Atualiza estado da matriz de adjacência com aplicação de eventos exógenos"""
     global adj_matrix, norm_adj, original_adj_matrix
     global adj_geo, adj_faction, norm_adj_list
 
@@ -543,7 +792,11 @@ def update_exogenous_state():
         except Exception:
             pass
 
-    apply_exogenous_events()
+    # Usar versão apropriada baseado na flag
+    if USE_ENHANCED_EXOGENOUS:
+        apply_exogenous_events_enhanced()
+    else:
+        apply_exogenous_events()
 
     if adj_geo is not None and adj_faction is not None:
         norm_adj_list = compute_norm_adj_list([adj_geo, adj_faction])
@@ -836,8 +1089,11 @@ def load_data_and_models():
         if adj_matrix is not None:
             original_adj_matrix = adj_matrix.copy()
 
-        load_exogenous_events()
-        apply_exogenous_events()
+        # Carrega eventos exógenos apenas na inicialização (primeira vez)
+        # PeriodicReload não deve reaplicar pesos
+        if not exogenous_weights_initialized:
+            load_exogenous_events()
+        # apply_exogenous_events() será executado de forma assíncrona APÓS load_data_and_models()
 
         if adj_geo is not None and adj_faction is not None:
             try:
@@ -1415,9 +1671,13 @@ def calculate_risk(custom_norm_adj=None):
 
                 input_tensor = torch.FloatTensor(input_slice).permute(2, 0, 1).unsqueeze(0).to(device) # (1, 3, N, T)
 
-                with torch.no_grad():
-                    pred = model_cvli(input_tensor, adj_for_model)
-                out_cvli = pred.squeeze(0).cpu().numpy() # (N, 1)
+                # Protege predição com lock para evitar race conditions com apply_exogenous_events()
+                with prediction_lock:
+                    # Força modo de avaliação (desativa dropout e batch norm estocástico)
+                    model_cvli.eval()
+                    with torch.no_grad():
+                        pred = model_cvli(input_tensor, adj_for_model)
+                    out_cvli = pred.squeeze(0).cpu().numpy() # (N, 1)
                 
                 try:
                     if _DESSCALE_A is not None:
@@ -2355,15 +2615,47 @@ def save_exogenous():
         print(f"Erro ao salvar eventos: {e}")
         return jsonify({'error': f'Erro ao salvar: {e}'}), 500
 
-try:
-    load_data_and_models()
-    enrich_regions()
-except Exception as e:
-    print(f"Startup error: {e}")
+# Flag para controlar se pesos foram aplicados
+exogenous_weights_applied = False
+
+async def initialize_app():
+    """Inicializa a aplicação com asincronismo para pesos exógenos"""
+    global exogenous_weights_applied
+    
+    try:
+        print("[STARTUP] Carregando dados e modelos...")
+        load_data_and_models()
+        enrich_regions()
+        print("[STARTUP] Dados e modelos carregados com sucesso")
+    except Exception as e:
+        print(f"[STARTUP] Erro ao carregar dados: {e}")
+        return False
+    
+    try:
+        print("[STARTUP] Aplicando pesos exógenos (asincronamente)...")
+        result = await apply_exogenous_events_async()
+        exogenous_weights_applied = result
+        print(f"[STARTUP] Pesos exógenos aplicados: {result}")
+    except Exception as e:
+        print(f"[STARTUP] Erro ao aplicar pesos exógenos: {e}")
+        exogenous_weights_applied = False
+    
+    return True
 
 if __name__ == "__main__":
+    # Executa inicialização assíncrona
+    try:
+        asyncio.run(initialize_app())
+    except Exception as e:
+        print(f"[STARTUP] Erro fatal na inicialização assíncrona: {e}")
+    
     # Inicia o monitor de atualização de modelos (verifica a cada 5 min)
     print("[STARTUP] Iniciando monitor de atualizações de modelos...")
     start_monitor(check_interval=300)
     
-    app.run(host='0.0.0.0', port=5050, debug=True, use_reloader=True)
+    print("[STARTUP] Iniciando servidor Flask na porta 5050...")
+    print("[DETERMINISM] Debug Reloader DESATIVADO para manter determinismo em predições")
+    # use_reloader=False garante que seeds não sejam resetados entre requisições
+    # Se precisar debugar, use: debug=False, use_reloader=False (sem auto-reload)
+    app.run(host='0.0.0.0', port=5050, debug=False, use_reloader=False)
+

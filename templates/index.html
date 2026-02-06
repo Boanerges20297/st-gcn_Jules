@@ -906,6 +906,9 @@
                                      
                                      // Exogenous events are saved server-side and will surface in the 'motivos' UI
                                      // when justifying critical states - no visual markers needed.
+                                     
+                                     // Trigger immediate model update check
+                                     checkModelUpdateStatus();
                                 });
                             },
                             error: function(err) {
@@ -1269,8 +1272,8 @@
 
     // Inicia monitoramento ao carregar página
     $(document).ready(function() {
-        // Verifica status a cada 3 segundos
-        modelUpdateCheckInterval = setInterval(checkModelUpdateStatus, 3000);
+        // Verifica status a cada 5 minutos (300000ms) ou ao salvar dados
+        modelUpdateCheckInterval = setInterval(checkModelUpdateStatus, 300000);
         // Primeira verificação imediata
         checkModelUpdateStatus();
     });
