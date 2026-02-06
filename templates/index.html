@@ -198,6 +198,9 @@
                         <button class="btn btn-outline-secondary btn-sm d-none" id="btn-clear-sim">
                             <i class="fas fa-undo"></i> Limpar Simulação
                         </button>
+                        <button class="btn btn-outline-secondary btn-sm" id="btn-reset-view">
+                            <i class="fas fa-compress-arrows-alt"></i> Restaurar Visualização
+                        </button>
                     </div>
 
                     <div id="selected-info">
@@ -254,7 +257,8 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    var map = L.map('map').setView([-3.7319, -38.5267], 12);
+    var initialView = { center: [-3.8600, -38.5267], zoom: 12 };
+    var map = L.map('map').setView(initialView.center, initialView.zoom);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
         subdomains: 'abcd',
@@ -420,9 +424,9 @@
         // Hide overlay (keep element in DOM so it can be shown again)
         try {
             setTimeout(function() {
-                if (map && map.invalidateSize) map.invalidateSize();
+                try { if (map && map.invalidateSize) map.invalidateSize(true); } catch(e) {}
                 $('#loading-overlay').addClass('d-none');
-            }, 200);
+            }, 300);
         } catch(e) {
             console.warn('invalidateSize/hide overlay failed', e);
         }
@@ -716,13 +720,9 @@
                         L.DomEvent.stopPropagation(e); // Prevent map click from firing twice
                         addSimulationPoint(e.latlng);
                     } else {
-                        showFeatureDetails(layer, e.latlng);
-                        // Zoom to feature (Zoom In)
-                        if (layer.getBounds) {
-                            map.fitBounds(layer.getBounds(), { maxZoom: 16 });
-                        } else {
-                            map.flyTo(layer.getLatLng(), 16);
-                        }
+                        L.DomEvent.stopPropagation(e);
+                        // Use smart focus to account for sidebar and headers
+                        focusLayerAndShowDetails(layer, 1.0);
                     }
                 });
             }
@@ -761,7 +761,7 @@
 
         // Ensure Leaflet recalculates container size now that the geojson layer is added
         try {
-            setTimeout(function() { if (map && map.invalidateSize) map.invalidateSize(); }, 200);
+            setTimeout(function() { try { if (map && map.invalidateSize) map.invalidateSize(true); } catch(e) {} }, 250);
         } catch(e) {
             console.warn('invalidateSize after geojson failed', e);
         }
@@ -770,9 +770,9 @@
     $(window).on('load', function() {
         try {
             setTimeout(function() {
-                if (map && map.invalidateSize) map.invalidateSize();
+                try { if (map && map.invalidateSize) map.invalidateSize(true); } catch(e) {}
                 $('#loading-overlay').addClass('d-none');
-            }, 300);
+            }, 350);
         } catch(e) {
             console.warn('window.load invalidateSize failed', e);
         }
@@ -827,6 +827,13 @@
 
         $('#btn-clear-sim').on('click', function() {
             clearSimulation();
+        });
+
+        // Reset View Handler
+        $('#btn-reset-view').on('click', function() {
+            map.setView(initialView.center, initialView.zoom);
+            $('#region-filter').val('capital').trigger('change');
+            map.closePopup();
         });
 
         // Exogenous Data Handler
@@ -969,6 +976,61 @@
         if (score >= 50) return { label: 'Moderado', class: 'text-info' };
         if (score >= 20) return { label: 'Baixo', class: 'text-secondary' };
         return { label: 'Sem Risco', class: 'text-success' };
+    }
+
+    // Focus a layer with smart padding to account for sidebar and headers,
+    // then open the details popup at a visually centered position.
+    function focusLayerAndShowDetails(layer, animateSeconds) {
+        try {
+            var bounds = (layer.getBounds && layer.getBounds()) || null;
+            var duration = (typeof animateSeconds === 'number') ? animateSeconds : 1.2;
+
+            // Compute UI offsets: right sidebar width, top card header, small margins
+            var sidebar = $('.col-md-3').has('#top-areas');
+            var sidebarWidth = sidebar.length ? sidebar.outerWidth() : 300;
+            var headerHeight = $('.card-header').first().outerHeight() || 0;
+            var topPad = Math.round(headerHeight + 20);
+            var rightPad = Math.round(sidebarWidth + 30);
+            var leftPad = 20;
+            var bottomPad = 20;
+
+            if (bounds) {
+                map.flyToBounds(bounds, {
+                    maxZoom: 16,
+                    paddingTopLeft: [leftPad, topPad],
+                    paddingBottomRight: [rightPad, bottomPad],
+                    duration: duration
+                });
+
+                // After map move, show details at the geometric center of the bounds
+                map.once('moveend', function() {
+                    try {
+                        // Use the bounds center directly - flyToBounds already accounts for padding
+                        var center = bounds.getCenter();
+                        showFeatureDetails(layer, center);
+
+                        // Force a redraw in case tiles or vectors show artifacts
+                        setTimeout(function() {
+                            try { map.invalidateSize(true); } catch(e) {}
+                        }, 200);
+                    } catch (e) {
+                        // Fallback: just show at natural center
+                        showFeatureDetails(layer, bounds.getCenter());
+                    }
+                });
+            } else {
+                // Fallback for point-like layers
+                var latlng = (layer.getLatLng && layer.getLatLng()) || null;
+                if (latlng) {
+                    map.flyTo(latlng, 16, { duration: duration });
+                    map.once('moveend', function() {
+                        try { showFeatureDetails(layer, latlng); map.invalidateSize(true); } catch (e) {}
+                    });
+                }
+            }
+        } catch (e) {
+            console.warn('focusLayerAndShowDetails failed', e);
+        }
     }
 
     function showFeatureDetails(layer, latlng) {
@@ -1129,9 +1191,8 @@
             var idx = $(this).data('idx');
             var item = top10[idx];
             if (item && item.layer) {
-                var center = item.layer.getBounds ? item.layer.getBounds().getCenter() : item.layer.getLatLng();
-                map.flyTo(center, 15);
-                showFeatureDetails(item.layer, center);
+                // Center with smart padding and show details
+                focusLayerAndShowDetails(item.layer, 1.5);
             }
         });
     }

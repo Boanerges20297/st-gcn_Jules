@@ -63,8 +63,8 @@ class RankingInference:
                 dropout_small=0.1
             )
             
-            # Load weights
-            self.model.load_state_dict(data.get('model_state', {}))
+            # Load weights (usando strict=False para permitir incompatibilidades de chaves)
+            self.model.load_state_dict(data.get('model_state', {}), strict=False)
             self.model.to(device)
             self.model.eval()
             

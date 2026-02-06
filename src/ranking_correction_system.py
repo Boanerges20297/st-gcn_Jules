@@ -50,10 +50,23 @@ class RankingCorrectionSystem:
         for day in range(7):
             model_path = model_dir / f'ranking_model_day{day}.pth'
             if model_path.exists():
-                model = self._build_model()
-                model.load_state_dict(torch.load(model_path, map_location=self.device))
-                model.eval()
-                self.models_by_day[day] = model
+                try:
+                    # Carregar arquivo (novo formato com config/model_state)
+                    checkpoint = torch.load(model_path, map_location=self.device, weights_only=False)
+                    
+                    # Se for novo formato (dict com 'model_state'), extrair
+                    if isinstance(checkpoint, dict) and 'model_state' in checkpoint:
+                        state_dict = checkpoint['model_state']
+                    else:
+                        # Formato antigo (state_dict direto)
+                        state_dict = checkpoint
+                    
+                    model = self._build_model()
+                    model.load_state_dict(state_dict, strict=False)
+                    model.eval()
+                    self.models_by_day[day] = model
+                except Exception as e:
+                    print(f"[WARNING] Falha ao carregar modelo dia {day}: {e}")
         
         print(f"[RANKING] Sistema de correção carregado com {len(self.models_by_day)} modelos")
     

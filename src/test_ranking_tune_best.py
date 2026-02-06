@@ -93,7 +93,7 @@ def load_model(model_path, device='cpu'):
     """Carrega modelo treinado - inspeciona checkpoint primeiro"""
     print(f"[MODEL] Carregando modelo de {model_path}")
     
-    checkpoint = torch.load(model_path, map_location=device)
+    checkpoint = torch.load(model_path, map_location=device, weights_only=False)
     
     # Inspecionar checkpoint
     if isinstance(checkpoint, dict):

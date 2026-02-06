@@ -1,0 +1,56 @@
+{
+  "timestamp": "2026-02-06T09:29:37.671172",
+  "ground_truth": [
+    2,
+    8,
+    14,
+    22,
+    24
+  ],
+  "stgcn_baseline": {
+    "top5": [
+      2,
+      14,
+      19,
+      22,
+      27
+    ],
+    "p5": 0.6,
+    "ndcg5": 0.6992148198508501,
+    "overlap_with_truth": 3
+  },
+  "correction_system": {
+    "top5": [
+      2,
+      14,
+      19,
+      22,
+      15
+    ],
+    "p5": 0.6,
+    "ndcg5": 0.6992148198508501,
+    "overlap_with_truth": 3,
+    "overlap_with_stgcn": 4,
+    "was_corrected": true,
+    "confidence": 1.0
+  },
+  "inference_blend": {
+    "top5": [
+      2,
+      14,
+      19,
+      22,
+      8
+    ],
+    "p5": 0.8,
+    "ndcg5": 0.830419897363192,
+    "overlap_with_truth": 4,
+    "overlap_with_stgcn": 4,
+    "weight": "70% ST-GCN + 30% Ranking"
+  },
+  "direct_comparison": {
+    "overlap_correction_vs_inference": 4,
+    "delta_p5": 0.20000000000000007,
+    "delta_ndcg5": 0.1312050775123419
+  }
+}

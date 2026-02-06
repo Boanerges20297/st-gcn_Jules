@@ -295,16 +295,49 @@ def main():
     print(f"  - Spearman médio: {avg_spear_test:.4f}")
     print(f"  - Pronto para integração em produção!")
     
-    # Salvar modelos
+    # Salvar modelos com formato compatível com RankingInference
     model_dir = Path(ROOT) / 'models' / 'ranking_by_day'
     model_dir.mkdir(parents=True, exist_ok=True)
     
     for day_num, model in models_by_day.items():
         model_path = model_dir / f'ranking_model_day{day_num}.pth'
-        torch.save(model.state_dict(), model_path)
+        
+        # Obter input_dim do modelo
+        model_state = model.state_dict()
+        input_dim = None
+        for key, param in model_state.items():
+            if 'weight' in key and len(param.shape) >= 2:
+                input_dim = param.shape[-1]
+                break
+        if input_dim is None:
+            input_dim = 12  # Default fallback
+        
+        # Converter chaves de 'fc' para 'net' (compatibilidade com RankingModel)
+        # RankingModelProduction usa 'self.fc', mas RankingModel usa 'self.net'
+        converted_state = {}
+        for key, value in model_state.items():
+            # Substituir 'fc.' por 'net.'
+            new_key = key.replace('fc.', 'net.')
+            converted_state[new_key] = value
+        
+        # Salvar no formato que RankingInference espera
+        torch.save({
+            'config': {
+                'input_dim': input_dim,
+                'hidden_dim': 128,
+                'dropout': 0.2
+            },
+            'model_state': converted_state,
+            'scaler_mean': scalers_by_day[day_num].mean_,
+            'scaler_scale': scalers_by_day[day_num].scale_,
+            'metrics': {
+                'p5': results[day_num]['p5_test'],
+                'spearman': results[day_num]['spear_test']
+            }
+        }, model_path)
         print(f"  Modelo dia {day_num} salvo em {model_path}")
     
-    # Salvar scalers
+    # Salvar scalers também como separado (compatibilidade)
     import pickle as pkl
     scalers_path = model_dir / 'scalers.pkl'
     with open(scalers_path, 'wb') as f:

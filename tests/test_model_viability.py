@@ -210,7 +210,7 @@ class TestModelViability:
             full_path = os.path.join(base_dir, model_path)
             if os.path.exists(full_path):
                 try:
-                    checkpoint = torch.load(full_path, map_location='cpu')
+                    checkpoint = torch.load(full_path, map_location='cpu', weights_only=False)
                     assert checkpoint is not None
                     
                     # Verifica se tem state_dict
