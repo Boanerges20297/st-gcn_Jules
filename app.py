@@ -30,6 +30,7 @@ from src.ranking_inference import RankingInference
 from src.ranking_correction_system import get_ranking_system
 from src.metrics import MetricReporter
 from src.event_manager import EventManager
+from src.anomaly_monitor import start_anomaly_monitoring, get_anomaly_monitor
 from src.explanation_generator import ExplanationGenerator
 
 # Feature extraction for ranking model
@@ -186,6 +187,7 @@ except Exception:
 # Week 4 Modules (Explainability & Metrics)
 metric_reporter = None  # MetricReporter para cálculos de métricas
 event_manager = None  # EventManager para gerenciar eventos exógenos
+anomaly_monitor = None  # AnomalyMonitor para monitoramento periódico de anomalias
 explanation_generator = None  # ExplanationGenerator para gerar explicações
 
 # Static Data Cache
@@ -1197,7 +1199,7 @@ def load_data_and_models():
 
         # ===== WEEK 4: INITIALIZE EXPLANATION MODULES =====
         try:
-            global metric_reporter, event_manager, explanation_generator
+            global metric_reporter, event_manager, anomaly_monitor, explanation_generator
             
             # Initialize MetricReporter
             metric_reporter = MetricReporter()
@@ -1208,6 +1210,14 @@ def load_data_and_models():
             if os.path.exists(event_file):
                 event_manager = EventManager(event_file)
                 print(f"[WEEK4] ✅ EventManager carregado ({len(event_manager.events)} eventos)")
+                
+                # Initialize AnomalyMonitor (periodic anomaly detection)
+                anomaly_monitor = start_anomaly_monitoring(
+                    event_manager=event_manager,
+                    interval_minutes=15  # Check every 15 minutes
+                )
+                if anomaly_monitor:
+                    print(f"[WEEK4] ✅ AnomalyMonitor iniciado (verificação a cada 15 min)")
             else:
                 print(f"[WEEK4] ⚠️ Nenhum arquivo de eventos encontrado: {event_file}")
             
@@ -2990,6 +3000,122 @@ def api_client_export():
     except Exception as e:
         print(f"Error in /api/client/export-json: {e}")
         return jsonify({'error': f'Export failed: {str(e)}'}), 500
+
+
+# ==================== ANOMALY MONITORING ENDPOINTS ====================
+
+@app.route('/api/anomaly_monitor/status', methods=['GET'])
+def get_anomaly_monitor_status():
+    """
+    Get real-time status of anomaly monitoring system
+    
+    Returns:
+    - monitoring_active: bool (is monitor running?)
+    - check_interval_minutes: int (how often checks occur)
+    - total_checks_performed: int
+    - alerts_generated: int (total alerts since startup)
+    - last_check_time: str (ISO timestamp)
+    - current_anomalies_count: int
+    - unprocessed_alerts: int (not yet used for retraining)
+    """
+    from src.anomaly_monitor import get_anomaly_monitor
+    
+    monitor = get_anomaly_monitor()
+    if not monitor:
+        return jsonify({
+            'error': 'Anomaly monitor not initialized',
+            'monitoring_active': False
+        }), 503
+    
+    return jsonify(monitor.get_anomaly_summary())
+
+
+@app.route('/api/anomaly_monitor/alerts', methods=['GET'])
+def get_anomaly_alerts():
+    """
+    Get all active anomaly alerts
+    
+    Query params:
+    - date: str (specific date YYYY-MM-DD) [optional]
+    - days_back: int (get alerts from last N days, default 7) [optional]
+    
+    Returns:
+    - anomalies: list of {date, severity, event_count, crime_types, risk_level, timestamp, processed}
+    """
+    from src.anomaly_monitor import get_anomaly_monitor
+    from datetime import date, timedelta
+    
+    monitor = get_anomaly_monitor()
+    if not monitor:
+        return jsonify({'error': 'Anomaly monitor not initialized'}), 503
+    
+    try:
+        query_date = request.args.get('date')
+        days_back = int(request.args.get('days_back', 7))
+        
+        if query_date:
+            # Single date query
+            try:
+                target_date = datetime.strptime(query_date, '%Y-%m-%d').date()
+                alert = monitor.get_anomaly_for_date(target_date)
+                if alert:
+                    return jsonify({
+                        'date': query_date,
+                        'alert': alert.to_dict()
+                    })
+                else:
+                    return jsonify({
+                        'date': query_date,
+                        'alert': None,
+                        'severity': 0.0,
+                        'risk_level': 'LOW'
+                    })
+            except ValueError:
+                return jsonify({'error': f'Invalid date format: {query_date}. Use YYYY-MM-DD'}), 400
+        else:
+            # Recent anomalies
+            alerts = monitor.get_current_anomalies()
+            return jsonify({
+                'period_days': days_back,
+                'anomalies_count': len(alerts),
+                'anomalies': [
+                    {
+                        'date': date_str,
+                        'alert': alert.to_dict()
+                    }
+                    for date_str, alert in sorted(alerts.items(), reverse=True)
+                ]
+            })
+    
+    except Exception as e:
+        logger.error(f"Error in /api/anomaly_monitor/alerts: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/anomaly_monitor/context', methods=['GET'])
+def get_anomaly_context():
+    """
+    Get anomaly context for retraining decision-making
+    
+    Returns:
+    - period: {start, end, days_with_anomalies, high_risk_days}
+    - statistics: {average_severity, max_severity, min_severity, anomaly_frequency}
+    - today: {date, has_anomaly, severity, risk_level, event_count, crime_types}
+    - recommendation: {skip_retrain, use_conservative_weights, increase_confidence_penalty, temporal_weighting}
+    """
+    from src.anomaly_monitor import get_anomaly_monitor
+    
+    monitor = get_anomaly_monitor()
+    if not monitor:
+        return jsonify({'error': 'Anomaly monitor not initialized'}), 503
+    
+    try:
+        context = monitor.get_anomaly_context_for_retraining()
+        return jsonify(context)
+    except Exception as e:
+        logger.error(f"Error in /api/anomaly_monitor/context: {e}")
+        return jsonify({'error': str(e)}), 500
+
 
 # Flag para controlar se pesos foram aplicados
 exogenous_weights_applied = False
