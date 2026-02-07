@@ -1,0 +1,78 @@
+{
+  "baseline_with_anomaly": {
+    "val_metrics": {
+      "p_at_5": 0.8,
+      "p_at_10": 0.68,
+      "p_at_20": 0.48,
+      "ndcg_at_5": 0.92,
+      "ndcg_at_20": 0.74
+    },
+    "scores": {
+      "p_at_5": 0.8,
+      "p_at_20": 0.48,
+      "ndcg_at_5": 0.92,
+      "ndcg_at_20": 0.74,
+      "generalization_gap": 0.020000000000000018,
+      "overall_score": 0.7
+    },
+    "notes": "Week 2 baseline with event integration",
+    "passes_criteria": false
+  },
+  "model_p5_focused": {
+    "val_metrics": {
+      "p_at_5": 0.83,
+      "p_at_10": 0.67,
+      "p_at_20": 0.44,
+      "ndcg_at_5": 0.93,
+      "ndcg_at_20": 0.72
+    },
+    "scores": {
+      "p_at_5": 0.83,
+      "p_at_20": 0.44,
+      "ndcg_at_5": 0.93,
+      "ndcg_at_20": 0.72,
+      "generalization_gap": 0.020000000000000018,
+      "overall_score": 0.6885
+    },
+    "notes": "Optimized for P@5, may hurt long-tail",
+    "passes_criteria": false
+  },
+  "model_with_p20_optimization": {
+    "val_metrics": {
+      "p_at_5": 0.78,
+      "p_at_10": 0.7,
+      "p_at_20": 0.55,
+      "ndcg_at_5": 0.9,
+      "ndcg_at_20": 0.77
+    },
+    "scores": {
+      "p_at_5": 0.78,
+      "p_at_20": 0.55,
+      "ndcg_at_5": 0.9,
+      "ndcg_at_20": 0.77,
+      "generalization_gap": 0.020000000000000018,
+      "overall_score": 0.7270000000000001
+    },
+    "notes": "Combined loss (0.5 P@5 + 0.5 P@20), balanced approach",
+    "passes_criteria": false
+  },
+  "model_balanced_loss": {
+    "val_metrics": {
+      "p_at_5": 0.79,
+      "p_at_10": 0.69,
+      "p_at_20": 0.54,
+      "ndcg_at_5": 0.91,
+      "ndcg_at_20": 0.76
+    },
+    "scores": {
+      "p_at_5": 0.79,
+      "p_at_20": 0.54,
+      "ndcg_at_5": 0.91,
+      "ndcg_at_20": 0.76,
+      "generalization_gap": 0.020000000000000018,
+      "overall_score": 0.7235
+    },
+    "notes": "Alpha=0.6, slightly more weight on P@5",
+    "passes_criteria": false
+  }
+}

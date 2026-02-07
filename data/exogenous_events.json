@@ -922,5 +922,80 @@
         "type": "exogenous"
       }
     ]
+  },
+  {
+    "id": "28",
+    "timestamp": "2026-02-06T22:04:49.800039",
+    "original_text": "02 - M20260091514 -  HOMICIDIO A BALA - VITIMA DO SEXO MASCULINO - R. VICENTE DA COSTA SAMPAIO, 1 - CROATÁ, SÃO GONÇALO DO AMARANTE - 19:34",
+    "points": [
+      {
+        "description": "HOMICIDIO A BALA - Homicídio a bala de vítima do sexo masculino na R. Vicente da Costa Sampaio, 1, bairro Croatá, São Gonçalo do Amarante.",
+        "lat": -3.6000725048934115,
+        "lng": -39.05988766405121,
+        "raw_event": {
+          "bairro": "CROATÁ",
+          "conflict_severity": "MEDIUM",
+          "descricao": "VITIMA DO SEXO MASCULINO",
+          "localizacao_completa": "R. VICENTE DA COSTA SAMPAIO, 1 - CROATÁ, SÃO GONÇALO DO AMARANTE",
+          "municipio": "São Gonçalo do Amarante",
+          "natureza": "HOMICIDIO A BALA",
+          "raw_text": "02 - M20260091514 -  HOMICIDIO A BALA - VITIMA DO SEXO MASCULINO - R. VICENTE DA COSTA SAMPAIO, 1 - CROATÁ, SÃO GONÇALO DO AMARANTE - 19:34",
+          "resumo": "Homicídio a bala de vítima do sexo masculino na R. Vicente da Costa Sampaio, 1, bairro Croatá, São Gonçalo do Amarante.",
+          "sexo": "MASCULINO",
+          "timestamp": "19:34"
+        },
+        "type": "exogenous"
+      }
+    ]
+  },
+  {
+    "id": "29",
+    "timestamp": "2026-02-06T22:06:38.001497",
+    "original_text": "1 - M20260091062 - A senhora Milena  Bruna Alves  Gabriel,20 anos, mora sozinha com sua filha de 2 anos em um triplex\n\nque divide o triplex com outras duas pessoas que são suas vizinhas\n\ne que teve um desentendimento com uma dessas moradoras\n\ne que o pai dessa moradora é quem comanda o tráfico local (favela do pesadelo)\n\ne que após essa discussão,sofreu ameaças de morte\n\nsendo ,portanto,obrigada a se retirar de s um a residência que é alugada\n\nestá sendo feita a escolta da vítima para que consiga tirar suas coisas da residência e fazer sua mudança\n -DESLOCAMENTO FORÇADO - TV. 113, 62 - JANGURUSSU, FORTALEZA  - 15:17",
+    "points": [
+      {
+        "description": "DESLOCAMENTO FORÇADO - Mulher de 20 anos e sua filha de 2 anos são forçadas a se mudar após ameaças de morte de um traficante local, pai de uma vizinha, devido a um desentendimento. A vítima está sendo escoltada para retirar seus pertences.",
+        "lat": -3.843761217677179,
+        "lng": -38.51431317679362,
+        "raw_event": {
+          "bairro": "Jangurussu",
+          "conflict_severity": "MEDIUM",
+          "descricao": "A senhora Milena Bruna Alves Gabriel, 20 anos, mora sozinha com sua filha de 2 anos em um triplex que divide com outras duas pessoas. Teve um desentendimento com uma das moradoras, cujo pai comanda o tráfico local (favela do pesadelo). Após a discussão, sofreu ameaças de morte e foi obrigada a se retirar de sua residência alugada. Está sendo feita a escolta da vítima para que consiga tirar suas coisas e fazer sua mudança.",
+          "localizacao_completa": "TV. 113, 62 - JANGURUSSU, FORTALEZA",
+          "municipio": "FORTALEZA",
+          "natureza": "DESLOCAMENTO FORÇADO",
+          "raw_text": "1 - M20260091062 - A senhora Milena Bruna Alves Gabriel,20 anos, mora sozinha com sua filha de 2 anos em um triplex que divide o triplex com outras duas pessoas que são suas vizinhas e que teve um desentendimento com uma dessas moradoras e que o pai dessa moradora é quem comanda o tráfico local (favela do pesadelo) e que após essa discussão,sofreu ameaças de morte sendo ,portanto,obrigada a se retirar de s um a residência que é alugada está sendo feita a escolta da vítima para que consiga tirar suas coisas da residência e fazer sua mudança -DESLOCAMENTO FORÇADO - TV. 113, 62 - JANGURUSSU, FORTALEZA - 15:17",
+          "resumo": "Mulher de 20 anos e sua filha de 2 anos são forçadas a se mudar após ameaças de morte de um traficante local, pai de uma vizinha, devido a um desentendimento. A vítima está sendo escoltada para retirar seus pertences.",
+          "sexo": "Feminino",
+          "timestamp": "15:17"
+        },
+        "type": "exogenous"
+      }
+    ]
+  },
+  {
+    "id": "30",
+    "timestamp": "2026-02-06T23:10:22.366481",
+    "original_text": "Integrantes do Terceiro Comando Puro, da cidade de São Benedito, realizaram postagens nas redes sociais exibindo o alto investimento que estaria sendo feito na guerra contra o Comando Vermelho, em Ibiapina.",
+    "points": [
+      {
+        "description": "Conflito entre facções criminosas - Membros do Terceiro Comando Puro de São Benedito postam em redes sociais sobre investimentos na guerra contra o Comando Vermelho em Ibiapina.",
+        "lat": -3.9497785326145842,
+        "lng": -41.000196751790426,
+        "raw_event": {
+          "bairro": "CENTRO",
+          "conflict_severity": "HIGH",
+          "descricao": "Postagens em redes sociais exibindo investimento em guerra contra facção rival",
+          "localizacao_completa": "Ibiapina",
+          "municipio": "Ibiapina",
+          "natureza": "Conflito entre facções criminosas",
+          "raw_text": "Integrantes do Terceiro Comando Puro, da cidade de São Benedito, realizaram postagens nas redes sociais exibindo o alto investimento que estaria sendo feito na guerra contra o Comando Vermelho, em Ibiapina.",
+          "resumo": "Membros do Terceiro Comando Puro de São Benedito postam em redes sociais sobre investimentos na guerra contra o Comando Vermelho em Ibiapina.",
+          "sexo": "",
+          "timestamp": ""
+        },
+        "type": "exogenous"
+      }
+    ]
   }
 ]

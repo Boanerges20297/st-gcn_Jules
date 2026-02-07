@@ -1,0 +1,2106 @@
+{
+  "timestamp": "2026-02-06",
+  "summary": {
+    "total_windows": 20,
+    "avg_p_at_20": 0.8775000000000001,
+    "avg_recall_at_20": 0.8775000000000001,
+    "window_results": [
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 18,
+          "missed_from_top_k": 2,
+          "false_positives": 2,
+          "p_at_k": 0.9,
+          "recall_at_k": 0.9
+        },
+        "correct_nodes": [
+          "2",
+          "32",
+          "37",
+          "56",
+          "90",
+          "110",
+          "120",
+          "126",
+          "127",
+          "149",
+          "158",
+          "168",
+          "177",
+          "178",
+          "185",
+          "228",
+          "281",
+          "290"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 46,
+            "true_rank": 20,
+            "pred_rank": 22,
+            "true_score": 8.635587009053731,
+            "pred_score": 8.436025631796497,
+            "score_error": 0.19956137725723444,
+            "rank_error": 2,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 247,
+            "true_rank": 17,
+            "pred_rank": 24,
+            "true_score": 8.858155401278994,
+            "pred_score": 8.353707431385683,
+            "score_error": 0.5044479698933113,
+            "rank_error": 7,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 3,
+            "true_rank": 25,
+            "pred_rank": 15,
+            "true_score": 7.85586401381615,
+            "pred_score": 9.168321843358385
+          },
+          {
+            "node_id": 227,
+            "true_rank": 22,
+            "pred_rank": 20,
+            "true_score": 8.539325008902557,
+            "pred_score": 8.76807839448979
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 18,
+          "missed_from_top_k": 2,
+          "false_positives": 2,
+          "p_at_k": 0.9,
+          "recall_at_k": 0.9
+        },
+        "correct_nodes": [
+          "9",
+          "14",
+          "42",
+          "44",
+          "49",
+          "57",
+          "70",
+          "89",
+          "90",
+          "122",
+          "133",
+          "158",
+          "171",
+          "174",
+          "180",
+          "263",
+          "268",
+          "292"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 56,
+            "true_rank": 16,
+            "pred_rank": 23,
+            "true_score": 7.837510302108941,
+            "pred_score": 7.206991839672192,
+            "score_error": 0.6305184624367497,
+            "rank_error": 7,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 302,
+            "true_rank": 20,
+            "pred_rank": 21,
+            "true_score": 7.432338484088571,
+            "pred_score": 7.4746361904639995,
+            "score_error": -0.042297706375428845,
+            "rank_error": 1,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 45,
+            "true_rank": 24,
+            "pred_rank": 15,
+            "true_score": 6.946598322587669,
+            "pred_score": 8.521201917038347
+          },
+          {
+            "node_id": 189,
+            "true_rank": 29,
+            "pred_rank": 17,
+            "true_score": 6.655598366385302,
+            "pred_score": 8.17782146376617
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 17,
+          "missed_from_top_k": 3,
+          "false_positives": 3,
+          "p_at_k": 0.85,
+          "recall_at_k": 0.85
+        },
+        "correct_nodes": [
+          "48",
+          "55",
+          "94",
+          "113",
+          "147",
+          "149",
+          "157",
+          "158",
+          "180",
+          "183",
+          "199",
+          "226",
+          "239",
+          "242",
+          "243",
+          "297",
+          "314"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 2,
+            "true_rank": 14,
+            "pred_rank": 31,
+            "true_score": 8.994568462362198,
+            "pred_score": 7.884657081270731,
+            "score_error": 1.1099113810914663,
+            "rank_error": 17,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 129,
+            "true_rank": 17,
+            "pred_rank": 24,
+            "true_score": 8.932549380475473,
+            "pred_score": 8.226769068326456,
+            "score_error": 0.7057803121490167,
+            "rank_error": 7,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 145,
+            "true_rank": 15,
+            "pred_rank": 28,
+            "true_score": 8.972474078300529,
+            "pred_score": 8.014539722767296,
+            "score_error": 0.9579343555332329,
+            "rank_error": 13,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 13,
+            "true_rank": 34,
+            "pred_rank": 17,
+            "true_score": 7.123121446284129,
+            "pred_score": 8.614300889930291
+          },
+          {
+            "node_id": 121,
+            "true_rank": 23,
+            "pred_rank": 15,
+            "true_score": 8.255693429527385,
+            "pred_score": 8.841041880498073
+          },
+          {
+            "node_id": 244,
+            "true_rank": 32,
+            "pred_rank": 14,
+            "true_score": 7.288031578153555,
+            "pred_score": 8.864639602645598
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 16,
+          "missed_from_top_k": 4,
+          "false_positives": 4,
+          "p_at_k": 0.8,
+          "recall_at_k": 0.8
+        },
+        "correct_nodes": [
+          "8",
+          "22",
+          "25",
+          "27",
+          "31",
+          "112",
+          "119",
+          "122",
+          "142",
+          "150",
+          "173",
+          "200",
+          "235",
+          "259",
+          "275",
+          "276"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 111,
+            "true_rank": 11,
+            "pred_rank": 25,
+            "true_score": 10.0,
+            "pred_score": 8.612698332370284,
+            "score_error": 1.3873016676297159,
+            "rank_error": 14,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 168,
+            "true_rank": 19,
+            "pred_rank": 22,
+            "true_score": 9.497033393628339,
+            "pred_score": 8.845089050998288,
+            "score_error": 0.6519443426300509,
+            "rank_error": 3,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 191,
+            "true_rank": 9,
+            "pred_rank": 21,
+            "true_score": 10.0,
+            "pred_score": 8.859373326335596,
+            "score_error": 1.1406266736644035,
+            "rank_error": 12,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 261,
+            "true_rank": 5,
+            "pred_rank": 26,
+            "true_score": 10.0,
+            "pred_score": 8.51545335777963,
+            "score_error": 1.4845466422203693,
+            "rank_error": 21,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 50,
+            "true_rank": 22,
+            "pred_rank": 12,
+            "true_score": 8.963025268258619,
+            "pred_score": 9.493902238397892
+          },
+          {
+            "node_id": 69,
+            "true_rank": 24,
+            "pred_rank": 20,
+            "true_score": 8.817825513674425,
+            "pred_score": 9.044977862889404
+          },
+          {
+            "node_id": 303,
+            "true_rank": 29,
+            "pred_rank": 19,
+            "true_score": 7.7696244416567755,
+            "pred_score": 9.046178743419885
+          },
+          {
+            "node_id": 314,
+            "true_rank": 23,
+            "pred_rank": 13,
+            "true_score": 8.890217278068892,
+            "pred_score": 9.431244723478768
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 17,
+          "missed_from_top_k": 3,
+          "false_positives": 3,
+          "p_at_k": 0.85,
+          "recall_at_k": 0.85
+        },
+        "correct_nodes": [
+          "25",
+          "67",
+          "84",
+          "107",
+          "111",
+          "124",
+          "136",
+          "150",
+          "172",
+          "176",
+          "196",
+          "222",
+          "227",
+          "249",
+          "267",
+          "310",
+          "317"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 80,
+            "true_rank": 8,
+            "pred_rank": 23,
+            "true_score": 10.0,
+            "pred_score": 8.591245701051283,
+            "score_error": 1.4087542989487165,
+            "rank_error": 15,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 201,
+            "true_rank": 12,
+            "pred_rank": 21,
+            "true_score": 10.0,
+            "pred_score": 8.832989432360574,
+            "score_error": 1.1670105676394265,
+            "rank_error": 9,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 268,
+            "true_rank": 2,
+            "pred_rank": 25,
+            "true_score": 10.0,
+            "pred_score": 8.443979839987337,
+            "score_error": 1.5560201600126629,
+            "rank_error": 23,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 157,
+            "true_rank": 21,
+            "pred_rank": 15,
+            "true_score": 9.379158086750902,
+            "pred_score": 9.197284706985732
+          },
+          {
+            "node_id": 300,
+            "true_rank": 24,
+            "pred_rank": 10,
+            "true_score": 8.580730717609969,
+            "pred_score": 9.918011287137997
+          },
+          {
+            "node_id": 301,
+            "true_rank": 22,
+            "pred_rank": 17,
+            "true_score": 9.237813669749906,
+            "pred_score": 9.0762780249808
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 18,
+          "missed_from_top_k": 2,
+          "false_positives": 2,
+          "p_at_k": 0.9,
+          "recall_at_k": 0.9
+        },
+        "correct_nodes": [
+          "4",
+          "21",
+          "53",
+          "54",
+          "62",
+          "68",
+          "86",
+          "116",
+          "121",
+          "122",
+          "144",
+          "167",
+          "194",
+          "201",
+          "207",
+          "227",
+          "247",
+          "251"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 83,
+            "true_rank": 12,
+            "pred_rank": 25,
+            "true_score": 9.124072520836098,
+            "pred_score": 7.84208082445664,
+            "score_error": 1.2819916963794578,
+            "rank_error": 13,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 107,
+            "true_rank": 18,
+            "pred_rank": 26,
+            "true_score": 8.325317090244504,
+            "pred_score": 7.639281241187622,
+            "score_error": 0.6860358490568812,
+            "rank_error": 8,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 147,
+            "true_rank": 21,
+            "pred_rank": 16,
+            "true_score": 8.050851333670856,
+            "pred_score": 8.720177258037143
+          },
+          {
+            "node_id": 314,
+            "true_rank": 28,
+            "pred_rank": 18,
+            "true_score": 7.345329463768464,
+            "pred_score": 8.322538654696334
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 19,
+          "missed_from_top_k": 1,
+          "false_positives": 1,
+          "p_at_k": 0.95,
+          "recall_at_k": 0.95
+        },
+        "correct_nodes": [
+          "7",
+          "11",
+          "15",
+          "30",
+          "34",
+          "36",
+          "38",
+          "139",
+          "155",
+          "176",
+          "191",
+          "199",
+          "208",
+          "212",
+          "226",
+          "241",
+          "264",
+          "295",
+          "296"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 40,
+            "true_rank": 19,
+            "pred_rank": 22,
+            "true_score": 9.003113302425572,
+            "pred_score": 8.459382657383888,
+            "score_error": 0.5437306450416841,
+            "rank_error": 3,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 164,
+            "true_rank": 21,
+            "pred_rank": 11,
+            "true_score": 8.335124535525598,
+            "pred_score": 9.971963958321009
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 16,
+          "missed_from_top_k": 4,
+          "false_positives": 4,
+          "p_at_k": 0.8,
+          "recall_at_k": 0.8
+        },
+        "correct_nodes": [
+          "18",
+          "23",
+          "59",
+          "60",
+          "108",
+          "112",
+          "113",
+          "146",
+          "192",
+          "203",
+          "206",
+          "222",
+          "249",
+          "269",
+          "282",
+          "312"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 216,
+            "true_rank": 17,
+            "pred_rank": 23,
+            "true_score": 9.219378438214676,
+            "pred_score": 8.42112041287839,
+            "score_error": 0.7982580253362865,
+            "rank_error": 6,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 253,
+            "true_rank": 20,
+            "pred_rank": 24,
+            "true_score": 8.992151867139526,
+            "pred_score": 8.186788976141813,
+            "score_error": 0.8053628909977135,
+            "rank_error": 4,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 264,
+            "true_rank": 16,
+            "pred_rank": 21,
+            "true_score": 9.24990211836492,
+            "pred_score": 8.650671168299526,
+            "score_error": 0.5992309500653938,
+            "rank_error": 5,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 267,
+            "true_rank": 15,
+            "pred_rank": 22,
+            "true_score": 9.266984256912679,
+            "pred_score": 8.58400137379982,
+            "score_error": 0.6829828831128584,
+            "rank_error": 7,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 156,
+            "true_rank": 23,
+            "pred_rank": 18,
+            "true_score": 8.750767883747056,
+            "pred_score": 9.051195022073157
+          },
+          {
+            "node_id": 158,
+            "true_rank": 22,
+            "pred_rank": 20,
+            "true_score": 8.778369104860031,
+            "pred_score": 8.81131430352599
+          },
+          {
+            "node_id": 242,
+            "true_rank": 25,
+            "pred_rank": 17,
+            "true_score": 8.309034738675406,
+            "pred_score": 9.108214544678635
+          },
+          {
+            "node_id": 275,
+            "true_rank": 24,
+            "pred_rank": 19,
+            "true_score": 8.379813630695034,
+            "pred_score": 9.028666539200131
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 16,
+          "missed_from_top_k": 4,
+          "false_positives": 4,
+          "p_at_k": 0.8,
+          "recall_at_k": 0.8
+        },
+        "correct_nodes": [
+          "36",
+          "49",
+          "50",
+          "94",
+          "109",
+          "115",
+          "128",
+          "185",
+          "187",
+          "204",
+          "267",
+          "278",
+          "280",
+          "288",
+          "309",
+          "313"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 3,
+            "true_rank": 18,
+            "pred_rank": 27,
+            "true_score": 9.626787138448602,
+            "pred_score": 8.455714710328067,
+            "score_error": 1.1710724281205351,
+            "rank_error": 9,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 7,
+            "true_rank": 10,
+            "pred_rank": 23,
+            "true_score": 10.0,
+            "pred_score": 8.9166477827481,
+            "score_error": 1.0833522172518997,
+            "rank_error": 13,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 229,
+            "true_rank": 19,
+            "pred_rank": 29,
+            "true_score": 9.450973676489518,
+            "pred_score": 8.375171649087616,
+            "score_error": 1.0758020274019024,
+            "rank_error": 10,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 291,
+            "true_rank": 20,
+            "pred_rank": 22,
+            "true_score": 9.327884167051657,
+            "pred_score": 9.069913194704787,
+            "score_error": 0.25797097234686994,
+            "rank_error": 2,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 177,
+            "true_rank": 22,
+            "pred_rank": 8,
+            "true_score": 8.967287536245097,
+            "pred_score": 10.0
+          },
+          {
+            "node_id": 179,
+            "true_rank": 26,
+            "pred_rank": 20,
+            "true_score": 8.673001695663347,
+            "pred_score": 9.135151780770776
+          },
+          {
+            "node_id": 237,
+            "true_rank": 25,
+            "pred_rank": 13,
+            "true_score": 8.77013749359313,
+            "pred_score": 9.880931430163187
+          },
+          {
+            "node_id": 245,
+            "true_rank": 21,
+            "pred_rank": 11,
+            "true_score": 9.167098219283037,
+            "pred_score": 9.904769845282578
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 15,
+          "missed_from_top_k": 5,
+          "false_positives": 5,
+          "p_at_k": 0.75,
+          "recall_at_k": 0.75
+        },
+        "correct_nodes": [
+          "53",
+          "54",
+          "57",
+          "72",
+          "84",
+          "108",
+          "142",
+          "165",
+          "175",
+          "190",
+          "197",
+          "227",
+          "234",
+          "273",
+          "275"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 8,
+            "true_rank": 19,
+            "pred_rank": 22,
+            "true_score": 8.647051216902348,
+            "pred_score": 8.491412984007102,
+            "score_error": 0.15563823289524592,
+            "rank_error": 3,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 93,
+            "true_rank": 20,
+            "pred_rank": 28,
+            "true_score": 8.642592680046633,
+            "pred_score": 7.84221266738037,
+            "score_error": 0.8003800126662632,
+            "rank_error": 8,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 135,
+            "true_rank": 11,
+            "pred_rank": 23,
+            "true_score": 9.668595964597262,
+            "pred_score": 8.481444139518443,
+            "score_error": 1.1871518250788196,
+            "rank_error": 12,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 210,
+            "true_rank": 18,
+            "pred_rank": 21,
+            "true_score": 8.70702864912954,
+            "pred_score": 8.66646458386256,
+            "score_error": 0.040564065266980975,
+            "rank_error": 3,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 211,
+            "true_rank": 13,
+            "pred_rank": 30,
+            "true_score": 9.622879631730022,
+            "pred_score": 7.6505795000904335,
+            "score_error": 1.9723001316395887,
+            "rank_error": 17,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 4,
+            "true_rank": 21,
+            "pred_rank": 17,
+            "true_score": 8.617110132830245,
+            "pred_score": 8.91503514373072
+          },
+          {
+            "node_id": 44,
+            "true_rank": 27,
+            "pred_rank": 20,
+            "true_score": 7.9714933789463664,
+            "pred_score": 8.743635429132965
+          },
+          {
+            "node_id": 60,
+            "true_rank": 30,
+            "pred_rank": 19,
+            "true_score": 7.828781815595137,
+            "pred_score": 8.747684598576097
+          },
+          {
+            "node_id": 68,
+            "true_rank": 29,
+            "pred_rank": 18,
+            "true_score": 7.929839641729281,
+            "pred_score": 8.88160233023419
+          },
+          {
+            "node_id": 174,
+            "true_rank": 24,
+            "pred_rank": 15,
+            "true_score": 8.223556240252446,
+            "pred_score": 9.098035842395031
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 18,
+          "missed_from_top_k": 2,
+          "false_positives": 2,
+          "p_at_k": 0.9,
+          "recall_at_k": 0.9
+        },
+        "correct_nodes": [
+          "5",
+          "38",
+          "42",
+          "56",
+          "64",
+          "92",
+          "125",
+          "130",
+          "148",
+          "173",
+          "187",
+          "205",
+          "217",
+          "230",
+          "255",
+          "268",
+          "278",
+          "317"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 32,
+            "true_rank": 11,
+            "pred_rank": 25,
+            "true_score": 9.256116159098331,
+            "pred_score": 7.3936869422741385,
+            "score_error": 1.862429216824193,
+            "rank_error": 14,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 188,
+            "true_rank": 20,
+            "pred_rank": 27,
+            "true_score": 8.229950328245216,
+            "pred_score": 7.1227471290800635,
+            "score_error": 1.107203199165153,
+            "rank_error": 7,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 124,
+            "true_rank": 26,
+            "pred_rank": 19,
+            "true_score": 7.244796180925475,
+            "pred_score": 8.110696567298081
+          },
+          {
+            "node_id": 179,
+            "true_rank": 22,
+            "pred_rank": 18,
+            "true_score": 7.787087360967816,
+            "pred_score": 8.27041776444024
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 18,
+          "missed_from_top_k": 2,
+          "false_positives": 2,
+          "p_at_k": 0.9,
+          "recall_at_k": 0.9
+        },
+        "correct_nodes": [
+          "43",
+          "55",
+          "96",
+          "121",
+          "126",
+          "152",
+          "154",
+          "156",
+          "167",
+          "218",
+          "221",
+          "239",
+          "241",
+          "246",
+          "251",
+          "271",
+          "274",
+          "303"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 149,
+            "true_rank": 15,
+            "pred_rank": 24,
+            "true_score": 10.0,
+            "pred_score": 9.009691341941307,
+            "score_error": 0.9903086580586926,
+            "rank_error": 9,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 304,
+            "true_rank": 17,
+            "pred_rank": 22,
+            "true_score": 9.916309484604813,
+            "pred_score": 9.113372439340727,
+            "score_error": 0.8029370452640858,
+            "rank_error": 5,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 250,
+            "true_rank": 22,
+            "pred_rank": 6,
+            "true_score": 9.423735994480568,
+            "pred_score": 10.0
+          },
+          {
+            "node_id": 293,
+            "true_rank": 21,
+            "pred_rank": 14,
+            "true_score": 9.424920997465446,
+            "pred_score": 9.831549554187005
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 19,
+          "missed_from_top_k": 1,
+          "false_positives": 1,
+          "p_at_k": 0.95,
+          "recall_at_k": 0.95
+        },
+        "correct_nodes": [
+          "6",
+          "38",
+          "62",
+          "78",
+          "89",
+          "96",
+          "102",
+          "107",
+          "122",
+          "134",
+          "159",
+          "168",
+          "178",
+          "212",
+          "243",
+          "256",
+          "261",
+          "287",
+          "300"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 40,
+            "true_rank": 20,
+            "pred_rank": 22,
+            "true_score": 8.714764397468771,
+            "pred_score": 8.555136070401684,
+            "score_error": 0.15962832706708774,
+            "rank_error": 2,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 152,
+            "true_rank": 21,
+            "pred_rank": 5,
+            "true_score": 8.3464954007862,
+            "pred_score": 10.0
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 18,
+          "missed_from_top_k": 2,
+          "false_positives": 2,
+          "p_at_k": 0.9,
+          "recall_at_k": 0.9
+        },
+        "correct_nodes": [
+          "40",
+          "51",
+          "52",
+          "83",
+          "104",
+          "135",
+          "148",
+          "172",
+          "175",
+          "186",
+          "225",
+          "228",
+          "237",
+          "258",
+          "268",
+          "269",
+          "275",
+          "280"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 2,
+            "true_rank": 17,
+            "pred_rank": 21,
+            "true_score": 9.40836462592204,
+            "pred_score": 8.673413976688147,
+            "score_error": 0.7349506492338929,
+            "rank_error": 4,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 288,
+            "true_rank": 18,
+            "pred_rank": 23,
+            "true_score": 9.346331346510897,
+            "pred_score": 8.498169897945377,
+            "score_error": 0.84816144856552,
+            "rank_error": 5,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 138,
+            "true_rank": 25,
+            "pred_rank": 17,
+            "true_score": 8.01868922127407,
+            "pred_score": 9.163133810543544
+          },
+          {
+            "node_id": 197,
+            "true_rank": 21,
+            "pred_rank": 20,
+            "true_score": 8.761735364257012,
+            "pred_score": 8.80484604755856
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 18,
+          "missed_from_top_k": 2,
+          "false_positives": 2,
+          "p_at_k": 0.9,
+          "recall_at_k": 0.9
+        },
+        "correct_nodes": [
+          "1",
+          "20",
+          "34",
+          "64",
+          "79",
+          "99",
+          "105",
+          "144",
+          "147",
+          "150",
+          "162",
+          "179",
+          "226",
+          "229",
+          "246",
+          "260",
+          "267",
+          "284"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 24,
+            "true_rank": 13,
+            "pred_rank": 26,
+            "true_score": 9.482773517538902,
+            "pred_score": 7.914762506219969,
+            "score_error": 1.5680110113189336,
+            "rank_error": 13,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 93,
+            "true_rank": 20,
+            "pred_rank": 33,
+            "true_score": 8.777304878042088,
+            "pred_score": 7.362637138735883,
+            "score_error": 1.4146677393062053,
+            "rank_error": 13,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 13,
+            "true_rank": 28,
+            "pred_rank": 19,
+            "true_score": 7.918479778607695,
+            "pred_score": 8.957507919232725
+          },
+          {
+            "node_id": 26,
+            "true_rank": 22,
+            "pred_rank": 17,
+            "true_score": 8.649014368479628,
+            "pred_score": 9.11729056886227
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 18,
+          "missed_from_top_k": 2,
+          "false_positives": 2,
+          "p_at_k": 0.9,
+          "recall_at_k": 0.9
+        },
+        "correct_nodes": [
+          "12",
+          "32",
+          "34",
+          "43",
+          "48",
+          "51",
+          "93",
+          "114",
+          "128",
+          "134",
+          "154",
+          "162",
+          "163",
+          "167",
+          "186",
+          "231",
+          "282",
+          "287"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 147,
+            "true_rank": 20,
+            "pred_rank": 25,
+            "true_score": 8.322592563677587,
+            "pred_score": 7.612198284493455,
+            "score_error": 0.7103942791841318,
+            "rank_error": 5,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 215,
+            "true_rank": 19,
+            "pred_rank": 21,
+            "true_score": 8.387382081965193,
+            "pred_score": 8.131684500616927,
+            "score_error": 0.25569758134826515,
+            "rank_error": 2,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 9,
+            "true_rank": 23,
+            "pred_rank": 17,
+            "true_score": 7.916244566197763,
+            "pred_score": 8.550628254342678
+          },
+          {
+            "node_id": 120,
+            "true_rank": 22,
+            "pred_rank": 20,
+            "true_score": 8.211584098457442,
+            "pred_score": 8.23313451088994
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 18,
+          "missed_from_top_k": 2,
+          "false_positives": 2,
+          "p_at_k": 0.9,
+          "recall_at_k": 0.9
+        },
+        "correct_nodes": [
+          "3",
+          "6",
+          "26",
+          "48",
+          "63",
+          "65",
+          "69",
+          "143",
+          "186",
+          "195",
+          "198",
+          "201",
+          "210",
+          "220",
+          "223",
+          "239",
+          "288",
+          "293"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 137,
+            "true_rank": 19,
+            "pred_rank": 27,
+            "true_score": 8.510979794499226,
+            "pred_score": 7.721730094759886,
+            "score_error": 0.7892496997393401,
+            "rank_error": 8,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 226,
+            "true_rank": 20,
+            "pred_rank": 33,
+            "true_score": 8.287975971517339,
+            "pred_score": 6.9648653883169,
+            "score_error": 1.3231105832004388,
+            "rank_error": 13,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 261,
+            "true_rank": 29,
+            "pred_rank": 19,
+            "true_score": 7.437542195050751,
+            "pred_score": 8.188439380112497
+          },
+          {
+            "node_id": 317,
+            "true_rank": 22,
+            "pred_rank": 20,
+            "true_score": 8.122424522428506,
+            "pred_score": 8.143053604072264
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 19,
+          "missed_from_top_k": 1,
+          "false_positives": 1,
+          "p_at_k": 0.95,
+          "recall_at_k": 0.95
+        },
+        "correct_nodes": [
+          "2",
+          "11",
+          "35",
+          "69",
+          "80",
+          "113",
+          "134",
+          "141",
+          "142",
+          "147",
+          "165",
+          "186",
+          "195",
+          "200",
+          "240",
+          "254",
+          "282",
+          "289",
+          "296"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 52,
+            "true_rank": 15,
+            "pred_rank": 21,
+            "true_score": 9.858656098643719,
+            "pred_score": 8.774110622800496,
+            "score_error": 1.084545475843223,
+            "rank_error": 6,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 272,
+            "true_rank": 22,
+            "pred_rank": 16,
+            "true_score": 8.023739691244689,
+            "pred_score": 9.499760409467555
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 18,
+          "missed_from_top_k": 2,
+          "false_positives": 2,
+          "p_at_k": 0.9,
+          "recall_at_k": 0.9
+        },
+        "correct_nodes": [
+          "57",
+          "64",
+          "67",
+          "79",
+          "82",
+          "92",
+          "172",
+          "179",
+          "181",
+          "210",
+          "228",
+          "261",
+          "274",
+          "280",
+          "285",
+          "296",
+          "302",
+          "312"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 42,
+            "true_rank": 17,
+            "pred_rank": 26,
+            "true_score": 9.40526243889876,
+            "pred_score": 8.24123582166297,
+            "score_error": 1.1640266172357894,
+            "rank_error": 9,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 105,
+            "true_rank": 19,
+            "pred_rank": 27,
+            "true_score": 8.974995139656505,
+            "pred_score": 8.205355280648847,
+            "score_error": 0.7696398590076576,
+            "rank_error": 8,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 94,
+            "true_rank": 23,
+            "pred_rank": 14,
+            "true_score": 8.461518842637776,
+            "pred_score": 9.152594558211925
+          },
+          {
+            "node_id": 142,
+            "true_rank": 25,
+            "pred_rank": 17,
+            "true_score": 8.163637446956475,
+            "pred_score": 8.988867389340518
+          }
+        ]
+      },
+      {
+        "window_summary": {
+          "total_nodes": 319,
+          "top_k": 20,
+          "correct_in_top_k": 17,
+          "missed_from_top_k": 3,
+          "false_positives": 3,
+          "p_at_k": 0.85,
+          "recall_at_k": 0.85
+        },
+        "correct_nodes": [
+          "20",
+          "53",
+          "75",
+          "88",
+          "89",
+          "95",
+          "97",
+          "149",
+          "155",
+          "165",
+          "170",
+          "188",
+          "190",
+          "196",
+          "210",
+          "230",
+          "284"
+        ],
+        "missed_nodes_detailed": [
+          {
+            "node_id": 197,
+            "true_rank": 12,
+            "pred_rank": 22,
+            "true_score": 9.62069180541529,
+            "pred_score": 8.230285061330388,
+            "score_error": 1.3904067440849026,
+            "rank_error": 10,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 212,
+            "true_rank": 18,
+            "pred_rank": 30,
+            "true_score": 8.922876639487471,
+            "pred_score": 7.06159638315712,
+            "score_error": 1.8612802563303514,
+            "rank_error": 12,
+            "error_type": "undershooting"
+          },
+          {
+            "node_id": 250,
+            "true_rank": 20,
+            "pred_rank": 29,
+            "true_score": 8.500374001983596,
+            "pred_score": 7.213219421532741,
+            "score_error": 1.2871545804508555,
+            "rank_error": 9,
+            "error_type": "undershooting"
+          }
+        ],
+        "false_positive_detailed": [
+          {
+            "node_id": 12,
+            "true_rank": 27,
+            "pred_rank": 18,
+            "true_score": 7.552695658406136,
+            "pred_score": 8.484057347602025
+          },
+          {
+            "node_id": 258,
+            "true_rank": 24,
+            "pred_rank": 19,
+            "true_score": 7.929694094421107,
+            "pred_score": 8.435050113954057
+          },
+          {
+            "node_id": 259,
+            "true_rank": 23,
+            "pred_rank": 15,
+            "true_score": 7.958214293483207,
+            "pred_score": 8.96728932274734
+          }
+        ]
+      }
+    ]
+  },
+  "patterns": {
+    "total_nodes": 46,
+    "consistently_missed_top_10": [
+      {
+        "node_id": 2,
+        "miss_rate": 0.1,
+        "times_missed": 2,
+        "avg_rank_error": 10.5,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 2
+        }
+      },
+      {
+        "node_id": 40,
+        "miss_rate": 0.1,
+        "times_missed": 2,
+        "avg_rank_error": 2.5,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 2
+        }
+      },
+      {
+        "node_id": 93,
+        "miss_rate": 0.1,
+        "times_missed": 2,
+        "avg_rank_error": 10.5,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 2
+        }
+      },
+      {
+        "node_id": 46,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 2.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 247,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 7.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 56,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 7.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 302,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 1.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 129,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 7.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 145,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 13.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 111,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 14.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      }
+    ],
+    "all_consistently_missed": [
+      {
+        "node_id": 2,
+        "miss_rate": 0.1,
+        "times_missed": 2,
+        "avg_rank_error": 10.5,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 2
+        }
+      },
+      {
+        "node_id": 40,
+        "miss_rate": 0.1,
+        "times_missed": 2,
+        "avg_rank_error": 2.5,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 2
+        }
+      },
+      {
+        "node_id": 93,
+        "miss_rate": 0.1,
+        "times_missed": 2,
+        "avg_rank_error": 10.5,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 2
+        }
+      },
+      {
+        "node_id": 46,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 2.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 247,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 7.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 56,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 7.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 302,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 1.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 129,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 7.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 145,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 13.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 111,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 14.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 168,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 3.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 191,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 12.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 261,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 21.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 80,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 15.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 201,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 9.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 268,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 23.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 83,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 13.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 107,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 8.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 216,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 6.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 253,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 4.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 264,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 5.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 267,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 7.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 3,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 9.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 7,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 13.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 229,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 10.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 291,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 2.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 8,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 3.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 135,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 12.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 210,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 3.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 211,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 17.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 32,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 14.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 188,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 7.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 149,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 9.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 304,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 5.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 288,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 5.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 24,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 13.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 147,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 5.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 215,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 2.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 137,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 8.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 226,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 13.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 52,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 6.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 42,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 9.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 105,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 8.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 197,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 10.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 212,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 12.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      },
+      {
+        "node_id": 250,
+        "miss_rate": 0.05,
+        "times_missed": 1,
+        "avg_rank_error": 9.0,
+        "primary_error_type": "undershooting",
+        "error_distribution": {
+          "undershooting": 1
+        }
+      }
+    ]
+  },
+  "recommendations": [
+    "P@20 is acceptable. Continue with current approach.",
+    "Most errors are undershooting (predicting rank too low). Model may have low recall on important nodes.",
+    "Top 3 consistently missed nodes: 2, 40, 93. Investigate why model struggles with these nodes."
+  ]
+}

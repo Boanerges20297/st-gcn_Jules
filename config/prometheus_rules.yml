@@ -1,0 +1,175 @@
+# Regras de Alertas para Prometheus
+# Alertas críticos para ST-GCN Crime Prediction System
+
+groups:
+  - name: 'st-gcn-alerts'
+    interval: 30s
+    rules:
+      # Alerta 1: App não está respondendo
+      - alert: AppNotResponding
+        expr: up{job="st-gcn-app"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: st-gcn-app
+        annotations:
+          summary: "ST-GCN App não está respondendo"
+          description: "App em {{ $labels.instance }} não respondeu por 2 minutos"
+          action: "Verificar logs do container: docker logs st-gcn-app"
+
+      # Alerta 2: Uso de CPU muito alto
+      - alert: HighCPUUsage
+        expr: rate(container_cpu_usage_seconds_total{container_label_com_st_gcn_component="application"}[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          service: st-gcn-app
+        annotations:
+          summary: "Uso de CPU elevado"
+          description: "CPU em {{ $labels.instance }} acima de 80% por 5 minutos"
+          action: "Verificar carga e processos: top, docker stats"
+
+      # Alerta 3: Memória crítica
+      - alert: HighMemoryUsage
+        expr: (container_memory_usage_bytes{container_label_com_st_gcn_component="application"} / container_spec_memory_limit_bytes) > 0.9
+        for: 3m
+        labels:
+          severity: critical
+          service: st-gcn-app
+        annotations:
+          summary: "Memória crítica"
+          description: "Memória em {{ $labels.instance }} acima de 90%"
+          action: "Aumentar limite de memória ou otimizar código"
+
+      # Alerta 4: Taxa de erro alta
+      - alert: HighErrorRate
+        expr: (rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          service: st-gcn-app
+        annotations:
+          summary: "Taxa de erro acima de 5%"
+          description: "{{ $value | humanizePercentage }} de erros detectados"
+          action: "Verificar logs: docker logs st-gcn-app | grep ERROR"
+
+      # Alerta 5: Tempo de resposta lento
+      - alert: SlowResponse
+        expr: histogram_quantile(0.95, rate(http_requests_duration_seconds_bucket[5m])) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          service: st-gcn-app
+        annotations:
+          summary: "P95 latência > 500ms"
+          description: "P95: {{ $value | humanizeDuration }}"
+          action: "Verificar índices e queries lentas"
+
+      # Alerta 6: Redis off-line
+      - alert: RedisCacheDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: warning
+          service: redis-cache
+        annotations:
+          summary: "Redis cache offline"
+          description: "Redis em {{ $labels.instance }} está down"
+          action: "docker-compose up -d cache"
+
+      # Alerta 7: Disco cheio
+      - alert: DiskAlmostFull
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.1
+        for: 5m
+        labels:
+          severity: critical
+          service: node
+        annotations:
+          summary: "Disco {{ $labels.device }} com <10% livre"
+          description: "Livre: {{ $value | humanizePercentage }}"
+          action: "Limpar espaço: docker system prune -a"
+
+      # Alerta 8: Muita requisição por segundo
+      - alert: HighRequestRate
+        expr: rate(http_requests_total[5m]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          service: st-gcn-app
+        annotations:
+          summary: "Taxa de requisição elevada"
+          description: "{{ $value | humanize }} requisições/seg"
+          action: "Escalar horizontalmente ou verificar escaneamento"
+
+      # Alerta 9: Explicação levando muito tempo
+      - alert: SlowExplanationGeneration
+        expr: histogram_quantile(0.95, rate(explanation_generation_duration_seconds_bucket{endpoint="/api/explain"}[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          service: st-gcn-app
+          endpoint: /api/explain
+        annotations:
+          summary: "Geração de explicação lenta"
+          description: "P95: {{ $value | humanizeDuration }}"
+          action: "Verificar complexidade do modelo ou dados"
+
+      # Alerta 10: Anomaly detector não funcionando
+      - alert: AnomalyDetectorError
+        expr: rate(anomaly_detection_errors_total[5m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          service: st-gcn-app
+          component: anomaly-detector
+        annotations:
+          summary: "Erros no detector de anomalias"
+          description: "Erros detectados: {{ $value }}"
+          action: "Verificar: docker logs st-gcn-app | grep AnomalyDetector"
+
+      # Alerta 11: Taxa de sucesso métricas baixa
+      - alert: MetricsCalculationFailure
+        expr: (rate(metrics_calculation_success_total[5m]) / rate(metrics_calculation_total[5m])) < 0.95
+        for: 5m
+        labels:
+          severity: warning
+          service: st-gcn-app
+          component: metrics
+        annotations:
+          summary: "Taxa de sucesso de cálculo de métricas < 95%"
+          description: "Sucesso: {{ $value | humanizePercentage }}"
+          action: "Verificar compatibilidade de dados"
+
+      # Alerta 12: Prometheus não coleta dados
+      - alert: PrometheusDown
+        expr: up{job="prometheus"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: prometheus
+        annotations:
+          summary: "Prometheus não respondendo"
+          description: "Prometheus em {{ $labels.instance }} está down"
+          action: "docker-compose restart prometheus"
+
+  - name: 'st-gcn-recording-rules'
+    interval: 1m
+    rules:
+      # Recording rules para performance
+      - record: 'http:requests:rate5m'
+        expr: 'rate(http_requests_total[5m])'
+
+      - record: 'http:errors:rate5m'
+        expr: 'rate(http_requests_total{status=~"5.."}[5m])'
+
+      - record: 'http:latency:p95_5m'
+        expr: 'histogram_quantile(0.95, rate(http_requests_duration_seconds_bucket[5m]))'
+
+      - record: 'http:latency:p99_5m'
+        expr: 'histogram_quantile(0.99, rate(http_requests_duration_seconds_bucket[5m]))'
+
+      - record: 'container:memory:percent'
+        expr: '(container_memory_usage_bytes / container_spec_memory_limit_bytes) * 100'
+
+      - record: 'container:cpu:percent'
+        expr: 'rate(container_cpu_usage_seconds_total[5m]) * 100'

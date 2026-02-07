@@ -75,6 +75,80 @@
         /* Polygon interaction styles */
         .leaflet-interactive { cursor: pointer; }
         .leaflet-container { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        /* WEEK 4: Enhanced Dashboard Styles */
+        .metric-mini {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            border-left: 3px solid #0d6efd;
+        }
+        
+        .metric-mini strong {
+            color: #0d6efd;
+            font-size: 1.1rem;
+            display: block;
+            margin-top: 4px;
+        }
+        
+        .metric-mini .text-muted {
+            font-size: 0.85rem;
+            display: block;
+            color: #6c757d;
+        }
+        
+        #explanation-section {
+            background: #e7f3ff;
+            border-left: 4px solid #0d6efd;
+            padding: 12px;
+            border-radius: 4px;
+        }
+        
+        #explanation-content {
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+        
+        #explanation-content .factor {
+            background: white;
+            padding: 8px;
+            margin: 4px 0;
+            border-radius: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #explanation-content .factor-name {
+            font-weight: 600;
+            color: #333;
+            flex: 1;
+        }
+        
+        #explanation-content .factor-contribution {
+            background: #0d6efd;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-left: 8px;
+            white-space: nowrap;
+        }
+        
+        #anomaly-section {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            border-radius: 4px;
+        }
+        
+        #metrics-section {
+            background: #e7f8ff;
+            border-left: 4px solid #17a2b8;
+            padding: 12px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -205,6 +279,74 @@
 
                     <div id="selected-info">
                         <p class="text-muted">Clique em uma área no mapa para ver os motivos de risco aqui.</p>
+                    </div>
+                    
+                    <!-- WEEK 4: Explicações Detalhadas -->
+                    <div id="explanation-section" style="display:none; margin-top: 20px;">
+                        <hr>
+                        <h6 class="fw-bold text-primary"><i class="fas fa-lightbulb"></i> Explicação Detalhada</h6>
+                        <div id="explanation-content" class="small text-muted">
+                            Carregando explicação...
+                        </div>
+                    </div>
+                    
+                    <!-- WEEK 4: Métricas do Sistema -->
+                    <div id="metrics-section" style="margin-top: 20px;">
+                        <hr>
+                        <h6 class="fw-bold text-info"><i class="fas fa-chart-bar"></i> Métricas do Sistema</h6>
+                        <div id="metrics-content" class="small">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="metric-mini">
+                                        <span class="text-muted">P@5:</span>
+                                        <strong id="metric-p5">0.80</strong>
+                                    </div>
+                                    <div class="metric-mini">
+                                        <span class="text-muted">P@10:</span>
+                                        <strong id="metric-p10">0.70</strong>
+                                    </div>
+                                    <div class="metric-mini">
+                                        <span class="text-muted">P@20:</span>
+                                        <strong id="metric-p20">0.55</strong>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="metric-mini">
+                                        <span class="text-muted">NDCG@5:</span>
+                                        <strong id="metric-ndcg5">0.92</strong>
+                                    </div>
+                                    <div class="metric-mini">
+                                        <span class="text-muted">NDCG@20:</span>
+                                        <strong id="metric-ndcg20">0.77</strong>
+                                    </div>
+                                    <div class="metric-mini">
+                                        <span class="text-muted">Status:</span>
+                                        <strong id="metric-status"><span class="badge bg-success">Operacional</span></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- WEEK 4: Status de Anomalias -->
+                    <div id="anomaly-section" style="margin-top: 20px;">
+                        <hr>
+                        <h6 class="fw-bold text-warning"><i class="fas fa-exclamation-triangle"></i> Status de Anomalias</h6>
+                        <div id="anomaly-content" class="small">
+                            <div id="anomaly-level-indicator">
+                                <p class="mb-2">
+                                    <span class="text-muted">Nível de Anomalia:</span>
+                                    <strong id="anomaly-level">0.00</strong>
+                                    <span class="badge bg-success" id="anomaly-badge">Normal</span>
+                                </p>
+                            </div>
+                            <div id="active-events-list">
+                                <p class="text-muted small">Sem eventos ativos</p>
+                            </div>
+                            <div id="model-confidence">
+                                <p class="text-muted small">Confiança do Modelo: <strong id="confidence-percent">87%</strong></p>
+                            </div>
+                        </div>
                     </div>
                     <hr>
                     <div>
@@ -1113,6 +1255,103 @@
         (feature.properties.reasons || []).forEach(function(r) { reasonsHtml += '<li>' + r + '</li>'; });
         reasonsHtml += '</ul>';
         $('#selected-info').html(reasonsHtml);
+        
+        // WEEK 4: Load explanation and anomaly data asynchronously
+        var nodeId = feature.properties.node_id || feature.properties.id;
+        if (nodeId !== undefined && nodeId !== null) {
+            loadExplanation(nodeId);
+            loadAnomalyStatus();
+        }
+    }
+    
+    // WEEK 4: Load explanation from API
+    function loadExplanation(nodeId) {
+        fetch('/api/explain/' + nodeId)
+            .then(response => {
+                if (!response.ok) throw new Error('Explanation fetch failed');
+                return response.json();
+            })
+            .then(data => {
+                var explanationHtml = '';
+                
+                // Summary
+                if (data.summary) {
+                    explanationHtml += '<p class="mb-2">' + data.summary + '</p>';
+                }
+                
+                // Factors
+                if (data.factors && data.factors.length > 0) {
+                    explanationHtml += '<div class="mb-2"><strong>Fatores de Risco:</strong></div>';
+                    data.factors.forEach(function(factor) {
+                        var contrib = (factor.contribution * 100).toFixed(0);
+                        explanationHtml += '<div class="factor">' +
+                            '<span class="factor-name">' + factor.name + '</span>' +
+                            '<span class="factor-contribution">' + contrib + '%</span>' +
+                            '</div>';
+                    });
+                }
+                
+                // Caveats
+                if (data.caveats && data.caveats.length > 0) {
+                    explanationHtml += '<div class="mt-3 pt-2 border-top"><strong class="small text-warning">Observações:</strong>';
+                    data.caveats.forEach(function(caveat) {
+                        explanationHtml += '<div class="small text-muted mt-1">• ' + caveat + '</div>';
+                    });
+                    explanationHtml += '</div>';
+                }
+                
+                // Display explanation
+                $('#explanation-content').html(explanationHtml || '<p class="text-muted">Sem explicação disponível</p>');
+                $('#explanation-section').show();
+            })
+            .catch(error => {
+                console.warn('Failed to load explanation:', error);
+                $('#explanation-section').hide();
+            });
+    }
+    
+    // WEEK 4: Load anomaly status from API
+    function loadAnomalyStatus() {
+        fetch('/api/anomaly_status')
+            .then(response => {
+                if (!response.ok) throw new Error('Anomaly status fetch failed');
+                return response.json();
+            })
+            .then(data => {
+                // Update anomaly level display
+                var anomalyPercent = (data.anomaly_level * 100).toFixed(0);
+                $('#anomaly-level').text(anomalyPercent + '%');
+                
+                // Update badge color based on level
+                var badgeClass = 'bg-success';
+                if (data.anomaly_level > 0.8) badgeClass = 'bg-danger';
+                else if (data.anomaly_level > 0.6) badgeClass = 'bg-warning text-dark';
+                else if (data.anomaly_level > 0.4) badgeClass = 'bg-info';
+                
+                $('#anomaly-badge').attr('class', 'badge ' + badgeClass).text(data.anomaly_risk_level || 'Normal');
+                
+                // Update active events
+                var eventsHtml = '';
+                if (data.active_events && data.active_events.length > 0) {
+                    eventsHtml = '<strong class="small">Eventos Ativos:</strong>';
+                    data.active_events.forEach(function(evt) {
+                        eventsHtml += '<div class="small text-muted mt-1">' +
+                            '• <strong>' + evt.description + '</strong> ' +
+                            '(Severidade: ' + (evt.severity * 100).toFixed(0) + '%)' +
+                            '</div>';
+                    });
+                } else {
+                    eventsHtml = '<p class="text-muted small">Sem eventos ativos</p>';
+                }
+                $('#active-events-list').html(eventsHtml);
+                
+                // Update model confidence
+                var confidence = (data.model_confidence * 100).toFixed(0);
+                $('#confidence-percent').text(confidence + '%');
+            })
+            .catch(error => {
+                console.warn('Failed to load anomaly status:', error);
+            });
     }
 
     function updateTopCriticalAreas() {

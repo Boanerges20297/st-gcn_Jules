@@ -1,0 +1,73 @@
+# Configuração Prometheus para ST-GCN Crime Prediction System
+# Coleta de métricas de aplicação e infraestrutura
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'st-gcn-prometheus'
+    environment: 'production'
+
+# Alertas
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+# Arquivos de regras
+rule_files:
+  - '/etc/prometheus/rules.yml'
+
+# Targets para scraping
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Flask App (expor métricas via /metrics)
+  - job_name: 'st-gcn-app'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    static_configs:
+      - targets: ['app:5000']
+        labels:
+          service: 'st-gcn-api'
+    metrics_path: '/metrics'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+
+  # Redis Cache
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['cache:6379']
+        labels:
+          service: 'redis-cache'
+    scrape_interval: 30s
+
+  # Docker (se disponível)
+  - job_name: 'docker'
+    static_configs:
+      - targets: ['127.0.0.1:9323']
+    scrape_interval: 60s
+    scrape_timeout: 10s
+
+  # Node Exporter (métricas do SO)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['127.0.0.1:9100']
+    scrape_interval: 30s
+
+# Remote write (opcional - salvar em banco externo)
+# remote_write:
+#   - url: "http://remote-storage:9009/api/v1/push"
+#     queue_config:
+#       capacity: 10000
+#       max_shards: 200
+#       min_shards: 1
+#       max_samples_per_send: 500
+#       batch_send_wait: 5s
+#       min_retry_period: 30ms
+#       max_retry_period: 100ms
