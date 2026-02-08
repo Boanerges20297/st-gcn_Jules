@@ -752,76 +752,136 @@
         simulationPoints = [];
         $('#btn-clear-sim').addClass('d-none');
 
-        // Exogenous markers will be cleaned up automatically during map update
-
-        // Reload original data
+        // Reload entire map layer with original data
         showLoading('Restaurando Estado Original...', 'Recuperando dados históricos.');
-         $.getJSON('/api/risk', function(resp) {
-            riskDataGlobal = resp.data || resp;
-            updateRiskMap(riskDataGlobal);
+        
+        // Use reloadMapLayer to ensure complete synchronization
+        reloadMapLayer();
+        
+        setTimeout(function() {
             var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
             updateDashboard(mode);
-        }).always(function() {
             hideLoading();
+        }, 500);
+    }
+
+    function reloadMapLayer() {
+        // Remove a camada GeoJSON anterior do mapa
+        if (geojsonLayer) {
+            map.removeLayer(geojsonLayer);
+            geojsonLayer = null;
+        }
+
+        // Recarregar polígonos e dados de risco do servidor
+        $.when(
+            $.getJSON('/api/polygons'),
+            $.getJSON('/api/risk')
+        ).done(function(polygonsArgs, riskArgs) {
+            var geojson = polygonsArgs[0];
+            var riskResp = riskArgs[0];
+            riskDataGlobal = riskResp.data || riskResp;
+            metaDataGlobal = riskResp.meta || {};
+
+            var riskMapCVLI = {};
+            var riskMapCVP = {};
+            var riskById = {};
+
+            riskDataGlobal.forEach(function(item) {
+                var id = String(item.node_id || item.id);
+                riskMapCVLI[id] = item.risk_score_cvli || 0;
+                riskMapCVP[id] = item.risk_score_cvp || 0;
+                riskById[id] = item;
+            });
+
+            // Atualizar propriedades do GeoJSON com dados de risco
+            geojson.features.forEach(function(feature, index) {
+                var fid = feature.id || (feature.properties && feature.properties.node_id) || String(index);
+                fid = String(fid);
+                var r = riskById[fid] || {};
+                feature.properties.node_id = String(fid);
+                feature.properties.id = String(fid);
+                feature.properties.risk_score = r.risk_score || r.risk_score_cvli || 0;
+                feature.properties.risk_score_cvli = riskMapCVLI[fid] || 0;
+                feature.properties.risk_score_cvp = riskMapCVP[fid] || 0;
+                feature.properties.cvli_pred = (r.cvli_pred !== undefined) ? r.cvli_pred : 0;
+                feature.properties.cvp_pred = (r.cvp_pred !== undefined) ? r.cvp_pred : 0;
+                feature.properties.faction = r.faction || feature.properties.faction || null;
+                feature.properties.reasons = r.reasons || [];
+                feature.properties.name = feature.properties.name || ('Área ' + fid);
+            });
+
+            // Recriar a camada GeoJSON com os novos dados
+            geojsonLayer = L.geoJson(geojson, {
+                style: style,
+                pointToLayer: function(feature, latlng) {
+                    var featureStyle = style(feature);
+                    var marker = L.circleMarker(latlng, featureStyle);
+                    var nodeName = feature.properties.name || 'Nó Dinâmico';
+                    var nodeId = feature.properties.node_id || feature.properties.id || '';
+                    var riskScore = feature.properties.risk_score || 0;
+                    var popupText = '<strong>' + nodeName + '</strong><br/>' +
+                                    'ID: ' + nodeId + '<br/>' +
+                                    'Risco: ' + riskScore.toFixed(1) + '%<br/>' +
+                                    'Tipo: Nó Dinâmico';
+                    marker.bindPopup(popupText);
+                    return marker;
+                },
+                onEachFeature: function(feature, layer) {
+                    layer.on('mouseover', function(e) {
+                        if (!simulationMode) {
+                            var targetLayer = e.target;
+                            targetLayer.setStyle({
+                                weight: 4,
+                                color: '#fff',
+                                fillOpacity: 0.6
+                            });
+                            if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                                targetLayer.bringToFront();
+                            }
+                        }
+                    });
+                    
+                    layer.on('mouseout', function(e) {
+                        if (!simulationMode) {
+                            geojsonLayer.resetStyle(e.target);
+                        }
+                    });
+
+                    layer.on('click', function(e) {
+                        if (!simulationMode) {
+                            var props = e.target.feature.properties;
+                            var content = '<div style="max-width: 250px; font-size: 0.9rem;">' +
+                                         '<strong>' + (props.name || 'Área') + '</strong><br/>' +
+                                         '<small>ID: ' + props.node_id + '</small><br/>' +
+                                         '<hr style="margin: 5px 0;">' +
+                                         '<strong>Risco CVLI:</strong> ' + (props.risk_score_cvli || 0).toFixed(1) + '%<br/>' +
+                                         '<strong>Risco CVP:</strong> ' + (props.risk_score_cvp || 0).toFixed(1) + '%<br/>' +
+                                         (props.faction ? '<strong>Facção:</strong> ' + props.faction + '<br/>' : '');
+                            
+                            if (props.reasons && props.reasons.length > 0) {
+                                content += '<strong>Motivos:</strong><ul style="margin: 5px 0; padding-left: 15px;">';
+                                props.reasons.forEach(function(r) {
+                                    content += '<li>' + r + '</li>';
+                                });
+                                content += '</ul>';
+                            }
+                            content += '</div>';
+                            e.target.bindPopup(content, {maxWidth: 300}).openPopup();
+                        }
+                    });
+                }
+            });
+
+            // Adicionar a camada ao mapa
+            geojsonLayer.addTo(map);
+        }).fail(function() {
+            console.error("Erro ao recarregar o mapa");
         });
     }
 
     function updateRiskMap(riskData) {
-        var riskMapCVLI = {};
-        var riskMapCVP = {};
-
-        riskData.forEach(function(item) {
-            riskMapCVLI[item.node_id] = item.risk_score_cvli || 0;
-            riskMapCVP[item.node_id] = item.risk_score_cvp || 0;
-        });
-
-        geojsonLayer.eachLayer(function(layer) {
-            var index = layer.feature.properties.node_id; // Need to ensure node_id is available in properties.
-            // Wait, previous code used array index matching.
-            // "geojson.features.forEach(function(feature, index) {...}"
-            // We need to map back.
-            // The safest way is to assume array order is preserved.
-
-            // Let's rely on the loop index if node_id is not set,
-            // but we need the index. Leaflet layers don't expose index easily unless we stored it.
-            // In initial load, we stored risk data into properties.
-            // We should do the same here.
-
-            // Wait, we can't easily iterate layers in order matching the array unless we assigned IDs.
-            // Let's check initial load logic again.
-        });
-
-        // Re-process all features logic is complex inside leaflet loop.
-        // Easier: Re-apply properties to the GeoJSON features source and redraw? No, slow.
-        // Best: In initial load, assign an ID to each feature property if not exists.
-
-        // But let's look at initial load again.
-        // "geojson.features.forEach(function(feature, index) { ... }"
-        // It updates `feature.properties`.
-        // Leaflet layers reference `feature`. If we update `feature.properties`, does it update style?
-        // `layer.feature` is a reference. So updating it works.
-
-        // So we need to iterate geojson features again?
-        // We don't have direct access to the original geojson object easily unless stored.
-        // But `geojsonLayer.toGeoJSON()` returns new geojson.
-        // `geojsonLayer.getLayers()` returns array of layers.
-
-        // Let's assume `geojsonLayer` layers are consistent.
-        var layers = geojsonLayer.getLayers();
-        riskData.forEach(function(item, idx) {
-            if (layers[idx]) {
-                var layer = layers[idx];
-                layer.feature.properties.risk_score_cvli = item.risk_score_cvli;
-                layer.feature.properties.risk_score_cvp = item.risk_score_cvp;
-                layer.feature.properties.cvli_pred = item.cvli_pred;
-                layer.feature.properties.cvp_pred = item.cvp_pred;
-                layer.feature.properties.reasons = item.reasons;
-                // Update popup content if needed? Popups are bound on click, so they read current properties.
-                // Except the `bindPopup` string is created at binding time.
-                // We need to re-bind popup or use a function for content.
-                // The current code binds a static string. I should change it to a function.
-            }
-        });
+        // Esta função foi substituída por reloadMapLayer() para uma melhor sincronização
+        reloadMapLayer();
     }
 
     $.when(
@@ -1073,32 +1133,35 @@
                                 // Clear Form
                                 $('#ciops-text').val('');
 
-                                // Refresh Risk Data from Server (since server reloaded model)
-                                $.getJSON('/api/risk', function(riskResp) {
-                                     riskDataGlobal = riskResp.data || riskResp;
-                                     updateRiskMap(riskDataGlobal);
-                                     updateDashboard('CVLI');
+                                // Refresh Risk Data and Reload Map Layer Completely
+                                showLoading('Sincronizando Mapa...', 'Atualizando visualização com novos dados de risco.');
+                                
+                                // Reload the entire map layer to ensure all changes are reflected
+                                reloadMapLayer();
+                                
+                                // Update dashboard after a short delay to let the map render
+                                setTimeout(function() {
+                                    updateDashboard('CVLI');
+                                    hideLoading();
+                                    alert('Eventos salvos com sucesso!\nA malha foi adaptada permanentemente e o mapa foi atualizado.');
 
-                                     hideLoading();
-                                     alert('Eventos salvos com sucesso!\nA malha foi adaptada permanentemente e o risco recalculado.');
+                                    // Ensure simulation mode is NOT left active after malha adaptation.
+                                    simulationMode = false;
+                                    simulationType = 'suppression';
+                                    // Reset button visual states
+                                    $('#btn-simulate').removeClass('active btn-primary').addClass('btn-outline-primary');
+                                    $('#btn-simulate-exo').removeClass('active btn-danger').addClass('btn-outline-danger');
+                                    $('.leaflet-container').removeClass('simulation-active');
 
-                                     // Ensure simulation mode is NOT left active after malha adaptation.
-                                     simulationMode = false;
-                                     simulationType = 'suppression';
-                                     // Reset button visual states
-                                     $('#btn-simulate').removeClass('active btn-primary').addClass('btn-outline-primary');
-                                     $('#btn-simulate-exo').removeClass('active btn-danger').addClass('btn-outline-danger');
-                                     $('.leaflet-container').removeClass('simulation-active');
-
-                                     // Clean up any exogenous markers that may have been added
-                                     cleanupExogenousMarkers();
-                                     
-                                     // Exogenous events are saved server-side and will surface in the 'motivos' UI
-                                     // when justifying critical states - no visual markers needed.
-                                     
-                                     // Trigger immediate model update check
-                                     checkModelUpdateStatus();
-                                });
+                                    // Clean up any exogenous markers that may have been added
+                                    cleanupExogenousMarkers();
+                                    
+                                    // Exogenous events are saved server-side and will surface in the 'motivos' UI
+                                    // when justifying critical states - no visual markers needed.
+                                    
+                                    // Trigger immediate model update check
+                                    checkModelUpdateStatus();
+                                }, 500);
                             },
                             error: function(err) {
                                 hideLoading();
