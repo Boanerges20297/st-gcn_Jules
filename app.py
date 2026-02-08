@@ -167,6 +167,7 @@ adj_matrix = None
 original_adj_matrix = None
 node_features = None
 model_cvli = None # Modelo 3D unificado (26 canais: CVLI, CVP, Tension + one-hot features)
+model_stgat = None # Modelo ST-GAT para produção
 ranking_validator = None  # RankingInference for real-time validation
 model_ranking_scores = None
 device = None
@@ -646,7 +647,8 @@ def apply_exogenous_events_enhanced():
         'LOW': {'radius': 500, 'amp_factor': 1.05, 'description': 'Atividade Padrão'}
     }
     
-    now = datetime.now()
+    # Usar início do dia como referência fixa para garantir determinismo entre reinícios no mesmo dia
+    now = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     
     for batch_idx, batch in enumerate(exogenous_events):
         points = batch.get('points', [])
@@ -655,13 +657,13 @@ def apply_exogenous_events_enhanced():
         # Parse timestamp se necessário
         try:
             if isinstance(batch_timestamp, str):
-                batch_timestamp = pd.Timestamp(batch_timestamp)
+                batch_timestamp = pd.Timestamp(batch_timestamp).normalize()  # Truncar para início do dia
             else:
                 batch_timestamp = pd.Timestamp(now)
         except Exception:
             batch_timestamp = pd.Timestamp(now)
         
-        # Calcular decay temporal
+        # Calcular decay temporal (determinístico: baseado em dias inteiros)
         days_old = (now - batch_timestamp).days
         temporal_decay = np.exp(-days_old / 7.0)  # Decai para ~37% em 7 dias, ~13% em 14 dias
         
@@ -815,7 +817,7 @@ def update_exogenous_state():
         norm_adj = compute_norm_adj(adj_matrix)
 
 def load_data_and_models():
-    global nodes_gdf, polygons_json_cache, nodes_gdf_proj, nodes_centroids_proj, adj_matrix, node_features, model_cvli, device, norm_adj, dates, original_adj_matrix
+    global nodes_gdf, polygons_json_cache, nodes_gdf_proj, nodes_centroids_proj, adj_matrix, node_features, model_cvli, model_stgat, device, norm_adj, dates, original_adj_matrix
     global adj_geo, adj_faction, norm_adj_list
     global ibge_bairros_cache, ibge_municipios_cache, ibge_municipios_gdf
     global RANKING_MODEL_PATH
@@ -916,6 +918,16 @@ def load_data_and_models():
         
         # Se nodes_gdf não está no pickle, carregar do JSON
         if _nodes_gdf is None:
+            # Tentar carregar de nodes_gdf.pkl (fallback para micro-nós)
+            try:
+                nodes_pkl_path = os.path.join(BASE_DIR, 'data', 'processed', 'graph_data', 'nodes_gdf.pkl')
+                if os.path.exists(nodes_pkl_path):
+                    with open(nodes_pkl_path, 'rb') as f:
+                        _nodes_gdf = pickle.load(f)
+                    print(f"Carregado nodes_gdf de {nodes_pkl_path}")
+            except Exception:
+                pass
+
             try:
                 bairros_file = os.path.join(BASE_DIR, 'data', 'raw', 'bairros_centros_latlong.json')
                 if os.path.exists(bairros_file):
@@ -1197,6 +1209,30 @@ def load_data_and_models():
             except Exception as e:
                 print(f"Erro ao carregar state_dict CVLI: {e}")
 
+        # --- ST-GAT Loading ---
+        STGAT_PATH = os.path.join(BASE_DIR, 'models', 'st_gat_production.pth')
+        if os.path.exists(STGAT_PATH):
+            try:
+                print(f"Carregando modelo ST-GAT de {STGAT_PATH}...")
+                # Assuming parameters match training: in_channels=26, time_steps=12, num_graphs=2
+                stgat_in_channels = 26
+                stgat_time_steps = 12 
+                stgat_num_graphs = 2
+                
+                m_stgat = STGAT(num_nodes=num_nodes, in_channels=stgat_in_channels, time_steps=stgat_time_steps, num_graphs=stgat_num_graphs, dropout=0.5)
+                # Use weights_only=False for complex objects if needed, but True is safer
+                try:
+                    m_stgat.load_state_dict(torch.load(STGAT_PATH, map_location=device))
+                except:
+                     m_stgat.load_state_dict(torch.load(STGAT_PATH, map_location=device, weights_only=False))
+                     
+                m_stgat.to(device)
+                m_stgat.eval()
+                model_stgat = m_stgat
+                print("[OK] Modelo ST-GAT carregado com sucesso")
+            except Exception as e:
+                print(f"Erro ao carregar ST-GAT: {e}")
+
         # ===== WEEK 4: INITIALIZE EXPLANATION MODULES =====
         try:
             global metric_reporter, event_manager, anomaly_monitor, explanation_generator
@@ -1385,24 +1421,102 @@ def index():
 
 @app.route('/api/polygons')
 def get_polygons():
-    global polygons_json_cache
+    global polygons_json_cache, nodes_gdf
     try:
-        if polygons_json_cache is not None:
-            return polygons_json_cache
-
         # Load polygon GeoJSON from static file with real polygons
         polygon_file = os.path.join(BASE_DIR, 'data', 'static', 'nodes_polygons.geojson')
+        
+        base_features = []
         if os.path.exists(polygon_file):
             with open(polygon_file, 'r', encoding='utf-8') as f:
-                polygons_json_cache = f.read()
-                return polygons_json_cache
+                data = json.load(f)
+                base_features = data.get('features', [])
+        elif nodes_gdf is not None:
+            # Fallback to nodes_gdf
+            data = json.loads(nodes_gdf.to_json())
+            base_features = data.get('features', [])
+        else:
+             return jsonify({'error': 'Dados de polígonos não carregados.'}), 503
+
+        # Injetar Nós Dinâmicos (Pontos) para Visualização Híbrida
+        # Se nodes_gdf for None, carregar do pickle de fallback
+        ngdf_for_points = nodes_gdf
+        if ngdf_for_points is None:
+            try:
+                nodes_pkl_path = os.path.join(BASE_DIR, 'data', 'processed', 'graph_data', 'nodes_gdf.pkl')
+                if os.path.exists(nodes_pkl_path):
+                    with open(nodes_pkl_path, 'rb') as f:
+                        ngdf_for_points = pickle.load(f)
+                    print(f"[DEBUG] Carregado nodes_gdf de fallback no /api/polygons")
+            except Exception as e:
+                print(f"[DEBUG] Falha ao carregar fallback: {e}")
         
-        # Fallback to nodes_gdf if polygon file doesn't exist
-        if nodes_gdf is None:
-            return jsonify({'error': 'Dados de polígonos não carregados.'}), 503
-            
-        polygons_json_cache = nodes_gdf.to_json()
-        return polygons_json_cache
+        point_features = []
+        if ngdf_for_points is not None and len(ngdf_for_points) > 0:
+            print(f"[DEBUG] ngdf_for_points has {len(ngdf_for_points)} rows")
+            # Iterar sobre ngdf_for_points para garantir sincronia de IDs
+            count_points = 0
+            for idx, row in ngdf_for_points.iterrows():
+                try:
+                    # Pegar geometria (deve ser Point já)
+                    geom = row.geometry
+                    if geom is None:
+                        continue
+                    
+                    # Se for Polygon, usar centróide; senão usar o ponto direto
+                    if hasattr(geom, 'geom_type'):
+                        if geom.geom_type == 'Polygon':
+                            geom = geom.centroid
+                        elif geom.geom_type != 'Point':
+                            continue
+                    
+                    if hasattr(geom, 'x') and hasattr(geom, 'y'):
+                        # Default risk_score para micro-nós
+                        risk_score = 60  # Moderado por padrão (fica visível)
+                        
+                        # Tenta obter do próprio nó
+                        try:
+                            if 'risk_score' in row.index and pd.notna(row['risk_score']):
+                                risk_score = float(row['risk_score'])
+                        except:
+                            pass
+                        
+                        node_name = row.get('name', f"Nó {idx}") if 'name' in row.index else f"Nó {idx}"
+                        
+                        feat = {
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [float(geom.x), float(geom.y)]
+                            },
+                            "properties": {
+                                "id": int(idx),
+                                "node_id": int(idx),
+                                "name": str(node_name),
+                                "node_type": "dynamic_node",
+                                "is_point": True,
+                                "risk_score": risk_score
+                            }
+                        }
+                        point_features.append(feat)
+                        count_points += 1
+                except Exception as e:
+                    print(f"[DEBUG] Error at node {idx}: {str(e)[:100]}")
+                    continue
+            print(f"[DEBUG] Generated {count_points} dynamic points from ngdf_for_points")
+        else:
+            print(f"[DEBUG] ngdf_for_points is None or empty, skipping dynamic points")
+        
+        # Combinar Polígonos + Pontos
+        print(f"[DEBUG] Combining {len(base_features)} base features + {len(point_features)} point features")
+        combined_geojson = {
+            "type": "FeatureCollection",
+            "features": base_features + point_features
+        }
+        print(f"[DEBUG] Final GeoJSON has {len(combined_geojson['features'])} features")
+        
+        return jsonify(combined_geojson)
+
     except Exception as e:
         return jsonify({'error': f'Erro ao serializar polígonos: {e}'}), 500
 
@@ -2244,8 +2358,21 @@ def calculate_risk(custom_norm_adj=None):
                 'top_5_percent_threshold': sorted_scores[max(0, int(len(sorted_scores) * 0.05))] if len(sorted_scores) > 0 else 0,
                 'top_10_percent_threshold': sorted_scores[max(0, int(len(sorted_scores) * 0.10))] if len(sorted_scores) > 0 else 0,
                 'method': meta.get('ranking_source', 'percentile_ranking'),
-                'note': 'Scores baseados em ranking (artefato) ou percentile do ST-GCN'
+                'validation_status': '⚠️ Métricas do app.py usam auto-comparação (sem ground truth independente)',
+                'note': 'Para validação real, usar src/validate_with_crossval.py com temporal split'
             }
+
+            # Estatísticas descritivas reais (não são métricas de validação)
+            # NOTA: P@K e NDCG reais requerem ground truth — usar src/validate_with_crossval.py
+            n_nodes = len(sorted_scores)
+            meta['stats_top5_mean'] = float(np.mean(sorted_scores[:5])) if n_nodes >= 5 else 0.0
+            meta['stats_top10_mean'] = float(np.mean(sorted_scores[:10])) if n_nodes >= 10 else 0.0
+            meta['stats_top20_mean'] = float(np.mean(sorted_scores[:20])) if n_nodes >= 20 else 0.0
+            meta['stats_top5_min'] = float(sorted_scores[4]) if n_nodes >= 5 else 0.0
+            meta['stats_overall_mean'] = float(np.mean(all_scores)) if n_nodes > 0 else 0.0
+            meta['stats_overall_std'] = float(np.std(all_scores)) if n_nodes > 0 else 0.0
+            meta['metrics_source'] = 'descriptive_stats'
+            meta['metrics_note'] = 'Sem ground truth. Para P@K/NDCG reais, usar validate_with_crossval.py'
 
         # ==================== LOG DE PREDICTION ====================
         try:
@@ -2711,17 +2838,21 @@ def explain_node_ranking(node_id):
         # Find rank (1-based)
         rank = None
         for idx, n in enumerate(all_nodes, 1):
-            if n['id'] == node_id:
+            if n.get('node_id') == node_id or idx - 1 == node_id:
                 rank = idx
                 break
         
         if rank is None:
-            rank = sorted(range(len(all_nodes)), key=lambda i: all_nodes[i].get('risk', 0), reverse=True).index(node_id) + 1
+            # Fallback: use index as node_id
+            if node_id < len(all_nodes):
+                rank = sorted(range(len(all_nodes)), key=lambda i: all_nodes[i].get('risk_score', 0), reverse=True).index(node_id) + 1
+            else:
+                rank = 1
         
         # Build context dictionary for explanation generator
         nearby_nodes = []
         if rank <= 5:
-            nearby_nodes = [n['id'] for n in all_nodes[max(0, node_id-2):node_id+3] if n['id'] != node_id]
+            nearby_nodes = [all_nodes[i].get('node_id', i) for i in range(max(0, node_id-2), min(len(all_nodes), node_id+3)) if i != node_id]
         
         recent_events = []
         if event_manager:
@@ -2818,17 +2949,34 @@ def get_metrics():
         }
         
         # Return metrics summary
+        
+        # Check for ST-GAT metrics file
+        st_gat_metrics_file = os.path.join(BASE_DIR, 'models', 'st_gat_metrics.json')
+        metrics_data = {
+            'precision_at_5': 0.80,  # Placeholder - computed during training
+            'precision_at_10': 0.70,
+            'precision_at_20': 0.55,
+            'ndcg_at_5': 0.92,
+            'ndcg_at_10': 0.86,
+            'ndcg_at_20': 0.77
+        }
+        model_name = 'ST-GCN Enhanced with Anomaly Awareness'
+        
+        if os.path.exists(st_gat_metrics_file):
+            try:
+                with open(st_gat_metrics_file, 'r') as f:
+                    loaded_metrics = json.load(f)
+                    if 'metrics' in loaded_metrics:
+                        metrics_data = loaded_metrics['metrics']
+                    if 'model' in loaded_metrics:
+                        model_name = loaded_metrics['model']
+            except Exception as e:
+                print(f"Erro ao ler métricas ST-GAT: {e}")
+
         return jsonify({
             'timestamp': datetime.now(timezone.utc).isoformat(),
-            'model': 'ST-GCN Enhanced with Anomaly Awareness',
-            'metrics': {
-                'precision_at_5': 0.80,  # Placeholder - computed during training
-                'precision_at_10': 0.70,
-                'precision_at_20': 0.55,
-                'ndcg_at_5': 0.92,
-                'ndcg_at_10': 0.86,
-                'ndcg_at_20': 0.77
-            },
+            'model': model_name,
+            'metrics': metrics_data,
             'summary': summary,
             'status': 'operation'
         })
@@ -3160,4 +3308,3 @@ if __name__ == "__main__":
     # use_reloader=False garante que seeds não sejam resetados entre requisições
     # Se precisar debugar, use: debug=False, use_reloader=False (sem auto-reload)
     app.run(host='0.0.0.0', port=5050, debug=False, use_reloader=False)
-

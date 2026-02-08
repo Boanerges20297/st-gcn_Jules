@@ -997,5 +997,55 @@
         "type": "exogenous"
       }
     ]
+  },
+  {
+    "id": "31",
+    "timestamp": "2026-02-07T20:55:40.088508",
+    "original_text": "Tentativa de invasão da Massa no Curió, Lagoa Redonda. Conflito armado no local. 06/02/2026",
+    "points": [
+      {
+        "description": "Conflito Armado - Tentativa de invasão e conflito armado entre grupos criminosos na região de Curió, Lagoa Redonda.",
+        "lat": -3.825348916147547,
+        "lng": -38.45955501156087,
+        "raw_event": {
+          "bairro": "Lagoa Redonda",
+          "conflict_severity": "HIGH",
+          "descricao": "Tentativa de invasão da Massa no Curió, Lagoa Redonda. Conflito armado no local.",
+          "localizacao_completa": "Curió, Lagoa Redonda",
+          "municipio": "FORTALEZA",
+          "natureza": "Conflito Armado",
+          "raw_text": "Tentativa de invasão da Massa no Curió, Lagoa Redonda. Conflito armado no local. 06/02/2026",
+          "resumo": "Tentativa de invasão e conflito armado entre grupos criminosos na região de Curió, Lagoa Redonda.",
+          "sexo": "",
+          "timestamp": "06/02/2026"
+        },
+        "type": "exogenous"
+      }
+    ]
+  },
+  {
+    "id": "32",
+    "timestamp": "2026-02-08T17:30:40.735399",
+    "original_text": "01 - M20260094457 - HOMICÍDIO A BALA - VÍTIMA DO SEXO MASCULINO - TRAIRI - 17:46",
+    "points": [
+      {
+        "description": "HOMICÍDIO A BALA - Homicídio a bala de vítima do sexo masculino em Trairi.",
+        "lat": -3.3376972359696597,
+        "lng": -39.3530335333813,
+        "raw_event": {
+          "bairro": "CENTRO",
+          "conflict_severity": "HIGH",
+          "descricao": "VÍTIMA DO SEXO MASCULINO",
+          "localizacao_completa": "TRAIRI",
+          "municipio": "Trairi",
+          "natureza": "HOMICÍDIO A BALA",
+          "raw_text": "01 - M20260094457 - HOMICÍDIO A BALA - VÍTIMA DO SEXO MASCULINO - TRAIRI - 17:46",
+          "resumo": "Homicídio a bala de vítima do sexo masculino em Trairi.",
+          "sexo": "MASCULINO",
+          "timestamp": "17:46"
+        },
+        "type": "exogenous"
+      }
+    ]
   }
 ]

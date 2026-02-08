@@ -8,10 +8,13 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { padding-top: 20px; background-color: #f8f9fa; }
-        #map { min-height: 600px; width: 100%; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        body { padding-top: 15px; background-color: #f8f9fa; }
+        #map { min-height: 400px; width: 100%; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         .metric-card { transition: transform 0.2s; }
-        .metric-card:hover { transform: translateY(-5px); }
+        .metric-card:hover { transform: translateY(-2px); }
+        .metric-card .card-body { padding: 12px 8px !important; }
+        .metric-card .card-title { font-size: 0.9rem; margin-bottom: 4px; }
+        .metric-card .card-text { font-size: 1.5rem; margin-bottom: 2px !important; }
         .legend { background: white; padding: 10px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
         .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
         .simulation-active { cursor: crosshair !important; }
@@ -174,9 +177,9 @@
             <p class="lead text-muted">Análise de Risco em Áreas Monitoradas (CVLI)</p>
         </div>
     </div>
-    <div class="row mb-4 justify-content-center">
+    <div class="row mb-2 justify-content-center">
         <div class="col-md-3">
-            <div class="card metric-card border-danger mb-3">
+            <div class="card metric-card border-danger mb-0">
                 <div class="card-body text-center">
                     <h5 class="card-title text-danger">Áreas Críticas</h5>
                     <p class="card-text display-4 fw-bold" id="high-risk-count">-</p>
@@ -185,7 +188,7 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card metric-card border-warning mb-3">
+            <div class="card metric-card border-warning mb-0">
                 <div class="card-body text-center">
                     <h5 class="card-title text-warning">Áreas de Alto Risco</h5>
                     <p class="card-text display-4 fw-bold" id="medium-risk-count">-</p>
@@ -194,7 +197,7 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card metric-card border-info mb-3">
+            <div class="card metric-card border-info mb-0">
                 <div class="card-body text-center">
                     <h5 class="card-title text-info">Áreas Moderadas</h5>
                     <p class="card-text display-4 fw-bold" id="low-risk-count">-</p>
@@ -218,16 +221,16 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 d-flex flex-column">
-            <div class="card shadow-sm h-100 w-100">
+        <div class="col-md-3 d-flex flex-column" style="max-height: calc(100vh - 280px); overflow: hidden;">
+            <div class="card shadow-sm h-100 w-100" style="display: flex; flex-direction: column; overflow: hidden;">
                 <div class="card-header">
                     <strong>Motivos de Risco</strong>
                     <div class="alert alert-warning alert-sm mt-2 mb-0 p-2 small">
                         <i class="fas fa-info-circle"></i> <strong>Nota:</strong> Predições para os <strong>próximos 7 dias</strong>, não apenas amanhã
                     </div>
                 </div>
-                <div class="card-body">
-                    <div id="window-info" class="mb-2">
+                <div class="card-body" style="overflow-y: auto; flex: 1; padding: 12px; font-size: 0.9rem;">
+                    <div id="window-info" class="mb-1" style="font-size: 0.8rem;">
                         <small class="text-muted d-block">Janela Histórica: —</small>
                         <small class="text-primary fw-bold" id="horizon-info">Horizonte: —</small>
                         <small class="text-success d-block" id="validity-info">📅 Previsão válida até: —</small>
@@ -251,7 +254,7 @@
                         </div>
                     </div>
 
-                    <div class="d-grid gap-2 mb-2">
+                    <div class="d-grid gap-1 mb-2" style="gap: 6px !important;">
                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exogenousModal">
                             <i class="fas fa-file-import"></i> Inserir Eventos (CIOPS)
                         </button>
@@ -260,7 +263,7 @@
                         </a>
                     </div>
 
-                    <div class="d-grid gap-2 mb-3">
+                    <div class="d-grid gap-1 mb-2" style="gap: 6px !important;">
                         <div class="btn-group" role="group">
                             <button class="btn btn-outline-primary btn-sm" id="btn-simulate">
                                 <i class="fas fa-motorcycle"></i> Equipe
@@ -281,43 +284,48 @@
                         <p class="text-muted">Clique em uma área no mapa para ver os motivos de risco aqui.</p>
                     </div>
                     
-                    <!-- WEEK 4: Explicações Detalhadas -->
-                    <div id="explanation-section" style="display:none; margin-top: 20px;">
-                        <hr>
-                        <h6 class="fw-bold text-primary"><i class="fas fa-lightbulb"></i> Explicação Detalhada</h6>
-                        <div id="explanation-content" class="small text-muted">
-                            Carregando explicação...
+                    <!-- Explicações Detalhadas (Collapsible) -->
+                    <div id="explanation-section" style="display:none; margin-top: 6px; margin-bottom: 8px; border-top: 1px solid #ddd; padding-top: 8px;">
+                        <button class="btn btn-sm btn-link p-0 text-primary fw-bold" data-bs-toggle="collapse" data-bs-target="#explanation-collapse" aria-expanded="false">
+                            <i class="fas fa-lightbulb"></i> Explicação Detalhada
+                        </button>
+                        <div id="explanation-collapse" class="collapse">
+                            <div id="explanation-content" class="small text-muted mt-2">
+                                Carregando explicação...
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- WEEK 4: Métricas do Sistema -->
-                    <div id="metrics-section" style="margin-top: 20px;">
-                        <hr>
-                        <h6 class="fw-bold text-info"><i class="fas fa-chart-bar"></i> Métricas do Sistema</h6>
+                    <!-- Métricas Descritivas do Sistema (Collapsible) -->
+                    <div id="metrics-section" style="margin-top: 0; margin-bottom: 0; border-top: 1px solid #ddd; padding-top: 8px;">
+                        <button class="btn btn-sm btn-link p-0 text-info fw-bold" data-bs-toggle="collapse" data-bs-target="#metrics-collapse" aria-expanded="false">
+                            <i class="fas fa-chart-bar"></i> Estatísticas do Modelo
+                        </button>
+                        <div id="metrics-collapse" class="collapse" style="margin-top: 6px;">
                         <div id="metrics-content" class="small">
                             <div class="row">
                                 <div class="col-6">
                                     <div class="metric-mini">
-                                        <span class="text-muted">P@5:</span>
-                                        <strong id="metric-p5">0.80</strong>
+                                        <span class="text-muted">Média Top 5:</span>
+                                        <strong id="metric-top5-mean">—</strong>
                                     </div>
                                     <div class="metric-mini">
-                                        <span class="text-muted">P@10:</span>
-                                        <strong id="metric-p10">0.70</strong>
+                                        <span class="text-muted">Média Top 10:</span>
+                                        <strong id="metric-top10-mean">—</strong>
                                     </div>
                                     <div class="metric-mini">
-                                        <span class="text-muted">P@20:</span>
-                                        <strong id="metric-p20">0.55</strong>
+                                        <span class="text-muted">Mín. Top 5:</span>
+                                        <strong id="metric-top5-min">—</strong>
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="metric-mini">
-                                        <span class="text-muted">NDCG@5:</span>
-                                        <strong id="metric-ndcg5">0.92</strong>
+                                        <span class="text-muted">Média Geral:</span>
+                                        <strong id="metric-overall-mean">—</strong>
                                     </div>
                                     <div class="metric-mini">
-                                        <span class="text-muted">NDCG@20:</span>
-                                        <strong id="metric-ndcg20">0.77</strong>
+                                        <span class="text-muted">Desvio Padrão:</span>
+                                        <strong id="metric-overall-std">—</strong>
                                     </div>
                                     <div class="metric-mini">
                                         <span class="text-muted">Status:</span>
@@ -326,12 +334,18 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="alert alert-info mt-1 mb-0 p-1" style="font-size: 0.75rem;">
+                            <i class="fas fa-info-circle"></i> Para P@K/NDCG reais com ground truth, usar <code>validate_with_crossval.py</code>
+                        </div>
+                        </div>
                     </div>
                     
-                    <!-- WEEK 4: Status de Anomalias -->
-                    <div id="anomaly-section" style="margin-top: 20px;">
-                        <hr>
-                        <h6 class="fw-bold text-warning"><i class="fas fa-exclamation-triangle"></i> Status de Anomalias</h6>
+                    <!-- Status de Anomalias (Collapsible) -->
+                    <div id="anomaly-section" style="margin-top: 0; margin-bottom: 0; border-top: 1px solid #ddd; padding-top: 8px;">
+                        <button class="btn btn-sm btn-link p-0 text-warning fw-bold" data-bs-toggle="collapse" data-bs-target="#anomaly-collapse" aria-expanded="false">
+                            <i class="fas fa-exclamation-triangle"></i> Status de Anomalias
+                        </button>
+                        <div id="anomaly-collapse" class="collapse" style="margin-top: 6px;">
                         <div id="anomaly-content" class="small">
                             <div id="anomaly-level-indicator">
                                 <p class="mb-2">
@@ -347,9 +361,9 @@
                                 <p class="text-muted small">Confiança do Modelo: <strong id="confidence-percent">87%</strong></p>
                             </div>
                         </div>
+                        </div>
                     </div>
-                    <hr>
-                    <div>
+                    <div style="border-top: 1px solid #ddd; padding-top: 8px; margin-top: 8px;">
                         <div class="mb-2">
                             <label for="region-filter" class="form-label small fw-bold text-muted">Filtrar Região:</label>
                             <select class="form-select form-select-sm" id="region-filter">
@@ -359,10 +373,8 @@
                                 <option value="interior">Interior do Estado</option>
                             </select>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="mb-0 fw-bold" id="top-list-title">Top 10 Áreas Críticas</h6>
-                        </div>
-                        <div id="top-areas" class="list-group list-group-flush small" style="max-height: 400px; overflow-y: auto;"></div>
+                        <h6 class="mb-2 fw-bold text-dark" id="top-list-title" style="font-size: 0.9rem;">Top 10 Áreas Críticas</h6>
+                        <div id="top-areas" class="list-group list-group-flush small" style="max-height: 200px; overflow-y: auto;"></div>
                     </div>
                 </div>
             </div>
@@ -399,7 +411,8 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    var initialView = { center: [-3.8000, -38.5267], zoom: 12 };
+    //Subir mais o mapa para evitar corte em mobile - coordenadas ajustadas para Fortaleza bem em cima
+    var initialView = { center: [-3.8100, -38.5267], zoom: 11 };
     var map = L.map('map').setView(initialView.center, initialView.zoom);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
@@ -436,17 +449,21 @@
         }
 
         var fill = getColor(score);
-        // Mostrar Alto (>=80) e Moderado (>=50) no mapa
-        var isVisible = (score >= 50);
+        
+        // Visualização Híbrida: Distinção entre Polígonos (Bairros) e Pontos (Nós Dinâmicos)
+        var isPoint = (feature.geometry && feature.geometry.type === 'Point');
+        
+        // Pontos dinâmicos SEMPRE visíveis; Polígonos seguem regra de threshold
+        var isVisible = isPoint ? true : (score >= 50);
 
         return {
-            radius: 10,
+            radius: isPoint ? 10 : 10,
             fillColor: fill,
-            weight: isVisible ? 2 : 0,
+            weight: isVisible ? (isPoint ? 2 : 2) : 0,
             opacity: isVisible ? 1 : 0,
             color: isVisible ? 'white' : 'transparent',
-            dashArray: isVisible ? '3' : null,
-            fillOpacity: isVisible ? 0.6 : 0,
+            dashArray: isVisible ? (isPoint ? null : '3') : null,
+            fillOpacity: isVisible ? (isPoint ? 1.0 : 0.3) : 0,
             interactive: isVisible
         };
     }
@@ -622,6 +639,20 @@
         } catch (e) {
             $('#model-window-info').text('Modelo: —');
             $('#ranking-info').hide();
+        }
+
+        // Atualizar estatísticas descritivas do modelo
+        try {
+            if (metaDataGlobal) {
+                var fmt = function(v) { return (typeof v === 'number') ? v.toFixed(1) + '%' : '—'; };
+                $('#metric-top5-mean').text(fmt(metaDataGlobal.stats_top5_mean));
+                $('#metric-top10-mean').text(fmt(metaDataGlobal.stats_top10_mean));
+                $('#metric-top5-min').text(fmt(metaDataGlobal.stats_top5_min));
+                $('#metric-overall-mean').text(fmt(metaDataGlobal.stats_overall_mean));
+                $('#metric-overall-std').text(fmt(metaDataGlobal.stats_overall_std));
+            }
+        } catch (e) {
+            console.warn('Failed to update metrics', e);
         }
 
         // Recalculate Stats: prefer backend-provided summary counts (meta) to avoid mismatches.
@@ -807,7 +838,7 @@
         var riskById = {};
 
         riskDataGlobal.forEach(function(item) {
-            var id = String(item.node_id);
+            var id = String(item.node_id || item.id);  // Garantir string
             riskMapCVLI[id] = item.risk_score_cvli || 0;
             riskMapCVP[id] = item.risk_score_cvp || 0;
             riskById[id] = item;
@@ -815,9 +846,11 @@
 
         geojson.features.forEach(function(feature, index) {
             var fid = feature.id || (feature.properties && feature.properties.node_id) || String(index);
-            fid = String(fid);
+            fid = String(fid);  // Garantir string para matching
             var r = riskById[fid] || {};
-            feature.properties.node_id = fid;
+            feature.properties.node_id = String(fid);  // Garantir que node_id é string
+            feature.properties.id = String(fid);       // Adicionar id como string também
+            feature.properties.risk_score = r.risk_score || r.risk_score_cvli || 0;  // Adicionar risk_score principal
             feature.properties.risk_score_cvli = riskMapCVLI[fid] || 0;
             feature.properties.risk_score_cvp = riskMapCVP[fid] || 0;
             feature.properties.cvli_pred = (r.cvli_pred !== undefined) ? r.cvli_pred : 0;
@@ -830,9 +863,23 @@
         // Initialize Map
         geojsonLayer = L.geoJson(geojson, {
             style: style,
-            // Prevent default Point->Marker creation to avoid duplicate markers
+            // Híbrido: Renderizar Pontos como CircleMarkers visíveis
             pointToLayer: function(feature, latlng) {
-                return L.circleMarker(latlng, { radius: 0, opacity: 0, fillOpacity: 0, interactive: false });
+                // Aplicar o mesmo estilo aos pontos dinamicamente gerados
+                var featureStyle = style(feature);
+                var marker = L.circleMarker(latlng, featureStyle);
+                
+                // Adicionar popup com informações do nó dinâmico
+                var nodeName = feature.properties.name || 'Nó Dinâmico';
+                var nodeId = feature.properties.node_id || feature.properties.id || '';
+                var riskScore = feature.properties.risk_score || 0;
+                var popupText = '<strong>' + nodeName + '</strong><br/>' +
+                                'ID: ' + nodeId + '<br/>' +
+                                'Risco: ' + riskScore.toFixed(1) + '%<br/>' +
+                                'Tipo: Nó Dinâmico';
+                marker.bindPopup(popupText);
+                
+                return marker;
             },
             onEachFeature: function(feature, layer) {
                 // Hover effects for better UX
@@ -1123,53 +1170,36 @@
         return { label: 'Sem Risco', class: 'text-success' };
     }
 
-    // Focus a layer with smart padding to account for sidebar and headers,
-    // then open the details popup at a visually centered position.
+    // Focus a layer: zoom to polygon bounds and show details popup
     function focusLayerAndShowDetails(layer, animateSeconds) {
         try {
             var bounds = (layer.getBounds && layer.getBounds()) || null;
-            var duration = (typeof animateSeconds === 'number') ? animateSeconds : 1.2;
-
-            // Compute UI offsets: right sidebar width, top card header, small margins
-            var sidebar = $('.col-md-3').has('#top-areas');
-            var sidebarWidth = sidebar.length ? sidebar.outerWidth() : 300;
-            var headerHeight = $('.card-header').first().outerHeight() || 0;
-            var topPad = Math.round(headerHeight + 20);
-            var rightPad = Math.round(sidebarWidth + 30);
-            var leftPad = 20;
-            var bottomPad = 20;
+            var duration = (typeof animateSeconds === 'number') ? animateSeconds : 0.8;
 
             if (bounds) {
-                map.flyToBounds(bounds, {
-                    maxZoom: 16,
-                    paddingTopLeft: [leftPad, topPad],
-                    paddingBottomRight: [rightPad, bottomPad],
+                var center = bounds.getCenter();
+
+                // fitBounds zooms to show the polygon perfectly within the map container.
+                // The map is in col-md-9 (separate from sidebar), so no sidebar offset needed.
+                // padding: L.point(x, y) adds uniform margin in pixels around the bounds.
+                map.fitBounds(bounds, {
+                    maxZoom: 13,
+                    padding: [40, 40],  // 40px uniform padding around the polygon
+                    animate: true,
                     duration: duration
                 });
 
-                // After map move, show details at the geometric center of the bounds
+                // After animation ends, show details popup at the polygon center
                 map.once('moveend', function() {
-                    try {
-                        // Use the bounds center directly - flyToBounds already accounts for padding
-                        var center = bounds.getCenter();
-                        showFeatureDetails(layer, center);
-
-                        // Force a redraw in case tiles or vectors show artifacts
-                        setTimeout(function() {
-                            try { map.invalidateSize(true); } catch(e) {}
-                        }, 200);
-                    } catch (e) {
-                        // Fallback: just show at natural center
-                        showFeatureDetails(layer, bounds.getCenter());
-                    }
+                    showFeatureDetails(layer, center);
                 });
             } else {
-                // Fallback for point-like layers
+                // Fallback for point-like layers (CircleMarkers)
                 var latlng = (layer.getLatLng && layer.getLatLng()) || null;
                 if (latlng) {
-                    map.flyTo(latlng, 16, { duration: duration });
+                    map.setView(latlng, 15, { animate: true, duration: duration });
                     map.once('moveend', function() {
-                        try { showFeatureDetails(layer, latlng); map.invalidateSize(true); } catch (e) {}
+                        showFeatureDetails(layer, latlng);
                     });
                 }
             }
@@ -1238,8 +1268,8 @@
             // ignore
         }
 
-        // Create popup and open it manually
-        L.popup()
+        // Create popup and open it manually (autoPan disabled to avoid shifting the view)
+        L.popup({ autoPan: false })
             .setLatLng(latlng)
             .setContent(popupContent)
             .openOn(map);

@@ -512,12 +512,13 @@ def main():
     # 6. Grafos
     adj_geo, adj_conflict = create_adjacency_matrices(nodes_gdf, nodes_proj)
 
-    # 7. Salvar (sem GeoDataFrame para evitar problema de import)
+    # 7. Salvar
     data_pack = {
         'node_features': node_features,
         'adj_geo': adj_geo,
         'adj_conflict': adj_conflict,
         'dates': dates,
+        'nodes_gdf': nodes_gdf,
         'feature_names': [
             # 0-2: Events / indices
             'CVLI', 'CVP', 'TENSION_INDEX',
@@ -532,6 +533,13 @@ def main():
     }
     
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
+    
+    # Save nodes_gdf separately for app.py fallback/micro-nodes
+    nodes_pkl_dir = os.path.join(os.path.dirname(OUTPUT_FILE), 'graph_data')
+    os.makedirs(nodes_pkl_dir, exist_ok=True)
+    with open(os.path.join(nodes_pkl_dir, 'nodes_gdf.pkl'), 'wb') as f:
+        pickle.dump(nodes_gdf, f)
+
     with open(OUTPUT_FILE, 'wb') as f:
         pickle.dump(data_pack, f)
         
