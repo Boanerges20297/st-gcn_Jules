@@ -148,17 +148,17 @@ def evaluate_with_without_micros():
     
     # Análise
     print("\n" + "="*70)
-    print("ANÁLISE")
+    print("ANALISE")
     print("="*70)
     print("""
-✓ Métricas REAIS usam ground truth não-visto (teste)
-✓ Comparação justa entre cenários
-✓ Sem data leakage
+[CHECK] Metricas REAIS usam ground truth nao-visto (teste)
+[CHECK] Comparacao justa entre cenarios
+[CHECK] Sem data leakage
 
-CONCLUSÕES:
-1. Se COM micro-nós melhora: modelo generaliza melhor (mais diversidade)
-2. Se SEM micro-nós melhora: modelo tem overfitting (memorizou padrões)
-3. P@5/P@10/P@20 = 1.00 no app.py é FALSO (auto-comparação)
+CONCLUSOES:
+1. Se COM micro-nos melhora: modelo generaliza melhor (mais diversidade)
+2. Se SEM micro-nos melhora: modelo tem overfitting (memorizou padroes)
+3. P@5/P@10/P@20 = 1.00 no app.py e FALSO (auto-comparacao)
     """)
     
     # Resumo executivo

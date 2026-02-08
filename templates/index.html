@@ -1177,7 +1177,13 @@
                 },
                 error: function(jqXHR) {
                     hideLoading();
-                    console.error("Parsing error", jqXHR);
+                    console.error("[ExogenousParseError]", {
+                        status: jqXHR.status,
+                        statusText: jqXHR.statusText,
+                        responseJSON: jqXHR.responseJSON,
+                        responseText: (jqXHR.responseText || '').substring(0, 300)
+                    });
+                    
                     try {
                         var body = jqXHR.responseJSON || {};
                         if (jqXHR.status === 400 && body.error) {
@@ -1195,9 +1201,9 @@
                             return;
                         }
                     } catch (e) {
-                        console.warn('Error handling parse error', e);
+                        console.warn('[ExogenousParseError] Error handling parse error', e);
                     }
-                    alert("Erro ao processar dados: " + (jqXHR.statusText || 'Erro desconhecido'));
+                    alert("Erro ao processar dados (HTTP " + jqXHR.status + "): " + (jqXHR.statusText || 'Erro desconhecido'));
                 }
             });
         });
@@ -1448,8 +1454,24 @@
     }
 
     function updateTopCriticalAreas() {
+        // Protect against premature call (race condition with geojsonLayer loading)
+        if (!geojsonLayer) {
+            console.debug('[updateTopCriticalAreas] geojsonLayer nao carregado, aguardando...');
+            return;
+        }
+        
+        try {
+            var layers = geojsonLayer.getLayers();
+            if (!layers || layers.length === 0) {
+                console.debug('[updateTopCriticalAreas] Nenhuma camada disponivel');
+                return;
+            }
+        } catch (e) {
+            console.warn('[updateTopCriticalAreas] Erro ao obter camadas:', e);
+            return;
+        }
+        
         // Use geojsonLayer layers to access up-to-date properties
-        var layers = geojsonLayer.getLayers();
         var regionFilter = $('#region-filter').val();
 
         // Map to array for sorting

@@ -1072,5 +1072,48 @@
         "type": "exogenous"
       }
     ]
+  },
+  {
+    "id": "34",
+    "timestamp": "2026-02-08T20:13:42.092496",
+    "original_text": "01 - M20260099043 - LESÃO A BALA - VITIMA DO SEXO FEMININO - UMA SENHORA DE IDADE DEU ENTRADA NA UPA DO CANIDEZINHO - 15:58 (Canindezinho sempre fica em Fortaleza)\n\n02 - M20260099644 - LESÃO A BALA - VITIMA DO SEXO MASCULINO - JOSÉ WALTER - 18:46 (Fortaleza)",
+    "points": [
+      {
+        "description": "LESÃO A BALA - Vitima do sexo feminino, uma senhora de idade, deu entrada na UPA do Canindezinho com lesão a bala.",
+        "lat": -3.812635257496074,
+        "lng": -38.603375389338495,
+        "raw_event": {
+          "bairro": "Canindezinho",
+          "conflict_severity": "MEDIUM",
+          "descricao": "VITIMA DO SEXO FEMININO - UMA SENHORA DE IDADE DEU ENTRADA NA UPA DO CANIDEZINHO",
+          "localizacao_completa": "UPA DO CANIDEZINHO",
+          "municipio": "Fortaleza",
+          "natureza": "LESÃO A BALA",
+          "raw_text": "01 - M20260099043 - LESÃO A BALA - VITIMA DO SEXO FEMININO - UMA SENHORA DE IDADE DEU ENTRADA NA UPA DO CANIDEZINHO - 15:58 (Canindezinho sempre fica em Fortaleza)",
+          "resumo": "Vitima do sexo feminino, uma senhora de idade, deu entrada na UPA do Canindezinho com lesão a bala.",
+          "sexo": "FEMININO",
+          "timestamp": "15:58"
+        },
+        "type": "exogenous"
+      },
+      {
+        "description": "LESÃO A BALA - Vitima do sexo masculino com lesão a bala no bairro José Walter.",
+        "lat": -3.8363505365465698,
+        "lng": -38.54824578788061,
+        "raw_event": {
+          "bairro": "JOSÉ WALTER",
+          "conflict_severity": "MEDIUM",
+          "descricao": "VITIMA DO SEXO MASCULINO",
+          "localizacao_completa": "JOSÉ WALTER",
+          "municipio": "Fortaleza",
+          "natureza": "LESÃO A BALA",
+          "raw_text": "02 - M20260099644 - LESÃO A BALA - VITIMA DO SEXO MASCULINO - JOSÉ WALTER - 18:46 (Fortaleza)",
+          "resumo": "Vitima do sexo masculino com lesão a bala no bairro José Walter.",
+          "sexo": "MASCULINO",
+          "timestamp": "18:46"
+        },
+        "type": "exogenous"
+      }
+    ]
   }
 ]
