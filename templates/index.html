@@ -372,6 +372,10 @@
                                 <option value="rmf">Região Metropolitana (RMF)</option>
                                 <option value="interior">Interior do Estado</option>
                             </select>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="toggle-top20">
+                                <label class="form-check-label small" for="toggle-top20">Mostrar Top20 Micro‑Nodos (alfinetes)</label>
+                            </div>
                         </div>
                         <h6 class="mb-2 fw-bold text-dark" id="top-list-title" style="font-size: 0.9rem;">Top 10 Áreas Críticas</h6>
                         <div id="top-areas" class="list-group list-group-flush small" style="max-height: 200px; overflow-y: auto;"></div>
@@ -522,6 +526,70 @@
     var geojsonLayer = null;
     var riskDataGlobal = null;
     var metaDataGlobal = null;
+
+    // Top20 micro-nodes layer
+    var top20Layer = L.layerGroup();
+    var top20LoadedRegion = null; // track which region is loaded into top20Layer
+
+    function colorByRankSimple(r){ return r<=3 ? '#8B0000' : r<=10 ? '#FF6B6B' : '#FFA500'; }
+    function makePinSimple(color){
+        var html = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;">'
+                + '<div style="width:14px;height:14px;background:'+color+';border-radius:7px;border:2px solid #fff;box-shadow:0 1px 2px rgba(0,0,0,0.4);"></div>'
+                + '<div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid '+color+';margin-top:-2px;border-radius:1px 1px 0 0;opacity:0.95"></div>'
+                + '</div>';
+        return L.divIcon({html: html, className: '', iconSize: [18,22], iconAnchor: [9,20]});
+    }
+
+    function loadTop20(region, cb){
+        // region optional: capital|rmf|interior
+        var url = '/api/top20_micro_nodes';
+        if (region) url += '?region=' + region;
+        console.log('[Top20] Loading', url);
+        fetch(url).then(function(resp){
+            if (!resp.ok) throw new Error('Não foi possível carregar Top20: ' + resp.status);
+            return resp.json();
+        }).then(function(data){
+            try{
+                top20Layer.clearLayers();
+                var features = data.features || data;
+                console.log('[Top20] Received features:', (features && features.length) || 0);
+                features.forEach(function(f, i){
+                    try{
+                        var lon = f.geometry.coordinates[0];
+                        var lat = f.geometry.coordinates[1];
+                        var rank = f.properties.rank || 0;
+                        var color = colorByRankSimple(rank);
+                        var icon = makePinSimple(color);
+                        var m = L.marker([lat, lon], {icon: icon});
+                        var popup = '<strong>'+ (f.properties.rank||'') + '. ' + (f.properties.name||'Área') + '</strong><br/>' +
+                                    (f.properties.source? f.properties.source + '<br/>':'') +
+                                    'ID: ' + (f.properties.node_id || '') + '<br/>' +
+                                    'Score: ' + Math.round(f.properties.score||0);
+                        m.bindPopup(popup);
+                        top20Layer.addLayer(m);
+                    }catch(e){ console.warn('[Top20] feature error', e, f); }
+                });
+                console.log('[Top20] Built markers:', top20Layer.getLayers().length);
+                top20LoadedRegion = region || 'all';
+                if (cb) cb(null);
+            }catch(err){ console.warn('[Top20] build error', err); if (cb) cb(err); }
+        }).catch(function(err){ console.warn('[Top20] fetch error', err); if (cb) cb(err); });
+    }
+
+    function updateTop20ForRegion(region){
+        if (!$('#toggle-top20').is(':checked')) return;
+        // If already loaded for this region, just ensure layer is visible
+        if (top20LoadedRegion === region){
+            if (!map.hasLayer(top20Layer)) map.addLayer(top20Layer);
+            return;
+        }
+        // else load
+        loadTop20(region, function(err){
+            if (err){ console.warn('Top20 load error', err); alert('Erro ao carregar Top20 micro‑nós'); return; }
+            if (!map.hasLayer(top20Layer)) map.addLayer(top20Layer);
+        });
+    }
+
 
     // Simulation State
     var simulationMode = false;
@@ -1304,30 +1372,54 @@
             .then(data => {
                 var explanationHtml = '';
                 
-                // Summary
+                // Simplified summary (remove all technical jargon and English)
                 if (data.summary) {
-                    explanationHtml += '<p class="mb-2">' + data.summary + '</p>';
+                    var simpleSummary = data.summary
+                        .replace(/Node \d+ is ranked #(\d+) and predicted as a significant risk area/i, 'Esta área está na posição <strong>#$1</strong> — identificada como <strong>risco significativo</strong>')
+                        .replace(/Node \d+ is ranked #(\d+) and predicted as a notable area of concern/i, 'Esta área está na posição <strong>#$1</strong> — identificada como <strong>área de atenção</strong>')
+                        .replace(/Node \d+ is ranked #(\d+) and predicted as a monitored area/i, 'Esta área está na posição <strong>#$1</strong> — identificada como <strong>área monitorada</strong>')
+                        .replace(/Node \d+ is ranked #(\d+) and predicted as one of the most critical areas/i, 'Esta área está na posição <strong>#$1</strong> — identificada como <strong>uma das mais críticas</strong>')
+                        .replace(/based on:\s*/i, '')
+                        .replace(/\s*Temporal Pattern \(\d+%\)\s*\+\s*Spatial Correlation \(\d+%\)\s*\+\s*Recent Events \(\d+%\)\s*\.\s*Risk score:\s*[\d.]+\/10\.?\s*/i, '')
+                        .replace(/\s*Risk score:\s*[\d.]+\/10\.?\s*/i, '');
+                    
+                    explanationHtml += '<p class="mb-3" style="font-size: 0.95rem;">' + simpleSummary.trim() + '</p>';
                 }
                 
-                // Factors
+                // Simple factor indicators with colors
                 if (data.factors && data.factors.length > 0) {
-                    explanationHtml += '<div class="mb-2"><strong>Fatores de Risco:</strong></div>';
+                    explanationHtml += '<div class="mb-2"><strong style="font-size: 0.9rem;">Por quê?</strong></div>';
+                    
+                    var factorLabels = {
+                        'Temporal Pattern': '📈 <strong>Piorou recentemente</strong> — há dias/semanas esta área está com mais problemas',
+                        'Spatial Correlation': '📍 <strong>Vizinhos também têm problema</strong> — áreas ao redor estão com risco alto',
+                        'Recent Events': '⚡ <strong>Ocorreu agora</strong> — eventos novos foram registrados recentemente',
+                        'Historical Baseline': '🔄 <strong>Sempre foi assim</strong> — historicamente essa é uma área conhecida como tensa'
+                    };
+                    
                     data.factors.forEach(function(factor) {
-                        var contrib = (factor.contribution * 100).toFixed(0);
-                        explanationHtml += '<div class="factor">' +
-                            '<span class="factor-name">' + factor.name + '</span>' +
-                            '<span class="factor-contribution">' + contrib + '%</span>' +
+                        var label = factorLabels[factor.name] || factor.name;
+                        var colors = ['#ffebee', '#fff3e0', '#e8f5e9', '#f3e5f5'];
+                        var idx = data.factors.indexOf(factor);
+                        var bgColor = colors[idx % colors.length];
+                        
+                        explanationHtml += '<div style="background: ' + bgColor + '; padding: 8px; margin: 6px 0; border-radius: 4px; font-size: 0.9rem;">' +
+                            label +
                             '</div>';
                     });
                 }
                 
-                // Caveats
+                // Caveats as notes (translate common English caveats)
                 if (data.caveats && data.caveats.length > 0) {
-                    explanationHtml += '<div class="mt-3 pt-2 border-top"><strong class="small text-warning">Observações:</strong>';
-                    data.caveats.forEach(function(caveat) {
-                        explanationHtml += '<div class="small text-muted mt-1">• ' + caveat + '</div>';
-                    });
-                    explanationHtml += '</div>';
+                    var caveatText = data.caveats[0]
+                        .replace(/Low confidence/i, 'Confiança baixa')
+                        .replace(/Model confidence is high for this prediction/i, 'Confiança do modelo é alta para esta previsão')
+                        .replace(/Prediction may be unreliable/i, 'Previsão pode ser pouco confiável')
+                        .replace(/Based on limited historical data/i, 'Baseada em dados históricos limitados');
+                    
+                    explanationHtml += '<div class="mt-2 pt-2" style="border-top: 1px solid #ddd;"><small class="text-muted"><strong>📌 Nota:</strong> ' +
+                        caveatText +
+                        '</small></div>';
                 }
                 
                 // Display explanation
@@ -1474,7 +1566,29 @@
         var val = $(this).val();
         applyRegionFilter(val);
         updateTopCriticalAreas();
+        // update top20 layer for selected region if visible
+        updateTop20ForRegion(val);
     });
+
+    // Toggle Top20 micro-nodes
+    $('#toggle-top20').on('change', function(){
+        var checked = $(this).is(':checked');
+        var region = $('#region-filter').val();
+        if (checked){
+            updateTop20ForRegion(region);
+        } else {
+            try{ top20Layer.clearLayers(); }catch(e){}
+            if (map.hasLayer(top20Layer)) map.removeLayer(top20Layer);
+        }
+    });
+
+    // Expose function to refresh Top20 (useful after model updates)
+    function refreshTop20(){
+        var region = $('#region-filter').val();
+        if ($('#toggle-top20').is(':checked')){
+            loadTop20(region, function(err){ if (err) console.warn('refreshTop20 failed', err); });
+        }
+    }
 
     // Apply region filter to map layers (show/hide)
     function applyRegionFilter(regionFilter) {

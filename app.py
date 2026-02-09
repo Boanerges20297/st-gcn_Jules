@@ -1478,41 +1478,64 @@ def get_polygons():
                         try:
                             if 'risk_score' in row.index and pd.notna(row['risk_score']):
                                 risk_score = float(row['risk_score'])
-                        except:
+                                
+                        except Exception:
                             pass
                         
-                        node_name = row.get('name', f"Nó {idx}") if 'name' in row.index else f"Nó {idx}"
-                        
-                        feat = {
-                            "type": "Feature",
-                            "geometry": {
-                                "type": "Point",
-                                "coordinates": [float(geom.x), float(geom.y)]
-                            },
-                            "properties": {
-                                "id": int(idx),
-                                "node_id": int(idx),
-                                "name": str(node_name),
-                                "node_type": "dynamic_node",
-                                "is_point": True,
-                                "risk_score": risk_score
-                            }
+                        props = {
+                            'id': int(idx),
+                            'node_id': int(idx),
+                            'name': str(row.get('name') or row.get('nome') or row.get('NOME') or f'Nó {idx}'),
+                            'node_type': 'dynamic_node',
+                            'is_point': True,
+                            'risk_score': risk_score
                         }
-                        point_features.append(feat)
+                        # build point geojson feature
+                        point_features.append({
+                            'type': 'Feature',
+                            'properties': props,
+                            'geometry': {
+                                'type': 'Point',
+                                'coordinates': [float(geom.x), float(geom.y)]
+                            }
+                        })
                         count_points += 1
                 except Exception as e:
-                    print(f"[DEBUG] Error at node {idx}: {str(e)[:100]}")
+                    print('[DEBUG] erro ao processar linha ngdf_for_points', e)
                     continue
-            print(f"[DEBUG] Generated {count_points} dynamic points from ngdf_for_points")
-        else:
-            print(f"[DEBUG] ngdf_for_points is None or empty, skipping dynamic points")
-        
-        # Combinar Polígonos + Pontos
-        print(f"[DEBUG] Combining {len(base_features)} base features + {len(point_features)} point features")
-        combined_geojson = {
-            "type": "FeatureCollection",
-            "features": base_features + point_features
-        }
+
+        # Combine base polygon features and dynamic points
+        all_features = base_features + point_features
+
+        return jsonify({ 'type': 'FeatureCollection', 'features': all_features })
+    except Exception as e:
+        print('[ERROR] get_polygons', e)
+        return jsonify({'error': 'Falha interna ao preparar polígonos.'}), 500
+
+
+# API para servir Top20 Micro Nodes gerados por scripts
+@app.route('/api/top20_micro_nodes')
+def get_top20_micro_nodes():
+    region = request.args.get('region')  # capital|rmf|interior optional
+    fpath = None
+    if region in ('capital','rmf','interior'):
+        candidate = os.path.join(BASE_DIR, 'outputs', f'top20_micro_nodes_{region}.geojson')
+        if os.path.exists(candidate):
+            fpath = candidate
+    if fpath is None:
+        candidate = os.path.join(BASE_DIR, 'outputs', 'top20_micro_nodes.geojson')
+        if os.path.exists(candidate):
+            fpath = candidate
+    if fpath is None:
+        return jsonify({'error': 'Top20 micro nodes not found. Run scripts/extract_top20_micro_nodes.py'}), 404
+    try:
+        with open(fpath, 'r', encoding='utf-8') as fh:
+            data = json.load(fh)
+        return jsonify(data)
+    except Exception as e:
+        print('[ERROR] get_top20_micro_nodes', e)
+        return jsonify({'error': 'Falha ao ler arquivo Top20'}), 500
+
         print(f"[DEBUG] Final GeoJSON has {len(combined_geojson['features'])} features")
         
         return jsonify(combined_geojson)
