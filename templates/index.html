@@ -553,8 +553,23 @@
                 top20Layer.clearLayers();
                 var features = data.features || data;
                 console.log('[Top20] Received features:', (features && features.length) || 0);
-                features.forEach(function(f, i){
+                var skippedPolygons = 0;
+            features.forEach(function(f, i){
                     try{
+                        // Only render actual Point geometries as markers.
+                        // Prefer the real geometry.type when present; fallback to properties.geometry_type for older files.
+                        var geomType = (f.geometry && f.geometry.type) || (f.properties && f.properties.geometry_type) || '';
+                        if (geomType){
+                            if (String(geomType).toLowerCase() !== 'point'){
+                                skippedPolygons += 1; // not a point - skip
+                                return;
+                            }
+                        } else {
+                            // No geometry info at all - skip to be safe
+                            skippedPolygons += 1;
+                            return;
+                        }
+
                         var lon = f.geometry.coordinates[0];
                         var lat = f.geometry.coordinates[1];
                         var rank = f.properties.rank || 0;
@@ -569,7 +584,7 @@
                         top20Layer.addLayer(m);
                     }catch(e){ console.warn('[Top20] feature error', e, f); }
                 });
-                console.log('[Top20] Built markers:', top20Layer.getLayers().length);
+                console.log('[Top20] Built markers:', top20Layer.getLayers().length, ' skippedPolygons:', skippedPolygons);
                 top20LoadedRegion = region || 'all';
                 if (cb) cb(null);
             }catch(err){ console.warn('[Top20] build error', err); if (cb) cb(err); }

@@ -233,7 +233,7 @@ def classify_region(lon, lat):
         return 'rmf'
     return 'interior'
 
-# group by region and pick top20 each
+# group by region and pick top20 each (prefer point micro-nodes)
 regions = {'capital': [], 'rmf': [], 'interior': []}
 for it in uniq_sorted:
     r = classify_region(it['lon'], it['lat'])
@@ -242,10 +242,17 @@ for it in uniq_sorted:
 out_features = []
 node_counter = 1
 for rname, feats in regions.items():
-    top = feats[:20]
+    # Prefer point features (micro-nodes) first, then fill with polygon-based areas if necessary
+    points = [f for f in feats if f.get('geometry_type') in ('Point', 'MultiPoint')]
+    polys = [f for f in feats if f.get('geometry_type') not in ('Point', 'MultiPoint')]
+    top = points[:20]
+    if len(top) < 20:
+        top += polys[:(20 - len(top))]
+
     for i, it in enumerate(top):
         # ensure name exists, otherwise build from source + rank
         name = it.get('name') or f"{Path(it.get('source', 'orig')).stem} - Área {i+1}"
+        # NOTE: output geometry is always a Point (centroid). Preserve original type in source_geometry_type
         feat = {
             'type': 'Feature',
             'properties': {
@@ -254,7 +261,12 @@ for rname, feats in regions.items():
                 'name': name,
                 'source': it['source'],
                 'score': it['score'],
-                'geometry_type': it['geometry_type'],
+                # geometry_type describes the actual geometry of the feature (Point since we use centroids)
+                'geometry_type': 'Point',
+                # keep original geometry type for provenance/debugging
+                'source_geometry_type': it.get('geometry_type'),
+                # flag to mark this was generated from a polygon centroid
+                'is_centroid': (it.get('geometry_type') not in ('Point', 'MultiPoint')),
                 'region': rname
             },
             'geometry': {
