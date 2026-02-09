@@ -916,54 +916,18 @@ def load_data_and_models():
         # Use temporary local variables to allow validation before assignment
         _nodes_gdf = data_pack.get('nodes_gdf')
         
-        # Se nodes_gdf não está no pickle, carregar do JSON
+        # Se nodes_gdf não está no pickle, carregar do pickle de micro-nós real
+        # NÃO usar bairros como fallback - apenas micro-nós reais do grafo
         if _nodes_gdf is None:
-            # Tentar carregar de nodes_gdf.pkl (fallback para micro-nós)
             try:
                 nodes_pkl_path = os.path.join(BASE_DIR, 'data', 'processed', 'graph_data', 'nodes_gdf.pkl')
                 if os.path.exists(nodes_pkl_path):
                     with open(nodes_pkl_path, 'rb') as f:
                         _nodes_gdf = pickle.load(f)
                     print(f"Carregado nodes_gdf de {nodes_pkl_path}")
-            except Exception:
-                pass
-
-            try:
-                bairros_file = os.path.join(BASE_DIR, 'data', 'raw', 'bairros_centros_latlong.json')
-                if os.path.exists(bairros_file):
-                    with open(bairros_file, 'r', encoding='utf-8') as f:
-                        bairros_data = json.load(f)
-                    
-                    records = []
-                    for name, info in bairros_data.items():
-                        if name in ["Nome", "null", "None", ""] or name is None:
-                            continue
-                        regiao = info.get('regiao', 'desconhecido').lower()
-                        # Use node_type from data if available; otherwise classify by logic
-                        if 'node_type' in info:
-                            node_type = info['node_type']
-                        elif 'eh_cidade' in info and info['eh_cidade']:
-                            node_type = 'cidade'
-                        else:
-                            node_type = 'bairro' if regiao == 'fortaleza' else 'cidade'
-                        
-                        records.append({
-                            'name': name,
-                            'latitude': info['lat'],
-                            'longitude': info['long'],
-                            'regiao': regiao,
-                            'node_type': node_type
-                        })
-                    
-                    if records:
-                        df = pd.DataFrame(records)
-                        _nodes_gdf = gpd.GeoDataFrame(
-                            df,
-                            geometry=gpd.points_from_xy(df.longitude, df.latitude),
-                            crs="EPSG:4326"
-                        )
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"Não conseguiu carregar nodes_gdf: {e}")
+                _nodes_gdf = None
         
         polygons_json_cache = None
         _adj_geo = data_pack.get('adj_geo')
@@ -975,13 +939,14 @@ def load_data_and_models():
         
         _dates = data_pack.get('dates')
 
-        # --- VALIDATION: Check Data Integrity (Paradigm Shift) ---
+        # --- VALIDATION: Check Data Integrity ---
         if _node_features is not None:
-            # Check Node Count (Expected ~319 for Admin boundaries, NOT ~2378 for Grid)
-            if _node_features.shape[0] > 1000:
+            # Check Node Count (Expected: 319 admin boundaries + ~2374 communities = ~2693 total)
+            # Aceitar dados entre 300-3000 nós (range razoável para grafo com comunidades)
+            if _node_features.shape[0] < 300 or _node_features.shape[0] > 3000:
                 err_msg = (
-                    f"CRITICAL: Dados obsoletos detectados! (Nós: {_node_features.shape[0]}). "
-                    "O sistema agora usa limites administrativos (~319 nós). "
+                    f"CRITICAL: Dados inválidos detectados! (Nós: {_node_features.shape[0]}). "
+                    "O sistema requer entre 300-3000 nós (bairros + cidades + comunidades). "
                     "Por favor, execute 'python src/data_processing.py' para regenerar os dados."
                 )
                 print(err_msg)
@@ -1421,101 +1386,40 @@ def index():
 
 @app.route('/api/polygons')
 def get_polygons():
-    global polygons_json_cache, nodes_gdf
+    global polygons_json_cache
     try:
-        # Load polygon GeoJSON from static file with real polygons
-        polygon_file = os.path.join(BASE_DIR, 'data', 'static', 'nodes_polygons.geojson')
+        # Carregar polígonos de bairros do AIS - CAPITAL.geojson
+        ais_capital_path = os.path.join(BASE_DIR, 'data', 'static', 'AIS - CAPITAL.geojson')
+        features = []
         
-        base_features = []
-        if os.path.exists(polygon_file):
-            with open(polygon_file, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-                base_features = data.get('features', [])
-        elif nodes_gdf is not None:
-            # Fallback to nodes_gdf
-            data = json.loads(nodes_gdf.to_json())
-            base_features = data.get('features', [])
-        else:
-             return jsonify({'error': 'Dados de polígonos não carregados.'}), 503
-
-        # Injetar Nós Dinâmicos (Pontos) para Visualização Híbrida
-        # Se nodes_gdf for None, carregar do pickle de fallback
-        ngdf_for_points = nodes_gdf
-        if ngdf_for_points is None:
+        if os.path.exists(ais_capital_path):
             try:
-                nodes_pkl_path = os.path.join(BASE_DIR, 'data', 'processed', 'graph_data', 'nodes_gdf.pkl')
-                if os.path.exists(nodes_pkl_path):
-                    with open(nodes_pkl_path, 'rb') as f:
-                        ngdf_for_points = pickle.load(f)
-                    print(f"[DEBUG] Carregado nodes_gdf de fallback no /api/polygons")
+                with open(ais_capital_path, 'r', encoding='utf-8') as f:
+                    ais_data = json.load(f)
+                    features = ais_data.get('features', [])
+                    
+                    # Normalizar nome field (AIS usa 'Name' maiúsculo)
+                    for feat in features:
+                        if 'properties' in feat:
+                            props = feat['properties']
+                            # Garantir que existe 'name' minúsculo
+                            if 'name' not in props and 'Name' in props:
+                                props['name'] = props['Name']
+                            if 'name' not in props:
+                                props['name'] = 'Área'
+                    
+                    print(f"[DEBUG] Carregado {len(features)} polígonos de bairros")
             except Exception as e:
-                print(f"[DEBUG] Falha ao carregar fallback: {e}")
+                print(f"[DEBUG] Erro ao carregar AIS: {e}")
+                features = []
         
-        point_features = []
-        if ngdf_for_points is not None and len(ngdf_for_points) > 0:
-            print(f"[DEBUG] ngdf_for_points has {len(ngdf_for_points)} rows")
-            # Iterar sobre ngdf_for_points para garantir sincronia de IDs
-            count_points = 0
-            for idx, row in ngdf_for_points.iterrows():
-                try:
-                    # Pegar geometria (deve ser Point já)
-                    geom = row.geometry
-                    if geom is None:
-                        continue
-                    
-                    # Se for Polygon, usar centróide; senão usar o ponto direto
-                    if hasattr(geom, 'geom_type'):
-                        if geom.geom_type == 'Polygon':
-                            geom = geom.centroid
-                        elif geom.geom_type != 'Point':
-                            continue
-                    
-                    if hasattr(geom, 'x') and hasattr(geom, 'y'):
-                        # Default risk_score para micro-nós
-                        risk_score = 60  # Moderado por padrão (fica visível)
-                        
-                        # Tenta obter do próprio nó
-                        try:
-                            if 'risk_score' in row.index and pd.notna(row['risk_score']):
-                                risk_score = float(row['risk_score'])
-                        except:
-                            pass
-                        
-                        node_name = row.get('name', f"Nó {idx}") if 'name' in row.index else f"Nó {idx}"
-                        
-                        feat = {
-                            "type": "Feature",
-                            "geometry": {
-                                "type": "Point",
-                                "coordinates": [float(geom.x), float(geom.y)]
-                            },
-                            "properties": {
-                                "id": int(idx),
-                                "node_id": int(idx),
-                                "name": str(node_name),
-                                "node_type": "dynamic_node",
-                                "is_point": True,
-                                "risk_score": risk_score
-                            }
-                        }
-                        point_features.append(feat)
-                        count_points += 1
-                except Exception as e:
-                    print(f"[DEBUG] Error at node {idx}: {str(e)[:100]}")
-                    continue
-            print(f"[DEBUG] Generated {count_points} dynamic points from ngdf_for_points")
-        else:
-            print(f"[DEBUG] ngdf_for_points is None or empty, skipping dynamic points")
-        
-        # Combinar Polígonos + Pontos
-        print(f"[DEBUG] Combining {len(base_features)} base features + {len(point_features)} point features")
-        combined_geojson = {
+        # Retornar apenas polígonos (sem micro-nós por enquanto)
+        geojson = {
             "type": "FeatureCollection",
-            "features": base_features + point_features
+            "features": features
         }
-        print(f"[DEBUG] Final GeoJSON has {len(combined_geojson['features'])} features")
         
-        return jsonify(combined_geojson)
+        return jsonify(geojson)
 
     except Exception as e:
         return jsonify({'error': f'Erro ao serializar polígonos: {e}'}), 500
@@ -2180,11 +2084,31 @@ def calculate_risk(custom_norm_adj=None):
             except Exception:
                 rk_score = None
 
+            # Calcular percentil real do nó
+            percentile_rank = (np.sum(normalized_risk_cvli <= cvli_score) / len(normalized_risk_cvli)) * 100
+            percentile_rank = float(percentile_rank)
+            
+            # Gerar descrição amigável baseada em percentil
+            if percentile_rank >= 99:
+                description = "Top 1% em risco no Estado do Ceará"
+            elif percentile_rank >= 95:
+                description = "Top 5% em risco no Estado do Ceará"
+            elif percentile_rank >= 90:
+                description = "Top 10% em risco no Estado do Ceará"
+            elif percentile_rank >= 75:
+                description = "Top 25% em risco no Estado do Ceará"
+            elif percentile_rank >= 50:
+                description = "Acima da mediana de risco no Estado do Ceará"
+            else:
+                description = "Abaixo da mediana de risco no Estado do Ceará"
+
             results.append({
                 'node_id': int(i),
                 'risk_score': cvli_score,
                 'risk_score_cvli': cvli_score,
                 'risk_score_cvp': cvp_score,
+                'percentile_rank': percentile_rank,
+                'description': description,
                 'cvli_pred': cvli_val,
                 'cvp_pred': cvp_val,
                 'faction': factions[i],
@@ -2227,6 +2151,14 @@ def calculate_risk(custom_norm_adj=None):
                 meta['start_cvp'] = meta['start_cvli']
                 meta['window_start'] = meta.get('start_cvli', '')
                 meta['window_end'] = meta.get('last_date', '')
+                
+                # Adicionar janela de validade dinâmica (hoje + 7 dias)
+                forecast_date = last_date_obj.date()
+                valid_until = forecast_date + pd.Timedelta(days=7)
+                meta['forecast_date'] = str(forecast_date)
+                meta['valid_from'] = str(forecast_date)
+                meta['valid_until'] = str(valid_until)
+                meta['validity_description'] = f"Previsão para {forecast_date.strftime('%d/%m')} até {valid_until.strftime('%d/%m')} (7 dias)"
             except Exception:
                 pass
 

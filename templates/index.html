@@ -766,17 +766,19 @@
     }
 
     function reloadMapLayer() {
-        // Remove a camada GeoJSON anterior do mapa
-        if (geojsonLayer) {
-            map.removeLayer(geojsonLayer);
-            geojsonLayer = null;
-        }
+        // Retorna uma Promise que resolve quando o mapa terminou de atualizar
+        return new Promise(function(resolve, reject) {
+            // Remove a camada GeoJSON anterior do mapa
+            if (geojsonLayer) {
+                map.removeLayer(geojsonLayer);
+                geojsonLayer = null;
+            }
 
-        // Recarregar polígonos e dados de risco do servidor
-        $.when(
-            $.getJSON('/api/polygons'),
-            $.getJSON('/api/risk')
-        ).done(function(polygonsArgs, riskArgs) {
+            // Recarregar polígonos e dados de risco do servidor
+            $.when(
+                $.getJSON('/api/polygons'),
+                $.getJSON('/api/risk')
+            ).done(function(polygonsArgs, riskArgs) {
             var geojson = polygonsArgs[0];
             var riskResp = riskArgs[0];
             riskDataGlobal = riskResp.data || riskResp;
@@ -874,8 +876,13 @@
 
             // Adicionar a camada ao mapa
             geojsonLayer.addTo(map);
-        }).fail(function() {
-            console.error("Erro ao recarregar o mapa");
+            
+            // Resolver a promise assim que a camada foi adicionada
+            resolve();
+        }).fail(function(err) {
+            console.error("Erro ao recarregar o mapa", err);
+            reject(err);
+        });
         });
     }
 
@@ -920,27 +927,11 @@
             feature.properties.name = feature.properties.name || ('Área ' + fid);
         });
 
+        // Manter todos os features (polígonos de bairros)
+
         // Initialize Map
         geojsonLayer = L.geoJson(geojson, {
             style: style,
-            // Híbrido: Renderizar Pontos como CircleMarkers visíveis
-            pointToLayer: function(feature, latlng) {
-                // Aplicar o mesmo estilo aos pontos dinamicamente gerados
-                var featureStyle = style(feature);
-                var marker = L.circleMarker(latlng, featureStyle);
-                
-                // Adicionar popup com informações do nó dinâmico
-                var nodeName = feature.properties.name || 'Nó Dinâmico';
-                var nodeId = feature.properties.node_id || feature.properties.id || '';
-                var riskScore = feature.properties.risk_score || 0;
-                var popupText = '<strong>' + nodeName + '</strong><br/>' +
-                                'ID: ' + nodeId + '<br/>' +
-                                'Risco: ' + riskScore.toFixed(1) + '%<br/>' +
-                                'Tipo: Nó Dinâmico';
-                marker.bindPopup(popupText);
-                
-                return marker;
-            },
             onEachFeature: function(feature, layer) {
                 // Hover effects for better UX
                 layer.on('mouseover', function(e) {
@@ -976,6 +967,9 @@
                 });
             }
         }).addTo(map);
+
+        // AVISO: Micro-nós (comunidades/favelas) não estão disponíveis no momento
+        // Apenas polígonos de bairros estão visíveis
 
         // Polygons provide all visualization - no markers/clusters needed
         
@@ -1137,10 +1131,8 @@
                                 showLoading('Sincronizando Mapa...', 'Atualizando visualização com novos dados de risco.');
                                 
                                 // Reload the entire map layer to ensure all changes are reflected
-                                reloadMapLayer();
-                                
-                                // Update dashboard after a short delay to let the map render
-                                setTimeout(function() {
+                                reloadMapLayer().then(function() {
+                                    // Update dashboard AFTER map rendering completes
                                     updateDashboard('CVLI');
                                     hideLoading();
                                     alert('Eventos salvos com sucesso!\nA malha foi adaptada permanentemente e o mapa foi atualizado.');
@@ -1161,7 +1153,11 @@
                                     
                                     // Trigger immediate model update check
                                     checkModelUpdateStatus();
-                                }, 500);
+                                }).catch(function(err) {
+                                    console.error('Error during reloadMapLayer', err);
+                                    hideLoading();
+                                    alert('Erro ao atualizar mapa: ' + err);
+                                });
                             },
                             error: function(err) {
                                 hideLoading();

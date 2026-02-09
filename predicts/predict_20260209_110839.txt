@@ -1,0 +1,212 @@
+================================================================================
+ST-GCN PREDICTION LOG - RANKING VALIDATION
+================================================================================
+Timestamp: 2026-02-09 11:08:39
+
+1. RESUMO EXECUTIVO
+--------------------------------------------------------------------------------
+Total de nodes analisados: 2693
+  • Crítico (≥90%):    426 ( 15%)
+  • Alto (80-89%):     406 ( 15%)
+  • Moderado (50-79%): 1113 ( 41%)
+  • Baixo (20-49%):    748 ( 27%)
+  • Sem Risco (<20%):    0 (  0%)
+
+Ranking Source: stgcn_percentile
+Window CVLI: 30 dias
+Período: 2026-01-01 → 2026-01-30
+Última atualização: 2026-01-30
+
+2. RANKING ATUALIZADO (TOP 20 NODES)
+--------------------------------------------------------------------------------
+Rank  Node                                CVLI%   Ranking%  Status       Provenance                              
+--------------------------------------------------------------------------------------------------------------
+1     146 (MARACANAÚ)                      100.0%        — Crítico                                              
+2     144 (HORIZONTE)                       99.9%        — Crítico                                              
+3     137 (ALTO ALEGRE II)                  99.6%        — Crítico                                              
+4     8 (BARRA DO CEARÁ)                    99.6%        — Crítico                                              
+5     145 (ITAITINGA)                       99.5%        — Crítico                                              
+6     231 (ITAIÇABA)                        99.4%        — Crítico                                              
+7     133 (SIQUEIRA)                        99.2%        — Crítico                                              
+8     303 (SOBRAL)                          99.1%        — Crítico      exogenous, exogenous_critical           
+9     136 (INDUSTRIAL)                      99.0%        — Crítico                                              
+10    151 (PARAIPABA)                       98.9%        — Crítico                                              
+11    30 (CRISTO REDENTOR)                  98.8%        — Crítico                                              
+12    207 (FORQUILHA)                       98.8%        — Crítico                                              
+13    14 (BOM JARDIM)                       98.8%        — Crítico      exogenous, exogenous_critical           
+14    16 (CAIS DO PORTO)                    98.7%        — Crítico                                              
+15    312 (UBAJARA)                         98.7%        — Crítico                                              
+16    653 (Cidade de Moraújo)               98.6%        — Crítico                                              
+17    2450 (Cidade De Jati)                 98.6%        — Crítico                                              
+18    96 (PLANALTO AYRTON SENNA)            98.5%        — Crítico      exogenous, exogenous_critical           
+19    1893 (Cidade de Óros)                 98.5%        — Crítico                                              
+20    28 (CONJUNTO PALMEIRAS)               98.5%        — Crítico                                              
+
+3. CORREÇÕES FEITAS PELO RANKING (DEMOTIONS)
+--------------------------------------------------------------------------------
+✅ Nenhuma demoção de ranking detectada.
+Todos os nodes mantiveram seu score baseado no modelo ST-GCN.
+
+4. PADRÕES IDENTIFICADOS (PROVENANCE)
+--------------------------------------------------------------------------------
+📊 Padrões de risco detectados:
+
+📍 HISTÓRICO RECENTE (93 nodes)
+   Nodes com atividade recente no período analisado.
+   Exemplo: [9, 15, 17, 18, 21]
+
+🔴 ALTA ATIVIDADE (34 nodes)
+   Nodes com 3+ homicídios na janela de 14 dias.
+   Exemplo: [9, 17, 21, 24, 63]
+
+⚠️ EVENTOS EXÓGENOS (90 nodes)
+   Nodes afetados por conflitos ou eventos especiais.
+   Exemplo: [14, 19, 24, 52, 61]
+
+🚨 EVENTOS CRÍTICOS (82 nodes)
+   Nodes com conflitos de alta severidade.
+   Exemplo: [14, 19, 24, 52, 61]
+
+📈 Resumo Estatístico:
+   Nodes com padrão detectado: 173/2693 (6%)
+
+5. DISTRIBUIÇÃO E ESTATÍSTICAS
+--------------------------------------------------------------------------------
+📊 Distribuição de Scores (Normalizados):
+  Mínimo: 30.0%
+  Máximo: 100.0%
+  Média:  65.7%
+
+  Percentis:
+    P50:   66.1%
+    P75:   84.1%
+    P90:   94.0%
+    P95:   95.4%
+    P99:   98.3%
+
+📊 Estatísticas de Histórico (CVLI 14 dias):
+  Mínimo: 0 ocorrências
+  Máximo: 14 ocorrências
+  Média:  0.1 ocorrências
+
+  Percentis:
+    P50:   0 ocorrências
+    P75:   0 ocorrências
+    P90:   0 ocorrências
+    P95:   0 ocorrências
+
+6. CONFIGURAÇÃO DO MODELO
+--------------------------------------------------------------------------------
+Window CVLI: 30 dias
+Window CVP:  30 dias
+Ranking Source: stgcn_percentile
+
+Ranking Validation Thresholds:
+  Top 1%:  98.3%
+  Top 5%:  95.4%
+  Top 10%: 94.0%
+  Método: stgcn_percentile
+
+7. EVENTOS EXÓGENOS DETECTADOS
+--------------------------------------------------------------------------------
+Total: 90 areas afetadas
+
+Node 14 (BOM JARDIM) - 🚨 CRÍTICO (98.8%)
+  🔴 Conflito ativo detectado (severidade alta)
+  ⚠️ Modelo prevê ~1 homicídio nos próximos 7 dias
+
+Node 19 (CANINDEZINHO) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+  ⚠️ Modelo prevê ~1 homicídio nos próximos 7 dias
+
+Node 24 (COAÇU) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+  ⚠️ Modelo prevê ~1 homicídio nos próximos 7 dias
+
+Node 52 (JANGURUSSU) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+  ⚠️ Modelo prevê ~1 homicídio nos próximos 7 dias
+
+Node 61 (JOSÉ DE ALENCAR) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+  ⚠️ Modelo prevê ~1 homicídio nos próximos 7 dias
+
+Node 63 (LAGOA REDONDA) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+  ⚠️ Modelo prevê ~1 homicídio nos próximos 7 dias
+
+Node 68 (MESSEJANA) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+  ⚠️ Modelo prevê ~1 homicídio nos próximos 7 dias
+
+Node 90 (PASSARÉ) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+  ⚠️ Modelo prevê ~1 homicídio nos próximos 7 dias
+
+Node 96 (PLANALTO AYRTON SENNA) - 🚨 CRÍTICO (98.5%)
+  🔴 Conflito ativo detectado (severidade alta)
+  ⚠️ Modelo prevê ~1 homicídio nos próximos 7 dias
+
+Node 100 (PREFEITO JOSÉ WALTER) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+  ⚠️ Modelo prevê ~1 homicídio nos próximos 7 dias
+
+
+8. ANÁLISE CRÍTICA (NODES COM RISCO CRÍTICO)
+--------------------------------------------------------------------------------
+⚠️ 426 nodes em nível CRÍTICO:
+
+1. Node 146 (MARACANAÚ) - 100.0% | CVLI Pred: 3.3 | Facção: TCP
+   • 📈 Modelo prevê 3.3 homicídios nos próximos 7 dias
+   • 🛣️ Área estratégica (alta conectividade - rota de fuga)
+   • 🏴 Território de influência: TCP
+
+2. Node 144 (HORIZONTE) - 99.9% | CVLI Pred: 2.6 | Facção: TCP
+   • 📈 Modelo prevê 2.6 homicídios nos próximos 7 dias
+   • 🛣️ Área estratégica (alta conectividade - rota de fuga)
+   • 🏴 Território de influência: TCP
+
+3. Node 137 (ALTO ALEGRE II) - 99.6% | CVLI Pred: 2.1 | Facção: TCP
+   • 📈 Modelo prevê 2.1 homicídios nos próximos 7 dias
+   • 🛣️ Área estratégica (alta conectividade - rota de fuga)
+   • 🏴 Território de influência: TCP
+
+4. Node 8 (BARRA DO CEARÁ) - 99.6% | CVLI Pred: 2.1 | Facção: TCP
+   • 📈 Modelo prevê 2.1 homicídios nos próximos 7 dias
+   • 🛣️ Área estratégica (alta conectividade - rota de fuga)
+   • 🏴 Território de influência: TCP
+
+5. Node 145 (ITAITINGA) - 99.5% | CVLI Pred: 2.0 | Facção: N/A
+   • 📈 Modelo prevê 2.0 homicídios nos próximos 7 dias
+   • 🛣️ Área estratégica (alta conectividade - rota de fuga)
+   • 🏴 Território de influência: N/A
+
+6. Node 231 (ITAIÇABA) - 99.4% | CVLI Pred: 2.0 | Facção: COMANDO VERMELHO
+   • ⚠️ Modelo prevê ~1 homicídio nos próximos 7 dias
+   • 🛣️ Área estratégica (alta conectividade - rota de fuga)
+   • 🏴 Território de influência: COMANDO VERMELHO
+
+7. Node 133 (SIQUEIRA) - 99.2% | CVLI Pred: 1.8 | Facção: TCP
+   • ⚠️ Modelo prevê ~1 homicídio nos próximos 7 dias
+   • 🛣️ Área estratégica (alta conectividade - rota de fuga)
+   • 🏴 Território de influência: TCP
+
+8. Node 303 (SOBRAL) - 99.1% | CVLI Pred: 1.7 | Facção: N/A
+   • 🔴 Conflito ativo detectado (severidade alta)
+   • ⚠️ Modelo prevê ~1 homicídio nos próximos 7 dias
+   • 🗺️ Área com múltiplas conexões (acesso facilitado)
+
+9. Node 136 (INDUSTRIAL) - 99.0% | CVLI Pred: 1.6 | Facção: TCP
+   • ⚠️ Modelo prevê ~1 homicídio nos próximos 7 dias
+   • 🚙 Roubos/furtos de veículos detectados (8 casos)
+   • 🛣️ Área estratégica (alta conectividade - rota de fuga)
+
+10. Node 151 (PARAIPABA) - 98.9% | CVLI Pred: 1.6 | Facção: N/A
+   • ⚠️ Modelo prevê ~1 homicídio nos próximos 7 dias
+   • 🗺️ Área com múltiplas conexões (acesso facilitado)
+   • 🏴 Território de influência: N/A
+
+
+================================================================================
+FIM DO LOG
+================================================================================
