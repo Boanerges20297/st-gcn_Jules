@@ -25,6 +25,7 @@ logging.getLogger('werkzeug.serving').setLevel(logging.INFO)
 from shapely.geometry import shape, Point, Polygon
 from scipy.spatial.distance import cdist
 from src.model import STGCN
+from src.stgat import STGAT
 from src.llm_service import process_exogenous_text, parse_ciops_report
 from src.ranking_inference import RankingInference
 from src.ranking_correction_system import get_ranking_system
@@ -1388,37 +1389,46 @@ def index():
 def get_polygons():
     global polygons_json_cache
     try:
-        # Carregar polígonos de bairros do AIS - CAPITAL.geojson
-        ais_capital_path = os.path.join(BASE_DIR, 'data', 'static', 'AIS - CAPITAL.geojson')
         features = []
         
-        if os.path.exists(ais_capital_path):
-            try:
-                with open(ais_capital_path, 'r', encoding='utf-8') as f:
-                    ais_data = json.load(f)
-                    features = ais_data.get('features', [])
-                    
-                    # Normalizar nome field (AIS usa 'Name' maiúsculo)
-                    for feat in features:
-                        if 'properties' in feat:
-                            props = feat['properties']
-                            # Garantir que existe 'name' minúsculo
-                            if 'name' not in props and 'Name' in props:
-                                props['name'] = props['Name']
-                            if 'name' not in props:
-                                props['name'] = 'Área'
-                    
-                    print(f"[DEBUG] Carregado {len(features)} polígonos de bairros")
-            except Exception as e:
-                print(f"[DEBUG] Erro ao carregar AIS: {e}")
-                features = []
+        # Carregar polígonos de 3 regionais: CAPITAL, METROPOLITANA, INTERIOR
+        ais_files = [
+            ('capital', os.path.join(BASE_DIR, 'data', 'static', 'AIS - CAPITAL.geojson')),
+            ('rmf', os.path.join(BASE_DIR, 'data', 'static', 'AIS - METROPOLITANA.geojson')),
+            ('interior', os.path.join(BASE_DIR, 'data', 'static', 'AIS - INTERIOR.geojson'))
+        ]
         
-        # Retornar apenas polígonos (sem micro-nós por enquanto)
+        for region_type, ais_path in ais_files:
+            if os.path.exists(ais_path):
+                try:
+                    with open(ais_path, 'r', encoding='utf-8') as f:
+                        ais_data = json.load(f)
+                        ais_features = ais_data.get('features', [])
+                        
+                        # Normalizar nome field e adicionar region_type
+                        for feat in ais_features:
+                            if 'properties' in feat:
+                                props = feat['properties']
+                                # Garantir que existe 'name' minúsculo
+                                if 'name' not in props and 'Name' in props:
+                                    props['name'] = props['Name']
+                                if 'name' not in props:
+                                    props['name'] = 'Área'
+                                # Adicionar region_type para filtro
+                                props['region_type'] = region_type
+                        
+                        features.extend(ais_features)
+                        print(f"[DEBUG] Carregado {len(ais_features)} polígonos de {region_type}")
+                except Exception as e:
+                    print(f"[DEBUG] Erro ao carregar AIS {region_type}: {e}")
+        
+        # Retornar todos os polígonos (Capital + RMF + Interior)
         geojson = {
             "type": "FeatureCollection",
             "features": features
         }
         
+        print(f"[DEBUG] Total de polígonos retornados: {len(features)}")
         return jsonify(geojson)
 
     except Exception as e:
@@ -1427,6 +1437,28 @@ def get_polygons():
 @app.route('/api/risk')
 def get_risk():
     return calculate_risk()
+
+@app.route('/api/top20_micro_nodes')
+def get_top20_micro_nodes():
+    try:
+        region = (request.args.get('region') or 'all').lower()
+        base_path = os.path.join(BASE_DIR, 'outputs')
+        file_map = {
+            'capital': 'top20_micro_nodes_capital.geojson',
+            'rmf': 'top20_micro_nodes_rmf.geojson',
+            'interior': 'top20_micro_nodes_interior.geojson',
+            'all': 'top20_micro_nodes.geojson'
+        }
+        filename = file_map.get(region, file_map['all'])
+        geojson_path = os.path.join(base_path, filename)
+        if not os.path.exists(geojson_path):
+            return jsonify({'error': f'Arquivo nao encontrado: {filename}'}), 404
+
+        with open(geojson_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'error': f'Erro ao carregar Top20: {e}'}), 500
 
 @app.route('/connections')
 def connections_view():

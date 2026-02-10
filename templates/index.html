@@ -456,19 +456,25 @@
         
         // Visualização Híbrida: Distinção entre Polígonos (Bairros) e Pontos (Nós Dinâmicos)
         var isPoint = (feature.geometry && feature.geometry.type === 'Point');
-        
-        // Pontos dinâmicos SEMPRE visíveis; Polígonos seguem regra de threshold
-        var isVisible = isPoint ? true : (score >= 50);
+        // Pontos dinâmicos SEMPRE visíveis; Polígonos serão exibidos sempre,
+        // mas com opacidade reduzida quando o score for baixo (evita desaparecer)
+        var isVisiblePoint = isPoint ? true : true; // always add polygon layer
+
+        // For polygons with low score, show faint fill and thin border so shapes are visible
+        var isHigh = (score >= 50);
+        var borderColor = isHigh ? 'white' : '#999999';
+        var borderWeight = isPoint ? 2 : (isHigh ? 2 : 1);
+        var fillOpacity = isPoint ? 1.0 : (isHigh ? 0.30 : 0.06);
 
         return {
             radius: isPoint ? 10 : 10,
             fillColor: fill,
-            weight: isVisible ? (isPoint ? 2 : 2) : 0,
-            opacity: isVisible ? 1 : 0,
-            color: isVisible ? 'white' : 'transparent',
-            dashArray: isVisible ? (isPoint ? null : '3') : null,
-            fillOpacity: isVisible ? (isPoint ? 1.0 : 0.3) : 0,
-            interactive: isVisible
+            weight: borderWeight,
+            opacity: 1,
+            color: borderColor,
+            dashArray: isPoint ? null : '3',
+            fillOpacity: fillOpacity,
+            interactive: true
         };
     }
 
@@ -576,7 +582,8 @@
                         var color = colorByRankSimple(rank);
                         var icon = makePinSimple(color);
                         var m = L.marker([lat, lon], {icon: icon});
-                        var popup = '<strong>'+ (f.properties.rank||'') + '. ' + (f.properties.name||'Área') + '</strong><br/>' +
+                        var displayName = (f.properties && (f.properties.name || f.properties.nome)) || 'Área';
+                        var popup = '<strong>'+ (f.properties.rank||'') + '. ' + displayName + '</strong><br/>' +
                                     (f.properties.source? f.properties.source + '<br/>':'') +
                                     'ID: ' + (f.properties.node_id || '') + '<br/>' +
                                     'Score: ' + Math.round(f.properties.score||0);
@@ -893,6 +900,10 @@
                 feature.properties.faction = r.faction || feature.properties.faction || null;
                 feature.properties.reasons = r.reasons || [];
                 feature.properties.name = feature.properties.name || ('Área ' + fid);
+                // region_type vem do backend (/api/polygons), não sobrescrever se não tiver
+                if (!feature.properties.region_type) {
+                    feature.properties.region_type = 'unknown';
+                }
             });
 
             // Recriar a camada GeoJSON com os novos dados
@@ -1008,6 +1019,10 @@
             feature.properties.faction = r.faction || feature.properties.faction || null;
             feature.properties.reasons = r.reasons || [];
             feature.properties.name = feature.properties.name || ('Área ' + fid);
+            // region_type vem do backend (/api/polygons), não sobrescrever se não tiver
+            if (!feature.properties.region_type) {
+                feature.properties.region_type = 'unknown';
+            }
         });
 
         // Manter todos os features (polígonos de bairros)
@@ -1556,24 +1571,36 @@
             });
     }
 
-    function updateTopCriticalAreas() {
+    function updateTopCriticalAreas(retryCount) {
+        retryCount = typeof retryCount === 'number' ? retryCount : 0;
+        var maxRetries = 6; // ~3s total (6 * 500ms)
+
         // Protect against premature call (race condition with geojsonLayer loading)
-        if (!geojsonLayer) {
-            console.debug('[updateTopCriticalAreas] geojsonLayer nao carregado, aguardando...');
+        if (!geojsonLayer || typeof geojsonLayer.getLayers !== 'function') {
+            if (retryCount < maxRetries) {
+                console.debug('[updateTopCriticalAreas] geojsonLayer nao pronto (retry ' + retryCount + '), tentando novamente em 500ms');
+                setTimeout(function(){ updateTopCriticalAreas(retryCount + 1); }, 500);
+            } else {
+                console.warn('[updateTopCriticalAreas] geojsonLayer nao pronto apos ' + maxRetries + ' tentativas; abortando.');
+            }
             return;
         }
-        
+
+        var layers;
         try {
-            var layers = geojsonLayer.getLayers();
+            layers = geojsonLayer.getLayers();
             if (!layers || layers.length === 0) {
                 console.debug('[updateTopCriticalAreas] Nenhuma camada disponivel');
                 return;
             }
         } catch (e) {
             console.warn('[updateTopCriticalAreas] Erro ao obter camadas:', e);
+            if (retryCount < maxRetries) {
+                setTimeout(function(){ updateTopCriticalAreas(retryCount + 1); }, 500);
+            }
             return;
         }
-        
+
         // Use geojsonLayer layers to access up-to-date properties
         var regionFilter = $('#region-filter').val();
 
@@ -1583,21 +1610,19 @@
             var props = layer.feature.properties;
             var score = typeof props.risk_score !== 'undefined' && props.risk_score !== null ? props.risk_score : (props.risk_score_cvli || 0);
 
-            // Filter Logic: prefer server-provided region hints
-            var regionType = props.region_type || props.regiao || getRegionType(props.CIDADE);
+            // Filter Logic: usar region_type do backend
+            var regionType = props.region_type || 'unknown';
             var include = false;
 
             if (regionFilter === 'all') include = true;
-            else if (regionFilter === 'capital' && regionType === 'capital') include = true;
-            else if (regionFilter === 'rmf' && regionType === 'rmf') include = true;
-            else if (regionFilter === 'interior' && regionType === 'interior') include = true;
+            else if (regionFilter === regionType) include = true;
 
             if (include) {
                 items.push({
                     name: props.name,
                     score: score,
                     layer: layer,
-                    cidade: props.CIDADE
+                    cidade: props.CIDADE || 'Fortaleza'
                 });
             }
         });
@@ -1691,7 +1716,7 @@
         if (!geojsonLayer) return;
         geojsonLayer.eachLayer(function(layer) {
             var props = (layer.feature && layer.feature.properties) || {};
-            var regionType = props.region_type || props.regiao || getRegionType(props.CIDADE);
+            var regionType = props.region_type || 'unknown';
             var show = (regionFilter === 'all') || (regionFilter === regionType);
             try {
                 if (show) {

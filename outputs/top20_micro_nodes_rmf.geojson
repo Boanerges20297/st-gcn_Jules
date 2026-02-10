@@ -6,17 +6,20 @@
       "properties": {
         "node_id": 21,
         "rank": 1,
-        "name": "TERCEIRO COMANDO PURO - Área 1",
+        "name": "Cidade de Pindoretama",
         "source": "TERCEIRO COMANDO PURO.geojson",
         "score": 4361803.183031473,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "municipality": "Pindoretama",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.3092078975955,
-          -4.0251813187456085
+          -38.308593897959184,
+          -4.023818224489796
         ]
       }
     },
@@ -25,17 +28,20 @@
       "properties": {
         "node_id": 22,
         "rank": 2,
-        "name": "COMANDO VERMELHO - Área 2",
+        "name": "Distrito de Matuões",
         "source": "COMANDO VERMELHO.geojson",
-        "score": 3054279.406614019,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "score": 2889063.7986719594,
+        "municipality": "Caucaia",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.51000479960425,
-          -4.075749227855151
+          -38.82523231428571,
+          -3.588355628571428
         ]
       }
     },
@@ -44,17 +50,20 @@
       "properties": {
         "node_id": 23,
         "rank": 3,
-        "name": "COMANDO VERMELHO - Área 3",
+        "name": "Bairro do Machuca",
         "source": "COMANDO VERMELHO.geojson",
         "score": 2495878.5327200308,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "municipality": "Aquiraz",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.385111746671974,
-          -3.939891553123014
+          -38.385119696629204,
+          -3.9389944157303374
         ]
       }
     },
@@ -63,17 +72,20 @@
       "properties": {
         "node_id": 24,
         "rank": 4,
-        "name": "TERCEIRO COMANDO PURO - Área 4",
+        "name": "Vila Pagã - Aquiraz",
         "source": "TERCEIRO COMANDO PURO.geojson",
         "score": 1834818.1704598058,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "municipality": "Aquiraz",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.36332543238894,
-          -3.9599337542364186
+          -38.36179326666668,
+          -3.9610897000000005
         ]
       }
     },
@@ -82,17 +94,20 @@
       "properties": {
         "node_id": 25,
         "rank": 5,
-        "name": "COMANDO VERMELHO - Área 5",
+        "name": "Cidade de Chorozinho",
         "source": "COMANDO VERMELHO.geojson",
-        "score": 1752581.0635804625,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "score": 1764725.9755112757,
+        "municipality": "Chorozinho",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.66392981226804,
-          -3.819798633967006
+          -38.50375595000002,
+          -4.296848566666666
         ]
       }
     },
@@ -101,17 +116,20 @@
       "properties": {
         "node_id": 26,
         "rank": 6,
-        "name": "TERCEIRO COMANDO PURO - Área 6",
-        "source": "TERCEIRO COMANDO PURO.geojson",
-        "score": 1718502.2778552882,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "name": "Taquara - Caucaia",
+        "source": "COMANDO VERMELHO.geojson",
+        "score": 1752581.0635804625,
+        "municipality": "Caucaia",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.316830583023254,
-          -3.953474631194353
+          -38.663501657142845,
+          -3.822248923809524
         ]
       }
     },
@@ -120,17 +138,20 @@
       "properties": {
         "node_id": 27,
         "rank": 7,
-        "name": "MASSA - Área 7",
-        "source": "MASSA.geojson",
-        "score": 1530465.3004131622,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "name": "Novo iguape",
+        "source": "TERCEIRO COMANDO PURO.geojson",
+        "score": 1718502.2778552882,
+        "municipality": "Aquiraz",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.744893833202205,
-          -3.683702311820921
+          -38.31428258333334,
+          -3.9486580833333327
         ]
       }
     },
@@ -139,17 +160,20 @@
       "properties": {
         "node_id": 28,
         "rank": 8,
-        "name": "TERCEIRO COMANDO PURO - Área 8",
-        "source": "TERCEIRO COMANDO PURO.geojson",
-        "score": 1340028.0742389348,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "name": "Japuara- Caucaia",
+        "source": "MASSA.geojson",
+        "score": 1530465.3004131622,
+        "municipality": "Caucaia",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.358722766032,
-          -3.983410870072861
+          -38.747452042553206,
+          -3.682344829787234
         ]
       }
     },
@@ -158,17 +182,20 @@
       "properties": {
         "node_id": 29,
         "rank": 9,
-        "name": "MASSA - Área 9",
-        "source": "MASSA.geojson",
-        "score": 1319072.1638577415,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "name": "Pingo De Ouro - Aquiraz",
+        "source": "TERCEIRO COMANDO PURO.geojson",
+        "score": 1340028.0742389348,
+        "municipality": "Aquiraz",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.69996966563308,
-          -3.64886412455596
+          -38.35893891176471,
+          -3.981120382352942
         ]
       }
     },
@@ -177,17 +204,20 @@
       "properties": {
         "node_id": 30,
         "rank": 10,
-        "name": "MASSA - Área 10",
-        "source": "MASSA.geojson",
-        "score": 1216273.8370599912,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "name": "Sítios Novos- Caucaia",
+        "source": "COMANDO VERMELHO.geojson",
+        "score": 1336017.2829911793,
+        "municipality": "Caucaia",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.75377949470369,
-          -3.6636009434458128
+          -38.95021675,
+          -3.7455504687499994
         ]
       }
     },
@@ -196,17 +226,20 @@
       "properties": {
         "node_id": 31,
         "rank": 11,
-        "name": "TERCEIRO COMANDO PURO - Área 11",
-        "source": "TERCEIRO COMANDO PURO.geojson",
-        "score": 1119633.9363681437,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "name": "Tabuba",
+        "source": "MASSA.geojson",
+        "score": 1319072.1638577415,
+        "municipality": "Caucaia",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.48406594733366,
-          -4.11052195979225
+          -38.70025519230769,
+          -3.649447615384616
         ]
       }
     },
@@ -215,17 +248,20 @@
       "properties": {
         "node_id": 32,
         "rank": 12,
-        "name": "COMANDO VERMELHO - Área 12",
+        "name": "Vila Machado",
         "source": "COMANDO VERMELHO.geojson",
-        "score": 960924.3903590577,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "score": 1223985.7108215562,
+        "municipality": "Itaitinga",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.454169224494876,
-          -4.10390124940208
+          -38.51757470833333,
+          -3.897355479166667
         ]
       }
     },
@@ -234,17 +270,20 @@
       "properties": {
         "node_id": 33,
         "rank": 13,
-        "name": "MASSA - Área 13",
+        "name": "Mangabeira- Caucaia",
         "source": "MASSA.geojson",
-        "score": 940351.4480055997,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "score": 1216273.8370599912,
+        "municipality": "Caucaia",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.70210167408204,
-          -3.7282036305268553
+          -38.753065533333334,
+          -3.6610709333333338
         ]
       }
     },
@@ -253,17 +292,20 @@
       "properties": {
         "node_id": 34,
         "rank": 14,
-        "name": "COMUNIDADES EM DISPUTA - Área 14",
-        "source": "COMUNIDADES EM DISPUTA.geojson",
-        "score": 902094.836208289,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "name": "Alvorada (Maracanaú)",
+        "source": "COMANDO VERMELHO.geojson",
+        "score": 1185405.2596219913,
+        "municipality": "Pacatuba",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.59840507202177,
-          -3.9162350892776274
+          -38.59164499999999,
+          -3.8898429473684217
         ]
       }
     },
@@ -272,17 +314,20 @@
       "properties": {
         "node_id": 35,
         "rank": 15,
-        "name": "MASSA - Área 15",
-        "source": "MASSA.geojson",
-        "score": 870711.8166124909,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "name": "Pratius ll",
+        "source": "TERCEIRO COMANDO PURO.geojson",
+        "score": 1163296.215869736,
+        "municipality": "Pindoretama",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.747581295644096,
-          -3.700308791133157
+          -38.25680740229885,
+          -4.035585735632184
         ]
       }
     },
@@ -291,17 +336,20 @@
       "properties": {
         "node_id": 36,
         "rank": 16,
-        "name": "TERCEIRO COMANDO PURO - Área 16",
-        "source": "TERCEIRO COMANDO PURO.geojson",
-        "score": 850599.3367034647,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "name": "Ancuri",
+        "source": "MASSA.geojson",
+        "score": 1103102.6534137863,
+        "municipality": "Itaitinga",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.599893394028975,
-          -3.9063660134892415
+          -38.53031767199999,
+          -3.8788217680000017
         ]
       }
     },
@@ -310,17 +358,20 @@
       "properties": {
         "node_id": 37,
         "rank": 17,
-        "name": "MASSA - Área 17",
-        "source": "MASSA.geojson",
-        "score": 772171.9168482907,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "name": "Pratius l",
+        "source": "TERCEIRO COMANDO PURO.geojson",
+        "score": 1081241.479807142,
+        "municipality": "Pindoretama",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.71762269492462,
-          -3.667363476487887
+          -38.27321500000001,
+          -4.0353057647058845
         ]
       }
     },
@@ -329,17 +380,20 @@
       "properties": {
         "node_id": 38,
         "rank": 18,
-        "name": "COMANDO VERMELHO - Área 18",
-        "source": "COMANDO VERMELHO.geojson",
-        "score": 753830.933886521,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "name": "Pacheco",
+        "source": "TERCEIRO COMANDO PURO.geojson",
+        "score": 1067428.6377343398,
+        "municipality": "Caucaia",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.51524229765145,
-          -3.9246621518813183
+          -38.63837892307692,
+          -3.6898973076923074
         ]
       }
     },
@@ -348,17 +402,20 @@
       "properties": {
         "node_id": 39,
         "rank": 19,
-        "name": "MASSA - Área 19",
-        "source": "MASSA.geojson",
-        "score": 739079.540155332,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "name": "Luzardo Viana",
+        "source": "COMANDO VERMELHO.geojson",
+        "score": 1064799.8210208716,
+        "municipality": "Maracanaú",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.721978926086734,
-          -3.7266300609538194
+          -38.64944326470587,
+          -3.861614058823529
         ]
       }
     },
@@ -367,17 +424,20 @@
       "properties": {
         "node_id": 40,
         "rank": 20,
-        "name": "COMANDO VERMELHO - Área 20",
+        "name": "Arianópolis - Caucaia",
         "source": "COMANDO VERMELHO.geojson",
-        "score": 723255.8697860297,
-        "geometry_type": "Polygon",
-        "region": "rmf"
+        "score": 1061365.5105071766,
+        "municipality": "Caucaia",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Polygon",
+        "is_centroid": true
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.72701721291483,
-          -3.989664337604681
+          -38.64739823809524,
+          -3.767287619047619
         ]
       }
     }
