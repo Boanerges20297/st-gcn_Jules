@@ -73,10 +73,11 @@ class RankingInference:
             self.model.to(device)
             self.model.eval()
             
-            metrics = data.get('metrics', {})
+            # Armazenar métricas para blend adaptativo
+            self.metrics = data.get('metrics', {})
             print(f"[OK] Ranking model loaded from {os.path.basename(model_path)}")
             print(f"      Config: input={self.input_dim}, hidden={self.config.get('hidden_dim')}")
-            print(f"      Performance: P@5={metrics.get('p5', 'N/A')}")
+            print(f"      Performance: P@5={self.metrics.get('p5', 'N/A')}")
             
         except Exception as e:
             print(f"[ERROR] Failed to load ranking model: {e}")
@@ -127,8 +128,21 @@ class RankingInference:
             stgcn_norm = (stgcn_scores - stgcn_scores.min()) / (stgcn_scores.max() - stgcn_scores.min() + 1e-6)
             ranking_norm = (ranking_scores.flatten() - ranking_scores.min()) / (ranking_scores.max() - ranking_scores.min() + 1e-6)
             
-            # Combined score: 70% ST-GCN (primary model) + 30% Ranking (validator)
-            combined_scores = 0.7 * stgcn_norm + 0.3 * ranking_norm
+            # BLEND ADAPTATIVO: ajustar pesos baseado na confiança do modelo de ranking
+            # Modelos com P@5 > 0.6 (boa confiança) recebem mais peso
+            ranking_p5 = self.metrics.get('p5', 0.5) if hasattr(self, 'metrics') else 0.5
+            
+            if ranking_p5 >= 0.8:  # Excelente (quinta, sábado)
+                w_stgcn, w_ranking = 0.70, 0.30
+            elif ranking_p5 >= 0.6:  # Bom (segunda, terça, domingo)
+                w_stgcn, w_ranking = 0.80, 0.20
+            elif ranking_p5 >= 0.4:  # Aceitável (quarta, sexta)
+                w_stgcn, w_ranking = 0.90, 0.10
+            else:  # Fraco
+                w_stgcn, w_ranking = 0.95, 0.05
+            
+            # Combined score adaptativo
+            combined_scores = w_stgcn * stgcn_norm + w_ranking * ranking_norm
             
             # Get top-k
             top_indices = np.argsort(-combined_scores)[:top_k]

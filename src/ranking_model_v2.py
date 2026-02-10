@@ -55,31 +55,26 @@ class PairwiseLoss(nn.Module):
         return total_loss / (batch_size * min(10, num_nodes - 1))
 
 class RankingModel(nn.Module):
-    """Modelo neural para ranking de hotspots"""
-    def __init__(self, input_dim=26, hidden_dim=128, dropout_main=0.3, dropout_small=0.2):
+    """Modelo neural para ranking de hotspots - arquitetura alinhada com RankingModelProduction"""
+    def __init__(self, input_dim=25, hidden_dim=128, dropout_main=0.3, dropout_small=0.2):
         super(RankingModel, self).__init__()
 
-        h1 = hidden_dim
-        h2 = max(8, hidden_dim // 2)
-        h3 = max(4, hidden_dim // 4)
-
+        # Arquitetura compatível com RankingModelProduction (64-32-16)
         self.net = nn.Sequential(
-            nn.Linear(input_dim, h1),
+            nn.Linear(input_dim, 64),
             nn.ReLU(),
-            nn.BatchNorm1d(h1),
+            nn.BatchNorm1d(64),
             nn.Dropout(dropout_main),
 
-            nn.Linear(h1, h2),
+            nn.Linear(64, 32),
             nn.ReLU(),
-            nn.BatchNorm1d(h2),
-            nn.Dropout(dropout_main),
-
-            nn.Linear(h2, h3),
-            nn.ReLU(),
+            nn.BatchNorm1d(32),
             nn.Dropout(dropout_small),
 
-            nn.Linear(h3, 1),
-            nn.Sigmoid()  # Output entre 0 e 1
+            nn.Linear(32, 16),
+            nn.ReLU(),
+
+            nn.Linear(16, 1),
         )
     
     def forward(self, x):

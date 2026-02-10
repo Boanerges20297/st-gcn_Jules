@@ -30,48 +30,138 @@ def load_data():
     with open(pkl_path, 'rb') as f:
         return pickle.load(f)
 
-def extract_features_clean(X):
-    """Extrai features sem NaN (comprovadamente funciona)"""
+def extract_features_enhanced(X):
+    """
+    Extrai features enriquecidas para ranking (25 features)
+    Focado em capturar padrões temporais, momentum e sazonalidade
+    """
     num_nodes = X.shape[0]
-    features = np.zeros((num_nodes, 12))
+    features = np.zeros((num_nodes, 25))
     
     for i in range(num_nodes):
         ts = X[i, :]
+        n = len(ts)
         
+        # ===== FEATURES BÁSICAS (0-5) =====
         features[i, 0] = ts.mean()
-        features[i, 1] = np.sqrt(np.var(ts))
+        features[i, 1] = np.std(ts)
         features[i, 2] = ts.max()
         features[i, 3] = ts.min()
-        features[i, 4] = (ts > 0).sum() / len(ts)
-        features[i, 5] = ts.sum() / len(ts)
+        features[i, 4] = (ts > 0).sum() / n  # Frequência de dias ativos
+        features[i, 5] = ts.sum()
         
-        if len(ts) > 5:
-            recent = ts[-5:].mean()
-            old = ts[:5].mean()
-            features[i, 6] = recent - old
+        # ===== MOMENTUM E TENDÊNCIAS (6-10) =====
+        if n >= 14:
+            # Tendência: última semana vs semana anterior
+            last_week = ts[-7:].mean()
+            prev_week = ts[-14:-7].mean()
+            features[i, 6] = last_week - prev_week
+            
+            # Aceleração: tendência da tendência
+            if n >= 21:
+                earlier_week = ts[-21:-14].mean()
+                accel = (last_week - prev_week) - (prev_week - earlier_week)
+                features[i, 7] = accel
         
-        if len(ts) > 1:
-            features[i, 7] = np.mean(np.abs(np.diff(ts)))
+        # Momentum exponencial (últimos 3, 7, 14 dias)
+        if n >= 3:
+            features[i, 8] = ts[-3:].mean()
+        if n >= 7:
+            features[i, 9] = ts[-7:].mean()
+        if n >= 14:
+            features[i, 10] = ts[-14:].mean()
         
-        features[i, 8] = np.percentile(ts, 75) - np.percentile(ts, 25)
-        features[i, 9] = ts.sum()
+        # ===== VOLATILIDADE E VARIABILIDADE (11-14) =====
+        if n > 1:
+            # Volatilidade (média das mudanças absolutas)
+            features[i, 11] = np.mean(np.abs(np.diff(ts)))
+            
+            # Coeficiente de variação
+            if ts.mean() > 0:
+                features[i, 12] = ts.std() / ts.mean()
         
-        if len(ts) > 3 and ts.sum() > 0:
-            top3 = np.sum(np.sort(ts)[-3:])
-            features[i, 10] = top3 / ts.sum()
+        # IQR (robustez a outliers)
+        features[i, 13] = np.percentile(ts, 75) - np.percentile(ts, 25)
         
+        # Range normalizado
+        if ts.max() > 0:
+            features[i, 14] = (ts.max() - ts.min()) / ts.max()
+        
+        # ===== CONCENTRAÇÃO E DISTRIBUIÇÃO (15-18) =====
+        if ts.sum() > 0:
+            # Top-3 dias concentram quanto % do total?
+            top3_sum = np.sum(np.sort(ts)[-3:])
+            features[i, 15] = top3_sum / ts.sum()
+            
+            # Top-5 concentração
+            if n >= 5:
+                top5_sum = np.sum(np.sort(ts)[-5:])
+                features[i, 16] = top5_sum / ts.sum()
+        
+        # Relação max/mean (detecta spikes)
         if ts.mean() > 0:
-            features[i, 11] = ts.max() / ts.mean()
+            features[i, 17] = ts.max() / ts.mean()
+        
+        # Mediana/Mean (detecta assimetria)
+        if ts.mean() > 0:
+            features[i, 18] = np.median(ts) / ts.mean()
+        
+        # ===== PERIODICIDADE E GAPS (19-21) =====
+        if n > 7:
+            # Autocorrelação lag-7 (padrão semanal)
+            ts_normalized = (ts - ts.mean()) / (ts.std() + 1e-6)
+            if n >= 14:
+                autocorr_7 = np.corrcoef(ts_normalized[:-7], ts_normalized[7:])[0, 1]
+                features[i, 19] = autocorr_7 if not np.isnan(autocorr_7) else 0
+        
+        # Maior gap entre eventos
+        if (ts > 0).sum() >= 2:
+            event_indices = np.where(ts > 0)[0]
+            gaps = np.diff(event_indices)
+            features[i, 20] = gaps.max() if len(gaps) > 0 else 0
+        
+        # Média de gaps
+        if (ts > 0).sum() >= 2:
+            event_indices = np.where(ts > 0)[0]
+            gaps = np.diff(event_indices)
+            features[i, 21] = gaps.mean() if len(gaps) > 0 else 0
+        
+        # ===== RECÊNCIA (22-24) =====
+        # Quantos dias desde último evento?
+        last_event_idx = np.where(ts > 0)[0]
+        if len(last_event_idx) > 0:
+            features[i, 22] = n - last_event_idx[-1] - 1
+        else:
+            features[i, 22] = n  # Nunca teve evento
+        
+        # Intensidade do último evento
+        if len(last_event_idx) > 0:
+            features[i, 23] = ts[last_event_idx[-1]]
+        
+        # Intensidade média dos últimos 3 eventos
+        if (ts > 0).sum() >= 3:
+            last_3_events = ts[ts > 0][-3:]
+            features[i, 24] = last_3_events.mean()
     
-    features = np.nan_to_num(features, 0.0)
+    # Substituir NaN/Inf por 0
+    features = np.nan_to_num(features, nan=0.0, posinf=0.0, neginf=0.0)
     return features
 
+def extract_features_clean(X):
+    """Wrapper para compatibilidade - chama versão enhanced"""
+    return extract_features_enhanced(X)
+
 class RankingModelProduction(nn.Module):
-    """Modelo neural para ranking - versão produção"""
+    """Modelo neural para ranking - versão produção aprimorada"""
     def __init__(self, input_dim):
         super().__init__()
+        # Aumentado capacidade para capturar padrões mais complexos
         self.fc = nn.Sequential(
-            nn.Linear(input_dim, 32),
+            nn.Linear(input_dim, 64),
+            nn.ReLU(),
+            nn.BatchNorm1d(64),
+            nn.Dropout(0.3),
+            nn.Linear(64, 32),
             nn.ReLU(),
             nn.BatchNorm1d(32),
             nn.Dropout(0.2),
@@ -103,17 +193,17 @@ def train_model_for_day_final(X_train, X_test, y_train, y_test, day_name, device
     
     # Modelo
     model = RankingModelProduction(X_train_norm.shape[1]).to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=1e-5)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=10, factor=0.5)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.005, weight_decay=1e-4)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=15, factor=0.5)
     criterion = nn.MSELoss()
     
     best_test_loss = float('inf')
-    patience = 20
+    patience = 30
     patience_counter = 0
     best_model_state = None
     
     # Treinar
-    for epoch in range(150):
+    for epoch in range(250):
         model.train()
         optimizer.zero_grad()
         pred_train = model(X_train_t)

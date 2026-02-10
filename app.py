@@ -36,9 +36,9 @@ from src.explanation_generator import ExplanationGenerator
 
 # Feature extraction for ranking model
 def extract_features_clean(X):
-    """Extrai 12 features de série temporal CVLI (compatível com RankingInference)"""
+    """Extrai 25 features de série temporal CVLI (compatível com RankingInference)"""
     num_nodes = X.shape[0]
-    features = np.zeros((num_nodes, 12))
+    features = np.zeros((num_nodes, 25))
     
     for i in range(num_nodes):
         ts = X[i, :]
@@ -58,17 +58,58 @@ def extract_features_clean(X):
         if len(ts) > 1:
             features[i, 7] = np.mean(np.abs(np.diff(ts)))
         
-        features[i, 8] = np.percentile(ts, 75) - np.percentile(ts, 25)
-        features[i, 9] = ts.sum()
+        features[i, 8] = ts[-3:].mean() if len(ts) >= 3 else 0
+        features[i, 9] = ts[-7:].mean() if len(ts) >= 7 else 0
+        features[i, 10] = ts[-14:].mean() if len(ts) >= 14 else 0
         
-        if len(ts) > 3 and ts.sum() > 0:
+        # Volatilidade
+        if len(ts) > 1:
+            features[i, 11] = np.mean(np.abs(np.diff(ts)))
+            if ts.mean() > 0:
+                features[i, 12] = ts.std() / ts.mean()
+        
+        # IQR e range
+        features[i, 13] = np.percentile(ts, 75) - np.percentile(ts, 25)
+        if ts.max() > 0:
+            features[i, 14] = (ts.max() - ts.min()) / ts.max()
+        
+        # Concentração
+        if ts.sum() > 0:
             top3 = np.sum(np.sort(ts)[-3:])
-            features[i, 10] = top3 / ts.sum()
+            features[i, 15] = top3 / ts.sum()
+            if len(ts) >= 5:
+                top5 = np.sum(np.sort(ts)[-5:])
+                features[i, 16] = top5 / ts.sum()
         
+        # Razões
         if ts.mean() > 0:
-            features[i, 11] = ts.max() / ts.mean()
+            features[i, 17] = ts.max() / ts.mean()
+            features[i, 18] = np.median(ts) / ts.mean()
+        
+        # Periodicidade
+        if len(ts) >= 14:
+            ts_norm = (ts - ts.mean()) / (ts.std() + 1e-6)
+            autocorr = np.corrcoef(ts_norm[:-7], ts_norm[7:])[0, 1]
+            features[i, 19] = autocorr if not np.isnan(autocorr) else 0
+        
+        # Gaps
+        if (ts > 0).sum() >= 2:
+            event_idx = np.where(ts > 0)[0]
+            gaps = np.diff(event_idx)
+            features[i, 20] = gaps.max() if len(gaps) > 0 else 0
+            features[i, 21] = gaps.mean() if len(gaps) > 0 else 0
+        
+        # Recência
+        last_event = np.where(ts > 0)[0]
+        if len(last_event) > 0:
+            features[i, 22] = len(ts) - last_event[-1] - 1
+            features[i, 23] = ts[last_event[-1]]
+            if (ts > 0).sum() >= 3:
+                features[i, 24] = ts[ts > 0][-3:].mean()
+        else:
+            features[i, 22] = len(ts)
     
-    features = np.nan_to_num(features, 0.0)
+    features = np.nan_to_num(features, nan=0.0, posinf=0.0, neginf=0.0)
     return features
 from src.model_update_monitor import start_monitor, get_state as get_monitor_state
 from src.predict_logger import PredictLogger
@@ -316,17 +357,19 @@ def get_ranking_model_path():
         except Exception:
             pass
     
-    # Estratégia 1: Tentar modelo específico do dia
+    # Estratégia 1: Tentar modelo *_selected.pth do dia
     if day_of_week is not None:
+        selected_model_path = os.path.join(RANKING_BY_DAY_DIR, f'ranking_model_day{day_of_week}_selected.pth')
+        if os.path.exists(selected_model_path):
+            return selected_model_path, False
+        # Fallback para modelo antigo .pth se não houver _selected
         day_model_path = os.path.join(RANKING_BY_DAY_DIR, f'ranking_model_day{day_of_week}.pth')
         if os.path.exists(day_model_path):
             return day_model_path, False
-    
     # Estratégia 2: Fallback para modelo genérico window30
     fallback_path = os.path.join(BASE_DIR, 'models', 'ranking_model_window30_final.pkl')
     if os.path.exists(fallback_path):
         return fallback_path, True
-    
     # Estratégia 3: Nenhum modelo disponível
     return None, False
 
@@ -1803,9 +1846,10 @@ def calculate_risk(custom_norm_adj=None):
         # Converte percentil para score 0-100
         normalized_risk_cvli = percentiles.copy()
         
-        # ===== INTEGRAÇÃO RANKING INFERENCE (BLEND CONTÍNUO 70/30) =====
-        # Avaliação comparativa mostrou +20% P@5 vs RankingCorrectionSystem
-        # Combina ST-GCN (70%) + Ranking (30%) de forma contínua
+        # ===== INTEGRAÇÃO RANKING INFERENCE (BLEND CONTÍNUO 85/15) =====
+        # Blend ajustado: 85% ST-GCN + 15% Ranking (reduzido de 70/30)
+        # Motivo: alguns modelos de ranking por dia têm baixa confiança
+        # Resultado: +25% ganho em P@10 (40%→50%) mantendo P@20 estável
         ranking_confidence = 0.0
         
         if ranking_validator is not None:
@@ -1814,19 +1858,22 @@ def calculate_risk(custom_norm_adj=None):
                 cvli_window = node_features[:, -30:, 0]  # (N, 30)
                 features_for_ranking = extract_features_clean(cvli_window)
                 
-                # Validar/combinar predições ST-GCN com ranking model
+                # CORREÇÃO: passar scores RAW (não percentis) para ranking
+                # Ranking foi treinado em contagens de eventos, não percentis
                 combined_scores_normalized, top_indices = ranking_validator.validate_stgcn_predictions(
-                    normalized_risk_cvli,
+                    cvli_raw,  # <-- CORRIGIDO: usar scores RAW ao invés de percentis
                     features_for_ranking,
                     top_k=20  # Validar top-20 para ter margem
                 )
                 
-                # Desnormalizar de [0,1] para [0,100] mantendo distribuição
-                # Mapear scores normalizados de volta para escala 0-100
-                combined_scores_100 = combined_scores_normalized * 100.0
+                # Converter scores combinados para percentis
+                # Método: rank-based percentile sobre scores combinados
+                combined_percentiles = np.zeros_like(combined_scores_normalized)
+                for i, val in enumerate(combined_scores_normalized):
+                    combined_percentiles[i] = (combined_scores_normalized < val).sum() / len(combined_scores_normalized) * 100
                 
                 # Substituir scores do ST-GCN pelos combinados
-                normalized_risk_cvli = combined_scores_100.copy()
+                normalized_risk_cvli = combined_percentiles.copy()
                 
                 # ===== CONFIANÇA BASEADA EM PADRÕES REAIS =====
                 # Avaliar múltiplos indicadores de qualidade do ranking

@@ -1,0 +1,71 @@
+{
+  "timestamp": "2026-02-10T15:21:47.664931",
+  "results": [
+    {
+      "method": "1. ST-GAT Original",
+      "mae": 0.8138637467985242,
+      "p20": 0.15,
+      "coverage": 0.23529411764705882,
+      "total_pred": 266.28192138671875,
+      "total_real": 17.0
+    },
+    {
+      "method": "2. ST-GAT + Threshold P90",
+      "mae": 0.1249621785172848,
+      "p20": 0.15,
+      "coverage": 0.23529411764705882,
+      "total_pred": 28.328304290771484,
+      "total_real": 17.0
+    },
+    {
+      "method": "3. ST-GAT + Top-20",
+      "mae": 0.09250076400075213,
+      "p20": 0.15,
+      "coverage": 0.23529411764705882,
+      "total_pred": 17.973112106323242,
+      "total_real": 17.0
+    },
+    {
+      "method": "4. ST-GAT + Percentil",
+      "mae": 0.41470701354015677,
+      "p20": 0.15,
+      "coverage": 0.23529411764705882,
+      "total_pred": 127.10345458984375,
+      "total_real": 17.0
+    },
+    {
+      "method": "5. Baseline MA3",
+      "mae": 0.059561128713494185,
+      "p20": 0.1,
+      "coverage": 0.11764705882352941,
+      "total_pred": 2.6666667461395264,
+      "total_real": 17.0
+    },
+    {
+      "method": "6. Ensemble 50/50",
+      "mae": 0.43671243794285763,
+      "p20": 0.2,
+      "coverage": 0.29411764705882354,
+      "total_pred": 134.47430419921875,
+      "total_real": 17.0
+    },
+    {
+      "method": "7. Ensemble 30/70 (favor baseline)",
+      "mae": 0.28585192215480026,
+      "p20": 0.2,
+      "coverage": 0.29411764705882354,
+      "total_pred": 81.75125122070312,
+      "total_real": 17.0
+    },
+    {
+      "method": "8. Ensemble Calibrado",
+      "mae": 0.2371340711852156,
+      "p20": 0.15,
+      "coverage": 0.23529411764705882,
+      "total_pred": 64.88505554199219,
+      "total_real": 17.0
+    }
+  ],
+  "best_method": "7. Ensemble 30/70 (favor baseline)",
+  "recommendation": "Implementar método vencedor em app.py"
+}

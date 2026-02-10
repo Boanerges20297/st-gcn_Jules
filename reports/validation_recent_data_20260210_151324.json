@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-02-10T15:13:24.670062",
+  "model_type": "ST-GAT",
+  "validation_period": {
+    "start": "2026-02-03",
+    "end": "2026-02-05",
+    "days": 3
+  },
+  "metrics": {
+    "mae": 0.8138637467985242,
+    "rmse": 0.8246864505434607,
+    "precision_at_k": 0.15
+  },
+  "total_events": {
+    "predicted": 266.28192138671875,
+    "actual": 17
+  },
+  "data_summary": {
+    "total_records": 55,
+    "cvli_count": 17,
+    "cvp_count": 38
+  }
+}
