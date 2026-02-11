@@ -44,11 +44,25 @@ def get_feature_indices(day_num, X_train_feat, y_train):
     # Igual ao script de treino
     if day_num in [2, 4]:
         robust_idx = [0, 4, 5, 6, 8, 9, 10, 13, 17, 18, 22, 24]
-        corrs = [abs(np.corrcoef(X_train_feat[:, i], y_train)[0, 1]) for i in range(X_train_feat.shape[1])]
+        corrs = []
+        for i in range(X_train_feat.shape[1]):
+            std_x = np.std(X_train_feat[:, i])
+            std_y = np.std(y_train)
+            if std_x == 0 or std_y == 0:
+                corrs.append(0.0)
+            else:
+                corrs.append(abs(np.corrcoef(X_train_feat[:, i], y_train)[0, 1]))
         extra = [i for i in np.argsort(corrs)[::-1] if i not in robust_idx][:3]
         return robust_idx + extra
     else:
-        corrs = [abs(np.corrcoef(X_train_feat[:, i], y_train)[0, 1]) for i in range(X_train_feat.shape[1])]
+        corrs = []
+        for i in range(X_train_feat.shape[1]):
+            std_x = np.std(X_train_feat[:, i])
+            std_y = np.std(y_train)
+            if std_x == 0 or std_y == 0:
+                corrs.append(0.0)
+            else:
+                corrs.append(abs(np.corrcoef(X_train_feat[:, i], y_train)[0, 1]))
         return list(np.argsort(corrs)[-15:][::-1])
 
 def main():

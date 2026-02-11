@@ -1,0 +1,190 @@
+================================================================================
+ST-GCN PREDICTION LOG - RANKING VALIDATION
+================================================================================
+Timestamp: 2026-02-11 12:02:50
+
+1. RESUMO EXECUTIVO
+--------------------------------------------------------------------------------
+Total de nodes analisados: 319
+  • Crítico (≥90%):     48 ( 15%)
+  • Alto (80-89%):      20 (  6%)
+  • Moderado (50-79%):   0 (  0%)
+  • Baixo (20-49%):      0 (  0%)
+  • Sem Risco (<20%):  251 ( 78%)
+
+Ranking Source: stgcn_percentile
+Window CVLI: 30 dias
+Período: 2026-02-03 → 2026-02-06
+Última atualização: 2026-02-06
+
+2. RANKING ATUALIZADO (TOP 20 NODES)
+--------------------------------------------------------------------------------
+Rank  Node                                CVLI%   Ranking%  Status       Provenance                              
+--------------------------------------------------------------------------------------------------------------
+1     119 (IPARANA)                         99.7%        — Crítico                                              
+2     244 (JUAZEIRO DO NORTE)               99.4%        — Crítico                                              
+3     161 (ALCÂNTARAS)                      99.1%        — Crítico                                              
+4     140 (CAUCAIA)                         96.9%        — Crítico      exogenous, exogenous_critical           
+5     155 (TRAIRI)                          96.9%        — Crítico      exogenous, exogenous_critical           
+6     235 (ITAREMA)                         96.9%        — Crítico                                              
+7     253 (MERUOCA)                         96.9%        — Crítico                                              
+8     265 (NOVA OLINDA)                     96.9%        — Crítico                                              
+9     276 (PEDRA BRANCA)                    96.9%        — Crítico                                              
+10    307 (TARRAFAS)                        96.9%        — Crítico                                              
+11    51 (JACARECANGA)                      95.6%        — Crítico                                              
+12    166 (APUIARÉS)                        95.6%        — Crítico                                              
+13    184 (BOA VIAGEM)                      95.6%        — Crítico                                              
+14    234 (ITAPIÚNA)                        95.6%        — Crítico                                              
+15    14 (BOM JARDIM)                       95.0%        — Crítico      exogenous, exogenous_critical           
+16    19 (CANINDEZINHO)                     95.0%        — Crítico      exogenous, exogenous_critical           
+17    24 (COAÇU)                            95.0%        — Crítico      exogenous, exogenous_critical           
+18    45 (GRANJA LISBOA)                    95.0%        — Crítico      exogenous, exogenous_critical           
+19    52 (JANGURUSSU)                       95.0%        — Crítico      exogenous, exogenous_critical           
+20    61 (JOSÉ DE ALENCAR)                  95.0%        — Crítico      exogenous, exogenous_critical           
+
+3. CORREÇÕES FEITAS PELO RANKING (DEMOTIONS)
+--------------------------------------------------------------------------------
+✅ Nenhuma demoção de ranking detectada.
+Todos os nodes mantiveram seu score baseado no modelo ST-GCN.
+
+4. PADRÕES IDENTIFICADOS (PROVENANCE)
+--------------------------------------------------------------------------------
+📊 Padrões de risco detectados:
+
+⚠️ EVENTOS EXÓGENOS (30 nodes)
+   Nodes afetados por conflitos ou eventos especiais.
+   Exemplo: [14, 15, 19, 24, 45]
+
+🚨 EVENTOS CRÍTICOS (26 nodes)
+   Nodes com conflitos de alta severidade.
+   Exemplo: [14, 19, 24, 45, 52]
+
+🗺️ BOOST POR VIZINHANÇA (10 nodes)
+   Nodes elevados por proximidade com área crítica.
+   Exemplo: [0, 1, 2, 3, 4]
+
+📈 Resumo Estatístico:
+   Nodes com padrão detectado: 40/319 (12%)
+
+5. DISTRIBUIÇÃO E ESTATÍSTICAS
+--------------------------------------------------------------------------------
+📊 Distribuição de Scores (Normalizados):
+  Mínimo: 0.0%
+  Máximo: 99.7%
+  Média:  19.8%
+
+  Percentis:
+    P50:    0.0%
+    P75:    0.0%
+    P90:   95.0%
+    P95:   95.0%
+    P99:   96.9%
+
+📊 Estatísticas de Histórico (CVLI 14 dias):
+  Mínimo: 0 ocorrências
+  Máximo: 0 ocorrências
+  Média:  0.0 ocorrências
+
+  Percentis:
+    P50:   0 ocorrências
+    P75:   0 ocorrências
+    P90:   0 ocorrências
+    P95:   0 ocorrências
+
+6. CONFIGURAÇÃO DO MODELO
+--------------------------------------------------------------------------------
+Window CVLI: 30 dias
+Window CVP:  30 dias
+Ranking Source: stgcn_percentile
+
+Ranking Validation Thresholds:
+  Top 1%:  96.9%
+  Top 5%:  95.0%
+  Top 10%: 95.0%
+  Método: stgcn_percentile
+
+7. EVENTOS EXÓGENOS DETECTADOS
+--------------------------------------------------------------------------------
+Total: 30 areas afetadas
+
+Node 14 (BOM JARDIM) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+
+Node 15 (BONSUCESSO) - ⚠️ MODERADO (85.0%)
+  🔴 Conflito ativo detectado (severidade moderada)
+
+Node 19 (CANINDEZINHO) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+
+Node 24 (COAÇU) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+
+Node 45 (GRANJA LISBOA) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+
+Node 52 (JANGURUSSU) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+
+Node 61 (JOSÉ DE ALENCAR) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+
+Node 63 (LAGOA REDONDA) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+
+Node 68 (MESSEJANA) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+
+Node 81 (PARQUE IRACEMA) - 🚨 CRÍTICO (95.0%)
+  🔴 Conflito ativo detectado (severidade alta)
+
+
+8. ANÁLISE CRÍTICA (NODES COM RISCO CRÍTICO)
+--------------------------------------------------------------------------------
+⚠️ 48 nodes em nível CRÍTICO:
+
+1. Node 119 (IPARANA) - 99.7% | CVLI Pred: 0.0 | Facção: TCP
+   • 🎯 Área no top 10% de maior risco (modelo ST-GCN)
+   • 🏴 Território de influência: TCP
+
+2. Node 244 (JUAZEIRO DO NORTE) - 99.4% | CVLI Pred: 0.0 | Facção: N/A
+   • 🎯 Área no top 10% de maior risco (modelo ST-GCN)
+   • 🏴 Território de influência: N/A
+
+3. Node 161 (ALCÂNTARAS) - 99.1% | CVLI Pred: 0.0 | Facção: COMANDO VERMELHO
+   • 🎯 Área no top 10% de maior risco (modelo ST-GCN)
+   • 🏴 Território de influência: COMANDO VERMELHO
+
+4. Node 140 (CAUCAIA) - 96.9% | CVLI Pred: 0.0 | Facção: N/A
+   • 🔴 Conflito ativo detectado (severidade alta)
+   • 🎯 Área no top 10% de maior risco (modelo ST-GCN)
+   • 🏴 Território de influência: N/A
+
+5. Node 155 (TRAIRI) - 96.9% | CVLI Pred: 0.0 | Facção: N/A
+   • 🔴 Conflito ativo detectado (severidade alta)
+   • 🎯 Área no top 10% de maior risco (modelo ST-GCN)
+   • 🏴 Território de influência: N/A
+
+6. Node 235 (ITAREMA) - 96.9% | CVLI Pred: 0.0 | Facção: N/A
+   • 🎯 Área no top 10% de maior risco (modelo ST-GCN)
+   • 🏴 Território de influência: N/A
+
+7. Node 253 (MERUOCA) - 96.9% | CVLI Pred: 0.0 | Facção: N/A
+   • 🎯 Área no top 10% de maior risco (modelo ST-GCN)
+   • 🏴 Território de influência: N/A
+
+8. Node 265 (NOVA OLINDA) - 96.9% | CVLI Pred: 0.0 | Facção: PCC
+   • 🎯 Área no top 10% de maior risco (modelo ST-GCN)
+   • 🏴 Território de influência: PCC
+
+9. Node 276 (PEDRA BRANCA) - 96.9% | CVLI Pred: 0.0 | Facção: N/A
+   • 🎯 Área no top 10% de maior risco (modelo ST-GCN)
+   • 🏴 Território de influência: N/A
+
+10. Node 307 (TARRAFAS) - 96.9% | CVLI Pred: 0.0 | Facção: N/A
+   • 🎯 Área no top 10% de maior risco (modelo ST-GCN)
+   • 🏴 Território de influência: N/A
+
+
+================================================================================
+FIM DO LOG
+================================================================================

@@ -119,6 +119,73 @@ def guess_name(props):
     
     return None
 
+
+# ================= ENRIQUECIMENTO DE MICRO-NÓS COM RUAS CRÍTICAS =================
+import math
+
+def haversine_distance(lon1, lat1, lon2, lat2):
+    R = 6371000  # metros
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlambda = math.radians(lon2 - lon1)
+    a = math.sin(dphi/2)**2 + math.cos(phi1)*math.cos(phi2)*math.sin(dlambda/2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return R * c
+
+def load_exogenous_points(json_path):
+    import json
+    points = []
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        for event in data:
+            for pt in event.get('points', []):
+                if 'lat' in pt and 'lng' in pt and 'description' in pt:
+                    points.append({
+                        'lat': pt['lat'],
+                        'lng': pt['lng'],
+                        'description': pt['description']
+                    })
+    except Exception as e:
+        print(f'Erro ao carregar eventos exógenos: {e}')
+    return points
+
+
+import re
+def extract_street(desc):
+    # Tenta extrair nome de rua de uma descrição
+    # Ex: "RUA JOÃO HENRIQUE DA SILVA SN" ou "AV. CAPITÃO HUGO BEZERRA, 221"
+    m = re.search(r'(RUA|AV\.?|AVENIDA|TRAVESSA|ALAMEDA|RODOVIA|ESTRADA|VILA|PRAÇA|PRACA|LARGO|BECO|PASSAGEM|CAMINHO|R\. |AV |R |RUA |AVENIDA )([A-Z0-9 .\-ÁÉÍÓÚÃÕÇÊÂÔÜ]+)', desc.upper())
+    if m:
+        return m.group(0).title()
+    return desc.split('-')[0].strip().title() if '-' in desc else desc.title()
+
+def find_critical_streets(lon, lat, exo_points, max_dist=1000):
+    # max_dist em metros (aumentado para 1000)
+    close = []
+    for pt in exo_points:
+        dist = haversine_distance(lon, lat, pt['lng'], pt['lat'])
+        if dist <= max_dist:
+            street = extract_street(pt['description'])
+            close.append((dist, street))
+    close.sort()
+    # Remove duplicatas mantendo ordem
+    seen = set()
+    result = []
+    for _, street in close:
+        if street not in seen:
+            seen.add(street)
+            result.append(street)
+        if len(result) == 3:
+            break
+    return result
+
+
+# Usar arquivo geocodificado para obter descrições de ruas mais detalhadas
+EXOGENOUS_EVENTS_PATH = os.path.join(BASE_DIR, 'data', 'exogenous_events_geocoded.json')
+EXO_POINTS = load_exogenous_points(EXOGENOUS_EVENTS_PATH)
+
 print('='*70)
 print('EXTRAÇÃO TOP20 MICRO-NÓS - VERSÃO 2 (REGIONAL)')
 print('='*70)
@@ -259,6 +326,8 @@ for region_name in ['capital', 'rmf', 'interior']:
     
     for rank, feat in enumerate(selected, 1):
         name = feat['name'] or f"{Path(feat['source']).stem} - Área {rank}"
+        # Enriquecer com ruas críticas próximas
+        critical_streets = find_critical_streets(feat['lon'], feat['lat'], EXO_POINTS)
         feat_obj = {
             'type': 'Feature',
             'properties': {
@@ -271,7 +340,8 @@ for region_name in ['capital', 'rmf', 'interior']:
                 'region': region_name,
                 'geometry_type': 'Point',
                 'source_geometry_type': feat['geometry_type'],
-                'is_centroid': feat['geometry_type'] not in ('Point', 'MultiPoint')
+                'is_centroid': feat['geometry_type'] not in ('Point', 'MultiPoint'),
+                'critical_streets': critical_streets
             },
             'geometry': {
                 'type': 'Point',

@@ -583,10 +583,23 @@
                         var icon = makePinSimple(color);
                         var m = L.marker([lat, lon], {icon: icon});
                         var displayName = (f.properties && (f.properties.name || f.properties.nome)) || 'Área';
-                        var popup = '<strong>'+ (f.properties.rank||'') + '. ' + displayName + '</strong><br/>' +
-                                    (f.properties.source? f.properties.source + '<br/>':'') +
-                                    'ID: ' + (f.properties.node_id || '') + '<br/>' +
-                                    'Score: ' + Math.round(f.properties.score||0);
+                        // Mapeamento do nome do arquivo para facção amigável
+                        var faccaoMap = {
+                            'COMANDO VERMELHO.geojson': 'Comando Vermelho',
+                            'TERCEIRO COMANDO PURO.geojson': 'Terceiro Comando Puro',
+                            'MASSA.geojson': 'Massa',
+                            'PRIMEIRO COMANDO DA CAPITAL.geojson': 'Primeiro Comando da Capital',
+                            'COMUNIDADES EM DISPUTA.geojson': 'Comunidades em Disputa',
+                            'OKAIDA.geojson': 'Okaida',
+                            'TERRITÓRIOS FANTASMAS.geojson': 'Territórios Fantasmas',
+                        };
+                        var faccao = faccaoMap[f.properties.source] || (f.properties.faction || 'Não identificado');
+                        // Placeholder para ruas críticas (pode ser alimentado via backend futuramente)
+                        var ruasCriticas = f.properties.critical_streets || '<span style="color:#888">(dados não disponíveis)</span>';
+                        var popup = '<strong>' + (f.properties.rank || '') + '. ' + displayName + '</strong><br/>' +
+                                    '<b>Facção:</b> ' + faccao + '<br/>' +
+                                    '<b>Ruas mais críticas:</b> ' + ruasCriticas + '<br/>' +
+                                    (f.properties.score ? '<b>Score de risco:</b> ' + Math.round(f.properties.score) + '<br/>' : '');
                         m.bindPopup(popup);
                         top20Layer.addLayer(m);
                     }catch(e){ console.warn('[Top20] feature error', e, f); }
