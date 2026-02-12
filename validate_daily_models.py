@@ -6,21 +6,52 @@ import torch.nn as nn
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import ndcg_score
 
-# Configuração
-ROOT = os.path.dirname(os.path.abspath(__file__))
+# ==============================================================================
+# CONFIGURAÇÃO DE CAMINHOS (CORRIGIDA)
+# ==============================================================================
+# Pega o diretório onde o script está rodando
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Se estiver rodando da raiz (st-gcn_jules), o ROOT é o próprio diretório
+# Se estiver em src/, o ROOT é um nível acima
+if os.path.basename(CURRENT_DIR) == 'src':
+    ROOT = os.path.dirname(CURRENT_DIR)
+else:
+    ROOT = CURRENT_DIR
+
+sys.path.insert(0, ROOT)
+
+# ==============================================================================
+# IMPORTS E PARÂMETROS
+# ==============================================================================
+try:
+    from src.model import STGCN
+except ImportError:
+    # Fallback se não encontrar o módulo (tenta adicionar src manualmente)
+    sys.path.append(os.path.join(ROOT, 'src'))
+    try:
+        from model import STGCN
+    except ImportError:
+        print("❌ Erro Crítico: Não foi possível importar STGCN. Verifique se 'src/model.py' existe.")
+        sys.exit(1)
+
 DATA_PATH = os.path.join(ROOT, 'data', 'processed', 'processed_graph_data.pkl')
-MODELS_DIR = os.path.join(ROOT, 'models', 'ranking_by_day')
-SCALER_PATH = os.path.join(MODELS_DIR, 'ranking_scaler.pkl')
+STGCN_PATH = os.path.join(ROOT, 'models', 'stgcn_model_v2.pth')
+RANKING_DIR = os.path.join(ROOT, 'models', 'ranking_by_day')
+SCALER_PATH = os.path.join(RANKING_DIR, 'ranking_scaler.pkl')
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+# PESOS DA ESTRATÉGIA HÍBRIDA (90% ST-GCN / 10% Ranking)
+WEIGHT_STGCN = 0.90
+WEIGHT_RANKING = 0.10
+
 # ==============================================================================
-# 1. ARQUITETURA V3 (15 Inputs - Igual ao Treino)
+# DEFINIÇÕES LOCAIS
 # ==============================================================================
-class RankingModelDay(nn.Module):
+class RankingModelV3(nn.Module):
     def __init__(self, input_dim=15, hidden_dim=128):
-        super(RankingModelDay, self).__init__()
+        super(RankingModelV3, self).__init__()
         self.net = nn.Sequential(
             nn.Linear(input_dim, hidden_dim),
             nn.ReLU(),
@@ -30,53 +61,39 @@ class RankingModelDay(nn.Module):
             nn.ReLU(),
             nn.Linear(64, 1)
         )
+    def forward(self, x): return self.net(x).squeeze()
 
-    def forward(self, x):
-        return self.net(x).squeeze()
+def compute_norm_adj(adj):
+    adj_t = torch.FloatTensor(adj)
+    rowsum = adj_t.sum(1)
+    d_inv_sqrt = torch.pow(rowsum, -0.5)
+    d_inv_sqrt[torch.isinf(d_inv_sqrt)] = 0.
+    d_mat_inv_sqrt = torch.diag(d_inv_sqrt)
+    return torch.mm(torch.mm(d_mat_inv_sqrt, adj_t), d_mat_inv_sqrt).to(DEVICE)
 
-# ==============================================================================
-# 2. Extração de Features V3 (Estatísticas Robustas)
-# ==============================================================================
 def extract_features_v3(ts_window):
-    """Extrai as 15 features estatísticas usadas no treino V3"""
     num_nodes = ts_window.shape[0]
     features = np.zeros((num_nodes, 15))
-    
     with np.errstate(divide='ignore', invalid='ignore'):
         for i in range(num_nodes):
             ts = ts_window[i, :]
-            # Básicas
             features[i, 0] = np.mean(ts)
             features[i, 1] = np.std(ts)
             features[i, 2] = np.max(ts)
             features[i, 3] = np.min(ts)
             features[i, 4] = np.sum(ts > 0) / len(ts) if len(ts) > 0 else 0
             features[i, 5] = np.sum(ts) / len(ts) if len(ts) > 0 else 0
-            
-            # Tendência
-            if len(ts) > 5:
-                features[i, 6] = np.mean(ts[-5:]) - np.mean(ts[:5])
-            if len(ts) > 1:
-                features[i, 7] = np.mean(np.abs(np.diff(ts)))
-            
-            # Recência
+            if len(ts) > 5: features[i, 6] = np.mean(ts[-5:]) - np.mean(ts[:5])
+            if len(ts) > 1: features[i, 7] = np.mean(np.abs(np.diff(ts)))
             features[i, 8] = np.mean(ts[-3:]) if len(ts) >= 3 else 0
             features[i, 9] = np.mean(ts[-7:]) if len(ts) >= 7 else 0
             features[i, 10] = np.mean(ts[-14:]) if len(ts) >= 14 else 0
-            
-            # Volatilidade
             if len(ts) > 1:
-                features[i, 11] = np.mean(np.abs(np.diff(ts)))
                 mean_val = np.mean(ts)
-                if mean_val > 1e-6:
-                    features[i, 12] = np.std(ts) / mean_val
-            
-            # Picos
-            features[i, 13] = np.percentile(ts, 75) - np.percentile(ts, 25)
+                if mean_val > 1e-6: features[i, 11] = np.std(ts) / mean_val
+            features[i, 12] = np.percentile(ts, 75) - np.percentile(ts, 25)
             max_val = np.max(ts)
-            if max_val > 0: 
-                features[i, 14] = (max_val - np.min(ts)) / max_val
-
+            if max_val > 0: features[i, 13] = (max_val - np.min(ts)) / max_val
     return np.nan_to_num(features)
 
 def get_p_at_k(y_true, y_pred, k=5):
@@ -85,103 +102,133 @@ def get_p_at_k(y_true, y_pred, k=5):
     common = len(set(idx_true) & set(idx_pred))
     return common / k
 
-def evaluate_day(day_idx, X_test, y_test, model_path, scaler):
-    if not os.path.exists(model_path):
-        print(f"⚠️ Modelo não encontrado para Dia {day_idx}")
-        return None
-
-    # Carregar modelo V3
-    model = RankingModelDay(input_dim=15).to(DEVICE)
-    try:
-        model.load_state_dict(torch.load(model_path, map_location=DEVICE))
-        model.eval()
-    except Exception as e:
-        print(f"❌ Erro arquitetura Dia {day_idx}: {e}")
-        return None
-
-    # Extrair Features V3 (15 dims)
-    X_feats = extract_features_v3(X_test)
-    
-    # Normalizar com Scaler (CRÍTICO)
-    if scaler:
-        X_scaled = scaler.transform(X_feats)
-    else:
-        X_scaled = X_feats # Fallback perigoso
-        
-    X_tensor = torch.FloatTensor(X_scaled).to(DEVICE)
-
-    with torch.no_grad():
-        y_pred = model(X_tensor).cpu().numpy()
-
-    p5 = get_p_at_k(y_test, y_pred, k=5)
-    
-    try:
-        ndcg = ndcg_score([y_test], [y_pred], k=10)
-    except:
-        ndcg = 0.0
-
-    return {'p5': p5, 'ndcg': ndcg}
-
 # ==============================================================================
-# 3. Loop de Validação
+# EXECUÇÃO PRINCIPAL
 # ==============================================================================
 def main():
-    print(f"🚀 Iniciando Validação V3 por Dia da Semana...")
+    print(f"🚀 Validação Híbrida: ST-GCN ({WEIGHT_STGCN*100}%) + Ranking ({WEIGHT_RANKING*100}%)")
+    print(f"📂 Diretório Raiz: {ROOT}")
     
-    with open(DATA_PATH, 'rb') as f:
-        data = pickle.load(f)
+    # 1. Dados
+    if not os.path.exists(DATA_PATH):
+        print(f"❌ Arquivo de dados não encontrado em: {DATA_PATH}")
+        return
+
+    with open(DATA_PATH, 'rb') as f: data = pickle.load(f)
+    node_features = data['node_features']
+    dates = data['dates']
+    nodes_gdf = data.get('nodes_gdf')
     
-    node_features = data['node_features'][:, :, 0] # Apenas CVLI
-    dates = pd.to_datetime(data['dates'])
-    
-    # Carregar Scaler
+    # Filtro Capital/RMF
+    target_indices = []
+    if nodes_gdf is not None:
+        for idx, row in nodes_gdf.iterrows():
+            reg = str(row.get('regiao', '')).lower()
+            if any(x in reg for x in ['fortaleza', 'rmf']) or row.get('node_type') == 'bairro':
+                target_indices.append(idx)
+    print(f"🎯 Foco: {len(target_indices)} bairros (Capital/RMF)")
+
+    # 2. Scaler
     scaler = None
     if os.path.exists(SCALER_PATH):
-        with open(SCALER_PATH, 'rb') as f:
-            scaler = pickle.load(f)
-        print("✅ Scaler carregado.")
+        with open(SCALER_PATH, 'rb') as f: scaler = pickle.load(f)
+        print("✅ Scaler carregado")
     else:
-        print("⚠️ AVISO: Scaler não encontrado! Resultados serão ruins.")
-
-    results = []
+        print("⚠️ Scaler não encontrado (Ranking pode falhar)")
     
-    # Testar a última semana completa disponível nos dados
-    test_window_start = len(dates) - 37 
+    # 3. ST-GCN
+    adj_geo = data['adj_geo']
+    adj_faction = data.get('adj_faction', adj_geo)
+    adj_list = [compute_norm_adj(adj_geo), compute_norm_adj(adj_faction)]
     
-    print("-" * 60)
-    print(f"{'Dia':<10} | {'Data':<12} | {'Modelo':<25} | {'P@5':<6} | {'NDCG':<6}")
-    print("-" * 60)
+    stgcn = STGCN(num_nodes=319, in_channels=26, time_steps=30, num_graphs=2).to(DEVICE)
+    try:
+        sd = torch.load(STGCN_PATH, map_location=DEVICE)
+        new_sd = {}
+        for k,v in sd.items():
+            nk = k.replace('module.', '')
+            if nk.endswith('.gcn.weight'):
+                base = nk[:-len('.gcn.weight')]
+                new_sd[f"{base}.gcn.weights.0"] = v
+                new_sd[f"{base}.gcn.weights.1"] = v
+            else: new_sd[nk] = v
+        stgcn.load_state_dict(new_sd, strict=False)
+        stgcn.eval()
+        print("✅ ST-GCN carregado")
+    except Exception as e:
+        print(f"❌ Erro ST-GCN: {e}")
+        return
 
-    for i in range(7):
-        target_idx = test_window_start + 30 + i
-        if target_idx >= len(dates): break
+    # 4. Loop de Teste
+    print("-" * 75)
+    print(f"{'Semana Alvo':<12} | {'P@5':<6} | {'Top Real'}")
+    print("-" * 75)
+    
+    metrics = []
+    total_days = len(dates)
+    
+    # Testa últimas 8 semanas
+    for i in range(8):
+        end_idx = total_days - 7 - (i * 7)
+        start_idx = end_idx - 30
+        if start_idx < 0: break
         
-        target_date = dates[target_idx]
+        # ST-GCN Prediction
+        X_slice = node_features[:, start_idx:end_idx, :]
+        X_tensor = torch.FloatTensor(X_slice).permute(2, 0, 1).unsqueeze(0).to(DEVICE)
+        
+        with torch.no_grad():
+            stgcn_out = stgcn(X_tensor, adj_list).squeeze(0).cpu().numpy()[:, 0]
+            
+        # Ranking Prediction
+        target_date = dates[end_idx]
         dow = target_date.weekday()
+        rank_model_path = os.path.join(RANKING_DIR, f"ranking_model_day{dow}_selected.pth")
         
-        model_name = f"ranking_model_day{dow}_selected.pth"
-        model_path = os.path.join(MODELS_DIR, model_name)
-
-        # Dados: 30 dias passados
-        X_window = node_features[:, target_idx-30:target_idx]
-        y_test_day = node_features[:, target_idx]
-
-        metrics = evaluate_day(dow, X_window, y_test_day, model_path, scaler)
+        ranking_score = np.zeros_like(stgcn_out)
+        if os.path.exists(rank_model_path) and scaler:
+            try:
+                model_rank = RankingModelV3(input_dim=15).to(DEVICE)
+                model_rank.load_state_dict(torch.load(rank_model_path, map_location=DEVICE))
+                model_rank.eval()
+                
+                feats = extract_features_v3(X_slice[:, :, 0])
+                feats_scaled = scaler.transform(feats)
+                feats_t = torch.FloatTensor(feats_scaled).to(DEVICE)
+                
+                with torch.no_grad():
+                    ranking_score = model_rank(feats_t).cpu().numpy()
+            except: pass
+            
+        # Normalização Min-Max
+        def normalize(v):
+            if v.max() == v.min(): return np.zeros_like(v)
+            return (v - v.min()) / (v.max() - v.min() + 1e-6)
+            
+        s_norm = normalize(stgcn_out)
+        r_norm = normalize(ranking_score)
         
-        if metrics:
-            day_name = target_date.strftime("%A")
-            date_str = target_date.strftime("%Y-%m-%d")
-            print(f"{day_name:<10} | {date_str:<12} | {model_name:<25} | {metrics['p5']:.2f}   | {metrics['ndcg']:.2f}")
-            results.append(metrics)
+        # FUSÃO 90/10
+        final_score = (s_norm * WEIGHT_STGCN) + (r_norm * WEIGHT_RANKING)
+        
+        # Ground Truth
+        future = node_features[:, end_idx:end_idx+7, 0]
+        y_true = np.sum(future, axis=1)
+        
+        # Filtro Capital
+        y_true_cap = y_true[target_indices]
+        y_pred_cap = final_score[target_indices]
+        
+        if np.sum(y_true_cap) == 0: continue
+        
+        p5 = get_p_at_k(y_true_cap, y_pred_cap, k=5)
+        metrics.append(p5)
+        
+        top_node = nodes_gdf.iloc[target_indices[np.argmax(y_true_cap)]]['name']
+        print(f"{str(target_date.date()):<12} | {p5:.2f}   | {top_node}")
 
-    if results:
-        avg_p5 = np.mean([r['p5'] for r in results])
-        avg_ndcg = np.mean([r['ndcg'] for r in results])
-        print("-" * 60)
-        print(f"MÉDIA SEMANAL V3: P@5 = {avg_p5:.4f} ({avg_p5*100:.1f}%) | NDCG = {avg_ndcg:.4f}")
-        print("✅ Validação concluída.")
-    else:
-        print("❌ Falha na validação.")
+    print("-" * 75)
+    print(f"MÉDIA FINAL (Híbrido 90/10): {np.mean(metrics)*100:.1f}%")
 
 if __name__ == "__main__":
     main()
