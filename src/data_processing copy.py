@@ -465,9 +465,9 @@ def main():
 
     # 5. Feature Tensor
     max_date = occurrences_df['data'].max()
-    # Aumentado para 1000 dias (aprox 33 meses) para capturar a inteligência de longo prazo
-    min_date = max_date - pd.Timedelta(days=1000)
-    print(f"Janela de Treino Expandida (Phase 5): {min_date.date()} a {max_date.date()}")
+    # Pega 6 meses de histórico para permitir Backtesting/Validação
+    min_date = max_date - pd.Timedelta(days=180)
+    print(f"Janela de Treino Definida: {min_date.date()} a {max_date.date()}")
 
     node_features, dates = build_feature_tensor(nodes_gdf, occurrences_df, min_date, max_date, exogenous_events)
 

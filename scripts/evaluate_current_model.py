@@ -12,11 +12,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.model import STGCN
 
-DATA_FILE = 'data/processed/processed_graph_data.pkl'
+DATA_FILE = 'data/processed/processed_graph_data_dense.pkl'
 MODEL_PATH = 'models/stgcn_model_v2.pth'
 HISTORY_WINDOW = 30
 HORIZON = 7
-BATCH_SIZE = 64
+BATCH_SIZE = 16
 
 # --- Metric & Loss Definitions (Copied from src/train.py for standalone execution) ---
 

@@ -11,6 +11,7 @@ import numpy as np
 from numpy.lib.stride_tricks import sliding_window_view
 import os
 import sys
+import argparse
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -23,7 +24,7 @@ MODEL_DIR = 'models'
 MODEL_PATH = os.path.join(MODEL_DIR, 'stgcn_model_v2.pth')  # v2: 26 canais categóricos (one-hot)
 HISTORY_WINDOW = 30  # Use 30 days history for input (matches production training)
 HORIZON = 7  # Predict next 7 days
-BATCH_SIZE = 64  # 1. Ajuste fino: 16-32 para gradientes mais estáveis
+BATCH_SIZE = 8  # Ajustado para evitar problemas de memória e melhorar estabilidade
 EPOCHS = 60  # 5. Ajuste fino: 50+ para convergência completa
 LEARNING_RATE = 0.0002  # 2. Ajuste fino: Manter 0.0001 (dados em escala original)
 GAMMA = 1.5  # 3. Ajuste fino: Testar 1.5-2.0 (amplificação moderada)
@@ -152,16 +153,43 @@ def precision_at_k(pred, target, k=5):
 
 def main():
     logger = get_logger()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--train_start', type=str, default=None, help='Data inicial do treino (YYYY-MM-DD)')
+    parser.add_argument('--train_end', type=str, default=None, help='Data final do treino (YYYY-MM-DD)')
+    parser.add_argument('--val_start', type=str, default=None, help='Data inicial da validação (YYYY-MM-DD)')
+    parser.add_argument('--val_end', type=str, default=None, help='Data final da validação (YYYY-MM-DD)')
+    parser.add_argument('--data_file', type=str, default=DATA_FILE, help='Arquivo de dados processados (.pkl)')
+    args = parser.parse_args()
+
     if not os.path.exists(MODEL_DIR):
         os.makedirs(MODEL_DIR)
 
-    logger.info("Carregando dados...")
-    with open(DATA_FILE, 'rb') as f:
+    logger.info(f"Carregando dados de {args.data_file}...")
+    with open(args.data_file, 'rb') as f:
         data_pack = pickle.load(f)
 
     node_features = data_pack['node_features']
+    dates = data_pack['dates']
     adj_geo = data_pack['adj_geo']
     adj_conflict = data_pack['adj_conflict']
+
+    # Filtragem por período
+    import pandas as pd
+    dates = pd.to_datetime(dates)
+    train_mask = np.ones(len(dates), dtype=bool)
+    val_mask = np.ones(len(dates), dtype=bool)
+    if args.train_start:
+        train_mask &= dates >= pd.to_datetime(args.train_start)
+    if args.train_end:
+        train_mask &= dates <= pd.to_datetime(args.train_end)
+    if args.val_start:
+        val_mask &= dates >= pd.to_datetime(args.val_start)
+    if args.val_end:
+        val_mask &= dates <= pd.to_datetime(args.val_end)
+
+    # Aplica máscara nos dados
+    node_features_train = node_features[:, train_mask, :]
+    node_features_val = node_features[:, val_mask, :]
 
     def normalize_adj(adj_np):
         adj_t = torch.FloatTensor(adj_np)
@@ -176,25 +204,21 @@ def main():
     norm_adj_list = [norm_adj_geo, norm_adj_conflict]
 
     logger.info("Criando janelas temporais...")
-    X, Y = prepare_dataset(node_features)
-    
-    split_idx = int(len(X) * 0.8)
-    X_train, X_val = X[:split_idx], X[split_idx:]
-    Y_train, Y_val = Y[:split_idx], Y[split_idx:]
+    X_train, Y_train = prepare_dataset(node_features_train)
+    X_val, Y_val = prepare_dataset(node_features_val)
     
     logger.info(f"Treino: {X_train.shape}, Validação: {X_val.shape}")
-    
+
     # Datasets
     train_dataset = BalancedWindowDataset(X_train, Y_train)
-    # Ensure validation data is also writable/contiguous before TensorDataset
     val_dataset = TensorDataset(
         torch.FloatTensor(X_val.copy()),
         torch.FloatTensor(Y_val.copy())
     )
-    
+
     train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
-    
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logger.info(f"Usando dispositivo: {device}")
 

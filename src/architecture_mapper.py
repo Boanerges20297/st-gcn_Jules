@@ -16,7 +16,9 @@ Permite:
 import numpy as np
 import geopandas as gpd
 from shapely.geometry import Point, Polygon
+from shapely.strtree import STRtree
 from scipy.spatial import KDTree
+from scipy.spatial.distance import cdist
 from typing import Dict, List, Tuple, Optional, Set
 import logging
 
@@ -98,6 +100,11 @@ class ArchitectureMapper:
         self.kdtree_coords = None
         self._build_kdtree()
         
+        # STRtree para busca geométrica exata (ponto em polígono)
+        self.strtree = None
+        self.real_nodes_list = []
+        self._build_strtree()
+        
         # Matriz de adjacência: a ser construída
         self.adjacency_matrix = None
         self.adjacency_type = None  # 'geo', 'faction', 'combined'
@@ -143,6 +150,16 @@ class ArchitectureMapper:
             self.kdtree = KDTree(self.kdtree_coords)
             logger.debug(f"KDTree built with {len(coords)} coordinates")
     
+    def _build_strtree(self):
+        """Cria índice espacial (R-tree) para consultas rápidas de geometria."""
+        # Lista ordenada de nós reais para mapear índice do STRtree de volta ao Node
+        self.real_nodes_list = [n for n in self.nodes.values() if n.is_real()]
+        geometries = [n.geometry for n in self.real_nodes_list]
+        
+        if geometries:
+            self.strtree = STRtree(geometries)
+            logger.debug(f"STRtree built with {len(geometries)} polygons")
+
     # ========== NODE LOOKUP ==========
     
     def get_node_by_name(self, name: str) -> Optional[Node]:
@@ -200,12 +217,20 @@ class ArchitectureMapper:
         point = Point(lng, lat)
         
         # Técnica 1: Ponto dentro de polígono?
-        for idx, node in self.nodes.items():
-            if node.is_real() and hasattr(node.geometry, 'contains'):
+        # Otimização: Uso de STRtree em vez de iterar sobre todos os nós
+        if self.strtree:
+            # query retorna índices das geometrias que intersectam (bounding box)
+            # Em shapely >= 2.0, query retorna array de índices.
+            # Para compatibilidade, assumimos comportamento padrão de query.
+            candidate_indices = self.strtree.query(point)
+            
+            for idx_in_list in candidate_indices:
+                node = self.real_nodes_list[idx_in_list]
                 if node.geometry.contains(point):
-                    return idx, 0.0
+                    return node.idx, 0.0
         
-        # Técnica 2: Vizinhança de borda (buffer)
+        # Técnica 2: Vizinhança de borda (buffer) - Fallback mais lento
+        # Só executa se não encontrou via STRtree
         for idx, node in self.nodes.items():
             if node.is_real() and hasattr(node.geometry, 'distance'):
                 dist_degrees = node.geometry.distance(point)
@@ -299,22 +324,32 @@ class ArchitectureMapper:
         Returns:
             (num_nodes, num_nodes) binary adjacency matrix
         """
-        adj = np.zeros((self.num_nodes, self.num_nodes), dtype=np.float32)
+        # Otimização: Cálculo vetorizado usando cdist
+        coords = []
+        sorted_indices = sorted(self.nodes.keys())
         
-        for node_idx in range(self.num_nodes):
-            neighbors = self.get_neighbors(node_idx, distance_km=2.5)
-            for neighbor_idx in neighbors:
-                adj[node_idx, neighbor_idx] = 1.0
+        for idx in sorted_indices:
+            node = self.nodes[idx]
+            if node.centroid:
+                coords.append([node.centroid.x, node.centroid.y])
+            else:
+                coords.append([0.0, 0.0])
         
-        # Simetria: se j vizinho de i, então i vizinho de j
-        adj = np.maximum(adj, adj.T)
+        coords_arr = np.array(coords)
         
-        self.adjacency_matrix = adj
+        # Calcular distâncias euclidianas (graus) e converter para km
+        dists_degrees = cdist(coords_arr, coords_arr, metric='euclidean')
+        dists_km = dists_degrees * 111.0
+        
+        # Criar matriz binária baseada no limiar e zerar a diagonal
+        self.adjacency_matrix = (dists_km <= 2.5).astype(np.float32)
+        np.fill_diagonal(self.adjacency_matrix, 0.0)
+        
         self.adjacency_type = 'geo'
         
-        logger.info(f"Geo adjacency matrix computed: {np.sum(adj)} edges")
+        logger.info(f"Geo adjacency matrix computed: {np.sum(self.adjacency_matrix)} edges")
         
-        return adj
+        return self.adjacency_matrix
     
     def get_hierarchical_neighborhoods(self) -> Dict[str, List[int]]:
         """
