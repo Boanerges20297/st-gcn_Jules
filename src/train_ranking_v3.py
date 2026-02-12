@@ -15,13 +15,13 @@ SCALER_PATH = os.path.join(OUTPUT_MODEL_DIR, 'ranking_scaler.pkl') # ARQUIVO CR�
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class RankingModelV3(nn.Module):
-    def __init__(self, input_dim=15, hidden_dim=128):
+    def __init__(self, input_dim=15, hidden_dim=128, dropout=0.3):
         super(RankingModelV3, self).__init__()
         self.net = nn.Sequential(
             nn.Linear(input_dim, hidden_dim),
             nn.ReLU(),
             nn.BatchNorm1d(hidden_dim),
-            nn.Dropout(0.3),
+            nn.Dropout(dropout),
             nn.Linear(hidden_dim, 64),
             nn.ReLU(),
             nn.Linear(64, 1)
@@ -108,23 +108,62 @@ def train_ranking_v3():
     X_val_t = torch.FloatTensor(X_val).to(DEVICE)
     y_val_t = torch.FloatTensor(y_val).unsqueeze(1).to(DEVICE)
     
-    model = RankingModelV3().to(DEVICE)
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
-    criterion = nn.MSELoss()
-    
-    print("🏋️ Treinando...")
-    for epoch in range(150):
+    # Configurações por env
+    EPOCHS = int(os.environ.get('RANKING_EPOCHS', 150))
+    LR = float(os.environ.get('RANKING_LR', 0.001))
+    DROPOUT = float(os.environ.get('RANKING_DROPOUT', 0.2))
+    LOSS_TYPE = os.environ.get('RANKING_LOSS', 'mse') # 'mse' ou 'bce'
+    POS_WEIGHT = float(os.environ.get('RANKING_POS_WEIGHT', 2.0))
+
+    model = RankingModelV3(dropout=DROPOUT).to(DEVICE)
+    optimizer = optim.Adam(model.parameters(), lr=LR)
+    if LOSS_TYPE == 'bce':
+        criterion = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([POS_WEIGHT]).to(DEVICE))
+        print(f"Usando BCEWithLogitsLoss com pos_weight={POS_WEIGHT}")
+    else:
+        criterion = nn.MSELoss()
+        print("Usando MSELoss")
+
+    def p_at_k(pred, true, k=5):
+        pred = np.array(pred).ravel()
+        true = np.array(true).ravel()
+        if true.max() == 0:
+            return None
+        k_actual = min(k, int((true>0).sum()), len(true))
+        if k_actual<=0: return None
+        pred_top = np.argsort(-pred)[:k_actual]
+        true_top = np.argsort(-true)[:k_actual]
+        return len(set(pred_top)&set(true_top))/k_actual
+
+    print(f"🏋️ Treinando... EPOCHS={EPOCHS} LR={LR} DROPOUT={DROPOUT} LOSS={LOSS_TYPE}")
+    for epoch in range(EPOCHS):
         model.train()
         optimizer.zero_grad()
         output = model(X_train_t)
-        loss = criterion(output, y_train_t)
+        if LOSS_TYPE == 'bce':
+            loss = criterion(output, y_train_t)
+        else:
+            loss = criterion(output, y_train_t)
         loss.backward()
         optimizer.step()
-            
+
+        # Avaliação
+        if (epoch+1) % 10 == 0 or epoch == 0:
+            model.eval()
+            with torch.no_grad():
+                out_val = model(X_val_t)
+                if LOSS_TYPE == 'bce':
+                    val_pred = torch.sigmoid(out_val).cpu().numpy()
+                else:
+                    val_pred = out_val.cpu().numpy()
+                p5 = p_at_k(val_pred, y_val, k=5)
+                val_loss = criterion(out_val, y_val_t).item()
+                print(f"Epoch {epoch+1}: Val Loss={val_loss:.4f} P@5={p5}")
+
     for day in range(7):
         path = os.path.join(OUTPUT_MODEL_DIR, f"ranking_model_day{day}_selected.pth")
         torch.save(model.state_dict(), path)
-        
+
     print(f"✅ Modelos salvos em {OUTPUT_MODEL_DIR}")
 
 if __name__ == "__main__":
