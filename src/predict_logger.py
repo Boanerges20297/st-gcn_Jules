@@ -369,9 +369,21 @@ class PredictLogger:
         if ranking_info:
             lines.append("")
             lines.append("Ranking Validation Thresholds:")
-            lines.append(f"  Top 1%:  {ranking_info.get('top_1_percent_threshold', 'N/A'):.1f}%")
-            lines.append(f"  Top 5%:  {ranking_info.get('top_5_percent_threshold', 'N/A'):.1f}%")
-            lines.append(f"  Top 10%: {ranking_info.get('top_10_percent_threshold', 'N/A'):.1f}%")
+            val1 = ranking_info.get('top_1_percent_threshold', 'N/A')
+            if isinstance(val1, (int, float)):
+                lines.append(f"  Top 1%:  {val1:.1f}%")
+            else:
+                lines.append(f"  Top 1%:  {val1}%")
+            val5 = ranking_info.get('top_5_percent_threshold', 'N/A')
+            if isinstance(val5, (int, float)):
+                lines.append(f"  Top 5%:  {val5:.1f}%")
+            else:
+                lines.append(f"  Top 5%:  {val5}%")
+            val10 = ranking_info.get('top_10_percent_threshold', 'N/A')
+            if isinstance(val10, (int, float)):
+                lines.append(f"  Top 10%: {val10:.1f}%")
+            else:
+                lines.append(f"  Top 10%: {val10}%")
             lines.append(f"  Método: {ranking_info.get('method', 'unknown')}")
         
         return lines

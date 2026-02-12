@@ -1,0 +1,78 @@
+================================================================================
+ST-GCN PREDICTION LOG - RANKING VALIDATION
+================================================================================
+Timestamp: 2026-02-11 21:49:39
+
+1. RESUMO EXECUTIVO
+--------------------------------------------------------------------------------
+Total de nodes analisados: 319
+  • Crítico (≥90%):      1 (  0%)
+  • Alto (80-89%):      19 (  5%)
+  • Moderado (50-79%): 299 ( 93%)
+  • Baixo (20-49%):      0 (  0%)
+  • Sem Risco (<20%):    0 (  0%)
+
+Ranking Source: unknown
+Window CVLI: N/A dias
+Período: N/A → N/A
+Última atualização: N/A
+
+2. RANKING ATUALIZADO (TOP 20 NODES)
+--------------------------------------------------------------------------------
+Rank  Node                                CVLI%   Ranking%  Status       Provenance                              
+--------------------------------------------------------------------------------------------------------------
+1     244 (JUAZEIRO DO NORTE)               89.8%        — Crítico                                              
+2     253 (MERUOCA)                         82.2%        — Alto                                                 
+3     119 (IPARANA)                         79.3%        — Alto                                                 
+4     155 (TRAIRI)                          77.2%        — Alto                                                 
+5     235 (ITAREMA)                         77.1%        — Alto                                                 
+6     63 (LAGOA REDONDA)                    76.9%        — Alto                                                 
+7     191 (CARIRÉ)                          76.3%        — Alto                                                 
+8     152 (PINDORETAMA)                     76.1%        — Alto                                                 
+9     276 (PEDRA BRANCA)                    75.4%        — Alto                                                 
+10    205 (DEPUTADO IRAPUAN PINHEIRO)       75.0%        — Alto                                                 
+11    184 (BOA VIAGEM)                      75.0%        — Alto                                                 
+12    124 (PARQUE SOLEDADE)                 74.6%        — Alto                                                 
+13    260 (MORADA NOVA)                     74.5%        — Alto                                                 
+14    230 (IRAUÇUBA)                        73.8%        — Alto                                                 
+15    202 (CRATO)                           73.2%        — Alto                                                 
+16    214 (GROAÍRAS)                        73.1%        — Alto                                                 
+17    150 (PARACURU)                        72.5%        — Alto                                                 
+18    208 (FORTIM)                          71.8%        — Alto                                                 
+19    173 (ASSARÉ)                          70.9%        — Alto                                                 
+20    309 (TEJUÇUOCA)                       70.4%        — Alto                                                 
+
+3. CORREÇÕES FEITAS PELO RANKING (DEMOTIONS)
+--------------------------------------------------------------------------------
+✅ Nenhuma demoção de ranking detectada.
+Todos os nodes mantiveram seu score baseado no modelo ST-GCN.
+
+4. PADRÕES IDENTIFICADOS (PROVENANCE)
+--------------------------------------------------------------------------------
+📊 Padrões de risco detectados:
+
+📈 Resumo Estatístico:
+   Nodes com padrão detectado: 0/319 (0%)
+
+5. DISTRIBUIÇÃO E ESTATÍSTICAS
+--------------------------------------------------------------------------------
+
+6. CONFIGURAÇÃO DO MODELO
+--------------------------------------------------------------------------------
+Window CVLI: N/A dias
+Window CVP:  N/A dias
+Ranking Source: unknown
+
+Ranking Validation Thresholds:
+  Top 1%:  N/A%
+  Top 5%:  N/A%
+  Top 10%: N/A%
+  Método: unknown
+
+8. ANÁLISE CRÍTICA (NODES COM RISCO CRÍTICO)
+--------------------------------------------------------------------------------
+✅ Nenhum node com risco crítico (≥90%) detectado.
+
+================================================================================
+FIM DO LOG
+================================================================================

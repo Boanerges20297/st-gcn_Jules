@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-02-12T09:45:35.690218",
+  "period": {
+    "start": "2026-01-23",
+    "end": "2026-01-29"
+  },
+  "validation_days_back": 7,
+  "total_events": 49,
+  "nodes_with_events": 29,
+  "metrics": {
+    "P@10": 0.4,
+    "coverage@10": 0.20408163265306123,
+    "events_in_top10": 10.0,
+    "P@20": 0.4,
+    "coverage@20": 0.30612244897959184,
+    "events_in_top20": 15.0
+  },
+  "meta_counts": {
+    "crítico": 12,
+    "alto": 0,
+    "moderado": 145,
+    "baixo": 140,
+    "sem risco": 22
+  },
+  "meta_stats": {
+    "top5_mean": 99.46855345911948,
+    "top10_mean": 98.42610062893081,
+    "overall_mean": 49.94384968750616,
+    "overall_std": 17.879777448775624
+  },
+  "ranking_status": {
+    "status": "Híbrido 60/25/15 (ST-GCN/Ranking/Histórico)"
+  },
+  "ranking_source": "stgcn_percentile+ranking_v3+history"
+}
