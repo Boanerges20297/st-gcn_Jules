@@ -1251,5 +1251,102 @@
         "type": "exogenous"
       }
     ]
+  },
+  {
+    "id": "auto_20260213_01",
+    "timestamp": "2026-02-13T00:00:00",
+    "original_text": "01 - M20260108371 - LESÃO CORPORAL A BALA - VITIMA DO SEXO MASCULINO - 4° ANEL VIARIO MARACANAU - AIS12 - 12/12/2026 - 09:47\nM20260106630 - DESLOCAMENTO FORÇADO - TV VILA NOVA - 132 - CURIO - MESSEJANA - AIS16 - 11/02/2026 - 12:4\n01 - M20260106158 - HOMICÍDIO À BALA - VÍTIMA DO SEXO MASCULINO - VIA PÚBLICA - TV. VERA LUCIA,36 - TABAPUÁ - AIS12 - 11/02/2026 - 02:54\n01 - M20260104460 - HOMICIDIO A BALA - VITIMA DO SEXO MASCULINO - EM RESIDENCIA - RUA LUIZ MENDES XAVIER N 210 - PACAJUS (AIS25) - 10/02/2026 - 01:10\n01 - M20260103782 - LESÃO CORPORAL A BALA - VITIMA DO SEXO MASCULINO - LESIONADO NAS CAJAZEIRAS - SOCORRIDO PARA O FROTINHA DA MESSEJANA - 10/02/2026 - 17:18",
+    "points": [
+      {
+        "description": "LESÃO CORPORAL A BALA - VITIMA DO SEXO MASCULINO - 4° ANEL VIARIO MARACANAU",
+        "lat": null,
+        "lng": null,
+        "raw_event": {
+          "natureza": "LESÃO CORPORAL A BALA",
+          "descricao": "VITIMA DO SEXO MASCULINO",
+          "sexo": "MASCULINO",
+          "localizacao_completa": "4° ANEL VIARIO MARACANAU",
+          "bairro": "",
+          "municipio": "Maracanaú",
+          "timestamp": "12/12/2026 - 09:47",
+          "resumo": "LESÃO CORPORAL A BALA - VITIMA DO SEXO MASCULINO - 4° ANEL VIARIO MARACANAU",
+          "raw_text": "01 - M20260108371 - LESÃO CORPORAL A BALA - VITIMA DO SEXO MASCULINO - 4° ANEL VIARIO MARACANAU - AIS12 - 12/12/2026 - 09:47",
+          "conflict_severity": "MEDIUM"
+        },
+        "type": "exogenous"
+      },
+      {
+        "description": "DESLOCAMENTO FORÇADO - TV VILA NOVA - 132 - CURIO - MESSEJANA",
+        "lat": null,
+        "lng": null,
+        "raw_event": {
+          "natureza": "DESLOCAMENTO FORÇADO",
+          "descricao": "",
+          "sexo": "",
+          "localizacao_completa": "TV VILA NOVA - 132 - CURIO - MESSEJANA",
+          "bairro": "Messejana",
+          "municipio": "FORTALEZA",
+          "timestamp": "11/02/2026 - 12:4",
+          "resumo": "DESLOCAMENTO FORÇADO - TV VILA NOVA - 132 - CURIO - MESSEJANA",
+          "raw_text": "M20260106630 - DESLOCAMENTO FORÇADO - TV VILA NOVA - 132 - CURIO - MESSEJANA - AIS16 - 11/02/2026 - 12:4",
+          "conflict_severity": "MEDIUM"
+        },
+        "type": "exogenous"
+      },
+      {
+        "description": "HOMICÍDIO À BALA - VÍTIMA DO SEXO MASCULINO - VIA PÚBLICA - TV. VERA LUCIA,36 - TABAPUÁ",
+        "lat": null,
+        "lng": null,
+        "raw_event": {
+          "natureza": "HOMICÍDIO À BALA",
+          "descricao": "VÍTIMA DO SEXO MASCULINO",
+          "sexo": "MASCULINO",
+          "localizacao_completa": "VIA PÚBLICA - TV. VERA LUCIA,36 - TABAPUÁ",
+          "bairro": "TABAPUÁ",
+          "municipio": "",
+          "timestamp": "11/02/2026 - 02:54",
+          "resumo": "HOMICÍDIO À BALA - VÍTIMA DO SEXO MASCULINO - VIA PÚBLICA - TV. VERA LUCIA,36 - TABAPUÁ",
+          "raw_text": "01 - M20260106158 - HOMICÍDIO À BALA - VÍTIMA DO SEXO MASCULINO - VIA PÚBLICA - TV. VERA LUCIA,36 - TABAPUÁ - AIS12 - 11/02/2026 - 02:54",
+          "conflict_severity": "MEDIUM"
+        },
+        "type": "exogenous"
+      },
+      {
+        "description": "HOMICIDIO A BALA - VITIMA DO SEXO MASCULINO - EM RESIDENCIA - RUA LUIZ MENDES XAVIER N 210 - PACAJUS",
+        "lat": null,
+        "lng": null,
+        "raw_event": {
+          "natureza": "HOMICIDIO A BALA",
+          "descricao": "VITIMA DO SEXO MASCULINO",
+          "sexo": "MASCULINO",
+          "localizacao_completa": "EM RESIDENCIA - RUA LUIZ MENDES XAVIER N 210 - PACAJUS",
+          "bairro": "",
+          "municipio": "Pacajus",
+          "timestamp": "10/02/2026 - 01:10",
+          "resumo": "HOMICIDIO A BALA - VITIMA DO SEXO MASCULINO - EM RESIDENCIA - RUA LUIZ MENDES XAVIER N 210 - PACAJUS",
+          "raw_text": "01 - M20260104460 - HOMICIDIO A BALA - VITIMA DO SEXO MASCULINO - EM RESIDENCIA - RUA LUIZ MENDES XAVIER N 210 - PACAJUS (AIS25) - 10/02/2026 - 01:10",
+          "conflict_severity": "MEDIUM"
+        },
+        "type": "exogenous"
+      },
+      {
+        "description": "LESÃO CORPORAL A BALA - VITIMA DO SEXO MASCULINO - LESIONADO NAS CAJAZEIRAS - SOCORRIDO PARA O FROTINHA DA MESSEJANA",
+        "lat": null,
+        "lng": null,
+        "raw_event": {
+          "natureza": "LESÃO CORPORAL A BALA",
+          "descricao": "VITIMA DO SEXO MASCULINO",
+          "sexo": "MASCULINO",
+          "localizacao_completa": "LESIONADO NAS CAJAZEIRAS - SOCORRIDO PARA O FROTINHA DA MESSEJANA",
+          "bairro": "Messejana",
+          "municipio": "FORTALEZA",
+          "timestamp": "10/02/2026 - 17:18",
+          "resumo": "LESÃO CORPORAL A BALA - VITIMA DO SEXO MASCULINO - LESIONADO NAS CAJAZEIRAS - SOCORRIDO PARA O FROTINHA DA MESSEJANA",
+          "raw_text": "01 - M20260103782 - LESÃO CORPORAL A BALA - VITIMA DO SEXO MASCULINO - LESIONADO NAS CAJAZEIRAS - SOCORRIDO PARA O FROTINHA DA MESSEJANA - 10/02/2026 - 17:18",
+          "conflict_severity": "MEDIUM"
+        },
+        "type": "exogenous"
+      }
+    ]
   }
 ]
