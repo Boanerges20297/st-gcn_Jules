@@ -161,7 +161,7 @@
         <div class="mb-3">
              <i class="fas fa-crosshairs loading-icon"></i>
         </div>
-        <h4 class="mt-3 text-muted loading-text" id="loading-message">Processando Inteligência Tática...</h4>
+        <h4 class="mt-3 text-muted loading-text" id="loading-message">Carregando dados de risco...</h4>
         <small class="text-muted" id="loading-sub">Aguarde, analisando dados em tempo real.</small>
         <div class="progress-bar-custom" id="progress-container" style="display: none;">
             <div class="progress-fill" id="progress-fill"></div>
@@ -213,7 +213,7 @@
                     <span><i class="fas fa-map-marked-alt"></i> Mapa Tático Operacional</span>
                     <div>
                         <span class="badge bg-info me-2">⏱️ Próximos 7 Dias</span>
-                        <span class="badge bg-success">Modelo v2 Ativo</span>
+                        <span class="badge bg-success">Modelo ST-GAT Ativo</span>
                     </div>
                 </div>
                 <div class="card-body p-0 d-flex flex-column">
@@ -305,31 +305,34 @@
                         <div id="metrics-content" class="small">
                             <div class="row">
                                 <div class="col-6">
-                                    <div class="metric-mini">
-                                        <span class="text-muted">Média Top 5:</span>
+                                    <div class="metric-mini" title="Média de risco dos 5 bairros mais perigosos no momento. Indica a gravidade nos pontos mais críticos.">
+                                        <span class="text-muted">Pressão nos Hotspots:</span>
                                         <strong id="metric-top5-mean">—</strong>
                                     </div>
-                                    <div class="metric-mini">
-                                        <span class="text-muted">Média Top 10:</span>
+                                    <div class="metric-mini" title="Média de risco das 10 áreas no topo do ranking. Útil para visão de priorização tática.">
+                                        <span class="text-muted">Alerta do Top 10:</span>
                                         <strong id="metric-top10-mean">—</strong>
                                     </div>
-                                    <div class="metric-mini">
-                                        <span class="text-muted">Mín. Top 5:</span>
+                                    <div class="metric-mini" title="O menor score necessário para entrar no grupo das 5 áreas mais críticas. Define a linha de corte.">
+                                        <span class="text-muted">Corte de Prioridade:</span>
                                         <strong id="metric-top5-min">—</strong>
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    <div class="metric-mini">
-                                        <span class="text-muted">Média Geral:</span>
-                                        <strong id="metric-overall-mean">—</strong>
+                                    <div class="metric-mini" title="Média global de risco de todos os 299 bairros/cidades. Indica o nível geral de periculosidade do Estado.">
+                                        <span class="text-muted">Calor do Estado:</span>
+                                        <div style="display:flex;align-items:center;gap:8px;">
+                                            <strong id="metric-overall-mean">—</strong>
+                                            <span id="metric-state-label" style="display:inline-block;padding:3px 8px;border-radius:12px;font-size:0.8rem;color:#fff;background:#6c757d;">—</span>
+                                        </div>
                                     </div>
-                                    <div class="metric-mini">
-                                        <span class="text-muted">Desvio Padrão:</span>
+                                    <div class="metric-mini" title="Indica se o risco está concentrado em poucos bairros (baixa volatilidade) ou espalhado por todo o estado (alta volatilidade).">
+                                        <span class="text-muted">Volatilidade:</span>
                                         <strong id="metric-overall-std">—</strong>
                                     </div>
-                                    <div class="metric-mini">
+                                    <div class="metric-mini" title="Estado de operação do motor de inteligência Jules.">
                                         <span class="text-muted">Status:</span>
-                                        <strong id="metric-status"><span class="badge bg-success">Operacional</span></strong>
+                                        <strong id="metric-status"><span class="badge bg-success">Radar Ativo</span></strong>
                                     </div>
                                 </div>
                             </div>
@@ -347,18 +350,19 @@
                         </button>
                         <div id="anomaly-collapse" class="collapse" style="margin-top: 6px;">
                         <div id="anomaly-content" class="small">
-                            <div id="anomaly-level-indicator">
+                            <div id="anomaly-level-indicator" title="Índice de 0 a 10 que combina a volatilidade do risco com eventos graves recentes. Acima de 7.5 indica instabilidade severa no estado.">
                                 <p class="mb-2">
-                                    <span class="text-muted">Nível de Anomalia:</span>
-                                    <strong id="anomaly-level">0.00</strong>
-                                    <span class="badge bg-success" id="anomaly-badge">Normal</span>
+                                    <span class="text-muted">Tensão Estadual (0-10):</span>
+                                    <strong id="anomaly-level">—</strong>
+                                    <span class="badge bg-secondary" id="anomaly-badge">Radar Offline</span>
                                 </p>
                             </div>
                             <div id="active-events-list">
-                                <p class="text-muted small">Sem eventos ativos</p>
+                                <p class="text-muted small">Sincronizando com motor Jules...</p>
                             </div>
-                            <div id="model-confidence">
-                                <p class="text-muted small">Confiança do Modelo: <strong id="confidence-percent">87%</strong></p>
+                            <div id="model-confidence-container">
+                                <p class="text-muted small mb-1" title="Mede a nitidez do sinal de risco. Quanto mais nítido é o ranking em relação ao ruído comum, maior a confiança na detecção de anomalias.">Precisão de Captura: <strong id="confidence-percent">—</strong></p>
+                                <small class="text-muted" style="font-size: 0.7rem;" title="Horário do último processamento de dados realizado pelo motor Jules.">Última varredura estadual: <span id="last-anomaly-check">—</span></small>
                             </div>
                         </div>
                         </div>
@@ -367,7 +371,7 @@
                         <div class="mb-2">
                             <label for="region-filter" class="form-label small fw-bold text-muted">Filtrar Região:</label>
                             <select class="form-select form-select-sm" id="region-filter">
-                                <option value="capital" selected>Capital (Fortaleza)</option>
+                                <option value="fortaleza" selected>Capital (Fortaleza)</option>
                                 <option value="all">Todas as Regiões</option>
                                 <option value="rmf">Região Metropolitana (RMF)</option>
                                 <option value="interior">Interior do Estado</option>
@@ -417,6 +421,10 @@
 <script>
     //Subir mais o mapa para evitar corte em mobile - coordenadas ajustadas para Fortaleza bem em cima
     var initialView = { center: [-3.8100, -38.5267], zoom: 11 };
+    // Control whether the map should auto-focus the top area on the very first load.
+    // We default to true to keep UX stable, but skip auto-focus on initialMapLoad so
+    // the user sees the city-level view (Fortaleza) first.
+    var initialMapLoad = true;
     var map = L.map('map').setView(initialView.center, initialView.zoom);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
@@ -432,39 +440,41 @@
     });
 
     function getColor(d) {
-        // Frontend visualization with color bands:
-        // Crítico (>=90): Vermelho escuro
-        // Alto (80-89): Vermelho claro
-        // Moderado (50-79): Laranja
-        // Baixo/Sem Risco: Cinza (invisível)
-        return d >= 90 ? '#8B0000' :
-               d >= 80 ? '#FF6B6B' :
-               d >= 50 ? '#FFA500' :
-                        '#CCCCCC';
+        // Alinhado com o backend (app.py) - Novo Sistema Granular
+        return d >= 95 ? '#8B0000' : // Crítico (Vermelho Escuro)
+               d >= 80 ? '#E63946' : // Alerta (Vermelho Vivo)
+               d >= 50 ? '#F4A261' : // Moderado (Laranja)
+               d >= 20 ? '#A8DADC' : // Baixo (Ciano/Azul Claro)
+                        '#CCCCCC'; // Estável (Cinza)
     }
 
     function style(feature) {
-        // Use final `risk_score` provided by backend (post-processing + ranking) when available
-        // Fallback to CVLI/CVP raw percentiles if final score missing.
-        var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
+        // Preferência total ao risk_score do backend (processado e rankeado)
         var score = feature.properties.risk_score;
-        if (typeof score === 'undefined' || score === null) {
-            score = (mode === 'CVLI') ? feature.properties.risk_score_cvli : feature.properties.risk_score_cvp;
+        
+        // Fallback apenas se risk_score for nulo
+        if (score === undefined || score === null) {
+            score = feature.properties.risk_score_cvli || 0;
         }
 
         var fill = getColor(score);
         
-        // Visualização Híbrida: Distinção entre Polígonos (Bairros) e Pontos (Nós Dinâmicos)
+        // Visualização Híbrida: Distinção entre Polígonos e Pontos
         var isPoint = (feature.geometry && feature.geometry.type === 'Point');
-        // Pontos dinâmicos SEMPRE visíveis; Polígonos serão exibidos sempre,
-        // mas com opacidade reduzida quando o score for baixo (evita desaparecer)
-        var isVisiblePoint = isPoint ? true : true; // always add polygon layer
-
-        // For polygons with low score, show faint fill and thin border so shapes are visible
+        
+        // Opacidade baseada no risco para refletir o ranking visualmente
         var isHigh = (score >= 50);
+        var isModerate = (score >= 20);
+        
         var borderColor = isHigh ? 'white' : '#999999';
         var borderWeight = isPoint ? 2 : (isHigh ? 2 : 1);
-        var fillOpacity = isPoint ? 1.0 : (isHigh ? 0.30 : 0.06);
+        
+        // Opacidade dinâmica para dar destaque ao Top do Ranking
+        var fillOpacity = isPoint ? 1.0 : 
+                          (score >= 90 ? 0.60 : 
+                          (score >= 80 ? 0.45 : 
+                          (score >= 50 ? 0.30 : 
+                          (score >= 20 ? 0.15 : 0.05))));
 
         return {
             radius: isPoint ? 10 : 10,
@@ -479,23 +489,23 @@
     }
 
     function getStatus(score, type) {
-        // Align with backend thresholds (five bands)
-        if (score >= 90) return { label: 'CRÍTICO (' + type + ')', class: 'bg-danger' };
-        if (score >= 80) return { label: 'ALTO (' + type + ')', class: 'bg-warning text-dark' };
-        if (score >= 50) return { label: 'MODERADO (' + type + ')', class: 'bg-info text-dark' };
-        if (score >= 20) return { label: 'BAIXO (' + type + ')', class: 'bg-secondary text-dark' };
-        return { label: 'SEM RISCO (' + type + ')', class: 'bg-success text-white' };
+        // Alinhado com app.py
+        if (score >= 95) return { label: 'CRÍTICO (' + type + ')', class: 'bg-danger' };
+        if (score >= 80) return { label: 'ALTO (' + type + ')', class: 'bg-danger opacity-75' };
+        if (score >= 50) return { label: 'MODERADO (' + type + ')', class: 'bg-warning text-dark' };
+        if (score >= 20) return { label: 'BAIXO (' + type + ')', class: 'bg-info text-dark' };
+        return { label: 'ESTÁVEL (' + type + ')', class: 'bg-secondary text-white' };
     }
 
     var legend = L.control({position: 'bottomright'});
     legend.onAdd = function (map) {
         var div = L.DomUtil.create('div', 'legend');
-        div.innerHTML = '<strong>Nível de Risco (Próximos 7d)</strong><br>';
-        // Mostra Crítico, Alto e Moderado na legenda
-        div.innerHTML += '<i style="background:' + getColor(95) + '"></i> Crítico (≥ 90)<br>';
-        div.innerHTML += '<i style="background:' + getColor(85) + '"></i> Alto (80–89)<br>';
+        div.innerHTML = '<strong>Nível de Risco (Ranking)</strong><br>';
+        div.innerHTML += '<i style="background:' + getColor(95) + '"></i> Crítico (≥ 95)<br>';
+        div.innerHTML += '<i style="background:' + getColor(85) + '"></i> Alerta (80–94)<br>';
         div.innerHTML += '<i style="background:' + getColor(65) + '"></i> Moderado (50–79)<br>';
-        div.innerHTML += '<hr style="margin: 5px 0; opacity: 0.5;"><small style="color: #666;">🕐 <strong>Agregação:</strong> Próximos 7 dias<br/><strong>⚠️ Probabilística:</strong> P@5 > 80%</small>';
+        div.innerHTML += '<i style="background:' + getColor(35) + '"></i> Baixo (20–49)<br>';
+        div.innerHTML += '<hr style="margin: 5px 0; opacity: 0.5;"><small style="color: #666;">🕐 <strong>Agregação:</strong> Próximos 7 dias<br/><strong>📊 Ranking:</strong> Baseado em P@K</small>';
         return div;
     };
     legend.addTo(map);
@@ -681,9 +691,14 @@
         $('#loading-overlay').removeClass('d-none');
     }
 
-    function hideLoading() {
+    function hideLoading(force) {
+        if (!force) {
+            var currentText = $('#loading-message').text() || '';
+            if (currentText.indexOf('Carregando dados de risco') !== -1) {
+                return; // Bloqueia remoção prematura
+            }
+        }
         $('#loading-overlay').addClass('d-none');
-        // Hide overlay (keep element in DOM so it can be shown again)
         try {
             setTimeout(function() {
                 try { if (map && map.invalidateSize) map.invalidateSize(true); } catch(e) {}
@@ -753,45 +768,70 @@
                 $('#metric-top5-min').text(fmt(metaDataGlobal.stats_top5_min));
                 $('#metric-overall-mean').text(fmt(metaDataGlobal.stats_overall_mean));
                 $('#metric-overall-std').text(fmt(metaDataGlobal.stats_overall_std));
+
+                // Se houver manager_view, atualiza os badges/labels específicos
+                if (metaDataGlobal.manager_view) {
+                    var mv = metaDataGlobal.manager_view;
+                    try {
+                        var lbl = mv.state_temperature_label || '—';
+                        var color = mv.state_temperature_color || '#6c757d';
+                        $('#metric-state-label').text(lbl).css({'background': color, 'color': '#fff'});
+                    } catch (e) {}
+                    
+                    if (typeof mv.confidence_pct === 'number') {
+                        $('#confidence-percent').text(mv.confidence_pct.toFixed(1) + '%');
+                    }
+                }
             }
         } catch (e) {
             console.warn('Failed to update metrics', e);
         }
 
-        // Recalculate Stats: prefer backend-provided summary counts (meta) to avoid mismatches.
+        // Recalculate Stats based on current region filter
+        var regionFilter = $('#region-filter').val() || 'all';
+
+        // Preferir contagens/estatísticas vindas do backend por região quando disponíveis.
         try {
-            if (metaDataGlobal && metaDataGlobal.counts) {
-                var c = metaDataGlobal.counts;
-                // Exibir categorias EXATAS sem agrupamento
-                var criticalRisk = c['crítico'] || 0;      // SOMENTE Crítico (≥90)
-                var highRisk = c['alto'] || 0;              // SOMENTE Alto (80-89)
-                var mediumRisk = c['moderado'] || 0;       // SOMENTE Moderado (50-79)
-                var stableAreas = (c['baixo'] || 0) + (c['sem risco'] || 0);  // Estáveis (<50)
-                
-                $('#high-risk-count').text(criticalRisk);   // Box vermelho = Crítico
-                $('#medium-risk-count').text(highRisk);     // Box laranja = Alto
-                $('#low-risk-count').text(mediumRisk);      // Box azul = Moderado
-                $('#stable-areas-count').text(stableAreas); // Badge verde = Estáveis
+            if (metaDataGlobal && metaDataGlobal.counts_by_region && metaDataGlobal.counts_by_region[regionFilter]) {
+                var rc = metaDataGlobal.counts_by_region[regionFilter];
+                $('#high-risk-count').text(rc['crítico'] || rc['critico'] || 0);
+                $('#medium-risk-count').text(rc['alto'] || 0);
+                $('#low-risk-count').text(rc['moderado'] || 0);
+                $('#stable-areas-count').text(rc['baixo'] || 0);
+            } else if (regionFilter === 'all' && metaDataGlobal && metaDataGlobal.counts) {
+                // fallback to global counts when 'all' selected
+                var counts = metaDataGlobal.counts;
+                $('#high-risk-count').text(counts['crítico'] || counts['critico'] || 0);
+                $('#medium-risk-count').text(counts['alto'] || 0);
+                $('#low-risk-count').text(counts['moderado'] || 0);
+                $('#stable-areas-count').text(counts['baixo'] || 0);
             } else {
-                // Fallback: compute from per-node final `risk_score` if available
+                // Fallback: contar direto das camadas visíveis (apenas features com score numérico)
                 var criticalRisk = 0, highRisk = 0, mediumRisk = 0, stableAreas = 0;
-                riskDataGlobal.forEach(function(item) {
-                    var score = typeof item.risk_score !== 'undefined' && item.risk_score !== null ? item.risk_score : item.risk_score_cvli || 0;
-                    if (score >= 90) criticalRisk++;
-                    else if (score >= 80) highRisk++;
-                    else if (score >= 50) mediumRisk++;
-                    else stableAreas++;
-                });
+                if (geojsonLayer) {
+                    geojsonLayer.eachLayer(function(layer) {
+                        var props = layer.feature.properties;
+                        var regionType = props.region_type || 'unknown';
+                        var score = (typeof props.risk_score === 'number') ? props.risk_score : (typeof props.risk_score_cvli === 'number' ? props.risk_score_cvli : null);
+                        if (regionFilter === 'all' || regionFilter === regionType) {
+                            if (score === null) return;
+                            if (score >= 90) criticalRisk++;
+                            else if (score >= 80) highRisk++;
+                            else if (score >= 50) mediumRisk++;
+                            else stableAreas++;
+                        }
+                    });
+                }
                 $('#high-risk-count').text(criticalRisk);
                 $('#medium-risk-count').text(highRisk);
                 $('#low-risk-count').text(mediumRisk);
                 $('#stable-areas-count').text(stableAreas);
             }
         } catch (e) {
-            console.warn('Failed to compute summary counts', e);
+            console.warn('Erro ao atualizar contagens por região:', e);
         }
 
-        // Update Map Style (guard for non-path layers like Markers)
+        // Update Map Style
         if (geojsonLayer) {
             geojsonLayer.eachLayer(function(layer) {
                 try {
@@ -868,56 +908,73 @@
         }, 500);
     }
 
+    function normalizeName(text) {
+        if (!text) return "";
+        return text.toString()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s*-\s*AIS.*$/gi, "") // Remove " - AIS 12, 26", " - AIS CAPITAL", etc
+            .toUpperCase()
+            .trim();
+    }
+
     function reloadMapLayer() {
-        // Retorna uma Promise que resolve quando o mapa terminou de atualizar
         return new Promise(function(resolve, reject) {
-            // Remove a camada GeoJSON anterior do mapa
             if (geojsonLayer) {
                 map.removeLayer(geojsonLayer);
                 geojsonLayer = null;
             }
 
-            // Recarregar polígonos e dados de risco do servidor
             $.when(
                 $.getJSON('/api/polygons'),
                 $.getJSON('/api/risk')
             ).done(function(polygonsArgs, riskArgs) {
-            var geojson = polygonsArgs[0];
-            var riskResp = riskArgs[0];
-            riskDataGlobal = riskResp.data || riskResp;
-            metaDataGlobal = riskResp.meta || {};
+                var geojson = polygonsArgs[0];
+                var riskResp = riskArgs[0];
+                riskDataGlobal = riskResp.data || riskResp;
+                metaDataGlobal = riskResp.meta || {};
 
-            var riskMapCVLI = {};
-            var riskMapCVP = {};
-            var riskById = {};
+                // MAPA DE NOMES -> DADOS
+                // Build a map keyed by normalized name + region to avoid collisions
+                var riskByName = {};
+                riskDataGlobal.forEach(function(item) {
+                    try {
+                        var regionKey = (item.region_type || item.region || '').toString().toLowerCase() || 'unknown';
+                        var nameKey = item.clean_name || normalizeName(item.name || '');
+                        var composite = nameKey + '|' + regionKey;
+                        riskByName[composite] = item;
+                        // also keep simple name as fallback (but composite preferred)
+                        if (nameKey) riskByName[nameKey] = item;
+                    } catch (e) {
+                        // ignore malformed items
+                    }
+                });
 
-            riskDataGlobal.forEach(function(item) {
-                var id = String(item.node_id || item.id);
-                riskMapCVLI[id] = item.risk_score_cvli || 0;
-                riskMapCVP[id] = item.risk_score_cvp || 0;
-                riskById[id] = item;
-            });
+                geojson.features.forEach(function(feature) {
+                    var rawName = feature.properties.Name || feature.properties.name || feature.properties.NOME || "";
+                    var normName = normalizeName(rawName);
+                    var regionType = (feature.properties.region_type || '').toString().toLowerCase() || 'unknown';
+                    var compositeKey = normName + '|' + regionType;
+                    var r = riskByName[compositeKey] || riskByName[normName] || {};
+                    
+                    // Use apenas o `risk_score` fornecido pelo backend quando disponível.
+                    // NÃO criar/fabricar valores locais (remover suavização/fallback no front).
+                    var finalScore = (typeof r.risk_score === 'number') ? r.risk_score
+                                     : (typeof r.risk_score_cvli === 'number' ? r.risk_score_cvli : null);
 
-            // Atualizar propriedades do GeoJSON com dados de risco
-            geojson.features.forEach(function(feature, index) {
-                var fid = feature.id || (feature.properties && feature.properties.node_id) || String(index);
-                fid = String(fid);
-                var r = riskById[fid] || {};
-                feature.properties.node_id = String(fid);
-                feature.properties.id = String(fid);
-                feature.properties.risk_score = r.risk_score || r.risk_score_cvli || 0;
-                feature.properties.risk_score_cvli = riskMapCVLI[fid] || 0;
-                feature.properties.risk_score_cvp = riskMapCVP[fid] || 0;
-                feature.properties.cvli_pred = (r.cvli_pred !== undefined) ? r.cvli_pred : 0;
-                feature.properties.cvp_pred = (r.cvp_pred !== undefined) ? r.cvp_pred : 0;
-                feature.properties.faction = r.faction || feature.properties.faction || null;
-                feature.properties.reasons = r.reasons || [];
-                feature.properties.name = feature.properties.name || ('Área ' + fid);
-                // region_type vem do backend (/api/polygons), não sobrescrever se não tiver
-                if (!feature.properties.region_type) {
-                    feature.properties.region_type = 'unknown';
-                }
-            });
+                    feature.properties.risk_score = finalScore;
+                    feature.properties.risk_score_cvli = (typeof r.risk_score_cvli === 'number') ? r.risk_score_cvli : null;
+                    feature.properties.faction = r.faction || feature.properties.faction || "Não Identificado";
+                    feature.properties.name = r.name || rawName;
+                    feature.properties.node_id = r.node_id || "0";
+                    // Copy server-provided labels (status, textual risk) so front apenas apresenta o que vem do back
+                    if (r.status_label) feature.properties.status_label = r.status_label;
+                    if (r.risk_text) feature.properties.risk_text = r.risk_text;
+                    
+                    if (!feature.properties.region_type) {
+                        feature.properties.region_type = 'unknown';
+                    }
+                });
 
             // Recriar a camada GeoJSON com os novos dados
             geojsonLayer = L.geoJson(geojson, {
@@ -927,10 +984,11 @@
                     var marker = L.circleMarker(latlng, featureStyle);
                     var nodeName = feature.properties.name || 'Nó Dinâmico';
                     var nodeId = feature.properties.node_id || feature.properties.id || '';
-                    var riskScore = feature.properties.risk_score || 0;
+                    var riskScoreRaw = feature.properties.risk_score;
+                    var riskDisplay = (typeof riskScoreRaw === 'number') ? (riskScoreRaw.toFixed(1) + '%') : '—';
                     var popupText = '<strong>' + nodeName + '</strong><br/>' +
                                     'ID: ' + nodeId + '<br/>' +
-                                    'Risco: ' + riskScore.toFixed(1) + '%<br/>' +
+                                    'Risco: ' + riskDisplay + '<br/>' +
                                     'Tipo: Nó Dinâmico';
                     marker.bindPopup(popupText);
                     return marker;
@@ -959,16 +1017,18 @@
                     layer.on('click', function(e) {
                         if (!simulationMode) {
                             var props = e.target.feature.properties;
+                            var cvli = (typeof props.risk_score === 'number') ? props.risk_score : 0;
+                            var cvp = (typeof props.risk_score_cvp === 'number') ? props.risk_score_cvp : 0;
+                            
                             var content = '<div style="max-width: 250px; font-size: 0.9rem;">' +
                                          '<strong>' + (props.name || 'Área') + '</strong><br/>' +
                                          '<small>ID: ' + props.node_id + '</small><br/>' +
                                          '<hr style="margin: 5px 0;">' +
-                                         '<strong>Risco CVLI:</strong> ' + (props.risk_score_cvli || 0).toFixed(1) + '%<br/>' +
-                                         '<strong>Risco CVP:</strong> ' + (props.risk_score_cvp || 0).toFixed(1) + '%<br/>' +
+                                         '<strong>Risco (Ranking):</strong> ' + cvli.toFixed(1) + '%<br/>' +
                                          (props.faction ? '<strong>Facção:</strong> ' + props.faction + '<br/>' : '');
                             
                             if (props.reasons && props.reasons.length > 0) {
-                                content += '<strong>Motivos:</strong><ul style="margin: 5px 0; padding-left: 15px;">';
+                                
                                 props.reasons.forEach(function(r) {
                                     content += '<li>' + r + '</li>';
                                 });
@@ -998,6 +1058,9 @@
         reloadMapLayer();
     }
 
+    // Show loading overlay while initial data (polygons + risk) are fetched
+    showLoading('Carregando dados de risco...', 'Aguarde enquanto o sistema obtém previsões.');
+
     $.when(
         $.getJSON('/api/polygons'),
         $.getJSON('/api/risk')
@@ -1007,32 +1070,34 @@
         riskDataGlobal = riskResp.data || riskResp;
         metaDataGlobal = riskResp.meta || {};
 
-        var riskMapCVLI = {};
-        var riskMapCVP = {};
-        var riskById = {};
-
+        // Build mapping keyed by normalized name + region to prevent same-name collisions across regions
+        var riskByName = {};
         riskDataGlobal.forEach(function(item) {
-            var id = String(item.node_id || item.id);  // Garantir string
-            riskMapCVLI[id] = item.risk_score_cvli || 0;
-            riskMapCVP[id] = item.risk_score_cvp || 0;
-            riskById[id] = item;
+            try {
+                var regionKey = (item.region_type || item.region || '').toString().toLowerCase() || 'unknown';
+                var nameKey = item.clean_name || normalizeName(item.name || '');
+                var composite = nameKey + '|' + regionKey;
+                riskByName[composite] = item;
+                if (nameKey) riskByName[nameKey] = item; // fallback
+            } catch(e) {}
         });
 
-        geojson.features.forEach(function(feature, index) {
-            var fid = feature.id || (feature.properties && feature.properties.node_id) || String(index);
-            fid = String(fid);  // Garantir string para matching
-            var r = riskById[fid] || {};
-            feature.properties.node_id = String(fid);  // Garantir que node_id é string
-            feature.properties.id = String(fid);       // Adicionar id como string também
-            feature.properties.risk_score = r.risk_score || r.risk_score_cvli || 0;  // Adicionar risk_score principal
-            feature.properties.risk_score_cvli = riskMapCVLI[fid] || 0;
-            feature.properties.risk_score_cvp = riskMapCVP[fid] || 0;
-            feature.properties.cvli_pred = (r.cvli_pred !== undefined) ? r.cvli_pred : 0;
-            feature.properties.cvp_pred = (r.cvp_pred !== undefined) ? r.cvp_pred : 0;
+        geojson.features.forEach(function(feature) {
+            var rawName = feature.properties.Name || feature.properties.name || feature.properties.NOME || "";
+            var normName = normalizeName(rawName);
+            var regionType = (feature.properties.region_type || '').toString().toLowerCase() || 'unknown';
+            var compositeKey = normName + '|' + regionType;
+            var r = riskByName[compositeKey] || riskByName[normName] || {};
+            
+            // Use apenas valores numéricos vindos do backend; não inventar fallback no front.
+            feature.properties.risk_score = (typeof r.risk_score === 'number') ? r.risk_score : (typeof r.risk_score_cvli === 'number' ? r.risk_score_cvli : null);
+            feature.properties.risk_score_cvli = (typeof r.risk_score_cvli === 'number') ? r.risk_score_cvli : null;
+            // also keep any friendly server fields when loading initial data
+            if (r.status_label) feature.properties.status_label = r.status_label;
+            if (r.risk_text) feature.properties.risk_text = r.risk_text;
             feature.properties.faction = r.faction || feature.properties.faction || null;
-            feature.properties.reasons = r.reasons || [];
-            feature.properties.name = feature.properties.name || ('Área ' + fid);
-            // region_type vem do backend (/api/polygons), não sobrescrever se não tiver
+            feature.properties.name = r.name || rawName;
+            feature.properties.node_id = r.node_id;
             if (!feature.properties.region_type) {
                 feature.properties.region_type = 'unknown';
             }
@@ -1120,25 +1185,36 @@
             console.warn('invalidateSize after geojson failed', e);
         }
 
-    // As a final fallback, ensure the overlay is removed and map resized on full window load
-    $(window).on('load', function() {
-        try {
-            setTimeout(function() {
-                try { if (map && map.invalidateSize) map.invalidateSize(true); } catch(e) {}
-                $('#loading-overlay').addClass('d-none');
-            }, 350);
-        } catch(e) {
-            console.warn('window.load invalidateSize failed', e);
-        }
-    });
+    // NOTE: removed automatic hide-on-window-load to avoid removing the loading
+    // overlay before risk data is fully available. We rely on the initial
+    // requests' completion to call hideLoading().
 
         updateTopCriticalAreas();
 
         // Aplicar filtro inicial: apenas Capital (Fortaleza)
-        applyRegionFilter('capital');
+        applyRegionFilter('fortaleza');
 
         // Initial State
         updateDashboard('CVLI');
+
+        // Ensure initial map view and region filter remain focused on Fortaleza.
+        // Some auto-focus routines may run after Top10 is computed; schedule
+        // a short override to restore the city-level view on first load.
+        setTimeout(function() {
+            try {
+                $('#region-filter').val('fortaleza').trigger('change');
+                if (typeof applyRegionFilter === 'function') applyRegionFilter('fortaleza');
+                map.setView(initialView.center, initialView.zoom);
+                map.closePopup();
+            } catch (e) {
+                console.warn('Initial view override failed', e);
+            }
+            // mark initial load done so subsequent updates may auto-focus
+            initialMapLoad = false;
+            
+            // LIBERAR INTERFACE: Agora que tudo está renderizado e focado
+            hideLoading(true);
+        }, 1200);
 
         // Double click to zoom out (Afastar)
         map.doubleClickZoom.disable();
@@ -1186,7 +1262,7 @@
         // Reset View Handler
         $('#btn-reset-view').on('click', function() {
             map.setView(initialView.center, initialView.zoom);
-            $('#region-filter').val('capital').trigger('change');
+            $('#region-filter').val('fortaleza').trigger('change');
             map.closePopup();
         });
 
@@ -1258,10 +1334,22 @@
 
                                     // Clean up any exogenous markers that may have been added
                                     cleanupExogenousMarkers();
-                                    
+
+                                    // Ensure view resets to Fortaleza and region filter applied so managers see the primary view
+                                    try {
+                                        $('#region-filter').val('fortaleza').trigger('change');
+                                        applyRegionFilter('fortaleza');
+                                        map.setView(initialView.center, initialView.zoom);
+                                        map.closePopup();
+                                        // Refresh top20 layer if visible
+                                        refreshTop20();
+                                        // Update dashboard again to ensure counts reflect saved events
+                                        updateDashboard('CVLI');
+                                    } catch (e) { console.warn('Error restoring initial view after exogenous save', e); }
+
                                     // Exogenous events are saved server-side and will surface in the 'motivos' UI
                                     // when justifying critical states - no visual markers needed.
-                                    
+
                                     // Trigger immediate model update check
                                     checkModelUpdateStatus();
                                 }).catch(function(err) {
@@ -1330,7 +1418,7 @@
         if (regionProp) return regionProp.toLowerCase();
         if (!cidade) return 'unknown';
         var c = String(cidade).trim().toLowerCase();
-        if (c.indexOf('fortalez') === 0) return 'capital';
+        if (c.indexOf('fortalez') === 0) return 'fortaleza';
         if (rmfCities.indexOf(c) !== -1) return 'rmf';
         if (c === 'rmf/interior') return 'unknown';
         return 'interior';
@@ -1352,7 +1440,7 @@
             var bounds = (layer.getBounds && layer.getBounds()) || null;
             var duration = (typeof animateSeconds === 'number') ? animateSeconds : 0.8;
 
-            if (bounds) {
+                if (bounds) {
                 var center = bounds.getCenter();
 
                 // fitBounds zooms to show the polygon perfectly within the map container.
@@ -1366,17 +1454,22 @@
                 });
 
                 // After animation ends, show details popup at the polygon center
-                map.once('moveend', function() {
-                    showFeatureDetails(layer, center);
-                });
+                // Only show details popup after moveend if not the initial map load
+                if (!initialMapLoad) {
+                    map.once('moveend', function() {
+                        showFeatureDetails(layer, center);
+                    });
+                }
             } else {
                 // Fallback for point-like layers (CircleMarkers)
                 var latlng = (layer.getLatLng && layer.getLatLng()) || null;
                 if (latlng) {
                     map.setView(latlng, 15, { animate: true, duration: duration });
-                    map.once('moveend', function() {
-                        showFeatureDetails(layer, latlng);
-                    });
+                    if (!initialMapLoad) {
+                        map.once('moveend', function() {
+                            showFeatureDetails(layer, latlng);
+                        });
+                    }
                 }
             }
         } catch (e) {
@@ -1387,9 +1480,9 @@
     function showFeatureDetails(layer, latlng) {
         var feature = layer.feature;
         // Prefer final backend `risk_score` (post-ranking). Fallback to CVLI raw percentiles.
-        var score = typeof feature.properties.risk_score !== 'undefined' && feature.properties.risk_score !== null ? feature.properties.risk_score : feature.properties.risk_score_cvli;
+        var score = typeof feature.properties.risk_score !== 'undefined' && feature.properties.risk_score !== null ? feature.properties.risk_score : (feature.properties.risk_score_cvli || 0);
         var predVal = feature.properties.cvli_pred;
-        var typeLabel = 'CVLI';
+        var typeLabel = 'Inteligência';
         var status = getStatus(score, typeLabel);
         // Prefer server-provided normalized region if present, else CIDADE
         var region = feature.properties.region_type || feature.properties.CIDADE || feature.properties.city || 'RMF/Interior';
@@ -1428,7 +1521,7 @@
             try {
                 var modelWindow = null;
                 if (metaDataGlobal) {
-                    modelWindow = (mode === 'CVLI') ? metaDataGlobal.model_window_cvli : metaDataGlobal.model_window_cvp;
+                    modelWindow = metaDataGlobal.model_window_cvli || 30;
                 }
                 if (modelWindow) {
                     var note = `Modelo atualizado — previsões baseadas em janela de ${modelWindow} dias`;
@@ -1457,7 +1550,6 @@
         var sidePred = feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('~' + predVal.toFixed(1) + ' ocorrências') : 'Sem novas ocorrências previstas');
         reasonsHtml += '<p><strong>Status:</strong> ' + sideStatus + '</p>';
         reasonsHtml += '<p><strong>Previsão (' + typeLabel + '):</strong> ' + sidePred + '</p>';
-        reasonsHtml += '<h6>Motivos</h6><ul>';
         (feature.properties.reasons || []).forEach(function(r) { reasonsHtml += '<li>' + r + '</li>'; });
         reasonsHtml += '</ul>';
         $('#selected-info').html(reasonsHtml);
@@ -1540,7 +1632,6 @@
             });
     }
     
-    // WEEK 4: Load anomaly status from API
     function loadAnomalyStatus() {
         fetch('/api/anomaly_status')
             .then(response => {
@@ -1548,36 +1639,46 @@
                 return response.json();
             })
             .then(data => {
-                // Update anomaly level display
-                var anomalyPercent = (data.anomaly_level * 100).toFixed(0);
-                $('#anomaly-level').text(anomalyPercent + '%');
+                // Proteção contra campos indefinidos
+                var level = (typeof data.anomaly_level === 'number') ? data.anomaly_level : 0;
+                var tension = level.toFixed(1);
+                $('#anomaly-level').text(tension);
                 
-                // Update badge color based on level
-                var badgeClass = 'bg-success';
-                if (data.anomaly_level > 0.8) badgeClass = 'bg-danger';
-                else if (data.anomaly_level > 0.6) badgeClass = 'bg-warning text-dark';
-                else if (data.anomaly_level > 0.4) badgeClass = 'bg-info';
+                // Update badge color
+                var badgeClass = 'bg-secondary';
+                if (level >= 7.5) badgeClass = 'bg-danger';
+                else if (level >= 5.0) badgeClass = 'bg-warning text-dark';
+                else if (level > 0) badgeClass = 'bg-success';
                 
-                $('#anomaly-badge').attr('class', 'badge ' + badgeClass).text(data.anomaly_risk_level || 'Normal');
+                $('#anomaly-badge').attr('class', 'badge ' + badgeClass).text(data.anomaly_risk_level || 'S/ DADOS');
                 
                 // Update active events
                 var eventsHtml = '';
                 if (data.active_events && data.active_events.length > 0) {
-                    eventsHtml = '<strong class="small">Eventos Ativos:</strong>';
+                    eventsHtml = '<strong class="small">Eventos Críticos Ativos:</strong>';
                     data.active_events.forEach(function(evt) {
+                        var sev = (typeof evt.severity === 'number') ? (evt.severity * 100).toFixed(0) : 0;
                         eventsHtml += '<div class="small text-muted mt-1">' +
-                            '• <strong>' + evt.description + '</strong> ' +
-                            '(Severidade: ' + (evt.severity * 100).toFixed(0) + '%)' +
+                            '• <strong>' + (evt.description || 'Evento') + '</strong> ' +
+                            '(Intensidade: ' + sev + '%)' +
                             '</div>';
                     });
                 } else {
-                    eventsHtml = '<p class="text-muted small">Sem eventos ativos</p>';
+                    eventsHtml = '<p class="text-muted small">Nenhum evento crítico ativo nos últimos 7 dias</p>';
                 }
                 $('#active-events-list').html(eventsHtml);
                 
                 // Update model confidence
-                var confidence = (data.model_confidence * 100).toFixed(0);
-                $('#confidence-percent').text(confidence + '%');
+                var confidence = '—';
+                if (typeof data.model_confidence === 'number') {
+                    confidence = (data.model_confidence * 100).toFixed(1) + '%';
+                }
+                $('#confidence-percent').text(confidence);
+                
+                // Update last check time
+                if (data.last_check) {
+                    $('#last-anomaly-check').text(data.last_check);
+                }
             })
             .catch(error => {
                 console.warn('Failed to load anomaly status:', error);
@@ -1614,14 +1715,60 @@
             return;
         }
 
+        // If backend provided a Top10 ranking, prefer per-region top10 when available
+        var regionFilter = $('#region-filter').val();
+        var serverTop = null;
+        if (metaDataGlobal && metaDataGlobal.top10_by_region && metaDataGlobal.top10_by_region[regionFilter] && metaDataGlobal.top10_by_region[regionFilter].length > 0) {
+            serverTop = metaDataGlobal.top10_by_region[regionFilter];
+        } else if (metaDataGlobal && Array.isArray(metaDataGlobal.top10) && metaDataGlobal.top10.length > 0 && regionFilter === 'all') {
+            serverTop = metaDataGlobal.top10;
+        }
+
+        if (serverTop) {
+            var topFromServer = serverTop;
+            var htmlSrv = '';
+            topFromServer.forEach(function(item, idx) {
+                var label = item.status_label || '';
+                var cls = '';
+                if (label.toUpperCase().indexOf('CRÍTIC') !== -1 || label.toUpperCase().indexOf('CRITIC') !== -1) cls = 'text-danger';
+                else if (label.toUpperCase().indexOf('ALERT') !== -1 || label.toUpperCase().indexOf('ALTO') !== -1) cls = 'text-warning';
+                else if (label.toUpperCase().indexOf('MODER') !== -1) cls = 'text-info';
+
+                htmlSrv += `<a href="#" class="list-group-item list-group-item-action py-2 ps-2 pe-1" data-nodeid="${item.node_id}">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <span class="mb-1">${idx+1}. ${item.name}</span>
+                            <div class="text-end ms-2" style="min-width: 70px;">
+                                <small class="d-block text-muted" style="font-size: 0.7rem; line-height: 1;">Risco</small>
+                                <span class="${cls} fw-bold" style="font-size: 0.85rem;">${item.status_label || ''}</span>
+                            </div>
+                        </div>
+                    </a>`;
+            });
+
+            $('#top-areas').html(htmlSrv);
+            // bind clicks to focus corresponding layer by node_id
+            $('#top-areas a').on('click', function(e) {
+                e.preventDefault();
+                var nodeId = $(this).data('nodeid');
+                var found = null;
+                geojsonLayer.getLayers().forEach(function(l) {
+                    try { if (l.feature && (l.feature.properties.node_id == nodeId || l.feature.properties.node_id === String(nodeId))) found = l; } catch(e){}
+                });
+                if (found) focusLayerAndShowDetails(found, 1.5);
+            });
+            // Mark that initial load has been handled
+            initialMapLoad = false;
+            return;
+        }
+
         // Use geojsonLayer layers to access up-to-date properties
         var regionFilter = $('#region-filter').val();
 
         // Map to array for sorting
         var items = [];
-        layers.forEach(function(layer) {
+            layers.forEach(function(layer) {
             var props = layer.feature.properties;
-            var score = typeof props.risk_score !== 'undefined' && props.risk_score !== null ? props.risk_score : (props.risk_score_cvli || 0);
+            var score = (typeof props.risk_score === 'number') ? props.risk_score : (typeof props.risk_score_cvli === 'number' ? props.risk_score_cvli : null);
 
             // Filter Logic: usar region_type do backend
             var regionType = props.region_type || 'unknown';
@@ -1630,7 +1777,7 @@
             if (regionFilter === 'all') include = true;
             else if (regionFilter === regionType) include = true;
 
-            if (include) {
+            if (include && score !== null) {
                 items.push({
                     name: props.name,
                     score: score,
@@ -1702,6 +1849,8 @@
         updateTopCriticalAreas();
         // update top20 layer for selected region if visible
         updateTop20ForRegion(val);
+        // Atualiza também os cards que mostram contagens por região
+        try { updateDashboard('CVLI'); } catch(e) { console.warn('updateDashboard failed on region change', e); }
     });
 
     // Toggle Top20 micro-nodes
@@ -1777,7 +1926,11 @@
                 } else {
                     // Idle - sem atualização
                     if ($('#loading-overlay').hasClass('d-none') === false) {
-                        hideLoading();
+                        // NÃO esconder se for o loading de inicialização
+                        var currentText = $('#loading-message').text() || '';
+                        if (currentText.indexOf('Carregando dados de risco') === -1) {
+                            hideLoading();
+                        }
                     }
                 }
             },
@@ -1791,8 +1944,11 @@
     $(document).ready(function() {
         // Verifica status a cada 5 minutos (300000ms) ou ao salvar dados
         modelUpdateCheckInterval = setInterval(checkModelUpdateStatus, 300000);
-        // Primeira verificação imediata
         checkModelUpdateStatus();
+        
+        // NOVO: Inicia Radar Jules (Anomalias)
+        loadAnomalyStatus();
+        setInterval(loadAnomalyStatus, 60000); // Atualiza a cada 1 min
     });
 
     // Para o monitoramento ao sair da página

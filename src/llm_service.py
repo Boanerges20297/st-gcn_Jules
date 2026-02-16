@@ -497,14 +497,41 @@ def _parse_ciops_line(line: str, block_type: str, event_type: str) -> Dict[str, 
 
 def _assign_severity(event_type: str, num_arrested: int, has_drugs: bool, has_weapons: bool) -> str:
     """Assign conflict severity based on event type and characteristics."""
-    if 'HOMICIDE' in event_type or 'INJURY' in event_type or 'BODY' in event_type:
+    if not event_type:
+        return 'LOW'
+
+    et = event_type.upper()
+
+    # Police / enforcement keywords: if event is explicitly a police intervention, classify as MEDIUM
+    police_keywords = ['POLICE', 'POLICIA', 'POLÍCIA', 'PM ', 'PM;', 'PM,', 'PM-', 'PM/', 'OPERACAO POLICIAL', 'OPERAÇÃO POLICIAL', 'OPERAÇAO POLICIAL', 'ABORDAGEM POLICIAL', 'INTERVENCAO POLICIAL', 'PRISÃO', 'PRISAO', 'PRISÕES', 'OPERACAO']
+
+    # Homicide and firearm-related keywords (English + Portuguese + variants)
+    homicide_keywords = ['HOMICIDE', 'HOMICID', 'HOMICÍD', 'HOMICÍDIO', 'HOMICIDIO', 'ASSASSINATO', 'EXECUCAO', 'EXECUÇÃO', 'CHACINA', 'ASSASSIN']
+    shooting_keywords = ['SHOT', 'SHOOT', 'FIREARM', 'BALA', 'TIRO', 'DISPARO', 'FERIDO A BALA', 'FERIDO POR BALA', 'FERIMENTO POR ARMA', 'FERIDO', 'BALA PERDIDA', 'LESÃO A BALA', 'LESÃO_BALA']
+
+    # Normalize for keyword checking
+    # If text explicitly mentions police operations, prefer MEDIUM (police intervention exception)
+    if any(k in et for k in police_keywords):
+        return 'MEDIUM'
+
+    # If homicide or shooting keywords present, classify as HIGH
+    if any(k in et for k in homicide_keywords) or any(k in et for k in shooting_keywords):
         return 'HIGH'
-    elif 'DISPLACEMENT' in event_type:
-        return 'HIGH'  # CRIME: expulsão forçada = conflito territorial severo
-    elif 'ENFORCEMENT' in event_type:
+
+    # Displacement (forced removal) is high severity
+    if 'DISPLACEMENT' in et or 'DESLOCAMENTO' in et or 'EXPULS' in et:
+        return 'HIGH'
+
+    # Enforcement mentions without police keywords handled above; keep medium when weapons/arrests
+    if 'ENFORCEMENT' in et:
         if has_weapons or (has_drugs and num_arrested >= 2):
             return 'MEDIUM'
         return 'LOW'
+
+    # Generic injury/lesao without firearm/homicide
+    if 'INJURY' in et or 'INJURI' in et or 'LESÃO' in et or 'LESAO' in et or 'LESO' in et:
+        return 'MEDIUM'
+
     return 'LOW'
 
 

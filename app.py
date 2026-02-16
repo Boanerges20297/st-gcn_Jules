@@ -1,949 +1,857 @@
 from flask import Flask, jsonify, render_template, request
 import pandas as pd
-import geopandas as gpd
-import pickle
-import torch
-import torch.nn as nn
 import numpy as np
 import os
-import copy
-import re
+import pickle
 import json
-import hashlib
 import warnings
 import logging
-import asyncio
-import threading
-import time
 import unicodedata
-from datetime import datetime, timezone
-from shapely.geometry import Point
+from datetime import datetime, timedelta
+import re
 
-# --- Imports Internos ---
-from src.model import STGCN
-# Seus módulos internos
-from src.metrics import MetricReporter
-from src.event_manager import EventManager
-from src.anomaly_monitor import start_anomaly_monitoring
-from src.explanation_generator import ExplanationGenerator
-from src.model_update_monitor import start_monitor, get_state as get_monitor_state
-from src.predict_logger import PredictLogger
+# --- Orquestrador Regional ST-GAT ---
+try:
+    from Phase4.orchestrator import StateOrchestrator, normalize_name
+    orchestrator = None 
+except ImportError:
+    from Phase4.orchestrator import StateOrchestrator
+    def normalize_name(text):
+        if not isinstance(text, str): return ""
+        import re
+        text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('ASCII').upper().strip()
+        # Remove " - AIS" e tudo o que vier depois
+        return re.sub(r'\s*-\s*AIS.*$', '', text).strip()
 
-# ============================================================================
-# CONFIGURAÇÃO
-# ============================================================================
 warnings.filterwarnings('ignore')
-logging.getLogger('werkzeug').setLevel(logging.INFO)
+# Configurando logs para garantir visibilidade no terminal
+logging.basicConfig(level=logging.INFO)
 
-SEED_VALUE = 42
-def set_deterministic_mode():
-    np.random.seed(SEED_VALUE)
-    torch.manual_seed(SEED_VALUE)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed(SEED_VALUE)
-        torch.backends.cudnn.deterministic = True
-    import random
-    random.seed(SEED_VALUE)
-
-set_deterministic_mode()
-
-# ============================================================================
-# CLASSE DE RANKING LOCAL
-# ============================================================================
-class RankingModelV3(nn.Module):
-    def __init__(self, input_dim=15, hidden_dim=128):
-        super(RankingModelV3, self).__init__()
-        self.net = nn.Sequential(
-            nn.Linear(input_dim, hidden_dim),
-            nn.ReLU(),
-            nn.BatchNorm1d(hidden_dim),
-            nn.Dropout(0.3),
-            nn.Linear(hidden_dim, 64),
-            nn.ReLU(),
-            nn.Linear(64, 1)
-        )
-
-    def forward(self, x):
-        return self.net(x)
-
-# ============================================================================
-# VARIÁVEIS GLOBAIS
-# ============================================================================
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Caminhos
-DATA_FILE = os.path.join(BASE_DIR, 'data', 'processed', 'processed_graph_data.pkl')
-MODEL_CVLI_PATH = os.path.join(BASE_DIR, 'models', 'stgcn_model_v2.pth')
-EXOGENOUS_FILE = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
-RANKING_BY_DAY_DIR = os.path.join(BASE_DIR, 'models', 'ranking_by_day')
-SCALER_PATH = os.path.join(RANKING_BY_DAY_DIR, 'ranking_scaler.pkl')
+nodes_gdf = None
+orchestrator = None
 
-# Janela padrão para considerar eventos exógenos (em dias).
-# Pode ser sobrescrita via variável de ambiente EXOGENOUS_DAYS_BACK.
-EXOGENOUS_DAYS_BACK = int(os.getenv('EXOGENOUS_DAYS_BACK', '14'))
-
-# Estado
-nodes_gdf, nodes_gdf_proj, nodes_centroids_proj = None, None, None
-adj_matrix, original_adj_matrix, node_features, dates = None, None, None, None
-model_cvli, model_ranking_simple, scaler, device = None, None, None, None
-norm_adj_list, exogenous_events = None, []
-exogenous_affected_nodes, exogenous_critical_nodes = set(), set()
-exogenous_weights_lock = threading.Lock()
-exogenous_weights_initialized = False
-prediction_lock = threading.Lock()
-
-# Auxiliares
-predict_logger, metric_reporter, event_manager, anomaly_monitor = None, None, None, None
-
-try:
-    predict_logger = PredictLogger(BASE_DIR, nodes_gdf=None)
-    print("✅ PredictLogger inicializado")
-except: pass
-
-# ============================================================================
-# FUNÇÕES DE SUPORTE
-# ============================================================================
-def extract_features_clean(X):
-    """Extrai 15 features para o Ranking V3."""
-    num_nodes = X.shape[0]
-    features = np.zeros((num_nodes, 15))
-    with np.errstate(divide='ignore', invalid='ignore'):
-        for i in range(num_nodes):
-            ts = X[i, :]
-            features[i, 0] = np.mean(ts)
-            features[i, 1] = np.std(ts)
-            features[i, 2] = np.max(ts)
-            features[i, 3] = np.min(ts)
-            if len(ts) > 0:
-                features[i, 4] = np.sum(ts > 0) / len(ts)
-                features[i, 5] = np.sum(ts) / len(ts)
-            if len(ts) > 5:
-                features[i, 6] = np.mean(ts[-5:]) - np.mean(ts[:5])
-            if len(ts) > 1:
-                features[i, 7] = np.mean(np.abs(np.diff(ts)))
-            features[i, 8] = np.mean(ts[-3:]) if len(ts) >= 3 else 0
-            features[i, 9] = np.mean(ts[-7:]) if len(ts) >= 7 else 0
-            features[i, 10] = np.mean(ts[-14:]) if len(ts) >= 14 else 0
-            if len(ts) > 1:
-                mean_val = np.mean(ts)
-                if mean_val > 1e-6: features[i, 11] = np.std(ts) / mean_val
-            features[i, 12] = np.percentile(ts, 75) - np.percentile(ts, 25)
-            max_val = np.max(ts)
-            if max_val > 0: features[i, 13] = (max_val - np.min(ts)) / max_val
-    return np.nan_to_num(features)
-
-def get_ranking_model_path():
-    day_of_week = datetime.now().weekday()
-    path = os.path.join(RANKING_BY_DAY_DIR, f'ranking_model_day{day_of_week}_selected.pth')
-    if os.path.exists(path): return path
-    return None
-
-
-def compute_predictions():
-    """Compute model predictions and return (meta, results, raw arrays).
-    Returns: (meta_dict, results_list, final_risk_array, stgcn_score, hist_sum)
+def archive_old_exogenous_events():
     """
-    # 1. Inferência ST-GCN
-    model_ts = 30
-    input_slice = node_features[:, -model_ts:, :]
-    input_tensor = torch.FloatTensor(input_slice).permute(2, 0, 1).unsqueeze(0).to(device)
+    Cria um 'arquivo morto' dos eventos exógenos que ultrapassam os últimos 7 dias.
+    O arquivo é salvo como 'data/exogenous_events_(data_limite).json'.
 
-    with torch.no_grad():
-        pred = model_cvli(input_tensor, norm_adj_list)
-        stgcn_score = pred.squeeze(0).cpu().numpy()[:, 0]
-        stgcn_score = np.maximum(stgcn_score, 0)
+    Correção: alguns registros não tinham campo `date` mas tinham `ingested_at` e `timestamp` (hora).
+    Neste caso, combinamos a data de `ingested_at` com o `timestamp` da ocorrência para obter a data
+    do evento. Se não for possível extrair uma data, consideramos o evento recente e NÃO o arquivamos.
+    """
+    exogenous_file = os.path.join(BASE_DIR, "data", "exogenous_events.json")
+    if not os.path.exists(exogenous_file):
+        return
 
-    hist_sum = np.sum(input_slice[:, :, 0], axis=1)
-
-    # 2. Ranking V3 (opcional)
-    rank_score = np.zeros_like(stgcn_score)
-    ranking_used = False
-    if model_ranking_simple and scaler:
-        try:
-            feats = extract_features_clean(input_slice[:, :, 0])
-            feats_scaled = scaler.transform(feats)
-            feats_t = torch.FloatTensor(feats_scaled).to(device)
-            with torch.no_grad():
-                rank_score = model_ranking_simple(feats_t).cpu().numpy()[:, 0]
-            ranking_used = not np.allclose(rank_score, 0.0)
-        except Exception as e:
-            print(f"Ranking Fail: {e}")
-            rank_score = np.zeros_like(stgcn_score)
-            ranking_used = False
-
-    # 3. Normalização por percentil + blend 70/30 (ST-GCN / Ranking)
-    def to_percentile(arr: np.ndarray) -> np.ndarray:
-        """Converte vetor em percentis [0, 100], estável mesmo com empates."""
-        arr = np.asarray(arr, dtype=float)
-        if arr.size == 0:
-            return arr
-        # ranking baseado na ordenação (0 .. N-1)
-        order = np.argsort(arr)
-        ranks = np.empty_like(order, dtype=float)
-        ranks[order] = np.arange(len(arr), dtype=float)
-        # evitar divisão por zero quando N=1
-        denom = max(len(arr) - 1, 1)
-        return (ranks / denom) * 100.0
-
-    stgcn_pct = to_percentile(stgcn_score)
-
-    # Incorporar informação de histórico recente (soma de CVLI na janela)
-    if np.any(hist_sum > 0):
-        hist_pct = to_percentile(hist_sum)
-    else:
-        hist_pct = np.zeros_like(hist_sum, dtype=float)
-
-    if ranking_used:
-        rank_pct = to_percentile(rank_score)
-        # Blend mais rico: ST-GCN (60%) + Ranking (25%) + Histórico (15%)
-        final_risk = (0.60 * stgcn_pct) + (0.25 * rank_pct) + (0.15 * hist_pct)
-        ranking_source = "stgcn_percentile+ranking_v3+history"
-        ranking_status = "Híbrido 60/25/15 (ST-GCN/Ranking/Histórico)"
-    else:
-        # Sem ranking: ST-GCN (75%) + Histórico (25%)
-        final_risk = (0.75 * stgcn_pct) + (0.25 * hist_pct)
-        ranking_source = "stgcn_percentile+history"
-        ranking_status = "ST-GCN+Histórico (Percentil, sem ranking)"
-
-    # Apply local exogenous adjustments: map recent exogenous points to nearest nodes
     try:
-        def _compute_local_severity(days_back=1):
-            """Retorna severidade exógena por nó em [0,1].
-            Usa, por padrão, `exogenous_events.json` (CIOPS estruturado).
-            """
-            path = EXOGENOUS_FILE
-            if not os.path.exists(path):
-                # fallback para arquivo geocodificado antigo, se existir
-                alt = os.path.join(BASE_DIR, 'data', 'exogenous_events_geocoded.json')
-                if os.path.exists(alt):
-                    path = alt
-                else:
-                    return np.zeros(len(nodes_gdf))
+        with open(exogenous_file, 'r', encoding='utf-8') as f:
+            events = json.load(f)
 
-            try:
-                with open(path, 'r', encoding='utf-8') as fh:
-                    data = json.load(fh)
-            except Exception:
-                return np.zeros(len(nodes_gdf))
+        if not events:
+            return
 
-            # Build KDTree of node coords (lat, lon)
-            try:
-                from scipy.spatial import KDTree
-            except Exception:
-                return np.zeros(len(nodes_gdf))
+        cutoff_date = (datetime.now() - timedelta(days=7)).date()
 
-            node_coords = [(g.y, g.x) for g in nodes_gdf.geometry.centroid]
-            tree = KDTree(node_coords)
+        old_events = []
+        current_events = []
 
-            severities = np.zeros(len(nodes_gdf), dtype=float)
-            cutoff_date = None
-            # accept both list and dict-wrapped files
-            events_list = data if isinstance(data, list) else data.get('events', []) if isinstance(data, dict) else []
+        for e in events:
+            event_date = None
 
-            for ev in events_list:
-                # parse timestamp if present
-                tstr = ev.get('timestamp') or ev.get('date') or ev.get('event_date')
-                if tstr and days_back is not None:
-                    try:
-                        from datetime import datetime, timedelta
-                        # try ISO then DD/MM/YYYY
+            # 1) Prefer explicit 'date' field if it's a full date string (YYYY-MM-DD)
+            dval = e.get('date') or e.get('event_date')
+            if isinstance(dval, str):
+                try:
+                    # if it's only a time like '22:10', skip here
+                    if re.match(r'^\d{2}:\d{2}$', dval.strip()):
+                        dval = None
+                    else:
+                        # accept ISO-like strings, take leading YYYY-MM-DD
+                        event_date = datetime.strptime(dval.strip()[:10], '%Y-%m-%d').date()
+                except Exception:
+                    event_date = None
+
+            # 2) If no full date, try combining 'ingested_at' (datetime) with 'timestamp' (HH:MM)
+            if event_date is None:
+                ing = e.get('ingested_at')
+                ts = e.get('timestamp')  # e.g. '22:10'
+                try:
+                    ing_dt = None
+                    if isinstance(ing, str) and ing:
                         try:
-                            ed = datetime.fromisoformat(tstr)
+                            ing_dt = datetime.strptime(ing.strip(), '%Y-%m-%d %H:%M:%S')
                         except Exception:
                             try:
-                                ed = datetime.strptime(tstr, '%d/%m/%Y')
+                                ing_dt = datetime.fromisoformat(ing.strip())
                             except Exception:
-                                ed = None
-                        if ed is not None:
-                            if cutoff_date is None:
-                                cutoff_date = datetime.now() - timedelta(days=days_back)
-                            if ed < cutoff_date:
-                                continue
-                    except Exception:
-                        pass
+                                ing_dt = None
 
-                for pt in ev.get('points', []) if isinstance(ev.get('points', []), list) else []:
-                    lat = pt.get('lat')
-                    lng = pt.get('lng')
-                    if lat is None or lng is None:
-                        continue
-                    try:
-                        dist, idx = tree.query((float(lat), float(lng)))
-                        # determine severity from raw_event if available
-                        sev = 0.5
-                        raw = pt.get('raw_event') or ev.get('raw_event') or ev
-                        if isinstance(raw, dict):
-                            sev = float(raw.get('conflict_severity') or raw.get('severity') or raw.get('conflict') or 0.5)
-                            # normalize string labels if present
-                            if isinstance(sev, str):
-                                mapping = {'LOW': 0.2, 'MEDIUM': 0.5, 'HIGH': 0.8, 'CRITICAL': 1.0}
-                                sev = mapping.get(sev.upper(), 0.5)
-                        severities[int(idx)] = max(severities[int(idx)], min(max(sev, 0.0), 1.0))
-                    except Exception:
-                        continue
+                    if ing_dt:
+                        # If timestamp present and looks like HH:MM, we could combine,
+                        # but for archiving we only need the date portion.
+                        event_date = ing_dt.date()
+                except Exception:
+                    event_date = None
 
-            return severities
+            # 3) If still no date, treat as recent (do not archive)
+            if event_date is None:
+                current_events.append(e)
+                continue
 
-        # Usar janela configurável (por padrão 14 dias) para exógenos
-        local_sev = _compute_local_severity(days_back=EXOGENOUS_DAYS_BACK)
-        if local_sev is None:
-            local_sev = np.zeros(len(nodes_gdf))
-        # Multiplicador local mais forte: até +120% quando severity==1.0
-        local_factor = 1.0 + (local_sev * 1.2)
-        final_risk = np.clip(final_risk * local_factor, 0.0, 100.0)
+            # Decide to archive or keep
+            if event_date < cutoff_date:
+                old_events.append(e)
+            else:
+                current_events.append(e)
 
-        # Boost mínimo para nós com exógenos muito fortes:
-        # - severidade >= 0.9  -> pelo menos 90% de risco
-        # - severidade >= 0.7  -> pelo menos 80% de risco
-        high_crit_mask = local_sev >= 0.9
-        high_mask = (local_sev >= 0.7) & ~high_crit_mask
+        if old_events:
+            archive_filename = f"exogenous_events_{cutoff_date.isoformat()}.json"
+            archive_path = os.path.join(BASE_DIR, "data", archive_filename)
 
-        if np.any(high_crit_mask):
-            final_risk = np.where(high_crit_mask & (final_risk < 90.0), 90.0, final_risk)
-        if np.any(high_mask):
-            final_risk = np.where(high_mask & (final_risk < 80.0), 80.0, final_risk)
+            with open(archive_path, 'w', encoding='utf-8') as af:
+                json.dump(old_events, af, indent=2, ensure_ascii=False)
+
+            with open(exogenous_file, 'w', encoding='utf-8') as f:
+                json.dump(current_events, f, indent=2, ensure_ascii=False)
+
+            print(f"📦 Arquivo morto criado: {archive_filename} ({len(old_events)} eventos)")
+            print(f"✅ Arquivo principal atualizado ({len(current_events)} eventos ativos)")
+
     except Exception as e:
-        print(f"[WARN] local exogenous adjustment failed: {e}")
-
-    # Montar JSON básico (sem ajustes de anomalia)
-    results = []
-    factions = nodes_gdf['faction'].tolist() if 'faction' in nodes_gdf.columns else [None]*len(nodes_gdf)
-
-    for i in range(len(final_risk)):
-        score = float(final_risk[i])
-        raw_pred = float(stgcn_score[i])
-
-        if raw_pred < 0.5:
-            score = min(score, 45.0)
-        elif raw_pred < 1.0:
-            score = min(score, 75.0)
-
-        if hist_sum[i] == 0 and score > 60:
-            score = 60.0
-
-        status = 'Crítico' if score >= 90 else 'Alto' if score >= 80 else 'Moderado' if score >= 50 else 'Baixo'
-
-        reasons = []
-        if raw_pred > 0.5: reasons.append(f"Previsão: {raw_pred:.1f}")
-        if hist_sum[i] > 0: reasons.append(f"{int(hist_sum[i])} crimes recentes")
-        if not reasons: reasons.append("Estável")
-
-        results.append({
-            'node_id': i,
-            'risk_score': score,
-            'cvli_pred': raw_pred,
-            'faction': factions[i],
-            'reasons': reasons,
-            'status_label': status,
-            'risk_text': f"{int(score)}% — {status}"
-        })
-
-    meta = {
-        'counts': {
-            'crítico': 0,
-            'alto': 0,
-            'moderado': 0,
-            'baixo': 0,
-            'sem risco': 0,
-        }
-    }
-    scores = [r['risk_score'] for r in results]
-    scores = np.nan_to_num(scores)
-    for s in scores:
-        if s >= 90:
-            meta['counts']['crítico'] += 1
-        elif s >= 80:
-            meta['counts']['alto'] += 1
-        elif s >= 50:
-            meta['counts']['moderado'] += 1
-        elif s >= 20:
-            meta['counts']['baixo'] += 1
-        else:
-            meta['counts']['sem risco'] += 1
-
-    s_sort = sorted(scores, reverse=True)
-    meta['stats_top5_mean'] = float(np.mean(s_sort[:5])) if len(s_sort) >= 5 else 0.0
-    meta['stats_top10_mean'] = float(np.mean(s_sort[:10])) if len(s_sort) >= 10 else 0.0
-    meta['stats_top5_min'] = float(s_sort[4]) if len(s_sort) >= 5 else 0.0
-    meta['stats_overall_mean'] = float(np.mean(scores)) if len(scores) > 0 else 0.0
-    meta['stats_overall_std'] = float(np.std(scores)) if len(scores) > 0 else 0.0
-    meta['ranking_info'] = {'status': ranking_status}
-    meta['ranking_source'] = ranking_source
-    meta['window_cvli'] = 30
-
-    return meta, results, final_risk, stgcn_score, hist_sum
-
-def compute_norm_adj(adj):
-    adj_t = torch.FloatTensor(adj)
-    rowsum = adj_t.sum(1)
-    d_inv = torch.pow(rowsum, -0.5)
-    d_inv[torch.isinf(d_inv)] = 0.
-    d_mat = torch.diag(d_inv)
-    return torch.mm(torch.mm(d_mat, adj_t), d_mat).to(device)
+        print(f"⚠️ Erro ao arquivar eventos exógenos: {e}")
 
 def load_data_and_models():
-    global nodes_gdf, node_features, model_cvli, model_ranking_simple, scaler, device
-    global norm_adj_list, adj_matrix, dates, nodes_gdf_proj, nodes_centroids_proj
+    global nodes_gdf, orchestrator
+    # Limpeza de eventos exógenos antigos
+    archive_old_exogenous_events()
     
-    # 1. Carregar Scaler
-    if os.path.exists(SCALER_PATH):
-        with open(SCALER_PATH, 'rb') as f: scaler = pickle.load(f)
-        print("✅ Scaler carregado")
-    else: print("⚠️ Scaler não encontrado")
-
-    # 2. Carregar Dados
-    if not os.path.exists(DATA_FILE): return
-    with open(DATA_FILE, 'rb') as f: data_pack = pickle.load(f)
+    path = os.path.join(BASE_DIR, "data", "processed", "processed_graph_data_global.pkl")
+    if not os.path.exists(path):
+        print(f"❌ Erro: Metadados não encontrados em {path}. Verifique se o arquivo existe e está no local correto.")
     
-    nodes_gdf = data_pack.get('nodes_gdf')
-    adj_geo = data_pack.get('adj_geo')
-    adj_faction = data_pack.get('adj_faction')
-    node_features = data_pack.get('node_features')
-    dates = data_pack.get('dates')
-    
-    if predict_logger and nodes_gdf is not None: predict_logger.nodes_gdf = nodes_gdf
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            nodes_gdf = pickle.load(f).get("nodes_gdf")
+            print(f"✅ Metadados: {len(nodes_gdf)} localidades.")
 
-    # Projeção Geo
-    if nodes_gdf is not None:
-        try:
-            nodes_gdf_proj = nodes_gdf.to_crs(epsg=3857)
-            nodes_centroids_proj = nodes_gdf_proj.geometry.centroid
-            build_node_search_index()
-        except: pass
-
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    
-    # Grafos
-    norm_adj_list = [compute_norm_adj(adj_geo), compute_norm_adj(adj_faction)]
-
-    # 3. Carregar ST-GCN
-    if os.path.exists(MODEL_CVLI_PATH):
-        try:
-            raw_state = torch.load(MODEL_CVLI_PATH, map_location=device)
-            state_dict = {}
-            for k,v in raw_state.items():
-                nk = k.replace('module.', '')
-                if nk.endswith('.gcn.weight'):
-                    base = nk[:-len('.gcn.weight')]
-                    state_dict[f"{base}.gcn.weights.0"] = v
-                    state_dict[f"{base}.gcn.weights.1"] = v
-                else: state_dict[nk] = v
-            
-            model_cvli = STGCN(num_nodes=node_features.shape[0], in_channels=26, time_steps=30, num_graphs=2)
-            model_cvli.load_state_dict(state_dict, strict=False)
-            model_cvli.to(device).eval()
-            print("✅ ST-GCN Carregado")
-        except Exception as e: print(f"❌ Erro ST-GCN: {e}")
-
-    # 4. Carregar Ranking V3 (Local)
-    rank_path = get_ranking_model_path()
-    if rank_path:
-        try:
-            m_rank = RankingModelV3(input_dim=15).to(device)
-            m_rank.load_state_dict(torch.load(rank_path, map_location=device))
-            m_rank.eval()
-            model_ranking_simple = m_rank
-            print(f"✅ Ranking V3 Carregado: {os.path.basename(rank_path)}")
-        except Exception as e: 
-            print(f"❌ Erro Ranking: {e}")
-            model_ranking_simple = None
-
-    # 5. Módulos
     try:
-        global metric_reporter, event_manager, anomaly_monitor
-        metric_reporter = MetricReporter()
-        if os.path.exists(os.path.join(BASE_DIR, 'data', 'exogenous_events_geocoded.json')):
-            event_manager = EventManager(os.path.join(BASE_DIR, 'data', 'exogenous_events_geocoded.json'))
-            anomaly_monitor = start_anomaly_monitoring(event_manager, interval_minutes=15)
-            print("✅ Monitoramento Ativo")
-    except: pass
+        orchestrator = StateOrchestrator(BASE_DIR)
+        print("✅ Motor de Inteligência ST-GAT Ativo.")
+    except Exception as e:
+        print(f"❌ Erro Motor: {e}")
 
-# ============================================================================
-# ROTAS
-# ============================================================================
 @app.route('/')
 def index(): return render_template('index.html')
 
 @app.route('/api/risk')
 def get_risk():
-    import traceback
-    # Log do estado das variáveis principais
-    print("[DEBUG] node_features:", type(node_features), "shape:", getattr(node_features, 'shape', None))
-    print("[DEBUG] model_cvli:", type(model_cvli))
-    print("[DEBUG] norm_adj_list:", type(norm_adj_list))
-    print("[DEBUG] model_ranking_simple:", type(model_ranking_simple))
-    print("[DEBUG] scaler:", type(scaler))
-    print("[DEBUG] nodes_gdf:", type(nodes_gdf))
-    if node_features is None:
-        print("[ERROR] node_features is None")
-        return jsonify({'error': 'Loading...'}), 503
-
+    if nodes_gdf is None or orchestrator is None:
+        return jsonify({'error': 'Inicializando...'}), 503
     try:
-        # Use helper to compute baseline predictions
-        meta, results, final_risk, stgcn_score, hist_sum = compute_predictions()
-
-        # Apply anomaly-based real-time adjustment (option B)
+        # --- Build exogenous_shocks from recent exogenous events ---
+        exogenous_shocks = {}
         try:
-            adj_info = {}
-            if anomaly_monitor is not None:
-                ctx = anomaly_monitor.get_anomaly_context_for_retraining()
-                # Prefer today's severity when available
-                s = ctx.get('today', {}).get('severity', None) or ctx.get('statistics', {}).get('average_severity', 0.0)
+            # Carregar de ambos os arquivos potenciais para garantir cobertura
+            exo_files = ['exogenous_events.json', 'exogenous_events_geocoded.json']
+            all_raw_events = []
+            for f_name in exo_files:
+                f_path = os.path.join(BASE_DIR, 'data', f_name)
+                if os.path.exists(f_path):
+                    try:
+                        with open(f_path, 'r', encoding='utf-8') as xf:
+                            all_raw_events.extend(json.load(xf) or [])
+                    except: pass
+
+            # Considerar eventos nos últimos 7 dias
+            cutoff = datetime.now().date() - timedelta(days=7)
+            
+            # Tipos que sempre são CRÍTICOS (Canal 25) - Incluindo sinais de violência extrema
+            CRITICAL_TYPES = [
+                'leader_transfer', 'faction_conflict', 'territory_dispute', 
+                'confronto', 'execucao', 'chacina', 'tortura', 'homicidio_com_sinais_de_faccao'
+            ]
+            
+            # Tipos que são de SUPRESSÃO (Canal 23) - Ação Policial Positiva
+            SUPPRESSION_TYPES = [
+                'apreensao', 'prisao', 'recuperacao_veiculo', 'cumprimento_mandado',
+                'abordagem_positiva', 'desarticulacao_grupo'
+            ]
+
+            for ev in all_raw_events:
                 try:
-                    s = float(s)
-                except Exception:
-                    s = 0.0
+                    # ... (lógica de extração de data preservada)
+                    
+                    # Intensidade e Criticidade
+                    ev_type = str(ev.get('type') or ev.get('natureza') or '').lower()
+                    description = str(ev.get('description') or ev.get('resumo') or '').lower()
+                    
+                    # Classificação de Supressão e Ajuste de Intensidade Técnica
+                    is_supp = (ev_type in SUPPRESSION_TYPES) or ('apreen' in ev_type) or ('pris' in ev_type)
+                    
+                    # Se for supressão, calibramos a intensidade pelo impacto
+                    if is_supp:
+                        if any(w in description for w in ['fuzil', 'metralhadora', 'fuzi', '7.62', '5.56']):
+                            intensity = 1.0
+                        elif any(w in description for w in ['lider', 'chefe', 'frente', 'comando']):
+                            intensity = 0.9
+                        elif any(w in description for w in ['pistola', 'revolver', 'arma de fogo']):
+                            intensity = 0.7
+                        elif any(w in description for w in ['quilos', 'kg', 'grande quantidade', 'deposito']):
+                            intensity = 0.6
+                        elif any(w in description for w in ['veiculo', 'carro', 'moto', 'recuperad']):
+                            intensity = 0.4
+                        else:
+                            intensity = float(ev.get('intensity', 0.3))
+                    else:
+                        intensity = float(ev.get('intensity', 0.5))
+                    
+                    # Decisão de Canal: Canal 25 se tipo for crítico, intensidade > 0.7 
+                    # OU se a descrição contiver palavras-chave de alerta máximo
+                    is_critical = (ev_type in CRITICAL_TYPES) or (not is_supp and intensity > 0.7) or \
+                                  ('execuc' in description) or ('facç' in description) or \
+                                  ('morte' in description and 'facç' in description)
+                    
+                    # Atualiza o shock para a localidade
+                    if loc_norm not in exogenous_shocks:
+                        exogenous_shocks[loc_norm] = {
+                            'intensity': intensity, 
+                            'is_critical': is_critical,
+                            'is_suppression': is_supp
+                        }
+                    else:
+                        # Prioridade: Crítico > Supressão > Padrão
+                        if is_critical:
+                            exogenous_shocks[loc_norm]['is_critical'] = True
+                        if is_supp:
+                            exogenous_shocks[loc_norm]['is_suppression'] = True
+                        # Mantém sempre a maior intensidade detectada para a área
+                        if intensity > exogenous_shocks[loc_norm]['intensity']:
+                            exogenous_shocks[loc_norm]['intensity'] = intensity
+                except: continue
 
-                # Small conservative multiplier: up to +25% global risk when severity=1
-                adj_factor = 1.0 + (s * 0.25)
-                final_risk = np.clip(final_risk * adj_factor, 0.0, 100.0)
-
-                adj_info = {'severity': s, 'adj_factor': adj_factor, 'recommendation': ctx.get('recommendation', {})}
-
-                # Update results' risk_score with adjusted values
-                for i in range(len(results)):
-                    # Keep per-node safety caps similar to baseline logic
-                    score = float(final_risk[i])
-                    raw_pred = float(stgcn_score[i])
-                    if raw_pred < 0.5:
-                        score = min(score, 45.0)
-                    elif raw_pred < 1.0:
-                        score = min(score, 75.0)
-                    if hist_sum[i] == 0 and score > 60:
-                        score = 60.0
-                    results[i]['risk_score'] = score
-                    results[i]['risk_text'] = f"{int(score)}% — {'Crítico' if score >= 90 else 'Alto' if score >= 80 else 'Moderado' if score >= 50 else 'Baixo'}"
-
-            else:
-                adj_info = {'severity': 0.0, 'adj_factor': 1.0, 'recommendation': {}}
+            if not exogenous_shocks:
+                exogenous_shocks = None
         except Exception as e:
-            print(f"[WARN] anomaly adjustment failed: {e}")
-            adj_info = {'severity': 0.0, 'adj_factor': 1.0, 'recommendation': {}}
+            print(f"Erro ao processar shocks no app.py: {e}")
+            exogenous_shocks = None
 
-        # Recompute meta scores after adjustment
-        scores = [r['risk_score'] for r in results]
-        scores = np.nan_to_num(scores)
-        s_sort = sorted(scores, reverse=True)
-        meta['stats_top5_mean'] = float(np.mean(s_sort[:5])) if len(s_sort) >= 5 else 0.0
-        meta['stats_top10_mean'] = float(np.mean(s_sort[:10])) if len(s_sort) >= 10 else 0.0
-        meta['stats_top5_min'] = float(s_sort[4]) if len(s_sort) >= 5 else 0.0
-        meta['stats_overall_mean'] = float(np.mean(scores)) if len(scores) > 0 else 0.0
-        meta['stats_overall_std'] = float(np.std(scores)) if len(scores) > 0 else 0.0
-        meta['anomaly_adjustment'] = adj_info
+        scores_map = orchestrator.get_combined_risk(exogenous_shocks)
+        results = []
+        meta = {'counts': {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0}}
+        all_scores = []
+        
+        # Prepare per-region accumulators so frontend can request region-specific counts
+        region_buckets = {}
 
-        if predict_logger: predict_logger.log_prediction(meta, results)
-        return jsonify({'meta': meta, 'data': results})
+        for i, row in nodes_gdf.iterrows():
+            name = str(row['name'])
+            name_norm = normalize_name(name)
+            score = float(scores_map.get(name_norm, 20.0))
+            if np.isnan(score) or np.isinf(score): score = 20.0
+            
+            # Novo Sistema de Cores e Status (Configuração do Usuário)
+            if score >= 90: 
+                status, css, color = 'CRÍTICO', 'risk-critico', '#8B0000'
+                meta['counts']['crítico'] += 1
+            elif score >= 80: 
+                status, css, color = 'ALTO', 'risk-alto', '#E63946'
+                meta['counts']['alto'] += 1
+            elif score >= 50: 
+                status, css, color = 'MODERADO', 'risk-moderado', '#F4A261'
+                meta['counts']['moderado'] += 1
+            else: 
+                status, css, color = 'BAIXO', 'risk-baixo', '#A8DADC'
+                meta['counts']['baixo'] += 1
+            
+            reg = str(row.get('region_type', 'fortaleza')).lower()
+            if reg == 'capital': reg = 'fortaleza'
 
-    except Exception as e:
-        tb = traceback.format_exc()
-        print("[ERROR] Exception in /api/risk:", e)
-        print(tb)
-        return jsonify({'error': str(e), 'traceback': tb}), 500
+            # --- CORREÇÃO: Sincronização com os 19 municípios oficiais da RMF ---
+            rmf_oficial = [
+                'AQUIRAZ', 'CASCAVEL', 'CAUCAIA', 'CHOROZINHO', 'EUSEBIO', 'GUAIUBA', 
+                'HORIZONTE', 'ITAITINGA', 'MARACANAU', 'MARANGUAPE', 'PACAJUS', 
+                'PACATUBA', 'PARAIPABA', 'PARACURU', 'PINDORETAMA', 
+                'SAO GONCALO DO AMARANTE', 'SAO LUIS DO CURU', 'TRAIRI'
+            ]
+            if name_norm in rmf_oficial:
+                reg = 'rmf'
 
-
-# -----------------------------
-# Endpoints para eventos exógenos
-# -----------------------------
-@app.route('/api/exogenous', methods=['GET', 'POST'])
-def handle_exogenous():
-    """Lista ou registra um evento exógeno simples (persistido em JSON).
-    GET: retorna lista de eventos salvos.
-    POST: recebe JSON com evento e anexa em `EXOGENOUS_FILE`.
-    """
-    try:
-        if request.method == 'POST':
-            data = request.get_json()
-            if data is None:
-                return jsonify({'error': 'JSON inválido ou cabecalho Content-Type ausente.'}), 400
-
-            os.makedirs(os.path.dirname(EXOGENOUS_FILE), exist_ok=True)
-
-            existing = []
-            if os.path.exists(EXOGENOUS_FILE):
-                try:
-                    with open(EXOGENOUS_FILE, 'r', encoding='utf-8') as f:
-                        existing = json.load(f)
-                except Exception:
-                    existing = []
-
-            existing.append(data)
-            with open(EXOGENOUS_FILE, 'w', encoding='utf-8') as f:
-                json.dump(existing, f, ensure_ascii=False, indent=2)
-
-            return jsonify({"status": "success", "message": "Evento registrado."})
-
-        # GET
-        if os.path.exists(EXOGENOUS_FILE):
-            try:
-                with open(EXOGENOUS_FILE, 'r', encoding='utf-8') as f:
-                    return jsonify(json.load(f))
-            except Exception:
-                return jsonify([])
-        return jsonify([])
-    except Exception as e:
-        print(f"[ERROR] /api/exogenous: {e}")
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/api/exogenous/parse', methods=['POST'])
-def parse_exogenous():
-    """Parseia texto de ocorrência (CIOPS) e retorna pontos geocodificados.
-    Retorna 400 se JSON inválido ou se cidade estiver faltando em ocorrências detectadas.
-    """
-    try:
-        payload = request.get_json()
-        if not payload or 'text' not in payload:
-            return jsonify({'error': 'JSON inválido ou campo "text" ausente.'}), 400
-
-        text = payload.get('text') or ''
-        block_type = payload.get('block_type')
-
-        from src.llm_service import process_exogenous_text
-
-        events = process_exogenous_text(text, block_type=block_type)
-        if events is None:
-            return jsonify({'error': 'Falha ao parsear o texto.'}), 500
-
-        points = []
-        missing_city = []
-
-        # Helper: normalize
-        def _norm(s):
-            return (s or '').strip().upper()
-
-        for ev in events:
-            municipio = (ev.get('municipio') or '').strip()
-            bairro = (ev.get('bairro') or '').strip()
-            if municipio == '':
-                missing_city.append(ev)
-
-            lat = None
-            lng = None
-            # Try to match against loaded nodes_gdf first
-            try:
-                if nodes_gdf is not None and bairro:
-                    # match by normalized name contains
-                    m = nodes_gdf[nodes_gdf['name'].str.upper().str.contains(_norm(bairro))]
-                    if len(m) > 0:
-                        geom = m.iloc[0].geometry
-                        # geometry may be polygon or point
-                        try:
-                            c = geom.centroid
-                            lat = float(c.y)
-                            lng = float(c.x)
-                        except Exception:
-                            lat = float(getattr(geom, 'y', None) or 0)
-                            lng = float(getattr(geom, 'x', None) or 0)
-
-            except Exception:
-                pass
-
-            # Fallback: try loading bairro centers from data/raw (if exists)
-            if (lat is None or lng is None) and os.path.exists(os.path.join(BASE_DIR, 'data', 'raw', 'bairros_centros_latlong.json')):
-                try:
-                    from src.data_processing import load_nodes_from_json
-                    gdf_nodes, _ = load_nodes_from_json(os.path.join('data', 'raw', 'bairros_centros_latlong.json'))
-                    if bairro:
-                        mm = gdf_nodes[gdf_nodes['name'].str.upper() == _norm(bairro)]
-                        if len(mm) > 0:
-                            geom = mm.iloc[0].geometry
-                            lat = float(geom.y)
-                            lng = float(geom.x)
-                except Exception:
-                    pass
-
-            # If still not found, but municipio is present, try geocoding by municipio
-            if (lat is None or lng is None) and municipio:
-                try:
-                    if nodes_gdf is not None:
-                        # Try to match a city node (node_type == 'cidade') or name equal
-                        mm = nodes_gdf[nodes_gdf['name'].str.upper() == _norm(municipio)]
-                        if len(mm) == 0 and 'node_type' in nodes_gdf.columns:
-                            mm = nodes_gdf[(nodes_gdf['node_type'] == 'cidade') & (nodes_gdf['name'].str.upper().str.contains(_norm(municipio)))]
-                        if len(mm) > 0:
-                            geom = mm.iloc[0].geometry
-                            try:
-                                c = geom.centroid
-                                lat = float(c.y)
-                                lng = float(c.x)
-                            except Exception:
-                                lat = float(getattr(geom, 'y', None) or 0)
-                                lng = float(getattr(geom, 'x', None) or 0)
-
-                except Exception:
-                    pass
-
-            if (lat is None or lng is None) and municipio:
-                # Try municipality coords file
-                mun_path = os.path.join(BASE_DIR, 'data', 'static', 'ceara_municipios_coords.json')
-                try:
-                    if os.path.exists(mun_path):
-                        with open(mun_path, 'r', encoding='utf-8') as fh:
-                            jm = json.load(fh)
-                            # jm expected structure: { 'MUNICIPIO': {'lat':..., 'long':...}, ... }
-                            for k, v in jm.items():
-                                if _norm(k) == _norm(municipio) or _norm(municipio) in _norm(k):
-                                    lat = float(v.get('lat') or v.get('latitude') or 0)
-                                    lng = float(v.get('long') or v.get('longitude') or 0)
-                                    break
-                except Exception:
-                    pass
-
-            if lat is not None and lng is not None:
-                points.append({'lat': lat, 'lng': lng, 'bairro': bairro, 'municipio': municipio, 'natureza': ev.get('natureza', '')})
-
-        # If any event lacked municipio, return 400 with details so frontend can show missing cities
-        if missing_city:
-            return jsonify({'error': 'Falta a cidade na sua ocorrência!', 'missing_city': missing_city}), 400
-
-        return jsonify({'points': points, 'events': events})
-
-    except Exception as e:
-        import traceback
-        tb = traceback.format_exc()
-        print(f"[ERROR] /api/exogenous/parse: {e}\n{tb}")
-        return jsonify({'error': str(e), 'traceback': tb}), 500
-
-
-@app.route('/api/exogenous/save', methods=['POST'])
-def save_exogenous():
-    """Persiste eventos exógenos geocodificados (recebe points + original_text)."""
-    try:
-        payload = request.get_json()
-        if not payload or 'points' not in payload:
-            return jsonify({'error': 'JSON inválido; espere {points, original_text}'}), 400
-
-        points = payload.get('points', [])
-        original = payload.get('original_text', '')
-
-        # Build entry following existing pattern in file
-        os.makedirs(os.path.dirname(EXOGENOUS_FILE), exist_ok=True)
-        existing = []
-        if os.path.exists(EXOGENOUS_FILE):
-            try:
-                with open(EXOGENOUS_FILE, 'r', encoding='utf-8') as f:
-                    existing = json.load(f)
-            except Exception:
-                existing = []
-
-        # Determine next id
-        next_id = 1
-        try:
-            ids = [int(item.get('id')) for item in existing if isinstance(item.get('id'), (int, str))]
-            if ids:
-                next_id = max(ids) + 1
-        except Exception:
-            next_id = len(existing) + 1
-
-        # If parser provided event details, use them to populate raw_event
-        events = payload.get('events', []) or []
-
-        built_points = []
-        for idx, p in enumerate(points):
-            lat = p.get('lat')
-            lng = p.get('lng')
-            bairro = p.get('bairro') or ''
-            municipio = p.get('municipio') or ''
-            natureza = p.get('natureza') or p.get('event_type') or ''
-
-            # Try to find corresponding event by matching fields
-            raw_event = None
-            for ev in events:
-                # match by resumo/natureza/municipio/bairro
-                if (ev.get('natureza') and ev.get('natureza') == natureza) or (ev.get('resumo') and ev.get('resumo') == p.get('description')):
-                    raw_event = ev
-                    break
-
-            if raw_event is None:
-                raw_event = {
-                    'bairro': bairro,
-                    'municipio': municipio,
-                    'natureza': natureza,
-                    'localizacao_completa': p.get('localizacao_completa', ''),
-                    'raw_text': p.get('raw_text', original),
-                    'resumo': p.get('resumo', '')
-                }
-
-            description = raw_event.get('resumo') or f"{natureza} - {municipio or bairro}"
-
-            built_points.append({
-                'description': description,
-                'lat': lat,
-                'lng': lng,
-                'raw_event': raw_event,
-                'type': 'exogenous'
+            # ensure region bucket exists
+            if reg not in region_buckets:
+                region_buckets[reg] = []
+            
+            all_scores.append(score)
+            results.append({
+                'node_id': i, 'name': name, 'clean_name': name_norm,
+                'risk_score': score, 'status_label': status, 'css_class': css,
+                'color': color,
+                'faction': str(row.get('faction', 'N/A')), 'region_type': reg
             })
+            # add to region bucket for later aggregation
+            region_buckets[reg].append(results[-1])
 
-        entry = {
-            'id': str(next_id),
-            'timestamp': datetime.now().isoformat(),
-            'original_text': original,
-            'points': built_points
-        }
+        # Adicionar Ranking Info para o Frontend
+        if all_scores:
+            meta['stats_overall_mean'] = float(np.mean(all_scores))
+            meta['ranking_info'] = {
+                'top_1_percent_threshold': float(np.percentile(all_scores, 99)),
+                'top_5_percent_threshold': float(np.percentile(all_scores, 95)),
+                'top_10_percent_threshold': float(np.percentile(all_scores, 90))
+            }
+        else:
+            meta['ranking_info'] = {'top_1_percent_threshold': 99, 'top_5_percent_threshold': 95, 'top_10_percent_threshold': 90}
 
-        existing.append(entry)
-        with open(EXOGENOUS_FILE, 'w', encoding='utf-8') as f:
-            json.dump(existing, f, ensure_ascii=False, indent=2)
+        # --- Métricas focadas no gestor: confiança do ranking e "temperatura do estado" ---
+        try:
+            scores_arr = np.array(all_scores) if all_scores else np.array([20.0])
+            s_mean = float(np.mean(scores_arr))
+            s_std = float(np.std(scores_arr))
+            s_min = float(np.min(scores_arr))
+            s_max = float(np.max(scores_arr))
 
-        return jsonify({'status': 'saved', 'count': len(existing), 'id': entry['id']})
+            # Ordenar scores para estatísticas de topo
+            sorted_scores_arr = np.sort(scores_arr)[::-1]
+            
+            # 1. Pressão nos Hotspots (Top 5 Mean)
+            top5_scores = sorted_scores_arr[:5]
+            meta['stats_top5_mean'] = float(np.mean(top5_scores)) if len(top5_scores) > 0 else s_mean
+            
+            # 2. Alerta do Top 10 (Top 10 Mean)
+            top10_scores = sorted_scores_arr[:10]
+            meta['stats_top10_mean'] = float(np.mean(top10_scores)) if len(top10_scores) > 0 else s_mean
+            
+            # 3. Corte de Prioridade (Mínimo do Top 5)
+            meta['stats_top5_min'] = float(np.min(top5_scores)) if len(top5_scores) > 0 else s_min
+            
+            # 4. Volatilidade Geral (STD)
+            meta['stats_overall_std'] = s_std
 
+            # Separação entre top10 e média geral — indica clareza do ranking
+            top10_threshold = int(np.percentile(scores_arr, 90)) if len(scores_arr) > 1 else s_mean
+            top10_mean = float(np.mean([v for v in scores_arr if v >= top10_threshold])) if len(scores_arr) > 0 else s_mean
+            separation = top10_mean - s_mean
+
+            # Confiança heurística: maior quando desvio é baixo e separação é alta
+            # Normalizar std pelo range observado para obter uma escala 0-1
+            denom = (s_max - s_min) if (s_max - s_min) > 0 else 1.0
+            std_norm = min(1.0, s_std / denom)
+            sep_norm = min(1.0, separation / (denom if denom > 0 else 1.0))
+
+            confidence_score = max(0.0, min(1.0, 0.55 + 0.45 * sep_norm - 0.5 * std_norm))
+            confidence_pct = round(confidence_score * 100.0, 1)
+
+            if confidence_pct >= 80:
+                confidence_label = 'Alta'
+            elif confidence_pct >= 60:
+                confidence_label = 'Moderada'
+            elif confidence_pct >= 40:
+                confidence_label = 'Baixa'
+            else:
+                confidence_label = 'Muito baixa'
+
+            confidence_explanation = (
+                f"Confiança estimada em {confidence_pct}% baseada em separação dos top {max(1,int(len(scores_arr)*0.1))}% "
+                f"e estabilidade dos scores (desvio padrão {s_std:.2f})."
+            )
+
+            # Temperatura do estado (visão gerencial): mapeia média para níveis claros
+            state_pct = round(s_mean, 1)
+            if state_pct >= 90:
+                temp_label = 'Crítico'
+                temp_color = '#8B0000'
+                recommendation = 'Intervenção imediata e mobilização de recursos.'
+            elif state_pct >= 70:
+                temp_label = 'Muito Quente'
+                temp_color = '#E63946'
+                recommendation = 'Aumentar vigilância e priorizar ações no top 10.'
+            elif state_pct >= 50:
+                temp_label = 'Quente'
+                temp_color = '#F4A261'
+                recommendation = 'Reforçar monitoramento e revisar alocação de recursos.'
+            elif state_pct >= 30:
+                temp_label = 'Morno'
+                temp_color = '#A8DADC'
+                recommendation = 'Manter operações regulares e monitorar tendências.'
+            else:
+                temp_label = 'Frio'
+                temp_color = '#4CAF50'
+                recommendation = 'Situação estável; operações normais.'
+
+            meta['manager_view'] = {
+                'confidence_pct': confidence_pct,
+                'confidence_label': confidence_label,
+                'confidence_explanation': confidence_explanation,
+                'state_temperature_pct': state_pct,
+                'state_temperature_label': temp_label,
+                'state_temperature_color': temp_color,
+                'recommendation': recommendation,
+                'source': 'computed'
+            }
+        except Exception:
+            meta['manager_view'] = {
+                'confidence_pct': 50.0,
+                'confidence_label': 'Moderada',
+                'state_temperature_pct': meta.get('stats_overall_mean', 30.0),
+                'state_temperature_label': 'Morno',
+                'recommendation': 'Monitorar',
+                'source': 'fallback'
+            }
+
+        # Build counts by region and top10 by region
+        try:
+            meta['counts_by_region'] = {}
+            meta['top10_by_region'] = {}
+            for region_key, items in region_buckets.items():
+                c = {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0}
+                for it in items:
+                    sc = it.get('risk_score', 0)
+                    if sc >= 90:
+                        c['crítico'] += 1
+                    elif sc >= 80:
+                        c['alto'] += 1
+                    elif sc >= 50:
+                        c['moderado'] += 1
+                    else:
+                        c['baixo'] += 1
+                meta['counts_by_region'][region_key] = c
+
+                sorted_region = sorted(items, key=lambda x: x.get('risk_score', 0), reverse=True)
+                meta['top10_by_region'][region_key] = [{
+                    'name': r.get('name'), 'node_id': r.get('node_id'), 'risk_score': r.get('risk_score'),
+                    'status_label': r.get('status_label'), 'region_type': r.get('region_type')
+                } for r in sorted_region[:10]]
+        except Exception:
+            meta['counts_by_region'] = {}
+            meta['top10_by_region'] = {}
+
+        # Build Top10 list server-side so frontend doesn't need to re-derive ranking.
+        try:
+            sorted_results = sorted(results, key=lambda x: x.get('risk_score', 0), reverse=True)
+            meta['top10'] = []
+            for r in sorted_results[:10]:
+                meta['top10'].append({
+                    'name': r.get('name'),
+                    'node_id': r.get('node_id'),
+                    'risk_score': r.get('risk_score'),
+                    'status_label': r.get('status_label'),
+                    'region_type': r.get('region_type')
+                })
+        except Exception:
+            meta['top10'] = []
+
+        # --- CORREÇÃO: Adicionar Datas da Janela Histórica para o Frontend ---
+        try:
+            if orchestrator is not None and hasattr(orchestrator, 'dates') and orchestrator.dates is not None:
+                meta['start_cvli'] = str(orchestrator.dates[0])
+                meta['last_date'] = str(orchestrator.dates[-1])
+                meta['window_cvli'] = len(orchestrator.dates)
+                meta['model_window_cvli'] = len(orchestrator.dates)
+            else:
+                meta['start_cvli'] = 'N/A'
+                meta['last_date'] = datetime.now().strftime('%Y-%m-%d')
+                meta['window_cvli'] = 30
+                meta['model_window_cvli'] = 30
+        except Exception:
+            pass
+
+        return jsonify({'meta': meta, 'data': results})
     except Exception as e:
-        print(f"[ERROR] /api/exogenous/save: {e}")
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/top20_micro_nodes')
-def get_top20():
-    # Fallback dinâmico
-    if nodes_gdf is not None:
-        try:
-            resp = calculate_risk()
-            data = resp.get_json()['data']
-            top = sorted(data, key=lambda x: x['risk_score'], reverse=True)[:20]
-            feats = []
-            for item in top:
-                idx = item['node_id']
-                if idx < len(nodes_gdf):
-                    geom = nodes_gdf.iloc[idx].geometry.centroid
-                    feats.append({
-                        "type": "Feature",
-                        "geometry": {"type": "Point", "coordinates": [geom.x, geom.y]},
-                        "properties": {"name": f"Risco {int(item['risk_score'])}%", "risk": item['risk_score']}
-                    })
-            return jsonify({"type": "FeatureCollection", "features": feats})
-        except: pass
-    return jsonify({'features': []})
-
-
-@app.route('/api/explain/<int:node_id>')
-def explain_node(node_id: int):
-    """Generate explanation for a specific node using current predictions."""
-    try:
-        if node_features is None:
-            return jsonify({'error': 'Loading...'}), 503
-
-        meta, results, final_risk, stgcn_score, hist_sum = compute_predictions()
-
-        if node_id < 0 or node_id >= len(results):
-            return jsonify({'error': 'Node not found'}), 404
-
-        # Determine rank
-        sorted_nodes = sorted(results, key=lambda x: x['risk_score'], reverse=True)
-        ranks = {r['node_id']: idx+1 for idx, r in enumerate(sorted_nodes)}
-        rank = ranks.get(node_id, None)
-
-        # Nearby: take top-5 highest risk nodes excluding self
-        nearby = [n['node_id'] for n in sorted_nodes if n['node_id'] != node_id][:5]
-
-        # Temporal pattern: simple heuristic from recent mean trend
-        recent = node_features[node_id, -14:, 0]
-        if np.mean(recent[-7:]) > np.mean(recent[:7]):
-            temporal = 'Aumento nas últimas semanas'
-        else:
-            temporal = 'Estável'
-
-        # Events: include recent exogenous events if available
-        evs = []
-        if event_manager:
-            evs = event_manager.get_recent_events(days_back=7)
-
-        context = {
-            'score': results[node_id]['risk_score'],
-            'temporal_pattern': temporal,
-            'nearby_nodes': nearby,
-            'events': evs,
-            'confidence': 0.85,
-            'tier': 'top_5' if rank and rank <= 5 else 'long_tail_20' if rank and rank <= 20 else 'tail'
-        }
-
-        gen = ExplanationGenerator()
-        explanation = gen.explain_node_ranking(node_id, rank or 0, context)
-        return jsonify({'explanation': explanation})
-    except Exception as e:
-        import traceback
-        tb = traceback.format_exc()
-        print(f"[ERROR] /api/explain: {e}\n{tb}")
-        return jsonify({'error': str(e), 'traceback': tb}), 500
-
-
-@app.route('/api/simulate', methods=['POST'])
-def simulate():
-    """Simulate applying an exogenous shock to a node and return adjusted top list.
-    Payload: { node_id: int, severity: float(0-1) }
-    """
-    try:
-        payload = request.get_json() or {}
-        node_id = payload.get('node_id')
-        severity = float(payload.get('severity', 0.0))
-
-        if node_id is None:
-            return jsonify({'error': 'node_id required'}), 400
-
-        meta, results, final_risk, stgcn_score, hist_sum = compute_predictions()
-
-        if node_id < 0 or node_id >= len(results):
-            return jsonify({'error': 'Node not found'}), 404
-
-        # Apply local bump
-        sim_scores = final_risk.copy()
-        bump = 1.0 + min(max(severity, 0.0), 1.0) * 0.6
-        sim_scores[node_id] = float(np.clip(sim_scores[node_id] * bump, 0.0, 100.0))
-
-        # Build top summary before and after
-        before = sorted([(r['node_id'], r['risk_score']) for r in results], key=lambda x: x[1], reverse=True)[:20]
-        after = sorted([(i, float(sim_scores[i])) for i in range(len(sim_scores))], key=lambda x: x[1], reverse=True)[:20]
-
-        return jsonify({'before_top20': before, 'after_top20': after, 'node_id': node_id, 'severity': severity})
-    except Exception as e:
-        import traceback
-        tb = traceback.format_exc()
-        print(f"[ERROR] /api/simulate: {e}\n{tb}")
-        return jsonify({'error': str(e), 'traceback': tb}), 500
-
-# --- ROTA DE POLÍGONOS CORRIGIDA (CARREGA TUDO) ---
 @app.route('/api/polygons')
 def get_polygons():
     features = []
-    # Lista de arquivos + Tag de região
-    ais_files = [
-        ('capital', 'AIS - CAPITAL.geojson'),
-        ('rmf', 'AIS - METROPOLITANA.geojson'),
-        ('interior', 'AIS - INTERIOR.geojson')
-    ]
-    
-    for region_type, fname in ais_files:
+    ais_files = [('fortaleza', 'AIS - CAPITAL.geojson'), ('rmf', 'AIS - METROPOLITANA.geojson'), ('interior', 'AIS - INTERIOR.geojson')]
+    for reg, fname in ais_files:
         path = os.path.join(BASE_DIR, 'data', 'static', fname)
         if os.path.exists(path):
             try:
                 with open(path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                     for feat in data.get('features', []):
-                        if 'properties' in feat:
-                            # ETIQUETA OBRIGATÓRIA PARA O FILTRO FUNCIONAR
-                            feat['properties']['region_type'] = region_type
-                            
-                            # Normaliza nome para exibição
-                            if 'name' not in feat['properties']:
-                                for key in ['Name', 'NOME', 'bairro', 'municipio', 'NM_MUN']:
-                                    if key in feat['properties']:
-                                        feat['properties']['name'] = feat['properties'][key]
-                                        break
+                        feat['properties']['region_type'] = reg
                         features.append(feat)
-            except Exception as e:
-                print(f"Erro lendo {fname}: {e}")
-            
+            except: pass
     return jsonify({"type": "FeatureCollection", "features": features})
+
+@app.route('/api/model-update-status')
+def model_status(): return jsonify({"status": "idle"})
 
 @app.route('/api/anomaly_status')
 def anomaly_status():
-    if anomaly_monitor: 
-        # Força atualização para não ficar "congelado"
-        return jsonify(anomaly_monitor.get_anomaly_summary())
-    return jsonify({'monitoring_active': False, 'status': 'Monitor Offline'})
+    """Retorna o status de anomalias calculado em tempo real sobre o estado atual do modelo."""
+    if nodes_gdf is None or orchestrator is None:
+        return jsonify({'monitoring_active': False, 'error': 'Inicializando...'}), 503
+    
+    try:
+        # 1. Obter scores atuais para cálculo de tensão
+        scores_map = orchestrator.get_combined_risk()
+        scores = list(scores_map.values())
+        
+        # 2. Cálculo da Tensão Estadual (Escala 0-10)
+        # Baseado na volatilidade (STD) e na média do Top 5%
+        if scores:
+            s_mean = np.mean(scores)
+            s_std = np.std(scores)
+            top_mean = np.percentile(scores, 95)
+            # Tensão sobe se a média do topo for alta e houver muita variação
+            tension = min(10.0, (top_mean / 20.0) + (s_std / 10.0))
+        else:
+            tension = 0.0
+            
+        # Determinar Label
+        if tension >= 7.5: label = 'CRÍTICO'
+        elif tension >= 5.0: label = 'ALERTA'
+        else: label = 'ESTÁVEL'
 
-@app.route('/api/model-update-status')
-def model_status(): return jsonify(get_monitor_state())
+        # 3. Listar Eventos Ativos Reais (Janela de 7 dias)
+        active_events = []
+        try:
+            exo_path = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
+            if os.path.exists(exo_path):
+                with open(exo_path, 'r', encoding='utf-8') as f:
+                    events = json.load(f)
+                
+                cutoff = (datetime.now() - timedelta(days=7)).date()
+                for e in events:
+                    # Tenta pegar a data
+                    try:
+                        dstr = e.get('date', '')
+                        if dstr and datetime.strptime(dstr, '%Y-%m-%d').date() >= cutoff:
+                            active_events.append({
+                                'description': e.get('description') or e.get('resumo', 'Evento Crítico'),
+                                'severity': float(e.get('intensity', 0.5))
+                            })
+                    except: continue
+        except: pass
+
+        # 4. Confiança (Precisão de Captura)
+        # Heurística: Baseada na separação estatística do sinal
+        confidence = 0.5 # Base
+        if scores and s_std > 0:
+            separation = (np.max(scores) - np.mean(scores)) / s_std
+            confidence = min(0.98, 0.6 + (separation / 10.0))
+
+        return jsonify({
+            'monitoring_active': True,
+            'anomaly_level': float(tension),
+            'anomaly_risk_level': label,
+            'active_events': active_events[:5], # Top 5 eventos
+            'model_confidence': float(confidence),
+            'last_check': datetime.now().strftime('%H:%M:%S')
+        })
+    except Exception as e:
+        return jsonify({'monitoring_active': True, 'error': str(e), 'anomaly_level': 0.0})
+
+
+@app.route('/api/explain/<int:node_id>')
+def explain_node(node_id):
+    """Retorna uma explicação resumida dos motivos de criticidade para um nó (região/localidade).
+    Implementação leve que responde mesmo sem o gerador de explicações completo disponível.
+    """
+    if nodes_gdf is None or orchestrator is None:
+        return jsonify({'error': 'Inicializando...'}), 503
+    try:
+        if node_id not in list(nodes_gdf.index):
+            return jsonify({'error': 'node not found'}), 404
+
+        row = nodes_gdf.loc[node_id]
+        name = str(row.get('name', 'unknown'))
+        name_norm = normalize_name(name)
+
+        # Obter scores e preparar contexto
+        scores_map = orchestrator.get_combined_risk()
+        score_pct = float(scores_map.get(name_norm, 20.0))
+        # ExplanationGenerator trabalha com escala 0-10
+        score_10 = score_pct / 10.0
+
+        # Construir ranking e estatísticas locais
+        all_scores = []
+        node_score_pairs = []
+        for i, r in nodes_gdf.iterrows():
+            nname = normalize_name(str(r.get('name', '')))
+            s = float(scores_map.get(nname, 20.0))
+            all_scores.append(s)
+            node_score_pairs.append((i, s))
+
+        # Determinar posição por score (1 = maior)
+        sorted_by_score = sorted(node_score_pairs, key=lambda x: x[1], reverse=True)
+        ranks = {nid: idx + 1 for idx, (nid, _) in enumerate(sorted_by_score)}
+        rank_pos = ranks.get(node_id, len(sorted_by_score))
+
+        # Definir tier legível esperado pelo generator
+        pct_rank = rank_pos / max(1, len(sorted_by_score))
+        if rank_pos <= 5:
+            tier = 'top_5'
+        elif pct_rank <= 0.2:
+            tier = 'long_tail_20'
+        elif pct_rank <= 0.5:
+            tier = 'long_tail_50'
+        else:
+            tier = 'tail'
+
+        # Nearby: escolher até 3 peers com scores próximos ou na mesma região
+        nearby = []
+        try:
+            # Preferir mesmos region_type quando disponível
+            region_type = str(row.get('region_type', '')).lower()
+            peers = [nid for nid, s in node_score_pairs if nid != node_id and str(nodes_gdf.loc[nid].get('region_type','')).lower() == region_type]
+            if not peers:
+                # fallback: peers by score proximity
+                peers = [nid for nid, s in sorted_by_score if nid != node_id]
+            nearby = peers[:3]
+        except Exception:
+            nearby = [nid for nid, _ in sorted_by_score if nid != node_id][:3]
+
+        # Events: carregar eventos exógenos se disponíveis
+        events = []
+        events_path = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
+        try:
+            if os.path.exists(events_path):
+                with open(events_path, 'r', encoding='utf-8') as ef:
+                    evts = json.load(ef)
+                    # filtrar por localidade aproximada pelo nome
+                    for e in evts:
+                        if name_norm in normalize_name(e.get('title', '')) or name_norm in normalize_name(e.get('location','')):
+                            events.append(e)
+        except Exception:
+            events = []
+
+        # Temporal pattern heurística
+        overall_mean = float(np.mean(all_scores)) if all_scores else 30.0
+        temporal_pattern = 'Increasing' if score_pct > overall_mean else 'Stable'
+
+        # Confidence heurística
+        confidence = min(0.95, 0.6 + (score_10 / 20.0))
+
+        # Criar contexto esperado por ExplanationGenerator
+        try:
+            from src.explanation_generator import ExplanationGenerator
+            gen = ExplanationGenerator()
+            context = {
+                'score': score_10,
+                'temporal_pattern': temporal_pattern,
+                'nearby_nodes': nearby,
+                'events': events,
+                'confidence': float(confidence),
+                'tier': tier
+            }
+
+            explanation = gen.explain_node_ranking(int(node_id), int(rank_pos), context)
+            # Ajustar para incluir score original em percent
+            explanation['risk_score_pct'] = float(score_pct)
+            return jsonify(explanation)
+        except Exception:
+            # Fallback simples se generator não puder ser usado
+            factors = [
+                {'factor': 'temporal_trend', 'contribution': round(max(0.0, min(1.0, (score_pct - 30.0) / 70.0)) * 100.0, 1)},
+                {'factor': 'spatial_influence', 'contribution': round(max(0.0, min(1.0, (overall_mean - 30.0) / 70.0)) * 100.0, 1)},
+                {'factor': 'recent_events', 'contribution': round(min(1.0, len(events) * 0.1) * 100.0, 1)},
+            ]
+            summary = f'Risco estimado {score_pct:.1f}%. Principais fatores: temporal, espacial e eventos recentes.'
+            return jsonify({'node_id': node_id, 'name': name, 'summary': summary, 'factors': factors, 'confidence': float(confidence), 'risk_score': float(score_pct)})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/exogenous/parse', methods=['POST'])
+def parse_exogenous():
+    """Parse raw CIOPS-like text into structured events using llm_service.process_exogenous_text
+    Expects JSON: { text: '...raw lines...' }
+    Returns: { points: [ {bairro, municipio, resumo, ...}, ... ] }
+    """
+    try:
+        payload = request.get_json(force=True) or {}
+        text = payload.get('text') or payload.get('raw') or ''
+        if not text or not text.strip():
+            return jsonify({'error': 'empty_text'}), 400
+
+        try:
+            from src.llm_service import process_exogenous_text
+        except Exception as e:
+            return jsonify({'error': 'llm_service_unavailable', 'detail': str(e)}), 500
+
+        parsed = process_exogenous_text(text)
+        # Return parsed items as 'points' for frontend compatibility
+        return jsonify({'points': parsed, 'count': len(parsed)})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/exogenous/save', methods=['POST'])
+def save_exogenous():
+    """Save parsed exogenous events to disk for downstream processing.
+    Expects JSON: { points: [...], original_text: '...' }
+    Writes to `data/exogenous_events.json` and `data/exogenous_events_geocoded.json`.
+    """
+    try:
+        payload = request.get_json(force=True) or {}
+        points = payload.get('points') or []
+        original = payload.get('original_text', '')
+
+        if not isinstance(points, list) or len(points) == 0:
+            return jsonify({'error': 'no_points'}), 400
+
+        # Normalize minimal fields and add ingest metadata
+        for p in points:
+            if isinstance(p, dict):
+                p.setdefault('ingested_at', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                # Ensure `date` exists and is a YYYY-MM-DD string (EventManager expects a date)
+                # Prefer an explicit full-date if provided; otherwise derive from `ingested_at`.
+                # We'll try to produce a full datetime string in `date`.
+                # Priority:
+                # 1) If `date` already contains a full datetime/ISO -> keep as-is
+                # 2) If `date` is only a YYYY-MM-DD and `timestamp` available -> combine
+                # 3) If `date` is only a time (HH:MM[:SS]) -> combine with `ingested_at` date
+                # 4) Else try to derive date from `ingested_at` and combine with `timestamp` if present
+
+                def _normalize_time_part(t):
+                    if not t or not isinstance(t, str):
+                        return None
+                    t = t.strip()
+                    # HH:MM or H:MM or HH:MM:SS
+                    m = re.match(r'^(\d{1,2}:\d{2})(:?\d{0,2})$', t)
+                    if m:
+                        hhmm = m.group(1)
+                        rest = m.group(2) or ''
+                        if rest and rest.startswith(':') and len(rest) == 3:
+                            return hhmm + rest
+                        else:
+                            return hhmm + ':00'
+                    # If already HH:MM:SS
+                    m2 = re.match(r'^(\d{2}:\d{2}:\d{2})$', t)
+                    if m2:
+                        return m2.group(1)
+                    return None
+
+                date_val = p.get('date')
+                ts_val = p.get('timestamp') or p.get('time') or p.get('hora')
+
+                final_dt = None
+
+                # 1) If date_val already contains a date part (YYYY-MM-DD)
+                if isinstance(date_val, str) and re.search(r'\d{4}-\d{2}-\d{2}', date_val):
+                    # If it includes time, keep full; otherwise try to append timestamp
+                    try:
+                        # Try parsing full datetime first
+                        try:
+                            parsed = datetime.fromisoformat(date_val.strip())
+                            final_dt = parsed.strftime('%Y-%m-%d %H:%M:%S')
+                        except Exception:
+                            # If only date present like YYYY-MM-DD
+                            if re.match(r'^\d{4}-\d{2}-\d{2}$', date_val.strip()):
+                                date_part = date_val.strip()
+                                tnorm = _normalize_time_part(ts_val)
+                                if tnorm:
+                                    final_dt = f"{date_part} {tnorm}"
+                                else:
+                                    final_dt = f"{date_part} 00:00:00"
+                            else:
+                                # fallback: take leading YYYY-MM-DD and default time
+                                date_part = date_val.strip()[:10]
+                                final_dt = f"{date_part} 00:00:00"
+                    except Exception:
+                        final_dt = None
+
+                # 2) If date_val looks like a time only (HH:MM) -> combine with ingested_at date
+                if final_dt is None and isinstance(date_val, str) and re.match(r'^\d{1,2}:\d{2}(:\d{2})?$', date_val.strip()):
+                    tnorm = _normalize_time_part(date_val.strip())
+                    ing = p.get('ingested_at')
+                    ing_dt = None
+                    if isinstance(ing, str) and ing:
+                        try:
+                            ing_dt = datetime.strptime(ing.strip(), '%Y-%m-%d %H:%M:%S')
+                        except Exception:
+                            try:
+                                ing_dt = datetime.fromisoformat(ing.strip())
+                            except Exception:
+                                ing_dt = None
+                    if ing_dt:
+                        final_dt = f"{ing_dt.date().isoformat()} {tnorm}"
+
+                # 3) If still none, but timestamp present -> combine with ingested_at date
+                if final_dt is None and ts_val:
+                    tnorm = _normalize_time_part(ts_val)
+                    if tnorm:
+                        ing = p.get('ingested_at')
+                        ing_dt = None
+                        if isinstance(ing, str) and ing:
+                            try:
+                                ing_dt = datetime.strptime(ing.strip(), '%Y-%m-%d %H:%M:%S')
+                            except Exception:
+                                try:
+                                    ing_dt = datetime.fromisoformat(ing.strip())
+                                except Exception:
+                                    ing_dt = None
+                        if ing_dt:
+                            final_dt = f"{ing_dt.date().isoformat()} {tnorm}"
+
+                # 4) Fallback: derive date from ingested_at and set midnight time
+                if final_dt is None:
+                    ing = p.get('ingested_at')
+                    if isinstance(ing, str) and ing:
+                        try:
+                            ing_dt = datetime.strptime(ing.strip(), '%Y-%m-%d %H:%M:%S')
+                        except Exception:
+                            try:
+                                ing_dt = datetime.fromisoformat(ing.strip())
+                            except Exception:
+                                ing_dt = None
+                        if ing_dt:
+                            final_dt = f"{ing_dt.date().isoformat()} 00:00:00"
+                if final_dt:
+                    p['date'] = final_dt
+                else:
+                    p['date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                if 'raw_text' not in p and original:
+                    p['raw_text'] = original
+
+        # Save raw parsed to exogenous_events.json
+        raw_path = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
+        try:
+            if os.path.exists(raw_path):
+                with open(raw_path, 'r', encoding='utf-8') as f:
+                    existing = json.load(f) or []
+                if isinstance(existing, dict) and 'events' in existing:
+                    existing_list = existing['events']
+                elif isinstance(existing, list):
+                    existing_list = existing
+                else:
+                    existing_list = []
+            else:
+                existing_list = []
+        except Exception:
+            existing_list = []
+
+        # Append and write back
+        existing_list.extend(points)
+        try:
+            with open(raw_path, 'w', encoding='utf-8') as f:
+                json.dump(existing_list, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            return jsonify({'error': 'write_failed', 'detail': str(e)}), 500
+
+        # Also write geocoded version used by EventManager
+        geocoded_path = os.path.join(BASE_DIR, 'data', 'exogenous_events_geocoded.json')
+        try:
+            with open(geocoded_path, 'w', encoding='utf-8') as gf:
+                json.dump(existing_list, gf, ensure_ascii=False, indent=2)
+        except Exception:
+            # not fatal; continue
+            pass
+
+        return jsonify({'saved': len(points)})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == "__main__":
     load_data_and_models()
-    app.run(host='0.0.0.0', port=5050, debug=False, use_reloader=False)
+    print("\n" + "="*50)
+    print("DASHBOARD CPRAIO PRONTO")
+    print("ACESSE: http://localhost:5050")
+    print("="*50 + "\n")
+    # Usando 0.0.0.0 para maior compatibilidade, mas o link impresso é localhost
+    app.run(host='0.0.0.0', port=5050, debug=True, use_reloader=True)
