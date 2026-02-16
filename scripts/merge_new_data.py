@@ -1,161 +1,142 @@
 import json
 import os
-import time
-import sys
+import re
+import numpy as np
+from scipy.spatial import KDTree
+import unicodedata
 
-# Tenta importar geopy para geolocalização
-try:
-    from geopy.geocoders import Nominatim
-    from geopy.exc import GeocoderTimedOut
-    GEOPY_AVAILABLE = True
-except ImportError:
-    print("AVISO: Biblioteca 'geopy' não encontrada. A geolocalização será ignorada.")
-    print("Para instalar: pip install geopy")
-    GEOPY_AVAILABLE = False
+# Configurações de Caminhos
+BASE_DIR = os.getcwd()
+OFFICIAL_BASE = os.path.join(BASE_DIR, 'data', 'raw', 'dados_status_ocorrencias_gerais_ENRIQUECIDO.json')
+BAIRROS_REF = os.path.join(BASE_DIR, 'data', 'raw', 'bairros_centros_latlong.json')
 
-# Definição de caminhos
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA_RAW_DIR = os.path.join(BASE_DIR, 'data', 'raw')
-NEW_DATA_FILE = os.path.join(DATA_RAW_DIR, 'dados_status.json')
-MAIN_DATA_FILE = os.path.join(DATA_RAW_DIR, 'dados_status_ocorrencias_gerais.json')
+def normalize_text(text):
+    if not text: return ""
+    return unicodedata.normalize('NFKD', str(text)).encode('ASCII', 'ignore').decode('ASCII').upper().strip()
 
-def load_json(filepath):
-    """Carrega arquivo JSON."""
-    if not os.path.exists(filepath):
-        return None
+def robust_load_new_data(path):
+    """Extrai objetos JSON de forma bruta para lidar com arquivos malformados do PHPMyAdmin."""
+    print(f"Lendo arquivo bruto: {path}...")
+    with open(path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    # 1. Tenta carregar como JSON padrão primeiro
     try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except Exception as e:
-        print(f"Erro ao ler {filepath}: {e}")
-        return None
+        data = json.loads(content)
+        if isinstance(data, list): return data
+    except:
+        print("Aviso: Formato JSON padrão falhou. Iniciando extração por blocos de texto (Brute Force)...")
 
-def save_json(filepath, data):
-    """Salva arquivo JSON."""
-    try:
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
-        print(f"Arquivo salvo com sucesso: {filepath}")
-    except Exception as e:
-        print(f"Erro ao salvar {filepath}: {e}")
-
-def enrich_data(item):
-    """
-    Geolocaliza e enriquece o item com Bairro, Distrito, Lat/Lon.
-    """
-    if not GEOPY_AVAILABLE:
-        return item
-
-    # Se já tem Lat/Lon e Bairro, não precisa consultar
-    if item.get('Latitude') and item.get('Longitude') and item.get('BairroOcor'):
-        return item
-
-    address = item.get('LocalOcor')
-    city = item.get('CidadeOcor', 'Caucaia') # Default para Caucaia se não especificado
+    # 2. Extração via Regex (Busca qualquer padrão { ... "id": "..." ... })
+    # Captura objetos que tenham ID e Data (para garantir que sejam registros de crime)
+    pattern = r'\{[^{}]*?"id":\s*?"\d+"[^{}]*?\}'
+    matches = re.findall(pattern, content, re.DOTALL)
     
-    if not address:
-        return item
-
-    # Limpa endereço para melhor busca (remove números de apto, etc se necessário, aqui uso simples)
-    full_query = f"{address}, {city}, Ceará, Brazil"
-    
-    geolocator = Nominatim(user_agent="st_gcn_jules_merger")
-
-    try:
-        print(f"Geolocalizando: {full_query}...")
-        location = geolocator.geocode(full_query, addressdetails=True, timeout=10)
-        
-        if location:
-            # Atualiza coordenadas se não existirem
-            if not item.get('Latitude'):
-                item['Latitude'] = location.latitude
-            if not item.get('Longitude'):
-                item['Longitude'] = location.longitude
+    records = []
+    for m in matches:
+        try:
+            # Limpa possíveis vírgulas extras ou caracteres de controle
+            clean_m = m.strip().rstrip(',')
+            obj = json.loads(clean_m)
             
-            address_details = location.raw.get('address', {})
-            
-            # Extrai Bairro
-            if not item.get('BairroOcor'):
-                bairro = address_details.get('suburb') or address_details.get('neighbourhood') or address_details.get('residential')
-                if bairro:
-                    item['BairroOcor'] = bairro
-                    print(f" -> Bairro identificado: {bairro}")
-            
-            # Extrai Distrito (se houver)
-            if not item.get('Distrito'):
-                distrito = address_details.get('city_district')
-                if distrito:
-                    item['Distrito'] = distrito
-                    print(f" -> Distrito identificado: {distrito}")
-
-        else:
-            print(f" -> Localização não encontrada.")
-            
-        # Respeita limites da API (1 req/s)
-        time.sleep(1.1)
-
-    except (GeocoderTimedOut, Exception) as e:
-        print(f"Erro na geolocalização: {e}")
-
-    return item
-
-def main():
-    print("=== Script de Merge e Enriquecimento de Dados ===")
-    
-    # 1. Carregar dados novos
-    new_data = load_json(NEW_DATA_FILE)
-    if not new_data:
-        print(f"Arquivo de novos dados não encontrado ou vazio: {NEW_DATA_FILE}")
-        return
-
-    if not isinstance(new_data, list):
-        new_data = [new_data]
-    
-    print(f"Novos registros encontrados: {len(new_data)}")
-
-    # 2. Carregar dados existentes (Main)
-    main_data = load_json(MAIN_DATA_FILE)
-    if main_data is None:
-        print("Arquivo principal não encontrado. Criando novo.")
-        main_data = []
-    
-    # Lidar com estrutura complexa (header/database/table) se existir
-    target_list = main_data
-    if isinstance(main_data, list) and len(main_data) > 0:
-        if isinstance(main_data[0], dict) and main_data[0].get('type') == 'header':
-            for entry in main_data:
-                if entry.get('type') == 'table' and 'data' in entry:
-                    target_list = entry['data']
-                    break
-    
-    # 3. Criar índice de duplicatas
-    existing_keys = set()
-    for item in target_list:
-        key = item.get('Controle') or item.get('id')
-        if key:
-            existing_keys.add(str(key))
-
-    # 4. Processar e Mergear
-    merged_count = 0
-    for item in new_data:
-        key = item.get('Controle') or item.get('id')
-        
-        if key and str(key) in existing_keys:
+            # Se o objeto tiver um campo 'data' que é outro dicionário (caso aninhado)
+            if 'data' in obj and isinstance(obj['data'], dict):
+                obj = obj['data']
+                
+            records.append(obj)
+        except:
             continue
             
-        enriched_item = enrich_data(item)
-        target_list.append(enriched_item)
-        
-        if key:
-            existing_keys.add(str(key))
-        merged_count = 1
+    return records
 
-    # 5. Salvar
-    if merged_count > 0:
-        save_json(MAIN_DATA_FILE, main_data)
-        print(f"Sucesso! {merged_count} novos registros adicionados e enriquecidos.")
+def save_json(data, path):
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+def merge(new_data_path):
+    print(f"--- INICIANDO MESCLAGEM ROBUSTA: {new_data_path} ---")
+    
+    # 1. Carregar Base Oficial e criar set de chaves compostas para unicidade
+    if os.path.exists(OFFICIAL_BASE):
+        with open(OFFICIAL_BASE, 'r', encoding='utf-8') as f:
+            official_data = json.load(f)
+        print(f"Base oficial carregada: {len(official_data)} registros.")
     else:
-        print("Nenhum registro novo para adicionar.")
+        official_data = []
+        print("Aviso: Base oficial nao encontrada. Criando uma nova.")
+
+    # Chave de unicidade: ID + DATA + HORA (para evitar conflitos de IDs reaproveitados)
+    existing_keys = set()
+    for item in official_data:
+        if isinstance(item, dict):
+            key = f"{item.get('id')}_{item.get('data')}_{item.get('hora')}"
+            existing_keys.add(key)
+
+    # 2. Carregar Referencia Geo para enriquecimento espacial
+    geo_ref = {}
+    if os.path.exists(BAIRROS_REF):
+        with open(BAIRROS_REF, 'r', encoding='utf-8') as f:
+            geo_ref = json.load(f)
+            
+    node_names = []
+    node_coords = []
+    for name, info in geo_ref.items():
+        node_names.append(name)
+        node_coords.append([float(info['lat']), float(info['long'])])
+    
+    tree = KDTree(node_coords) if node_coords else None
+
+    # 3. Extração e Processamento
+    new_records = robust_load_new_data(new_data_path)
+    to_add = []
+    count_new = 0
+    count_dupes = 0
+    count_enriched = 0
+
+    for item in new_records:
+        if not isinstance(item, dict) or 'id' not in item: continue
+        
+        # Gera chave de unicidade
+        item_key = f"{item.get('id')}_{item.get('data')}_{item.get('hora')}"
+        
+        if item_key in existing_keys:
+            count_dupes += 1
+            continue
+
+        # Enriquecimento Espacial (GPS -> Bairro)
+        b_at = item.get('bairro')
+        if tree and (not b_at or str(b_at).lower() in ["null", "none", ""]):
+            try:
+                lat, lon = float(item.get('latitude', 0)), float(item.get('longitude', 0))
+                if lat != 0:
+                    dist, idx = tree.query([lat, lon])
+                    # Raio de aprox 5km
+                    if dist < 0.05:
+                        item['bairro_geo'] = node_names[idx]
+                        count_enriched += 1
+            except: pass
+        else:
+            item['bairro'] = normalize_text(b_at)
+
+        to_add.append(item)
+        existing_keys.add(item_key)
+        count_new += 1
+
+    # 4. Mesclar e Salvar
+    if to_add:
+        final_data = official_data + to_add
+        save_json(final_data, OFFICIAL_BASE)
+        print(f"Sucesso!")
+        print(f"   - Novos registros inseridos: {count_new}")
+        print(f"   - Registros enriquecidos via GPS: {count_enriched}")
+        print(f"   - Duplicatas ignoradas: {count_dupes}")
+        print(f"Base total atualizada para {len(final_data)} registros em {OFFICIAL_BASE}")
+    else:
+        print("Nenhum registro novo para inserir.")
 
 if __name__ == "__main__":
-    main()
+    import sys
+    if len(sys.argv) < 2:
+        print("Uso: python scripts/merge_new_data.py caminho_do_novo_arquivo.json")
+    else:
+        merge(sys.argv[1])

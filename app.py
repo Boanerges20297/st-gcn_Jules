@@ -12,15 +12,17 @@ import re
 
 # --- Orquestrador Regional ST-GAT ---
 try:
-    from Phase4.orchestrator import StateOrchestrator, normalize_name
+    from src.core.orchestrator import StateOrchestrator, normalize_name
     orchestrator = None 
 except ImportError:
-    from Phase4.orchestrator import StateOrchestrator
+    # Fallback se o PYTHONPATH não incluir a raiz corretamente
+    import sys
+    sys.path.append(os.getcwd())
+    from src.core.orchestrator import StateOrchestrator
     def normalize_name(text):
         if not isinstance(text, str): return ""
-        import re
         text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('ASCII').upper().strip()
-        # Remove " - AIS" e tudo o que vier depois
+        import re
         return re.sub(r'\s*-\s*AIS.*$', '', text).strip()
 
 warnings.filterwarnings('ignore')
@@ -182,8 +184,11 @@ def get_risk():
 
             for ev in all_raw_events:
                 try:
-                    # ... (lógica de extração de data preservada)
-                    
+                    # Extração e Normalização da Localidade
+                    loc_raw = ev.get('bairro') or ev.get('municipio') or ev.get('location') or ev.get('cidade')
+                    if not loc_raw: continue
+                    loc_norm = normalize_name(str(loc_raw))
+
                     # Intensidade e Criticidade
                     ev_type = str(ev.get('type') or ev.get('natureza') or '').lower()
                     description = str(ev.get('description') or ev.get('resumo') or '').lower()
@@ -243,8 +248,14 @@ def get_risk():
         meta = {'counts': {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0}}
         all_scores = []
         
-        # Prepare per-region accumulators so frontend can request region-specific counts
+        # Prepare per-region accumulators
         region_buckets = {}
+        # Contadores por região para o frontend
+        region_stats = {
+            'fortaleza': {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0},
+            'rmf': {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0},
+            'interior': {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0}
+        }
 
         for i, row in nodes_gdf.iterrows():
             name = str(row['name'])
@@ -252,33 +263,32 @@ def get_risk():
             score = float(scores_map.get(name_norm, 20.0))
             if np.isnan(score) or np.isinf(score): score = 20.0
             
-            # Novo Sistema de Cores e Status (Configuração do Usuário)
+            # Identificação de Região
+            reg = str(row.get('regiao', 'fortaleza')).lower()
+            if reg == 'capital': reg = 'fortaleza'
+            
+            # Sincronização RMF Oficial
+            rmf_oficial = ['AQUIRAZ', 'CASCAVEL', 'CAUCAIA', 'CHOROZINHO', 'EUSEBIO', 'GUAIUBA', 'HORIZONTE', 'ITAITINGA', 'MARACANAU', 'MARANGUAPE', 'PACAJUS', 'PACATUBA', 'PARAIPABA', 'PARACURU', 'PINDORETAMA', 'SAO GONCALO DO AMARANTE', 'SAO LUIS DO CURU', 'TRAIRI']
+            if name_norm in rmf_oficial: reg = 'rmf'
+
+            # Novo Sistema de Cores e Status
             if score >= 90: 
                 status, css, color = 'CRÍTICO', 'risk-critico', '#8B0000'
-                meta['counts']['crítico'] += 1
+                if reg in region_stats: region_stats[reg]['crítico'] += 1
+                meta['counts']['crítico'] += 1 # Global
             elif score >= 80: 
                 status, css, color = 'ALTO', 'risk-alto', '#E63946'
-                meta['counts']['alto'] += 1
+                if reg in region_stats: region_stats[reg]['alto'] += 1
+                meta['counts']['alto'] += 1 # Global
             elif score >= 50: 
                 status, css, color = 'MODERADO', 'risk-moderado', '#F4A261'
-                meta['counts']['moderado'] += 1
+                if reg in region_stats: region_stats[reg]['moderado'] += 1
+                meta['counts']['moderado'] += 1 # Global
             else: 
                 status, css, color = 'BAIXO', 'risk-baixo', '#A8DADC'
-                meta['counts']['baixo'] += 1
+                if reg in region_stats: region_stats[reg]['baixo'] += 1
+                meta['counts']['baixo'] += 1 # Global
             
-            reg = str(row.get('region_type', 'fortaleza')).lower()
-            if reg == 'capital': reg = 'fortaleza'
-
-            # --- CORREÇÃO: Sincronização com os 19 municípios oficiais da RMF ---
-            rmf_oficial = [
-                'AQUIRAZ', 'CASCAVEL', 'CAUCAIA', 'CHOROZINHO', 'EUSEBIO', 'GUAIUBA', 
-                'HORIZONTE', 'ITAITINGA', 'MARACANAU', 'MARANGUAPE', 'PACAJUS', 
-                'PACATUBA', 'PARAIPABA', 'PARACURU', 'PINDORETAMA', 
-                'SAO GONCALO DO AMARANTE', 'SAO LUIS DO CURU', 'TRAIRI'
-            ]
-            if name_norm in rmf_oficial:
-                reg = 'rmf'
-
             # ensure region bucket exists
             if reg not in region_buckets:
                 region_buckets[reg] = []
@@ -456,6 +466,13 @@ def get_risk():
                 meta['model_window_cvli'] = 30
         except Exception:
             pass
+
+        # --- CORREÇÃO: Respeitar Filtro de Região nas caixas de resumo ---
+        target_region = request.args.get('region', 'global').lower()
+        if target_region != 'global' and target_region in meta.get('counts_by_region', {}):
+            meta['counts'] = meta['counts_by_region'][target_region]
+            # Envia apenas os resultados daquela região
+            results = region_buckets.get(target_region, [])
 
         return jsonify({'meta': meta, 'data': results})
     except Exception as e:
