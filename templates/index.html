@@ -330,7 +330,7 @@
                                         <span class="text-muted">Volatilidade:</span>
                                         <strong id="metric-overall-std">—</strong>
                                     </div>
-                                    <div class="metric-mini" title="Estado de operação do motor de inteligência Jules.">
+                                    <div class="metric-mini" title="Estado de operação do motor de inteligência Report Preview.">
                                         <span class="text-muted">Status:</span>
                                         <strong id="metric-status"><span class="badge bg-success">Radar Ativo</span></strong>
                                     </div>
@@ -358,11 +358,11 @@
                                 </p>
                             </div>
                             <div id="active-events-list">
-                                <p class="text-muted small">Sincronizando com motor Jules...</p>
+                                <p class="text-muted small">Sincronizando com motor Report Preview...</p>
                             </div>
                             <div id="model-confidence-container">
                                 <p class="text-muted small mb-1" title="Mede a nitidez do sinal de risco. Quanto mais nítido é o ranking em relação ao ruído comum, maior a confiança na detecção de anomalias.">Precisão de Captura: <strong id="confidence-percent">—</strong></p>
-                                <small class="text-muted" style="font-size: 0.7rem;" title="Horário do último processamento de dados realizado pelo motor Jules.">Última varredura estadual: <span id="last-anomaly-check">—</span></small>
+                                <small class="text-muted" style="font-size: 0.7rem;" title="Horário do último processamento de dados realizado pelo motor Report Preview.">Última varredura estadual: <span id="last-anomaly-check">—</span></small>
                             </div>
                         </div>
                         </div>
@@ -713,32 +713,25 @@
         // Mode is always CVLI - CVP is only a prediction criterion
         mode = 'CVLI';
         
-        // Update Window Info
-        var startDate = metaDataGlobal.start_cvli;
-        var endDate = metaDataGlobal.last_date;
-        var days = metaDataGlobal.window_cvli;
+        // Update Window Info via Backend Meta
+        var startDate = metaDataGlobal.start_cvli || '—';
+        var lastBaseDate = metaDataGlobal.last_date_base || '—';
+        var days = metaDataGlobal.window_cvli || '—';
+        var intelLabel = metaDataGlobal.intelligence_label || 'Janela de Inteligência: Ativa';
 
-        var dateText = formatDate(startDate) + ' → ' + formatDate(endDate);
-        $('#window-info small.text-muted').text('Janela Histórica: ' + dateText + ' (' + days + ' dias)');
+        var dateText = formatDate(startDate) + ' → ' + lastBaseDate;
+        $('#window-info small.text-muted').text('Base Histórica: ' + dateText + ' (' + days + ' dias)');
 
-        var horizonText = 'Horizonte de Predição: 7 dias (168h)';
-        $('#horizon-info').text(horizonText);
+        $('#horizon-info').text('Horizonte de Predição: 7 dias');
+        $('#validity-info').html('<i class="fas fa-brain"></i> ' + intelLabel);
 
-        // Calculate and show validity date (today + 7 days)
-        var today = new Date();
-        var validityDate = new Date(today);
-        validityDate.setDate(validityDate.getDate() + 7);
-        var validityText = '📅 Previsão válida até: ' + 
-            String(validityDate.getDate()).padStart(2, '0') + '/' + 
-            String(validityDate.getMonth() + 1).padStart(2, '0') + '/' + 
-            validityDate.getFullYear();
-        $('#validity-info').text(validityText);
-
-        // Show model's internal window (from backend meta)
+        // Show model's internal window and architecture (from backend meta)
         try {
+            var modelArch = metaDataGlobal && metaDataGlobal.model_architecture;
             var modelWindow = metaDataGlobal && metaDataGlobal.model_window_cvli;
-            if (modelWindow) {
-                $('#model-window-info').text('Janela do Modelo: ' + modelWindow + ' dias');
+            
+            if (modelArch) {
+                $('#model-window-info').html('Modelo: <strong>' + modelArch + '</strong> (Janela: ' + (modelWindow || 30) + 'd)');
             } else {
                 $('#model-window-info').text('Modelo: —');
             }
@@ -753,6 +746,22 @@
                 $('#ranking-info').show();
             } else {
                 $('#ranking-info').hide();
+            }
+
+            // SINALIZAÇÃO NO CONSOLE: Monitor de Eficiência Report Preview
+            if (metaDataGlobal && metaDataGlobal.efficiency_metrics) {
+                var em = metaDataGlobal.efficiency_metrics;
+                var g = em.global || {};
+                var f = em.fortaleza || {};
+                
+                console.info('%c🛡️ MONITOR DE EFICIÊNCIA REPORT PREVIEW %c\n' +
+                             'Data da Avaliação: ' + em.date + '\n' +
+                             'P5  Global: ' + ((g.p5 || 0) * 100).toFixed(1) + '% | Hits: ' + (g.hits5 ? g.hits5.join(', ') : "—") + '\n' +
+                             'P10 Global: ' + ((g.p10 || 0) * 100).toFixed(1) + '% | Hits: ' + (g.hits10 ? g.hits10.join(', ') : "—") + '\n' +
+                             'P20 Global: ' + ((g.p20 || 0) * 100).toFixed(1) + '% | Hits: ' + (g.hits20 ? g.hits20.join(', ') : "—") + '\n\n' +
+                             'P10 Fortaleza: ' + ((f.p10 || 0) * 100).toFixed(1) + '% | Hits: ' + (f.hits10 ? f.hits10.join(', ') : "—"),
+                             'background: #0d6efd; color: #fff; font-weight: bold; padding: 2px 5px; border-radius: 3px;',
+                             'color: #0d6efd; font-weight: bold;');
             }
         } catch (e) {
             $('#model-window-info').text('Modelo: —');
@@ -920,14 +929,16 @@
 
     function reloadMapLayer() {
         return new Promise(function(resolve, reject) {
+            // Preserve user's current region filter so a reload doesn't reset the view
+            var preservedRegion = ($('#region-filter').length ? $('#region-filter').val() : 'all') || 'all';
             if (geojsonLayer) {
                 map.removeLayer(geojsonLayer);
                 geojsonLayer = null;
             }
 
             $.when(
-                $.getJSON('/api/polygons'),
-                $.getJSON('/api/risk')
+                $.ajax({url: '/api/polygons', dataType: 'json', cache: false}),
+                $.ajax({url: '/api/risk', dataType: 'json', cache: false})
             ).done(function(polygonsArgs, riskArgs) {
                 var geojson = polygonsArgs[0];
                 var riskResp = riskArgs[0];
@@ -1043,7 +1054,14 @@
 
             // Adicionar a camada ao mapa
             geojsonLayer.addTo(map);
-            
+
+            // Reaplicar o filtro de região preservado para manter a seleção do usuário
+            try {
+                if (typeof applyRegionFilter === 'function') applyRegionFilter(preservedRegion);
+                // Also update the Top Critical Areas list to reflect the current filter
+                try { updateTopCriticalAreas(); } catch(e) {}
+            } catch(e) { console.warn('Failed to reapply preserved region filter', e); }
+
             // Resolver a promise assim que a camada foi adicionada
             resolve();
         }).fail(function(err) {
@@ -1062,8 +1080,8 @@
     showLoading('Carregando dados de risco...', 'Aguarde enquanto o sistema obtém previsões.');
 
     $.when(
-        $.getJSON('/api/polygons'),
-        $.getJSON('/api/risk')
+        $.ajax({url: '/api/polygons', dataType: 'json', cache: false}),
+        $.ajax({url: '/api/risk', dataType: 'json', cache: false})
     ).done(function(polygonsArgs, riskArgs) {
         var geojson = polygonsArgs[0];
         var riskResp = riskArgs[0];
@@ -1352,6 +1370,18 @@
 
                                     // Trigger immediate model update check
                                     checkModelUpdateStatus();
+                                    // Final assurance: after a short delay, retry reload and dashboard
+                                    // This gives the backend a small window to finish recalculation
+                                    setTimeout(function() {
+                                        showLoading('Sincronizando (final)...', 'Verificando atualizações de risco e atualizando painéis.');
+                                        reloadMapLayer().then(function() {
+                                            updateDashboard('CVLI');
+                                            hideLoading(true);
+                                        }).catch(function(err){
+                                            console.warn('Final sync failed', err);
+                                            hideLoading(true);
+                                        });
+                                    }, 3000);
                                 }).catch(function(err) {
                                     console.error('Error during reloadMapLayer', err);
                                     hideLoading();
@@ -1564,14 +1594,25 @@
     
     // WEEK 4: Load explanation from API
     function loadExplanation(nodeId) {
+        // Show a small, discreet loading indicator while fetching
+        $('#explanation-section').show();
+        $('#explanation-collapse').collapse('show');
+        $('#explanation-content').html('<div class="small text-muted"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Carregando explicação...</div>');
+
         fetch('/api/explain/' + nodeId)
             .then(response => {
                 if (!response.ok) throw new Error('Explanation fetch failed');
                 return response.json();
             })
             .then(data => {
+                // If server provided a manager-friendly harmonized text, prefer it
+                if (data.manager_text && data.manager_text.trim().length > 0) {
+                    $('#explanation-content').html(data.manager_text);
+                    return;
+                }
+
                 var explanationHtml = '';
-                
+
                 // Simplified summary (remove all technical jargon and English)
                 if (data.summary) {
                     var simpleSummary = data.summary
@@ -1582,33 +1623,33 @@
                         .replace(/based on:\s*/i, '')
                         .replace(/\s*Temporal Pattern \(\d+%\)\s*\+\s*Spatial Correlation \(\d+%\)\s*\+\s*Recent Events \(\d+%\)\s*\.\s*Risk score:\s*[\d.]+\/10\.?\s*/i, '')
                         .replace(/\s*Risk score:\s*[\d.]+\/10\.?\s*/i, '');
-                    
+
                     explanationHtml += '<p class="mb-3" style="font-size: 0.95rem;">' + simpleSummary.trim() + '</p>';
                 }
-                
+
                 // Simple factor indicators with colors
                 if (data.factors && data.factors.length > 0) {
                     explanationHtml += '<div class="mb-2"><strong style="font-size: 0.9rem;">Por quê?</strong></div>';
-                    
+
                     var factorLabels = {
                         'Temporal Pattern': '📈 <strong>Piorou recentemente</strong> — há dias/semanas esta área está com mais problemas',
                         'Spatial Correlation': '📍 <strong>Vizinhos também têm problema</strong> — áreas ao redor estão com risco alto',
                         'Recent Events': '⚡ <strong>Ocorreu agora</strong> — eventos novos foram registrados recentemente',
                         'Historical Baseline': '🔄 <strong>Sempre foi assim</strong> — historicamente essa é uma área conhecida como tensa'
                     };
-                    
+
                     data.factors.forEach(function(factor) {
                         var label = factorLabels[factor.name] || factor.name;
                         var colors = ['#ffebee', '#fff3e0', '#e8f5e9', '#f3e5f5'];
                         var idx = data.factors.indexOf(factor);
                         var bgColor = colors[idx % colors.length];
-                        
+
                         explanationHtml += '<div style="background: ' + bgColor + '; padding: 8px; margin: 6px 0; border-radius: 4px; font-size: 0.9rem;">' +
                             label +
                             '</div>';
                     });
                 }
-                
+
                 // Caveats as notes (translate common English caveats)
                 if (data.caveats && data.caveats.length > 0) {
                     var caveatText = data.caveats[0]
@@ -1616,19 +1657,20 @@
                         .replace(/Model confidence is high for this prediction/i, 'Confiança do modelo é alta para esta previsão')
                         .replace(/Prediction may be unreliable/i, 'Previsão pode ser pouco confiável')
                         .replace(/Based on limited historical data/i, 'Baseada em dados históricos limitados');
-                    
+
                     explanationHtml += '<div class="mt-2 pt-2" style="border-top: 1px solid #ddd;"><small class="text-muted"><strong>📌 Nota:</strong> ' +
                         caveatText +
                         '</small></div>';
                 }
-                
-                // Display explanation
-                $('#explanation-content').html(explanationHtml || '<p class="text-muted">Sem explicação disponível</p>');
+
+                // Display explanation (or fallback message)
+                $('#explanation-content').html(explanationHtml || '<p class="text-muted">Explicação detalhada indisponível</p>');
                 $('#explanation-section').show();
             })
             .catch(error => {
                 console.warn('Failed to load explanation:', error);
-                $('#explanation-section').hide();
+                $('#explanation-content').html('<p class="text-muted">Explicação detalhada indisponível</p>');
+                $('#explanation-section').show();
             });
     }
     
@@ -1946,7 +1988,7 @@
         modelUpdateCheckInterval = setInterval(checkModelUpdateStatus, 300000);
         checkModelUpdateStatus();
         
-        // NOVO: Inicia Radar Jules (Anomalias)
+        // NOVO: Inicia Radar Report Preview (Anomalias)
         loadAnomalyStatus();
         setInterval(loadAnomalyStatus, 60000); // Atualiza a cada 1 min
     });

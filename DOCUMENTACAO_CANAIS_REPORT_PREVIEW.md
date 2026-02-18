@@ -1,12 +1,12 @@
-# 🧠 Guia de Canais e Inteligência: Sistema Jules (ST-GAT)
+# 🧠 Guia de Canais e Inteligência: Sistema Report Preview (ST-GAT)
 
-O Sistema Jules opera utilizando um tensor de entrada de **26 canais**, onde cada canal representa uma "camada de realidade" diferente capturada pelo modelo de Redes Neurais em Grafo (ST-GAT).
+O Sistema Report Preview opera utilizando um tensor de entrada de **26 canais**, onde cada canal representa uma "camada de realidade" diferente capturada pelo modelo de Redes Neurais em Grafo (ST-GAT).
 
 ---
 
 ## 📊 1. Mapa Geral de Canais (Tensores)
 
-O cérebro do Jules processa 26 informações simultâneas para cada bairro, todos os dias:
+O cérebro do Report Preview processa 26 informações simultâneas para cada bairro, todos os dias:
 
 | Canal | Nome | Tipo | Descrição |
 | :--- | :--- | :--- | :--- |
@@ -45,7 +45,7 @@ Eventos que possuem alto poder de gerar retaliação ou morte imediata.
 
 ## ⚙️ 3. Funcionamento Matemático (O fluxo do Risco)
 
-O Jules não apenas "soma" os crimes. Ele processa a informação em 3 etapas:
+O Report Preview não apenas "soma" os crimes. Ele processa a informação em 3 etapas:
 
 ### Passo A: Injeção Espacial
 Quando um evento entra no **Canal 25** no bairro **BOM JARDIM**, o modelo ativa a **Atenção em Grafo (GAT)**.
@@ -82,6 +82,6 @@ No sidebar, o gestor acompanha a saúde do modelo:
 *   **Precisão de Captura:** Quão nítido está o sinal de risco hoje (Confiança).
 
 ---
-**Autor:** Inteligência Jules / Gemini CLI
+**Autor:** Inteligência Report Preview / Gemini CLI
 **Versão:** 2.0 (Arquitetura Estadual Unificada)
 **Última Atualização:** 16 de Fevereiro de 2026

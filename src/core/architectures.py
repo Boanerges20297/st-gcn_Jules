@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 # ============================================================================
-# NÚCLEO NEURAL JULES: DEEP-STGAT (Spatial-Temporal Graph Attention)
+# NÚCLEO NEURAL REPORT PREVIEW: DEEP-STGAT (Spatial-Temporal Graph Attention)
 # ============================================================================
 
 class MultiHeadTemporalAttention(nn.Module):

@@ -1,9 +1,10 @@
-# Documentação Técnica: Orquestrador Estadual Jules (ST-GAT)
+# Documentação Técnica: Orquestrador Estadual Report Preview (ST-GAT)
 **Data de Emissão:** 15 de Fevereiro de 2026
 **Versão:** 7.5.0 - Unificação Estadual
 
 ## 1. Visão Geral da Arquitetura
-O sistema Jules evoluiu de um modelo monolítico para um **Orquestrador Regional Polimórfico**. Ele gerencia três especialistas independentes baseados na arquitetura **DeepSTGAT**, cada um calibrado para a dinâmica criminal específica de sua zona de atuação.
+O sistema Report Preview evoluiu de um modelo monolítico para um **Orquestrador Regional Polimórfico**.
+ Ele gerencia três especialistas independentes baseados na arquitetura **DeepSTGAT**, cada um calibrado para a dinâmica criminal específica de sua zona de atuação.
 
 ### Componentes Principais:
 - **Orchestrator (`Phase4/orchestrator.py`):** O cérebro central que roteia requisições para o especialista correto.
@@ -61,5 +62,5 @@ O match entre o modelo e o mapa é feito via **Normalização Soberana de Nomes*
 - Isso garante que o risco calculado para "CAUCAIA" sempre caia no polígono "CAUCAIA - AIS 12" do Leaflet.
 
 ---
-**Autor:** Gemini CLI / Jules System
+**Autor:** Gemini CLI / Report Preview System
 **Status do Sistema:** Operacional Unificado (Fortaleza, RMF, Interior).

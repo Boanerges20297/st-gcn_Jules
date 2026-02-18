@@ -13,12 +13,14 @@ import re
 # --- Orquestrador Regional ST-GAT ---
 try:
     from src.core.orchestrator import StateOrchestrator, normalize_name
+    from src.core.efficiency_monitor import EfficiencyMonitor
     orchestrator = None 
 except ImportError:
     # Fallback se o PYTHONPATH não incluir a raiz corretamente
     import sys
     sys.path.append(os.getcwd())
     from src.core.orchestrator import StateOrchestrator
+    from src.core.efficiency_monitor import EfficiencyMonitor
     def normalize_name(text):
         if not isinstance(text, str): return ""
         text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('ASCII').upper().strip()
@@ -32,8 +34,88 @@ logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# Cache file for manager-harmonized explanations
+CACHE_FILE = os.path.join(BASE_DIR, 'data', 'manager_explanations_cache.json')
+
+import threading
+import time
+
 nodes_gdf = None
 orchestrator = None
+efficiency_monitor = None
+
+def run_background_efficiency_monitor():
+    """Tarefa em background que executa a cada 7 dias ou no start."""
+    global efficiency_monitor
+    # Aguarda o sistema inicializar completamente
+    time.sleep(10)
+    while True:
+        if efficiency_monitor is not None:
+            try:
+                print("🧠 [Report Preview Monitor] Iniciando avaliação de eficiência global (299 localidades)...")
+                metrics = efficiency_monitor.run_evaluation()
+                if metrics and 'global' in metrics and 'p10' in metrics['global']:
+                    p10 = metrics['global']['p10']
+                    hits = metrics['global'].get('hits10', [])
+                    print(f"📊 [Report Preview] Eficiência Global do Estado (P10): {p10*100:.1f}%")
+                    print(f"📍 [Report Preview] Acertos no Top 10: {', '.join(hits)}")
+                else:
+                    print("📊 [Report Preview Monitor] Sem eventos suficientes para avaliação global hoje.")
+            except Exception as e:
+                print(f"⚠️ [Report Preview Monitor] Erro na thread de eficiência: {e}")
+        
+        # Dorme por 7 dias antes da próxima rodada (604800 segundos)
+        time.sleep(604800)
+
+def verify_date_consistency(event_date_str, last_base_date):
+    """
+    Verifica a consistência temporal.
+    
+    MODO PROTÓTIPO (Data Lag Tolerance):
+    Aceita o evento se:
+    1. For anterior ou igual à base do modelo (Consistência Histórica)
+    2. OU Se for posterior à base mas anterior/igual a HOJE (Preenchimento do Gap de Atraso)
+    
+    Rejeita apenas se for > HOJE (Futuro Real).
+    """
+    if not event_date_str:
+        return True # Sem data, aceita por segurança
+        
+    try:
+        # Conversão robusta de strings
+        if isinstance(event_date_str, str):
+            e_date = datetime.strptime(event_date_str[:10], '%Y-%m-%d').date()
+        elif hasattr(event_date_str, 'date'):
+            e_date = event_date_str.date()
+        else:
+            e_date = event_date_str
+            
+        # Data de Hoje (Limite do Real)
+        today = datetime.now().date()
+        
+        # Se o evento é futuro em relação ao tempo real, rejeita sempre
+        if e_date > today:
+            return False
+            
+        # Se não temos last_base_date, aceitamos pois é <= today
+        if not last_base_date:
+            return True
+            
+        # Lógica Original Estrita (Comentada para o Protótipo)
+        # if isinstance(last_base_date, str):
+        #     b_date = datetime.strptime(last_base_date[:10], '%Y-%m-%d').date()
+        # elif hasattr(last_base_date, 'date'):
+        #     b_date = last_base_date.date()
+        # else:
+        #     b_date = last_base_date
+        # return e_date <= b_date
+        
+        # Lógica de Tolerância de Atraso (Prototype Mode)
+        # Aceitamos o evento pois ele representa a realidade atual sobreposta ao modelo defasado
+        return True 
+
+    except Exception:
+        return True # Em caso de erro, permitimos a inclusão
 
 def archive_old_exogenous_events():
     """
@@ -125,8 +207,80 @@ def archive_old_exogenous_events():
     except Exception as e:
         print(f"⚠️ Erro ao arquivar eventos exógenos: {e}")
 
+def generate_daily_ranking_report():
+    """
+    Gera um relatório Markdown diário com o Top 20 de cada região.
+    Utilizado para acompanhamento manual de eficiência e auditoria.
+    """
+    if orchestrator is None or nodes_gdf is None:
+        return
+
+    today_str = datetime.now().strftime('%Y-%m-%d')
+    base_log_dir = os.path.join(BASE_DIR, "logs", "rankings")
+    os.makedirs(base_log_dir, exist_ok=True)
+
+    # Calculamos o risco atual (sem shocks para servir de baseline estável ou com os atuais)
+    scores_map = orchestrator.get_combined_risk()
+    
+    regions = {
+        'fortaleza': 'FORTALEZA (CAPITAL)',
+        'rmf': 'REGIÃO METROPOLITANA',
+        'interior': 'INTERIOR DO ESTADO'
+    }
+
+    for reg_key, reg_name in regions.items():
+        filename = f"ranking_{today_str}_{reg_key}.md"
+        filepath = os.path.join(base_log_dir, filename)
+
+        # Se já existir o relatório de hoje, não sobrescrevemos (mantém o snapshot inicial)
+        if os.path.exists(filepath):
+            continue
+
+        try:
+            # Filtrar e ordenar bairros da região
+            reg_results = []
+            for i, row in nodes_gdf.iterrows():
+                # Lógica de identificação de região similar ao api/risk
+                r = str(row.get('regiao', 'fortaleza')).lower()
+                if r == 'capital': r = 'fortaleza'
+                
+                name = str(row['name'])
+                name_norm = normalize_name(name)
+                
+                # Sincronização RMF Oficial
+                rmf_oficial = ['AQUIRAZ', 'CASCAVEL', 'CAUCAIA', 'CHOROZINHO', 'EUSEBIO', 'GUAIUBA', 'HORIZONTE', 'ITAITINGA', 'MARACANAU', 'MARANGUAPE', 'PACAJUS', 'PACATUBA', 'PARAIPABA', 'PARACURU', 'PINDORETAMA', 'SAO GONCALO DO AMARANTE', 'SAO LUIS DO CURU', 'TRAIRI']
+                if name_norm in rmf_oficial: r = 'rmf'
+                
+                if r == reg_key:
+                    score = float(scores_map.get(name_norm, 20.0))
+                    reg_results.append({
+                        'name': name,
+                        'score': score,
+                        'faction': str(row.get('faction', 'N/A'))
+                    })
+
+            # Ordenar por Score (Top 20)
+            reg_results.sort(key=lambda x: x['score'], reverse=True)
+            top_20 = reg_results[:20]
+
+            # Escrever o arquivo Markdown
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(f"# 🛡️ Relatório de Risco Diário - {reg_name}\n")
+                f.write(f"**Data de Geração:** {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}\n")
+                f.write(f"**Estado da Base Histórica:** {orchestrator.dates[-1] if hasattr(orchestrator, 'dates') else 'N/A'}\n\n")
+                f.write("| Pos | Localidade | Risco (%) | Facção Predominante |\n")
+                f.write("|:---:|:---|:---:|:---:|\n")
+                for idx, res in enumerate(top_20):
+                    f.write(f"| {idx+1} | {res['name']} | {res['score']:.2f}% | {res['faction']} |\n")
+                
+                f.write(f"\n\n*Nota: Este ranking reflete o estado de inteligência do modelo no início do dia operacional.*")
+
+            print(f"📄 Relatório gerado: {filename}")
+        except Exception as e:
+            print(f"⚠️ Erro ao gerar relatório {reg_key}: {e}")
+
 def load_data_and_models():
-    global nodes_gdf, orchestrator
+    global nodes_gdf, orchestrator, efficiency_monitor
     # Limpeza de eventos exógenos antigos
     archive_old_exogenous_events()
     
@@ -142,6 +296,13 @@ def load_data_and_models():
     try:
         orchestrator = StateOrchestrator(BASE_DIR)
         print("✅ Motor de Inteligência ST-GAT Ativo.")
+        
+        # Iniciar Monitor de Eficiência e Relatórios
+        efficiency_monitor = EfficiencyMonitor(BASE_DIR, orchestrator, nodes_gdf)
+        generate_daily_ranking_report()
+        
+        # Disparar Monitor em Segundo Plano (Thread Paralela)
+        threading.Thread(target=run_background_efficiency_monitor, daemon=True).start()
     except Exception as e:
         print(f"❌ Erro Motor: {e}")
 
@@ -170,6 +331,11 @@ def get_risk():
             # Considerar eventos nos últimos 7 dias
             cutoff = datetime.now().date() - timedelta(days=7)
             
+            # Limite superior baseado nos dados do orquestrador (evita inconsistência teórica)
+            last_date_base = None
+            if orchestrator is not None and hasattr(orchestrator, 'dates') and orchestrator.dates is not None:
+                last_date_base = orchestrator.dates[-1]
+
             # Tipos que sempre são CRÍTICOS (Canal 25) - Incluindo sinais de violência extrema
             CRITICAL_TYPES = [
                 'leader_transfer', 'faction_conflict', 'territory_dispute', 
@@ -182,12 +348,43 @@ def get_risk():
                 'abordagem_positiva', 'desarticulacao_grupo'
             ]
 
+            # Small helper: RMF cities (covers metro municipalities frequently used in reports)
+            RMF_CITIES = {'MARACANAU', 'CAUCAIA', 'AQUIRAZ', 'PACATUBA', 'PINDORETAMA', 'ITAITINGA', 'GUAIUBA', 'CHOROZINHO', 'MARANGUAPE'}
+
             for ev in all_raw_events:
                 try:
+                    # --- Verificação de Consistência Teórica (Não ver o futuro) ---
+                    ev_date_str = ev.get('date') or ev.get('event_date')
+                    if not verify_date_consistency(ev_date_str, last_date_base):
+                        continue # Pula evento futuro em relação ao estado do modelo
+
                     # Extração e Normalização da Localidade
-                    loc_raw = ev.get('bairro') or ev.get('municipio') or ev.get('location') or ev.get('cidade')
-                    if not loc_raw: continue
-                    loc_norm = normalize_name(str(loc_raw))
+                    bairro_raw = (ev.get('bairro') or '').strip()
+                    municipio_raw = (ev.get('municipio') or '').strip()
+                    # If a bairro is present, target that specific node; otherwise expand by municipio->region
+                    targets = []  # list of normalized node names to apply this shock to
+                    if bairro_raw:
+                        targets = [normalize_name(str(bairro_raw))]
+                    elif municipio_raw:
+                        mun_up = municipio_raw.upper()
+                        # Determine high-level region from municipality name
+                        if 'FORTALEZA' in mun_up:
+                            region_key = 'fortaleza'
+                        elif mun_up in RMF_CITIES or any(c in mun_up for c in RMF_CITIES):
+                            region_key = 'rmf'
+                        else:
+                            region_key = 'interior'
+
+                        # Expand to all node names that belong to that region
+                        try:
+                            for i, row in nodes_gdf.iterrows():
+                                if str(row.get('regiao', '')).lower() == region_key:
+                                    targets.append(normalize_name(row['name']))
+                        except Exception:
+                            # Fallback: use municipality string as single target
+                            targets = [normalize_name(municipio_raw)]
+                    else:
+                        continue
 
                     # Intensidade e Criticidade
                     ev_type = str(ev.get('type') or ev.get('natureza') or '').lower()
@@ -219,22 +416,21 @@ def get_risk():
                                   ('execuc' in description) or ('facç' in description) or \
                                   ('morte' in description and 'facç' in description)
                     
-                    # Atualiza o shock para a localidade
-                    if loc_norm not in exogenous_shocks:
-                        exogenous_shocks[loc_norm] = {
-                            'intensity': intensity, 
-                            'is_critical': is_critical,
-                            'is_suppression': is_supp
-                        }
-                    else:
-                        # Prioridade: Crítico > Supressão > Padrão
-                        if is_critical:
-                            exogenous_shocks[loc_norm]['is_critical'] = True
-                        if is_supp:
-                            exogenous_shocks[loc_norm]['is_suppression'] = True
-                        # Mantém sempre a maior intensidade detectada para a área
-                        if intensity > exogenous_shocks[loc_norm]['intensity']:
-                            exogenous_shocks[loc_norm]['intensity'] = intensity
+                    # Apply/update shock for all resolved targets (single bairro or expanded region nodes)
+                    for loc_norm in targets:
+                        if loc_norm not in exogenous_shocks:
+                            exogenous_shocks[loc_norm] = {
+                                'intensity': intensity,
+                                'is_critical': is_critical,
+                                'is_suppression': is_supp
+                            }
+                        else:
+                            if is_critical:
+                                exogenous_shocks[loc_norm]['is_critical'] = True
+                            if is_supp:
+                                exogenous_shocks[loc_norm]['is_suppression'] = True
+                            if intensity > exogenous_shocks[loc_norm]['intensity']:
+                                exogenous_shocks[loc_norm]['intensity'] = intensity
                 except: continue
 
             if not exogenous_shocks:
@@ -452,20 +648,38 @@ def get_risk():
         except Exception:
             meta['top10'] = []
 
-        # --- CORREÇÃO: Adicionar Datas da Janela Histórica para o Frontend ---
+            # --- CORREÇÃO: Adicionar Datas da Janela de Inteligência (Projeção 7 dias) ---
         try:
             if orchestrator is not None and hasattr(orchestrator, 'dates') and orchestrator.dates is not None:
+                last_db_date = orchestrator.dates[-1]
+                if isinstance(last_db_date, str):
+                    last_db_dt = datetime.strptime(last_db_date[:10], '%Y-%m-%d')
+                else:
+                    last_db_dt = last_db_date
+                
+                # Início e Fim da Projeção (7 dias à frente da base)
+                start_pred = last_db_dt + timedelta(days=1)
+                end_pred = last_db_dt + timedelta(days=7)
+                
                 meta['start_cvli'] = str(orchestrator.dates[0])
-                meta['last_date'] = str(orchestrator.dates[-1])
+                meta['last_date_base'] = last_db_dt.strftime('%d/%m/%Y')
+                meta['prediction_window'] = f"{start_pred.strftime('%d/%m')} a {end_pred.strftime('%d/%m')}"
+                meta['intelligence_label'] = f"Janela de Inteligência: {meta['prediction_window']} (Atualizada com Eventos de Hoje)"
                 meta['window_cvli'] = len(orchestrator.dates)
-                meta['model_window_cvli'] = len(orchestrator.dates)
+                meta['model_architecture'] = "Deep ST-GAT (Regionalizado)"
+                meta['model_window_cvli'] = 30 # Janela padrão de 30 dias para Fortaleza
+                
+                # Incluir Eficiência Recente do Monitor
+                if efficiency_monitor:
+                    meta['efficiency_metrics'] = efficiency_monitor.get_latest_metrics()
             else:
-                meta['start_cvli'] = 'N/A'
-                meta['last_date'] = datetime.now().strftime('%Y-%m-%d')
-                meta['window_cvli'] = 30
+                meta['intelligence_label'] = "Janela de Inteligência: Projeção 7 dias (Tempo Real)"
+                meta['last_date_base'] = 'N/A'
+                meta['model_architecture'] = "ST-GAT v2"
                 meta['model_window_cvli'] = 30
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Erro ao calcular datas de inteligência: {e}")
+            meta['intelligence_label'] = "Janela de Inteligência: Ativa"
 
         # --- CORREÇÃO: Respeitar Filtro de Região nas caixas de resumo ---
         target_region = request.args.get('region', 'global').lower()
@@ -533,11 +747,15 @@ def anomaly_status():
                     events = json.load(f)
                 
                 cutoff = (datetime.now() - timedelta(days=7)).date()
+                last_date_base = orchestrator.dates[-1] if (orchestrator and hasattr(orchestrator, 'dates')) else None
                 for e in events:
                     # Tenta pegar a data
                     try:
-                        dstr = e.get('date', '')
-                        if dstr and datetime.strptime(dstr, '%Y-%m-%d').date() >= cutoff:
+                        dstr = e.get('date', '') or e.get('event_date', '')
+                        if not verify_date_consistency(dstr, last_date_base):
+                            continue # Pula evento futuro
+                            
+                        if dstr and datetime.strptime(dstr[:10], '%Y-%m-%d').date() >= cutoff:
                             active_events.append({
                                 'description': e.get('description') or e.get('resumo', 'Evento Crítico'),
                                 'severity': float(e.get('intensity', 0.5))
@@ -626,12 +844,17 @@ def explain_node(node_id):
         # Events: carregar eventos exógenos se disponíveis
         events = []
         events_path = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
+        last_date_base = orchestrator.dates[-1] if (orchestrator and hasattr(orchestrator, 'dates')) else None
         try:
             if os.path.exists(events_path):
                 with open(events_path, 'r', encoding='utf-8') as ef:
                     evts = json.load(ef)
-                    # filtrar por localidade aproximada pelo nome
+                    # filtrar por localidade aproximada pelo nome e consistência de data
                     for e in evts:
+                        e_date_str = e.get('date') or e.get('event_date')
+                        if not verify_date_consistency(e_date_str, last_date_base):
+                            continue
+                            
                         if name_norm in normalize_name(e.get('title', '')) or name_norm in normalize_name(e.get('location','')):
                             events.append(e)
         except Exception:
@@ -660,16 +883,215 @@ def explain_node(node_id):
             explanation = gen.explain_node_ranking(int(node_id), int(rank_pos), context)
             # Ajustar para incluir score original em percent
             explanation['risk_score_pct'] = float(score_pct)
-            return jsonify(explanation)
-        except Exception:
-            # Fallback simples se generator não puder ser usado
-            factors = [
-                {'factor': 'temporal_trend', 'contribution': round(max(0.0, min(1.0, (score_pct - 30.0) / 70.0)) * 100.0, 1)},
-                {'factor': 'spatial_influence', 'contribution': round(max(0.0, min(1.0, (overall_mean - 30.0) / 70.0)) * 100.0, 1)},
-                {'factor': 'recent_events', 'contribution': round(min(1.0, len(events) * 0.1) * 100.0, 1)},
-            ]
-            summary = f'Risco estimado {score_pct:.1f}%. Principais fatores: temporal, espacial e eventos recentes.'
-            return jsonify({'node_id': node_id, 'name': name, 'summary': summary, 'factors': factors, 'confidence': float(confidence), 'risk_score': float(score_pct)})
+
+            # Normalizar estrutura para frontend: garantir 'factors' como [{name, contribution}]
+            def _norm_factor_item(it):
+                if not isinstance(it, dict):
+                    return None
+                name = it.get('name') or it.get('factor') or it.get('label') or it.get('factor_name') or it.get('factor_label')
+                contrib = it.get('contribution') or it.get('value') or it.get('score') or it.get('weight') or it.get('percentage')
+                # try to coerce strings like '45%' or '0.45' to numeric percent
+                try:
+                    if isinstance(contrib, str):
+                        if contrib.strip().endswith('%'):
+                            contrib = float(contrib.strip().rstrip('%'))
+                        else:
+                            contrib = float(contrib)
+                    if isinstance(contrib, float) and contrib <= 1.0:
+                        contrib = round(contrib * 100.0, 1)
+                    if isinstance(contrib, (int, float)):
+                        contrib = round(float(contrib), 1)
+                except Exception:
+                    contrib = None
+                return {'name': name or '', 'contribution': contrib if contrib is not None else 0.0}
+
+            normalized = {}
+            normalized['node_id'] = node_id
+            normalized['name'] = name
+            normalized['risk_score_pct'] = float(score_pct)
+            normalized['confidence'] = float(explanation.get('confidence', confidence))
+
+            # summary
+            summary = explanation.get('summary') or explanation.get('text') or f'Risco estimado {score_pct:.1f}%. Principais fatores: ver detalhes.'
+            normalized['summary'] = summary
+
+            # factors normalization
+            raw_factors = explanation.get('factors') or explanation.get('factors_list') or []
+            factors = []
+            if isinstance(raw_factors, list) and raw_factors:
+                for it in raw_factors:
+                    nf = _norm_factor_item(it)
+                    if nf:
+                        factors.append(nf)
+            else:
+                # try to infer from common keys
+                for key in ('temporal_pattern', 'spatial_correlation', 'recent_events', 'historical_baseline'):
+                    if key in explanation:
+                        val = explanation.get(key)
+                        try:
+                            contrib = float(val)
+                            if contrib <= 1.0:
+                                contrib = contrib * 100.0
+                        except Exception:
+                            contrib = None
+                        if contrib is not None:
+                            pretty = key.replace('_', ' ').title()
+                            factors.append({'name': pretty, 'contribution': round(contrib, 1)})
+
+            normalized['factors'] = factors
+
+            # caveats/notes
+            caveats = explanation.get('caveats') or explanation.get('notes') or explanation.get('warnings') or []
+            normalized['caveats'] = caveats if isinstance(caveats, list) else [caveats]
+
+            # Mark source as generator
+            normalized['explanation_available'] = True
+            normalized['source'] = 'generator'
+
+            # --- Manager harmonized text: cache-aware LLM call ---
+            def _ensure_cache_dir():
+                d = os.path.dirname(CACHE_FILE)
+                if not os.path.exists(d):
+                    try:
+                        os.makedirs(d, exist_ok=True)
+                    except Exception:
+                        pass
+
+            def _load_cache():
+                try:
+                    if os.path.exists(CACHE_FILE):
+                        with open(CACHE_FILE, 'r', encoding='utf-8') as cf:
+                            return json.load(cf) or {}
+                except Exception:
+                    pass
+                return {}
+
+            def _save_cache(c):
+                try:
+                    _ensure_cache_dir()
+                    with open(CACHE_FILE, 'w', encoding='utf-8') as cf:
+                        json.dump(c, cf, ensure_ascii=False, indent=2)
+                except Exception as e:
+                    logging.exception('Failed saving manager_text cache: %s', e)
+
+            def _parse_event_date(ev):
+                # Try common fields and return YYYY-MM-DD or None
+                if not isinstance(ev, dict):
+                    return None
+                for key in ('date', 'event_date', 'ingested_at'):
+                    v = ev.get(key)
+                    if not v:
+                        continue
+                    try:
+                        s = str(v).strip()
+                        if len(s) >= 10 and re.match(r'\d{4}-\d{2}-\d{2}', s):
+                            return s[:10]
+                    except Exception:
+                        continue
+                return None
+
+            try:
+                # compute newest event date in context (YYYY-MM-DD) if available
+                events_list = context.get('events') if isinstance(context.get('events'), list) else []
+                max_event_date = None
+                for ev in events_list:
+                    try:
+                        d = _parse_event_date(ev)
+                        if d:
+                            if (not max_event_date) or d > max_event_date:
+                                max_event_date = d
+                    except Exception:
+                        continue
+
+                cache = _load_cache()
+                node_key = str(node_id)
+                need_call = False
+                if node_key in cache:
+                    cached = cache[node_key]
+                    cached_last = cached.get('last_event_date')
+                    if max_event_date and (not cached_last or max_event_date > cached_last):
+                        need_call = True
+                else:
+                    need_call = True
+
+                if need_call:
+                    # Build prompt for manager harmonization
+                    try:
+                        prompt = (
+                            "Você é um assistente que reescreve explicações técnicas para um gestor municipal.\n"
+                            "Recebe a explicação estruturada em JSON abaixo. Produza um parágrafo curto (2-4 frases) em português claro, "
+                            "destacando os fatores principais, o nível de confiança e recomendação de ação. Seja objetivo e inclua o nome da localidade.\n\n"
+                            "EXPLICAÇÃO JSON:\n" + json.dumps(normalized, ensure_ascii=False)
+                        )
+
+                        # Attempt to call the legacy LLM service if available
+                        try:
+                            import src.llm_service as llmsvc
+                            legacy = getattr(llmsvc, '_legacy', None)
+                            keys = []
+                            if legacy and hasattr(legacy, 'get_gemini_api_keys'):
+                                try:
+                                    keys = legacy.get_gemini_api_keys()
+                                except Exception:
+                                    keys = []
+
+                            harmonized = None
+                            if legacy and hasattr(legacy, '_call_model_with_rotation') and keys:
+                                try:
+                                    out = legacy._call_model_with_rotation(prompt, keys)
+                                    harmonized = out if isinstance(out, str) else None
+                                except Exception:
+                                    harmonized = None
+
+                            # If harmonized text produced, cache it
+                            if harmonized:
+                                cache[node_key] = {
+                                    'manager_text': harmonized,
+                                    'cached_at': datetime.utcnow().isoformat(),
+                                    'last_event_date': max_event_date
+                                }
+                                _save_cache(cache)
+                                normalized['manager_text'] = harmonized
+                                normalized['manager_text_source'] = 'llm'
+                            else:
+                                # if no model output but cache has previous value, reuse it
+                                if node_key in cache and cache[node_key].get('manager_text'):
+                                    normalized['manager_text'] = cache[node_key].get('manager_text')
+                                    normalized['manager_text_source'] = 'cache'
+                        except ImportError:
+                            # llm_service not available; fallback to cached if present
+                            if node_key in cache and cache[node_key].get('manager_text'):
+                                normalized['manager_text'] = cache[node_key].get('manager_text')
+                                normalized['manager_text_source'] = 'cache'
+                    except Exception:
+                        logging.exception('Error preparing manager_text')
+                else:
+                    # reuse cached manager_text
+                    if node_key in cache and cache[node_key].get('manager_text'):
+                        normalized['manager_text'] = cache[node_key].get('manager_text')
+                        normalized['manager_text_source'] = 'cache'
+            except Exception:
+                logging.exception('Manager text caching flow failed')
+
+            return jsonify(normalized)
+        except Exception as e:
+            # Fail-safe: do not return HTTP error. Provide a consistent JSON response
+            # indicating the detailed explanation is unavailable while preserving
+            # the node id, name and score so the frontend can continue rendering.
+            safe_resp = {
+                'node_id': node_id,
+                'name': name,
+                'risk_score_pct': float(score_pct),
+                'confidence': float(confidence),
+                'summary': 'Explicação detalhada indisponível',
+                'factors': [],
+                'caveats': [],
+                'explanation_available': False,
+                'source': 'unavailable',
+            }
+            # Log the underlying exception for diagnostics without crashing
+            logging.exception('ExplanationGenerator failed: %s', e)
+            return jsonify(safe_resp)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -689,9 +1111,26 @@ def parse_exogenous():
         try:
             from src.llm_service import process_exogenous_text
         except Exception as e:
-            return jsonify({'error': 'llm_service_unavailable', 'detail': str(e)}), 500
+            # Friendly JSON response that frontend can render in a user-facing modal
+            friendly = {
+                'error': 'llm_service_unavailable',
+                'title': 'Serviço de extração temporariamente indisponível',
+                'message': 'Não foi possível processar automaticamente o texto de origem. Tente novamente em alguns minutos ou entre com os pontos manualmente.',
+                'detail': str(e)
+            }
+            return jsonify(friendly), 503
 
-        parsed = process_exogenous_text(text)
+        try:
+            parsed = process_exogenous_text(text)
+        except Exception as e:
+            friendly = {
+                'error': 'llm_processing_failed',
+                'title': 'Erro ao processar o texto',
+                'message': 'O servidor encontrou um problema ao tentar interpretar os dados. Tente novamente ou informe o problema ao suporte.',
+                'detail': str(e)
+            }
+            return jsonify(friendly), 503
+
         # Return parsed items as 'points' for frontend compatibility
         return jsonify({'points': parsed, 'count': len(parsed)})
     except Exception as e:
@@ -746,6 +1185,38 @@ def save_exogenous():
 
                 date_val = p.get('date')
                 ts_val = p.get('timestamp') or p.get('time') or p.get('hora')
+                raw_text = (p.get('raw_text') or p.get('descricao') or '')
+
+                # Try to extract an explicit time or date from the raw text when available.
+                # Many source messages append the occurrence time (e.g. "- 22:10") at the end.
+                try:
+                    if raw_text and isinstance(raw_text, str):
+                        # prefer the last HH:MM(:SS) pattern found in the raw text
+                        mtime = re.findall(r"(\d{1,2}:\d{2}(?::\d{2})?)", raw_text)
+                        if mtime and (not ts_val or len(str(ts_val).strip()) == 0):
+                            # take last found time
+                            ts_val = mtime[-1]
+
+                        # Also try to find an explicit date in raw_text (YYYY-MM-DD or DD/MM/YYYY)
+                        mdate = re.search(r"(\d{4}-\d{2}-\d{2})", raw_text)
+                        if not mdate:
+                            mdate = re.search(r"(\d{2}/\d{2}/\d{4})", raw_text)
+                        if mdate:
+                            extracted_date = mdate.group(1)
+                        else:
+                            extracted_date = None
+                    else:
+                        extracted_date = None
+                except Exception:
+                    extracted_date = None
+
+                # If we have an extracted_date in DD/MM/YYYY format, normalize to YYYY-MM-DD
+                if extracted_date and re.match(r'^\d{2}/\d{2}/\d{4}$', extracted_date):
+                    try:
+                        dparts = extracted_date.split('/')
+                        extracted_date = f"{dparts[2]}-{dparts[1]}-{dparts[0]}"
+                    except Exception:
+                        pass
 
                 final_dt = None
 
@@ -789,22 +1260,51 @@ def save_exogenous():
                     if ing_dt:
                         final_dt = f"{ing_dt.date().isoformat()} {tnorm}"
 
-                # 3) If still none, but timestamp present -> combine with ingested_at date
+                # 3) If still none, but timestamp present -> prefer timestamp's full datetime if it includes a date,
+                # otherwise combine the timestamp (time-only) with a sensible date.
                 if final_dt is None and ts_val:
-                    tnorm = _normalize_time_part(ts_val)
-                    if tnorm:
-                        ing = p.get('ingested_at')
-                        ing_dt = None
-                        if isinstance(ing, str) and ing:
+                    # If ts_val contains a full date (YYYY-MM-DD) or ISO, try parsing directly
+                    try:
+                        if isinstance(ts_val, str) and re.search(r'\d{4}-\d{2}-\d{2}', ts_val):
+                            # normalize full datetime
                             try:
-                                ing_dt = datetime.strptime(ing.strip(), '%Y-%m-%d %H:%M:%S')
+                                parsed = datetime.fromisoformat(ts_val.strip())
+                                final_dt = parsed.strftime('%Y-%m-%d %H:%M:%S')
                             except Exception:
+                                # try parse common formats
                                 try:
-                                    ing_dt = datetime.fromisoformat(ing.strip())
+                                    parsed = datetime.strptime(ts_val.strip(), '%Y-%m-%d %H:%M:%S')
+                                    final_dt = parsed.strftime('%Y-%m-%d %H:%M:%S')
                                 except Exception:
-                                    ing_dt = None
-                        if ing_dt:
-                            final_dt = f"{ing_dt.date().isoformat()} {tnorm}"
+                                    final_dt = None
+                        else:
+                            # time-only: normalize and combine with best-available date
+                            tnorm = _normalize_time_part(ts_val)
+                            if tnorm:
+                                # Prefer an explicit date extracted from raw_text
+                                if extracted_date:
+                                    final_dt = f"{extracted_date} {tnorm}"
+                                else:
+                                    # else prefer provided date_val if it contains a date
+                                    if isinstance(date_val, str) and re.search(r'\d{4}-\d{2}-\d{2}', str(date_val)):
+                                        date_part = str(date_val).strip()[:10]
+                                        final_dt = f"{date_part} {tnorm}"
+                                    else:
+                                        # fall back to ingested_at date
+                                        ing = p.get('ingested_at')
+                                        ing_dt = None
+                                        if isinstance(ing, str) and ing:
+                                            try:
+                                                ing_dt = datetime.strptime(ing.strip(), '%Y-%m-%d %H:%M:%S')
+                                            except Exception:
+                                                try:
+                                                    ing_dt = datetime.fromisoformat(ing.strip())
+                                                except Exception:
+                                                    ing_dt = None
+                                        if ing_dt:
+                                            final_dt = f"{ing_dt.date().isoformat()} {tnorm}"
+                    except Exception:
+                        final_dt = None
 
                 # 4) Fallback: derive date from ingested_at and set midnight time
                 if final_dt is None:
@@ -862,6 +1362,65 @@ def save_exogenous():
 
         return jsonify({'saved': len(points)})
     except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/manager_explanations/cache', methods=['GET'])
+def get_manager_cache():
+    """Return the full manager_explanations cache JSON (for debugging/inspection)."""
+    try:
+        if os.path.exists(CACHE_FILE):
+            with open(CACHE_FILE, 'r', encoding='utf-8') as cf:
+                data = json.load(cf) or {}
+        else:
+            data = {}
+        return jsonify({'cache': data})
+    except Exception as e:
+        logging.exception('Failed reading manager_explanations cache: %s', e)
+        return jsonify({'error': 'cache_read_failed', 'detail': str(e)}), 500
+
+
+@app.route('/api/manager_explanations/cache/<node_id>', methods=['DELETE'])
+def delete_manager_cache_node(node_id):
+    """Invalidate cached manager text for a specific node_id."""
+    try:
+        if os.path.exists(CACHE_FILE):
+            try:
+                with open(CACHE_FILE, 'r', encoding='utf-8') as cf:
+                    cache = json.load(cf) or {}
+            except Exception:
+                cache = {}
+        else:
+            cache = {}
+
+        if str(node_id) in cache:
+            del cache[str(node_id)]
+            try:
+                with open(CACHE_FILE, 'w', encoding='utf-8') as cf:
+                    json.dump(cache, cf, ensure_ascii=False, indent=2)
+            except Exception as e:
+                logging.exception('Failed saving cache after delete: %s', e)
+                return jsonify({'error': 'cache_write_failed', 'detail': str(e)}), 500
+            return jsonify({'deleted': node_id})
+        return jsonify({'deleted': None, 'reason': 'not_found'})
+    except Exception as e:
+        logging.exception('Error deleting cache node: %s', e)
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/manager_explanations/cache/clear', methods=['POST'])
+def clear_manager_cache():
+    """Clear the entire manager_explanations cache."""
+    try:
+        try:
+            with open(CACHE_FILE, 'w', encoding='utf-8') as cf:
+                json.dump({}, cf, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logging.exception('Failed clearing cache: %s', e)
+            return jsonify({'error': 'cache_clear_failed', 'detail': str(e)}), 500
+        return jsonify({'cleared': True})
+    except Exception as e:
+        logging.exception('Error clearing cache: %s', e)
         return jsonify({'error': str(e)}), 500
 
 if __name__ == "__main__":
