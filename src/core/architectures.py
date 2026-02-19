@@ -50,11 +50,29 @@ class FastRelationalGCN(nn.Module):
         out = self.bn(out.view(-1, C)).view(BT, N, C)
         return self.dropout(F.elu(out))
 
+class GlobalSpatialAttention(nn.Module):
+    """
+    SPATIAL TRANSFORMER: Permite que cada bairro olhe para todos os outros.
+    Ignora as restrições das matrizes de adjacência para descobrir links invisíveis.
+    """
+    def __init__(self, channels, heads=4):
+        super().__init__()
+        self.mha = nn.MultiheadAttention(embed_dim=channels, num_heads=heads, batch_first=True)
+        self.norm = nn.LayerNorm(channels)
+
+    def forward(self, x):
+        # x: (BT, N, C)
+        attn_out, _ = self.mha(x, x, x)
+        return self.norm(x + attn_out)
+
 class STGCNBlock(nn.Module):
-    """BLOCO BÁSICO: Combina Convolução Temporal, GCN Espacial e Atenção."""
+    """BLOCO BÁSICO: Agora com Spatial Transformer + Relational GCN."""
     def __init__(self, in_channels, out_channels, time_steps, dropout=0.4):
         super().__init__()
         self.time_conv = nn.Conv2d(in_channels, out_channels, (1, 3), padding=(0, 1))
+        # Componente 1: Atenção Global (Transformer)
+        self.spatial_transformer = GlobalSpatialAttention(out_channels)
+        # Componente 2: GCN Relacional (Física/Facções)
         self.gcn = FastRelationalGCN(out_channels, out_channels, dropout)
         self.temp_attn = MultiHeadTemporalAttention(out_channels)
         self.residual = nn.Conv2d(in_channels, out_channels, 1) if in_channels != out_channels else nn.Identity()
@@ -64,7 +82,12 @@ class STGCNBlock(nn.Module):
         x = F.elu(self.time_conv(x))
         B, C, N, T = x.shape
         x_flat = x.permute(0, 3, 2, 1).reshape(B * T, N, C)
-        x_spatial = self.gcn(x_flat, adj_list)
+        
+        # 1. Passo Transformer (Global)
+        x_spatial = self.spatial_transformer(x_flat)
+        # 2. Passo GCN (Local)
+        x_spatial = self.gcn(x_spatial, adj_list)
+        
         x = x_spatial.reshape(B, T, N, C).permute(0, 3, 2, 1)
         x = self.temp_attn(x)
         return x + res

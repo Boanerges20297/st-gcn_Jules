@@ -26,6 +26,10 @@ logging.basicConfig(
         logging.StreamHandler(sys.stdout)
     ]
 )
+# Forçar sys.stdout a usar UTF-8 para evitar erros em ambientes Windows
+if sys.stdout.encoding != 'utf-8':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # Configurações de Treino
 EPOCHS = 60
@@ -126,30 +130,53 @@ def train_specialist(region_key, ModelClass):
     model = ModelClass(num_nodes=N, in_channels=C, time_steps=WINDOW).to(DEVICE)
     optimizer = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=1e-4)
     
-    # Custom Weighted MSE Loss para priorizar Ranking (P@10)
-    # Penaliza mais os erros em nós com alto crime real
-    def weighted_mse_loss(pred, target):
-        # Peso = 1 + log(1 + target) para suavizar o impacto de outliers mas focar no topo
-        weights = 1.0 + torch.log1p(target)
-        loss = weights * (pred - target) ** 2
-        return loss.mean()
-        
-    criterion = weighted_mse_loss
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=8, factor=0.5)
+    # --- ESTRATÉGIA DE HOTSPOT OVERSAMPLING ---
+    # Identificar dias com muitos eventos e treinar neles com mais peso
+    day_severity = [torch.sum(y).item() for y in y_list]
+    high_crime_indices = set([i for i, sev in enumerate(day_severity) if sev > np.median(day_severity)])
     
-    best_p10 = -1.0
-    best_loss_at_p10 = float('inf')
+    # Criar lista final de índices (Seguro contra loop infinito)
+    final_train_indices = []
+    for i in range(len(train_X)):
+        final_train_indices.append(i)
+        if i in high_crime_indices:
+            final_train_indices.extend([i] * 2) # 3x mais peso para dias de crise
+    
+    # --- LOSS TOP-K FOCAL (FOCUSING ON THE PEAK) ---
+    def topk_focal_loss(pred, target):
+        pred = pred.squeeze()
+        target = target.squeeze()
+        
+        # Só calculamos a loss para o TOP 30 real de cada dia
+        k = 30
+        top_val, top_idx = torch.topk(target, min(k, len(target)))
+        
+        weights = torch.full_like(target, 0.1)
+        weights[top_idx] = 10.0 * (1.0 + target[top_idx])
+        
+        loss = weights * (pred - target)**2
+        return loss.mean()
+
+    criterion = topk_focal_loss
+    # OneCycleLR com mais epochs para acomodar o oversampling
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(
+        optimizer, max_lr=LR*3.0, steps_per_epoch=len(final_train_indices)//GRADIENT_ACCUMULATION_STEPS + 1, 
+        epochs=EPOCHS, pct_start=0.3
+    )
+    
+    best_p20 = -1.0
+    best_loss_at_p20 = float('inf')
     
     for epoch in range(EPOCHS):
         model.train()
         epoch_loss = 0.0
         optimizer.zero_grad()
         
-        # Embaralhar índices manualmente para SGD
-        indices = np.random.permutation(len(train_X))
+        # Embaralhar índices com oversampling
+        np.random.shuffle(final_train_indices)
         
         steps = 0
-        for idx in indices:
+        for idx in final_train_indices:
             bx = train_X[idx].to(DEVICE)
             by = train_y[idx].to(DEVICE)
             
@@ -168,20 +195,13 @@ def train_specialist(region_key, ModelClass):
             steps += 1
             if steps % GRADIENT_ACCUMULATION_STEPS == 0:
                 optimizer.step()
+                scheduler.step() # Step no OneCycle é por batch
                 optimizer.zero_grad()
-        
-        # Aplicar updates restantes
-        if steps % GRADIENT_ACCUMULATION_STEPS != 0:
-            optimizer.step()
-            optimizer.zero_grad()
-            
-        avg_train = epoch_loss / len(train_X)
         
         # Validação
         model.eval()
         val_loss = 0.0
-        p5_list = []
-        p10_list = []
+        p5_list, p10_list, p20_list = [], [], []
         
         with torch.no_grad():
             for i in range(len(val_X)):
@@ -194,51 +214,40 @@ def train_specialist(region_key, ModelClass):
                 y_true = vy.squeeze().cpu().numpy()
                 y_pred = vpred.squeeze().cpu().numpy()
                 
-                # Ignorar dias sem crime nenhum (ruído)
                 if np.sum(y_true) > 0:
-                    # Índices ordenados do maior para o menor
                     top_true = np.argsort(y_true)[::-1]
                     top_pred = np.argsort(y_pred)[::-1]
                     
-                    # P@5
-                    k = 5
-                    hits5 = len(set(top_true[:k]) & set(top_pred[:k]))
-                    p5_list.append(hits5 / k)
-                    
-                    # P@10
-                    k = 10
-                    hits10 = len(set(top_true[:k]) & set(top_pred[:k]))
-                    p10_list.append(hits10 / k)
+                    # P@5, P@10, P@20
+                    for k, l in zip([5, 10, 20], [p5_list, p10_list, p20_list]):
+                        hits = len(set(top_true[:k]) & set(top_pred[:k]))
+                        l.append(hits / k)
         
         avg_val = val_loss / len(val_X)
         avg_p5 = np.mean(p5_list) if p5_list else 0.0
         avg_p10 = np.mean(p10_list) if p10_list else 0.0
+        avg_p20 = np.mean(p20_list) if p20_list else 0.0
         
-        scheduler.step(avg_val)
-        
-        # Logging inteligente com label da região
-        logging.info(f"[{region_label}] Epoch {epoch+1:03d}/{EPOCHS} | MSE: {avg_val:.4f} | P@5: {avg_p5*100:.1f}% | P@10: {avg_p10*100:.1f}%")
+        # Logging inteligente com P@20
+        logging.info(f"[{region_label}] Epoch {epoch+1:03d}/{EPOCHS} | MSE: {avg_val:.4f} | P@5: {avg_p5*100:.1f}% | P@10: {avg_p10*100:.1f}% | P@20: {avg_p20*100:.1f}%")
             
-        # Lógica de Salvamento: Prioridade Total ao P@10
-        # Se P@10 melhorou -> Salva
-        # Se P@10 empatou mas Loss melhorou -> Salva
-        
+        # Lógica de Salvamento: Foco total no P@20 conforme solicitado
         saved = False
-        if avg_p10 > best_p10:
-            best_p10 = avg_p10
-            best_loss_at_p10 = avg_val
+        if avg_p20 > best_p20:
+            best_p20 = avg_p20
+            best_loss_at_p20 = avg_val
             saved = True
-            logging.info(f"🏆 [{region_label}] NOVO RECORDE P@10: {avg_p10*100:.1f}% (MSE: {avg_val:.4f})")
-        elif avg_p10 == best_p10 and avg_val < best_loss_at_p10:
-            best_loss_at_p10 = avg_val
+            logging.info(f"🏆 [{region_label}] NOVO RECORDE P@20: {avg_p20*100:.1f}% (P@10: {avg_p10*100:.1f}%)")
+        elif avg_p20 == best_p20 and avg_val < best_loss_at_p20:
+            best_loss_at_p20 = avg_val
             saved = True
-            logging.info(f"🔹 [{region_label}] P@10 Estável ({avg_p10*100:.1f}%), Melhoria no MSE: {avg_val:.4f}")
+            logging.info(f"🔹 [{region_label}] P@20 Estável ({avg_p20*100:.1f}%), Melhoria no MSE")
             
         if saved:
             torch.save({'model_state_dict': model.state_dict()}, f'models/active/{region_key}_model.pth')
 
     total_time = time.time() - start_time_region
-    logging.info(f"✅ {region_label} CONCLUÍDO. Melhor P@10: {best_p10*100:.1f}%. Tempo: {total_time:.1f}s")
+    logging.info(f"✅ {region_label} CONCLUÍDO. Melhor P@20: {best_p20*100:.1f}%. Tempo: {total_time:.1f}s")
 
 def main():
     os.makedirs('models/active', exist_ok=True)

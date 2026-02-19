@@ -51,13 +51,13 @@ class StateOrchestrator:
             'rmf': {
                 'model_path': os.path.join(self.root, 'models', 'active', 'rmf_model.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_rmf.pkl'),
-                'class': DeepSTGAT_64,
+                'class': DeepSTGAT_32,
                 'window': 30
             },
             'interior': {
                 'model_path': os.path.join(self.root, 'models', 'active', 'interior_model.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_interior.pkl'),
-                'class': DeepSTGAT_64,
+                'class': DeepSTGAT_32,
                 'window': 30
             }
         }
