@@ -6,19 +6,22 @@ O Sistema Report Preview opera utilizando um tensor de entrada de **26 canais**,
 
 ## 📊 1. Mapa Geral de Canais (Tensores)
 
-O cérebro do Report Preview processa 26 informações simultâneas para cada bairro, todos os dias:
+O cérebro do Report Preview processa **29 informações simultâneas** para cada bairro, todos os dias:
 
 | Canal | Nome | Tipo | Descrição |
 | :--- | :--- | :--- | :--- |
 | **0** | **CVLI** | Histórico | Ocorrências reais de crimes letais (Homicídios). |
-| **1** | **CVP** | Histórico | Crimes contra o patrimônio (Roubos/Furtos). |
+| **1** | **VEHICLE** | Histórico | Roubos e Furtos de Veículos (Indicador de Mobilidade). |
 | **2** | **Tensão** | Estrutural | Índice estático de vulnerabilidade e presença de facções. |
 | **3-9** | **DOW** | Sazonal | Dia da semana (Segunda a Domingo). |
 | **10-21** | **MONTH** | Sazonal | Mês do ano (Janeiro a Dezembro). |
-| **22** | **Weekend** | Sazonal | Flag de final de semana (Sexta noite a Domingo). |
+| **22** | **Weekend** | Sazonal | Flag de final de semana. |
 | **23** | **Supressão** | **Dinâmico** | **Ação Policial Positiva (Alívio de Risco).** |
-| **24** | **Exógeno** | **Dinâmico** | **Eventos de Tensão Padrão (Alertas comuns).** |
+| **24** | **Exógeno** | **Dinâmico** | **Eventos de Tensão Padrão (Média Móvel / Alertas).** |
 | **25** | **Crítico** | **Dinâmico** | **Alertas de Alta Periculosidade (Rupturas).** |
+| **26** | **Incursion** | **LIVRE** | **Canal disponível para Invasões de Território.** |
+| **27** | **Disponível** | **LIVRE** | **Canal disponível para Infraestrutura/Inteligência.** |
+| **28** | **Pulso** | Global | **Soma total de CVLIs no Estado (Contexto Global).** |
 
 ---
 

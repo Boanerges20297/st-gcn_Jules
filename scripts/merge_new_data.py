@@ -23,7 +23,24 @@ def robust_load_new_data(path):
     # 1. Tenta carregar como JSON padrão primeiro
     try:
         data = json.loads(content)
-        if isinstance(data, list): return data
+        if isinstance(data, list):
+            # Detectar formato PHPMyAdmin (lista onde um item tem chave 'data')
+            # Estrutura comum: [header, database, {type: table, data: [...]}]
+            for item in data:
+                if isinstance(item, dict) and item.get('type') == 'table' and 'data' in item:
+                    print(f"   -> Detectado formato PHPMyAdmin. Extraindo {len(item['data'])} registros da tabela '{item.get('name')}'.")
+                    return item['data']
+            
+            # Se não for o formato específico, assume lista plana de registros
+            return data
+            
+        elif isinstance(data, dict):
+            # Se for um dict raiz com chave 'data' ou 'records'
+            if 'data' in data and isinstance(data['data'], list):
+                return data['data']
+            if 'records' in data and isinstance(data['records'], list):
+                return data['records']
+                
     except:
         print("Aviso: Formato JSON padrão falhou. Iniciando extração por blocos de texto (Brute Force)...")
 
@@ -112,7 +129,7 @@ def merge(new_data_path):
                     dist, idx = tree.query([lat, lon])
                     # Raio de aprox 5km
                     if dist < 0.05:
-                        item['bairro_geo'] = node_names[idx]
+                        item['bairro'] = node_names[idx]
                         count_enriched += 1
             except: pass
         else:

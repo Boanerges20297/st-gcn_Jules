@@ -37,8 +37,8 @@ def _call_model(prompt: str, api_key: str) -> str:
         raise RuntimeError('google.generativeai SDK not available')
 
     genai.configure(api_key=api_key)
-    # Using flash model for speed and efficiency
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    # Using gemini-2.0-flash for high availability and speed
+    model = genai.GenerativeModel('gemini-2.0-flash')
     response = model.generate_content(
         prompt,
         generation_config={
@@ -200,6 +200,7 @@ def process_exogenous_text(text: str, block_type: str = None) -> List[Dict[str, 
     )
 
     try:
+        # Use rotation to handle quota limits
         out = _call_model_with_rotation(prompt, keys)
         events = _extract_json_from_text(out)
         
@@ -242,13 +243,29 @@ def _deterministic_parse(text: str) -> List[Dict[str, Any]]:
         
         parts = [p.strip() for p in line.split(' - ')]
         # Typical format: ID - AIS - NATUREZA - DESC - LOCAL - BAIRRO - TIME
+        # Default natureza when explicit part is not present
         natureza = "DESCONHECIDO"
-        if len(parts) >= 3:
+        if len(parts) >= 3 and parts[2]:
             natureza = parts[2]
-            
+
+        # Use normalized text (remove accents and punctuation) for reliable matching
+        norm = _normalize_text(line)
+
+        # Heuristics to detect specific event types
+        if 'HOMICIDIO' in norm:
+            # Prefer explicit homicide label
+            natureza = natureza if natureza != 'DESCONHECIDO' else 'HOMICÍDIO'
+            severity = 'HIGH'
+        elif 'LESAO' in norm and 'BALA' in norm:
+            # Treat lesão a bala as high risk (explicit request)
+            natureza = 'LESÃO A BALA'
+            severity = 'HIGH'
+        else:
+            severity = 'LOW'
+
         b = busca_bairro(line)
         m = busca_municipio(line) or ('FORTALEZA' if b else '')
-        
+
         results.append({
             'natureza': natureza,
             'descricao': line,
@@ -259,7 +276,7 @@ def _deterministic_parse(text: str) -> List[Dict[str, Any]]:
             'timestamp': '',
             'resumo': f"{natureza} em {b or 'local não identificado'}",
             'raw_text': line,
-            'conflict_severity': 'HIGH' if 'HOMICIDIO' in line.upper() else 'LOW'
+            'conflict_severity': severity
         })
     return results
 

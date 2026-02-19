@@ -17,6 +17,14 @@
         .metric-card .card-text { font-size: 1.5rem; margin-bottom: 2px !important; }
         .legend { background: white; padding: 10px; border-radius: 5px; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
         .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
+        /* Make Leaflet default popup close button visible on dark popups */
+        .leaflet-popup-close-button {
+            color: #ffffff !important;
+            background: transparent !important;
+            text-shadow: none !important;
+            font-size: 18px !important;
+            line-height: 1 !important;
+        }
         .simulation-active { cursor: crosshair !important; }
 
         /* Loading Overlay */
@@ -259,7 +267,7 @@
                             <i class="fas fa-file-import"></i> Inserir Eventos (CIOPS)
                         </button>
                         <a href="/connections" class="btn btn-outline-dark btn-sm">
-                            <i class="fas fa-project-diagram"></i> Grafo de Influência (Top 10)
+                            <i class="fas fa-chart-line"></i> Dashboard Estratégico
                         </a>
                     </div>
 
@@ -1454,99 +1462,117 @@
         return 'interior';
     }
 
-    function getRiskLevel(score) {
-        // Align frontend display thresholds with backend (`risk_score`): five bands
-        // >=90 -> Crítico, >=80 -> Alto, >=50 -> Moderado, >=20 -> Baixo, else Sem Risco
-        if (score >= 90) return { label: 'Crítico', class: 'text-danger' };
-        if (score >= 80) return { label: 'Alto', class: 'text-warning' };
-        if (score >= 50) return { label: 'Moderado', class: 'text-info' };
-        if (score >= 20) return { label: 'Baixo', class: 'text-secondary' };
-        return { label: 'Sem Risco', class: 'text-success' };
-    }
-
-    // Focus a layer: zoom to polygon bounds and show details popup
-    function focusLayerAndShowDetails(layer, animateSeconds) {
-        try {
-            var bounds = (layer.getBounds && layer.getBounds()) || null;
-            var duration = (typeof animateSeconds === 'number') ? animateSeconds : 0.8;
-
+        function getRiskLevel(score) {
+            // Align frontend display thresholds with backend (`risk_score`): five bands
+            // >=90 -> Crítico, >=80 -> Alto, >=50 -> Moderado, >=20 -> Baixo, else Sem Risco
+            if (score >= 90) return { label: 'Crítico', class: 'bg-danger text-white' };
+            if (score >= 80) return { label: 'Alto', class: 'bg-warning text-dark' };
+            if (score >= 50) return { label: 'Moderado', class: 'bg-info text-dark' };
+            if (score >= 20) return { label: 'Baixo', class: 'bg-secondary text-white' };
+            return { label: 'Sem Risco', class: 'bg-success text-white' };
+        }
+    
+        // Focus a layer: zoom to polygon bounds and show details popup
+        function focusLayerAndShowDetails(layer, animateSeconds) {
+            try {
+                var bounds = (layer.getBounds && layer.getBounds()) || null;
+                var duration = (typeof animateSeconds === 'number') ? animateSeconds : 0.8;
+    
                 if (bounds) {
-                var center = bounds.getCenter();
-
-                // fitBounds zooms to show the polygon perfectly within the map container.
-                // The map is in col-md-9 (separate from sidebar), so no sidebar offset needed.
-                // padding: L.point(x, y) adds uniform margin in pixels around the bounds.
-                map.fitBounds(bounds, {
-                    maxZoom: 13,
-                    padding: [40, 40],  // 40px uniform padding around the polygon
-                    animate: true,
-                    duration: duration
-                });
-
-                // After animation ends, show details popup at the polygon center
-                // Only show details popup after moveend if not the initial map load
-                if (!initialMapLoad) {
-                    map.once('moveend', function() {
-                        showFeatureDetails(layer, center);
+                    var center = bounds.getCenter();
+    
+                    // fitBounds zooms to show the polygon perfectly within the map container.
+                    // The map is in col-md-9 (separate from sidebar), so no sidebar offset needed.
+                    // padding: L.point(x, y) adds uniform margin in pixels around the bounds.
+                    map.fitBounds(bounds, {
+                        maxZoom: 13,
+                        padding: [40, 40],  // 40px uniform padding around the polygon
+                        animate: true,
+                        duration: duration
                     });
-                }
-            } else {
-                // Fallback for point-like layers (CircleMarkers)
-                var latlng = (layer.getLatLng && layer.getLatLng()) || null;
-                if (latlng) {
-                    map.setView(latlng, 15, { animate: true, duration: duration });
+    
+                    // After animation ends, show details popup at the polygon center
+                    // Only show details popup after moveend if not the initial map load
                     if (!initialMapLoad) {
                         map.once('moveend', function() {
-                            showFeatureDetails(layer, latlng);
+                            showFeatureDetails(layer, center);
                         });
                     }
+                } else {
+                    // Fallback for point-like layers (CircleMarkers)
+                    var latlng = (layer.getLatLng && layer.getLatLng()) || null;
+                    if (latlng) {
+                        map.setView(latlng, 15, { animate: true, duration: duration });
+                        if (!initialMapLoad) {
+                            map.once('moveend', function() {
+                                showFeatureDetails(layer, latlng);
+                            });
+                        }
+                    }
                 }
+            } catch (e) {
+                console.warn('focusLayerAndShowDetails failed', e);
             }
-        } catch (e) {
-            console.warn('focusLayerAndShowDetails failed', e);
         }
-    }
-
-    function showFeatureDetails(layer, latlng) {
-        var feature = layer.feature;
-        // Prefer final backend `risk_score` (post-ranking). Fallback to CVLI raw percentiles.
-        var score = typeof feature.properties.risk_score !== 'undefined' && feature.properties.risk_score !== null ? feature.properties.risk_score : (feature.properties.risk_score_cvli || 0);
-        var predVal = feature.properties.cvli_pred;
-        var typeLabel = 'Inteligência';
-        var status = getStatus(score, typeLabel);
-        // Prefer server-provided normalized region if present, else CIDADE
-        var region = feature.properties.region_type || feature.properties.CIDADE || feature.properties.city || 'RMF/Interior';
-
-        // Friendly fields provided by backend: status_label, risk_text, cvli_prediction_text
-        var friendlyLabel = feature.properties.status_label || status.label;
-        var level = getRiskLevel(score);
-        var riskText = feature.properties.risk_text || (Math.round(score) + '% — ' + friendlyLabel);
-        var predText = feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('Estimativa: ~' + predVal.toFixed(1) + ' ocorrências') : 'Sem novas ocorrências previstas');
-
-        var popupContent = `
-            <div style="font-family: sans-serif; font-size: 14px; min-width: 200px;">
-                <h6 class="mb-1"><strong>Bairro/Área:</strong> ${feature.properties.name}</h6>
-                <div class="text-muted small mb-2">
-                    <strong>Região:</strong> ${region}<br>
-                    <strong>Facção:</strong> ${feature.properties.faction || 'Não Identificado'}
-                </div>
-                <hr class="my-2">
-                <div class="mb-2">
-                    <strong>Status:</strong> <span class="badge ${level.class}">${friendlyLabel}</span>
-                </div>
-                <div class="mb-1">
-                    <strong>Risco:</strong> ${riskText}
-                </div>
-                <div class="text-muted small">
-                    <strong>Previsão (${typeLabel}):</strong> ${predText}
-                </div>
-                <div class="text-muted small mt-2">
-                    <em id="model-note-${feature.properties.node_id}"></em>
-                </div>
-            </div>
-        `;
-
-        // Inject model-note based on global meta if available
+    
+        function showFeatureDetails(layer, latlng) {
+            var feature = layer.feature;
+            // Prefer final backend `risk_score` (post-ranking). Fallback to CVLI raw percentiles.
+            var score = typeof feature.properties.risk_score !== 'undefined' && feature.properties.risk_score !== null ? feature.properties.risk_score : (feature.properties.risk_score_cvli || 0);
+            var predVal = feature.properties.cvli_pred;
+            var typeLabel = 'Inteligência';
+            var status = getStatus(score, typeLabel);
+            // Prefer server-provided normalized region if present, else CIDADE
+            var region = feature.properties.region_type || feature.properties.CIDADE || feature.properties.city || 'RMF/Interior';
+    
+            // Friendly fields provided by backend: status_label, risk_text, cvli_prediction_text
+            var friendlyLabel = feature.properties.status_label || status.label;
+            var level = getRiskLevel(score);
+            var riskText = feature.properties.risk_text || (Math.round(score) + '% — ' + friendlyLabel);
+            var predText = feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('Estimativa: ~' + predVal.toFixed(1) + ' ocorrências') : 'Sem novas ocorrências previstas');
+    
+                    var popupContent = `
+                        <div style="font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 14px; min-width: 240px; padding: 0; margin: -1px; background: #1a1d20; color: white; border-radius: 4px;">
+                            <div style="background: #000000; color: white; padding: 8px 10px; border-radius: 4px 4px 0 0; margin-bottom: 8px; border-bottom: 2px solid ${score >= 80 ? '#dc3545' : '#0d6efd'}; display:flex;align-items:center;justify-content:space-between;">
+                                <h6 style="margin: 0; font-weight: 700; font-size: 15px; color: white; line-height:1;">${feature.properties.name}</h6>
+                            </div>
+                            <div style="padding: 0 12px 12px 12px;">
+                                <div class="mb-2">
+                                    <span style="font-size: 0.75rem; color: #adb5bd; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Informações Gerais</span>
+                                    <div style="background: #2c3034; padding: 6px 8px; border-radius: 4px; border: 1px solid #3d4246; margin-top: 4px;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                                            <span style="color: #adb5bd; font-size: 0.8rem;">Região:</span>
+                                            <span style="font-weight: 600; color: white; font-size: 0.8rem;">${region}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between;">
+                                            <span style="color: #adb5bd; font-size: 0.8rem;">Facção:</span>
+                                            <span style="font-weight: 600; color: #ff6b6b; font-size: 0.8rem;">${feature.properties.faction || 'Neutro'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                                        <strong style="font-size: 0.85rem; color: white;">Status Atual:</strong>
+                                        <span class="badge ${level.class}" style="padding: 5px 10px; font-size: 0.75rem; border-radius: 12px; font-weight: 700;">${friendlyLabel}</span>
+                                    </div>
+                                </div>
+            
+                                <div style="background: ${score >= 90 ? 'rgba(220, 53, 69, 0.2)' : 'rgba(13, 110, 253, 0.15)'}; padding: 10px; border-radius: 6px; border-left: 4px solid ${score >= 90 ? '#dc3545' : '#0d6efd'}; margin-top: 8px;">
+                                    <div style="color: #ffffff; font-size: 0.85rem;">
+                                        <strong>Nível de Risco:</strong> ${riskText}
+                                    </div>
+                                    <div style="color: #e9ecef; font-size: 0.8rem; mt-1">
+                                        <strong>Previsão:</strong> ${predText}
+                                    </div>
+                                </div>
+            
+                                <div style="font-size: 0.7rem; color: #6c757d; margin-top: 10px; border-top: 1px solid #3d4246; padding-top: 6px; font-style: italic;">
+                                    <span id="model-note-${feature.properties.node_id}" style="color: #adb5bd;">Carregando metadados do modelo...</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;        // Inject model-note based on global meta if available
         try {
             try {
                 var modelWindow = null;

@@ -1,46 +1,54 @@
 # Dockerfile for ST-GCN Crime Prediction System
 
-FROM python:3.9-slim
+# Use a stable, slim Python 3.10 image
+FROM python:3.10-slim
 
+# Set working directory
 WORKDIR /app
 
-# Criar usuário não-root por segurança
-RUN useradd -m -u 1000 appuser
-
-# Instalar dependências de runtime (não-dev)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    gcc \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copiar requirements para instalar dependências Python
-COPY requirements.txt .
-
-# Instalar dependências Python
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copiar código da aplicação
-COPY --chown=appuser:appuser . .
-
-# Criar diretórios necessários
-RUN mkdir -p /app/logs /app/models /app/data && \
-    chown -R appuser:appuser /app
-
-# Configurar variáveis de ambiente
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
+# Prevent Python from writing pyc files to disc
+# and buffer stdout/stderr
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
     FLASK_APP=app.py
 
-# Trocar para usuário não-root
+# Install system dependencies required for scientific packages and GeoPandas
+# libgdal-dev and build-essential are often needed for compiling wheels or specific C-extensions
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libgdal-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first to leverage Docker cache
+COPY requirements.txt .
+
+# Install Python dependencies globally in the container
+# We don't need a venv here because the container IS the environment
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Create a non-root user for security
+RUN useradd -m -u 1000 appuser
+
+# Create necessary directories and set permissions
+# These must exist and be writable by the appuser
+RUN mkdir -p /app/logs /app/models /app/data /app/outputs && \
+    chown -R appuser:appuser /app
+
+# Copy the rest of the application code
+COPY --chown=appuser:appuser . .
+
+# Switch to non-root user
 USER appuser
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:5000/health || exit 1
-
-# Expor porta
+# Expose the Flask port
 EXPOSE 5000
 
-# Comando de inicialização
+# Healthcheck to ensure the service is running
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:5000/api/model-update-status || exit 1
+
+# Start the application
+# We use python app.py directly because the app logic (loading models)
+# is currently tied to the __main__ block in app.py
 CMD ["python", "app.py"]

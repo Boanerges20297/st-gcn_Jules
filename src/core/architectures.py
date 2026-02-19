@@ -28,6 +28,7 @@ class FastRelationalGCN(nn.Module):
     """
     GCN RELACIONAL: Diferencia vizinhança física de alianças de facções.
     Calcula a propagação do risco separadamente para Geo e Conflito.
+    Suporta Intel-Bias para priorização de nós críticos (ex: L.B. em facção).
     """
     def __init__(self, in_features, out_features, dropout=0.4):
         super().__init__()

@@ -91,9 +91,10 @@ class StateOrchestrator:
                     print(f"❌ Erro ao carregar {region}: {e}")
 
     # --- DEBUG: MOTOR DE INFERÊNCIA COMBINADA ---
-    def get_combined_risk(self, exogenous_shocks=None):
+    def get_combined_risk(self, exogenous_shocks=None, return_trends=False):
         """Calcula o risco para as 299 localidades em uma única chamada."""
         combined_scores = {}
+        trends = {}
         
         for region, spec in self.specialists.items():
             model, data, window = spec['model'], spec['data'], spec['window']
@@ -101,6 +102,23 @@ class StateOrchestrator:
             # Prepara tensor de entrada (Últimos dias da base)
             x_raw = data['node_features'][:, -window:, :].copy()
             
+            # --- NOVO: CÁLCULO DE TAG-BIAS (Trigger Alert Graph Bias) ---
+            # Identifica gatilhos (L.B. em Facção) nos últimos 3 dias
+            spatial_bias = self._compute_spatial_bias(x_raw, data['adj_geo'])
+            
+            # Cálculo de Tendência Real (Se solicitado)
+            if return_trends:
+                # CVLI é o canal 0. Comparamos última semana vs penúltima
+                last_7 = data['node_features'][:, -7:, 0].sum(axis=1)
+                prev_7 = data['node_features'][:, -14:-7, 0].sum(axis=1)
+                for i, row in data['nodes_gdf'].iterrows():
+                    name_norm = normalize_name(row['name'])
+                    diff = last_7[i] - prev_7[i]
+                    # Valor da tendência: positive (subindo), negative (descendo), neutral (igual)
+                    if diff > 0: trends[name_norm] = 'up'
+                    elif diff < 0: trends[name_norm] = 'down'
+                    else: trends[name_norm] = 'stable'
+
             # --- DEBUG: INJEÇÃO DE EVENTOS DINÂMICOS (Canais 23, 24 e 25) ---
             if exogenous_shocks:
                 # Esperamos exogenous_shocks = {'NOME': {'intensity': 1.0, 'is_critical': True, 'is_suppression': False}}
@@ -132,11 +150,17 @@ class StateOrchestrator:
             adj = self._norm_adj(data['adj_geo'], data['adj_conflict'])
             
             with torch.no_grad():
+                # Inferência Pura (Sem bias interno)
                 out = model(x, adj).squeeze().cpu().numpy()
             
             # --- CORREÇÃO: NORMALIZAÇÃO ROBUSTA E AMORTECIMENTO (DAMPENING) ---
             # --- NORMALIZAÇÃO REFINADA (SENSÍVEL A CONSISTÊNCIA) ---
             if len(out) > 1:
+                # INJEÇÃO PÓS-MODELO (ADITIVA) DO TAG-BIAS
+                # O bias agora é somado diretamente aos logits, garantindo impacto linear
+                if spatial_bias is not None:
+                     out = out + spatial_bias
+
                 # Em vez de Z-Score puro (que depende de vizinhos), usamos uma escala logística
                 # Onde o valor 0.5 (50%) é ancorado em uma atividade moderada constante.
                 # Isso impede que 9 mortes/mês virem "Risco 7".
@@ -172,7 +196,34 @@ class StateOrchestrator:
                 else:
                     combined_scores[name_key] = float(out_norm[i])
                 
+        if return_trends:
+            return combined_scores, trends
         return combined_scores
+
+    def _compute_spatial_bias(self, x_raw, adj_geo):
+        """
+        Calcula o TAG-Bias (Trigger Alert Graph Bias) como um VETOR ADITIVO.
+        Retorna: array de shape (N,) com valores a serem somados aos logits.
+        """
+        num_nodes = x_raw.shape[0]
+        bias_vector = np.zeros(num_nodes)
+        
+        # Canal 27: INTEL_TRIGGER (LB, Disparos) | Canal 2: TENSION (Facções)
+        # Analisamos os últimos 7 dias (semana ativa de risco) para disparar o alerta
+        recent_intel = x_raw[:, -7:, 27].sum(axis=1)
+        tension = x_raw[:, -1, 2]
+        
+        for i in range(num_nodes):
+            if recent_intel[i] > 0 and tension[i] > 0.5:
+                # GATILHO: Incidente crítico em zona de facção
+                # Boost Direto no Logit (+1.5 move 50% -> ~80%)
+                bias_vector[i] += 1.5
+                
+                # Vazamento para vizinhos (+0.5 move 50% -> ~62%)
+                neighbors = np.where(adj_geo[i] > 0)[0]
+                bias_vector[neighbors] += 0.5
+                    
+        return bias_vector
 
     # --- DEBUG: NORMALIZAÇÃO DE MATRIZES DE ADJACÊNCIA ---
     def _norm_adj(self, geo, conf):

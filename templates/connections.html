@@ -3,720 +3,771 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa de Influência - Análise de Redes Criminosas</title>
+    <title>Dashboard Estratégico de Decisão | ST-GAT Report</title>
     
-    <!-- Cytoscape.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
-    <!-- Bootstrap -->
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            overflow: hidden;
-            height: 100vh;
+        :root {
+            --primary: #0d6efd;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
         }
-        
-        #cy {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(15,12,41,0.9), rgba(48,43,99,0.9));
-            position: relative;
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: #f1f5f9;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
         }
-        
-        /* ========== OVERLAY UI ========== */
-        .overlay-container {
+
+        /* --- LOADER MODERNO --- */
+        .loading-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            pointer-events: none;
-            z-index: 10;
-        }
-        
-        .panel {
-            position: absolute;
-            background: rgba(20, 20, 40, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(100, 149, 237, 0.3);
-            border-radius: 12px;
-            padding: 20px;
-            color: #e0e0e0;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            pointer-events: auto;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        
-        /* ========== HEADER ========== */
-        #header-panel {
-            top: 15px;
-            left: 15px;
-            max-width: 450px;
-            z-index: 20;
-        }
-        
-        .panel h2 {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 5px;
-            background: linear-gradient(135deg, #6495ED, #87CEEB);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .panel .subtitle {
-            font-size: 12px;
-            color: #999;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(100, 149, 237, 0.5), transparent);
-            margin: 12px 0;
-        }
-        
-        .stat-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 8px 0;
-        }
-        
-        .stat-box {
-            background: rgba(100, 149, 237, 0.1);
-            border: 1px solid rgba(100, 149, 237, 0.2);
-            border-radius: 6px;
-            padding: 10px;
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #6495ED;
-        }
-        
-        .stat-label {
-            font-size: 11px;
-            color: #999;
-            text-transform: uppercase;
-            margin-top: 4px;
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-        
-        .btn-custom {
-            flex: 1;
-            padding: 8px 12px;
-            background: rgba(100, 149, 237, 0.2);
-            border: 1px solid rgba(100, 149, 237, 0.4);
-            color: #6495ED;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.3s;
-            text-align: center;
-        }
-        
-        .btn-custom:hover {
-            background: rgba(100, 149, 237, 0.4);
-            border-color: rgba(100, 149, 237, 0.6);
-        }
-        
-        /* ========== FILTERS ========== */
-        #filter-panel {
-            top: 15px;
-            right: 15px;
-            width: 280px;
-            max-height: 400px;
-        }
-        
-        .filter-group {
-            margin-bottom: 12px;
-        }
-        
-        .filter-group label {
-            display: block;
-            font-size: 11px;
-            color: #999;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-            font-weight: 600;
-        }
-        
-        select, input {
-            width: 100%;
-            padding: 8px 10px;
-            background: rgba(60, 60, 100, 0.5);
-            border: 1px solid rgba(100, 149, 237, 0.3);
-            border-radius: 4px;
-            color: #e0e0e0;
-            font-size: 12px;
-        }
-        
-        select:focus, input:focus {
-            outline: none;
-            border-color: #6495ED;
-            background: rgba(60, 60, 100, 0.8);
-        }
-        
-        .checkbox-group {
-            display: flex;
-            gap: 8px;
-            margin: 8px 0;
-            flex-wrap: wrap;
-        }
-        
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-        }
-        
-        .checkbox-item input {
-            width: auto;
-            cursor: pointer;
-        }
-        
-        /* ========== DETAILS PANEL ========== */
-        #details-panel {
-            bottom: 15px;
-            right: 15px;
-            width: 320px;
-            max-height: 300px;
-            display: none;
-        }
-        
-        .node-tag {
-            display: inline-block;
-            padding: 4px 10px;
-            background: rgba(255, 69, 0, 0.2);
-            border: 1px solid rgba(255, 69, 0, 0.4);
-            border-radius: 4px;
-            font-size: 11px;
-            color: #FF6B4A;
-            margin: 4px 4px 4px 0;
-        }
-        
-        .influence-item {
-            margin: 6px 0;
-            padding: 6px;
-            background: rgba(100, 149, 237, 0.1);
-            border-left: 3px solid #6495ED;
-            border-radius: 3px;
-            font-size: 12px;
-        }
-        
-        .influence-strength {
-            font-weight: bold;
-            color: #6495ED;
-        }
-        
-        .legend-section {
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(100, 149, 237, 0.2);
-            font-size: 11px;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 5px 0;
-        }
-        
-        .legend-color {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        
-        .legend-arrow {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 5px 0;
-        }
-        
-        .arrow {
-            flex-shrink: 0;
-            font-weight: bold;
-        }
-        
-        .arrow.weak { color: #6c757d; font-size: 14px; }
-        .arrow.medium { color: #FFC107; font-size: 16px; }
-        .arrow.strong { color: #FF6B4A; font-size: 18px; }
-        
-        /* ========== SCROLLBAR ========== */
-        .panel::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .panel::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        
-        .panel::-webkit-scrollbar-thumb {
-            background: rgba(100, 149, 237, 0.4);
-            border-radius: 3px;
-        }
-        
-        .panel::-webkit-scrollbar-thumb:hover {
-            background: rgba(100, 149, 237, 0.6);
-        }
-        
-        /* ========== LOADING ========== */
-        #loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--dark-bg);
+            z-index: 9999;
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
+        }
+
+        .loader-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            padding: 2.5rem;
+            border-radius: 20px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .progress-container {
+            height: 6px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #0d6efd, #60a5fa);
+            box-shadow: 0 0 15px rgba(13, 110, 253, 0.5);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        .loader-status {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .loader-msg {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* --- OVERLAY DE FILTRO (LEVE) --- */
+        .filter-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
             z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: flex-start; /* Alinha no topo */
+            padding-top: 150px;      /* Distância para ficar na altura do ranking */
+            border-radius: 16px;
         }
-        
-        .spinner {
-            border: 4px solid rgba(100, 149, 237, 0.2);
-            border-top: 4px solid #6495ED;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
+
+        .filter-loader-content {
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            border: 1px solid var(--primary);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        .dashboard-header {
+            background-color: var(--card-bg);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(90deg, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-title p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* --- ESTILO CUSTOM POPOVER --- */
+        .popover {
+            background-color: #0f1724; /* slightly darker for contrast */
+            border: 1px solid rgba(13,110,253,0.15);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            max-width: 360px;
+            color: #e6f0fb; /* default text color inside popover */
+        }
+
+        .popover-header {
+            background-color: var(--primary);
+            color: #ffffff;
+            font-weight: 700;
+            border-bottom: none;
+            padding: 0.55rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .popover-body {
+            color: #e6eef6; /* light text for readability */
+            padding: 1rem;
+            line-height: 1.45;
+        }
+
+        /* Ensure muted and small text inside popovers remains readable */
+        .popover .text-muted,
+        .popover .text-white-50,
+        .popover small,
+        .popover .small {
+            color: #98a9bf !important;
+        }
+
+        .popover .text-primary,
+        .popover .text-info,
+        .popover .text-warning {
+            color: var(--primary) !important;
+        }
+
+        .popover-body b {
+            color: #ffffff;
+        }
+
+        .main-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative; /* Necessário para o overlay absoluto */
+        }
+
+        /* --- CARDS DE RESUMO --- */
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .icon-blue { background: rgba(13, 110, 253, 0.2); color: #0d6efd; }
+        .icon-red { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .icon-yellow { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .icon-green { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        /* --- TABELAS E SEÇÕES --- */
+        .section-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .table {
+            color: #f1f5f9;
+            margin-bottom: 0;
+        }
+
+        .table th {
+            background-color: rgba(255, 255, 255, 0.02);
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table td {
+            padding: 1rem 1.5rem;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .risk-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+
+        .risk-high { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .risk-medium { background-color: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .risk-low { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+        .trend-up { color: var(--danger); }
+        .trend-down { color: var(--success); }
+
+        /* --- SIDEBAR RECENT EVENTS --- */
+        .event-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+
+        .event-item:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .event-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .event-title {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .event-desc {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .faction-tag {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        /* --- FILTROS --- */
+        .filter-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--dark-bg);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        @media (max-width: 992px) {
+            .main-container { padding: 1rem; }
+            .header-title h1 { font-size: 1.25rem; }
         }
     </style>
 </head>
 <body>
-    <div id="cy"></div>
-    
-    <div class="overlay-container">
-        <!-- Header & Controls -->
-        <div id="header-panel" class="panel">
-            <h2><i class="fas fa-project-diagram"></i> Mapa de Influência</h2>
-            <div class="subtitle"><i class="fas fa-info-circle"></i> Análise de Redes Criminosas - Fortaleza</div>
-            
-            <div class="stat-row">
-                <div class="stat-box">
-                    <div class="stat-value" id="node-count">0</div>
-                    <div class="stat-label">Áreas</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" id="edge-count">0</div>
-                    <div class="stat-label">Ligações</div>
-                </div>
+
+    <div id="loader" class="loading-overlay">
+        <div class="loader-card">
+            <div class="loader-status" id="load-step">Inicializando</div>
+            <div class="progress-container">
+                <div class="progress-bar-fill" id="load-progress"></div>
             </div>
-            
-            <div class="divider"></div>
-            
-            <div style="font-size: 12px; color: #bbb; margin-bottom: 12px;">
-                <strong>Modo de Análise:</strong><br>
-                📍 <strong>Apenas Alto (80-89%) e Crítico (≥90%)</strong><br>
-                🔗 <strong>Com conexões significativas (&gt;5%)</strong><br>
-                ➜ <strong>Independente de ranking ou limite</strong><br>
-                🎨 <strong>Cores:</strong> Facções criminosas<br>
-                ⚡ <strong>Espessura:</strong> Força da influência
-            </div>
-            
-            <div class="button-group">
-                <button class="btn-custom" onclick="zoomToFit()"><i class="fas fa-compress"></i> Ajustar</button>
-                <button class="btn-custom" onclick="reorganizeLayout()"><i class="fas fa-sync"></i> Reorganizar</button>
-                <button class="btn-custom" onclick="window.location.href='/'"><i class="fas fa-arrow-left"></i> Voltar</button>
-            </div>
-        </div>
-        
-        <!-- Filters -->
-        <div id="filter-panel" class="panel">
-            <h5 style="margin-bottom: 12px; color: #6495ED;"><i class="fas fa-sliders-h"></i> Filtros</h5>
-            
-            <div class="filter-group">
-                <label>Região</label>
-                <select id="region-filter" onchange="loadGraph()">
-                    <option value="all">Todas as Regiões</option>
-                    <option value="fortaleza" selected>Fortaleza</option>
-                    <option value="rmf">RMF</option>
-                    <option value="interior">Interior</option>
-                </select>
-            </div>
-            
-            <div style="background: rgba(100, 149, 237, 0.15); padding: 10px; border-radius: 6px; margin: 12px 0; border-left: 3px solid #6495ED;">
-                <div style="font-size: 11px; color: #999; margin-bottom: 6px;">
-                    <strong>📊 Modo:</strong>
-                </div>
-                <div style="font-size: 12px; color: #e0e0e0; line-height: 1.6;">
-                    ✓ Apenas Alto (80-89%) e Crítico (≥90%)<br>
-                    ✓ Com conexões significativas (&gt;5%)<br>
-                    ✓ Independente de ranking
-                </div>
-            </div>
-            
-            <div class="divider"></div>
-            
-            <button class="btn-custom" id="apply-filters-btn" style="width: 100%; margin-top: 10px;" onclick="applyFilters()">
-                <i class="fas fa-check"></i> Aplicar Filtros
-            </button>
-            
-            <div class="legend-section">
-                <strong style="color: #6495ED; display: block; margin-bottom: 8px;">Legenda de Influência</strong>
-                
-                <div style="font-size: 10px; color: #999; margin-bottom: 8px;">
-                    ⚠️ Apenas conexões significativas (&gt;5%) são exibidas
-                </div>
-                
-                <div class="legend-arrow">
-                    <span class="arrow weak">→</span>
-                    <span>Moderada (20-30%)</span>
-                </div>
-                <div class="legend-arrow">
-                    <span class="arrow medium">⟹</span>
-                    <span>Forte (30-70%)</span>
-                </div>
-                <div class="legend-arrow">
-                    <span class="arrow strong">⟹⟹</span>
-                    <span>Muito Forte (&gt;70%)</span>
-                </div>
-                
-                <div style="margin-top: 10px;">
-                    <strong style="color: #6495ED; display: block; margin-bottom: 6px;">Nível de Risco</strong>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: #8B0000;"></div>
-                        <span>Crítico (≥90%)</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: #FF8C00;"></div>
-                        <span>Alto (80-89%)</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Node Details -->
-        <div id="details-panel" class="panel">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
-                <div>
-                    <h5 id="d-name" style="margin: 0; color: #6495ED;">Nome da Área</h5>
-                    <span class="node-tag" id="d-faction">Facção</span>
-                </div>
-                <button onclick="document.getElementById('details-panel').style.display='none'" style="background: none; border: none; color: #999; cursor: pointer; font-size: 18px;">✕</button>
-            </div>
-            
-            <div style="background: rgba(255, 69, 0, 0.15); padding: 8px; border-radius: 4px; margin-bottom: 10px;">
-                <div style="font-size: 12px; color: #999;">Nível de Risco</div>
-                <div style="font-size: 20px; font-weight: bold; color: #FF6B4A;" id="d-risk">0%</div>
-            </div>
-            
-            <div style="margin-bottom: 10px;">
-                <strong style="color: #6495ED; display: block; font-size: 12px; margin-bottom: 6px;">📥 Influências Recebidas:</strong>
-                <div id="d-incoming" style="font-size: 11px;">Nenhuma</div>
-            </div>
-            
-            <div style="margin-bottom: 10px;">
-                <strong style="color: #6495ED; display: block; font-size: 12px; margin-bottom: 6px;">📤 Influencia:</strong>
-                <div id="d-outgoing" style="font-size: 11px;">Nenhuma</div>
-            </div>
-            
-            <div style="font-size: 11px; color: #999; border-top: 1px solid rgba(100, 149, 237, 0.2); padding-top: 8px;">
-                <strong style="color: #6495ED;">🎯 Fatores de Risco:</strong>
-                <ul id="d-factors" style="margin: 6px 0 0 16px; padding: 0;">
-                    <li>Sem informações</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    
-    <div id="loading">
-        <div style="text-align: center; color: #6495ED;">
-            <div class="spinner"></div>
-            <div style="margin-top: 20px; font-size: 14px;">Carregando rede de influência...</div>
+            <div class="loader-msg" id="load-msg">Conectando aos especialistas regionais...</div>
         </div>
     </div>
 
+    <header class="dashboard-header">
+        <div class="header-title">
+            <h1>Dashboard Estratégico de Decisão</h1>
+            <p>Análise de Risco Geoprocessado e Dinâmicas Criminosas</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-outline-light btn-sm me-2" onclick="forceReload()">
+                <i class="fas fa-sync-alt"></i> Atualizar
+            </button>
+            <a href="/" class="btn btn-primary btn-sm">
+                <i class="fas fa-map"></i> Voltar ao Mapa
+            </a>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Overlay de Carregamento de Filtro -->
+        <div id="filter-loader" class="filter-overlay">
+            <div class="filter-loader-content">
+                <div class="spinner-border spinner-border-sm text-primary"></div>
+                <span class="fw-600 text-white" style="font-size: 0.9rem;">Consultando Especialista...</span>
+            </div>
+        </div>
+
+        <!-- Cards de Resumo -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon icon-red">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-value" id="count-critical">--</div>
+                    <div class="stat-label">Áreas Críticas (≥90%)</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon icon-yellow">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="stat-value" id="count-high">--</div>
+                    <div class="stat-label">Áreas de Alto Risco (80-89%)</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon icon-blue">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <div class="stat-value" id="p10-global">--%</div>
+                    <div class="stat-label">Eficiência Global P10</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon icon-green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value" id="active-events">--</div>
+                    <div class="stat-label">Eventos Ativos (7d)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Coluna Principal: Ranking -->
+            <div class="col-lg-8">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-list-ol text-primary"></i> 
+                            Ranking de Prioridade Operacional (Top 15)
+                        </h2>
+                        <div class="d-flex gap-2">
+                            <button class="filter-btn active" data-region="fortaleza">Capital</button>
+                            <button class="filter-btn" data-region="rmf">RMF</button>
+                            <button class="filter-btn" data-region="interior">Interior</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table" id="ranking-table">
+                            <thead>
+                                <tr>
+                                    <th>Pos</th>
+                                    <th>Localidade</th>
+                                    <th>Região</th>
+                                    <th>Score de Risco</th>
+                                    <th>Tendência</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Preenchido via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna Lateral: Feed de Eventos -->
+            <div class="col-lg-4">
+                <div class="section-card h-100">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-rss text-danger"></i> 
+                            Inteligência de Eventos Críticos
+                        </h2>
+                    </div>
+                    <div id="events-feed" style="max-height: 600px; overflow-y: auto;">
+                        <!-- Preenchido via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let cy = null;
-        let graphData = null;
-        let allNodes = [];
-        let allEdges = [];
-        
-        const factionColors = {
-            'CV': '#FF6B6B', 'TCC': '#4ECDC4', 'PCC': '#95E1D3', 
-            'ADA': '#F38181', 'TCP': '#AA96DA', 'Outro': '#FCBAD3',
-            'N/A': '#6c757d'
+        let currentRegion = 'fortaleza';
+        const dataCache = {
+            'fortaleza': null,
+            'rmf': null,
+            'interior': null
         };
-        
-        function getRiskColor(risk) {
-            if (risk >= 90) return '#8B0000';
-            if (risk >= 80) return '#FF8C00';
-            if (risk >= 50) return '#FFC107';
-            return '#6495ED';
-        }
-        
-        async function loadGraph() {
+
+        let isInitialLoad = true;
+
+        async function initDashboard(forceRefresh = false) {
+            // Se já temos dados em cache e não for um refresh forçado, renderiza instantaneamente
+            if (dataCache[currentRegion] && !forceRefresh) {
+                const cached = dataCache[currentRegion];
+                updateSummaryCards(cached.riskData, cached.eff);
+                updateManagerView(cached.riskData.meta.manager_view);
+                renderRankingTable(cached.riskData.data);
+                return;
+            }
+
+            // Define qual loader usar
+            if (isInitialLoad) {
+                $('#loader').fadeIn(200);
+            } else {
+                $('#filter-loader').css('display', 'flex').hide().fadeIn(200);
+            }
+            
+            const updateLoad = (pct, step, msg) => {
+                if (isInitialLoad) {
+                    $('#load-progress').css('width', pct + '%');
+                    $('#load-step').text(step);
+                    $('#load-msg').text(msg);
+                }
+            };
+
             try {
-                // Show loading
-                document.getElementById('loading').style.display = 'flex';
-                
-                const params = new URLSearchParams();
-                const region = document.getElementById('region-filter').value;
-                if (region !== 'all') params.set('region', region);
-                
-                const response = await fetch('/api/network-graph?' + params.toString());
-                graphData = await response.json();
-                
-                document.getElementById('node-count').textContent = graphData.nodes.length;
-                document.getElementById('edge-count').textContent = graphData.links.length;
-                
-                initCytoscape();
-                document.getElementById('loading').style.display = 'none';
-            } catch (err) {
-                console.error('Erro ao carregar grafo:', err);
-                document.getElementById('loading').innerHTML = '<div style="color: #ff6b6b;">Erro ao carregar dados</div>';
-            }
-        }
-        
-        function initCytoscape() {
-            // Destroy previous instance if exists
-            if (cy) {
-                cy.destroy();
-            }
-            
-            const elements = [
-                ...graphData.nodes.map(n => ({
-                    data: {
-                        id: n.id,
-                        label: n.name,
-                        risk: n.risk,
-                        faction: n.faction,
-                        reasons: n.reasons
-                    }
-                })),
-                ...graphData.links.map(l => ({
-                    data: {
-                        id: `${l.source}-${l.target}`,
-                        source: l.source,
-                        target: l.target,
-                        weight: l.weight
-                    }
-                }))
-            ];
-            
-            cy = cytoscape({
-                container: document.getElementById('cy'),
-                elements: elements,
-                style: [
-                    {
-                        selector: 'node',
-                        style: {
-                            'content': 'data(label)',
-                            'text-valign': 'center',
-                            'text-halign': 'center',
-                            'background-color': n => factionColors[n.data('faction')] || factionColors['N/A'],
-                            'border-width': 3,
-                            'border-color': n => getRiskColor(n.data('risk')),
-                            'width': n => Math.max(30, 25 + (n.data('risk') / 4)),
-                            'height': n => Math.max(30, 25 + (n.data('risk') / 4)),
-                            'font-size': 10,
-                            'color': '#fff',
-                            'text-outline-width': 2,
-                            'text-outline-color': '#000',
-                            'z-index': n => n.data('risk')
-                        }
-                    },
-                    {
-                        selector: 'node:selected',
-                        style: {
-                            'border-width': 5,
-                            'border-color': '#6495ED'
-                        }
-                    },
-                    {
-                        selector: 'edge',
-                        style: {
-                            'target-arrow-shape': 'triangle',
-                            'target-arrow-color': e => e.data('weight') > 0.7 ? '#FF6B4A' : e.data('weight') > 0.3 ? '#FFC107' : '#6c757d',
-                            'line-color': e => e.data('weight') > 0.7 ? '#FF6B4A' : e.data('weight') > 0.3 ? '#FFC107' : '#6c757d',
-                            'width': e => Math.max(2, e.data('weight') * 5),
-                            'arrow-scale': 1.3,
-                            'opacity': e => 0.7 + (e.data('weight') * 0.3),
-                            'curve-style': 'bezier'
-                        }
-                    },
-                    {
-                        selector: 'edge:selected',
-                        style: {
-                            'opacity': 1,
-                            'width': e => Math.max(3, e.data('weight') * 5),
-                            'line-color': '#6495ED',
-                            'target-arrow-color': '#6495ED'
-                        }
-                    }
-                ],
-                layout: {
-                    name: 'cose',
-                    directed: true,
-                    fit: true,
-                    padding: 80,
-                    nodeOverlap: 20,
-                    nodeRepulsion: 8000,
-                    idealEdgeLength: 100,
-                    edgeElasticity: 100,
-                    nestingFactor: 5,
-                    gravity: 80,
-                    numIter: 1000,
-                    initialTemp: 200,
-                    coolingFactor: 0.95,
-                    minTemp: 1.0,
-                    animate: true,
-                    animationDuration: 500
+                if (isInitialLoad) {
+                    updateLoad(20, 'Sincronização', 'Recuperando matrizes de adjacência regional...');
+                    await new Promise(r => setTimeout(r, 300));
                 }
-            });
-            
-            // Hover effects via JavaScript
-            cy.on('mouseover', 'node', (evt) => {
-                evt.target.style('border-width', 5);
-                evt.target.style('border-color', '#FFD700');
-            });
-            
-            cy.on('mouseout', 'node', (evt) => {
-                evt.target.style('border-width', 3);
-                evt.target.style('border-color', n => getRiskColor(n.data('risk')));
-            });
-            
-            cy.on('mouseover', 'edge', (evt) => {
-                evt.target.style('opacity', 1);
-                evt.target.style('width', e => Math.max(3, e.data('weight') * 6));
-            });
-            
-            cy.on('mouseout', 'edge', (evt) => {
-                evt.target.style('opacity', e => 0.7 + (e.data('weight') * 0.3));
-                evt.target.style('width', e => Math.max(2, e.data('weight') * 5));
-            });
-            
-            // Node click
-            cy.on('tap', 'node', (evt) => {
-                const node = evt.target;
-                showNodeDetails(node);
-            });
-            
-            // Background click
-            cy.on('tap', (evt) => {
-                if (evt.target === cy) {
-                    document.getElementById('details-panel').style.display = 'none';
+                
+                updateLoad(45, 'Inteligência', 'Executando inferência ST-GAT em tempo real...');
+                const riskResp = await fetch(`/api/risk?region=${currentRegion}`);
+                const riskData = await riskResp.json();
+                
+                updateLoad(70, 'Consolidação', 'Cruzando indicadores exógenos e facções...');
+                const meta = riskData.meta || {};
+                const eff = meta.efficiency_metrics || {};
+
+                // Salvar no Cache
+                dataCache[currentRegion] = { riskData, eff };
+
+                updateLoad(90, 'Renderização', 'Gerando ranking de prioridade operacional...');
+                updateSummaryCards(riskData, eff);
+                updateManagerView(meta.manager_view);
+                renderRankingTable(riskData.data);
+                
+                if (forceRefresh || !$('#events-feed').children().length) {
+                    loadEventsFeed();
                 }
-            });
-        }
-        
-        function showNodeDetails(node) {
-            const nodeData = node.data();
-            document.getElementById('d-name').textContent = nodeData.label;
-            document.getElementById('d-faction').textContent = nodeData.faction || 'N/A';
-            document.getElementById('d-risk').textContent = nodeData.risk.toFixed(1) + '%';
-            
-            // Incoming edges
-            const incoming = node.incomers().edges().filter(e => e.isEdge());
-            const incomingHTML = incoming.length > 0 
-                ? incoming.map(e => {
-                    const source = e.source();
-                    const weight = e.data('weight');
-                    return `<div class="influence-item">← <strong>${source.data('label')}</strong><br><span class="influence-strength">${(weight*100).toFixed(0)}%</span></div>`;
-                }).join('')
-                : '<div style="color: #999; font-size: 11px;">Nenhuma</div>';
-            document.getElementById('d-incoming').innerHTML = incomingHTML;
-            
-            // Outgoing edges
-            const outgoing = node.outgoers().edges().filter(e => e.isEdge());
-            const outgoingHTML = outgoing.length > 0
-                ? outgoing.map(e => {
-                    const target = e.target();
-                    const weight = e.data('weight');
-                    return `<div class="influence-item">→ <strong>${target.data('label')}</strong><br><span class="influence-strength">${(weight*100).toFixed(0)}%</span></div>`;
-                }).join('')
-                : '<div style="color: #999; font-size: 11px;">Nenhuma</div>';
-            document.getElementById('d-outgoing').innerHTML = outgoingHTML;
-            
-            // Factors
-            const factorsHTML = nodeData.reasons && nodeData.reasons.length
-                ? nodeData.reasons.map(r => `<li>${r}</li>`).join('')
-                : '<li>Sem informações</li>';
-            document.getElementById('d-factors').innerHTML = factorsHTML;
-            
-            document.getElementById('details-panel').style.display = 'block';
-        }
-        
-        function zoomToFit() {
-            if (cy) cy.fit({ padding: 80 });
-        }
-        
-        function reorganizeLayout() {
-            if (cy) {
-                cy.layout({
-                    name: 'cose',
-                    directed: true,
-                    fit: true,
-                    padding: 80,
-                    randomize: true,
-                    animate: true,
-                    animationDuration: 500
-                }).run();
+
+                if (isInitialLoad) {
+                    updateLoad(100, 'Pronto', 'Dashboard estratégico consolidado.');
+                    await new Promise(r => setTimeout(r, 300));
+                    $('#loader').fadeOut(600);
+                    isInitialLoad = false;
+                } else {
+                    $('#filter-loader').fadeOut(400);
+                }
+            } catch (e) {
+                console.error("Erro crítico na inicialização:", e);
+                if (isInitialLoad) {
+                    $('#load-step').text('Erro Crítico');
+                    $('#load-msg').text('Falha na comunicação com o servidor de IA.');
+                    $('#load-progress').css('background', 'var(--danger)');
+                } else {
+                    $('#filter-loader').fadeOut();
+                    alert("Falha ao carregar região selecionada.");
+                }
             }
         }
-        
-        function applyFilters() {
-            // Simply reorganize the layout when button is clicked
-            reorganizeLayout();
+
+        // Função para o botão de Refresh Manual
+        function forceReload() {
+            // Limpa o cache
+            dataCache['fortaleza'] = null;
+            dataCache['rmf'] = null;
+            dataCache['interior'] = null;
+            initDashboard(true);
         }
-        
-        // Event listeners
-        document.getElementById('apply-filters-btn').addEventListener('click', function() {
-            const btn = this;
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reorganizando...';
-            btn.disabled = true;
+
+        function updateSummaryCards(riskData, eff) {
+            const data = riskData.data;
+            const critical = data.filter(n => n.risk_score >= 90).length;
+            const high = data.filter(n => n.risk_score >= 80 && n.risk_score < 90).length;
             
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fas fa-check"></i> Layout Reorganizado!';
-                btn.style.background = 'rgba(30, 255, 0, 0.2)';
-                btn.style.borderColor = 'rgba(30, 255, 0, 0.4)';
+            $('#count-critical').text(critical);
+            $('#count-high').text(high);
+            
+            const p10 = eff.global ? (eff.global.p10 * 100).toFixed(1) + '%' : 'N/A';
+            $('#p10-global').text(p10);
+            
+            const activeEvents = eff.global ? eff.global.total_events : 0;
+            $('#active-events').text(activeEvents);
+        }
+
+        function updateManagerView(manager) {
+            if (!manager) return;
+            
+            // Inserir Temperatura do Estado no Header de forma discreta mas visível
+            const tempHtml = `
+                <div class="d-flex align-items-center gap-3 ms-4 border-start ps-4 border-secondary">
+                    <div>
+                        <div class="stat-label">Clima de Segurança</div>
+                        <div class="fw-bold" style="color: ${manager.state_temperature_color}">${manager.state_temperature_label} (${manager.state_temperature_pct}%)</div>
+                    </div>
+                    <div>
+                        <div class="stat-label">Confiança</div>
+                        <div class="fw-bold text-white">${manager.confidence_label} (${manager.confidence_pct}%)</div>
+                    </div>
+                </div>
+            `;
+            
+            // Se já existir, remove para não duplicar no reload
+            $('.manager-indicator').remove();
+            const indicator = $('<div class="manager-indicator d-flex"></div>').append(tempHtml);
+            $('.header-title').after(indicator);
+        }
+
+        function renderRankingTable(nodes) {
+            const tbody = $('#ranking-table tbody');
+            tbody.empty();
+
+            // Ordenação rigorosa por score
+            const sorted = nodes.sort((a, b) => b.risk_score - a.risk_score).slice(0, 15);
+
+            sorted.forEach((node, index) => {
+                const score = node.risk_score;
+                const riskClass = score >= 90 ? 'risk-high' : (score >= 80 ? 'risk-medium' : 'risk-low');
                 
-                setTimeout(() => {
-                    btn.innerHTML = originalHTML;
-                    btn.disabled = false;
-                    btn.style.background = '';
-                    btn.style.borderColor = '';
-                }, 1000);
-            }, 300);
+                // Mapeamento de Tendência Real
+                let trendIcon = '<i class="fas fa-minus text-muted"></i>';
+                if (node.trend === 'up') trendIcon = '<i class="fas fa-arrow-up text-danger"></i>';
+                if (node.trend === 'down') trendIcon = '<i class="fas fa-arrow-down text-success"></i>';
+
+                // Mapeamento de Região
+                const regionMap = { 'fortaleza': 'Capital', 'rmf': 'RMF', 'interior': 'Interior' };
+                const regionLabel = regionMap[node.region_type] || 'Interior';
+
+                // --- CONSTRUÇÃO DO CONTEÚDO DO POPOVER (APENAS DADOS REAIS) ---
+                const m = node.metrics;
+                const evidenceHtml = `
+                    <div class='popover-content-wrapper'>
+                        <div class='mb-2 pb-2'>
+                            <div class='text-primary fw-bold small mb-2' style='letter-spacing: 0.5px;'>RELATÓRIO DE EVIDÊNCIAS:</div>
+                            <div class='d-flex justify-content-between mb-1'>
+                                <span class='small text-muted'>Crimes Violentos (7d):</span>
+                                <span class='small fw-bold'>${m.cvli_7d}</span>
+                            </div>
+                            <div class='d-flex justify-content-between mb-1'>
+                                <span class='small text-muted'>Índice de Tensão:</span>
+                                <span class='small fw-bold'>${m.tension}</span>
+                            </div>
+                            <div class='d-flex justify-content-between mb-1'>
+                                <span class='small text-muted'>Eventos Críticos:</span>
+                                <span class='small fw-bold'>${m.events_count}</span>
+                            </div>
+                            ${m.event_types.length ? `
+                            <div class='mt-2 pt-2 border-top border-secondary'>
+                                <div class='text-warning small fw-bold mb-1'>ALERTAS DETECTADOS:</div>
+                                <div class='small text-white-50'>${m.event_types.join(', ')}</div>
+                            </div>` : ''}
+                            <div class='mt-2 pt-2 border-top border-secondary'>
+                                <div class='text-info small fw-bold mb-1'>FACÇÃO PREDOMINANTE:</div>
+                                <div class='small text-white-50'>${node.faction}</div>
+                            </div>
+                        </div>
+                    </div>`;
+
+                // Título com botão de fechar explícito e estilizado
+                const popoverTitle = `
+                    <div class='d-flex justify-content-between align-items-center w-100'>
+                        <span style='font-size: 0.85rem;'>Justificativa: ${node.name}</span>
+                        <button type='button' class='btn-close btn-close-white' style='font-size: 0.95rem; padding: 0.05rem 0.35rem; color: #ffffff; background: transparent; border: 0; cursor: pointer;' onclick='closeAllPopovers()'>×</button>
+                    </div>`;
+                
+                const popoverAttr = `data-bs-container="body" data-bs-toggle="popover" data-bs-placement="left" data-bs-trigger="click" data-bs-html="true" data-bs-title="${popoverTitle.replace(/"/g, '&quot;')}" data-bs-content="${evidenceHtml.replace(/"/g, '&quot;')}"`;
+
+                const html = `
+                    <tr>
+                        <td class="fw-bold text-muted">#${index + 1}</td>
+                        <td>
+                            <div class="fw-semibold">${node.name}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted)">${node.faction}</div>
+                        </td>
+                        <td><span class="badge bg-dark border border-secondary">${regionLabel}</span></td>
+                        <td class="fw-bold">${score.toFixed(1)}%</td>
+                        <td class="text-center">${trendIcon}</td>
+                        <td><span class="risk-badge ${riskClass} btn-popover-trigger" ${popoverAttr} style="cursor:pointer;">${node.status_label}</span></td>
+                    </tr>
+                `;
+                tbody.append(html);
+            });
+
+            // Inicializar Popovers
+            const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            popoverTriggerList.map(function (popoverTriggerEl) {
+                popoverTriggerEl.addEventListener('click', function (e) {
+                    $('.btn-popover-trigger').not(this).popover('hide');
+                });
+                return new bootstrap.Popover(popoverTriggerEl);
+            });
+        }
+
+        async function loadEventsFeed() {
+            try {
+                // Endpoint que retorna os eventos brutos
+                const resp = await fetch('/api/exogenous-events'); 
+                const events = await resp.json();
+                
+                const feed = $('#events-feed');
+                feed.empty();
+
+                if (!events || events.length === 0) {
+                    feed.append('<div class="p-4 text-center text-muted">Nenhum evento crítico recente detectado.</div>');
+                    return;
+                }
+
+                // Mostrar últimos 20
+                events.slice(0, 20).forEach(ev => {
+                    const time = ev.timestamp || ev.date || '--:--';
+                    const nature = ev.natureza || 'Evento Exógeno';
+                    const severity = ev.conflict_severity === 'HIGH' ? 'text-danger' : 'text-warning';
+                    
+                    const html = `
+                        <div class="event-item">
+                            <div class="event-time"><i class="far fa-clock"></i> ${time}</div>
+                            <div class="event-title ${severity}">${nature}</div>
+                            <div class="event-desc">
+                                <strong>${ev.bairro || ev.municipio}:</strong> ${ev.resumo || ev.descricao}
+                            </div>
+                        </div>
+                    `;
+                    feed.append(html);
+                });
+            } catch (e) {
+                $('#events-feed').append('<div class="p-4 text-center text-danger">Falha ao carregar feed de inteligência.</div>');
+            }
+        }
+
+        // Filtros de Região
+        $('.filter-btn').click(function() {
+            $('.filter-btn').removeClass('active');
+            $(this).addClass('active');
+            currentRegion = $(this).data('region');
+            initDashboard();
         });
-        
-        // Initial load
-        loadGraph();
+
+        // Função global para fechar todos os popovers
+        function closeAllPopovers() {
+            $('.btn-popover-trigger').popover('hide');
+        }
+
+        // Fechar ao clicar fora
+        $(document).on('click', function (e) {
+            // Se o clique não for no badge e não for dentro de um popover
+            if (!$(e.target).closest('.btn-popover-trigger').length && !$(e.target).closest('.popover').length) {
+                closeAllPopovers();
+            }
+        });
+
+        $(document).ready(initDashboard);
     </script>
 </body>
 </html>

@@ -97,23 +97,51 @@ def build_feature_tensor(nodes_gdf, occurrences_df, start_date, end_date):
     name_to_idx = {normalize_text(name): i for i, name in enumerate(nodes_gdf['name'])}
     is_cvli = occurrences_df['tipo'].fillna('').astype(str).str.lower() == 'cvli'
     is_veiculo = occurrences_df['tipo_upper'].str.contains('ROUBO.*VEICULO|FURTO.*VEICULO|CARRO|MOTO', regex=True)
+    
+    # GATILHO DE INTELIGÊNCIA (Canal 27)
+    # Considera:
+    # 1. Palavras-chave de violência armada na descrição (LESÃO, TIRO, DISPARO)
+    # 2. Uso explícito de ARMA DE FOGO no campo 'arma'
+    has_keywords = occurrences_df['tipo_upper'].str.contains('LESAO.*BALA|ARMA.*FOGO|DISPARO|TIRO|INVASAO', regex=True)
+    has_firearm = occurrences_df['arma'].fillna('').astype(str).str.upper().str.contains('ARMA DE FOGO', regex=True)
+    is_intel_trigger = has_keywords | has_firearm
+    
     df_v = occurrences_df[(occurrences_df['data'] >= start_date) & (occurrences_df['data'] <= end_date)].copy()
     df_v['day_idx'] = (df_v['data'] - start_date).dt.days
+    
+    # Helper para normalizar nome do bairro da ocorrência igual ao do nó
+    def clean_occ_bairro(raw_name):
+        n = normalize_text(raw_name)
+        if not n: return None
+        if 'CONJUNTO CEARA' in n: n = 'CONJUNTO CEARA'
+        if 'PRAIA DO FUTURO' in n: n = 'PRAIA DO FUTURO'
+        if 'VILA MANOEL SATIRO' in n: n = 'MANOEL SATIRO'
+        n = re.sub(r'\s+[IVXLCDM]+$', '', n)
+        n = re.sub(r'\s+\d+$', '', n)
+        return n.strip()
+
     for _, row in df_v.iterrows():
-        n_idx = name_to_idx.get(normalize_text(row.get('bairro_geo') or row.get('municipio') or row.get('bairro')))
+        b_raw = row.get('bairro_geo') or row.get('municipio') or row.get('bairro')
+        b_clean = clean_occ_bairro(b_raw)
+        
+        n_idx = name_to_idx.get(b_clean)
+        
         if n_idx is not None:
             day = row['day_idx']
             if is_cvli.loc[row.name]: features[n_idx, day, 0] += 1
             if is_veiculo.loc[row.name]: features[n_idx, day, 1] += 1
+            if is_intel_trigger.loc[row.name]: features[n_idx, day, 27] += 1
+    
     for d_idx, date in enumerate(date_range):
         features[:, d_idx, 28] = features[:, d_idx, 0].sum()
         features[:, d_idx, 3 + date.weekday()] = 1.0
         features[:, d_idx, 10 + date.month - 1] = 1.0
         if date.weekday() >= 5: features[:, d_idx, 22] = 1.0
+    
     for n in range(num_nodes):
         features[n, :, 24] = pd.Series(features[n, :, 0]).rolling(window=7, min_periods=1).mean().values
+    
     features[:, :, 2] = nodes_gdf['tension_index'].values[:, np.newaxis]
-    features[:, :, 27] = 1.0 
     return features, date_range
 
 def save_regional_dataset(nodes_gdf, features, adj_geo, adj_conf, dates, region_name, output_path):
@@ -129,7 +157,7 @@ def save_regional_dataset(nodes_gdf, features, adj_geo, adj_conf, dates, region_
     data_pack = {
         'node_features': r_features, 'adj_geo': r_adj_geo, 'adj_conflict': r_adj_conf,
         'dates': dates, 'nodes_gdf': r_nodes,
-        'feature_names': ['CVLI', 'VEHICLE', 'TENSION', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC', 'WEEKEND', 'SUPPRESSION', 'NORMAL_SHOCK', 'CRITICAL_SHOCK', 'INCURSION', 'URBAN', 'CITY_PULSE']
+        'feature_names': ['CVLI', 'VEHICLE', 'TENSION', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC', 'WEEKEND', 'SUPPRESSION', 'NORMAL_SHOCK', 'CRITICAL_SHOCK', 'INCURSION', 'INTEL_TRIGGER', 'CITY_PULSE']
     }
     with open(output_path, 'wb') as f: pickle.dump(data_pack, f)
     print(f"✅ Dataset {region_name.upper()} gerado: {len(r_nodes)} nos.")

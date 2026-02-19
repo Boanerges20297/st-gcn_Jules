@@ -192,16 +192,32 @@ def archive_old_exogenous_events():
                 current_events.append(e)
 
         if old_events:
+            # Write archive files into a dedicated directory to avoid cluttering
+            archives_dir = os.path.join(BASE_DIR, 'data', 'archives')
+            os.makedirs(archives_dir, exist_ok=True)
+
             archive_filename = f"exogenous_events_{cutoff_date.isoformat()}.json"
-            archive_path = os.path.join(BASE_DIR, "data", archive_filename)
+            archive_path = os.path.join(archives_dir, archive_filename)
 
-            with open(archive_path, 'w', encoding='utf-8') as af:
-                json.dump(old_events, af, indent=2, ensure_ascii=False)
+            # Write atomically: write to a temp file then replace
+            try:
+                tmp_path = archive_path + '.tmp'
+                with open(tmp_path, 'w', encoding='utf-8') as af:
+                    json.dump(old_events, af, indent=2, ensure_ascii=False)
+                os.replace(tmp_path, archive_path)
+            except Exception as e:
+                print(f"⚠️ Erro ao gravar arquivo morto: {e}")
 
-            with open(exogenous_file, 'w', encoding='utf-8') as f:
-                json.dump(current_events, f, indent=2, ensure_ascii=False)
+            # Update canonical events file atomically as well
+            try:
+                tmp_main = exogenous_file + '.tmp'
+                with open(tmp_main, 'w', encoding='utf-8') as f:
+                    json.dump(current_events, f, indent=2, ensure_ascii=False)
+                os.replace(tmp_main, exogenous_file)
+            except Exception as e:
+                print(f"⚠️ Erro ao atualizar arquivo principal de eventos: {e}")
 
-            print(f"📦 Arquivo morto criado: {archive_filename} ({len(old_events)} eventos)")
+            print(f"📦 Arquivo morto criado: data/archives/{archive_filename} ({len(old_events)} eventos)")
             print(f"✅ Arquivo principal atualizado ({len(current_events)} eventos ativos)")
 
     except Exception as e:
@@ -309,6 +325,9 @@ def load_data_and_models():
 @app.route('/')
 def index(): return render_template('index.html')
 
+@app.route('/connections')
+def connections(): return render_template('connections.html')
+
 @app.route('/api/risk')
 def get_risk():
     if nodes_gdf is None or orchestrator is None:
@@ -318,7 +337,10 @@ def get_risk():
         exogenous_shocks = {}
         try:
             # Carregar de ambos os arquivos potenciais para garantir cobertura
-            exo_files = ['exogenous_events.json', 'exogenous_events_geocoded.json']
+            # Use only the canonical exogenous events file. Previously the
+            # geocoded variant was written as a duplicate which created
+            # multiple files and confusion. Keep a single source of truth.
+            exo_files = ['exogenous_events.json']
             all_raw_events = []
             for f_name in exo_files:
                 f_path = os.path.join(BASE_DIR, 'data', f_name)
@@ -439,7 +461,7 @@ def get_risk():
             print(f"Erro ao processar shocks no app.py: {e}")
             exogenous_shocks = None
 
-        scores_map = orchestrator.get_combined_risk(exogenous_shocks)
+        scores_map, trends_map = orchestrator.get_combined_risk(exogenous_shocks, return_trends=True)
         results = []
         meta = {'counts': {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0}}
         all_scores = []
@@ -453,50 +475,90 @@ def get_risk():
             'interior': {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0}
         }
 
+        # Carregar cache de explicações do gestor para uso no dashboard
+        manager_cache = {}
+        try:
+            if os.path.exists(CACHE_FILE):
+                with open(CACHE_FILE, 'r', encoding='utf-8') as cf:
+                    manager_cache = json.load(cf) or {}
+        except: pass
+
         for i, row in nodes_gdf.iterrows():
             name = str(row['name'])
             name_norm = normalize_name(name)
             score = float(scores_map.get(name_norm, 20.0))
+            trend = trends_map.get(name_norm, 'stable')
+            
             if np.isnan(score) or np.isinf(score): score = 20.0
             
-            # Identificação de Região
+            # Identificação de Região e Status (mantido)
             reg = str(row.get('regiao', 'fortaleza')).lower()
             if reg == 'capital': reg = 'fortaleza'
-            
-            # Sincronização RMF Oficial
             rmf_oficial = ['AQUIRAZ', 'CASCAVEL', 'CAUCAIA', 'CHOROZINHO', 'EUSEBIO', 'GUAIUBA', 'HORIZONTE', 'ITAITINGA', 'MARACANAU', 'MARANGUAPE', 'PACAJUS', 'PACATUBA', 'PARAIPABA', 'PARACURU', 'PINDORETAMA', 'SAO GONCALO DO AMARANTE', 'SAO LUIS DO CURU', 'TRAIRI']
             if name_norm in rmf_oficial: reg = 'rmf'
 
-            # Novo Sistema de Cores e Status
             if score >= 90: 
                 status, css, color = 'CRÍTICO', 'risk-critico', '#8B0000'
                 if reg in region_stats: region_stats[reg]['crítico'] += 1
-                meta['counts']['crítico'] += 1 # Global
+                meta['counts']['crítico'] += 1
             elif score >= 80: 
                 status, css, color = 'ALTO', 'risk-alto', '#E63946'
                 if reg in region_stats: region_stats[reg]['alto'] += 1
-                meta['counts']['alto'] += 1 # Global
+                meta['counts']['alto'] += 1
             elif score >= 50: 
                 status, css, color = 'MODERADO', 'risk-moderado', '#F4A261'
                 if reg in region_stats: region_stats[reg]['moderado'] += 1
-                meta['counts']['moderado'] += 1 # Global
+                meta['counts']['moderado'] += 1
             else: 
                 status, css, color = 'BAIXO', 'risk-baixo', '#A8DADC'
                 if reg in region_stats: region_stats[reg]['baixo'] += 1
-                meta['counts']['baixo'] += 1 # Global
+                meta['counts']['baixo'] += 1
             
-            # ensure region bucket exists
-            if reg not in region_buckets:
-                region_buckets[reg] = []
+            if reg not in region_buckets: region_buckets[reg] = []
             
+            # --- EXTRAÇÃO DE MÉTRICAS REAIS (DADOS BRUTOS DO MODELO) ---
+            node_metrics = {
+                'cvli_7d': 0,
+                'tension': round(float(row.get('tension_index', 0)), 2),
+                'events_count': 0,
+                'event_types': [],
+                'spatial_influence': score >= 80
+            }
+            
+            # Crimes Reais
+            current_spec = orchestrator.specialists.get(reg)
+            if current_spec:
+                try:
+                    local_idx = next(idx for idx, r in current_spec['data']['nodes_gdf'].iterrows() if normalize_name(r['name']) == name_norm)
+                    node_metrics['cvli_7d'] = int(current_spec['data']['node_features'][local_idx, -7:, 0].sum())
+                except: pass
+
+            # Eventos de Inteligência Reais
+            if exogenous_shocks and name_norm in exogenous_shocks:
+                # Filtrar eventos reais para listar os tipos
+                exo_path = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
+                if os.path.exists(exo_path):
+                    try:
+                        with open(exo_path, 'r', encoding='utf-8') as ef:
+                            all_ev = json.load(ef)
+                            node_evs = [e for e in all_ev if normalize_name(e.get('bairro','')) == name_norm or normalize_name(e.get('municipio','')) == name_norm]
+                            node_metrics['events_count'] = len(node_evs)
+                            node_metrics['event_types'] = list(set([e.get('natureza') or e.get('type') for e in node_evs]))
+                    except: pass
+
+            # Verificar cache de IA (apenas se existir)
+            node_key = str(i)
+            rich_explanation = manager_cache.get(node_key, {}).get('manager_text')
+
             all_scores.append(score)
             results.append({
                 'node_id': i, 'name': name, 'clean_name': name_norm,
                 'risk_score': score, 'status_label': status, 'css_class': css,
-                'color': color,
+                'color': color, 'trend': trend, 
+                'metrics': node_metrics,
+                'reasons_rich': rich_explanation,
                 'faction': str(row.get('faction', 'N/A')), 'region_type': reg
             })
-            # add to region bucket for later aggregation
             region_buckets[reg].append(results[-1])
 
         # Adicionar Ranking Info para o Frontend
@@ -540,13 +602,14 @@ def get_risk():
             top10_mean = float(np.mean([v for v in scores_arr if v >= top10_threshold])) if len(scores_arr) > 0 else s_mean
             separation = top10_mean - s_mean
 
-            # Confiança heurística: maior quando desvio é baixo e separação é alta
-            # Normalizar std pelo range observado para obter uma escala 0-1
+            # Confiança heurística recalibrada
             denom = (s_max - s_min) if (s_max - s_min) > 0 else 1.0
-            std_norm = min(1.0, s_std / denom)
-            sep_norm = min(1.0, separation / (denom if denom > 0 else 1.0))
+            std_norm = min(1.0, s_std / (s_mean + 1e-6)) # Relativo à média
+            sep_norm = min(1.0, separation / (s_std + 1e-6)) # Quantos desvios o top 10 está acima
 
-            confidence_score = max(0.0, min(1.0, 0.55 + 0.45 * sep_norm - 0.5 * std_norm))
+            # Novo cálculo: Base de 65%, bônus por separação, penalidade leve por volatilidade
+            confidence_score = 0.65 + (0.30 * sep_norm) - (0.15 * std_norm)
+            confidence_score = max(0.4, min(0.98, confidence_score))
             confidence_pct = round(confidence_score * 100.0, 1)
 
             if confidence_pct >= 80:
@@ -1024,22 +1087,15 @@ def explain_node(node_id):
                             "EXPLICAÇÃO JSON:\n" + json.dumps(normalized, ensure_ascii=False)
                         )
 
-                        # Attempt to call the legacy LLM service if available
+                        # Attempt to call the LLM service
                         try:
                             import src.llm_service as llmsvc
-                            legacy = getattr(llmsvc, '_legacy', None)
-                            keys = []
-                            if legacy and hasattr(legacy, 'get_gemini_api_keys'):
-                                try:
-                                    keys = legacy.get_gemini_api_keys()
-                                except Exception:
-                                    keys = []
+                            keys = llmsvc.get_gemini_api_keys()
 
                             harmonized = None
-                            if legacy and hasattr(legacy, '_call_model_with_rotation') and keys:
+                            if keys:
                                 try:
-                                    out = legacy._call_model_with_rotation(prompt, keys)
-                                    harmonized = out if isinstance(out, str) else None
+                                    harmonized = llmsvc._call_model_with_rotation(prompt, keys)
                                 except Exception:
                                     harmonized = None
 
@@ -1058,8 +1114,8 @@ def explain_node(node_id):
                                 if node_key in cache and cache[node_key].get('manager_text'):
                                     normalized['manager_text'] = cache[node_key].get('manager_text')
                                     normalized['manager_text_source'] = 'cache'
-                        except ImportError:
-                            # llm_service not available; fallback to cached if present
+                        except Exception:
+                            # fallback to cached if present
                             if node_key in cache and cache[node_key].get('manager_text'):
                                 normalized['manager_text'] = cache[node_key].get('manager_text')
                                 normalized['manager_text_source'] = 'cache'
@@ -1351,14 +1407,11 @@ def save_exogenous():
         except Exception as e:
             return jsonify({'error': 'write_failed', 'detail': str(e)}), 500
 
-        # Also write geocoded version used by EventManager
-        geocoded_path = os.path.join(BASE_DIR, 'data', 'exogenous_events_geocoded.json')
-        try:
-            with open(geocoded_path, 'w', encoding='utf-8') as gf:
-                json.dump(existing_list, gf, ensure_ascii=False, indent=2)
-        except Exception:
-            # not fatal; continue
-            pass
+        # Note: do not create a separate 'geocoded' file here. The system
+        # should maintain a single canonical `exogenous_events.json` file.
+        # Other components that require geocoded/enriched data should read
+        # this file and perform their own enrichment rather than relying
+        # on a duplicate file being written here.
 
         return jsonify({'saved': len(points)})
     except Exception as e:
@@ -1421,6 +1474,31 @@ def clear_manager_cache():
         return jsonify({'cleared': True})
     except Exception as e:
         logging.exception('Error clearing cache: %s', e)
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/exogenous-events')
+def get_exogenous_events_list():
+    """Retorna a lista de eventos exógenos para o dashboard estratégico."""
+    try:
+        path = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
+        if os.path.exists(path):
+            with open(path, 'r', encoding='utf-8') as f:
+                data = json.load(f) or []
+            # Inverter para mostrar os mais recentes primeiro
+            return jsonify(list(reversed(data)))
+        return jsonify([])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/efficiency-latest')
+def get_efficiency_latest():
+    """Retorna as métricas mais recentes do monitor de eficiência."""
+    try:
+        if efficiency_monitor:
+            latest = efficiency_monitor.get_latest_metrics()
+            return jsonify(latest if latest else {})
+        return jsonify({})
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 if __name__ == "__main__":
