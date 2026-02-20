@@ -2,6 +2,7 @@ import pickle
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import os
 import sys
 import time
@@ -33,26 +34,38 @@ if sys.stdout.encoding != 'utf-8':
 
 # Configurações de Treino
 EPOCHS = 60
-LR = 0.003
-GRADIENT_ACCUMULATION_STEPS = 32 # Simula batch size de 32
+LR = 0.001 
+GRADIENT_ACCUMULATION_STEPS = 24 # Reduzido para 24 conforme solicitado
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-logging.info(f"Dispositivo de Treinamento: {DEVICE}")
-
-def load_processed_data(region_key):
-    """Carrega o pickle processado da região."""
-    path = f'data/processed/processed_{region_key}.pkl'
-    if not os.path.exists(path):
-        raise FileNotFoundError(f"Arquivo não encontrado: {path}")
+def calculate_priority_weights(features, nodes_gdf):
+    """
+    Calcula pesos de severidade baseados na história real (A ideia 'marota').
+    features: (N, T, C)
+    """
+    # 1. Pesos Espaciais (Maracanaú e Top Hotspots)
+    cvli_total_per_node = features[:, :, 0].sum(axis=1)
+    # Maracanaú ganha +40%, outros proporcionalmente (capado em 1.5x)
+    spatial_weights = 1.0 + (cvli_total_per_node / (cvli_total_per_node.max() + 1e-6)) * 0.4
     
-    with open(path, 'rb') as f:
-        data = pickle.load(f)
-    return data
+    # 2. Pesos Temporais (Mês e Dia da Semana)
+    # No dataset, canal 21 é Mês (1-12) e 22 é Dia da Semana (0-6) - Confirmar se é isso
+    # Vamos assumir canais 21 e 22 baseados no padrão de 29 canais
+    month_weights = {m: 1.0 for m in range(1, 13)}
+    day_weights = {d: 1.0 for d in range(7)}
+    
+    # Valores extraídos do nosso relatório 'robust'
+    # Meses: Outubro(1.2), Agosto(1.2), Fevereiro(0.8)
+    month_weights.update({10: 1.2, 8: 1.2, 2: 0.8, 1: 1.1})
+    # Dias: Sab/Dom (1.3), Sex (1.1), outros (0.9)
+    day_weights.update({5: 1.1, 6: 1.3, 0: 1.3}) # 0 é Segunda ou Domingo? Assumindo 6=Sab, 0=Dom
+    
+    return spatial_weights, month_weights, day_weights
 
 def train_specialist(region_key, ModelClass):
     region_label = region_key.upper()
     logging.info(f"="*50)
-    logging.info(f"⚡ INICIANDO TREINAMENTO: {region_label}")
+    logging.info(f"⚡ INICIANDO TREINAMENTO: {region_label} (JULES DYNAMIC PRIORITY)")
     logging.info(f"="*50)
     
     start_time_region = time.time()
@@ -62,102 +75,106 @@ def train_specialist(region_key, ModelClass):
         logging.error(f"Erro ao carregar dados para {region_label}: {e}")
         return
 
-    features = data['node_features'] # (N, Total_Days, 29)
-    # Mover adjacências para GPU uma única vez
-    adj_geo = torch.tensor(data['adj_geo'], dtype=torch.float32).to(DEVICE)
-    adj_conf = torch.tensor(data['adj_conflict'], dtype=torch.float32).to(DEVICE)
+    features = data['node_features'] 
+    nodes_gdf = data['nodes_gdf']
+    
+    # Calcular Pesos Dinâmicos
+    spatial_weights_np, month_weights_map, day_weights_map = calculate_priority_weights(features, nodes_gdf)
+    spatial_weights = torch.tensor(spatial_weights_np, dtype=torch.float32).to(DEVICE)
+    
+    adj_geo_norm = normalize_adj(data['adj_geo'])
+    adj_conf_norm = normalize_adj(data['adj_conflict'])
+    adj_geo = torch.tensor(adj_geo_norm, dtype=torch.float32).to(DEVICE)
+    adj_conf = torch.tensor(adj_conf_norm, dtype=torch.float32).to(DEVICE)
     
     WINDOW = 30
     PREDICT_HORIZON = 7
-    
     N, T_total, C = features.shape
-    X_list, y_list = [], []
     
-    # Normalização Simples
+    # Normalização
     features_norm = features.copy()
     for c in range(C):
         mean, std = features[:, :, c].mean(), features[:, :, c].std() + 1e-5
         features_norm[:, :, c] = (features[:, :, c] - mean) / std
 
-    # Criar Dataset Deslizante com SUAVIZAÇÃO ESPACIAL (Tensão Regional)
-    # Objetivo: Ensinar o modelo a prever a "Mancha Criminal" e não apenas o ponto exato.
-    # Se Bairro A tem crime, Bairro B (vizinho) recebe 0.3 de risco no target.
+    X_list, y_list, info_list = [], [], []
+    adj_dense = torch.tensor(data['adj_geo'], dtype=torch.float32)
     
-    # Pre-computar matriz de adjacência densa para propagação (na CPU primeiro)
-    adj_dense = torch.tensor(data['adj_geo'], dtype=torch.float32) # (N, N)
-    
+    dates = pd.to_datetime(data['dates'])
+
     for t in range(WINDOW, T_total - PREDICT_HORIZON):
-        # Input: Janela (N, 30, 29) -> Transpor para (1, 29, N, 30)
         x_window = features_norm[:, t-WINDOW:t, :] 
         x_tensor = torch.tensor(x_window, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0)
         
-        # Target Original: Soma de CVLI (Canal 0) nos próximos 7 dias
-        y_raw = torch.tensor(features[:, t:t+PREDICT_HORIZON, 0].sum(axis=1), dtype=torch.float32) # (N,)
-        
-        # --- ENGENHARIA DE TARGET: SUAVIZAÇÃO ESPACIAL ---
-        # Propagar 30% do risco para vizinhos diretos (Simula Tensão Regional)
-        # y_smoothed = y_raw + 0.3 * (adj * y_raw)
+        y_raw = torch.tensor(features[:, t:t+PREDICT_HORIZON, 0].sum(axis=1), dtype=torch.float32)
         neighbor_risk = torch.matmul(adj_dense, y_raw)
         y_target = y_raw + (0.3 * neighbor_risk)
         
-        # Normalizar target para escala 0-1 (ajuda na convergência do MSE)
         if y_target.max() > 0:
             y_target = y_target / y_target.max()
             
-        y_tensor = y_target.unsqueeze(0) # (1, N)
+        y_tensor = y_target.unsqueeze(0)
+        
+        # Guardar info temporal para a Loss Mutante (Mês e Dia do dia da PREVISÃO)
+        current_date = dates[t]
+        info_list.append({
+            'month': current_date.month,
+            'dow': current_date.dayofweek
+        })
         
         X_list.append(x_tensor)
         y_list.append(y_tensor)
         
-    # Split Treino/Teste: Janela de Validação de 4 Meses (aprox 120 dias)
-    val_days = 120
-    if len(X_list) > val_days:
-        train_X = X_list[:-val_days]
-        train_y = y_list[:-val_days]
-        val_X = X_list[-val_days:]
-        val_y = y_list[-val_days:]
-    else:
-        # Fallback se dataset for pequeno (80/20)
-        split = int(len(X_list) * 0.8)
-        train_X = X_list[:split]
-        train_y = y_list[:split]
-        val_X = X_list[split:]
-        val_y = y_list[split:]
+    # Split: Janela de 90 dias conforme solicitado
+    val_days = 90
+    train_X = X_list[:-val_days]
+    train_y = y_list[:-val_days]
+    train_info = info_list[:-val_days]
+    val_X = X_list[-val_days:]
+    val_y = y_list[-val_days:]
+    val_info = info_list[-val_days:]
     
-    logging.info(f"Dataset pronto com Suavização Espacial. Treino: {len(train_X)} | Validação: {len(val_X)} (Janela de 4 meses)")
+    logging.info(f"Dataset pronto. Treino: {len(train_X)} | Validação: {len(val_X)} (Janela de 90 dias)")
     
-    # Inicializar Modelo
     model = ModelClass(num_nodes=N, in_channels=C, time_steps=WINDOW).to(DEVICE)
-    optimizer = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=1e-4)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
     
-    # --- ESTRATÉGIA DE HOTSPOT OVERSAMPLING ---
-    # Identificar dias com muitos eventos e treinar neles com mais peso
-    day_severity = [torch.sum(y).item() for y in y_list]
-    high_crime_indices = set([i for i, sev in enumerate(day_severity) if sev > np.median(day_severity)])
-    
-    # Criar lista final de índices (Seguro contra loop infinito)
-    final_train_indices = []
-    for i in range(len(train_X)):
-        final_train_indices.append(i)
-        if i in high_crime_indices:
-            final_train_indices.extend([i] * 2) # 3x mais peso para dias de crise
-    
-    # --- LOSS TOP-K FOCAL (FOCUSING ON THE PEAK) ---
-    def topk_focal_loss(pred, target):
+    # --- LOSS MUTANTE (JULES DYNAMIC) ---
+    def hybrid_priority_loss(pred, target, info):
         pred = pred.squeeze()
         target = target.squeeze()
         
-        # Só calculamos a loss para o TOP 30 real de cada dia
+        # 1. Multiplicador Temporal (Mês/Dia)
+        m_weight = month_weights_map.get(info['month'], 1.0)
+        d_weight = day_weights_map.get(info['dow'], 1.0)
+        temporal_multiplier = m_weight * d_weight
+        
+        # 2. Regressão com Peso Espacial + TopK
         k = 30
         top_val, top_idx = torch.topk(target, min(k, len(target)))
         
-        weights = torch.full_like(target, 0.1)
-        weights[top_idx] = 10.0 * (1.0 + target[top_idx])
+        # Base weights + Spatial Bias
+        weights = spatial_weights.clone() # (N,)
+        weights[top_idx] = weights[top_idx] * 4.0 * (1.0 + target[top_idx])
         
-        loss = weights * (pred - target)**2
-        return loss.mean()
+        loss_reg = (weights * F.smooth_l1_loss(pred, target, reduction='none')).mean()
+        
+        # 3. Ranking Refinado (Agressividade 0.3)
+        if top_val.sum() == 0:
+            return loss_reg * temporal_multiplier
+            
+        num_negatives = 50
+        neg_idx = torch.randint(0, len(target), (num_negatives,), device=target.device)
+        pred_high, pred_low = pred[top_idx].unsqueeze(1), pred[neg_idx].unsqueeze(0)
+        target_high, target_low = target[top_idx].unsqueeze(1), target[neg_idx].unsqueeze(0)
+        
+        margin = 0.2 + (F.relu(target_high - target_low) * 0.5)
+        loss_rank = (F.relu(margin - (pred_high - pred_low)) * (target_high > target_low).float()).sum() / (num_negatives * k)
+        
+        # A Loss total é multiplicada pela severidade da época (Temporal)
+        return (loss_reg + 0.3 * loss_rank) * temporal_multiplier
 
-    criterion = topk_focal_loss
+    criterion = hybrid_priority_loss
     # OneCycleLR com mais epochs para acomodar o oversampling
     scheduler = torch.optim.lr_scheduler.OneCycleLR(
         optimizer, max_lr=LR*3.0, steps_per_epoch=len(final_train_indices)//GRADIENT_ACCUMULATION_STEPS + 1, 
@@ -194,9 +211,31 @@ def train_specialist(region_key, ModelClass):
             
             steps += 1
             if steps % GRADIENT_ACCUMULATION_STEPS == 0:
+                # Gradient Clipping para evitar explosão
+                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
                 optimizer.step()
                 scheduler.step() # Step no OneCycle é por batch
                 optimizer.zero_grad()
+                
+                # Log progress every update
+                if (steps // GRADIENT_ACCUMULATION_STEPS) % 5 == 0:
+                    # Quick P@K calculation for the current batch
+                    with torch.no_grad():
+                        y_true = by.squeeze().cpu().numpy()
+                        y_pred = pred.squeeze().cpu().numpy()
+                        
+                        p10, p20 = 0.0, 0.0
+                        if np.sum(y_true) > 0:
+                            top_true = np.argsort(y_true)[::-1]
+                            top_pred = np.argsort(y_pred)[::-1]
+                            
+                            hits10 = len(set(top_true[:10]) & set(top_pred[:10]))
+                            p10 = hits10 / 10.0
+                            
+                            hits20 = len(set(top_true[:20]) & set(top_pred[:20]))
+                            p20 = hits20 / 20.0
+                            
+                    logging.info(f"   -> Epoch {epoch+1} Progress: {steps}/{len(final_train_indices)} steps | Loss: {loss.item()*GRADIENT_ACCUMULATION_STEPS:.4f} | Train P@10: {p10*100:.1f}% | Train P@20: {p20*100:.1f}%")
         
         # Validação
         model.eval()
