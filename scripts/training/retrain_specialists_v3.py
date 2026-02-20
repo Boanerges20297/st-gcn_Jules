@@ -49,17 +49,26 @@ def normalize_adj(adj):
     d_mat_inv_sqrt = np.diag(d_inv_sqrt)
     return adj.dot(d_mat_inv_sqrt).transpose().dot(d_mat_inv_sqrt)
 
-def calculate_priority_weights(features):
-    # 1. Pesos Espaciais (Hotspots)
+def calculate_priority_weights(features, dates):
+    # 1. Pesos Espaciais (Hotspots) - DINÂMICO
     cvli_total_per_node = features[:, :, 0].sum(axis=1)
     spatial_weights = 1.0 + (cvli_total_per_node / (cvli_total_per_node.max() + 1e-6)) * 0.4
     
-    # 2. Pesos Temporais (Baseados no Relatório)
-    month_weights = {m: 1.0 for m in range(1, 13)}
-    month_weights.update({10: 1.2, 8: 1.2, 2: 0.8, 1: 1.1})
+    # 2. Pesos Temporais (Sazonalidade) - AGORA 100% DINÂMICO
+    df_temp = pd.DataFrame({'date': pd.to_datetime(dates), 'crimes': features[:, :, 0].sum(axis=0)})
+    df_temp['month'] = df_temp['date'].dt.month
+    df_temp['dow'] = df_temp['date'].dt.dayofweek
     
-    day_weights = {d: 1.0 for d in range(7)}
-    day_weights.update({5: 1.1, 6: 1.3, 0: 1.3}) # 0=Seg (ou Dom, ajustamos no loop)
+    # Média global de crimes por dia para normalizar
+    avg_crimes = df_temp['crimes'].mean() + 1e-6
+    
+    # Pesos por Mês: Proporção em relação à média
+    month_avg = df_temp.groupby('month')['crimes'].mean()
+    month_weights = {m: max(0.8, min(1.3, val/avg_crimes)) for m, val in month_avg.items()}
+    
+    # Pesos por Dia da Semana: Proporção em relação à média
+    dow_avg = df_temp.groupby('dow')['crimes'].mean()
+    day_weights = {d: max(0.8, min(1.3, val/avg_crimes)) for d, val in dow_avg.items()}
     
     return spatial_weights, month_weights, day_weights
 
@@ -71,9 +80,10 @@ def train_specialist(region_key, ModelClass):
     
     data = load_processed_data(region_key)
     features = data['node_features'] 
+    dates = pd.to_datetime(data['dates'])
     
-    # Calcular Pesos Dinâmicos
-    spatial_weights_np, month_weights_map, day_weights_map = calculate_priority_weights(features)
+    # Calcular Pesos Dinâmicos (Agora com Sazonalidade Dinâmica)
+    spatial_weights_np, month_weights_map, day_weights_map = calculate_priority_weights(features, dates)
     spatial_weights = torch.tensor(spatial_weights_np, dtype=torch.float32).to(DEVICE)
     
     adj_geo = torch.tensor(normalize_adj(data['adj_geo']), dtype=torch.float32).to(DEVICE)
