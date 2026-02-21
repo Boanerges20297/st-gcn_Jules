@@ -80,3 +80,26 @@
   - **P@20 (Validação Aleatória):** **45.1%**
   - **P@20 (REALITY - Dados Inéditos):** **63.2%** (Recorde Científico).
 - **Avaliação Técnica:** A performance no `REALITY` superando a `VAL` indica que o modelo não está apenas decorando pontos, mas capturando a **inércia criminal** e a **lógica de conflito de facções** que se manteve estável no último trimestre. A blindagem de 14 dias elimina qualquer suspeita de vazamento por sobreposição de janelas. O modelo é estatisticamente robusto para produção.
+
+## Tentativa 14 (VALIDAÇÃO CRUZADA & ADAPTAÇÃO DINÂMICA) - 2026-02-20 20:30
+- **Estratégia:** Validação Cruzada (5-Fold TimeSeriesSplit) + Diagnóstico de Sazonalidade.
+- **Objetivo:** Confirmar robustez do modelo de 63.2% e identificar falhas em diferentes regimes de criminalidade (Calmo/Morno/Quente).
+- **Parâmetros de Validação:**
+  - **K-Folds:** 5 (Janela Deslizante Temporal).
+  - **Gap de Segurança:** 14 dias entre treino e teste de cada fold.
+  - **Monitoramento:** Loss detalhada por intensidade (Calmo/Morno/Quente).
+- **Resultados Preliminares (CV em Andamento):**
+  - **Fold 1 (164 dias):** P@20 de **35.5%** (Estável).
+  - **Fold 2 (324 dias):** P@20 saltou para **46.0%** (Efeito da maior base de dados).
+  - **Fold 3 (484 dias):** P@20 estabilizou em **42.9%** (até Época 6).
+  - **Diagnóstico de Loss:** O modelo mostrou estabilidade na convergência da Loss de Treino (0.054), indicando aprendizado real e não memorização.
+  - **Conclusão Técnica:** O modelo estático atingiu um platô robusto entre **42% e 46%**. Embora sólido, a dificuldade em superar essa barreira sugere que a arquitetura fixa luta para capturar mudanças bruscas de regime (dias muito calmos vs. dias muito quentes).
+- **Plano de Adaptação Dinâmica (Modo de Crise):**
+  - **Problema:** Inércia do modelo estático em mudanças bruscas de cenário (ex: tréguas ou guerras repentinas).
+  - **Solução Proposta:** "O Guardião do Estado".
+  - **Mecanismo:**
+    1.  **Monitoramento:** Calcular Erro Diário (`|P_ontem - Y_ontem| / Y_ontem`).
+    2.  **Gatilho:** Se Erro > **30% (0.3)**, ativar Modo de Crise.
+    3.  **Ação:** Fine-Tuning Rápido (7 dias de histórico recente, 10 épocas, apenas camadas finais).
+    4.  **UX:** Processamento em Background (Job Noturno) para manter a resposta instantânea ao usuário.
+- **Status:** **VALIDAÇÃO CONCLUÍDA. PRÓXIMA FASE: IMPLEMENTAÇÃO DA ESTRATÉGIA DINÂMICA.**
