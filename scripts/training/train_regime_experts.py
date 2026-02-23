@@ -35,10 +35,10 @@ logging.basicConfig(
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # --- RETORNO AO BASICO QUE FUNCIONA ---
 EPOCHS = 200
-LR = 0.02
+LR = 0.001
 DROPOUT = 0.3
-RANKING_WEIGHT = 2.0
-BATCH_SIZE = 16
+RANKING_WEIGHT = 10.0
+BATCH_SIZE = 32
 
 # INTEL-BIAS ATIVO
 FACTION_PRIORITY = {
@@ -82,21 +82,18 @@ def main():
     dates = dates[mask_date]
     logging.info(f"📅 FILTRO TEMPORAL: {len(dates)} dias (2024-2026)")
 
-    # --- FILTRO ESPACIAL: EXCLUIR APENAS ZERADOS (quase 0 CVLI/mês) ---
-    # Exclui bairros com ZERO ou irrelevante (<= 0.1/mês), mantendo Aldeota/Meireles se tiverem mínimo.
+    # --- FILTRO ESPACIAL: LEAGUE OF VIOLENCE (TOP 50) ---
+    # Foco absoluto nos 50 bairros mais violentos.
+    # Garante densidade de crime para o modelo aprender padrões reais.
 
     total_cvli_per_node = features[:, :, 0].sum(axis=1) # (Nodes,)
-    num_months = features.shape[1] / 30.0
-    threshold_total = num_months * 0.1 # Apenas extremamente inativos
+    top_k_indices = np.argsort(-total_cvli_per_node)[:30]
 
-    active_mask = total_cvli_per_node > threshold_total
-    active_indices = np.where(active_mask)[0]
-
-    logging.info(f"🏙️ FILTRO ESPACIAL: {len(active_indices)} bairros ativos (de {len(nodes_gdf)})")
+    logging.info(f"🏙️ FILTRO ESPACIAL: Top 30 Bairros Mais Violentos Selecionados (League of Violence Elite)")
 
     # Filtrar tensores e GDF
-    features = features[active_indices, :, :]
-    nodes_gdf = nodes_gdf.iloc[active_indices].reset_index(drop=True)
+    features = features[top_k_indices, :, :]
+    nodes_gdf = nodes_gdf.iloc[top_k_indices].reset_index(drop=True)
 
     # Recalcular matrizes de adjacência para o subgrafo
     coords = np.array(list(zip(nodes_gdf.geometry.x, nodes_gdf.geometry.y)))
@@ -150,19 +147,44 @@ def main():
     adj_conf_t = torch.tensor(normalize_adj(data['adj_conflict']), dtype=torch.float32).to(DEVICE)
 
     def criterion(pred, target):
-        loss_reg = (faction_weights * F.smooth_l1_loss(pred, target, reduction='none')).mean()
-        pred_var = torch.var(pred)
-        variance_penalty = F.relu(0.01 - pred_var) * 100.0
-        k = 30
+        # 1. Hotspot Weighted Regression (Foco nos picos)
+        # Se target > 0, erro pesa 5x mais.
+        weights = torch.ones_like(target)
+        weights[target > 0] = 5.0
+        loss_reg = (weights * F.smooth_l1_loss(pred, target, reduction='none')).mean()
+
+        # 2. Ranking Loss (Pairwise Margin)
+        # Garante que Hotspots fiquem acima de Non-Hotspots
+        k = 10 # Foco no Top 10
         top_val, top_idx = torch.topk(target, min(k, len(target)))
-        if top_val.sum() == 0: return loss_reg + 0.1 * variance_penalty
-        num_neg = 50
-        neg_idx = torch.randint(0, len(target), (num_neg,), device=target.device)
-        p_h, p_l = pred[top_idx].unsqueeze(1), pred[neg_idx].unsqueeze(0)
-        t_h, t_l = target[top_idx].unsqueeze(1), target[neg_idx].unsqueeze(0)
-        margin = 0.1 + (F.relu(t_h - t_l) * 0.5)
-        loss_rank = (F.relu(margin - (p_h - p_l)) * (t_h > t_l).float()).sum() / (num_neg * k)
-        return loss_reg + RANKING_WEIGHT * loss_rank + 0.1 * variance_penalty
+
+        if top_val.sum() == 0: return loss_reg
+
+        # Amostrar negativos (quem tem menos crime que o top k)
+        # Simplificacao: comparar Top K contra o resto
+        mask_top = torch.zeros_like(target, dtype=torch.bool)
+        mask_top[top_idx] = True
+        neg_idx = torch.where(~mask_top)[0]
+
+        if len(neg_idx) > 0:
+            # Selecionar alguns negativos aleatorios
+            perm = torch.randperm(len(neg_idx))[:20]
+            neg_idx_sel = neg_idx[perm]
+
+            p_h = pred[top_idx].unsqueeze(1) # (K, 1)
+            p_l = pred[neg_idx_sel].unsqueeze(0) # (1, M)
+            t_h = target[top_idx].unsqueeze(1)
+            t_l = target[neg_idx_sel].unsqueeze(0)
+
+            # Margem dinamica baseada na diferenca real
+            margin = 0.1 + (t_h - t_l)
+
+            # Loss: max(0, margin - (high_pred - low_pred))
+            loss_rank = F.relu(margin - (p_h - p_l)).mean()
+        else:
+            loss_rank = 0.0
+
+        return loss_reg + (RANKING_WEIGHT * loss_rank)
 
     best_recall = 0
     for epoch in range(EPOCHS):
@@ -173,7 +195,28 @@ def main():
         
         optimizer.zero_grad()
         for i, idx in enumerate(indices):
-            pred = model(train_X[idx].to(DEVICE), [adj_geo_t, adj_conf_t]).squeeze()
+            # Input X shape: (Batch, Channels, Nodes, Time)
+            batch_x = train_X[idx].to(DEVICE)
+
+            # Persistence: Pegar o ultimo dia de CVLI (Canal 0) para cada no
+            # batch_x eh (1, 29, 30, 30) -> (Batch, Ch, Node, Time) ???
+            # O script cria: features_norm[:, t-WINDOW:t, :] -> (N, T, C)
+            # permute(2, 0, 1) -> (C, N, T)
+            # unsqueeze(0) -> (1, C, N, T)
+            # Entao Time eh a ultima dimensao.
+            # Ultimo dia esta em -1.
+
+            # persistence = batch_x[:, 0, :, -1].squeeze() # (Nodes,)
+            # Mas o modelo ja aprende isso. Vamos forcar o residuo.
+
+            pred_raw = model(batch_x, [adj_geo_t, adj_conf_t]).squeeze()
+
+            # Hybrid Prediction: 0.5 * Model + 0.5 * Persistence
+            # persistence = batch_x[0, 0, :, -1]
+            # pred = pred_raw + persistence
+
+            pred = pred_raw # Manter puro por enquanto, arquitetura ja tem conexoes
+
             target = train_y[idx].squeeze().to(DEVICE)
             loss = criterion(pred, target) / BATCH_SIZE
             loss.backward()
@@ -192,7 +235,12 @@ def main():
         prec_20_list = []
         with torch.no_grad():
             for vx, vy in zip(val_X, val_y):
+                # Persistence bias no teste tambem?
+                # persistence = vx[0, 0, :, -1].to(DEVICE)
+
                 vpred = model(vx.to(DEVICE), [adj_geo_t, adj_conf_t]).squeeze().cpu().numpy()
+                # vpred = vpred + persistence.cpu().numpy()
+
                 vtrue = vy.squeeze().numpy()
                 if vtrue.sum() == 0: continue
 
