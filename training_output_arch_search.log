@@ -1,0 +1,28 @@
+2026-02-23 17:58:15,606 [INFO] 🏙️ FILTRO ESPACIAL: 19 bairros ativos (de 121)
+2026-02-23 17:58:15,914 [INFO] 🚀 INICIANDO TREINO FOCADO (19 Bairros | Diario > 2 Crimes)
+2026-02-23 17:58:15,914 [INFO]    Amostras Criticas: 80 dias | Foco: Detectar Picos
+Traceback (most recent call last):
+  File "/app/scripts/training/train_regime_experts.py", line 226, in <module>
+    main()
+  File "/app/scripts/training/train_regime_experts.py", line 175, in main
+    pred = model(train_X[idx].to(DEVICE), [adj_geo_t, adj_conf_t]).squeeze()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/src/core/architectures.py", line 128, in forward
+    x_emb = self.embedding(x_flat)
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1776, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1787, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/torch/nn/modules/linear.py", line 134, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (551x30 and 29x64)

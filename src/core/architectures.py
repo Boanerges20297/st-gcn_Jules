@@ -88,6 +88,7 @@ class DeepSTGAT_64(nn.Module):
         x = self.final_conv(x).squeeze(-1).permute(0, 2, 1)
         return self.fc(x)
 
+
 class TemperatureExpertGAT(nn.Module):
     """MODELO ESPECIALISTA LEVE (64 NEURONIOS FC)."""
     def __init__(self, num_nodes, in_channels, time_steps, dropout=0.2):
