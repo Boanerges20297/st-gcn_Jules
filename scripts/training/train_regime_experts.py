@@ -35,9 +35,9 @@ logging.basicConfig(
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # --- RETORNO AO BASICO QUE FUNCIONA ---
 EPOCHS = 200
-LR = 0.0005
-DROPOUT = 0.5
-RANKING_WEIGHT = 15.0
+LR = 0.002
+DROPOUT = 0.3
+RANKING_WEIGHT = 5.0
 BATCH_SIZE = 16
 
 # INTEL-BIAS ATIVO
@@ -75,14 +75,20 @@ def main():
     dates = pd.to_datetime(data['dates'])
     nodes_gdf = data['nodes_gdf']
     
-    # --- FILTRO ESPACIAL: APENAS BAIRROS ATIVOS (> 1 CVLI/MÊS) ---
-    # Remove ruído de bairros nobres/seguros (Aldeota, Meireles, etc.)
-    # Foco total em territórios de conflito.
-    
+    # --- FILTRO TEMPORAL: 2024 a 2026 ---
+    # Foco em dados recentes conforme solicitado.
+    mask_date = (dates >= pd.Timestamp('2024-01-01')) & (dates <= pd.Timestamp('2026-12-31'))
+    features = features[:, mask_date, :]
+    dates = dates[mask_date]
+    logging.info(f"📅 FILTRO TEMPORAL: {len(dates)} dias (2024-2026)")
+
+    # --- FILTRO ESPACIAL: EXCLUIR APENAS ZERADOS (quase 0 CVLI/mês) ---
+    # Exclui bairros com ZERO ou irrelevante (<= 0.1/mês), mantendo Aldeota/Meireles se tiverem mínimo.
+
     total_cvli_per_node = features[:, :, 0].sum(axis=1) # (Nodes,)
     num_months = features.shape[1] / 30.0
-    threshold_total = num_months * 1.0 # > 1 por mês
-    
+    threshold_total = num_months * 0.1 # Apenas extremamente inativos
+
     active_mask = total_cvli_per_node > threshold_total
     active_indices = np.where(active_mask)[0]
 
@@ -96,23 +102,19 @@ def main():
     coords = np.array(list(zip(nodes_gdf.geometry.x, nodes_gdf.geometry.y)))
     from scipy.spatial.distance import cdist
     adj_geo_new = (cdist(coords, coords) <= 3000).astype(float)
-    adj_conf_new = np.eye(len(nodes_gdf)) # Placeholder, idealmente recalcularia conflitos se disponível
+    adj_conf_new = np.eye(len(nodes_gdf))
 
-    # Atualizar dicionário de dados localmente
     data['adj_geo'] = adj_geo_new
     data['adj_conflict'] = adj_conf_new
 
-    # --- FILTRO TEMPORAL: APENAS DIAS QUENTES (> 3 crimes/dia NA REDE FILTRADA) ---
-    # O modelo vira um "Detector de Crise Diária". Ignoramos dias calmos (ruido).
+    # --- FILTRO DE INTENSIDADE DIÁRIA ---
+    daily_sums = features[:, :, 0].sum(axis=0)
+    mask_hot = daily_sums > 3 # Voltar para > 3 pois temos mais bairros agora
 
-    daily_sums = features[:, :, 0].sum(axis=0) # (TimeSteps,)
-    mask_hot = daily_sums > 2 # Reduzido de 3 para 2 pois removemos 102 bairros
-
-    # Aplicar filtro temporal
     features = features[:, mask_hot, :]
     dates = dates[mask_hot]
     
-    logging.info(f"🚀 INICIANDO TREINO FOCADO (19 Bairros | Diario > 2 Crimes)")
+    logging.info(f"🚀 INICIANDO TREINO (2024-2026 | Diario > 3 Crimes)")
     logging.info(f"   Amostras Criticas: {features.shape[1]} dias | Foco: Detectar Picos")
 
     WINDOW, PREDICT_HORIZON = 30, 7
@@ -186,40 +188,44 @@ def main():
                 logging.info(f"   [Epoch {epoch+1:02d}] Step {i+1}/{len(indices)} | Loss: {loss.item()*BATCH_SIZE:.6f}")
 
         model.eval()
-        prec_5_list = []
         prec_10_list = []
+        prec_20_list = []
         with torch.no_grad():
             for vx, vy in zip(val_X, val_y):
                 vpred = model(vx.to(DEVICE), [adj_geo_t, adj_conf_t]).squeeze().cpu().numpy()
                 vtrue = vy.squeeze().numpy()
                 if vtrue.sum() == 0: continue
 
-                # Ground Truth: Top 5 e Top 10 reais
-                k_true = min(10, len(vtrue))
-                top_k_true = set(np.argsort(-vtrue)[:k_true])
+                # Ground Truth: Top 20 reais (ou total se menor)
+                k_true_20 = min(20, len(vtrue))
+                top_20_true = set(np.argsort(-vtrue)[:k_true_20])
+
+                # Ground Truth: Top 10 reais
+                k_true_10 = min(10, len(vtrue))
+                top_10_true = set(np.argsort(-vtrue)[:k_true_10])
 
                 # Predictions
-                top_5_pred = set(np.argsort(-vpred)[:5])
                 top_10_pred = set(np.argsort(-vpred)[:10])
+                top_20_pred = set(np.argsort(-vpred)[:20])
 
                 # Precision@K: Quantos dos K previstos estavam no Top K real?
-                p5 = len(top_5_pred & top_k_true) / 5
-                p10 = len(top_10_pred & top_k_true) / 10
+                p10 = len(top_10_pred & top_10_true) / 10
+                p20 = len(top_20_pred & top_20_true) / 20
 
-                prec_5_list.append(p5)
                 prec_10_list.append(p10)
+                prec_20_list.append(p20)
 
-        avg_p5 = np.mean(prec_5_list) if prec_5_list else 0
         avg_p10 = np.mean(prec_10_list) if prec_10_list else 0
+        avg_p20 = np.mean(prec_20_list) if prec_20_list else 0
         
-        logging.info(f"📈 EPOCH {epoch+1:02d} | Loss: {epoch_loss/len(indices):.4f} | P@5: {avg_p5*100:.1f}% | P@10: {avg_p10*100:.1f}%")
+        logging.info(f"📈 EPOCH {epoch+1:02d} | Loss: {epoch_loss/len(indices):.4f} | P@10: {avg_p10*100:.1f}% | P@20: {avg_p20*100:.1f}%")
         
         path = os.path.join(ROOT, 'models', 'test', 'ranking', 'fortaleza_expert_universal.pth')
-        # Salvar se P@10 melhorar
-        if avg_p10 > best_recall:
-            best_recall = avg_p10
-            torch.save({'model_state_dict': model.state_dict(), 'p10': avg_p10}, path)
-            logging.info(f"🏆 NOVO RECORDE: P@10 = {avg_p10*100:.1f}%")
+        # Salvar se P@20 melhorar (solicitacao do usuario: foque nos top 20)
+        if avg_p20 > best_recall:
+            best_recall = avg_p20
+            torch.save({'model_state_dict': model.state_dict(), 'p20': avg_p20}, path)
+            logging.info(f"🏆 NOVO RECORDE: P@20 = {avg_p20*100:.1f}%")
 
 if __name__ == "__main__":
     main()
