@@ -1,0 +1,19 @@
+2026-02-23 10:36:00,346 [INFO] 🚀 INICIANDO TREINO DE 'PENEIRA QUENTE' (DIARIO > 10 CRIMES)
+2026-02-23 10:36:00,347 [INFO]    Amostras Criticas: 0 dias | Foco: Detectar Picos
+/app/scripts/training/train_regime_experts.py:106: RuntimeWarning: Mean of empty slice.
+  m, s = features[:, :, c].mean(), features[:, :, c].std() + 1e-6
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/numpy/core/_methods.py:129: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/numpy/core/_methods.py:206: RuntimeWarning: Degrees of freedom <= 0 for slice
+  ret = _var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/numpy/core/_methods.py:163: RuntimeWarning: invalid value encountered in divide
+  arrmean = um.true_divide(arrmean, div, out=arrmean,
+/home/jules/.pyenv/versions/3.12.12/lib/python3.12/site-packages/numpy/core/_methods.py:198: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+Traceback (most recent call last):
+  File "/app/scripts/training/train_regime_experts.py", line 184, in <module>
+    main()
+  File "/app/scripts/training/train_regime_experts.py", line 175, in main
+    logging.info(f"📈 EPOCH {epoch+1:02d} FINAL | Loss: {epoch_loss/len(indices):.6f} | Recall@40: {avg_recall*100:.1f}%")
+                                                         ~~~~~~~~~~^~~~~~~~~~~~~
+ZeroDivisionError: division by zero

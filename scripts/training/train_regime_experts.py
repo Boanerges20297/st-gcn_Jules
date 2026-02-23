@@ -34,11 +34,11 @@ logging.basicConfig(
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # --- RETORNO AO BASICO QUE FUNCIONA ---
-EPOCHS = 30
-LR = 0.02 
-DROPOUT = 0.2 
-RANKING_WEIGHT = 0.5 # Reduzido para dar liberdade ao modelo
-BATCH_SIZE = 32 # Aumentado para estabilizar o gradiente em dias quentes
+EPOCHS = 100
+LR = 0.002
+DROPOUT = 0.4
+RANKING_WEIGHT = 4.0
+BATCH_SIZE = 16
 
 # INTEL-BIAS ATIVO
 FACTION_PRIORITY = {
@@ -75,21 +75,18 @@ def main():
     dates = pd.to_datetime(data['dates'])
     nodes_gdf = data['nodes_gdf']
     
-    # --- FILTRO ESTRATEGICO: APENAS DIAS QUENTES E MORNOS (> 60 crimes/mes) ---
-    # O modelo vira um "Detector de Crise". Ignoramos dias calmos (ruido).
-    df_temp = pd.DataFrame({'date': dates, 'cvli': features[:, :, 0].sum(axis=0)})
-    df_temp['year_month'] = df_temp['date'].dt.to_period('M')
-    monthly_sums = df_temp.groupby('year_month')['cvli'].sum()
+    # --- FILTRO ESTRATEGICO: APENAS DIAS QUENTES (> 3 crimes/dia na cidade) ---
+    # O modelo vira um "Detector de Crise Diária". Ignoramos dias calmos (ruido).
+    # Focando em sazonalidade (Fins de semana intensos)
     
-    # Selecionar meses com mais de 60 crimes (Morno + Quente)
-    hot_months = monthly_sums[monthly_sums >= 60].index
-    mask_hot = df_temp['year_month'].isin(hot_months)
+    daily_sums = features[:, :, 0].sum(axis=0) # (TimeSteps,)
+    mask_hot = daily_sums > 3
     
     # Aplicar filtro
     features = features[:, mask_hot, :]
     dates = dates[mask_hot]
     
-    logging.info(f"🚀 INICIANDO TREINO DE 'PENEIRA QUENTE' (APENAS MESES > 60 CRIMES)")
+    logging.info(f"🚀 INICIANDO TREINO DE 'PENEIRA QUENTE' (DIARIO > 3 CRIMES)")
     logging.info(f"   Amostras Criticas: {features.shape[1]} dias | Foco: Detectar Picos")
 
     WINDOW, PREDICT_HORIZON = 30, 7
