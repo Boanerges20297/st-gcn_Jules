@@ -104,19 +104,16 @@
 ## Tentativa 19 (LAPIDAÇÃO DIAMANTE - ESTROBOSCÓPICA) - 2026-02-22 16:30
 - **Status:** **CONCLUÍDO.**
 
-## Tentativa 21 (SUPER ESPECIALISTA UNIVERSAL - PUREZA ALEATÓRIA) - 2026-02-22 17:15
-- **Estratégia:** Consolidação em um único Peneirador Neural de Elite com Massa Crítica Estendida.
-- **Pivot Decisivo:** Abandono da separação por buckets de regime (que limitavam a variância de amostras) em favor de um treinamento holístico em Fortaleza.
-- **Foco em Dados Modernos:** Dataset restrito ao período de Maio/2023 a Dezembro/2025 para capturar a dinâmica territorial vigente.
-- **Amostragem Estocástica:** Embaralhamento total de amostras em cada época para forçar o modelo a generalizar em qualquer patamar de criminalidade.
-- **Configurações de Elite:**
-  - **LR:** 0.01 (Estabilidade).
-  - **Batch Size:** 32.
-  - **Dropout:** 0.0 (Sinal Limpo).
-  - **Ranking Weight:** 1.5.
-  - **Penalidade de Variância Suave:** Mantida para evitar platôs de uniformidade.
-- **Métricas Iniciais:** Partida recorde de **29.6% de Recall@40** na Época 1.
-- **Status:** **TREINAMENTO ATIVO (RUMO AOS 80%+).**
+## Tentativa 23 (PENEIRA QUENTE - SEM MEDO) - 2026-02-22 23:45
+- **Estratégia:** "Hotspot Anomaly Detector" (Foco em Anomalias de Alta Temperatura).
+- **Mudança de Paradigma:** O especialista agora ignora dias calmos (ruído aleatório) e treina exclusivamente com dias pertencentes a meses quentes (> 60 crimes/mês). O objetivo é aprender a dinâmica de conflito real, não a aleatoriedade da paz.
+- **Ajuste Psicológico:** `Ranking Weight` reduzido para **0.5** para remover o medo de punição severa e encorajar o modelo a arriscar previsões de pico.
+- **Configuração Técnica:**
+  - **Arquitetura:** Leve (64 neurônios) para agilidade.
+  - **Batch Size:** 32 (Estabilidade).
+  - **Dataset:** Filtrado para dias críticos.
+- **Objetivo:** Maximizar o Recall@40 nos dias que realmente importam, entregando uma lista de "alerta vermelho" para o Generalista refinar.
+- **Status:** **TREINAMENTO ATIVO.**
 
 ## 🛠️ MANUAL DE AJUSTE DE PRIORIDADE DE FACÇÕES (INTEL-BIAS)
 Caso o cenário de inteligência aponte uma guerra específica, o treinamento dos especialistas pode ser "calibrado" para focar em determinadas facções.

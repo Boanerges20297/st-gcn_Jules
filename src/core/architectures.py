@@ -89,7 +89,7 @@ class DeepSTGAT_64(nn.Module):
         return self.fc(x)
 
 class TemperatureExpertGAT(nn.Module):
-    """MODELO ULTRA-TURBINADO PARA ESPECIALISTAS (256 NEURONIOS FC)."""
+    """MODELO ESPECIALISTA LEVE (64 NEURONIOS FC)."""
     def __init__(self, num_nodes, in_channels, time_steps, dropout=0.2):
         super().__init__()
         self.layer1 = STGCNBlock(in_channels, 32, time_steps, dropout)
@@ -97,15 +97,12 @@ class TemperatureExpertGAT(nn.Module):
         self.layer3 = STGCNBlock(64, 64, time_steps, dropout)
         self.final_conv = nn.Conv2d(64, 64, kernel_size=(1, time_steps))
         
-        # MASSA NEURAL DOBRADA: 64 -> 256 -> 128 -> 1
+        # FC CLASSICA: 64 -> 32 -> 1
         self.fc = nn.Sequential(
-            nn.Linear(64, 256),
+            nn.Linear(64, 32),
             nn.ReLU(),
             nn.Dropout(dropout),
-            nn.Linear(256, 128),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(128, 1)
+            nn.Linear(32, 1)
         )
 
     def forward(self, x, adj_list):
