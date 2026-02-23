@@ -172,8 +172,8 @@ def train_specialist(region_key, ModelClass):
         t_h, t_l = target[top_idx].unsqueeze(1), target[neg_idx].unsqueeze(0)
         margin = 0.2 + (F.relu(t_h - t_l) * 0.5)
         loss_rank = (F.relu(margin - (p_h - p_l)) * (t_h > t_l).float()).sum() / (num_neg * k)
-        # COMBINAÇÃO AGRESSIVA (T12): Regressão + 0.3 * Ranking
-        return (loss_reg + 0.3 * loss_rank) * t_mult
+        # COMBINAÇÃO AGRESSIVA (T12): Regressão + 0.5 * Ranking
+        return (loss_reg + 0.5 * loss_rank) * t_mult
 
     steps_per_epoch = (len(train_X) * 2 // GRADIENT_ACCUMULATION_STEPS) + 1
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=LR*3.0, steps_per_epoch=steps_per_epoch, epochs=EPOCHS)

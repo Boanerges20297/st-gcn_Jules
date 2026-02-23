@@ -7,10 +7,6 @@ import torch.nn.functional as F
 # ============================================================================
 
 class MultiHeadTemporalAttention(nn.Module):
-    """
-    ATENÇÃO TEMPORAL: Decide quais dias do passado são mais importantes.
-    Permite que o modelo ignore períodos estáveis e foque em rupturas de padrão.
-    """
     def __init__(self, channels, heads=2):
         super().__init__()
         self.mha = nn.MultiheadAttention(embed_dim=channels, num_heads=heads, batch_first=True)
@@ -25,11 +21,6 @@ class MultiHeadTemporalAttention(nn.Module):
         return x * torch.sigmoid(attn_weights)
 
 class FastRelationalGCN(nn.Module):
-    """
-    GCN RELACIONAL: Diferencia vizinhança física de alianças de facções.
-    Calcula a propagação do risco separadamente para Geo e Conflito.
-    Suporta Intel-Bias para priorização de nós críticos (ex: L.B. em facção).
-    """
     def __init__(self, in_features, out_features, dropout=0.4):
         super().__init__()
         self.W_self = nn.Linear(in_features, out_features)
@@ -43,36 +34,26 @@ class FastRelationalGCN(nn.Module):
         h_self = self.W_self(x)
         h_geo = torch.matmul(adj_geo, self.W_geo(x))
         h_conf = torch.matmul(adj_conf, self.W_conf(x))
-        
-        # SOMA DAS INFLUÊNCIAS: Auto-influência + Vizinhos + Facção
         out = h_self + h_geo + h_conf
         BT, N, C = out.shape
         out = self.bn(out.view(-1, C)).view(BT, N, C)
         return self.dropout(F.elu(out))
 
 class GlobalSpatialAttention(nn.Module):
-    """
-    SPATIAL TRANSFORMER: Permite que cada bairro olhe para todos os outros.
-    Ignora as restrições das matrizes de adjacência para descobrir links invisíveis.
-    """
     def __init__(self, channels, heads=4):
         super().__init__()
         self.mha = nn.MultiheadAttention(embed_dim=channels, num_heads=heads, batch_first=True)
         self.norm = nn.LayerNorm(channels)
 
     def forward(self, x):
-        # x: (BT, N, C)
         attn_out, _ = self.mha(x, x, x)
         return self.norm(x + attn_out)
 
 class STGCNBlock(nn.Module):
-    """BLOCO BÁSICO: Agora com Spatial Transformer + Relational GCN."""
     def __init__(self, in_channels, out_channels, time_steps, dropout=0.4):
         super().__init__()
         self.time_conv = nn.Conv2d(in_channels, out_channels, (1, 3), padding=(0, 1))
-        # Componente 1: Atenção Global (Transformer)
         self.spatial_transformer = GlobalSpatialAttention(out_channels)
-        # Componente 2: GCN Relacional (Física/Facções)
         self.gcn = FastRelationalGCN(out_channels, out_channels, dropout)
         self.temp_attn = MultiHeadTemporalAttention(out_channels)
         self.residual = nn.Conv2d(in_channels, out_channels, 1) if in_channels != out_channels else nn.Identity()
@@ -82,12 +63,8 @@ class STGCNBlock(nn.Module):
         x = F.elu(self.time_conv(x))
         B, C, N, T = x.shape
         x_flat = x.permute(0, 3, 2, 1).reshape(B * T, N, C)
-        
-        # 1. Passo Transformer (Global)
         x_spatial = self.spatial_transformer(x_flat)
-        # 2. Passo GCN (Local)
         x_spatial = self.gcn(x_spatial, adj_list)
-        
         x = x_spatial.reshape(B, T, N, C).permute(0, 3, 2, 1)
         x = self.temp_attn(x)
         return x + res
@@ -95,7 +72,7 @@ class STGCNBlock(nn.Module):
 # --- ARQUITETURAS DISPONÍVEIS ---
 
 class DeepSTGAT_64(nn.Module):
-    """ESPECIALISTA FORTALEZA: 3 camadas profundas, 64 canais internos."""
+    """ESPECIALISTA FORTALEZA (Versao Original Estavel - 63.2%)."""
     def __init__(self, num_nodes, in_channels, time_steps, dropout=0.4):
         super().__init__()
         self.layer1 = STGCNBlock(in_channels, 32, time_steps, dropout)
@@ -111,8 +88,34 @@ class DeepSTGAT_64(nn.Module):
         x = self.final_conv(x).squeeze(-1).permute(0, 2, 1)
         return self.fc(x)
 
+class TemperatureExpertGAT(nn.Module):
+    """MODELO ULTRA-TURBINADO PARA ESPECIALISTAS (256 NEURONIOS FC)."""
+    def __init__(self, num_nodes, in_channels, time_steps, dropout=0.2):
+        super().__init__()
+        self.layer1 = STGCNBlock(in_channels, 32, time_steps, dropout)
+        self.layer2 = STGCNBlock(32, 64, time_steps, dropout)
+        self.layer3 = STGCNBlock(64, 64, time_steps, dropout)
+        self.final_conv = nn.Conv2d(64, 64, kernel_size=(1, time_steps))
+        
+        # MASSA NEURAL DOBRADA: 64 -> 256 -> 128 -> 1
+        self.fc = nn.Sequential(
+            nn.Linear(64, 256),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(128, 1)
+        )
+
+    def forward(self, x, adj_list):
+        x = self.layer1(x, adj_list)
+        x = self.layer2(x, adj_list)
+        x = self.layer3(x, adj_list)
+        x = self.final_conv(x).squeeze(-1).permute(0, 2, 1)
+        return self.fc(x)
+
 class DeepSTGAT_32(nn.Module):
-    """ESPECIALISTA RMF/INTERIOR: Arquitetura equilibrada de 32 canais internos."""
     def __init__(self, num_nodes, in_channels, time_steps, dropout=0.4):
         super().__init__()
         self.layer1 = STGCNBlock(in_channels, 32, time_steps, dropout)

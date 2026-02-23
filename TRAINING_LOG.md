@@ -92,14 +92,44 @@
   - **Fold 1 (164 dias):** P@20 de **35.5%** (Estável).
   - **Fold 2 (324 dias):** P@20 saltou para **46.0%** (Efeito da maior base de dados).
   - **Fold 3 (484 dias):** P@20 estabilizou em **42.9%** (até Época 6).
-  - **Diagnóstico de Loss:** O modelo mostrou estabilidade na convergência da Loss de Treino (0.054), indicando aprendizado real e não memorização.
-  - **Conclusão Técnica:** O modelo estático atingiu um platô robusto entre **42% e 46%**. Embora sólido, a dificuldade em superar essa barreira sugere que a arquitetura fixa luta para capturar mudanças bruscas de regime (dias muito calmos vs. dias muito quentes).
-- **Plano de Adaptação Dinâmica (Modo de Crise):**
-  - **Problema:** Inércia do modelo estático em mudanças bruscas de cenário (ex: tréguas ou guerras repentinas).
-  - **Solução Proposta:** "O Guardião do Estado".
-  - **Mecanismo:**
-    1.  **Monitoramento:** Calcular Erro Diário (`|P_ontem - Y_ontem| / Y_ontem`).
-    2.  **Gatilho:** Se Erro > **30% (0.3)**, ativar Modo de Crise.
-    3.  **Ação:** Fine-Tuning Rápido (7 dias de histórico recente, 10 épocas, apenas camadas finais).
-    4.  **UX:** Processamento em Background (Job Noturno) para manter a resposta instantânea ao usuário.
-- **Status:** **VALIDAÇÃO CONCLUÍDA. PRÓXIMA FASE: IMPLEMENTAÇÃO DA ESTRATÉGIA DINÂMICA.**
+- **Status:** **CONCLUÍDO.**
+
+## Tentativa 16 (ARQUITETURA EM CASCATA - REGIMES DE INTENSIDADE) - 2026-02-21 22:30
+- **Estratégia:** "Cascata de Especialistas" (Peneirador Contextual -> Generalista Cirurgião).
+- **Status:** **CONCLUÍDO.**
+
+## Tentativa 17 (ELITE CASCADE RANKING - LAPIDAÇÃO SUPREMA) - 2026-02-22 01:10
+- **Status:** **CONCLUÍDO.**
+
+## Tentativa 19 (LAPIDAÇÃO DIAMANTE - ESTROBOSCÓPICA) - 2026-02-22 16:30
+- **Status:** **CONCLUÍDO.**
+
+## Tentativa 21 (SUPER ESPECIALISTA UNIVERSAL - PUREZA ALEATÓRIA) - 2026-02-22 17:15
+- **Estratégia:** Consolidação em um único Peneirador Neural de Elite com Massa Crítica Estendida.
+- **Pivot Decisivo:** Abandono da separação por buckets de regime (que limitavam a variância de amostras) em favor de um treinamento holístico em Fortaleza.
+- **Foco em Dados Modernos:** Dataset restrito ao período de Maio/2023 a Dezembro/2025 para capturar a dinâmica territorial vigente.
+- **Amostragem Estocástica:** Embaralhamento total de amostras em cada época para forçar o modelo a generalizar em qualquer patamar de criminalidade.
+- **Configurações de Elite:**
+  - **LR:** 0.01 (Estabilidade).
+  - **Batch Size:** 32.
+  - **Dropout:** 0.0 (Sinal Limpo).
+  - **Ranking Weight:** 1.5.
+  - **Penalidade de Variância Suave:** Mantida para evitar platôs de uniformidade.
+- **Métricas Iniciais:** Partida recorde de **29.6% de Recall@40** na Época 1.
+- **Status:** **TREINAMENTO ATIVO (RUMO AOS 80%+).**
+
+## 🛠️ MANUAL DE AJUSTE DE PRIORIDADE DE FACÇÕES (INTEL-BIAS)
+Caso o cenário de inteligência aponte uma guerra específica, o treinamento dos especialistas pode ser "calibrado" para focar em determinadas facções.
+
+**Onde mudar:** No arquivo `scripts/training/train_regime_experts.py`, dentro da variável global `FACTION_PRIORITY`.
+**Como ajustar:**
+- Procure pelo dicionário `FACTION_PRIORITY`.
+- Valores sugeridos: 
+  - `1.0`: Prioridade Normal (Padrão).
+  - `2.0`: Prioridade Alta (Guerra Ativa).
+  - `3.0`: Prioridade Crítica (Crise de Segurança).
+
+**Configuração Atual (Fevereiro/2026):**
+- **CV:** 2.0 (Foco em Lagoa Redonda/Passaré)
+- **MASSA:** 2.0 (Foco em Messejana)
+- **Outros:** 1.0
