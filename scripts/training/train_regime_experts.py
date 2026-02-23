@@ -35,9 +35,9 @@ logging.basicConfig(
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # --- RETORNO AO BASICO QUE FUNCIONA ---
 EPOCHS = 200
-LR = 0.002
+LR = 0.02
 DROPOUT = 0.3
-RANKING_WEIGHT = 5.0
+RANKING_WEIGHT = 2.0
 BATCH_SIZE = 16
 
 # INTEL-BIAS ATIVO
