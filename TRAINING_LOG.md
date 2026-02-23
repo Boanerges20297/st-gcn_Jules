@@ -113,7 +113,22 @@
   - **Batch Size:** 32 (Estabilidade).
   - **Dataset:** Filtrado para dias críticos.
 - **Objetivo:** Maximizar o Recall@40 nos dias que realmente importam, entregando uma lista de "alerta vermelho" para o Generalista refinar.
-- **Status:** **TREINAMENTO ATIVO.**
+- **Status:** **CONCLUÍDO.**
+
+## Tentativa 24 (PENEIRA QUENTE DIÁRIA - SAZONALIDADE PURA) - 2026-02-23 12:45
+- **Estratégia:** "Daily Intensity Sieve" (Filtro Diário de Alta Intensidade).
+- **Mudança de Paradigma:** Abandono da agregação mensal em favor de um filtro diário direto (> 3 crimes CVLI/dia em Fortaleza). O objetivo é capturar a "sazonalidade de fim de semana" e dias atípicos de alta violência, onde o modelo precisa ser cirúrgico.
+- **Diagnóstico de Dados:** Análise preliminar mostrou que filtrar por >10 crimes/dia zerava a amostra. O threshold foi ajustado para >3 crimes, capturando os ~20% dias mais violentos (187 dias).
+- **Parâmetros Otimizados:**
+  - **Epochs:** 150 (Convergência profunda).
+  - **LR:** 0.001 (Ajuste fino para evitar saturação).
+  - **Ranking Weight:** 5.0 (Prioridade máxima para o ordenamento correto dos bairros).
+  - **Batch Size:** 32.
+  - **Dropout:** 0.4.
+- **Resultado:**
+  - **Recall@40 (Pico):** **64.0%** (Época 142).
+  - **Estabilidade:** Manteve-se consistentemente acima de 60% nas últimas 20 épocas.
+- **Status:** **SUCESSO (Meta > 60% Atingida).**
 
 ## 🛠️ MANUAL DE AJUSTE DE PRIORIDADE DE FACÇÕES (INTEL-BIAS)
 Caso o cenário de inteligência aponte uma guerra específica, o treinamento dos especialistas pode ser "calibrado" para focar em determinadas facções.
