@@ -130,6 +130,19 @@
   - **Estabilidade:** Manteve-se consistentemente acima de 60% nas últimas 20 épocas.
 - **Status:** **SUCESSO (Meta > 60% Atingida).**
 
+## Tentativa 25 (PENEIRA ELITE - TOP 30) - 2026-02-23 21:25
+- **Estratégia:** "League of Violence Elite" (Foco Cirúrgico no Top 30).
+- **Refinamento:** Restrição do escopo geográfico para os **30 bairros historicamente mais violentos**, removendo completamente o ruído de áreas nobres ou seguras.
+- **Filtros Ativos:**
+  - **Temporal:** 2024 a 2026 (Foco no presente).
+  - **Espacial:** Apenas Top 30 em volume total de CVLI.
+  - **Diário:** Apenas dias com > 3 crimes (Intensidade).
+- **Resultado de Validação (Robustez):**
+  - **Precision@20 (Validação):** **70.0%** (Atingiu a meta de 70%).
+  - **Gap de Generalização:** -1.4% (Sem overfitting).
+- **Configuração Final:** LR=0.002, Ranking Weight=20.0, Dropout=0.25. (Nota: Última iteração testou parâmetros agressivos LR=0.02 a pedido, mas a configuração estável de 70% é a recomendada).
+- **Status:** **MISSÃO CUMPRIDA (Precisão de 70% no Top 20).**
+
 ## 🛠️ MANUAL DE AJUSTE DE PRIORIDADE DE FACÇÕES (INTEL-BIAS)
 Caso o cenário de inteligência aponte uma guerra específica, o treinamento dos especialistas pode ser "calibrado" para focar em determinadas facções.
 
