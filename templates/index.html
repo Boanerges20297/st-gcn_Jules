@@ -1453,12 +1453,18 @@
     ].map(function(s){ return s.toLowerCase(); });
 
     function getRegionType(cidade, regionProp) {
-        if (regionProp) return regionProp.toLowerCase();
+        // PRIORIDADE 1: Propriedade vinda direto do backend (Metadados de Elite)
+        if (regionProp) {
+            var r = regionProp.toLowerCase();
+            if (r === 'capital') return 'fortaleza';
+            return r;
+        }
+        
+        // FALLBACK: Lógica de strings (legado)
         if (!cidade) return 'unknown';
         var c = String(cidade).trim().toLowerCase();
         if (c.indexOf('fortalez') === 0) return 'fortaleza';
         if (rmfCities.indexOf(c) !== -1) return 'rmf';
-        if (c === 'rmf/interior') return 'unknown';
         return 'interior';
     }
 

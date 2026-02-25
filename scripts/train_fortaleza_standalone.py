@@ -93,7 +93,7 @@ def train_specialist(region_key, ModelClass):
     adj_geo = torch.tensor(normalize_adj(data['adj_geo']), dtype=torch.float32).to(DEVICE)
     adj_conf = torch.tensor(normalize_adj(data['adj_conflict']), dtype=torch.float32).to(DEVICE)
     
-    WINDOW, PREDICT_HORIZON = 30, 7
+    WINDOW, PREDICT_HORIZON = 120, 7
     N, T_total, C = features.shape
     
     features_norm = features.copy()
@@ -154,8 +154,8 @@ def train_specialist(region_key, ModelClass):
     
     logging.info(f"Dataset: Treino={len(train_X)} | Val={len(val_X)} | Lastro Inédito={len(lastro_X)}")
     
-    # Injetando DROPOUT de 0.2 e usando LR agressivo
-    model = ModelClass(num_nodes=N, in_channels=C, time_steps=WINDOW, dropout=0.2).to(DEVICE)
+    # Injetando DROPOUT de 0.4 para regularização extrema
+    model = ModelClass(num_nodes=N, in_channels=C, time_steps=WINDOW, dropout=0.4).to(DEVICE)
     optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=1e-4)
     
     def criterion(pred, target, info):
@@ -176,18 +176,38 @@ def train_specialist(region_key, ModelClass):
         t_h, t_l = target[top_idx].unsqueeze(1), target[neg_idx].unsqueeze(0)
         margin = 0.2 + (F.relu(t_h - t_l) * 0.5)
         loss_rank = (F.relu(margin - (p_h - p_l)) * (t_h > t_l).float()).sum() / (num_neg * k)
-        # COMBINAÇÃO AGRESSIVA (T12): Regressão + 0.3 * Ranking
-        return (loss_reg + 0.3 * loss_rank) * t_mult
+        # COMBINAÇÃO ULTRA-AGRESSIVA: Regressão + 15.0 * Ranking
+        return (loss_reg + 15.0 * loss_rank) * t_mult
 
     steps_per_epoch = (len(train_X) * 2 // GRADIENT_ACCUMULATION_STEPS) + 1
-    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=LR*3.0, steps_per_epoch=steps_per_epoch, epochs=EPOCHS)
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=LR, steps_per_epoch=steps_per_epoch, epochs=EPOCHS)
     
-    best_p20 = -1.0
+    # CARREGAR RECORDE HISTÓRICO (PERSISTÊNCIA)
+    best_p20 = 0.0
+    record_path = os.path.join(ROOT_DIR, 'logs', 'best_p20_record.txt')
+    if os.path.exists(record_path):
+        try:
+            with open(record_path, 'r') as f:
+                content = f.read()
+                # Extrair o valor numérico após "Recorde P@20: "
+                import re
+                match = re.search(r"Recorde P@20: ([\d.]+)", content)
+                if match:
+                    best_p20 = float(match.group(1)) / 100.0
+                    logging.info(f"📜 Recorde Histórico Carregado: {best_p20*100:.2f}%")
+        except Exception as e:
+            logging.warning(f"⚠️ Não foi possível carregar o recorde anterior: {e}")
     
     # Oversampling logic
     day_sev = [torch.sum(y).item() for y in train_y]
     high_idx = [i for i, s in enumerate(day_sev) if s > np.median(day_sev)]
     train_indices = list(range(len(train_X))) + high_idx + high_idx
+    total_steps = len(train_indices) // GRADIENT_ACCUMULATION_STEPS
+
+    logging.info(f"🎬 Iniciando Loop de Treinamento: {EPOCHS} épocas | {total_steps} passos/época")
+    logging.info(f"{'='*100}")
+    logging.info(f"{'PASSO':<15} | {'LR':<10} | {'LOSS':<10} | {'P@10':<8} | {'P@20':<8}")
+    logging.info(f"{'='*100}")
 
     for epoch in range(EPOCHS):
         model.train()
@@ -206,11 +226,13 @@ def train_specialist(region_key, ModelClass):
             if steps % GRADIENT_ACCUMULATION_STEPS == 0:
                 torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
                 optimizer.step()
+                current_lr = scheduler.get_last_lr()[0]
                 scheduler.step()
                 optimizer.zero_grad()
                 
-                # NOVO: Telemetria Completa (Loss + Ranking) por passo
-                if (steps // GRADIENT_ACCUMULATION_STEPS) % 5 == 0:
+                current_step = steps // GRADIENT_ACCUMULATION_STEPS
+                # Telemetria com Progresso e Cabeçalho Implícito
+                if current_step % 2 == 0:
                     with torch.no_grad():
                         y_true, y_pred = by.squeeze().cpu().numpy(), pred.squeeze().cpu().numpy()
                         p10, p20 = 0.0, 0.0
@@ -218,7 +240,7 @@ def train_specialist(region_key, ModelClass):
                             t_true, t_pred = np.argsort(y_true)[::-1], np.argsort(y_pred)[::-1]
                             p10 = len(set(t_true[:10]) & set(t_pred[:10])) / 10.0
                             p20 = len(set(t_true[:20]) & set(t_pred[:20])) / 20.0
-                    logging.info(f"   -> Progress: {steps}/{len(train_indices)} | Loss: {loss.item()*GRADIENT_ACCUMULATION_STEPS:.4f} | P@10: {p10*100:.1f}% | P@20: {p20*100:.1f}%")
+                    logging.info(f"E{epoch+1:02d} [{current_step:03d}/{total_steps:03d}] | {current_lr:.6f} | {loss.item()*GRADIENT_ACCUMULATION_STEPS:.6f} | {p10*100:>5.1f}% | {p20*100:>5.1f}%")
         
         model.eval()
         val_loss = 0.0
@@ -257,8 +279,18 @@ def train_specialist(region_key, ModelClass):
             best_p20 = real_p20
             # Definir o caminho de salvamento corretamente
             save_path = os.path.join(ROOT_DIR, 'models', 'active', f'{region_key}_model.pth')
-            torch.save({'model_state_dict': model.state_dict()}, save_path)
-            logging.info(f"🏆 NOVO RECORDE REALIDADE: {real_p20*100:.1f}% | Salvo em {save_path}")
+            torch.save({
+                'model_state_dict': model.state_dict(),
+                'p20_record': best_p20,
+                'epoch': epoch
+            }, save_path)
+            
+            # Salvar recorde em arquivo texto para consulta rápida
+            record_path = os.path.join(ROOT_DIR, 'logs', 'best_p20_record.txt')
+            with open(record_path, 'w') as f:
+                f.write(f"Regiao: {region_key}\nRecorde P@20: {best_p20*100:.2f}%\nEpoca: {epoch+1}\nData: {pd.Timestamp.now()}")
+            
+            logging.info(f"🏆 [RECORDE] Novo P@20 Realidade: {best_p20*100:.2f}% | Modelo salvo em {save_path}")
 
 def main():
     # Garantir que o diretório de modelos existe

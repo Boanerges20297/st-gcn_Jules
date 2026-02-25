@@ -165,9 +165,7 @@ def save_regional_dataset(nodes_gdf, features, adj_geo, adj_conf, dates, region_
 def main():
     print("🚀 Iniciando REBUILD GLOBAL (299 Nos)...")
     nodes_gdf, nodes_proj = load_all_nodes(BAIRROS_FILE)
-    layers = load_faction_layers(INTELIGENCIA_DIR)
-    factions, tensions = calculate_intelligence(nodes_proj, layers)
-    nodes_gdf['faction'], nodes_gdf['tension_index'] = factions, tensions
+    
     print("📊 Carregando Ocorrencias Master...")
     with open(OCORRENCIAS_FILE, 'r', encoding='utf-8') as f:
         occ_data = json.load(f)
@@ -181,8 +179,66 @@ def main():
     occ_df['data'] = pd.to_datetime(occ_df['data'].astype(str), errors='coerce')
     occ_df = occ_df.dropna(subset=['data'])
     occ_df['tipo_upper'] = occ_df.get('tipo_evento', pd.Series()).fillna('').astype(str).str.upper()
+    
+    # Precisamos calcular a inteligência ANTES do filtro de ruído
+    layers = load_faction_layers(INTELIGENCIA_DIR)
+    factions, tensions = calculate_intelligence(nodes_proj, layers)
+    nodes_gdf['faction'], nodes_gdf['tension_index'] = factions, tensions
+
+    # --- NOISE FILTERING (BAIRRO LEVEL) ---
+    # Filtrar bairros com menos de 3 crimes em 120 dias (0.75/mês) 
+    # MAS manter se tiver domínio de facção (NÃO NEUTRO)
+    print("🧹 Filtrando ruídos (Threshold: 0.75 CVLI/mês + Proteção de Facções)...")
     max_date = occ_df['data'].max()
     min_date = max_date - pd.Timedelta(days=1000)
+    
+    is_cvli_all = occ_df['tipo'].fillna('').astype(str).str.lower() == 'cvli'
+    cvli_df = occ_df[is_cvli_all].copy()
+    
+    def clean_occ_bairro(raw_name):
+        if not raw_name: return None
+        n = normalize_text(raw_name)
+        if 'CONJUNTO CEARA' in n: n = 'CONJUNTO CEARA'
+        if 'PRAIA DO FUTURO' in n: n = 'PRAIA DO FUTURO'
+        if 'VILA MANOEL SATIRO' in n: n = 'MANOEL SATIRO'
+        n = re.sub(r'\s+[IVXLCDM]+$', '', n)
+        n = re.sub(r'\s+\d+$', '', n)
+        return n.strip()
+    
+    cvli_df['b_clean'] = cvli_df.apply(lambda r: clean_occ_bairro(r.get('bairro_geo') or r.get('municipio') or r.get('bairro')), axis=1)
+    
+    # Calcular média por mês
+    node_cvli_counts = cvli_df.groupby('b_clean').size()
+    months = 1000 / 30.0
+    
+    # Lógica de Proteção Diferenciada:
+    # Fortaleza: Apenas por Crime (para evitar ruído de 120 bairros)
+    # RMF/Interior: Crime OU Facção (para monitorar polos de risco)
+    valid_mask = []
+    for _, row in nodes_gdf.iterrows():
+        name_norm = normalize_text(row['name'])
+        count = node_cvli_counts.get(name_norm, 0)
+        has_faction = row['faction'] != 'NEUTRO'
+        is_fortaleza = row['regiao'] == 'fortaleza'
+        is_rmf = row['regiao'] == 'rmf'
+        
+        # Filtro: 0.75 CVLI/mês é a base
+        if (count / months >= 0.75):
+            valid_mask.append(True)
+        # Proteção RMF: Mantém todas as cidades (visão completa)
+        elif is_rmf:
+            valid_mask.append(True)
+        # Proteção Interior: Apenas se tiver facção
+        elif not is_fortaleza and has_faction:
+            valid_mask.append(True)
+        else:
+            valid_mask.append(False)
+    
+    nodes_gdf = nodes_gdf[valid_mask].reset_index(drop=True)
+    nodes_proj = nodes_proj[valid_mask].reset_index(drop=True)
+    
+    print(f"📉 Nós mantidos após filtragem: {len(nodes_gdf)} de 299")
+    
     print(f"📅 Janela: {min_date.date()} ate {max_date.date()}")
     features, dates = build_feature_tensor(nodes_gdf, occ_df, min_date, max_date)
     coords = np.array(list(zip(nodes_proj.geometry.x, nodes_proj.geometry.y)))

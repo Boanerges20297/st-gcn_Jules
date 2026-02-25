@@ -52,7 +52,8 @@ def run_background_efficiency_monitor():
     while True:
         if efficiency_monitor is not None:
             try:
-                print("🧠 [Report Preview Monitor] Iniciando avaliação de eficiência global (299 localidades)...")
+                num_loc = len(nodes_gdf) if nodes_gdf is not None else 0
+                print(f"🧠 [Report Preview Monitor] Iniciando avaliação de eficiência global ({num_loc} localidades)...")
                 metrics = efficiency_monitor.run_evaluation()
                 if metrics and 'global' in metrics and 'p10' in metrics['global']:
                     p10 = metrics['global']['p10']
@@ -729,8 +730,8 @@ def get_risk():
                 meta['prediction_window'] = f"{start_pred.strftime('%d/%m')} a {end_pred.strftime('%d/%m')}"
                 meta['intelligence_label'] = f"Janela de Inteligência: {meta['prediction_window']} (Atualizada com Eventos de Hoje)"
                 meta['window_cvli'] = len(orchestrator.dates)
-                meta['model_architecture'] = "Deep ST-GAT (Regionalizado)"
-                meta['model_window_cvli'] = 30 # Janela padrão de 30 dias para Fortaleza
+                meta['model_architecture'] = "Deep ST-GAT Elite (Regionalizado)"
+                meta['model_window_cvli'] = 120 # Nova janela de 120 dias para todos
                 
                 # Incluir Eficiência Recente do Monitor
                 if efficiency_monitor:
@@ -738,8 +739,8 @@ def get_risk():
             else:
                 meta['intelligence_label'] = "Janela de Inteligência: Projeção 7 dias (Tempo Real)"
                 meta['last_date_base'] = 'N/A'
-                meta['model_architecture'] = "ST-GAT v2"
-                meta['model_window_cvli'] = 30
+                meta['model_architecture'] = "ST-GAT Elite v3"
+                meta['model_window_cvli'] = 120
         except Exception as e:
             print(f"Erro ao calcular datas de inteligência: {e}")
             meta['intelligence_label'] = "Janela de Inteligência: Ativa"

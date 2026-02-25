@@ -106,14 +106,67 @@
 
 ## Tentativa 23 (PENEIRA QUENTE - SEM MEDO) - 2026-02-22 23:45
 - **Estratégia:** "Hotspot Anomaly Detector" (Foco em Anomalias de Alta Temperatura).
-- **Mudança de Paradigma:** O especialista agora ignora dias calmos (ruído aleatório) e treina exclusivamente com dias pertencentes a meses quentes (> 60 crimes/mês). O objetivo é aprender a dinâmica de conflito real, não a aleatoriedade da paz.
-- **Ajuste Psicológico:** `Ranking Weight` reduzido para **0.5** para remover o medo de punição severa e encorajar o modelo a arriscar previsões de pico.
+- **Status:** CONCLUÍDO.
+
+## Tentativa 24 (LIMPEZA CIRÚRGICA & JANELA AMPLA) - 2026-02-24 14:40
+- **Estratégia:** Filtragem de Ruído Estatístico + Expansão Temporal.
+- **Mudanças:** 
+  - **Threshold de Ruído:** Bairros com menos de 0.75 CVLI/mês (3 crimes em 120 dias) foram removidos.
+  - **Dataset Fortaleza:** Reduzido de 121 para 48 bairros de alta relevância.
+  - **Janela de Análise (WINDOW):** Aumentada para 120 dias (foco em inércia de longo prazo).
+- **Objetivo:** Eliminar a aleatoriedade de bairros calmos que "poluem" o gradiente do modelo.
+- **Status:** **SUCEDIDO (Base para T25).**
+
+## Tentativa 25 (PRIORIDADE TOTAL AO TOP-N - RANKING 10.0) - 2026-02-24 15:30
+- **Estratégia:** "Agressividade Máxima no Ranking".
 - **Configuração Técnica:**
-  - **Arquitetura:** Leve (64 neurônios) para agilidade.
-  - **Batch Size:** 32 (Estabilidade).
-  - **Dataset:** Filtrado para dias críticos.
-- **Objetivo:** Maximizar o Recall@40 nos dias que realmente importam, entregando uma lista de "alerta vermelho" para o Generalista refinar.
-- **Status:** **TREINAMENTO ATIVO.**
+  - **Ranking Weight:** Elevado de 0.3 para **10.0**.
+  - **Loss:** Híbrida (SmoothL1 + 10.0 * Pairwise Ranking).
+  - **Telemetria:** Implementação de logs detalhados por batch e monitoramento de recorde P@20 em tempo real.
+- **Análise Esperada:** O modelo deve sacrificar a precisão dos valores absolutos (regressão) para garantir que a ordem dos bairros no "Report Preview" seja o mais fiel possível à realidade.
+- **Status:** **SUCEDIDO (82.4% P@20 REALITY).**
+
+## Tentativa 26 (REGULARIZAÇÃO ROBUSTA - DROPOUT 0.3) - 2026-02-24 17:25
+- **Estratégia:** Aumentar a resiliência do modelo contra overfitting no dataset reduzido.
+- **Status:** CONCLUÍDO.
+
+## Tentativa 27 (FILTRAGEM INTELIGENTE - PROTEÇÃO DE FACÇÕES) - 2026-02-25 06:15
+- **Estratégia:** "Presença Criminal como Dado de Risco Latente".
+- **Status:** CONCLUÍDO.
+
+## Tentativa 28 (CICLO GLOBAL DEFINITIVO - SEPARAÇÃO TÁTICA) - 2026-02-25 07:45
+- **Estratégia:** "Máxima Precisão na Capital vs. Consciência Situacional no Interior".
+- **Refinamento de Filtragem:**
+  - **Fortaleza (Estrito):** Apenas bairros com >= 0.75 CVLI/mês (48 nós). Objetivo: Restaurar e superar recorde de 82.4%.
+  - **RMF/Interior (Protegido):** Cidades com >= 0.75 CVLI/mês **OU** Domínio de Facção (16 e 59 nós). Objetivo: Vigilância de polos de risco.
+- **Configurações de Elite:**
+  - **Epochs:** 30 (Estabilidade).
+  - **LR Máximo:** 0.02 (Sem multiplicador - Consistência).
+  - **Ranking Weight:** 15.0 (Agressividade no Top-N).
+  - **Dropout:** 0.4 (Regularização Robusta).
+- **Status:** **CONCLUÍDO.**
+
+## Tentativa 29 (ELITE RMF - PRECISÃO CIRÚRGICA) - 2026-02-25 17:01
+- **Estratégia:** "Foco em P@10 para a Região Metropolitana".
+- **Configuração Técnica:**
+  - **Janela (WINDOW):** 120 dias (Eliminação de ruído sazonal).
+  - **Ranking Weight:** **25.0** (Prioridade total à ordenação).
+  - **Loss:** Híbrida (SmoothL1 + 25.0 * Pairwise Ranking).
+- **Resultado Histórico:**
+  - **P@10:** **90.7%** (Recorde absoluto para RMF).
+  - **P@5:** **61.6%**.
+- **Status:** **SUCEDIDO (Meta >= 80% superada).**
+
+## Tentativa 30 (ELITE INTERIOR - ESTABILIDADE VASTA) - 2026-02-25 17:49
+- **Estratégia:** "Foco em P@20 para o Interior (Vasto Território)".
+- **Configuração Técnica:**
+  - **Arquitetura:** DeepSTGAT_64 (Upgrade para lidar com >100 nós).
+  - **Ranking Weight:** **25.0**.
+  - **Dropout:** 0.3 (Equilíbrio entre aprendizado e ruído).
+- **Resultado Histórico:**
+  - **P@20:** **88.4%** (Superação da meta Jules).
+  - **P@10:** **75.8%**.
+- **Status:** **SUCEDIDO (Meta >= 80% superada).**
 
 ## 🛠️ MANUAL DE AJUSTE DE PRIORIDADE DE FACÇÕES (INTEL-BIAS)
 Caso o cenário de inteligência aponte uma guerra específica, o treinamento dos especialistas pode ser "calibrado" para focar em determinadas facções.

@@ -46,16 +46,16 @@ class StateOrchestrator:
                 'model_path': os.path.join(self.root, 'models', 'active', 'fortaleza_model.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_fortaleza.pkl'),
                 'class': DeepSTGAT_64,
-                'window': 30
+                'window': 120
             },
             'rmf': {
-                'model_path': os.path.join(self.root, 'models', 'active', 'rmf_model.pth'),
+                'model_path': os.path.join(self.root, 'models', 'active', 'rmf_model_elite.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_rmf.pkl'),
                 'class': DeepSTGAT_32,
                 'window': 30
             },
             'interior': {
-                'model_path': os.path.join(self.root, 'models', 'active', 'interior_model.pth'),
+                'model_path': os.path.join(self.root, 'models', 'active', 'interior_model_elite.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_interior.pkl'),
                 'class': DeepSTGAT_32,
                 'window': 30
