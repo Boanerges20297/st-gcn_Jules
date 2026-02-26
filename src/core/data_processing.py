@@ -27,7 +27,8 @@ def load_all_nodes(filepath):
         data = json.load(f)
     
     records = []
-    TO_REMOVE = ['ALTO ALEGRE II', 'CIDADE NOVA', 'DIF III', 'GUADALAJARA', 'INDUSTRIAL', 'IPARANA', 'MARECHAL RONDON', 'PARQUE ALBANO', 'PARQUE DAS NAÇÕES', 'PARQUE DAS NACOES', 'PARQUE LEBLON', 'PARQUE SOLEDADE', 'PRECABURA', 'RACHEL DE QUEIROZ', 'TABAPUÁ', 'URUCUTUBA']
+    # Lista de limpeza reduzida para permitir bairros de alta atividade
+    TO_REMOVE = ['DIF III', 'PRECABURA', 'RACHEL DE QUEIROZ']
     INTERIOR_ZERO = ['BAIXIO', 'GRANJEIRO', 'IPAUMIRIM']
     
     for name, info in data.items():
@@ -186,9 +187,9 @@ def main():
     nodes_gdf['faction'], nodes_gdf['tension_index'] = factions, tensions
 
     # --- NOISE FILTERING (BAIRRO LEVEL) ---
-    # Filtrar bairros com menos de 3 crimes em 120 dias (0.75/mês) 
-    # MAS manter se tiver domínio de facção (NÃO NEUTRO)
-    print("🧹 Filtrando ruídos (Threshold: 0.75 CVLI/mês + Proteção de Facções)...")
+    # Filtrar bairros com base em crimes recentes
+    # Threshold MODERADO: 0.5/mês (Equilíbrio entre massa de dados e ruído)
+    print("🧹 Filtrando ruídos (Threshold: 0.5 CVLI/mês + Proteção de Facções)...")
     max_date = occ_df['data'].max()
     min_date = max_date - pd.Timedelta(days=1000)
     
@@ -207,13 +208,14 @@ def main():
     
     cvli_df['b_clean'] = cvli_df.apply(lambda r: clean_occ_bairro(r.get('bairro_geo') or r.get('municipio') or r.get('bairro')), axis=1)
     
-    # Calcular média por mês
+    # Calcular média por mês (baseado nos 1000 dias de janela)
     node_cvli_counts = cvli_df.groupby('b_clean').size()
     months = 1000 / 30.0
     
-    # Lógica de Proteção Diferenciada:
-    # Fortaleza: Apenas por Crime (para evitar ruído de 120 bairros)
-    # RMF/Interior: Crime OU Facção (para monitorar polos de risco)
+    # Lógica de Proteção:
+    # Fortaleza: 0.5 CVLI/mês
+    # RMF: PROTEÇÃO TOTAL
+    # Interior: 0.5 CVLI/mês OU Presença de Facção
     valid_mask = []
     for _, row in nodes_gdf.iterrows():
         name_norm = normalize_text(row['name'])
@@ -222,13 +224,13 @@ def main():
         is_fortaleza = row['regiao'] == 'fortaleza'
         is_rmf = row['regiao'] == 'rmf'
         
-        # Filtro: 0.75 CVLI/mês é a base
-        if (count / months >= 0.75):
+        # Filtro de Crimes: 0.5/mês
+        if (count / months >= 0.5):
             valid_mask.append(True)
-        # Proteção RMF: Mantém todas as cidades (visão completa)
+        # Proteção RMF: Mantém as 18 cidades oficiais
         elif is_rmf:
             valid_mask.append(True)
-        # Proteção Interior: Apenas se tiver facção
+        # Proteção Interior: Se tiver facção, mantemos mesmo com baixo CVLI
         elif not is_fortaleza and has_faction:
             valid_mask.append(True)
         else:

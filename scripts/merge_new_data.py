@@ -4,6 +4,8 @@ import re
 import numpy as np
 from scipy.spatial import KDTree
 import unicodedata
+import subprocess
+import sys
 
 # Configurações de Caminhos
 BASE_DIR = os.getcwd()
@@ -148,6 +150,17 @@ def merge(new_data_path):
         print(f"   - Registros enriquecidos via GPS: {count_enriched}")
         print(f"   - Duplicatas ignoradas: {count_dupes}")
         print(f"Base total atualizada para {len(final_data)} registros em {OFFICIAL_BASE}")
+        # Após mesclar novos dados, disparar o processamento de dados
+        dp_path = os.path.join('src', 'core', 'data_processing.py')
+        if os.path.exists(dp_path):
+            print(f"Executando processamento adicional: {dp_path} ...")
+            try:
+                res = subprocess.run([sys.executable, dp_path], check=False)
+                print(f"Processamento finalizado com código de saída: {res.returncode}")
+            except Exception as e:
+                print(f"Falha ao executar {dp_path}: {e}")
+        else:
+            print(f"Aviso: arquivo de processamento não encontrado em {dp_path}")
     else:
         print("Nenhum registro novo para inserir.")
 

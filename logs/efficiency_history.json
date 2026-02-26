@@ -1,0 +1,118 @@
+[
+  {
+    "date": "2026-02-26",
+    "total_events": 52,
+    "brute_cvli": 0,
+    "exogenous": 52,
+    "global": {
+      "total_nodes": 87,
+      "active_locations": 18,
+      "total_events": 40,
+      "p5": 0.8,
+      "hits5": [
+        "CAUCAIA",
+        "BARRA DO CEARA",
+        "BARROSO",
+        "CRISTO REDENTOR"
+      ],
+      "p10": 0.6,
+      "hits10": [
+        "CAUCAIA",
+        "BARRA DO CEARA",
+        "BARROSO",
+        "CRISTO REDENTOR",
+        "JANGURUSSU",
+        "MESSEJANA"
+      ],
+      "p20": 0.3,
+      "hits20": [
+        "CAUCAIA",
+        "BARRA DO CEARA",
+        "BARROSO",
+        "CRISTO REDENTOR",
+        "JANGURUSSU",
+        "MESSEJANA"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 11,
+      "active_locations": 5,
+      "total_events": 9,
+      "p5": 0.6,
+      "hits5": [
+        "BARRA DO CEARA",
+        "BARROSO",
+        "CRISTO REDENTOR"
+      ],
+      "p10": 0.5,
+      "hits10": [
+        "BARRA DO CEARA",
+        "BARROSO",
+        "CRISTO REDENTOR",
+        "JANGURUSSU",
+        "MESSEJANA"
+      ],
+      "p20": 0.4545,
+      "hits20": [
+        "BARRA DO CEARA",
+        "BARROSO",
+        "CRISTO REDENTOR",
+        "JANGURUSSU",
+        "MESSEJANA"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 18,
+      "active_locations": 12,
+      "total_events": 30,
+      "p5": 0.8,
+      "hits5": [
+        "CAUCAIA",
+        "AQUIRAZ",
+        "CHOROZINHO",
+        "EUSEBIO"
+      ],
+      "p10": 0.8,
+      "hits10": [
+        "CAUCAIA",
+        "AQUIRAZ",
+        "CHOROZINHO",
+        "EUSEBIO",
+        "HORIZONTE",
+        "ITAITINGA",
+        "MARACANAU",
+        "MARANGUAPE"
+      ],
+      "p20": 0.6667,
+      "hits20": [
+        "CAUCAIA",
+        "AQUIRAZ",
+        "CHOROZINHO",
+        "EUSEBIO",
+        "HORIZONTE",
+        "ITAITINGA",
+        "MARACANAU",
+        "MARANGUAPE",
+        "PACATUBA",
+        "PARACURU",
+        "PARAIPABA",
+        "TRAIRI"
+      ]
+    },
+    "interior": {
+      "total_nodes": 58,
+      "active_locations": 1,
+      "total_events": 1,
+      "p5": 0.0,
+      "hits5": [],
+      "p10": 0.1,
+      "hits10": [
+        "BARREIRA"
+      ],
+      "p20": 0.05,
+      "hits20": [
+        "BARREIRA"
+      ]
+    }
+  }
+]

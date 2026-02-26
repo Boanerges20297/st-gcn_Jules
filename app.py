@@ -53,17 +53,43 @@ def run_background_efficiency_monitor():
         if efficiency_monitor is not None:
             try:
                 num_loc = len(nodes_gdf) if nodes_gdf is not None else 0
-                print(f"🧠 [Report Preview Monitor] Iniciando avaliação de eficiência global ({num_loc} localidades)...")
+                print(f"\n" + "="*60)
+                print(f"🛡️  [MONITOR DE EFICIÊNCIA] Iniciando Avaliação ({num_loc} localidades)")
+                print("="*60)
+                
                 metrics = efficiency_monitor.run_evaluation()
-                if metrics and 'global' in metrics and 'p10' in metrics['global']:
-                    p10 = metrics['global']['p10']
-                    hits = metrics['global'].get('hits10', [])
-                    print(f"📊 [Report Preview] Eficiência Global do Estado (P10): {p10*100:.1f}%")
-                    print(f"📍 [Report Preview] Acertos no Top 10: {', '.join(hits)}")
+                
+                if metrics:
+                    print(f"📅 Data da Avaliação: {metrics.get('date')}")
+                    print(f"📊 Eventos Detectados: {metrics.get('total_events', 0)} ({metrics.get('brute_cvli', 0)} Brutos + {metrics.get('exogenous', 0)} Exógenos)")
+                    
+                    # Exibir Global
+                    if 'global' in metrics:
+                        m = metrics['global']
+                        print(f"\n🌍 REGIONALIZAÇÃO: GLOBAL")
+                        print(f"   P5:  {m.get('p5', 0)*100:.1f}% | Hits: {', '.join(m.get('hits5', []))}")
+                        print(f"   P10: {m.get('p10', 0)*100:.1f}% | Hits: {', '.join(m.get('hits10', []))}")
+                        print(f"   P20: {m.get('p20', 0)*100:.1f}% | Hits: {', '.join(m.get('hits20', []))}")
+                    
+                    # Exibir Fortaleza
+                    if 'fortaleza' in metrics:
+                        m = metrics['fortaleza']
+                        print(f"\n🏙️  REGIONALIZAÇÃO: FORTALEZA")
+                        print(f"   P10: {m.get('p10', 0)*100:.1f}% | Hits: {', '.join(m.get('hits10', []))}")
+                    
+                    # Exibir RMF e Interior se houver acertos
+                    for reg in ['rmf', 'interior']:
+                        if reg in metrics and metrics[reg].get('p10', 0) > 0:
+                            m = metrics[reg]
+                            reg_name = "REGIÃO METROPOLITANA" if reg == 'rmf' else "INTERIOR"
+                            print(f"\n📍 REGIONALIZAÇÃO: {reg_name}")
+                            print(f"   P10: {m.get('p10', 0)*100:.1f}% | Hits: {', '.join(m.get('hits10', []))}")
+                    
+                    print("\n" + "="*60 + "\n")
                 else:
-                    print("📊 [Report Preview Monitor] Sem eventos suficientes para avaliação global hoje.")
+                    print("📊 [Monitor] Sem eventos suficientes para avaliação hoje.")
             except Exception as e:
-                print(f"⚠️ [Report Preview Monitor] Erro na thread de eficiência: {e}")
+                print(f"⚠️ [Monitor] Erro na thread de eficiência: {e}")
         
         # Dorme por 7 dias antes da próxima rodada (604800 segundos)
         time.sleep(604800)

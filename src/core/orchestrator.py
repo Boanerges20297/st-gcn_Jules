@@ -51,14 +51,14 @@ class StateOrchestrator:
             'rmf': {
                 'model_path': os.path.join(self.root, 'models', 'active', 'rmf_model_elite.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_rmf.pkl'),
-                'class': DeepSTGAT_32,
-                'window': 30
+                'class': DeepSTGAT_64,
+                'window': 120
             },
             'interior': {
                 'model_path': os.path.join(self.root, 'models', 'active', 'interior_model_elite.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_interior.pkl'),
-                'class': DeepSTGAT_32,
-                'window': 30
+                'class': DeepSTGAT_64,
+                'window': 120
             }
         }
         
@@ -76,7 +76,7 @@ class StateOrchestrator:
                     
                     # Cria instância da classe correta (64 ou 32 canais)
                     model = cfg['class'](num_nodes=len(data['nodes_gdf']), in_channels=29, time_steps=cfg['window']).to(self.device)
-                    ckpt = torch.load(cfg['model_path'], map_location=self.device)
+                    ckpt = torch.load(cfg['model_path'], map_location=self.device, weights_only=False)
                     model.load_state_dict(ckpt['model_state_dict'])
                     model.eval()
                     

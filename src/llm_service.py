@@ -242,22 +242,43 @@ def _deterministic_parse(text: str) -> List[Dict[str, Any]]:
         if not line: continue
         
         parts = [p.strip() for p in line.split(' - ')]
-        # Typical format: ID - AIS - NATUREZA - DESC - LOCAL - BAIRRO - TIME
+        # Typical format: ID - AIS - NATUREZA/UNIDADE - POSSÍVEL_DESCRIÇÃO - LOCAL - BAIRRO - TIME
         # Default natureza when explicit part is not present
         natureza = "DESCONHECIDO"
-        if len(parts) >= 3 and parts[2]:
+
+        # Normalized forms for matching
+        norm = _normalize_text(line)
+        norm_upper = norm.upper()
+
+        # Identify action/operation/prison keywords and prefer them over unit names
+        action_keywords = [
+            'ABANDON', 'ACHAD', 'APREENS', 'PORTE', 'VEICUL', 'MANDAD', 'PRIS', 'CONDUZ',
+            'ESTUPR', 'HOMICID', 'LESAO', 'ACHADO', 'TRAFIC', 'MORTE', 'ROUBO', 'ASSALT'
+        ]
+
+        # Try to find an action-containing part in the splitted sections (prefer parts after index 2)
+        chosen = None
+        if len(parts) >= 3:
+            for p in parts[2:]:
+                np = _normalize_text(p).upper()
+                for kw in action_keywords:
+                    if kw in np:
+                        chosen = p
+                        break
+                if chosen:
+                    break
+
+        if chosen:
+            natureza = chosen
+        elif len(parts) >= 3 and parts[2]:
+            # fallback to the third part (often the unit name)
             natureza = parts[2]
 
-        # Use normalized text (remove accents and punctuation) for reliable matching
-        norm = _normalize_text(line)
-
-        # Heuristics to detect specific event types
-        if 'HOMICIDIO' in norm:
-            # Prefer explicit homicide label
+        # Heuristics to detect specific event types overriding when explicit words appear
+        if 'HOMICIDIO' in norm_upper or 'HOMICÍDIO' in norm_upper:
             natureza = natureza if natureza != 'DESCONHECIDO' else 'HOMICÍDIO'
             severity = 'HIGH'
-        elif 'LESAO' in norm and 'BALA' in norm:
-            # Treat lesão a bala as high risk (explicit request)
+        elif ('LESAO' in norm_upper or 'LESÃO' in norm_upper) and 'BALA' in norm_upper:
             natureza = 'LESÃO A BALA'
             severity = 'HIGH'
         else:

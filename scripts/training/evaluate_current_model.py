@@ -142,7 +142,7 @@ def main():
 
     # Load Weights
     try:
-        state_dict = torch.load(MODEL_PATH, map_location=device)
+        state_dict = torch.load(MODEL_PATH, map_location=device, weights_only=False)
         model.load_state_dict(state_dict)
         print("Model weights loaded successfully.")
     except Exception as e:
