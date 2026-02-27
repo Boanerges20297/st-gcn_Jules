@@ -111,13 +111,13 @@ def process_ism_data():
         
         if keep:
             final_records.append({
-                'name': c_name, 'lat': info['lat'], 'long': info['long'],
+                'name': c_name, 'latitude': info['lat'], 'longitude': info['long'],
                 'regiao': reg, 'faction': info.get('faction', 'NEUTRO').upper(),
                 'tension_index': 1.0 if ('CAUCAIA' in c_name or 'MARACANAU' in c_name) else 0.0
             })
     
     nodes_df = pd.DataFrame(final_records).drop_duplicates(subset=['name']).reset_index(drop=True)
-    nodes_gdf = gpd.GeoDataFrame(nodes_df, geometry=gpd.points_from_xy(nodes_df.long, nodes_df.lat), crs="EPSG:4326")
+    nodes_gdf = gpd.GeoDataFrame(nodes_df, geometry=gpd.points_from_xy(nodes_df.longitude, nodes_df.latitude), crs="EPSG:4326")
 
     # 4. Construir Tensores
     start_d, end_d = occ_df['data'].min(), occ_df['data'].max()
