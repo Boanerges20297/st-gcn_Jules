@@ -1,4 +1,21 @@
 from flask import Flask, jsonify, render_template, request
+import sys
+import numpy
+# Hack de compatibilidade universal NumPy 1.x <-> 2.0
+try:
+    if numpy.version.version.startswith('1.'):
+        # Se estamos no NumPy 1.x mas o pickle pede 2.0
+        sys.modules['numpy._core'] = numpy.core
+    else:
+        # Se estamos no NumPy 2.x mas o pickle pede 1.0
+        import numpy._core as _core
+        sys.modules['numpy.core'] = _core
+        if not hasattr(_core, 'numeric') and hasattr(numpy, 'core') and hasattr(numpy.core, 'numeric'):
+             sys.modules['numpy.core.numeric'] = numpy.core.numeric
+except Exception as e:
+    print(f"Aviso: Falha ao aplicar hack de compatibilidade NumPy: {e}")
+
+import geopandas as gpd
 import pandas as pd
 import numpy as np
 import os

@@ -114,5 +114,109 @@
         "BARREIRA"
       ]
     }
+  },
+  {
+    "date": "2026-02-27",
+    "total_events": 52,
+    "brute_cvli": 0,
+    "exogenous": 52,
+    "global": {
+      "total_nodes": 96,
+      "active_locations": 20,
+      "total_events": 41,
+      "p5": 0.6,
+      "hits5": [
+        "CAUCAIA",
+        "MARACANAU",
+        "BARRA DO CEARA"
+      ],
+      "p10": 0.4,
+      "hits10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "BARRA DO CEARA",
+        "BARROSO"
+      ],
+      "p20": 0.4,
+      "hits20": [
+        "CAUCAIA",
+        "MARACANAU",
+        "BARRA DO CEARA",
+        "BARROSO",
+        "CRISTO REDENTOR",
+        "DOM LUSTOSA",
+        "JANGURUSSU",
+        "MESSEJANA"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 34,
+      "active_locations": 9,
+      "total_events": 13,
+      "p5": 0.4,
+      "hits5": [
+        "BARRA DO CEARA",
+        "BARROSO"
+      ],
+      "p10": 0.3,
+      "hits10": [
+        "BARRA DO CEARA",
+        "BARROSO",
+        "CRISTO REDENTOR"
+      ],
+      "p20": 0.35,
+      "hits20": [
+        "BARRA DO CEARA",
+        "BARROSO",
+        "CRISTO REDENTOR",
+        "DOM LUSTOSA",
+        "JANGURUSSU",
+        "MESSEJANA",
+        "MONDUBIM"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 18,
+      "active_locations": 11,
+      "total_events": 28,
+      "p5": 0.8,
+      "hits5": [
+        "CAUCAIA",
+        "MARACANAU",
+        "AQUIRAZ",
+        "CHOROZINHO"
+      ],
+      "p10": 0.8,
+      "hits10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "AQUIRAZ",
+        "CHOROZINHO",
+        "EUSEBIO",
+        "HORIZONTE",
+        "ITAITINGA",
+        "MARANGUAPE"
+      ],
+      "p20": 0.6111,
+      "hits20": [
+        "CAUCAIA",
+        "MARACANAU",
+        "AQUIRAZ",
+        "CHOROZINHO",
+        "EUSEBIO",
+        "HORIZONTE",
+        "ITAITINGA",
+        "MARANGUAPE",
+        "PACATUBA",
+        "PARACURU",
+        "TRAIRI"
+      ]
+    },
+    "interior": {
+      "status": "no_events",
+      "p5": 0.0,
+      "p10": 0.0,
+      "p20": 0.0
+    }
   }
 ]
