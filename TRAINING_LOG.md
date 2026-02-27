@@ -171,20 +171,29 @@
 
 ## Tentativa 31 (ISM - IMPLEMENTAÇÃO DO SISTEMA MESTRE) - 2026-02-27 14:45
 - **Estratégia:** Consolidação Regional Definitiva + Restauração da Visão 360º.
-- **Configuração Técnica (Rigor Jules):**
-  - **Arquitetura:** DeepSTGAT_64 (29 Canais Restaurados: CVLI, CVP, Sazonalidade, Tensão, Intel Trigger).
-  - **Janela (WINDOW):** 120 dias (Foco em inércia estrutural).
-  - **Parâmetros:** LR: 0.05 | Dropout: 0.5 | Ranking Weight: 20.0 | Gradient Accumulation: 32.
-- **Filtragem e Consolidação (Limpeza de Ruído):**
-  - **Fortaleza:** >= 1.0 CVLI/mês (33 nós legítimos). Bairros da RMF movidos para a sede.
-  - **RMF:** RIGOROSAMENTE 18 nós (Cidades sedes). Consolidação de bairros periféricos (ex: Guadalajara -> Caucaia).
-  - **Interior:** >= 1.0 CVLI/mês (44 nós estratégicos).
-  - **Facções:** Garantia de permanência para todos os nós com domínio (Não Neutro).
-- **Metas de Recorde (Regionalizadas):**
-  - **Fortaleza/Interior:** Prioridade **P@20** (Cobertura de Risco).
-  - **RMF:** Prioridade **P@10** (Precisão Metropolitana).
-- **Telemetria:** Implementação de logs por Step (Loss acumulada) e Validação Parcial P@10/P@20 em tempo real.
-- **Status:** **EM ANDAMENTO (Fase de Produção Final).**
+- **Status:** **SUCEDIDO (Base para T32).**
+
+
+## Tentativa 32 (ISM - FINAL PRODUCTION) - 2026-02-27 16:30
+- **Estratégia:** ISM (Implementação do Sistema Mestre) em Produção.
+- **Configuração Técnica Consolidada:**
+  - **Script:** `scripts/training/ISM_PRODUCTION_TRAIN.py`.
+  - **Arquitetura:** DeepSTGAT_64 (Tensor 29 Canais: Sazonalidade DOW/Month, CVLI, CVP, Tensão, Intel Trigger).
+  - **Rigor Regional (Filtro Jules Final):**
+    - **Fortaleza:** 33 nós (>= 1.0 CVLI/mês + Consolidação de bairros).
+    - **RMF:** RIGOROSAMENTE 18 nós (Cidades-Sede apenas).
+    - **Interior:** 44 nós (>= 1.0 CVLI/mês + Foco estratégico).
+    - **Facções:** Permanência garantida para todos os nós Não Neutros.
+  - **Hiperparâmetros de Sucesso:**
+    - **Janela:** 120 dias.
+    - **LR:** 0.05 (OneCycleLR).
+    - **Ranking Weight:** 20.0.
+    - **Gradient Accumulation:** 32.
+- **Recordes de Referência:**
+  - **Fortaleza:** P@20: **95.1%** | P@10: **71.2%**.
+  - **RMF:** P@10: **87.4%** | P@20: **90.0%**.
+- **Metas de Salvamento:** P@20 para FTZ/Interior, P@10 para RMF.
+- **Status:** **ATIVO (ENTREGA FINAL).**
 
 
 ## 🛠️ MANUAL DE AJUSTE DE PRIORIDADE DE FACÇÕES (INTEL-BIAS)
