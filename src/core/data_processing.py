@@ -206,32 +206,51 @@ def main():
         n = re.sub(r'\s+\d+$', '', n)
         return n.strip()
     
-    cvli_df['b_clean'] = cvli_df.apply(lambda r: clean_occ_bairro(r.get('bairro_geo') or r.get('municipio') or r.get('bairro')), axis=1)
+    def clean_occ_bairro(row):
+        # Fallback robusto para mapeamento de localidades
+        b_raw = row.get('bairro_geo') or row.get('bairro') or row.get('municipio') or row.get('cidade')
+        if not b_raw: return None
+        n = normalize_text(str(b_raw))
+        if 'CONJUNTO CEARA' in n: n = 'CONJUNTO CEARA'
+        if 'PRAIA DO FUTURO' in n: n = 'PRAIA DO FUTURO'
+        if 'VILA MANOEL SATIRO' in n: n = 'MANOEL SATIRO'
+        n = re.sub(r'\s+[IVXLCDM]+$', '', n)
+        n = re.sub(r'\s+\d+$', '', n)
+        return n.strip()
     
-    # Calcular média por mês (baseado nos 1000 dias de janela)
+    cvli_df['b_clean'] = cvli_df.apply(clean_occ_bairro, axis=1)
+    
+    # Calcular média por mês (baseado nos 1000 dias de janela do dataset)
     node_cvli_counts = cvli_df.groupby('b_clean').size()
     months = 1000 / 30.0
     
-    # Lógica de Proteção:
-    # Fortaleza: 0.5 CVLI/mês
-    # RMF: PROTEÇÃO TOTAL
-    # Interior: 0.5 CVLI/mês OU Presença de Facção
+    # --- FILTRAGEM ESTRITA JULES ---
     valid_mask = []
+    # Janela de análise de 1000 dias (aprox 33 meses)
+    months = 1000 / 30.0
+    
+    print(f"🧹 Aplicando Filtro Jules (Meses na base: {months:.1f})")
+    
     for _, row in nodes_gdf.iterrows():
         name_norm = normalize_text(row['name'])
         count = node_cvli_counts.get(name_norm, 0)
-        has_faction = row['faction'] != 'NEUTRO'
-        is_fortaleza = row['regiao'] == 'fortaleza'
-        is_rmf = row['regiao'] == 'rmf'
+        has_faction = row.get('faction', 'NEUTRO') != 'NEUTRO'
+        regiao = str(row['regiao']).lower()
         
-        # Filtro de Crimes: 0.5/mês
-        if (count / months >= 0.5):
+        crime_per_month = count / months
+        
+        # REGRAS JULES:
+        # 1. FACÇÃO: Sempre manter (Não Neutro)
+        if has_faction:
             valid_mask.append(True)
-        # Proteção RMF: Mantém as 18 cidades oficiais
-        elif is_rmf:
+        # 2. RMF: Sempre manter todos os 18 nós
+        elif regiao == 'rmf':
             valid_mask.append(True)
-        # Proteção Interior: Se tiver facção, mantemos mesmo com baixo CVLI
-        elif not is_fortaleza and has_faction:
+        # 3. FORTALEZA: Crimes >= 2.0/mês
+        elif regiao == 'fortaleza' and crime_per_month >= 2.0:
+            valid_mask.append(True)
+        # 4. INTERIOR: Crimes >= 1.0/mês
+        elif regiao == 'interior' and crime_per_month >= 1.0:
             valid_mask.append(True)
         else:
             valid_mask.append(False)
@@ -239,7 +258,11 @@ def main():
     nodes_gdf = nodes_gdf[valid_mask].reset_index(drop=True)
     nodes_proj = nodes_proj[valid_mask].reset_index(drop=True)
     
-    print(f"📉 Nós mantidos após filtragem: {len(nodes_gdf)} de 299")
+    # Auditoria por Região
+    counts_by_reg = nodes_gdf['regiao'].value_counts()
+    print(f"📉 Nós Finais Mantidos: {len(nodes_gdf)} total")
+    for reg, val in counts_by_reg.items():
+        print(f"   - {reg.upper()}: {val} nos")
     
     print(f"📅 Janela: {min_date.date()} ate {max_date.date()}")
     features, dates = build_feature_tensor(nodes_gdf, occ_df, min_date, max_date)

@@ -157,7 +157,7 @@
   - **P@5:** **61.6%**.
 - **Status:** **SUCEDIDO (Meta >= 80% superada).**
 
-## Tentativa 30 (ELITE INTERIOR - ESTABILIDADE VASTA) - 2026-02-25 17:49
+## Tentativa 30 - 2026-02-25 17:49
 - **Estratégia:** "Foco em P@20 para o Interior (Vasto Território)".
 - **Configuração Técnica:**
   - **Arquitetura:** DeepSTGAT_64 (Upgrade para lidar com >100 nós).
@@ -167,6 +167,25 @@
   - **P@20:** **88.4%** (Superação da meta Jules).
   - **P@10:** **75.8%**.
 - **Status:** **SUCEDIDO (Meta >= 80% superada).**
+
+
+## Tentativa 31 (ISM - IMPLEMENTAÇÃO DO SISTEMA MESTRE) - 2026-02-27 14:45
+- **Estratégia:** Consolidação Regional Definitiva + Restauração da Visão 360º.
+- **Configuração Técnica (Rigor Jules):**
+  - **Arquitetura:** DeepSTGAT_64 (29 Canais Restaurados: CVLI, CVP, Sazonalidade, Tensão, Intel Trigger).
+  - **Janela (WINDOW):** 120 dias (Foco em inércia estrutural).
+  - **Parâmetros:** LR: 0.05 | Dropout: 0.5 | Ranking Weight: 20.0 | Gradient Accumulation: 32.
+- **Filtragem e Consolidação (Limpeza de Ruído):**
+  - **Fortaleza:** >= 1.0 CVLI/mês (33 nós legítimos). Bairros da RMF movidos para a sede.
+  - **RMF:** RIGOROSAMENTE 18 nós (Cidades sedes). Consolidação de bairros periféricos (ex: Guadalajara -> Caucaia).
+  - **Interior:** >= 1.0 CVLI/mês (44 nós estratégicos).
+  - **Facções:** Garantia de permanência para todos os nós com domínio (Não Neutro).
+- **Metas de Recorde (Regionalizadas):**
+  - **Fortaleza/Interior:** Prioridade **P@20** (Cobertura de Risco).
+  - **RMF:** Prioridade **P@10** (Precisão Metropolitana).
+- **Telemetria:** Implementação de logs por Step (Loss acumulada) e Validação Parcial P@10/P@20 em tempo real.
+- **Status:** **EM ANDAMENTO (Fase de Produção Final).**
+
 
 ## 🛠️ MANUAL DE AJUSTE DE PRIORIDADE DE FACÇÕES (INTEL-BIAS)
 Caso o cenário de inteligência aponte uma guerra específica, o treinamento dos especialistas pode ser "calibrado" para focar em determinadas facções.
