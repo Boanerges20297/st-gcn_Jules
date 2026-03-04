@@ -269,6 +269,9 @@
                         <a href="/connections" class="btn btn-outline-dark btn-sm">
                             <i class="fas fa-chart-line"></i> Dashboard Estratégico
                         </a>
+                        <a href="/api/admin/health" target="_blank" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-heartbeat"></i> Monitor de Saúde
+                        </a>
                     </div>
 
                     <div class="d-grid gap-1 mb-2 simulation-ui-container" style="gap: 6px !important;">
@@ -430,7 +433,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     //Subir mais o mapa para evitar corte em mobile - coordenadas ajustadas para Fortaleza bem em cima
-    var initialView = { center: [-3.8100, -38.5267], zoom: 11 };
+    var initialView = { center: [-4.0000, -38.5267], zoom: 11 };
     // Control whether the map should auto-focus the top area on the very first load.
     // We default to true to keep UX stable, but skip auto-focus on initialMapLoad so
     // the user sees the city-level view (Fortaleza) first.
