@@ -136,7 +136,10 @@ class SpecialistTrainer:
         for epoch in range(self.epochs):
             model.train()
             total_loss = 0
-            for bx, by, bw in train_loader:
+            start_epoch = time.time()
+            
+            for i, (bx, by, bw) in enumerate(train_loader):
+                batch_start = time.time()
                 optimizer.zero_grad()
                 pred = model(bx, [adj_geo, adj_conf]).squeeze(-1)
                 
@@ -146,18 +149,24 @@ class SpecialistTrainer:
                 # Ranking (Top-K aproximado para velocidade)
                 loss_rank = torch.tensor(0.0)
                 if self.ranking_weight > 0:
-                    # Penalizar se a ordem dos top-20 estiver muito errada
                     _, top_idx = torch.topk(by, 20, dim=1)
-                    # Simplificação: Garantir que preds nos top_idx sejam maiores que a média
                     loss_rank = F.relu(0.5 - (pred.gather(1, top_idx) - pred.mean(dim=1, keepdim=True))).mean()
                 
                 loss = loss_reg + self.ranking_weight * loss_rank
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
                 optimizer.step()
+                
                 total_loss += loss.item()
+                
+                # Log detalhado por batch a cada 5 batches
+                if (i + 1) % 5 == 0 or (i + 1) == len(train_loader):
+                    elapsed = time.time() - batch_start
+                    progress = (i + 1) / len(train_loader) * 100
+                    logging.info(f"   > Batch {i+1}/{len(train_loader)} ({progress:.1f}%) | Loss: {loss.item():.4f} | Time: {elapsed:.2f}s")
             
             scheduler.step()
+            epoch_time = time.time() - start_epoch
             
             # Avaliação de Precisão Semanal
             if (epoch + 1) % 5 == 0 or epoch == 0:
@@ -173,16 +182,17 @@ class SpecialistTrainer:
                             p20_list.append(len(set(t_true) & set(t_pred)) / 20.0)
                 
                 current_p20 = np.mean(p20_list or [0])
-                logging.info(f"[{region_label}] E{epoch+1:02d} | Loss: {total_loss/len(train_loader):.4f} | Val P@20: {current_p20*100:.1f}%")
+                logging.info(f"✅ [{region_label}] E{epoch+1:02d} | Avg Loss: {total_loss/len(train_loader):.4f} | Val P@20: {current_p20*100:.1f}% | Time: {epoch_time:.1f}s")
                 
                 if current_p20 > self.best_p20:
                     self.best_p20 = current_p20
                     save_path = os.path.join(ROOT_DIR, 'models', 'active', f'{self.region_key}_model_active.pth')
                     torch.save({'model_state_dict': model.state_dict(), 'p20': current_p20}, save_path)
+                    logging.info(f"🏆 NOVO RECORDE {region_label}: P@20={current_p20*100:.1f}%")
 
 def main():
     os.makedirs(os.path.join(ROOT_DIR, 'models', 'active'), exist_ok=True)
-    # Configuração Padrão Semanal Viável
+    # Configuração Padrão Semanal Viável (Otimizada para CPU)
     tasks = [
         ('fortaleza', 30, 0.01, 16, 0.3, 10.0),
         ('rmf', 30, 0.01, 16, 0.3, 10.0),
@@ -192,11 +202,10 @@ def main():
         trainer = SpecialistTrainer(key, epochs, lr, bs, drop, rank_w)
         trainer.train()
     
-    logging.info("\n✅ TREINAMENTO SEMANAL CONCLUÍDO COM SUCESSO.")
+    logging.info("\n✅ TREINAMENTO SEMANAL CONCLUÍDO COM SUCESSO PARA TODOS OS ESPECIALISTAS.")
 
 if __name__ == "__main__":
     main()
-
 
 def main():
     os.makedirs(os.path.join(ROOT_DIR, 'models', 'active'), exist_ok=True)
