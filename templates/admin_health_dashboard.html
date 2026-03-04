@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Health Monitor - REPORT PREVIEW</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #10b981;
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .status-badge.warning {
+            background: #f59e0b;
+        }
+        
+        .status-badge.critical {
+            background: #ef4444;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            border-color: #475569;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
+        }
+        
+        .card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 8px;
+        }
+        
+        .metric-label {
+            font-size: 13px;
+            color: #cbd5e1;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #334155;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #1e40af);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-fill.warning {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+        }
+        
+        .progress-fill.critical {
+            background: linear-gradient(90deg, #ef4444, #b91c1c);
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3b82f6;
+            color: #f1f5f9;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: #0f172a;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #334155;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #334155;
+        }
+        
+        tr:hover {
+            background: #334155;
+        }
+        
+        .alert-box {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid;
+            background: #1e293b;
+        }
+        
+        .alert-critical {
+            border-color: #ef4444;
+        }
+        
+        .alert-critical .alert-badge {
+            background: #ef4444;
+        }
+        
+        .alert-high {
+            border-color: #f97316;
+        }
+        
+        .alert-high .alert-badge {
+            background: #f97316;
+        }
+        
+        .alert-medium {
+            border-color: #f59e0b;
+        }
+        
+        .alert-medium .alert-badge {
+            background: #f59e0b;
+        }
+        
+        .alert-badge {
+            display: inline-block;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #f1f5f9;
+        }
+        
+        .alert-time {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 8px 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        button.secondary {
+            background: #475569;
+        }
+        
+        button.secondary:hover {
+            background: #64748b;
+        }
+        
+        .refresh-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+        
+        .spinner {
+            width: 12px;
+            height: 12px;
+            border: 2px solid #3b82f6;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+        
+        .error {
+            color: #ef4444;
+            padding: 12px;
+            background: #1e293b;
+            border: 1px solid #ef4444;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .success {
+            color: #10b981;
+            padding: 12px;
+            background: #1e293b;
+            border: 1px solid #10b981;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 18px;
+            }
+        }
+
+        /* ===== CALIBRAÇÃO ===== */
+        .calib-region {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .calib-region.degraded  { border-color: #f59e0b; }
+        .calib-region.critical  { border-color: #ef4444; }
+        .calib-region.recovered { border-color: #10b981; }
+
+        .calib-region-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .calib-region-title { font-weight: 600; font-size: 14px; }
+        .calib-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .calib-badge.ok       { background: #064e3b; color: #10b981; }
+        .calib-badge.degraded { background: #78350f; color: #fbbf24; }
+        .calib-badge.critical { background: #7f1d1d; color: #f87171; }
+
+        .calib-params-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        @media (max-width: 900px) {
+            .calib-params-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        .calib-param {
+            background: #0f172a;
+            border-radius: 6px;
+            padding: 8px 10px;
+            text-align: center;
+        }
+        .calib-param-name  { font-size: 10px; color: #64748b; margin-bottom: 2px; }
+        .calib-param-value { font-size: 15px; font-weight: 700; color: #e2e8f0; }
+        .calib-param-delta { font-size: 10px; margin-top: 2px; }
+        .delta-up   { color: #f59e0b; }
+        .delta-down { color: #34d399; }
+        .delta-none { color: #64748b; }
+
+        .calib-history { margin-top: 10px; }
+        .calib-history-title { font-size: 11px; color: #64748b; margin-bottom: 6px; text-transform: uppercase; }
+        .calib-event {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 6px 0;
+            border-bottom: 1px solid #1e293b;
+            font-size: 12px;
+        }
+        .calib-event:last-child { border-bottom: none; }
+        .calib-event-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+        .calib-event-text { color: #94a3b8; }
+        .calib-event-time { font-size: 10px; color: #475569; margin-top: 2px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>🛡️ Admin Dashboard - Health Monitor</h1>
+                <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">
+                    REPORT PREVIEW v2.0 | Monitoramento em Tempo Real
+                </p>
+            </div>
+            <div id="status-indicator" class="status-badge">
+                <span class="spinner"></span>
+                <span>Carregando...</span>
+            </div>
+        </header>
+        
+        <!-- Summary Cards -->
+        <div class="section">
+            <h2 class="section-title">📊 Visão Geral do Sistema</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">CPU</div>
+                    <div class="metric-value" id="cpu-value">--</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="cpu-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="metric-label">de 100% disponível</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">Memória</div>
+                    <div class="metric-value" id="memory-value">--</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="memory-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="metric-label" id="memory-label">GB usados</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">Disco</div>
+                    <div class="metric-value" id="disk-value">--</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="disk-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="metric-label" id="disk-label">GB usados</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">Uptime</div>
+                    <div class="metric-value" style="font-size: 18px;" id="uptime-value">--</div>
+                    <div class="metric-label">Tempo em operação</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">Taxa de Erro</div>
+                    <div class="metric-value" id="error-rate-value">--</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="error-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="metric-label">últimas 24h</div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">Latência P95</div>
+                    <div class="metric-value" id="latency-value">--</div>
+                    <div class="metric-label">milissegundos</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Alerts Section -->
+        <div class="section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 class="section-title" style="margin: 0; border: none;">🔔 Alertas Ativos</h2>
+                <button onclick="refreshAlerts()" class="secondary">↻ Atualizar</button>
+            </div>
+            <div style="max-height: 500px; overflow-y: auto; border: 1px solid #334155; border-radius: 8px;">
+                <div id="alerts-container">
+                    <div class="loading">Carregando alertas...</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- API Performance -->
+        <div class="section">
+            <h2 class="section-title">⚡ Performance da API</h2>
+            <div class="controls">
+                <button onclick="updateApiStats()">↻ Atualizar</button>
+                <select id="endpoint-filter" onchange="updateApiStats()" style="padding: 8px 12px; background: #475569; color: white; border: 1px solid #64748b; border-radius: 6px;">
+                    <option value="">Todos os Endpoints</option>
+                </select>
+            </div>
+            <div style="max-height: 500px; overflow-y: auto; border: 1px solid #334155; border-radius: 8px;">
+                <table id="api-table" style="margin: 0; border-radius: 0;">
+                    <thead style="position: sticky; top: 0; z-index: 1; background: #0f172a;">
+                        <tr>
+                            <th>Endpoint</th>
+                            <th>Requisições</th>
+                            <th>Taxa Erro</th>
+                            <th>P50 (ms)</th>
+                            <th>P95 (ms)</th>
+                            <th>P99 (ms)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="api-tbody">
+                        <tr><td colspan="6" class="loading">Carregando dados...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Confidence Trends -->
+        <div class="section">
+            <h2 class="section-title">🌡️ Cobertura Territorial do Modelo</h2>
+            <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:12px 16px; margin-bottom:14px; font-size:13px; color:#94a3b8;">
+                Mede se os territórios de tensão conhecida (facções ativas, CVLI recente) estão sendo surfaçados no topo do ranking. Substitui P@K — o modelo não é avaliado por prever crimes, mas por cobrir zonas de tensão.
+            </div>
+            <div class="controls">
+                <select id="region-filter" onchange="updateConfidenceTrend()" style="padding: 8px 12px; background: #475569; color: white; border: 1px solid #64748b; border-radius: 6px;">
+                    <option value="global">Global</option>
+                    <option value="fortaleza">Fortaleza</option>
+                    <option value="rmf">RMF</option>
+                    <option value="interior">Interior</option>
+                </select>
+                <select id="period-filter" onchange="updateConfidenceTrend()" style="padding: 8px 12px; background: #475569; color: white; border: 1px solid #64748b; border-radius: 6px;">
+                    <option value="7">Últimos 7 dias</option>
+                    <option value="14">Últimos 14 dias</option>
+                    <option value="30">Últimos 30 dias</option>
+                </select>
+                <button onclick="updateConfidenceTrend()">↻ Atualizar</button>
+            </div>
+            <div class="chart-container">
+                <canvas id="confidence-chart"></canvas>
+            </div>
+            <table id="confidence-table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Cov@10 Global</th>
+                        <th>Cov@20 Global</th>
+                        <th>Cov@20 Fortaleza</th>
+                        <th>Cov@20 RMF</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="confidence-tbody">
+                    <tr><td colspan="6" class="loading">Carregando histórico...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Data Quality -->
+        <div class="section">
+            <h2 class="section-title">📊 Qualidade de Dados</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">Eventos Históricos</div>
+                    <div class="metric-value" id="historical-events">--</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Eventos Exógenos (14d)</div>
+                    <div class="metric-value" id="exogenous-events">--</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Taxa Completude</div>
+                    <div class="metric-value" id="completeness">--</div>
+                </div>
+                <div class="card" style="cursor:pointer;" onclick="toggleAnomalyDetails()" title="Clique para ver detalhes">
+                    <div class="card-title">Anomalias Detectadas <span style="font-size:11px; color:#94a3b8;">(CRITICAL/HIGH)</span></div>
+                    <div class="metric-value" id="anomalies" style="color:#ef4444;">--</div>
+                    <div style="font-size:11px; color:#64748b; margin-top:4px;">&#9660; ver detalhes</div>
+                </div>
+            </div>
+            <!-- Anomaly Details Panel -->
+            <div id="anomaly-details-panel" style="display:none; margin-top:12px; border:1px solid #334155; border-radius:8px; overflow:hidden;">
+                <div style="background:#1e293b; padding:10px 16px; font-size:12px; font-weight:600; color:#94a3b8; border-bottom:1px solid #334155;">DETALHES DAS ANOMALIAS ATIVAS</div>
+                <div id="anomaly-details-list" style="max-height:400px; overflow-y:auto;"></div>
+            </div>
+        </div>
+        
+        <!-- Auto-Ajuste / Calibração -->
+        <div class="section">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+                <h2 class="section-title" style="margin:0; border:none;">🌡️ Termômetro — Auto-Ajuste Territorial</h2>
+                <button onclick="updateCalibration()" class="secondary">↻ Atualizar</button>
+            </div>
+            <div id="calibration-container">
+                <div class="loading">Carregando status de calibração...</div>
+            </div>
+        </div>
+
+        <div class="refresh-info">
+            <span>⏱️ Atualizado automaticamente a cada 30 segundos</span>
+        </div>
+    </div>
+    
+    <script>
+        let confidenceChart = null;
+        const autoRefreshInterval = 30000; // 30 segundos
+        
+        // Carregar dados iniciais
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDashboard();
+            setInterval(updateDashboard, autoRefreshInterval);
+        });
+        
+        async function updateDashboard() {
+            try {
+                const response = await fetch('http://localhost:5050/api/admin/health/summary', { cache: 'no-store' });
+                const data = await response.json();
+                
+                // Update System Metrics
+                updateSystemMetrics(data.system);
+                
+                // Update Status Indicator
+                const status = data.system.status === 'OK' ? 'green' : 'orange';
+                document.getElementById('status-indicator').className = `status-badge ${status === 'orange' ? 'warning' : ''}`;
+                document.getElementById('status-indicator').innerHTML = 
+                    `<span class="spinner"></span><span>SISTEMA ${data.system.status}</span>`;
+                
+                // Update Alerts
+                if (data.alerts) {
+                    displayAlerts(data.alerts.recent || []);
+                }
+                
+                // Update API Stats
+                updateApiStats();
+                
+                // Update Confidence
+                updateConfidenceTrend();
+
+                // Update Data Quality
+                updateDataQuality();
+
+                // Update Calibration
+                updateCalibration();
+            } catch (error) {
+                console.error('Erro ao atualizar dashboard:', error);
+                document.getElementById('status-indicator').innerHTML = 
+                    `<span style="color: #ef4444;">❌ Erro ao conectar</span>`;
+            }
+        }
+
+        async function updateDataQuality() {
+            try {
+                const response = await fetch('http://localhost:5050/api/admin/health/data-quality', { cache: 'no-store' });
+                const data = await response.json();
+                
+                document.getElementById('historical-events').textContent =
+                    data.historical_events !== undefined ? data.historical_events.toLocaleString('pt-BR') : '--';
+                document.getElementById('exogenous-events').textContent =
+                    data.exogenous_events_7d !== undefined ? data.exogenous_events_7d.toLocaleString('pt-BR') : '--';
+                document.getElementById('completeness').textContent =
+                    data.completeness_pct !== undefined
+                        ? data.completeness_pct.toFixed(1) + '% (' + data.regions_available + '/' + data.regions_expected + ')'
+                        : '--';
+                const count = data.anomalies !== undefined ? data.anomalies : '--';
+                document.getElementById('anomalies').textContent = count;
+                // Cor do card conforme severidade
+                document.getElementById('anomalies').style.color = count > 0 ? '#ef4444' : '#10b981';
+
+                // Renderizar painel de detalhes
+                const list = document.getElementById('anomaly-details-list');
+                const details = data.anomaly_details || [];
+                if (details.length === 0) {
+                    list.innerHTML = '<div style="padding:16px; color:#10b981; text-align:center;">✅ Nenhuma anomalia ativa</div>';
+                } else {
+                    const sevColor = { CRITICAL: '#ef4444', HIGH: '#f97316', MEDIUM: '#eab308' };
+                    list.innerHTML = details.map(a => {
+                        const color = sevColor[a.severity] || '#94a3b8';
+                        const ts = a.timestamp ? new Date(a.timestamp).toLocaleString('pt-BR') : '--';
+                        return `<div style="padding:12px 16px; border-bottom:1px solid #1e293b; display:flex; gap:12px; align-items:flex-start;">
+                            <span style="background:${color}; color:#fff; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; flex-shrink:0; margin-top:2px;">${a.severity}</span>
+                            <div style="flex:1;">
+                                <div style="color:#e2e8f0; font-size:13px; line-height:1.4;">${a.message}</div>
+                                <div style="color:#64748b; font-size:11px; margin-top:4px;">${ts} &bull; ${a.type || 'alerta'}</div>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar qualidade de dados:', error);
+            }
+        }
+
+        function toggleAnomalyDetails() {
+            const panel = document.getElementById('anomaly-details-panel');
+            const arrow = document.querySelector('#anomalies').parentElement.querySelector('div:last-child');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                if (arrow) arrow.textContent = '\u25b2 fechar';
+            } else {
+                panel.style.display = 'none';
+                if (arrow) arrow.textContent = '\u25bc ver detalhes';
+            }
+        }
+        
+        function updateSystemMetrics(system) {
+            // CPU
+            const cpuPercent = system.cpu_percent || 0;
+            document.getElementById('cpu-value').textContent = cpuPercent.toFixed(1) + '%';
+            const cpuBar = document.getElementById('cpu-bar');
+            cpuBar.style.width = cpuPercent + '%';
+            cpuBar.className = cpuPercent > 80 ? 'progress-fill critical' : cpuPercent > 60 ? 'progress-fill warning' : 'progress-fill';
+            
+            // Memory
+            const memPercent = system.memory_percent || 0;
+            const memMB = system.memory_mb || 0;
+            const memTotalGB = ((system.memory_total_mb || 0) / 1024).toFixed(1);
+            document.getElementById('memory-value').textContent = (memMB / 1024).toFixed(1) + ' GB';
+            document.getElementById('memory-label').textContent = 'de ' + (memTotalGB > 0 ? memTotalGB : '?') + ' GB';
+            const memBar = document.getElementById('memory-bar');
+            memBar.style.width = memPercent + '%';
+            memBar.className = memPercent > 85 ? 'progress-fill critical' : memPercent > 70 ? 'progress-fill warning' : 'progress-fill';
+            
+            // Disk
+            const diskPercent = system.disk_percent || 0;
+            const diskGB = system.disk_gb || 0;
+            const diskTotalGB = (system.disk_total_gb || 0).toFixed(1);
+            document.getElementById('disk-value').textContent = diskGB.toFixed(1) + ' GB';
+            document.getElementById('disk-label').textContent = 'de ' + (diskTotalGB > 0 ? diskTotalGB : '?') + ' GB';
+            const diskBar = document.getElementById('disk-bar');
+            diskBar.style.width = diskPercent + '%';
+            diskBar.className = diskPercent > 90 ? 'progress-fill critical' : diskPercent > 75 ? 'progress-fill warning' : 'progress-fill';
+            
+            // Uptime
+            document.getElementById('uptime-value').textContent = system.uptime_str || 'N/A';
+        }
+        
+        async function refreshAlerts() {
+            try {
+                const response = await fetch('http://localhost:5050/api/admin/health/alerts?limit=50&resolved=false', { cache: 'no-store' });
+                const data = await response.json();
+                displayAlerts(data.alerts || []);
+            } catch (error) {
+                console.error('Erro ao carregar alertas:', error);
+            }
+        }
+        
+        function displayAlerts(alerts) {
+            const container = document.getElementById('alerts-container');
+            
+            if (!alerts || alerts.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #10b981;">✅ Nenhum alerta ativo</div>';
+                return;
+            }
+            
+            container.innerHTML = alerts.map(alert => `
+                <div class="alert-box alert-${alert.severity.toLowerCase()}">
+                    <span class="alert-badge">${alert.severity}</span>
+                    <div class="alert-title">${alert.message}</div>
+                    <div class="alert-time">${new Date(alert.timestamp).toLocaleString('pt-BR')}</div>
+                </div>
+            `).join('');
+        }
+        
+        async function updateApiStats() {
+            try {
+                const response = await fetch('http://localhost:5050/api/admin/health/api-stats', { cache: 'no-store' });
+                const data = await response.json();
+                
+                const tbody = document.getElementById('api-tbody');
+                const rows = Object.entries(data.endpoints || {}).map(([endpoint, stats]) => `
+                    <tr>
+                        <td>${endpoint}</td>
+                        <td>${stats.requests.toLocaleString()}</td>
+                        <td>${(stats.error_rate_percent).toFixed(2)}%</td>
+                        <td>${stats.p50_latency_ms.toFixed(0)}ms</td>
+                        <td>${stats.p95_latency_ms.toFixed(0)}ms</td>
+                        <td>${stats.p99_latency_ms.toFixed(0)}ms</td>
+                    </tr>
+                `);
+                
+                tbody.innerHTML = rows.length > 0 ? rows.join('') : '<tr><td colspan="6">Sem dados</td></tr>';
+            } catch (error) {
+                console.error('Erro ao carregar API stats:', error);
+            }
+        }
+        
+        async function updateConfidenceTrend() {
+            try {
+                const region = document.getElementById('region-filter').value || 'global';
+                const days = document.getElementById('period-filter').value || '7';
+                
+                const response = await fetch(`http://localhost:5050/api/admin/health/confidence-history?region=${region}&days=${days}`, { cache: 'no-store' });
+                const data = await response.json();
+                
+                // Update table
+                const tbody = document.getElementById('confidence-tbody');
+                const rows = (data.history || []).map(record => `
+                    <tr>
+                        <td>${record.date}</td>
+                        <td>${(record.global?.p10 * 100).toFixed(1)}%</td>
+                        <td>${(record.global?.p20 * 100).toFixed(1)}%</td>
+                        <td>${((record.regions?.fortaleza?.p20 ?? 0) * 100).toFixed(1)}%</td>
+                        <td>${((record.regions?.rmf?.p20 ?? 0) * 100).toFixed(1)}%</td>
+                        <td>${(record.global?.p20 >= 0.8 ? '<span style="color:#10b981">✅ OK</span>' : record.global?.p20 >= 0.6 ? '<span style="color:#f59e0b">⚠️ Atenção</span>' : '<span style="color:#ef4444">🔴 Baixa</span>')}</td>
+                    </tr>
+                `);
+                
+                tbody.innerHTML = rows.length > 0 ? rows.join('') : '<tr><td colspan="6">Sem dados</td></tr>';
+                
+                // Update chart
+                updateConfidenceChart(data.history || [], region);
+            } catch (error) {
+                console.error('Erro ao carregar histórico de confiança:', error);
+            }
+        }
+        
+        function updateConfidenceChart(history, region) {
+            const ctx = document.getElementById('confidence-chart').getContext('2d');
+            
+            const dates = history.map(h => h.date);
+            const p10 = history.map(h => (h.global?.p10 || 0) * 100);
+            const p20 = history.map(h => (h.global?.p20 || 0) * 100);
+
+            // Determine which region to highlight as the 3rd dataset
+            const regionKey = (region && region !== 'global') ? region : 'fortaleza';
+            const regionDisplayNames = { fortaleza: 'Fortaleza', rmf: 'RMF', interior: 'Interior' };
+            const regionLabel = `Cov@20 ${regionDisplayNames[regionKey] || regionKey}`;
+            const p20Region = history.map(h => ((h.regions?.[regionKey]?.p20) ?? 0) * 100);
+
+            // Warn visually when coverage is critically low for selected region
+            const avgRegionCov = p20Region.length > 0
+                ? p20Region.reduce((a, b) => a + b, 0) / p20Region.length
+                : null;
+            const regionColor = avgRegionCov !== null && avgRegionCov < 20
+                ? '#ef4444'   // red — critically low
+                : '#f59e0b';  // amber — normal
+            
+            if (confidenceChart) {
+                confidenceChart.destroy();
+            }
+            
+            confidenceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'Cov@10 Global',
+                            data: p10,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.3,
+                            fill: false
+                        },
+                        {
+                            label: 'Cov@20 Global',
+                            data: p20,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.3,
+                            fill: false
+                        },
+                        {
+                            label: regionLabel,
+                            data: p20Region,
+                            borderColor: regionColor,
+                            backgroundColor: regionColor === '#ef4444'
+                                ? 'rgba(239, 68, 68, 0.1)'
+                                : 'rgba(245, 158, 11, 0.1)',
+                            tension: 0.3,
+                            fill: false,
+                            borderDash: [5, 3]
+                        }
+                    ]
+                },
+                plugins: [{
+                    id: 'zeroCoverageWarning',
+                    afterDraw(chart) {
+                        if (avgRegionCov !== null && avgRegionCov < 5) {
+                            const { ctx: c, chartArea: { left, top, right, bottom } } = chart;
+                            c.save();
+                            c.fillStyle = 'rgba(239,68,68,0.12)';
+                            c.fillRect(left, top, right - left, bottom - top);
+                            c.fillStyle = '#ef4444';
+                            c.font = 'bold 13px sans-serif';
+                            c.textAlign = 'center';
+                            c.fillText(`⚠️ Cobertura ${regionDisplayNames[regionKey] || regionKey}: SEM DADOS (0%)`, (left + right) / 2, (top + bottom) / 2);
+                            c.restore();
+                        }
+                    }
+                }],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#e2e8f0' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(51, 65, 85, 0.2)' }
+                        },
+                        x: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(51, 65, 85, 0.2)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ===== AUTO-AJUSTE / CALIBRAÇÃO =====
+        const PARAM_LABELS = {
+            tension_factor:     '⚡ Peso Tensão',
+            tag_bias_direct:    '🎯 TAG Bias',
+            tag_bias_neighbor:  '🔗 Vizinhos',
+            min_risk:           '🔥 Calor Mín',
+        };
+        const REGION_LABELS = {
+            fortaleza: '🏙️ Fortaleza',
+            rmf:       '🌆 RMF',
+            interior:  '🌄 Interior',
+        };
+        const EVENT_ICONS = {
+            full_rollback:    '↩️',
+            auto_calibration: '🔧',
+            degradation:      '⚠️',
+            recovery:         '✅',
+        };
+
+        async function updateCalibration() {
+            const container = document.getElementById('calibration-container');
+            try {
+                const resp = await fetch('http://localhost:5050/api/admin/health/calibration-status', { cache: 'no-store' });
+                const data = await resp.json();
+
+                if (!data.available) {
+                    container.innerHTML = '<div style="color:#64748b;padding:20px;">Calibrador não disponível.</div>';
+                    return;
+                }
+
+                const regions = data.regions || {};
+                if (Object.keys(regions).length === 0) {
+                    container.innerHTML = '<div style="color:#10b981;padding:20px;">✅ Cobertura territorial normal. Nenhum ajuste aplicado.</div>';
+                    return;
+                }
+
+                container.innerHTML = Object.entries(regions).map(([region, info]) => {
+                    const steps = info.steps || 0;
+                    const isCritical = info.is_critical;
+                    const isDegraded = info.is_degraded;
+                    const cardClass = isCritical ? 'critical' : isDegraded ? 'degraded' : 'recovered';
+                    const badgeClass = isCritical ? 'critical' : isDegraded ? 'degraded' : 'ok';
+                    const badgeLabel = isCritical
+                        ? `⚠️ CRÍTICO — Intervenção Manual (${steps}/3)`
+                        : isDegraded
+                            ? `🔧 Ajuste Ativo: Cobertura Territorial (${steps}/3)`
+                            : '✅ Cobertura Normal';
+
+                    const cur = info.current_params || {};
+                    const def = info.default_params || {};
+
+                    // Obter último trigger para mostrar cobertura
+                    const lastEv = (info.last_5_events || []).slice(-1)[0] || {};
+                    const triggerText = lastEv.trigger || '';
+                    const coverageMatch = triggerText.match(/([\d.]+)%/);
+                    const coveragePct = coverageMatch ? parseFloat(coverageMatch[1]) : null;
+                    const coverageHtml = coveragePct !== null
+                        ? `<div style="margin:8px 0; padding:8px 12px; background:${coveragePct >= 80 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}; border-radius:6px; font-size:13px; color:${coveragePct >= 80 ? '#10b981' : '#ef4444'};">
+                            🌡️ Cobertura territorial: <strong>${coveragePct.toFixed(1)}%</strong>
+                            <span style="color:#94a3b8; font-size:11px;"> (limiar: 80%)</span>
+                          </div>`
+                        : '';
+
+                    const paramsHtml = Object.entries(PARAM_LABELS).map(([key, label]) => {
+                        const curVal = cur[key];
+                        const defVal = def[key];
+                        if (curVal === undefined) return '';
+                        const diff = curVal !== undefined && defVal !== undefined ? curVal - defVal : 0;
+                        const isDown = diff < -0.001;
+                        const isUp   = diff >  0.001;
+                        const deltaClass = isDown ? 'delta-down' : isUp ? 'delta-up' : 'delta-none';
+                        const deltaSign  = isDown ? '▼' : isUp ? '▲' : '—';
+                        const deltaStr   = (isDown || isUp)
+                            ? `<span class="${deltaClass}">${deltaSign} ${Math.abs(diff).toFixed(3)}</span>`
+                            : `<span class="delta-none">—</span>`;
+                        const highlight = (isDown || isUp) ? 'color:#fbbf24;' : '';
+                        return `
+                            <div class="calib-param">
+                                <div class="calib-param-name">${label}</div>
+                                <div class="calib-param-value" style="${highlight}">${typeof curVal === 'number' ? curVal.toFixed(2) : curVal}</div>
+                                <div class="calib-param-delta">${deltaStr}</div>
+                            </div>`;
+                    }).join('');
+
+                    const events = (info.last_5_events || []).slice().reverse();
+                    const eventsHtml = events.length === 0
+                        ? '<div style="color:#475569;font-size:12px;">Sem eventos registrados</div>'
+                        : events.map(ev => {
+                            const isRollback = ev.event === 'full_rollback';
+                            const icon = isRollback ? '↩️' : ev.step ? '🔧' : '✅';
+                            const time = ev.timestamp ? new Date(ev.timestamp).toLocaleString('pt-BR') : '';
+                            const text = ev.trigger || ev.event || 'Evento';
+                            const extra = isRollback
+                                ? ` <span style="color:#10b981">(${ev.steps_reverted} passo(s) revertidos)</span>`
+                                : ev.step ? ` <span style="color:#fbbf24">Passo ${ev.step}/3</span>` : '';
+                            return `
+                                <div class="calib-event">
+                                    <div class="calib-event-icon">${icon}</div>
+                                    <div>
+                                        <div class="calib-event-text">${text}${extra}</div>
+                                        <div class="calib-event-time">${time}</div>
+                                    </div>
+                                </div>`;
+                        }).join('');
+
+                    return `
+                        <div class="calib-region ${cardClass}">
+                            <div class="calib-region-header">
+                                <div class="calib-region-title">${REGION_LABELS[region] || region}</div>
+                                <span class="calib-badge ${badgeClass}">${badgeLabel}</span>
+                            </div>
+                            ${coverageHtml}
+                            <div class="calib-params-grid">${paramsHtml}</div>
+                            <div class="calib-history">
+                                <div class="calib-history-title">Últimos eventos</div>
+                                ${eventsHtml}
+                            </div>
+                        </div>`;
+                }).join('');
+
+            } catch (err) {
+                container.innerHTML = `<div class="error">Erro ao carregar calibração: ${err.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

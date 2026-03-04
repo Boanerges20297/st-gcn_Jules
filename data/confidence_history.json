@@ -1,0 +1,240 @@
+[
+  {
+    "date": "2026-02-26",
+    "timestamp": "2026-03-01T16:59:17.925678",
+    "global": {
+      "p10": 0.6,
+      "p20": 0.3,
+      "precision": 0.6,
+      "recall": 0.3,
+      "f1_score": 0.4
+    },
+    "regions": {
+      "fortaleza": {
+        "p10": 0.5,
+        "p20": 0.4545,
+        "precision": 0.5,
+        "recall": 0.4545,
+        "f1_score": 0.4762
+      },
+      "rmf": {
+        "p10": 0.8,
+        "p20": 0.6667,
+        "precision": 0.8,
+        "recall": 0.6667,
+        "f1_score": 0.7273
+      },
+      "interior": {
+        "p10": 0.1,
+        "p20": 0.05,
+        "precision": 0.1,
+        "recall": 0.05,
+        "f1_score": 0.0667
+      }
+    }
+  },
+  {
+    "date": "2026-02-27",
+    "timestamp": "2026-03-01T16:59:17.926706",
+    "global": {
+      "p10": 0.4,
+      "p20": 0.4,
+      "precision": 0.4,
+      "recall": 0.4,
+      "f1_score": 0.4
+    },
+    "regions": {
+      "fortaleza": {
+        "p10": 0.3,
+        "p20": 0.35,
+        "precision": 0.3,
+        "recall": 0.35,
+        "f1_score": 0.3231
+      },
+      "rmf": {
+        "p10": 0.8,
+        "p20": 0.6111,
+        "precision": 0.8,
+        "recall": 0.6111,
+        "f1_score": 0.6929
+      },
+      "interior": {
+        "p10": 0.0,
+        "p20": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1_score": 0.0
+      }
+    }
+  },
+  {
+    "date": "2026-02-28",
+    "timestamp": "2026-03-01T16:59:17.927679",
+    "global": {
+      "p10": 0.4,
+      "p20": 0.4,
+      "precision": 0.4,
+      "recall": 0.4,
+      "f1_score": 0.4
+    },
+    "regions": {
+      "fortaleza": {
+        "p10": 0.3,
+        "p20": 0.35,
+        "precision": 0.3,
+        "recall": 0.35,
+        "f1_score": 0.3231
+      },
+      "rmf": {
+        "p10": 0.8,
+        "p20": 0.6111,
+        "precision": 0.8,
+        "recall": 0.6111,
+        "f1_score": 0.6929
+      },
+      "interior": {
+        "p10": 0.0,
+        "p20": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1_score": 0.0
+      }
+    }
+  },
+  {
+    "date": "2026-03-01",
+    "timestamp": "2026-03-01T20:31:36.646741",
+    "global": {
+      "p10": 0.1905,
+      "p20": 0.4286,
+      "precision": 0.1905,
+      "recall": 0.4286,
+      "f1_score": 0.2638
+    },
+    "regions": {
+      "fortaleza": {
+        "p10": 0.3,
+        "p20": 0.8,
+        "precision": 0.3,
+        "recall": 0.8,
+        "f1_score": 0.0
+      },
+      "rmf": {
+        "p10": 0.7273,
+        "p20": 1.0,
+        "precision": 0.7273,
+        "recall": 1.0,
+        "f1_score": 0.0
+      },
+      "interior": {
+        "p10": 0.0,
+        "p20": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1_score": 0.0
+      }
+    }
+  },
+  {
+    "date": "2026-03-02",
+    "timestamp": "2026-03-02T14:32:16.109429",
+    "global": {
+      "p10": 0.0702,
+      "p20": 0.1228,
+      "precision": 0.0702,
+      "recall": 0.1228,
+      "f1_score": 0.0893
+    },
+    "regions": {
+      "fortaleza": {
+        "p10": 0.2857,
+        "p20": 0.7143,
+        "precision": 0.2857,
+        "recall": 0.7143,
+        "f1_score": 0.0
+      },
+      "rmf": {
+        "p10": 0.7273,
+        "p20": 1.0,
+        "precision": 0.7273,
+        "recall": 1.0,
+        "f1_score": 0.0
+      },
+      "interior": {
+        "p10": 0.2308,
+        "p20": 0.4359,
+        "precision": 0.2308,
+        "recall": 0.4359,
+        "f1_score": 0.0
+      }
+    }
+  },
+  {
+    "date": "2026-03-03",
+    "timestamp": "2026-03-03T19:22:32.867097",
+    "global": {
+      "p10": 0.0702,
+      "p20": 0.1228,
+      "precision": 0.0702,
+      "recall": 0.1228,
+      "f1_score": 0.0893
+    },
+    "regions": {
+      "fortaleza": {
+        "p10": 0.2857,
+        "p20": 0.7143,
+        "precision": 0.2857,
+        "recall": 0.7143,
+        "f1_score": 0.0
+      },
+      "rmf": {
+        "p10": 0.7273,
+        "p20": 1.0,
+        "precision": 0.7273,
+        "recall": 1.0,
+        "f1_score": 0.0
+      },
+      "interior": {
+        "p10": 0.2308,
+        "p20": 0.4359,
+        "precision": 0.2308,
+        "recall": 0.4359,
+        "f1_score": 0.0
+      }
+    }
+  },
+  {
+    "date": "2026-03-04",
+    "timestamp": "2026-03-04T15:17:12.394705",
+    "global": {
+      "p10": 0.0702,
+      "p20": 0.1228,
+      "precision": 0.0702,
+      "recall": 0.1228,
+      "f1_score": 0.0893
+    },
+    "regions": {
+      "fortaleza": {
+        "p10": 0.2857,
+        "p20": 0.7143,
+        "precision": 0.2857,
+        "recall": 0.7143,
+        "f1_score": 0.0
+      },
+      "rmf": {
+        "p10": 0.7273,
+        "p20": 1.0,
+        "precision": 0.7273,
+        "recall": 1.0,
+        "f1_score": 0.0
+      },
+      "interior": {
+        "p10": 0.2308,
+        "p20": 0.4359,
+        "precision": 0.2308,
+        "recall": 0.4359,
+        "f1_score": 0.0
+      }
+    }
+  }
+]

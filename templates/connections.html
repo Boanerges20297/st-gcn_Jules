@@ -380,7 +380,7 @@
     <header class="dashboard-header">
         <div class="header-title">
             <h1>Dashboard Estratégico de Decisão</h1>
-            <p>Análise de Risco Geoprocessado e Dinâmicas Criminosas</p>
+            <p>Termômetro de Tensão Territorial — Análise por Região</p>
         </div>
         <div class="header-actions">
             <button class="btn btn-outline-light btn-sm me-2" onclick="forceReload()">
@@ -418,16 +418,16 @@
                         <i class="fas fa-shield-alt"></i>
                     </div>
                     <div class="stat-value" id="count-high">--</div>
-                    <div class="stat-label">Áreas de Alto Risco (80-89%)</div>
+                    <div class="stat-label">Alta Tensão (80-89%)</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
                     <div class="stat-icon icon-blue">
-                        <i class="fas fa-bullseye"></i>
+                        <i class="fas fa-thermometer-half"></i>
                     </div>
                     <div class="stat-value" id="p10-global">--%</div>
-                    <div class="stat-label">Eficiência Global P10</div>
+                    <div class="stat-label">Cobertura Territorial (Cov@20)</div>
                 </div>
             </div>
             <div class="col-md-3">
@@ -436,7 +436,7 @@
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <div class="stat-value" id="active-events">--</div>
-                    <div class="stat-label">Eventos Ativos (7d)</div>
+                    <div class="stat-label">Eventos Ativos (14d)</div>
                 </div>
             </div>
         </div>
@@ -463,7 +463,7 @@
                                     <th>Pos</th>
                                     <th>Localidade</th>
                                     <th>Região</th>
-                                    <th>Score de Risco</th>
+                                    <th>Tensão Territorial</th>
                                     <th>Tendência</th>
                                     <th>Status</th>
                                 </tr>
@@ -482,7 +482,7 @@
                     <div class="section-header">
                         <h2 class="section-title">
                             <i class="fas fa-rss text-danger"></i> 
-                            Inteligência de Eventos Críticos
+                            Eventos Territoriais Ativos (14d)
                         </h2>
                     </div>
                     <div id="events-feed" style="max-height: 600px; overflow-y: auto;">
@@ -595,7 +595,7 @@
             $('#count-critical').text(critical);
             $('#count-high').text(high);
             
-            const p10 = eff.global ? (eff.global.p10 * 100).toFixed(1) + '%' : 'N/A';
+            const p10 = eff.global ? (eff.global.p20 * 100).toFixed(1) + '%' : 'N/A';
             $('#p10-global').text(p10);
             
             const activeEvents = eff.global ? eff.global.total_events : 0;
@@ -613,7 +613,7 @@
                         <div class="fw-bold" style="color: ${manager.state_temperature_color}">${manager.state_temperature_label} (${manager.state_temperature_pct}%)</div>
                     </div>
                     <div>
-                        <div class="stat-label">Confiança</div>
+                        <div class="stat-label">Cobertura @K</div>
                         <div class="fw-bold text-white">${manager.confidence_label} (${manager.confidence_pct}%)</div>
                     </div>
                 </div>
@@ -626,6 +626,19 @@
         }
 
         function renderRankingTable(nodes) {
+            const factionColors = {
+                'CV':      { bg: 'rgba(239,68,68,0.2)',   color: '#f87171', label: 'CV' },
+                'TCP':     { bg: 'rgba(168,85,247,0.2)',  color: '#c084fc', label: 'TCP' },
+                'MASSA':   { bg: 'rgba(59,130,246,0.2)',  color: '#60a5fa', label: 'MASSA' },
+                'PCC':     { bg: 'rgba(245,158,11,0.2)',  color: '#fbbf24', label: 'PCC' },
+                'GDE':     { bg: 'rgba(16,185,129,0.2)',  color: '#34d399', label: 'GDE' },
+                'DISPUTA': { bg: 'rgba(251,146,60,0.2)',  color: '#fb923c', label: '⚔️ DISPUTA' },
+                'NEUTRO':  { bg: 'rgba(100,116,139,0.1)', color: '#94a3b8', label: 'NEUTRO' },
+            };
+            function factionBadge(f) {
+                const fc = factionColors[f] || factionColors['NEUTRO'];
+                return `<span style="background:${fc.bg};color:${fc.color};border:1px solid ${fc.color};border-radius:4px;padding:2px 6px;font-size:0.7rem;font-weight:600;">${fc.label}</span>`;
+            }
             const tbody = $('#ranking-table tbody');
             tbody.empty();
 
@@ -652,7 +665,7 @@
                         <div class='mb-2 pb-2'>
                             <div class='text-primary fw-bold small mb-2' style='letter-spacing: 0.5px;'>RELATÓRIO DE EVIDÊNCIAS:</div>
                             <div class='d-flex justify-content-between mb-1'>
-                                <span class='small text-muted'>Crimes Violentos (7d):</span>
+                                <span class='small text-muted'>CVLI/Tensão (14d):</span>
                                 <span class='small fw-bold'>${m.cvli_7d}</span>
                             </div>
                             <div class='d-flex justify-content-between mb-1'>
@@ -670,7 +683,7 @@
                             </div>` : ''}
                             <div class='mt-2 pt-2 border-top border-secondary'>
                                 <div class='text-info small fw-bold mb-1'>FACÇÃO PREDOMINANTE:</div>
-                                <div class='small text-white-50'>${node.faction}</div>
+                                <div class='small text-white-50'>${factionBadge(node.faction)}</div>
                             </div>
                         </div>
                     </div>`;
@@ -689,7 +702,7 @@
                         <td class="fw-bold text-muted">#${index + 1}</td>
                         <td>
                             <div class="fw-semibold">${node.name}</div>
-                            <div style="font-size: 0.75rem; color: var(--text-muted)">${node.faction}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted)">${factionBadge(node.faction)}</div>
                         </td>
                         <td><span class="badge bg-dark border border-secondary">${regionLabel}</span></td>
                         <td class="fw-bold">${score.toFixed(1)}%</td>

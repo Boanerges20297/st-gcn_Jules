@@ -1,176 +1,66 @@
 [
   {
-    "date": "2026-02-26",
-    "total_events": 52,
+    "date": "2026-03-01",
+    "total_events": 64,
     "brute_cvli": 0,
-    "exogenous": 52,
-    "global": {
-      "total_nodes": 87,
-      "active_locations": 18,
-      "total_events": 40,
-      "p5": 0.8,
-      "hits5": [
-        "CAUCAIA",
-        "BARRA DO CEARA",
-        "BARROSO",
-        "CRISTO REDENTOR"
-      ],
-      "p10": 0.6,
-      "hits10": [
-        "CAUCAIA",
-        "BARRA DO CEARA",
-        "BARROSO",
-        "CRISTO REDENTOR",
-        "JANGURUSSU",
-        "MESSEJANA"
-      ],
-      "p20": 0.3,
-      "hits20": [
-        "CAUCAIA",
-        "BARRA DO CEARA",
-        "BARROSO",
-        "CRISTO REDENTOR",
-        "JANGURUSSU",
-        "MESSEJANA"
-      ]
-    },
-    "fortaleza": {
-      "total_nodes": 11,
-      "active_locations": 5,
-      "total_events": 9,
-      "p5": 0.6,
-      "hits5": [
-        "BARRA DO CEARA",
-        "BARROSO",
-        "CRISTO REDENTOR"
-      ],
-      "p10": 0.5,
-      "hits10": [
-        "BARRA DO CEARA",
-        "BARROSO",
-        "CRISTO REDENTOR",
-        "JANGURUSSU",
-        "MESSEJANA"
-      ],
-      "p20": 0.4545,
-      "hits20": [
-        "BARRA DO CEARA",
-        "BARROSO",
-        "CRISTO REDENTOR",
-        "JANGURUSSU",
-        "MESSEJANA"
-      ]
-    },
-    "rmf": {
-      "total_nodes": 18,
-      "active_locations": 12,
-      "total_events": 30,
-      "p5": 0.8,
-      "hits5": [
-        "CAUCAIA",
-        "AQUIRAZ",
-        "CHOROZINHO",
-        "EUSEBIO"
-      ],
-      "p10": 0.8,
-      "hits10": [
-        "CAUCAIA",
-        "AQUIRAZ",
-        "CHOROZINHO",
-        "EUSEBIO",
-        "HORIZONTE",
-        "ITAITINGA",
-        "MARACANAU",
-        "MARANGUAPE"
-      ],
-      "p20": 0.6667,
-      "hits20": [
-        "CAUCAIA",
-        "AQUIRAZ",
-        "CHOROZINHO",
-        "EUSEBIO",
-        "HORIZONTE",
-        "ITAITINGA",
-        "MARACANAU",
-        "MARANGUAPE",
-        "PACATUBA",
-        "PARACURU",
-        "PARAIPABA",
-        "TRAIRI"
-      ]
-    },
-    "interior": {
-      "total_nodes": 58,
-      "active_locations": 1,
-      "total_events": 1,
-      "p5": 0.0,
-      "hits5": [],
-      "p10": 0.1,
-      "hits10": [
-        "BARREIRA"
-      ],
-      "p20": 0.05,
-      "hits20": [
-        "BARREIRA"
-      ]
-    }
-  },
-  {
-    "date": "2026-02-27",
-    "total_events": 52,
-    "brute_cvli": 0,
-    "exogenous": 52,
+    "exogenous": 64,
     "global": {
       "total_nodes": 96,
-      "active_locations": 20,
-      "total_events": 41,
-      "p5": 0.6,
+      "active_locations": 21,
+      "total_events": 50,
+      "p5": 0.0952,
+      "precision5": 0.4,
       "hits5": [
         "CAUCAIA",
-        "MARACANAU",
-        "BARRA DO CEARA"
+        "MARACANAU"
       ],
-      "p10": 0.4,
+      "p10": 0.1905,
+      "precision10": 0.4,
       "hits10": [
         "CAUCAIA",
         "MARACANAU",
-        "BARRA DO CEARA",
-        "BARROSO"
+        "BARROSO",
+        "CARLITO PAMPLONA"
       ],
-      "p20": 0.4,
+      "p20": 0.4286,
+      "precision20": 0.45,
       "hits20": [
         "CAUCAIA",
         "MARACANAU",
-        "BARRA DO CEARA",
         "BARROSO",
+        "CARLITO PAMPLONA",
         "CRISTO REDENTOR",
         "DOM LUSTOSA",
         "JANGURUSSU",
+        "LAGOA REDONDA",
         "MESSEJANA"
       ]
     },
     "fortaleza": {
       "total_nodes": 34,
-      "active_locations": 9,
-      "total_events": 13,
-      "p5": 0.4,
+      "active_locations": 10,
+      "total_events": 16,
+      "p5": 0.1,
+      "precision5": 0.2,
       "hits5": [
-        "BARRA DO CEARA",
         "BARROSO"
       ],
       "p10": 0.3,
+      "precision10": 0.3,
       "hits10": [
-        "BARRA DO CEARA",
         "BARROSO",
+        "CARLITO PAMPLONA",
         "CRISTO REDENTOR"
       ],
-      "p20": 0.35,
+      "p20": 0.8,
+      "precision20": 0.4,
       "hits20": [
-        "BARRA DO CEARA",
         "BARROSO",
+        "CARLITO PAMPLONA",
         "CRISTO REDENTOR",
         "DOM LUSTOSA",
         "JANGURUSSU",
+        "LAGOA REDONDA",
         "MESSEJANA",
         "MONDUBIM"
       ]
@@ -178,15 +68,17 @@
     "rmf": {
       "total_nodes": 18,
       "active_locations": 11,
-      "total_events": 28,
-      "p5": 0.8,
+      "total_events": 34,
+      "p5": 0.3636,
+      "precision5": 0.8,
       "hits5": [
         "CAUCAIA",
         "MARACANAU",
         "AQUIRAZ",
         "CHOROZINHO"
       ],
-      "p10": 0.8,
+      "p10": 0.7273,
+      "precision10": 0.8,
       "hits10": [
         "CAUCAIA",
         "MARACANAU",
@@ -197,7 +89,8 @@
         "ITAITINGA",
         "MARANGUAPE"
       ],
-      "p20": 0.6111,
+      "p20": 1.0,
+      "precision20": 0.6111,
       "hits20": [
         "CAUCAIA",
         "MARACANAU",
@@ -213,10 +106,458 @@
       ]
     },
     "interior": {
-      "status": "no_events",
+      "status": "no_events_insufficient_window",
       "p5": 0.0,
       "p10": 0.0,
-      "p20": 0.0
+      "p20": 0.0,
+      "note": "Ground truth vazio: janela insuficiente para esta regi\u00e3o. N\u00e3o avaliar degrada\u00e7\u00e3o."
+    }
+  },
+  {
+    "date": "2026-03-02",
+    "total_events": 51,
+    "brute_cvli": 0,
+    "exogenous": 51,
+    "global": {
+      "total_nodes": 96,
+      "active_locations": 57,
+      "total_events": 78,
+      "p5": 0.0351,
+      "precision5": 0.4,
+      "hits5": [
+        "CAUCAIA",
+        "MARACANAU"
+      ],
+      "p10": 0.0702,
+      "precision10": 0.4,
+      "hits10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "BARROSO",
+        "CARLITO PAMPLONA"
+      ],
+      "p20": 0.1228,
+      "precision20": 0.35,
+      "hits20": [
+        "CAUCAIA",
+        "MARACANAU",
+        "BARROSO",
+        "CARLITO PAMPLONA",
+        "JANGURUSSU",
+        "LAGOA REDONDA",
+        "MESSEJANA"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 34,
+      "active_locations": 7,
+      "total_events": 12,
+      "p5": 0.1429,
+      "precision5": 0.2,
+      "hits5": [
+        "BARROSO"
+      ],
+      "p10": 0.2857,
+      "precision10": 0.2,
+      "hits10": [
+        "BARROSO",
+        "CARLITO PAMPLONA"
+      ],
+      "p20": 0.7143,
+      "precision20": 0.25,
+      "hits20": [
+        "BARROSO",
+        "CARLITO PAMPLONA",
+        "JANGURUSSU",
+        "LAGOA REDONDA",
+        "MESSEJANA"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 18,
+      "active_locations": 11,
+      "total_events": 27,
+      "p5": 0.3636,
+      "precision5": 0.8,
+      "hits5": [
+        "CAUCAIA",
+        "MARACANAU",
+        "AQUIRAZ",
+        "CHOROZINHO"
+      ],
+      "p10": 0.7273,
+      "precision10": 0.8,
+      "hits10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "AQUIRAZ",
+        "CHOROZINHO",
+        "EUSEBIO",
+        "HORIZONTE",
+        "ITAITINGA",
+        "MARANGUAPE"
+      ],
+      "p20": 1.0,
+      "precision20": 0.6111,
+      "hits20": [
+        "CAUCAIA",
+        "MARACANAU",
+        "AQUIRAZ",
+        "CHOROZINHO",
+        "EUSEBIO",
+        "HORIZONTE",
+        "ITAITINGA",
+        "MARANGUAPE",
+        "PACATUBA",
+        "PARACURU",
+        "TRAIRI"
+      ]
+    },
+    "interior": {
+      "total_nodes": 44,
+      "active_locations": 39,
+      "total_events": 39,
+      "p5": 0.1282,
+      "precision5": 1.0,
+      "hits5": [
+        "ACOPIARA",
+        "ALTO SANTO",
+        "AMONTADA",
+        "ARACATI",
+        "ARATUBA"
+      ],
+      "p10": 0.2308,
+      "precision10": 0.9,
+      "hits10": [
+        "ACOPIARA",
+        "ALTO SANTO",
+        "AMONTADA",
+        "ARACATI",
+        "ARATUBA",
+        "BARBALHA",
+        "BOA VIAGEM",
+        "CAMOCIM",
+        "CEDRO"
+      ],
+      "p20": 0.4359,
+      "precision20": 0.85,
+      "hits20": [
+        "ACOPIARA",
+        "ALTO SANTO",
+        "AMONTADA",
+        "ARACATI",
+        "ARATUBA",
+        "BARBALHA",
+        "BOA VIAGEM",
+        "CAMOCIM",
+        "CEDRO",
+        "CRATO",
+        "IBICUITINGA",
+        "IGUATU",
+        "ITAPIPOCA",
+        "ITAREMA",
+        "JAGUARETAMA",
+        "JAGUARIBE",
+        "JIJOCA DE JERICOACOARA"
+      ]
+    }
+  },
+  {
+    "date": "2026-03-03",
+    "total_events": 52,
+    "brute_cvli": 0,
+    "exogenous": 52,
+    "global": {
+      "total_nodes": 96,
+      "active_locations": 57,
+      "total_events": 79,
+      "p5": 0.0351,
+      "precision5": 0.4,
+      "hits5": [
+        "CAUCAIA",
+        "MARACANAU"
+      ],
+      "p10": 0.0702,
+      "precision10": 0.4,
+      "hits10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "BARROSO",
+        "CARLITO PAMPLONA"
+      ],
+      "p20": 0.1228,
+      "precision20": 0.35,
+      "hits20": [
+        "CAUCAIA",
+        "MARACANAU",
+        "BARROSO",
+        "CARLITO PAMPLONA",
+        "JANGURUSSU",
+        "LAGOA REDONDA",
+        "MESSEJANA"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 34,
+      "active_locations": 7,
+      "total_events": 13,
+      "p5": 0.1429,
+      "precision5": 0.2,
+      "hits5": [
+        "BARROSO"
+      ],
+      "p10": 0.2857,
+      "precision10": 0.2,
+      "hits10": [
+        "BARROSO",
+        "CARLITO PAMPLONA"
+      ],
+      "p20": 0.7143,
+      "precision20": 0.25,
+      "hits20": [
+        "BARROSO",
+        "CARLITO PAMPLONA",
+        "JANGURUSSU",
+        "LAGOA REDONDA",
+        "MESSEJANA"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 18,
+      "active_locations": 11,
+      "total_events": 27,
+      "p5": 0.3636,
+      "precision5": 0.8,
+      "hits5": [
+        "CAUCAIA",
+        "MARACANAU",
+        "AQUIRAZ",
+        "CHOROZINHO"
+      ],
+      "p10": 0.7273,
+      "precision10": 0.8,
+      "hits10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "AQUIRAZ",
+        "CHOROZINHO",
+        "EUSEBIO",
+        "HORIZONTE",
+        "ITAITINGA",
+        "MARANGUAPE"
+      ],
+      "p20": 1.0,
+      "precision20": 0.6111,
+      "hits20": [
+        "CAUCAIA",
+        "MARACANAU",
+        "AQUIRAZ",
+        "CHOROZINHO",
+        "EUSEBIO",
+        "HORIZONTE",
+        "ITAITINGA",
+        "MARANGUAPE",
+        "PACATUBA",
+        "PARACURU",
+        "TRAIRI"
+      ]
+    },
+    "interior": {
+      "total_nodes": 44,
+      "active_locations": 39,
+      "total_events": 39,
+      "p5": 0.1282,
+      "precision5": 1.0,
+      "hits5": [
+        "ACOPIARA",
+        "ALTO SANTO",
+        "AMONTADA",
+        "ARACATI",
+        "ARATUBA"
+      ],
+      "p10": 0.2308,
+      "precision10": 0.9,
+      "hits10": [
+        "ACOPIARA",
+        "ALTO SANTO",
+        "AMONTADA",
+        "ARACATI",
+        "ARATUBA",
+        "BARBALHA",
+        "BOA VIAGEM",
+        "CAMOCIM",
+        "CEDRO"
+      ],
+      "p20": 0.4359,
+      "precision20": 0.85,
+      "hits20": [
+        "ACOPIARA",
+        "ALTO SANTO",
+        "AMONTADA",
+        "ARACATI",
+        "ARATUBA",
+        "BARBALHA",
+        "BOA VIAGEM",
+        "CAMOCIM",
+        "CEDRO",
+        "CRATO",
+        "IBICUITINGA",
+        "IGUATU",
+        "ITAPIPOCA",
+        "ITAREMA",
+        "JAGUARETAMA",
+        "JAGUARIBE",
+        "JIJOCA DE JERICOACOARA"
+      ]
+    }
+  },
+  {
+    "date": "2026-03-04",
+    "total_events": 52,
+    "brute_cvli": 0,
+    "exogenous": 52,
+    "global": {
+      "total_nodes": 96,
+      "active_locations": 57,
+      "total_events": 79,
+      "p5": 0.0351,
+      "precision5": 0.4,
+      "hits5": [
+        "CAUCAIA",
+        "MARACANAU"
+      ],
+      "p10": 0.0702,
+      "precision10": 0.4,
+      "hits10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "BARROSO",
+        "CARLITO PAMPLONA"
+      ],
+      "p20": 0.1228,
+      "precision20": 0.35,
+      "hits20": [
+        "CAUCAIA",
+        "MARACANAU",
+        "BARROSO",
+        "CARLITO PAMPLONA",
+        "JANGURUSSU",
+        "LAGOA REDONDA",
+        "MESSEJANA"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 34,
+      "active_locations": 7,
+      "total_events": 13,
+      "p5": 0.1429,
+      "precision5": 0.2,
+      "hits5": [
+        "BARROSO"
+      ],
+      "p10": 0.2857,
+      "precision10": 0.2,
+      "hits10": [
+        "BARROSO",
+        "CARLITO PAMPLONA"
+      ],
+      "p20": 0.7143,
+      "precision20": 0.25,
+      "hits20": [
+        "BARROSO",
+        "CARLITO PAMPLONA",
+        "JANGURUSSU",
+        "LAGOA REDONDA",
+        "MESSEJANA"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 18,
+      "active_locations": 11,
+      "total_events": 27,
+      "p5": 0.3636,
+      "precision5": 0.8,
+      "hits5": [
+        "CAUCAIA",
+        "MARACANAU",
+        "AQUIRAZ",
+        "CHOROZINHO"
+      ],
+      "p10": 0.7273,
+      "precision10": 0.8,
+      "hits10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "AQUIRAZ",
+        "CHOROZINHO",
+        "EUSEBIO",
+        "HORIZONTE",
+        "ITAITINGA",
+        "MARANGUAPE"
+      ],
+      "p20": 1.0,
+      "precision20": 0.6111,
+      "hits20": [
+        "CAUCAIA",
+        "MARACANAU",
+        "AQUIRAZ",
+        "CHOROZINHO",
+        "EUSEBIO",
+        "HORIZONTE",
+        "ITAITINGA",
+        "MARANGUAPE",
+        "PACATUBA",
+        "PARACURU",
+        "TRAIRI"
+      ]
+    },
+    "interior": {
+      "total_nodes": 44,
+      "active_locations": 39,
+      "total_events": 39,
+      "p5": 0.1282,
+      "precision5": 1.0,
+      "hits5": [
+        "ACOPIARA",
+        "ALTO SANTO",
+        "AMONTADA",
+        "ARACATI",
+        "ARATUBA"
+      ],
+      "p10": 0.2308,
+      "precision10": 0.9,
+      "hits10": [
+        "ACOPIARA",
+        "ALTO SANTO",
+        "AMONTADA",
+        "ARACATI",
+        "ARATUBA",
+        "BARBALHA",
+        "BOA VIAGEM",
+        "CAMOCIM",
+        "CEDRO"
+      ],
+      "p20": 0.4359,
+      "precision20": 0.85,
+      "hits20": [
+        "ACOPIARA",
+        "ALTO SANTO",
+        "AMONTADA",
+        "ARACATI",
+        "ARATUBA",
+        "BARBALHA",
+        "BOA VIAGEM",
+        "CAMOCIM",
+        "CEDRO",
+        "CRATO",
+        "IBICUITINGA",
+        "IGUATU",
+        "ITAPIPOCA",
+        "ITAREMA",
+        "JAGUARETAMA",
+        "JAGUARIBE",
+        "JIJOCA DE JERICOACOARA"
+      ]
     }
   }
 ]

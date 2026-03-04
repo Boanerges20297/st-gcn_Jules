@@ -1,8 +1,9 @@
+import sys
+import numpy as np
+
 import torch
 import pickle
-import numpy as np
 import os
-import sys
 import pandas as pd
 import unicodedata
 import re
@@ -63,6 +64,19 @@ class StateOrchestrator:
         }
         
         self.specialists = {}
+        
+        # Parâmetros de calibração por região (ajustáveis em runtime)
+        # dampening removido: comprimir outliers é irracional para tensão territorial
+        self.calib_params = {
+            region: {
+                'tension_factor':     0.50,   # peso do tension_index no logit
+                'min_risk':          30.0,    # piso apenas para territórios com CVLI recente
+                'tag_bias_direct':    1.50,   # boost INTEL_TRIGGER no nó
+                'tag_bias_neighbor':  0.50,   # vazamento de tensão para vizinhos
+            }
+            for region in ['fortaleza', 'rmf', 'interior']
+        }
+        
         self._initialize_models()
 
     # --- DEBUG: CARREGAMENTO DE CHECKPOINTS ---
@@ -88,6 +102,8 @@ class StateOrchestrator:
                         
                     print(f"✅ Orquestrador: Especialista {region.upper()} carregado com sucesso.")
                 except Exception as e:
+                    import traceback
+                    traceback.print_exc()
                     print(f"❌ Erro ao carregar {region}: {e}")
 
     # --- DEBUG: MOTOR DE INFERÊNCIA COMBINADA ---
@@ -98,6 +114,7 @@ class StateOrchestrator:
         
         for region, spec in self.specialists.items():
             model, data, window = spec['model'], spec['data'], spec['window']
+            cp = self.calib_params.get(region, self.calib_params['fortaleza'])
             
             # Prepara tensor de entrada (Últimos dias da base)
             x_raw = data['node_features'][:, -window:, :].copy()
@@ -120,6 +137,7 @@ class StateOrchestrator:
                     else: trends[name_norm] = 'stable'
 
             # --- DEBUG: INJEÇÃO DE EVENTOS DINÂMICOS (Canais 23, 24 e 25) ---
+            sim_impact = np.zeros(len(data['nodes_gdf']))
             if exogenous_shocks:
                 # Esperamos exogenous_shocks = {'NOME': {'intensity': 1.0, 'is_critical': True, 'is_suppression': False}}
                 for loc_name, info in exogenous_shocks.items():
@@ -139,12 +157,17 @@ class StateOrchestrator:
                     # 23 = Supressão (Ação Policial/Alívio)
                     if is_supp:
                         channel_idx = 23
+                        # Boost Negativo Direto no Logit (Supressão)
+                        impact_value = -2.5 * intensity
                     else:
                         channel_idx = 25 if is_crit else 24
+                        # Boost Positivo Direto no Logit (Conflito)
+                        impact_value = 2.5 * intensity
                     
                     for i, row in data['nodes_gdf'].iterrows():
                         if normalize_name(row['name']) == norm_target:
                             x_raw[i, :, channel_idx] = intensity
+                            sim_impact[i] = impact_value
 
             x = torch.from_numpy(x_raw).float().permute(2, 0, 1).unsqueeze(0).to(self.device)
             adj = self._norm_adj(data['adj_geo'], data['adj_conflict'])
@@ -156,35 +179,42 @@ class StateOrchestrator:
             # --- CORREÇÃO: NORMALIZAÇÃO ROBUSTA E AMORTECIMENTO (DAMPENING) ---
             # --- NORMALIZAÇÃO REFINADA (SENSÍVEL A CONSISTÊNCIA) ---
             if len(out) > 1:
-                # INJEÇÃO PÓS-MODELO (ADITIVA) DO TAG-BIAS
+                # INJEÇÃO PÓS-MODELO (ADITIVA) DO TAG-BIAS E SIMULAÇÃO
                 # O bias agora é somado diretamente aos logits, garantindo impacto linear
                 if spatial_bias is not None:
                      out = out + spatial_bias
+                
+                # Somar Impacto Direto da Simulação (Equipes/Conflitos)
+                out = out + sim_impact
 
                 # Em vez de Z-Score puro (que depende de vizinhos), usamos uma escala logística
                 # Onde o valor 0.5 (50%) é ancorado em uma atividade moderada constante.
                 # Isso impede que 9 mortes/mês virem "Risco 7".
                 
-                # Boost por Tensão Geográfica (Facções) direto no logit
-                tension_weight = data['nodes_gdf']['tension_index'].values.astype(float) * 0.5
+                # Boost por Tensão Territorial (Facções) somado direto no logit
+                # A tensão é o sinal primário — não é apenas um ajuste, é o propósito do modelo
+                tension_weight = data['nodes_gdf']['tension_index'].values.astype(float) * cp['tension_factor']
                 adjusted_logits = out + tension_weight
                 
-                # Sigmoide de escala fixa (não relativa ao desvio padrão da região)
-                # Isso torna o risco mais "Absoluto"
+                # Sigmoide sobre os logits ajustados por tensão
+                # Preserva outliers: um território isolado com alta tensão de facção
+                # deve aparecer no topo mesmo sem crimes recentes
                 s = 1 / (1 + np.exp(-(adjusted_logits - adjusted_logits.mean()) / (adjusted_logits.std() + 1e-6)))
                 out_norm = s * 100
                 
-                # Garantia de Consistência: Se houve CVLI recente, o risco mínimo é 45%
+                # Garantia mínima de calor para:
+                # 1. Territórios com CVLI recente (memória de atividade)
+                # 2. Territórios com domínio de facção confirmado (tensão latente, mesmo sem crimes recentes)
                 recent_cvli = data['node_features'][:, -7:, 0].sum(axis=1)
+                factions = data['nodes_gdf']['faction'].values if 'faction' in data['nodes_gdf'].columns else None
                 for i in range(len(out_norm)):
-                    if recent_cvli[i] > 0:
-                        out_norm[i] = max(out_norm[i], 45.0)
+                    has_faction = factions is not None and str(factions[i]).upper() not in ('NEUTRO', 'N/A', '', 'NAN', 'NONE')
+                    if (recent_cvli[i] > 0 or has_faction) and sim_impact[i] >= 0:
+                        out_norm[i] = max(out_norm[i], cp['min_risk'])
                 
-                # Amortecimento para evitar 100% constante
-                mask_high = out_norm > 50
-                out_norm[mask_high] = 50 + (out_norm[mask_high] - 50) * 0.82
+                # DAMPENING REMOVIDO: comprimir outliers altos é irracional para tensão territorial.
+                # Um município isolado com domínio total de facção pode ter score 95%+ legitimamente.
             else:
-                out_norm = np.zeros_like(out) + 30.0
                 out_norm = np.zeros_like(out) + 30.0
             
             # Mapeia para o dicionário global pelo NOME NORMALIZADO
@@ -217,11 +247,11 @@ class StateOrchestrator:
             if recent_intel[i] > 0 and tension[i] > 0.5:
                 # GATILHO: Incidente crítico em zona de facção
                 # Boost Direto no Logit (+1.5 move 50% -> ~80%)
-                bias_vector[i] += 1.5
+                bias_vector[i] += cp['tag_bias_direct']
                 
-                # Vazamento para vizinhos (+0.5 move 50% -> ~62%)
+                # Vazamento para vizinhos
                 neighbors = np.where(adj_geo[i] > 0)[0]
-                bias_vector[neighbors] += 0.5
+                bias_vector[neighbors] += cp['tag_bias_neighbor']
                     
         return bias_vector
 

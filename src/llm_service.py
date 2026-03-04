@@ -182,20 +182,54 @@ def process_exogenous_text(text: str, block_type: str = None) -> List[Dict[str, 
     if not text or not text.strip():
         return []
 
+    # Detection logic for "Ações Policiais" header
+    is_police_header = False
+    header_date = None
+    
+    # Pre-process text to find the header in the first few non-empty lines
+    lines_raw = [l.strip() for l in text.strip().split('\n') if l.strip()]
+    if lines_raw:
+        first_line = lines_raw[0]
+        # Robust regex for header and date (DD/MM/YYYY or YYYY-MM-DD)
+        header_match = re.search(r'(Ações\s+Policiais|Ações\s+policiais)', first_line, re.IGNORECASE)
+        date_match = re.search(r'(\d{2}/\d{2}/\d{4}|\d{4}-\d{2}-\d{2})', first_line)
+        
+        if header_match:
+            is_police_header = True
+            if date_match:
+                header_date = date_match.group(1)
+                try:
+                    if '/' in header_date:
+                        d_pts = header_date.split('/')
+                        header_date = f"{d_pts[2]}-{d_pts[1]}-{d_pts[0]}"
+                except: pass
+
     keys = get_gemini_api_keys()
     if not keys or os.environ.get('DISABLE_GENAI_FOR_TESTS') == '1':
         return _deterministic_parse(text)
 
+    prompt_header_context = ""
+    if is_police_header:
+        prompt_header_context = (
+            f"IMPORTANTE: Este bloco de texto refere-se a AÇÕES POLICIAIS (supressão de risco).\n"
+            f"Todos os eventos DEVEM ter 'is_suppression': true.\n"
+        )
+        if header_date:
+            prompt_header_context += f"A data da ocorrência para todos estes eventos é {header_date}.\n"
+
     prompt = (
         "Você é um especialista em análise de segurança pública no Ceará.\n"
         "Extraia os eventos das linhas de log policial abaixo e retorne um ARRAY JSON.\n"
+        f"{prompt_header_context}"
         "Para cada evento, use estas chaves exatamente:\n"
-        "natureza, descricao, sexo, localizacao_completa, bairro, municipio, timestamp, resumo, raw_text, conflict_severity.\n\n"
+        "natureza, descricao, sexo, localizacao_completa, bairro, municipio, timestamp, resumo, raw_text, conflict_severity, is_suppression, date.\n\n"
         "REGRAS:\n"
         "1) 'municipio': Extraia o nome da cidade (ex: FORTALEZA, CAUCAIA, MARACANAU). Se não encontrar, deixe vazio.\n"
         "2) 'bairro': Extraia o bairro. Se for em Fortaleza e o bairro não estiver claro, use o contexto das AIS (ex: AIS18 costuma ser Quintino Cunha/Antônio Bezerra).\n"
         "3) 'conflict_severity': HIGH para homicídios, facções, execuções. MEDIUM para lesões a bala, expulsões. LOW para o resto.\n"
-        "4) 'raw_text': Mantenha a linha original completa.\n\n"
+        "4) 'raw_text': Mantenha a linha original completa.\n"
+        "5) 'is_suppression': true para prisões, apreensões de armas/drogas, recuperação de veículos. false para crimes cometidos.\n"
+        f"6) 'date': Use '{header_date}' se este for um bloco de Ações Policiais, caso contrário extraia da linha.\n\n"
         "LOGS:\n" + text
     )
 
@@ -206,6 +240,12 @@ def process_exogenous_text(text: str, block_type: str = None) -> List[Dict[str, 
         
         # Enrichment & Normalization
         for ev in events:
+            # Force is_suppression and date if header was present
+            if is_police_header:
+                ev['is_suppression'] = True
+                if header_date:
+                    ev['date'] = header_date
+
             # 1. Ensure nature/text exists
             natureza = ev.get('natureza', 'OCORRENCIA')
             raw = ev.get('raw_text') or ev.get('descricao') or ''
@@ -228,6 +268,9 @@ def process_exogenous_text(text: str, block_type: str = None) -> List[Dict[str, 
             # Final touch: ensure all keys exist
             ev.setdefault('conflict_severity', 'LOW')
             ev.setdefault('timestamp', '')
+            ev.setdefault('is_suppression', False)
+            if not ev.get('date') and header_date:
+                ev['date'] = header_date
             
         return events
     except Exception as e:
@@ -237,26 +280,66 @@ def process_exogenous_text(text: str, block_type: str = None) -> List[Dict[str, 
 def _deterministic_parse(text: str) -> List[Dict[str, Any]]:
     '''Basic fallback parser for police logs.'''
     results = []
-    for line in text.strip().split('\n'):
+    lines = [l.strip() for l in text.strip().split('\n') if l.strip()]
+    if not lines: return []
+
+    # Detection logic for "Ações Policiais" or "Ocorrências" header
+    is_police_header = False
+    header_date = None
+    first_line = lines[0]
+    
+    # Matches "Ações Policiais em 28/02/2026" or "Ocorrência em 28/02/2026"
+    # Aceita singular/plural, com/sem acento
+    header_match = re.search(r'(Aç[õã]es?\s+Policia[is]+|Ocorr[êe]ncias?)', first_line, re.IGNORECASE)
+    date_match = re.search(r'(\d{2}/\d{2}/\d{4}|\d{4}-\d{2}-\d{2})', first_line)
+    
+    if header_match:
+        is_police_header = True
+        if date_match:
+            header_date = date_match.group(1)
+            try:
+                if '/' in header_date:
+                    d_pts = header_date.split('/')
+                    header_date = f"{d_pts[2]}-{d_pts[1]}-{d_pts[0]}"
+            except: pass
+        # Remove the header line if it doesn't look like a real event (doesn't have ID or unit)
+        if len(first_line) < 50 and not re.search(r'\d{10,}', first_line):
+            lines = lines[1:]
+
+    for line in lines:
         line = line.strip()
         if not line: continue
         
+        # 1. Tentar extrair data/hora do final da linha (ex: "28/02/2026 08:56" ou "08:56")
+        line_date = None
+        line_time = None
+        
+        # Procura padrão de data e hora no final: DD/MM/YYYY HH:MM
+        dateTimeMatch = re.search(r'(\d{2}/\d{2}/\d{4})\s+(\d{2}:\d{2})', line)
+        if dateTimeMatch:
+            line_date = dateTimeMatch.group(1)
+            line_time = dateTimeMatch.group(2)
+            try:
+                if '/' in line_date:
+                    d_pts = line_date.split('/')
+                    line_date = f"{d_pts[2]}-{d_pts[1]}-{d_pts[0]}"
+            except: pass
+        else:
+            # Procura apenas hora no final: HH:MM
+            timeMatch = re.search(r'(\d{2}:\d{2})$', line)
+            if timeMatch:
+                line_time = timeMatch.group(1)
+                line_date = header_date # Usa a data do cabeçalho como fallback
+
         parts = [p.strip() for p in line.split(' - ')]
-        # Typical format: ID - AIS - NATUREZA/UNIDADE - POSSÍVEL_DESCRIÇÃO - LOCAL - BAIRRO - TIME
-        # Default natureza when explicit part is not present
         natureza = "DESCONHECIDO"
+        norm_upper = _normalize_text(line).upper()
 
-        # Normalized forms for matching
-        norm = _normalize_text(line)
-        norm_upper = norm.upper()
-
-        # Identify action/operation/prison keywords and prefer them over unit names
         action_keywords = [
             'ABANDON', 'ACHAD', 'APREENS', 'PORTE', 'VEICUL', 'MANDAD', 'PRIS', 'CONDUZ',
             'ESTUPR', 'HOMICID', 'LESAO', 'ACHADO', 'TRAFIC', 'MORTE', 'ROUBO', 'ASSALT'
         ]
 
-        # Try to find an action-containing part in the splitted sections (prefer parts after index 2)
         chosen = None
         if len(parts) >= 3:
             for p in parts[2:]:
@@ -265,21 +348,14 @@ def _deterministic_parse(text: str) -> List[Dict[str, Any]]:
                     if kw in np:
                         chosen = p
                         break
-                if chosen:
-                    break
+                if chosen: break
 
-        if chosen:
-            natureza = chosen
-        elif len(parts) >= 3 and parts[2]:
-            # fallback to the third part (often the unit name)
-            natureza = parts[2]
+        if chosen: natureza = chosen
+        elif len(parts) >= 3: natureza = parts[2]
 
-        # Heuristics to detect specific event types overriding when explicit words appear
         if 'HOMICIDIO' in norm_upper or 'HOMICÍDIO' in norm_upper:
-            natureza = natureza if natureza != 'DESCONHECIDO' else 'HOMICÍDIO'
             severity = 'HIGH'
         elif ('LESAO' in norm_upper or 'LESÃO' in norm_upper) and 'BALA' in norm_upper:
-            natureza = 'LESÃO A BALA'
             severity = 'HIGH'
         else:
             severity = 'LOW'
@@ -287,19 +363,23 @@ def _deterministic_parse(text: str) -> List[Dict[str, Any]]:
         b = busca_bairro(line)
         m = busca_municipio(line) or ('FORTALEZA' if b else '')
 
-        results.append({
+        event = {
             'natureza': natureza,
             'descricao': line,
             'sexo': 'MASCULINO' if 'MASCULINO' in line.upper() else ('FEMININO' if 'FEMININO' in line.upper() else ''),
             'localizacao_completa': line,
             'bairro': b or '',
             'municipio': m,
-            'timestamp': '',
+            'timestamp': line_time or '',
             'resumo': f"{natureza} em {b or 'local não identificado'}",
             'raw_text': line,
-            'conflict_severity': severity
-        })
+            'conflict_severity': severity,
+            'is_suppression': is_police_header,
+            'date': line_date or header_date
+        }
+        results.append(event)
     return results
+
 
 def _mock_response(text: str) -> List[Dict[str, Any]]:
     return _deterministic_parse(text)

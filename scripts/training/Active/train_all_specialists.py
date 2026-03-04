@@ -11,7 +11,7 @@ import pandas as pd
 import random
 
 # Adicionar raiz ao path para imports
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
@@ -27,12 +27,12 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s',
     handlers=[
-        logging.FileHandler("logs/training_fortaleza_breakthrough.log", mode='w', encoding='utf-8'),
+        logging.FileHandler("logs/training_all_specialists.log", mode='w', encoding='utf-8'),
         logging.StreamHandler(sys.stdout)
     ]
 )
 
-# Configurações Globais
+# Configurações Globais (Elite T32 ISM)
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 WINDOW = 120
 PREDICT_HORIZON = 7
@@ -60,7 +60,7 @@ def calculate_priority_weights(features, dates):
     return spatial_weights, month_weights, day_weights
 
 class SpecialistTrainer:
-    def __init__(self, region_key, epochs=80, lr=0.005, grad_accum=16, dropout=0.4, ranking_weight=30.0):
+    def __init__(self, region_key, epochs=80, lr=0.05, grad_accum=32, dropout=0.4, ranking_weight=20.0):
         self.region_key = region_key
         self.epochs = epochs
         self.lr = lr
@@ -72,10 +72,15 @@ class SpecialistTrainer:
     def train(self):
         region_label = self.region_key.upper()
         logging.info("\n" + "="*80)
-        logging.info(f"🚀 INICIANDO TREINAMENTO ESTABILIZADO: {region_label}")
+        logging.info(f"🚀 INICIANDO TREINAMENTO UNIFICADO ELITE: {region_label}")
+        logging.info(f"📊 Hiperparâmetros: LR={self.lr}, Ranking={self.ranking_weight}, Dropout={self.dropout}")
         logging.info("="*80)
         
         data_path = os.path.join(ROOT_DIR, 'data', 'processed', f'processed_{self.region_key}.pkl')
+        if not os.path.exists(data_path):
+            logging.error(f"❌ Arquivo de dados não encontrado: {data_path}")
+            return
+
         with open(data_path, 'rb') as f:
             data = pickle.load(f)
             
@@ -106,22 +111,17 @@ class SpecialistTrainer:
             X_list.append(x_tensor)
             y_list.append(y_target.unsqueeze(0))
             
-        lastro_days, val_days = 90, 60
+        lastro_days = 90
         total_idx = len(X_list)
         available_limit = total_idx - lastro_days - GAP
         available_idx = list(range(available_limit))
-        val_idx = random.sample(available_idx, val_days)
-        train_idx_base = [i for i in available_idx if i not in val_idx]
         lastro_idx = list(range(total_idx - lastro_days, total_idx))
         
-        # OVERSAMPLING: Repetir dias quentes (acima da mediana de crimes)
-        train_crime_median = np.median([info_list[i]['total_crimes'] for i in train_idx_base])
-        high_crime_idx = [i for i in train_idx_base if info_list[i]['total_crimes'] > train_crime_median]
-        train_indices_final = train_idx_base + high_crime_idx + high_crime_idx
+        # OVERSAMPLING: Repetir dias quentes
+        train_crime_median = np.median([info_list[i]['total_crimes'] for i in available_idx])
+        high_crime_idx = [i for i in available_idx if info_list[i]['total_crimes'] > train_crime_median]
+        train_indices_final = available_idx + high_crime_idx + high_crime_idx
         
-        train_X = [X_list[i] for i in train_idx_base] # Para o dataset
-        train_y = [y_list[i] for i in train_idx_base]
-        train_info = [info_list[i] for i in train_idx_base]
         lastro_X = [X_list[i] for i in lastro_idx]
         lastro_y = [y_list[i] for i in lastro_idx]
         
@@ -148,7 +148,7 @@ class SpecialistTrainer:
         steps_per_epoch = (len(train_indices_final) // self.grad_accum) + 1
         scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=self.lr, steps_per_epoch=steps_per_epoch, epochs=self.epochs)
         
-        logging.info(f"🎬 Iniciando Treinamento: {self.epochs} épocas | Oversampling Ativo")
+        logging.info(f"🎬 Iniciando Treinamento: {self.epochs} épocas | Accum: {self.grad_accum} | Device: {DEVICE}")
         total_batches = len(train_indices_final) // self.grad_accum
 
         for epoch in range(self.epochs):
@@ -169,17 +169,8 @@ class SpecialistTrainer:
                     optimizer.step()
                     scheduler.step()
                     optimizer.zero_grad()
-                    current_batch = steps // self.grad_accum
-                    if current_batch % 20 == 0 or current_batch == 1:
-                        with torch.no_grad():
-                            y_true, y_pred = by.squeeze().cpu().numpy(), pred.squeeze().cpu().numpy()
-                            p10, p20 = 0.0, 0.0
-                            if np.sum(y_true) > 0:
-                                t_true, t_pred = np.argsort(y_true)[::-1], np.argsort(y_pred)[::-1]
-                                p10 = len(set(t_true[:10]) & set(t_pred[:10])) / 10.0
-                                p20 = len(set(t_true[:20]) & set(t_pred[:20])) / 20.0
-                        logging.info(f"   E{epoch+1:02d} | Batch [{current_batch:03d}/{total_batches:03d}] | Loss: {loss_obj.item():.4f} | P@10: {p10*100:>5.1f}% | P@20: {p20*100:>5.1f}%")
-
+            
+            # Avaliação REALITY (Lastro inédito)
             model.eval()
             p10_l, p20_l = [], []
             with torch.no_grad():
@@ -191,20 +182,34 @@ class SpecialistTrainer:
                         t_true, t_pred = np.argsort(ly_np)[::-1], np.argsort(lp_np)[::-1]
                         p10_l.append(len(set(t_true[:10]) & set(t_pred[:10])) / 10.0)
                         p20_l.append(len(set(t_true[:20]) & set(t_pred[:20])) / 20.0)
+            
             real_p10, real_p20 = np.mean(p10_l or [0]), np.mean(p20_l or [0])
-            logging.info(f"[{region_label}] E{epoch+1:02d} | REALITY P@10: {real_p10*100:.1f}% | P@20: {real_p20*100:.1f}%")
+            if (epoch + 1) % 5 == 0 or epoch == 0:
+                logging.info(f"[{region_label}] E{epoch+1:02d} | REALITY P@10: {real_p10*100:.1f}% | P@20: {real_p20*100:.1f}%")
+            
             if real_p20 > self.best_p20:
                 self.best_p20 = real_p20
-                save_path = os.path.join(ROOT_DIR, 'models', 'active', f'{self.region_key}_model_new.pth')
-                torch.save({'model_state_dict': model.state_dict(), 'p20': real_p20}, save_path)
-                logging.info(f"🏆 NOVO RECORDE {region_label}: P@20={real_p20*100:.1f}%")
+                save_path = os.path.join(ROOT_DIR, 'models', 'active', f'{self.region_key}_model_active.pth')
+                # Backup do anterior
+                if os.path.exists(save_path):
+                    os.rename(save_path, save_path.replace('_active.pth', '_old.pth'))
+                
+                torch.save({'model_state_dict': model.state_dict(), 'p20': real_p20, 'date': time.strftime('%Y-%m-%d %H:%M:%S')}, save_path)
+                logging.info(f"🏆 NOVO RECORDE {region_label}: P@20={real_p20*100:.1f}% na Época {epoch+1}")
 
 def main():
     os.makedirs(os.path.join(ROOT_DIR, 'models', 'active'), exist_ok=True)
-    tasks = [('fortaleza', 80, 0.005, 16, 0.4, 30.0)]
+    # Configurações Elite T32 ISM
+    tasks = [
+        ('fortaleza', 80, 0.05, 32, 0.4, 20.0),
+        ('rmf', 80, 0.05, 32, 0.4, 25.0),
+        ('interior', 80, 0.05, 32, 0.3, 20.0)
+    ]
     for key, epochs, lr, accum, drop, rank_w in tasks:
         trainer = SpecialistTrainer(key, epochs, lr, accum, drop, rank_w)
         trainer.train()
+    
+    logging.info("\n✅ TREINAMENTO SEMANAL CONCLUÍDO PARA TODOS OS ESPECIALISTAS.")
 
 if __name__ == "__main__":
     main()

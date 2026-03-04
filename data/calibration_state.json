@@ -1,0 +1,126 @@
+{
+  "fortaleza": {
+    "steps": 3,
+    "history": [
+      {
+        "timestamp": "2026-03-01T17:34:24.833789",
+        "trigger": "fortaleza.p20=40.0% < 50%",
+        "step": 1,
+        "old_params": {
+          "dampening": 0.82,
+          "tension_factor": 0.5,
+          "min_risk": 45.0,
+          "tag_bias_direct": 1.5,
+          "tag_bias_neighbor": 0.5
+        },
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      },
+      {
+        "timestamp": "2026-03-01T17:35:10.100614",
+        "trigger": "fortaleza.p20=40.0% < 50%",
+        "step": 2,
+        "old_params": {
+          "dampening": 0.82,
+          "tension_factor": 0.5,
+          "min_risk": 45.0,
+          "tag_bias_direct": 1.5,
+          "tag_bias_neighbor": 0.5
+        },
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      },
+      {
+        "timestamp": "2026-03-01T17:37:00.629486",
+        "trigger": "fortaleza.p20=40.0% < 50%",
+        "step": 3,
+        "old_params": {
+          "dampening": 0.82,
+          "tension_factor": 0.5,
+          "min_risk": 45.0,
+          "tag_bias_direct": 1.5,
+          "tag_bias_neighbor": 0.5
+        },
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      }
+    ]
+  },
+  "interior": {
+    "steps": 3,
+    "history": [
+      {
+        "timestamp": "2026-03-01T17:34:24.838038",
+        "trigger": "interior.p20=0.0% < 50%",
+        "step": 1,
+        "old_params": {
+          "dampening": 0.82,
+          "tension_factor": 0.5,
+          "min_risk": 45.0,
+          "tag_bias_direct": 1.5,
+          "tag_bias_neighbor": 0.5
+        },
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      },
+      {
+        "timestamp": "2026-03-01T17:35:10.108983",
+        "trigger": "interior.p20=0.0% < 50%",
+        "step": 2,
+        "old_params": {
+          "dampening": 0.82,
+          "tension_factor": 0.5,
+          "min_risk": 45.0,
+          "tag_bias_direct": 1.5,
+          "tag_bias_neighbor": 0.5
+        },
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      },
+      {
+        "timestamp": "2026-03-01T17:37:00.651365",
+        "trigger": "interior.p20=0.0% < 50%",
+        "step": 3,
+        "old_params": {
+          "dampening": 0.82,
+          "tension_factor": 0.5,
+          "min_risk": 45.0,
+          "tag_bias_direct": 1.5,
+          "tag_bias_neighbor": 0.5
+        },
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      }
+    ]
+  }
+}

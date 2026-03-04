@@ -1,0 +1,322 @@
+{
+  "alerts": [
+    {
+      "timestamp": "2026-03-01T17:29:49.376931",
+      "type": "model_degraded_fortaleza_p20",
+      "severity": "HIGH",
+      "message": "Modelo degradado — Fortaleza P20: 40.0% (mínimo esperado: 50%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "value": 0.4,
+        "threshold": 0.5,
+        "evaluation_date": "2026-03-01"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-01T17:29:49.379944",
+      "type": "model_degraded_interior_p20",
+      "severity": "HIGH",
+      "message": "Modelo degradado — Interior P20: 0.0% (mínimo esperado: 50%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "value": 0.0,
+        "threshold": 0.5,
+        "evaluation_date": "2026-03-01"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-01T17:34:24.833789",
+      "type": "auto_calibration_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração FORTALEZA] Passo 1/3 — P20=40.0% abaixo de 50%. dampening=0.76, tension_factor=0.62, tag_bias=1.8",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "step": 1,
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-01T17:34:24.839593",
+      "type": "auto_calibration_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração INTERIOR] Passo 1/3 — P20=0.0% abaixo de 50%. dampening=0.76, tension_factor=0.62, tag_bias=1.8",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "step": 1,
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-01T17:35:10.100614",
+      "type": "auto_calibration_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração FORTALEZA] Passo 2/3 — P20=40.0% abaixo de 50%. dampening=0.76, tension_factor=0.62, tag_bias=1.8",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "step": 2,
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-01T17:35:10.118328",
+      "type": "auto_calibration_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração INTERIOR] Passo 2/3 — P20=0.0% abaixo de 50%. dampening=0.76, tension_factor=0.62, tag_bias=1.8",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "step": 2,
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-01T17:37:00.636275",
+      "type": "auto_calibration_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração FORTALEZA] Passo 3/3 — P20=40.0% abaixo de 50%. dampening=0.76, tension_factor=0.62, tag_bias=1.8",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "step": 3,
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-01T17:37:00.660234",
+      "type": "auto_calibration_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração INTERIOR] Passo 3/3 — P20=0.0% abaixo de 50%. dampening=0.76, tension_factor=0.62, tag_bias=1.8",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "step": 3,
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-01T17:38:50.958117",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 2.78%",
+      "details": {
+        "error_rate_percent": 2.7777777777777777
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-01T17:41:31.011215",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: P20=40.0% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "current_value": 0.4,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-04T15:15:06.344407",
+      "resolved_reason": "Região FORTALEZA sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
+    },
+    {
+      "timestamp": "2026-03-01T17:41:31.352390",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: P20=0.0% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "current_value": 0.0,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-04T15:15:06.344407",
+      "resolved_reason": "Região INTERIOR sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
+    },
+    {
+      "timestamp": "2026-03-01T19:22:24.924571",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 33.33%",
+      "details": {
+        "error_rate_percent": 33.33333333333333
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-01T19:57:20.614552",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 2.86%",
+      "details": {
+        "error_rate_percent": 2.857142857142857
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-01T20:27:26.216652",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 6.25%",
+      "details": {
+        "error_rate_percent": 6.25
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-02T14:11:51.772873",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 45.45%",
+      "details": {
+        "error_rate_percent": 45.45454545454545
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-02T14:32:18.842113",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 17.9% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: MORADA NOVA, QUIXERE, MIRAIMA",
+      "details": {
+        "region": "interior",
+        "coverage": 0.1795,
+        "threshold": 0.8,
+        "faction_nodes_total": 39,
+        "faction_nodes_in_top20": 7,
+        "missing_sample": [
+          "MORADA NOVA",
+          "QUIXERE",
+          "MIRAIMA",
+          "PENTECOSTE",
+          "ICO"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-04T15:15:06.344407",
+      "resolved_reason": "Região INTERIOR sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
+    },
+    {
+      "timestamp": "2026-03-02T14:32:20.434330",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=17.9% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.1794871794871795,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-04T15:15:06.344407",
+      "resolved_reason": "Região INTERIOR sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
+    },
+    {
+      "timestamp": "2026-03-03T19:22:39.894691",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 17.9% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: PEDRA BRANCA, MORADA NOVA, SOBRAL",
+      "details": {
+        "region": "interior",
+        "coverage": 0.1795,
+        "threshold": 0.8,
+        "faction_nodes_total": 39,
+        "faction_nodes_in_top20": 7,
+        "missing_sample": [
+          "PEDRA BRANCA",
+          "MORADA NOVA",
+          "SOBRAL",
+          "TEJUCUOCA",
+          "CRATEUS"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-04T15:15:06.344407",
+      "resolved_reason": "Região INTERIOR sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
+    },
+    {
+      "timestamp": "2026-03-03T19:22:39.947141",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=17.9% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.1794871794871795,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-04T15:15:06.344407",
+      "resolved_reason": "Região INTERIOR sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
+    },
+    {
+      "timestamp": "2026-03-04T13:31:35.026093",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=17.9% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.1794871794871795,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-04T15:15:06.344407",
+      "resolved_reason": "Região INTERIOR sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
+    }
+  ]
+}

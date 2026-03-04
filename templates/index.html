@@ -169,7 +169,7 @@
         <div class="mb-3">
              <i class="fas fa-crosshairs loading-icon"></i>
         </div>
-        <h4 class="mt-3 text-muted loading-text" id="loading-message">Carregando dados de risco...</h4>
+        <h4 class="mt-3 text-muted loading-text" id="loading-message">Carregando mapa de tensão...</h4>
         <small class="text-muted" id="loading-sub">Aguarde, analisando dados em tempo real.</small>
         <div class="progress-bar-custom" id="progress-container" style="display: none;">
             <div class="progress-fill" id="progress-fill"></div>
@@ -182,14 +182,14 @@
     <div class="row mb-4">
         <div class="col-12 text-center">
             <h1 class="display-6 fw-bold text-primary"><i class="fas fa-shield-alt"></i> Dashboard de Inteligência Preditiva</h1>
-            <p class="lead text-muted">Análise de Risco em Áreas Monitoradas (CVLI)</p>
+            <p class="lead text-muted">Termômetro de Tensão Territorial — Áreas Monitoradas</p>
         </div>
     </div>
     <div class="row mb-2 justify-content-center">
         <div class="col-md-3">
             <div class="card metric-card border-danger mb-0">
                 <div class="card-body text-center">
-                    <h5 class="card-title text-danger">Áreas Críticas</h5>
+                    <h5 class="card-title text-danger">Alta Tensão Crítica</h5>
                     <p class="card-text display-4 fw-bold" id="high-risk-count">-</p>
                     <small class="text-muted">Crítico (≥90)</small>
                 </div>
@@ -198,7 +198,7 @@
         <div class="col-md-3">
             <div class="card metric-card border-warning mb-0">
                 <div class="card-body text-center">
-                    <h5 class="card-title text-warning">Áreas de Alto Risco</h5>
+                    <h5 class="card-title text-warning">Tensão Elevada</h5>
                     <p class="card-text display-4 fw-bold" id="medium-risk-count">-</p>
                     <small class="text-muted">Alto (80-89)</small>
                 </div>
@@ -207,7 +207,7 @@
         <div class="col-md-3">
             <div class="card metric-card border-info mb-0">
                 <div class="card-body text-center">
-                    <h5 class="card-title text-info">Áreas Moderadas</h5>
+                    <h5 class="card-title text-info">Tensão Moderada</h5>
                     <p class="card-text display-4 fw-bold" id="low-risk-count">-</p>
                     <small class="text-muted">Moderado (50-79)</small>
                 </div>
@@ -220,8 +220,8 @@
                 <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                     <span><i class="fas fa-map-marked-alt"></i> Mapa Tático Operacional</span>
                     <div>
-                        <span class="badge bg-info me-2">⏱️ Próximos 7 Dias</span>
-                        <span class="badge bg-success">Modelo ST-GAT Ativo</span>
+                        <span class="badge bg-info me-2">⏱️ Janela 14 Dias</span>
+                        <span class="badge bg-success">Motor REPORT PREVIEW Ativo</span>
                     </div>
                 </div>
                 <div class="card-body p-0 d-flex flex-column">
@@ -229,12 +229,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 d-flex flex-column" style="max-height: calc(100vh - 280px); overflow: hidden;">
+        <div class="col-md-3 d-flex flex-column" style="overflow: hidden;">
             <div class="card shadow-sm h-100 w-100" style="display: flex; flex-direction: column; overflow: hidden;">
                 <div class="card-header">
-                    <strong>Motivos de Risco</strong>
+                    <strong>Fatores de Tensão</strong>
                     <div class="alert alert-warning alert-sm mt-2 mb-0 p-2 small">
-                        <i class="fas fa-info-circle"></i> <strong>Nota:</strong> Predições para os <strong>próximos 7 dias</strong>, não apenas amanhã
+                        <i class="fas fa-info-circle"></i> <strong>Nota:</strong> Projeção de tensão territorial para os <strong>próximos 14 dias</strong>, não apenas amanhã
                     </div>
                 </div>
                 <div class="card-body" style="overflow-y: auto; flex: 1; padding: 12px; font-size: 0.9rem;">
@@ -253,7 +253,7 @@
                                 </small>
                                 <span class="badge bg-success" id="stable-areas-count">-</span>
                             </div>
-                            <small class="text-muted d-block" style="font-size: 0.75rem;">Baixo + Sem Risco (&lt;50)</small>
+                            <small class="text-muted d-block" style="font-size: 0.75rem;">Baixa Tensão (&lt;50)</small>
                         </div>
                         
                         <div class="alert alert-info alert-sm mt-2 mb-2 p-2" id="ranking-info" style="display:none;">
@@ -271,12 +271,12 @@
                         </a>
                     </div>
 
-                    <div class="d-grid gap-1 mb-2" style="gap: 6px !important;">
+                    <div class="d-grid gap-1 mb-2 simulation-ui-container" style="gap: 6px !important;">
                         <div class="btn-group" role="group">
-                            <button class="btn btn-outline-primary btn-sm" id="btn-simulate">
+                            <button class="btn btn-outline-primary btn-sm" id="btn-simulate" title="Simular posicionamento de equipe no terreno">
                                 <i class="fas fa-motorcycle"></i> Equipe
                             </button>
-                            <button class="btn btn-outline-danger btn-sm" id="btn-simulate-exo">
+                            <button class="btn btn-outline-danger btn-sm" id="btn-simulate-exo" title="Simular cenário de conflito ou evento crítico">
                                 <i class="fas fa-radiation"></i> Conflito
                             </button>
                         </div>
@@ -288,8 +288,10 @@
                         </button>
                     </div>
 
+                    <script>console.log("Simulation UI Container Rendered");</script>
+
                     <div id="selected-info">
-                        <p class="text-muted">Clique em uma área no mapa para ver os motivos de risco aqui.</p>
+                        <p class="text-muted">Clique em uma área no mapa para ver os fatores de tensão aqui.</p>
                     </div>
                     
                     <!-- Explicações Detalhadas (Collapsible) -->
@@ -307,17 +309,17 @@
                     <!-- Métricas Descritivas do Sistema (Collapsible) -->
                     <div id="metrics-section" style="margin-top: 0; margin-bottom: 0; border-top: 1px solid #ddd; padding-top: 8px;">
                         <button class="btn btn-sm btn-link p-0 text-info fw-bold" data-bs-toggle="collapse" data-bs-target="#metrics-collapse" aria-expanded="false">
-                            <i class="fas fa-chart-bar"></i> Estatísticas do Modelo
+                            <i class="fas fa-thermometer-half"></i> 🌡️ Indicadores Territoriais
                         </button>
                         <div id="metrics-collapse" class="collapse" style="margin-top: 6px;">
                         <div id="metrics-content" class="small">
                             <div class="row">
                                 <div class="col-6">
-                                    <div class="metric-mini" title="Média de risco dos 5 bairros mais perigosos no momento. Indica a gravidade nos pontos mais críticos.">
+                                    <div class="metric-mini" title="Tensão média nos 5 territórios mais críticos no momento. Indica a pressão nos pontos de maior concentração.">
                                         <span class="text-muted">Pressão nos Hotspots:</span>
                                         <strong id="metric-top5-mean">—</strong>
                                     </div>
-                                    <div class="metric-mini" title="Média de risco das 10 áreas no topo do ranking. Útil para visão de priorização tática.">
+                                    <div class="metric-mini" title="Tensão média das 10 áreas no topo do termômetro. Útil para priorização territorial tática.">
                                         <span class="text-muted">Alerta do Top 10:</span>
                                         <strong id="metric-top10-mean">—</strong>
                                     </div>
@@ -327,14 +329,14 @@
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    <div class="metric-mini" title="Média global de risco de todos os 299 bairros/cidades. Indica o nível geral de periculosidade do Estado.">
+                                    <div class="metric-mini" title="Tensão média global de todos os territórios monitorados. Indica o nível geral de pressão territorial no Estado.">
                                         <span class="text-muted">Calor do Estado:</span>
                                         <div style="display:flex;align-items:center;gap:8px;">
                                             <strong id="metric-overall-mean">—</strong>
                                             <span id="metric-state-label" style="display:inline-block;padding:3px 8px;border-radius:12px;font-size:0.8rem;color:#fff;background:#6c757d;">—</span>
                                         </div>
                                     </div>
-                                    <div class="metric-mini" title="Indica se o risco está concentrado em poucos bairros (baixa volatilidade) ou espalhado por todo o estado (alta volatilidade).">
+                                    <div class="metric-mini" title="Indica se a tensão está concentrada em poucos territórios (sinal nítido) ou espalhada pelo estado (pressão difusa).">
                                         <span class="text-muted">Volatilidade:</span>
                                         <strong id="metric-overall-std">—</strong>
                                     </div>
@@ -346,7 +348,7 @@
                             </div>
                         </div>
                         <div class="alert alert-info mt-1 mb-0 p-1" style="font-size: 0.75rem;">
-                            <i class="fas fa-info-circle"></i> Para P@K/NDCG reais com ground truth, usar <code>validate_with_crossval.py</code>
+                            <i class="fas fa-info-circle"></i> Cobertura Territorial (Cov@K): % das zonas de tensão conhecidas presentes no top-K do termômetro
                         </div>
                         </div>
                     </div>
@@ -358,7 +360,7 @@
                         </button>
                         <div id="anomaly-collapse" class="collapse" style="margin-top: 6px;">
                         <div id="anomaly-content" class="small">
-                            <div id="anomaly-level-indicator" title="Índice de 0 a 10 que combina a volatilidade do risco com eventos graves recentes. Acima de 7.5 indica instabilidade severa no estado.">
+                            <div id="anomaly-level-indicator" title="Índice de 0 a 10 que mede a pressão territorial combinada: CVLI recente + eventos exógenos + territórios de facção. Acima de 7.5 indica instabilidade territorial severa.">
                                 <p class="mb-2">
                                     <span class="text-muted">Tensão Estadual (0-10):</span>
                                     <strong id="anomaly-level">—</strong>
@@ -369,7 +371,7 @@
                                 <p class="text-muted small">Sincronizando com motor Report Preview...</p>
                             </div>
                             <div id="model-confidence-container">
-                                <p class="text-muted small mb-1" title="Mede a nitidez do sinal de risco. Quanto mais nítido é o ranking em relação ao ruído comum, maior a confiança na detecção de anomalias.">Precisão de Captura: <strong id="confidence-percent">—</strong></p>
+                                <p class="text-muted small mb-1" title="Cobertura dos territórios de facção e CVLI no topo do termômetro. Acima de 80% indica que o modelo está surfaçando as zonas de tensão corretamente.">Cobertura Territorial: <strong id="confidence-percent">—</strong></p>
                                 <small class="text-muted" style="font-size: 0.7rem;" title="Horário do último processamento de dados realizado pelo motor Report Preview.">Última varredura estadual: <span id="last-anomaly-check">—</span></small>
                             </div>
                         </div>
@@ -389,7 +391,7 @@
                                 <label class="form-check-label small" for="toggle-top20">Mostrar Top20 Micro‑Nodos (alfinetes)</label>
                             </div>
                         </div>
-                        <h6 class="mb-2 fw-bold text-dark" id="top-list-title" style="font-size: 0.9rem;">Top 10 Áreas Críticas</h6>
+                        <h6 class="mb-2 fw-bold text-dark" id="top-list-title" style="font-size: 0.9rem;">🌡️ Top 10 Territórios em Tensão</h6>
                         <div id="top-areas" class="list-group list-group-flush small" style="max-height: 200px; overflow-y: auto;"></div>
                     </div>
                 </div>
@@ -412,7 +414,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p class="text-muted small">Cole os dados brutos de ocorrências (formato CIOPS) abaixo. O sistema identificará automaticamente as áreas e recalculará o risco.</p>
+        <p class="text-muted small">Cole os dados brutos de ocorrências (formato CIOPS) abaixo. O sistema identificará automaticamente as áreas e atualizará o termômetro de tensão territorial.</p>
         <textarea class="form-control" id="ciops-text" rows="10" placeholder="Exemplo:&#10;01 - M20260051891 - RAIO 04 CAUCAIA - ... - CENTRO DE FORTALEZA ..."></textarea>
       </div>
       <div class="modal-footer">
@@ -508,12 +510,12 @@
     var legend = L.control({position: 'bottomright'});
     legend.onAdd = function (map) {
         var div = L.DomUtil.create('div', 'legend');
-        div.innerHTML = '<strong>Nível de Risco (Ranking)</strong><br>';
+        div.innerHTML = '<strong>Tensão Territorial (Ranking)</strong><br>';
         div.innerHTML += '<i style="background:' + getColor(95) + '"></i> Crítico (≥ 95)<br>';
         div.innerHTML += '<i style="background:' + getColor(85) + '"></i> Alerta (80–94)<br>';
         div.innerHTML += '<i style="background:' + getColor(65) + '"></i> Moderado (50–79)<br>';
         div.innerHTML += '<i style="background:' + getColor(35) + '"></i> Baixo (20–49)<br>';
-        div.innerHTML += '<hr style="margin: 5px 0; opacity: 0.5;"><small style="color: #666;">🕐 <strong>Agregação:</strong> Próximos 7 dias<br/><strong>📊 Ranking:</strong> Baseado em P@K</small>';
+        div.innerHTML += '<hr style="margin: 5px 0; opacity: 0.5;"><small style="color: #666;">🕐 <strong>Janela:</strong> Próximos 14 dias<br/><strong>📊 Ranking:</strong> Cobertura Territorial (Cov@K)</small>';
         return div;
     };
     legend.addTo(map);
@@ -550,6 +552,7 @@
     var geojsonLayer = null;
     var riskDataGlobal = null;
     var metaDataGlobal = null;
+    var _effMetricsPrintedDate = null; // guard: print termômetro apenas 1x por data de avaliação
 
     // Top20 micro-nodes layer
     var top20Layer = L.layerGroup();
@@ -617,7 +620,7 @@
                         var popup = '<strong>' + (f.properties.rank || '') + '. ' + displayName + '</strong><br/>' +
                                     '<b>Facção:</b> ' + faccao + '<br/>' +
                                     '<b>Ruas mais críticas:</b> ' + ruasCriticas + '<br/>' +
-                                    (f.properties.score ? '<b>Score de risco:</b> ' + Math.round(f.properties.score) + '<br/>' : '');
+                                    (f.properties.score ? '<b>Tensão territorial:</b> ' + Math.round(f.properties.score) + '<br/>' : '');
                         m.bindPopup(popup);
                         top20Layer.addLayer(m);
                     }catch(e){ console.warn('[Top20] feature error', e, f); }
@@ -702,7 +705,7 @@
     function hideLoading(force) {
         if (!force) {
             var currentText = $('#loading-message').text() || '';
-            if (currentText.indexOf('Carregando dados de risco') !== -1) {
+            if (currentText.indexOf('Carregando mapa de tensão') !== -1) {
                 return; // Bloqueia remoção prematura
             }
         }
@@ -757,19 +760,25 @@
             }
 
             // SINALIZAÇÃO NO CONSOLE: Monitor de Eficiência Report Preview
+            // Imprime apenas 1x por data de avaliação para não repetir a cada refresh do mapa
             if (metaDataGlobal && metaDataGlobal.efficiency_metrics) {
                 var em = metaDataGlobal.efficiency_metrics;
-                var g = em.global || {};
-                var f = em.fortaleza || {};
-                
-                console.info('%c🛡️ MONITOR DE EFICIÊNCIA REPORT PREVIEW %c\n' +
-                             'Data da Avaliação: ' + em.date + '\n' +
-                             'P5  Global: ' + ((g.p5 || 0) * 100).toFixed(1) + '% | Hits: ' + (g.hits5 ? g.hits5.join(', ') : "—") + '\n' +
-                             'P10 Global: ' + ((g.p10 || 0) * 100).toFixed(1) + '% | Hits: ' + (g.hits10 ? g.hits10.join(', ') : "—") + '\n' +
-                             'P20 Global: ' + ((g.p20 || 0) * 100).toFixed(1) + '% | Hits: ' + (g.hits20 ? g.hits20.join(', ') : "—") + '\n\n' +
-                             'P10 Fortaleza: ' + ((f.p10 || 0) * 100).toFixed(1) + '% | Hits: ' + (f.hits10 ? f.hits10.join(', ') : "—"),
-                             'background: #0d6efd; color: #fff; font-weight: bold; padding: 2px 5px; border-radius: 3px;',
-                             'color: #0d6efd; font-weight: bold;');
+                if (em.date && em.date !== _effMetricsPrintedDate) {
+                    _effMetricsPrintedDate = em.date;
+                    var g = em.global || {};
+                    var f = em.fortaleza || {};
+                    
+                    console.info('%c🌡️ TERMÔMETRO TERRITORIAL — COBERTURA DO MODELO %c\n' +
+                                 'Data da Avaliação: ' + em.date + ' (última avaliação — atualiza a cada 7 dias)\n' +
+                                 'Cov@5  Global: ' + ((g.p5 || 0) * 100).toFixed(1) + '% | Zones: ' + (g.hits5 ? g.hits5.join(', ') : "—") + '\n' +
+                                 'Cov@10 Global: ' + ((g.p10 || 0) * 100).toFixed(1) + '% | Zones: ' + (g.hits10 ? g.hits10.join(', ') : "—") + '\n' +
+                                 'Cov@20 Global: ' + ((g.p20 || 0) * 100).toFixed(1) + '% | Zones: ' + (g.hits20 ? g.hits20.join(', ') : "—") + '\n\n' +
+                                 'Cov@10 Fortaleza: ' + ((f.p10 || 0) * 100).toFixed(1) + '% | Zones: ' + (f.hits10 ? f.hits10.join(', ') : "—") + '\n' +
+                                 'Cov@20 Fortaleza: ' + ((f.p20 || 0) * 100).toFixed(1) + '% | Zones: ' + (f.hits20 ? f.hits20.join(', ') : "—"),
+
+                                 'background: #0d6efd; color: #fff; font-weight: bold; padding: 2px 5px; border-radius: 3px;',
+                                 'color: #0d6efd; font-weight: bold;');
+                }
             }
         } catch (e) {
             $('#model-window-info').text('Modelo: —');
@@ -912,17 +921,35 @@
         simulationPoints = [];
         $('#btn-clear-sim').addClass('d-none');
 
-        // Reload entire map layer with original data
+        // Restaurar estado original sem destruir o layer do mapa
         showLoading('Restaurando Estado Original...', 'Recuperando dados históricos.');
         
-        // Use reloadMapLayer to ensure complete synchronization
-        reloadMapLayer();
-        
-        setTimeout(function() {
-            var mode = $('#mode-switch').is(':checked') ? 'CVLI' : 'CVP';
-            updateDashboard(mode);
-            hideLoading();
-        }, 500);
+        $.ajax({
+            url: '/api/risk',
+            dataType: 'json',
+            cache: false,
+            success: function(resp) {
+                if (resp.data) {
+                    // 1. Atualizar dados globais
+                    riskDataGlobal = resp.data;
+                    metaDataGlobal = resp.meta || {};
+                    
+                    // 2. Atualizar visualização do mapa (cores/estilos)
+                    updateRiskMap(riskDataGlobal);
+                    
+                    // 3. Sincronizar Dashboard
+                    updateDashboard('CVLI');
+                }
+            },
+            error: function(err) {
+                console.warn('Erro ao restaurar dados originais:', err);
+                // Se o updateRiskMap falhar feio, ai sim usamos o reload como fallback
+                reloadMapLayer();
+            },
+            complete: function() {
+                hideLoading();
+            }
+        });
     }
 
     function normalizeName(text) {
@@ -1043,7 +1070,7 @@
                                          '<strong>' + (props.name || 'Área') + '</strong><br/>' +
                                          '<small>ID: ' + props.node_id + '</small><br/>' +
                                          '<hr style="margin: 5px 0;">' +
-                                         '<strong>Risco (Ranking):</strong> ' + cvli.toFixed(1) + '%<br/>' +
+                                         '<strong>Tensão Territorial:</strong> ' + cvli.toFixed(1) + '%<br/>' +
                                          (props.faction ? '<strong>Facção:</strong> ' + props.faction + '<br/>' : '');
                             
                             if (props.reasons && props.reasons.length > 0) {
@@ -1080,12 +1107,54 @@
     }
 
     function updateRiskMap(riskData) {
-        // Esta função foi substituída por reloadMapLayer() para uma melhor sincronização
-        reloadMapLayer();
+        if (!riskData || !geojsonLayer) return;
+        
+        // 1. Atualizar o cache global de risco com os dados da simulação
+        riskDataGlobal = riskData;
+        
+        // 2. Criar mapeamento rápido de Nome -> Dados de Simulação
+        var riskByName = {};
+        riskData.forEach(function(item) {
+            var regionKey = (item.region_type || item.region || '').toString().toLowerCase();
+            var nameKey = item.clean_name || normalizeName(item.name || '');
+            var composite = nameKey + '|' + regionKey;
+            riskByName[composite] = item;
+            if (nameKey) riskByName[nameKey] = item;
+        });
+
+        // 3. Atualizar as propriedades de cada feature no geojsonLayer existente
+        geojsonLayer.eachLayer(function(layer) {
+            var feature = layer.feature;
+            var rawName = feature.properties.Name || feature.properties.name || feature.properties.NOME || "";
+            var normName = normalizeName(rawName);
+            var regionType = (feature.properties.region_type || '').toString().toLowerCase();
+            var compositeKey = normName + '|' + regionType;
+            
+            var r = riskByName[compositeKey] || riskByName[normName];
+            if (r) {
+                // Atualizar scores e labels vindos da simulação
+                feature.properties.risk_score = (typeof r.risk_score === 'number') ? r.risk_score : null;
+                if (r.status_label) feature.properties.status_label = r.status_label;
+                if (r.risk_text) feature.properties.risk_text = r.risk_text;
+                if (r.metrics) feature.properties.metrics = r.metrics;
+                if (r.faction) feature.properties.faction = r.faction;
+                
+                // Aplicar novo estilo visual imediatamente
+                if (typeof layer.setStyle === 'function') {
+                    layer.setStyle(style(feature));
+                }
+            }
+        });
+
+        // 4. Sincronizar painéis laterais e estatísticas
+        try {
+            updateDashboard('CVLI');
+            updateTopCriticalAreas();
+        } catch(e) { console.warn('Dashboard sync failed after simulation', e); }
     }
 
     // Show loading overlay while initial data (polygons + risk) are fetched
-    showLoading('Carregando dados de risco...', 'Aguarde enquanto o sistema obtém previsões.');
+    showLoading('Carregando mapa de tensão...', 'Aguarde enquanto o sistema obtém previsões.');
 
     $.when(
         $.ajax({url: '/api/polygons', dataType: 'json', cache: false}),
@@ -1266,7 +1335,7 @@
         });
 
         $('#btn-simulate-exo').on('click', function() {
-            if (simulationMode && simulationType === 'exogenous') {
+            if (simulationMode && simulationType === 'conflict') {
                 // Toggle off
                 simulationMode = false;
                 $(this).removeClass('active btn-danger').addClass('btn-outline-danger');
@@ -1274,7 +1343,7 @@
             } else {
                 // Toggle on
                 simulationMode = true;
-                simulationType = 'exogenous';
+                simulationType = 'conflict';
                 $(this).addClass('active btn-danger').removeClass('btn-outline-danger');
                 $('#btn-simulate').removeClass('active btn-primary').addClass('btn-outline-primary');
                 $('.leaflet-container').addClass('simulation-active');
@@ -1341,7 +1410,7 @@
                                 $('#ciops-text').val('');
 
                                 // Refresh Risk Data and Reload Map Layer Completely
-                                showLoading('Sincronizando Mapa...', 'Atualizando visualização com novos dados de risco.');
+                                showLoading('Sincronizando Mapa...', 'Atualizando visualização com novos dados de tensão.');
                                 
                                 // Reload the entire map layer to ensure all changes are reflected
                                 reloadMapLayer().then(function() {
@@ -1475,7 +1544,7 @@
             if (score >= 80) return { label: 'Alto', class: 'bg-warning text-dark' };
             if (score >= 50) return { label: 'Moderado', class: 'bg-info text-dark' };
             if (score >= 20) return { label: 'Baixo', class: 'bg-secondary text-white' };
-            return { label: 'Sem Risco', class: 'bg-success text-white' };
+            return { label: 'Sem Tensão', class: 'bg-success text-white' };
         }
     
         // Focus a layer: zoom to polygon bounds and show details popup
@@ -1483,35 +1552,62 @@
             try {
                 var bounds = (layer.getBounds && layer.getBounds()) || null;
                 var duration = (typeof animateSeconds === 'number') ? animateSeconds : 0.8;
-    
+
                 if (bounds) {
                     var center = bounds.getCenter();
-    
-                    // fitBounds zooms to show the polygon perfectly within the map container.
-                    // The map is in col-md-9 (separate from sidebar), so no sidebar offset needed.
-                    // padding: L.point(x, y) adds uniform margin in pixels around the bounds.
+
+                    // Passo 1: fitBounds com padding uniforme para obter zoom correto
                     map.fitBounds(bounds, {
                         maxZoom: 13,
-                        padding: [40, 40],  // 40px uniform padding around the polygon
+                        padding: [60, 60],
                         animate: true,
                         duration: duration
                     });
-    
-                    // After animation ends, show details popup at the polygon center
-                    // Only show details popup after moveend if not the initial map load
+
                     if (!initialMapLoad) {
                         map.once('moveend', function() {
-                            showFeatureDetails(layer, center);
+                            // Passo 2: reposicionar o centro do polígono à 65% da altura
+                            // do container — popup (~280px, abre para cima) fica no terço
+                            // superior e o polígono permanece visível abaixo.
+                            var containerPt = map.latLngToContainerPoint(center);
+                            var mapSize    = map.getSize();
+                            var targetY    = mapSize.y * 0.72;  // mais para baixo → popup sobe mais
+                            var deltaY     = containerPt.y - targetY;
+
+                            // Centraliza horizontalmente também (deixa polígono no centro X)
+                            var targetX = mapSize.x * 0.50;
+                            var deltaX  = containerPt.x - targetX;
+
+                            if (Math.abs(deltaY) > 15 || Math.abs(deltaX) > 15) {
+                                map.panBy([deltaX, deltaY], { animate: true, duration: 0.35 });
+                                map.once('moveend', function() {
+                                    showFeatureDetails(layer, center);
+                                });
+                            } else {
+                                showFeatureDetails(layer, center);
+                            }
                         });
                     }
                 } else {
-                    // Fallback for point-like layers (CircleMarkers)
+                    // Fallback para CircleMarkers (ponto único)
                     var latlng = (layer.getLatLng && layer.getLatLng()) || null;
                     if (latlng) {
                         map.setView(latlng, 15, { animate: true, duration: duration });
                         if (!initialMapLoad) {
                             map.once('moveend', function() {
-                                showFeatureDetails(layer, latlng);
+                                // Posicionar ponto a 65% da altura
+                                var containerPt = map.latLngToContainerPoint(latlng);
+                                var mapSize     = map.getSize();
+                                var deltaY = containerPt.y - mapSize.y * 0.72;
+                                var deltaX = containerPt.x - mapSize.x * 0.50;
+                                if (Math.abs(deltaY) > 15 || Math.abs(deltaX) > 15) {
+                                    map.panBy([deltaX, deltaY], { animate: true, duration: 0.35 });
+                                    map.once('moveend', function() {
+                                        showFeatureDetails(layer, latlng);
+                                    });
+                                } else {
+                                    showFeatureDetails(layer, latlng);
+                                }
                             });
                         }
                     }
@@ -1531,11 +1627,11 @@
             // Prefer server-provided normalized region if present, else CIDADE
             var region = feature.properties.region_type || feature.properties.CIDADE || feature.properties.city || 'RMF/Interior';
     
-            // Friendly fields provided by backend: status_label, risk_text, cvli_prediction_text
+            // Friendly fields provided by backend: status_label, tension_text, cvli_prediction_text
             var friendlyLabel = feature.properties.status_label || status.label;
             var level = getRiskLevel(score);
             var riskText = feature.properties.risk_text || (Math.round(score) + '% — ' + friendlyLabel);
-            var predText = feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('Estimativa: ~' + predVal.toFixed(1) + ' ocorrências') : 'Sem novas ocorrências previstas');
+            var predText = feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('Estimativa: ~' + predVal.toFixed(1) + ' ocorrências/14d') : 'Sem eventos recentes na janela');
     
                     var popupContent = `
                         <div style="font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 14px; min-width: 240px; padding: 0; margin: -1px; background: #1a1d20; color: white; border-radius: 4px;">
@@ -1566,7 +1662,7 @@
             
                                 <div style="background: ${score >= 90 ? 'rgba(220, 53, 69, 0.2)' : 'rgba(13, 110, 253, 0.15)'}; padding: 10px; border-radius: 6px; border-left: 4px solid ${score >= 90 ? '#dc3545' : '#0d6efd'}; margin-top: 8px;">
                                     <div style="color: #ffffff; font-size: 0.85rem;">
-                                        <strong>Nível de Risco:</strong> ${riskText}
+                                        <strong>Tensão Territorial:</strong> ${riskText}
                                     </div>
                                     <div style="color: #e9ecef; font-size: 0.8rem; mt-1">
                                         <strong>Previsão:</strong> ${predText}
@@ -1599,8 +1695,14 @@
             // ignore
         }
 
-        // Create popup and open it manually (autoPan disabled to avoid shifting the view)
-        L.popup({ autoPan: false })
+        // autoPan ativo com padding generoso para garantir que o popup
+        // apareça sempre dentro da área visível do mapa.
+        L.popup({
+            autoPan: true,
+            autoPanPadding: L.point(50, 80),
+            autoPanPaddingTopLeft: L.point(50, 100),
+            maxWidth: 320,
+        })
             .setLatLng(latlng)
             .setContent(popupContent)
             .openOn(map);
@@ -1609,7 +1711,7 @@
         var reasonsHtml = '<h5>' + feature.properties.name + '</h5>';
         reasonsHtml += '<p><strong>Facção:</strong> ' + (feature.properties.faction || 'N/A') + '</p>';
         var sideStatus = feature.properties.status_label || status.label;
-        var sidePred = feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('~' + predVal.toFixed(1) + ' ocorrências') : 'Sem novas ocorrências previstas');
+        var sidePred = feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('~' + predVal.toFixed(1) + ' eventos/14d') : 'Sem eventos recentes na janela');
         reasonsHtml += '<p><strong>Status:</strong> ' + sideStatus + '</p>';
         reasonsHtml += '<p><strong>Previsão (' + typeLabel + '):</strong> ' + sidePred + '</p>';
         (feature.properties.reasons || []).forEach(function(r) { reasonsHtml += '<li>' + r + '</li>'; });
@@ -1626,83 +1728,50 @@
     
     // WEEK 4: Load explanation from API
     function loadExplanation(nodeId) {
-        // Show a small, discreet loading indicator while fetching
         $('#explanation-section').show();
         $('#explanation-collapse').collapse('show');
-        $('#explanation-content').html('<div class="small text-muted"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Carregando explicação...</div>');
+        $('#explanation-content').html('<div class="small text-muted"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Analisando dados táticos...</div>');
 
         fetch('/api/explain/' + nodeId)
             .then(response => {
-                if (!response.ok) throw new Error('Explanation fetch failed');
+                if (!response.ok) throw new Error('Falha ao obter explicação');
                 return response.json();
             })
             .then(data => {
-                // If server provided a manager-friendly harmonized text, prefer it
-                if (data.manager_text && data.manager_text.trim().length > 0) {
-                    $('#explanation-content').html(data.manager_text);
-                    return;
-                }
-
-                var explanationHtml = '';
-
-                // Simplified summary (remove all technical jargon and English)
+                var html = '';
+                
+                // 1. Resumo Principal
                 if (data.summary) {
-                    var simpleSummary = data.summary
-                        .replace(/Node \d+ is ranked #(\d+) and predicted as a significant risk area/i, 'Esta área está na posição <strong>#$1</strong> — identificada como <strong>risco significativo</strong>')
-                        .replace(/Node \d+ is ranked #(\d+) and predicted as a notable area of concern/i, 'Esta área está na posição <strong>#$1</strong> — identificada como <strong>área de atenção</strong>')
-                        .replace(/Node \d+ is ranked #(\d+) and predicted as a monitored area/i, 'Esta área está na posição <strong>#$1</strong> — identificada como <strong>área monitorada</strong>')
-                        .replace(/Node \d+ is ranked #(\d+) and predicted as one of the most critical areas/i, 'Esta área está na posição <strong>#$1</strong> — identificada como <strong>uma das mais críticas</strong>')
-                        .replace(/based on:\s*/i, '')
-                        .replace(/\s*Temporal Pattern \(\d+%\)\s*\+\s*Spatial Correlation \(\d+%\)\s*\+\s*Recent Events \(\d+%\)\s*\.\s*Risk score:\s*[\d.]+\/10\.?\s*/i, '')
-                        .replace(/\s*Risk score:\s*[\d.]+\/10\.?\s*/i, '');
-
-                    explanationHtml += '<p class="mb-3" style="font-size: 0.95rem;">' + simpleSummary.trim() + '</p>';
+                    html += '<p class="mb-3" style="font-size: 0.95rem;">' + data.summary + '</p>';
                 }
 
-                // Simple factor indicators with colors
+                // 2. Fatores Reais (Metrics-based)
                 if (data.factors && data.factors.length > 0) {
-                    explanationHtml += '<div class="mb-2"><strong style="font-size: 0.9rem;">Por quê?</strong></div>';
-
-                    var factorLabels = {
-                        'Temporal Pattern': '📈 <strong>Piorou recentemente</strong> — há dias/semanas esta área está com mais problemas',
-                        'Spatial Correlation': '📍 <strong>Vizinhos também têm problema</strong> — áreas ao redor estão com risco alto',
-                        'Recent Events': '⚡ <strong>Ocorreu agora</strong> — eventos novos foram registrados recentemente',
-                        'Historical Baseline': '🔄 <strong>Sempre foi assim</strong> — historicamente essa é uma área conhecida como tensa'
-                    };
-
-                    data.factors.forEach(function(factor) {
-                        var label = factorLabels[factor.name] || factor.name;
-                        var colors = ['#ffebee', '#fff3e0', '#e8f5e9', '#f3e5f5'];
-                        var idx = data.factors.indexOf(factor);
-                        var bgColor = colors[idx % colors.length];
-
-                        explanationHtml += '<div style="background: ' + bgColor + '; padding: 8px; margin: 6px 0; border-radius: 4px; font-size: 0.9rem;">' +
-                            label +
-                            '</div>';
+                    html += '<div class="mb-2"><strong style="font-size: 0.9rem;">Fatores Determinantes:</strong></div>';
+                    
+                    data.factors.forEach(function(f) {
+                        var color = '#f8f9fa';
+                        if (f.importance === 'high') color = '#fff5f5';
+                        else if (f.importance === 'medium') color = '#fffaf0';
+                        
+                        html += '<div style="background: ' + color + '; padding: 10px; margin: 8px 0; border-radius: 6px; border-left: 3px solid ' + (f.importance === 'high' ? '#dc3545' : '#fd7e14') + '; font-size: 0.9rem;">' +
+                                f.explanation +
+                                '</div>';
                     });
                 }
 
-                // Caveats as notes (translate common English caveats)
-                if (data.caveats && data.caveats.length > 0) {
-                    var caveatText = data.caveats[0]
-                        .replace(/Low confidence/i, 'Confiança baixa')
-                        .replace(/Model confidence is high for this prediction/i, 'Confiança do modelo é alta para esta previsão')
-                        .replace(/Prediction may be unreliable/i, 'Previsão pode ser pouco confiável')
-                        .replace(/Based on limited historical data/i, 'Baseada em dados históricos limitados');
-
-                    explanationHtml += '<div class="mt-2 pt-2" style="border-top: 1px solid #ddd;"><small class="text-muted"><strong>📌 Nota:</strong> ' +
-                        caveatText +
-                        '</small></div>';
+                // 3. Nota de Confiança
+                if (data.interpretation) {
+                    html += '<div class="mt-3 pt-2" style="border-top: 1px solid #dee2e6;"><small class="text-muted">📌 ' + 
+                            data.interpretation + 
+                            '</small></div>';
                 }
 
-                // Display explanation (or fallback message)
-                $('#explanation-content').html(explanationHtml || '<p class="text-muted">Explicação detalhada indisponível</p>');
-                $('#explanation-section').show();
+                $('#explanation-content').html(html || '<p class="text-muted">Dados insuficientes para gerar explicação tática.</p>');
             })
             .catch(error => {
-                console.warn('Failed to load explanation:', error);
-                $('#explanation-content').html('<p class="text-muted">Explicação detalhada indisponível</p>');
-                $('#explanation-section').show();
+                console.warn('Erro ao carregar explicação:', error);
+                $('#explanation-content').html('<p class="text-muted">Erro na conexão com o motor de inteligência.</p>');
             });
     }
     
@@ -1729,7 +1798,7 @@
                 // Update active events
                 var eventsHtml = '';
                 if (data.active_events && data.active_events.length > 0) {
-                    eventsHtml = '<strong class="small">Eventos Críticos Ativos:</strong>';
+                    eventsHtml = '<strong class="small">Eventos Territoriais Ativos (14d):</strong>';
                     data.active_events.forEach(function(evt) {
                         var sev = (typeof evt.severity === 'number') ? (evt.severity * 100).toFixed(0) : 0;
                         eventsHtml += '<div class="small text-muted mt-1">' +
@@ -1738,7 +1807,7 @@
                             '</div>';
                     });
                 } else {
-                    eventsHtml = '<p class="text-muted small">Nenhum evento crítico ativo nos últimos 7 dias</p>';
+                    eventsHtml = '<p class="text-muted small">Nenhum evento ativo nos últimos 14 dias</p>';
                 }
                 $('#active-events-list').html(eventsHtml);
                 
@@ -1812,13 +1881,12 @@
                         <div class="d-flex w-100 justify-content-between align-items-center">
                             <span class="mb-1">${idx+1}. ${item.name}</span>
                             <div class="text-end ms-2" style="min-width: 70px;">
-                                <small class="d-block text-muted" style="font-size: 0.7rem; line-height: 1;">Risco</small>
+                                <small class="d-block text-muted" style="font-size: 0.7rem; line-height: 1;">Tensão</small>
                                 <span class="${cls} fw-bold" style="font-size: 0.85rem;">${item.status_label || ''}</span>
                             </div>
                         </div>
                     </a>`;
             });
-
             $('#top-areas').html(htmlSrv);
             // bind clicks to focus corresponding layer by node_id
             $('#top-areas a').on('click', function(e) {
@@ -1892,7 +1960,7 @@
                                 ${idx+1}. ${item.name}${regionSuffix}
                             </span>
                             <div class="text-end ms-2" style="min-width: 70px;">
-                                <small class="d-block text-muted" style="font-size: 0.7rem; line-height: 1;">Risco</small>
+                                <small class="d-block text-muted" style="font-size: 0.7rem; line-height: 1;">Tensão</small>
                                 <span class="${riskInfo.class} fw-bold" style="font-size: 0.85rem;">${riskInfo.label}</span>
                             </div>
                         </div>
@@ -2002,7 +2070,7 @@
                     if ($('#loading-overlay').hasClass('d-none') === false) {
                         // NÃO esconder se for o loading de inicialização
                         var currentText = $('#loading-message').text() || '';
-                        if (currentText.indexOf('Carregando dados de risco') === -1) {
+                        if (currentText.indexOf('Carregando mapa de tensão') === -1) {
                             hideLoading();
                         }
                     }
