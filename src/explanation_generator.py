@@ -32,7 +32,7 @@ class ExplanationGenerator:
                             rank: int,
                             context_dict: Dict) -> Dict:
         """
-        Gera uma explicação rica para o bairro, tentando o LLM primeiro.
+        Gera uma explicação baseada em métricas técnicas e heurísticas de explicabilidade do modelo.
         """
         # Dados Base
         name = context_dict.get('name', f"Localidade {node_id}")
@@ -40,12 +40,7 @@ class ExplanationGenerator:
         confidence = context_dict.get('confidence', 0.85)
         tier = context_dict.get('tier', 'monitorada')
         
-        # Tentar LLM Primeiro
-        llm_explanation = self._get_llm_explanation(name, rank, score, context_dict)
-        if llm_explanation:
-            return llm_explanation
-
-        # Fallback para Lógica Elite (Métricas Reais)
+        # Retorna apenas a Lógica Elite (Métricas Reais e Explicabilidade Técnica)
         return self._generate_elite_fallback(node_id, name, rank, score, confidence, tier, context_dict)
 
     def _get_llm_explanation(self, name: str, rank: int, score: float, context: Dict) -> Optional[Dict]:

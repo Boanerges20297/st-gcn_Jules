@@ -1,172 +1,136 @@
-import json
+import pandas as pd
+import numpy as np
 import os
 import re
-import numpy as np
-from scipy.spatial import KDTree
+import json
 import unicodedata
 import subprocess
 import sys
+from scipy.spatial import KDTree
 
 # Configurações de Caminhos
 BASE_DIR = os.getcwd()
-OFFICIAL_BASE = os.path.join(BASE_DIR, 'data', 'raw', 'dados_status_ocorrencias_gerais_ENRIQUECIDO.json')
+OFFICIAL_CSV = os.path.join(BASE_DIR, 'data', 'raw', 'dados_status_ocorrencias_gerais_ENRIQUECIDO.csv')
 BAIRROS_REF = os.path.join(BASE_DIR, 'data', 'raw', 'bairros_centros_latlong.json')
 
 def normalize_text(text):
-    if not text: return ""
+    if not text or pd.isna(text): return ""
     return unicodedata.normalize('NFKD', str(text)).encode('ASCII', 'ignore').decode('ASCII').upper().strip()
 
-def robust_load_new_data(path):
-    """Extrai objetos JSON de forma bruta para lidar com arquivos malformados do PHPMyAdmin."""
-    print(f"Lendo arquivo bruto: {path}...")
+def robust_load_any(path):
+    """Carrega dados novos independente do formato (JSON ou CSV)."""
+    if path.lower().endswith('.csv'):
+        return pd.read_csv(path)
+    
     with open(path, 'r', encoding='utf-8') as f:
         content = f.read()
     
-    # 1. Tenta carregar como JSON padrão primeiro
+    # Tentativa de extração robusta de JSON (para casos malformados)
     try:
         data = json.loads(content)
         if isinstance(data, list):
-            # Detectar formato PHPMyAdmin (lista onde um item tem chave 'data')
-            # Estrutura comum: [header, database, {type: table, data: [...]}]
             for item in data:
                 if isinstance(item, dict) and item.get('type') == 'table' and 'data' in item:
-                    print(f"   -> Detectado formato PHPMyAdmin. Extraindo {len(item['data'])} registros da tabela '{item.get('name')}'.")
-                    return item['data']
-            
-            # Se não for o formato específico, assume lista plana de registros
-            return data
-            
+                    return pd.DataFrame(item['data'])
+            return pd.DataFrame(data)
         elif isinstance(data, dict):
-            # Se for um dict raiz com chave 'data' ou 'records'
-            if 'data' in data and isinstance(data['data'], list):
-                return data['data']
-            if 'records' in data and isinstance(data['records'], list):
-                return data['records']
-                
+            if 'data' in data: return pd.DataFrame(data['data'])
+            return pd.DataFrame([data])
     except:
-        print("Aviso: Formato JSON padrão falhou. Iniciando extração por blocos de texto (Brute Force)...")
+        # Brute force regex para JSONs quebrados
+        pattern = r'\{[^{}]*?"id":\s*?"\d+"[^{}]*?\}'
+        matches = re.findall(pattern, content, re.DOTALL)
+        records = []
+        for m in matches:
+            try: records.append(json.loads(m.strip().rstrip(',')))
+            except: continue
+        return pd.DataFrame(records)
+    return pd.DataFrame()
 
-    # 2. Extração via Regex (Busca qualquer padrão { ... "id": "..." ... })
-    # Captura objetos que tenham ID e Data (para garantir que sejam registros de crime)
-    pattern = r'\{[^{}]*?"id":\s*?"\d+"[^{}]*?\}'
-    matches = re.findall(pattern, content, re.DOTALL)
+from geopy.geocoders import Nominatim
+from geopy.extra.rate_limiter import RateLimiter
+
+# Iniciar Geocoder (Nominatim)
+geolocator = Nominatim(user_agent="report_preview_v2")
+reverse_geocode = RateLimiter(geolocator.reverse, min_delay_seconds=1)
+GEO_CACHE = {}
+
+def get_street_from_coords(lat, lon):
+    """Busca o nome da rua via OpenStreetMap com cache local."""
+    key = f"{round(lat, 4)}_{round(lon, 4)}"
+    if key in GEO_CACHE: return GEO_CACHE[key]
     
-    records = []
-    for m in matches:
-        try:
-            # Limpa possíveis vírgulas extras ou caracteres de controle
-            clean_m = m.strip().rstrip(',')
-            obj = json.loads(clean_m)
-            
-            # Se o objeto tiver um campo 'data' que é outro dicionário (caso aninhado)
-            if 'data' in obj and isinstance(obj['data'], dict):
-                obj = obj['data']
-                
-            records.append(obj)
-        except:
-            continue
-            
-    return records
-
-def save_json(data, path):
-    with open(path, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
+    try:
+        location = geolocator.reverse((lat, lon), timeout=3)
+        if location:
+            address = location.raw.get('address', {})
+            street = address.get('road') or address.get('suburb') or address.get('pedestrian')
+            GEO_CACHE[key] = street
+            return street
+    except: pass
+    return None
 
 def merge(new_data_path):
-    print(f"--- INICIANDO MESCLAGEM ROBUSTA: {new_data_path} ---")
+    print(f"--- INICIANDO MESCLAGEM EM CSV: {new_data_path} ---")
     
-    # 1. Carregar Base Oficial e criar set de chaves compostas para unicidade
-    if os.path.exists(OFFICIAL_BASE):
-        with open(OFFICIAL_BASE, 'r', encoding='utf-8') as f:
-            official_data = json.load(f)
-        print(f"Base oficial carregada: {len(official_data)} registros.")
+    # ... (carregamento oficial e dicionario geo ja existentes) ...
+    if os.path.exists(OFFICIAL_CSV):
+        df_official = pd.read_csv(OFFICIAL_CSV)
     else:
-        official_data = []
-        print("Aviso: Base oficial nao encontrada. Criando uma nova.")
+        df_official = pd.DataFrame()
 
-    # Chave de unicidade: ID + DATA + HORA (para evitar conflitos de IDs reaproveitados)
-    existing_keys = set()
-    for item in official_data:
-        if isinstance(item, dict):
-            key = f"{item.get('id')}_{item.get('data')}_{item.get('hora')}"
-            existing_keys.add(key)
+    df_new = robust_load_any(new_data_path)
+    if df_new.empty: return
 
-    # 2. Carregar Referencia Geo para enriquecimento espacial
-    geo_ref = {}
-    if os.path.exists(BAIRROS_REF):
-        with open(BAIRROS_REF, 'r', encoding='utf-8') as f:
-            geo_ref = json.load(f)
+    with open(BAIRROS_REF, 'r', encoding='utf-8') as f:
+        geo_ref = json.load(f)
+    node_names = list(geo_ref.keys())
+    node_coords = [[float(v['lat']), float(v['long'])] for v in geo_ref.values()]
+    tree = KDTree(node_coords)
+
+    # Termos de natureza para disparar geolocalizacao reversa se encontrados no campo de rua
+    invalid_street_terms = ['HOMICIDIO', 'BALA', 'FOGO', 'LESAO', 'MORTE', 'CADAVER', 'LATROCINIO', 'TIRO']
+
+    print("Enriquecendo dados (Bairro + Rua)...")
+    for idx, row in df_new.iterrows():
+        lat = pd.to_numeric(row.get('latitude'), errors='coerce')
+        lon = pd.to_numeric(row.get('longitude'), errors='coerce')
+        b_at = row.get('bairro')
+        street_at = str(row.get('name', row.get('LocalOcor', ''))).upper()
+        
+        if not pd.isna(lat) and lat != 0:
+            # 1. Enriquecimento de Bairro (KDTree)
+            dist, i = tree.query([lat, lon])
+            if dist < 0.05:
+                df_new.at[idx, 'bairro'] = node_names[i]
             
-    node_names = []
-    node_coords = []
-    for name, info in geo_ref.items():
-        node_names.append(name)
-        node_coords.append([float(info['lat']), float(info['long'])])
+            # 2. Enriquecimento de Rua (Geopy)
+            # Dispara se rua estiver vazia ou contiver termos de natureza
+            needs_reverse = (pd.isna(street_at) or len(street_at) < 4 or any(t in street_at for t in invalid_street_terms))
+            if needs_reverse:
+                street_found = get_street_from_coords(lat, lon)
+                if street_found:
+                    df_new.at[idx, 'name'] = street_found.upper()
+
+        # Normalização
+        df_new.at[idx, 'bairro'] = normalize_text(df_new.at[idx, 'bairro'])
+
+    # ... (mesclagem e remocao de duplicatas) ...
+    df_combined = pd.concat([df_official, df_new], ignore_index=True)
+    df_combined['temp_key'] = df_combined['id'].astype(str) + "_" + df_combined['data'].astype(str) + "_" + df_combined['hora'].astype(str)
+    df_combined = df_combined.drop_duplicates(subset=['temp_key'], keep='first').drop(columns=['temp_key'])
     
-    tree = KDTree(node_coords) if node_coords else None
+    df_combined.to_csv(OFFICIAL_CSV, index=False, encoding='utf-8')
+    print(f"✅ SUCESSO! Base atualizada em {OFFICIAL_CSV}")
 
-    # 3. Extração e Processamento
-    new_records = robust_load_new_data(new_data_path)
-    to_add = []
-    count_new = 0
-    count_dupes = 0
-    count_enriched = 0
-
-    for item in new_records:
-        if not isinstance(item, dict) or 'id' not in item: continue
-        
-        # Gera chave de unicidade
-        item_key = f"{item.get('id')}_{item.get('data')}_{item.get('hora')}"
-        
-        if item_key in existing_keys:
-            count_dupes += 1
-            continue
-
-        # Enriquecimento Espacial (GPS -> Bairro)
-        b_at = item.get('bairro')
-        if tree and (not b_at or str(b_at).lower() in ["null", "none", ""]):
-            try:
-                lat, lon = float(item.get('latitude', 0)), float(item.get('longitude', 0))
-                if lat != 0:
-                    dist, idx = tree.query([lat, lon])
-                    # Raio de aprox 5km
-                    if dist < 0.05:
-                        item['bairro'] = node_names[idx]
-                        count_enriched += 1
-            except: pass
-        else:
-            item['bairro'] = normalize_text(b_at)
-
-        to_add.append(item)
-        existing_keys.add(item_key)
-        count_new += 1
-
-    # 4. Mesclar e Salvar
-    if to_add:
-        final_data = official_data + to_add
-        save_json(final_data, OFFICIAL_BASE)
-        print(f"Sucesso!")
-        print(f"   - Novos registros inseridos: {count_new}")
-        print(f"   - Registros enriquecidos via GPS: {count_enriched}")
-        print(f"   - Duplicatas ignoradas: {count_dupes}")
-        print(f"Base total atualizada para {len(final_data)} registros em {OFFICIAL_BASE}")
-        # Após mesclar novos dados, disparar o processamento de dados
-        dp_path = os.path.join('src', 'core', 'data_processing.py')
-        if os.path.exists(dp_path):
-            print(f"Executando processamento adicional: {dp_path} ...")
-            try:
-                res = subprocess.run([sys.executable, dp_path], check=False)
-                print(f"Processamento finalizado com código de saída: {res.returncode}")
-            except Exception as e:
-                print(f"Falha ao executar {dp_path}: {e}")
-        else:
-            print(f"Aviso: arquivo de processamento não encontrado em {dp_path}")
-    else:
-        print("Nenhum registro novo para inserir.")
+    # 7. Disparar processamento subsequente
+    dp_path = os.path.join('src', 'core', 'data_processing.py')
+    if os.path.exists(dp_path):
+        print("Executando data_processing.py...")
+        subprocess.run([sys.executable, dp_path], check=False)
 
 if __name__ == "__main__":
-    import sys
     if len(sys.argv) < 2:
-        print("Uso: python scripts/merge_new_data.py caminho_do_novo_arquivo.json")
+        print("Uso: python scripts/merge_new_data.py novo_arquivo.json")
     else:
         merge(sys.argv[1])

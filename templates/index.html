@@ -224,7 +224,33 @@
                         <span class="badge bg-success">Motor REPORT PREVIEW Ativo</span>
                     </div>
                 </div>
-                <div class="card-body p-0 d-flex flex-column">
+                <div class="card-body p-0 d-flex flex-column" style="position:relative;">
+
+                    <!-- Search flutuante -->
+                    <div id="map-search-box"
+                         style="position:absolute; top:10px; left:50%; transform:translateX(-50%);
+                                z-index:1000; width:min(420px, 90%); pointer-events:auto;">
+                        <div style="display:flex; align-items:center; background:rgba(15,17,20,0.92);
+                                    border:1px solid rgba(255,255,255,0.18); border-radius:24px;
+                                    padding:5px 14px; box-shadow:0 4px 18px rgba(0,0,0,0.55);
+                                    backdrop-filter:blur(6px);">
+                            <i class="fas fa-search" style="color:#adb5bd; font-size:0.85rem; margin-right:8px; flex-shrink:0;"></i>
+                            <input id="map-search-input" type="text" autocomplete="off"
+                                   placeholder="Buscar rua, bairro ou localidade..."
+                                   style="flex:1; background:transparent; border:none; outline:none;
+                                          color:white; font-size:0.88rem; padding:2px 0;"/>
+                            <button id="map-search-clear" onclick="clearMapSearch()"
+                                    style="display:none; background:none; border:none; color:#adb5bd;
+                                           cursor:pointer; font-size:1rem; padding:0 0 0 6px; line-height:1;">&times;</button>
+                        </div>
+                        <!-- Dropdown de resultados -->
+                        <div id="map-search-results"
+                             style="display:none; background:rgba(15,17,20,0.97); border:1px solid rgba(255,255,255,0.12);
+                                    border-radius:12px; margin-top:6px; overflow:hidden;
+                                    box-shadow:0 8px 28px rgba(0,0,0,0.7); max-height:260px; overflow-y:auto;">
+                        </div>
+                    </div>
+
                     <div id="map" class="flex-grow-1"></div>
                 </div>
             </div>
@@ -297,14 +323,14 @@
                         <p class="text-muted">Clique em uma área no mapa para ver os fatores de tensão aqui.</p>
                     </div>
                     
-                    <!-- Explicações Detalhadas (Collapsible) -->
+                    <!-- Explicabilidade e Métricas Técnicas (Collapsible) -->
                     <div id="explanation-section" style="display:none; margin-top: 6px; margin-bottom: 8px; border-top: 1px solid #ddd; padding-top: 8px;">
-                        <button class="btn btn-sm btn-link p-0 text-primary fw-bold" data-bs-toggle="collapse" data-bs-target="#explanation-collapse" aria-expanded="false">
-                            <i class="fas fa-lightbulb"></i> Explicação Detalhada
+                        <button class="btn btn-sm btn-link p-0 text-primary fw-bold" data-bs-toggle="collapse" data-bs-target="#explanation-collapse" aria-expanded="true">
+                            <i class="fas fa-chart-bar"></i> Explicabilidade do Risco
                         </button>
-                        <div id="explanation-collapse" class="collapse">
+                        <div id="explanation-collapse" class="collapse show">
                             <div id="explanation-content" class="small text-muted mt-2">
-                                Carregando explicação...
+                                Carregando métricas...
                             </div>
                         </div>
                     </div>
@@ -391,7 +417,13 @@
                             </select>
                             <div class="form-check mt-2">
                                 <input class="form-check-input" type="checkbox" id="toggle-top20">
-                                <label class="form-check-label small" for="toggle-top20">Mostrar Top20 Micro‑Nodos (alfinetes)</label>
+                                <label class="form-check-label small" for="toggle-top20">Mostrar Top20 Predições (alfinetes)</label>
+                            </div>
+                            <div class="form-check mt-1">
+                                <input class="form-check-input" type="checkbox" id="toggle-micronodes-kml">
+                                <label class="form-check-label small fw-bold text-primary" for="toggle-micronodes-kml">
+                                    <i class="fas fa-microchip"></i> Detalhamento Micronós (KML 2026)
+                                </label>
                             </div>
                         </div>
                         <h6 class="mb-2 fw-bold text-dark" id="top-list-title" style="font-size: 0.9rem;">🌡️ Top 10 Territórios em Tensão</h6>
@@ -553,6 +585,7 @@
     }
 
     var geojsonLayer = null;
+    var selectedLayer = null;  // território em destaque (borda dourada)
     var riskDataGlobal = null;
     var metaDataGlobal = null;
     var _effMetricsPrintedDate = null; // guard: print termômetro apenas 1x por data de avaliação
@@ -618,11 +651,8 @@
                             'TERRITÓRIOS FANTASMAS.geojson': 'Territórios Fantasmas',
                         };
                         var faccao = faccaoMap[f.properties.source] || (f.properties.faction || 'Não identificado');
-                        // Placeholder para ruas críticas (pode ser alimentado via backend futuramente)
-                        var ruasCriticas = f.properties.critical_streets || '<span style="color:#888">(dados não disponíveis)</span>';
                         var popup = '<strong>' + (f.properties.rank || '') + '. ' + displayName + '</strong><br/>' +
                                     '<b>Facção:</b> ' + faccao + '<br/>' +
-                                    '<b>Ruas mais críticas:</b> ' + ruasCriticas + '<br/>' +
                                     (f.properties.score ? '<b>Tensão territorial:</b> ' + Math.round(f.properties.score) + '<br/>' : '');
                         m.bindPopup(popup);
                         top20Layer.addLayer(m);
@@ -1016,6 +1046,7 @@
                     feature.properties.faction = r.faction || feature.properties.faction || "Não Identificado";
                     feature.properties.name = r.name || rawName;
                     feature.properties.node_id = r.node_id || "0";
+                    feature.properties.metrics = r.metrics || {};
                     // Copy server-provided labels (status, textual risk) so front apenas apresenta o que vem do back
                     if (r.status_label) feature.properties.status_label = r.status_label;
                     if (r.risk_text) feature.properties.risk_text = r.risk_text;
@@ -1058,33 +1089,15 @@
                     });
                     
                     layer.on('mouseout', function(e) {
-                        if (!simulationMode) {
+                        if (!simulationMode && e.target !== selectedLayer) {
                             geojsonLayer.resetStyle(e.target);
                         }
                     });
 
                     layer.on('click', function(e) {
                         if (!simulationMode) {
-                            var props = e.target.feature.properties;
-                            var cvli = (typeof props.risk_score === 'number') ? props.risk_score : 0;
-                            var cvp = (typeof props.risk_score_cvp === 'number') ? props.risk_score_cvp : 0;
-                            
-                            var content = '<div style="max-width: 250px; font-size: 0.9rem;">' +
-                                         '<strong>' + (props.name || 'Área') + '</strong><br/>' +
-                                         '<small>ID: ' + props.node_id + '</small><br/>' +
-                                         '<hr style="margin: 5px 0;">' +
-                                         '<strong>Tensão Territorial:</strong> ' + cvli.toFixed(1) + '%<br/>' +
-                                         (props.faction ? '<strong>Facção:</strong> ' + props.faction + '<br/>' : '');
-                            
-                            if (props.reasons && props.reasons.length > 0) {
-                                
-                                props.reasons.forEach(function(r) {
-                                    content += '<li>' + r + '</li>';
-                                });
-                                content += '</ul>';
-                            }
-                            content += '</div>';
-                            e.target.bindPopup(content, {maxWidth: 300}).openPopup();
+                            L.DomEvent.stopPropagation(e);
+                            focusLayerAndShowDetails(e.target, 1.0);
                         }
                     });
                 }
@@ -1223,7 +1236,7 @@
                 });
                 
                 layer.on('mouseout', function(e) {
-                    if (!simulationMode) {
+                    if (!simulationMode && e.target !== selectedLayer) {
                         geojsonLayer.resetStyle(e.target);
                     }
                 });
@@ -1553,33 +1566,51 @@
         // Focus a layer: zoom to polygon bounds and show details popup
         function focusLayerAndShowDetails(layer, animateSeconds) {
             try {
+                // --- Escurece todos os outros polígonos e destaca o selecionado ---
+                if (geojsonLayer) {
+                    geojsonLayer.eachLayer(function(l) {
+                        try {
+                            if (l === layer) return;
+                            var fo = (l.options && l.options.fillOpacity) || 0.2;
+                            l.setStyle({ opacity: 0.20, fillOpacity: fo * 0.3 });
+                        } catch(er) {}
+                    });
+                }
+                selectedLayer = layer;
+
+                // Borda dourada grossa + fill visível
+                layer.setStyle({
+                    weight:      8,
+                    color:       '#FFD700',
+                    dashArray:   '',
+                    opacity:     1,
+                    fillOpacity: 0.65
+                });
+                if (layer.bringToFront) layer.bringToFront();
+
                 var bounds = (layer.getBounds && layer.getBounds()) || null;
                 var duration = (typeof animateSeconds === 'number') ? animateSeconds : 0.8;
 
                 if (bounds) {
                     var center = bounds.getCenter();
 
-                    // Passo 1: fitBounds com padding uniforme para obter zoom correto
-                    map.fitBounds(bounds, {
-                        maxZoom: 13,
-                        padding: [60, 60],
+                    // Zoom de cidade: centraliza no polígono mas mantém visão ampla (+20%)
+                    // zoom 12.3 ≈ 20% mais fechado que 12 (escala logarítmica base-2)
+                    var cityZoom = Math.min(12.3, Math.max(map.getZoom(), 11.3));
+                    map.setView(center, cityZoom, {
                         animate: true,
                         duration: duration
                     });
 
                     if (!initialMapLoad) {
                         map.once('moveend', function() {
-                            // Passo 2: reposicionar o centro do polígono à 65% da altura
-                            // do container — popup (~280px, abre para cima) fica no terço
-                            // superior e o polígono permanece visível abaixo.
+                            // Centraliza o polígono na tela (sem offset para popup)
                             var containerPt = map.latLngToContainerPoint(center);
                             var mapSize    = map.getSize();
-                            var targetY    = mapSize.y * 0.72;  // mais para baixo → popup sobe mais
+                            var targetY    = mapSize.y * 0.50;
                             var deltaY     = containerPt.y - targetY;
-
-                            // Centraliza horizontalmente também (deixa polígono no centro X)
-                            var targetX = mapSize.x * 0.50;
-                            var deltaX  = containerPt.x - targetX;
+                            var targetX    = mapSize.x * 0.50;
+                            var deltaX     = containerPt.x - targetX;
 
                             if (Math.abs(deltaY) > 15 || Math.abs(deltaX) > 15) {
                                 map.panBy([deltaX, deltaY], { animate: true, duration: 0.35 });
@@ -1595,13 +1626,13 @@
                     // Fallback para CircleMarkers (ponto único)
                     var latlng = (layer.getLatLng && layer.getLatLng()) || null;
                     if (latlng) {
-                        map.setView(latlng, 15, { animate: true, duration: duration });
+                        var cityZoom = Math.min(12.3, Math.max(map.getZoom(), 11.3));
+                        map.setView(latlng, cityZoom, { animate: true, duration: duration });
                         if (!initialMapLoad) {
                             map.once('moveend', function() {
-                                // Posicionar ponto a 65% da altura
                                 var containerPt = map.latLngToContainerPoint(latlng);
                                 var mapSize     = map.getSize();
-                                var deltaY = containerPt.y - mapSize.y * 0.72;
+                                var deltaY = containerPt.y - mapSize.y * 0.50;
                                 var deltaX = containerPt.x - mapSize.x * 0.50;
                                 if (Math.abs(deltaY) > 15 || Math.abs(deltaX) > 15) {
                                     map.panBy([deltaX, deltaY], { animate: true, duration: 0.35 });
@@ -1620,6 +1651,49 @@
             }
         }
     
+        // Extrai o contorno SVG do polígono e retorna um elemento <svg> minificado
+        function getPolygonSnapshot(layer, w, h) {
+            try {
+                var path = layer._path;
+                if (!path || typeof path.getBBox !== 'function') return null;
+                var bbox = path.getBBox();
+                if (!bbox || bbox.width < 2 || bbox.height < 2) return null;
+
+                var pad = 10;
+                var vx = bbox.x - pad, vy = bbox.y - pad;
+                var vw = bbox.width  + pad * 2;
+                var vh = bbox.height + pad * 2;
+
+                // Normaliza para quadrado mantendo proporção
+                var size = w || 110;
+                var ratio = vw / vh;
+                var svgW = ratio >= 1 ? size : Math.round(size * ratio);
+                var svgH = ratio >= 1 ? Math.round(size / ratio) : size;
+
+                var cloned = path.cloneNode(true);
+                cloned.style.cssText = '';
+                cloned.setAttribute('stroke',         '#FFD700');
+                cloned.setAttribute('stroke-width',   '3');
+                cloned.setAttribute('stroke-opacity', '1');
+                cloned.setAttribute('stroke-dasharray','none');
+                cloned.setAttribute('fill',            path.getAttribute('fill')  || path.style.fill  || '#E63946');
+                cloned.setAttribute('fill-opacity',    '0.70');
+
+                var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('viewBox',  vx + ' ' + vy + ' ' + vw + ' ' + vh);
+                svg.setAttribute('width',    svgW);
+                svg.setAttribute('height',   svgH);
+                svg.style.cssText = 'display:block; border-radius:8px;'
+                                  + ' background:#0d1117;'
+                                  + ' border:1px solid rgba(255,215,0,0.35);'
+                                  + ' flex-shrink:0; align-self:center;';
+                svg.appendChild(cloned);
+                return svg;
+            } catch(e) {
+                return null;
+            }
+        }
+
         function showFeatureDetails(layer, latlng) {
             var feature = layer.feature;
             // Prefer final backend `risk_score` (post-ranking). Fallback to CVLI raw percentiles.
@@ -1635,11 +1709,20 @@
             var level = getRiskLevel(score);
             var riskText = feature.properties.risk_text || (Math.round(score) + '% — ' + friendlyLabel);
             var predText = feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('Estimativa: ~' + predVal.toFixed(1) + ' ocorrências/14d') : 'Sem eventos recentes na janela');
+            
+            // BUSCAR RUAS CRÍTICAS GEOLOCALIZADAS VIA API
+            var bairroParam = feature.properties.name || '';
+            var cidadeParam = region || '';
+            var streetsContainerId = 'streets-list-' + feature.properties.node_id;
     
                     var popupContent = `
-                        <div style="font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 14px; min-width: 240px; padding: 0; margin: -1px; background: #1a1d20; color: white; border-radius: 4px;">
-                            <div style="background: #000000; color: white; padding: 8px 10px; border-radius: 4px 4px 0 0; margin-bottom: 8px; border-bottom: 2px solid ${score >= 80 ? '#dc3545' : '#0d6efd'}; display:flex;align-items:center;justify-content:space-between;">
-                                <h6 style="margin: 0; font-weight: 700; font-size: 15px; color: white; line-height:1;">${feature.properties.name}</h6>
+                        <div style="font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 14px; width: 100%; padding: 0; background: #1a1d20; color: white; border-radius: 4px;">
+                            <div style="background: #000000; color: white; padding: 8px 10px; border-radius: 4px 4px 0 0; margin-bottom: 8px; border-bottom: 2px solid ${score >= 80 ? '#dc3545' : '#0d6efd'}; display:flex; align-items:center; gap:12px;">
+                                <div id="poly-snap-${feature.properties.node_id}" style="flex-shrink:0;"></div>
+                                <div style="flex:1; min-width:0;">
+                                    <h6 style="margin: 0; font-weight: 700; font-size: 15px; color: white; line-height:1.2;">${feature.properties.name}</h6>
+                                    <div style="font-size:0.72rem; color:#adb5bd; margin-top:3px;">${region} &mdash; ${feature.properties.faction || 'Neutro'}</div>
+                                </div>
                             </div>
                             <div style="padding: 0 12px 12px 12px;">
                                 <div class="mb-2">
@@ -1671,6 +1754,13 @@
                                         <strong>Previsão:</strong> ${predText}
                                     </div>
                                 </div>
+
+                                <div style="margin-top: 10px; font-size: 0.8rem; background: rgba(255, 193, 7, 0.05); padding: 8px; border-radius: 4px; border: 1px solid rgba(255, 193, 7, 0.2);">
+                                    <strong style="color: #ffc107; display: block; margin-bottom: 4px;"><i class="fas fa-map-marker-alt"></i> Logradouros Críticos:</strong>
+                                    <div id="${streetsContainerId}" style="color: #adb5bd; line-height: 1.5; max-height: 200px; overflow-y: auto;">
+                                        <span style="color: #6c757d; font-style: italic;">Mapeando logradouros...</span>
+                                    </div>
+                                </div>
             
                                 <div style="font-size: 0.7rem; color: #6c757d; margin-top: 10px; border-top: 1px solid #3d4246; padding-top: 6px; font-style: italic;">
                                     <span id="model-note-${feature.properties.node_id}" style="color: #adb5bd;">Carregando metadados do modelo...</span>
@@ -1698,17 +1788,32 @@
             // ignore
         }
 
-        // autoPan ativo com padding generoso para garantir que o popup
-        // apareça sempre dentro da área visível do mapa.
-        L.popup({
-            autoPan: true,
-            autoPanPadding: L.point(50, 80),
-            autoPanPaddingTopLeft: L.point(50, 100),
-            maxWidth: 320,
-        })
-            .setLatLng(latlng)
-            .setContent(popupContent)
-            .openOn(map);
+        // Exibe o popup como modal centralizado na tela (independente do mapa)
+        map.closePopup();
+        document.getElementById('territory-modal-body').innerHTML = popupContent;
+        document.getElementById('territory-modal-overlay').style.display = 'flex';
+
+        // Injeta o snapshot SVG do polígono no placeholder do header
+        var snapSlot = document.getElementById('poly-snap-' + feature.properties.node_id);
+        if (snapSlot) {
+            var snapSvg = getPolygonSnapshot(layer);
+            if (snapSvg) snapSlot.appendChild(snapSvg);
+        }
+
+        // Fetch das ruas críticas em paralelo
+        $.getJSON('/api/streets/critical?bairro=' + encodeURIComponent(bairroParam) + '&cidade=' + encodeURIComponent(cidadeParam), function(data) {
+            var listId = '#' + streetsContainerId;
+            if (data && data.length > 0) {
+                var html = '<ul style="margin: 0; padding-left: 15px; list-style-type: disc; max-height: 200px; overflow-y: auto;">';
+                data.forEach(function(s) {
+                    html += '<li>' + s.rua + (s.ocorrencias > 1 ? ' <small style="color:#e63946;">(' + s.ocorrencias + ')</small>' : '') + '</li>';
+                });
+                html += '</ul>';
+                $(listId).html(html);
+            } else {
+                $(listId).html('<span style="color: #888;">Nenhum logradouro mapeado nesta área.</span>');
+            }
+        });
 
         // Sidebar update
         var reasonsHtml = '<h5>' + feature.properties.name + '</h5>';
@@ -1735,7 +1840,14 @@
         $('#explanation-collapse').collapse('show');
         $('#explanation-content').html('<div class="small text-muted"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Analisando dados táticos...</div>');
 
-        fetch('/api/explain/' + nodeId)
+        fetch('/api/explain/' + nodeId + '?t=' + new Date().getTime(), {
+            method: 'GET',
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        })
             .then(response => {
                 if (!response.ok) throw new Error('Falha ao obter explicação');
                 return response.json();
@@ -1763,9 +1875,25 @@
                     });
                 }
 
-                // 3. Nota de Confiança
+                // 3. Nota de Confiança + barra de percentil
+                var confPct   = (typeof data.confidence_pct   === 'number') ? data.confidence_pct   : (typeof data.confidence === 'number' ? Math.round(data.confidence * 100) : null);
+                var confLabel = data.confidence_label || null;
+                if (confPct !== null) {
+                    var barColor = confPct >= 80 ? '#28a745' : confPct >= 60 ? '#fd7e14' : confPct >= 40 ? '#ffc107' : '#dc3545';
+                    html += '<div class="mt-3 pt-2" style="border-top: 1px solid #dee2e6;">'
+                          + '<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">'
+                          + '<small style="font-weight:600; color:#495057;">Confiança na Previsão</small>'
+                          + '<small style="font-weight:700; color:' + barColor + ';">' + confPct.toFixed(1) + '%'
+                          + (confLabel ? ' &mdash; <span style="font-weight:600;">' + confLabel + '</span>' : '') + '</small>'
+                          + '</div>'
+                          + '<div style="background:#e9ecef; border-radius:4px; height:8px; overflow:hidden;">'
+                          + '<div style="height:100%; width:' + confPct + '%; background:' + barColor + '; border-radius:4px; transition:width .4s;"></div>'
+                          + '</div>'
+                          + '</div>';
+                }
+
                 if (data.interpretation) {
-                    html += '<div class="mt-3 pt-2" style="border-top: 1px solid #dee2e6;"><small class="text-muted">📌 ' + 
+                    html += '<div class="mt-2"><small class="text-muted">\u{1F4CC} ' + 
                             data.interpretation + 
                             '</small></div>';
                 }
@@ -1998,6 +2126,66 @@
         try { updateDashboard('CVLI'); } catch(e) { console.warn('updateDashboard failed on region change', e); }
     });
 
+    // Micronodes KML 2026 layer
+    var micronodesLayer = L.layerGroup();
+    
+    function getFactionColor(faction) {
+        var f = String(faction).toUpperCase();
+        if (f.indexOf('CV') !== -1) return '#dc3545'; // Vermelho
+        if (f.indexOf('TCP') !== -1 || f.indexOf('GDE') !== -1) return '#198754'; // Verde
+        if (f.indexOf('PCC') !== -1) return '#ffffff'; // Branco
+        if (f.indexOf('MASSA') !== -1) return '#0d6efd'; // Azul
+        if (f.indexOf('OKAIDA') !== -1) return '#ffc107'; // Amarelo
+        if (f.indexOf('DISPUTA') !== -1) return '#6f42c1'; // Roxo
+        return '#adb5bd'; // Neutro
+    }
+
+    function loadMicronodes() {
+        console.log('[Micronodes] Carregando dados...');
+        fetch('/api/micronodes')
+            .then(resp => resp.json())
+            .then(data => {
+                micronodesLayer.clearLayers();
+                L.geoJson(data, {
+                    pointToLayer: function(feature, latlng) {
+                        var color = getFactionColor(feature.properties.faction);
+                        return L.circleMarker(latlng, {
+                            radius: 4,
+                            fillColor: color,
+                            color: "#000",
+                            weight: 1,
+                            opacity: 1,
+                            fillOpacity: 0.8
+                        });
+                    },
+                    onEachFeature: function(feature, layer) {
+                        var props = feature.properties;
+                        var popup = `<strong>Micronodo: ${props.micronodo || props.name}</strong><br/>
+                                     <b>Local:</b> ${props.area_oficial || props.area}<br/>
+                                     <b>Facção:</b> <span style="color:${getFactionColor(props.faction)}">${props.faction}</span>`;
+                        layer.bindPopup(popup);
+                    }
+                }).addTo(micronodesLayer);
+                
+                if ($('#toggle-micronodes-kml').is(':checked')) {
+                    map.addLayer(micronodesLayer);
+                }
+            })
+            .catch(err => console.error('[Micronodes] Erro:', err));
+    }
+
+    $('#toggle-micronodes-kml').on('change', function() {
+        if ($(this).is(':checked')) {
+            if (micronodesLayer.getLayers().length === 0) {
+                loadMicronodes();
+            } else {
+                map.addLayer(micronodesLayer);
+            }
+        } else {
+            map.removeLayer(micronodesLayer);
+        }
+    });
+
     // Toggle Top20 micro-nodes
     $('#toggle-top20').on('change', function(){
         var checked = $(this).is(':checked');
@@ -2045,6 +2233,58 @@
 
     // ===== Monitor de Atualização de Modelos =====
     var modelUpdateCheckInterval = null;
+    var lastCalibrationTime = null;
+
+    function checkAutoAjusteStatus() {
+        $.ajax({
+            url: '/api/admin/health/calibration-status',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                if (!data || !data.available) return;
+                
+                var hasNewAjuste = false;
+                var latestEventTime = lastCalibrationTime;
+
+                Object.values(data.regions || {}).forEach(function(info) {
+                    if (info.last_5_events && info.last_5_events.length > 0) {
+                        var lastEv = info.last_5_events[info.last_5_events.length - 1];
+                        var evTime = new Date(lastEv.timestamp).getTime();
+                        
+                        // Se detectou um novo evento que não conhecia antes
+                        if (lastCalibrationTime && evTime > lastCalibrationTime) {
+                            if (lastEv.action === 'auto_calibration' || lastEv.action === 'degradation' || lastEv.action === 'full_rollback') {
+                                hasNewAjuste = true;
+                            }
+                        }
+                        
+                        if (!latestEventTime || evTime > latestEventTime) {
+                            latestEventTime = evTime;
+                        }
+                    }
+                });
+
+                if (hasNewAjuste) {
+                    // Exibir painel de loading claro para o auto-ajuste
+                    showLoadingWithProgress('⚙️ Auto-Ajuste Territorial Disparado', 10);
+                    $('#loading-sub').text('Ajustando parâmetros do modelo...');
+                    
+                    setTimeout(function() { showLoadingWithProgress('⚙️ Auto-Ajuste Territorial Disparado', 45); $('#loading-sub').text('Recalibrando pesos de tensão e vizinhança...'); }, 1500);
+                    setTimeout(function() { showLoadingWithProgress('⚙️ Auto-Ajuste Territorial Disparado', 85); $('#loading-sub').text('Sincronizando nova malha de risco...'); }, 3000);
+                    setTimeout(function() { showLoadingWithProgress('⚙️ Auto-Ajuste Territorial Disparado', 100); $('#loading-sub').text('Concluído!'); }, 4500);
+                    
+                    setTimeout(function() {
+                        location.reload(); // Recarregar para exibir a nova malha com os parâmetros atualizados
+                    }, 5000);
+                }
+
+                lastCalibrationTime = latestEventTime;
+            },
+            error: function() {
+                // Ignorar falhas silenciosamente
+            }
+        });
+    }
 
     function checkModelUpdateStatus() {
         $.ajax({
@@ -2091,6 +2331,10 @@
         modelUpdateCheckInterval = setInterval(checkModelUpdateStatus, 300000);
         checkModelUpdateStatus();
         
+        // Monitora o Auto-Ajuste do modelo
+        checkAutoAjusteStatus();
+        setInterval(checkAutoAjusteStatus, 15000); // Checa a cada 15 segundos
+        
         // NOVO: Inicia Radar Report Preview (Anomalias)
         loadAnomalyStatus();
         setInterval(loadAnomalyStatus, 60000); // Atualiza a cada 1 min
@@ -2102,6 +2346,268 @@
             clearInterval(modelUpdateCheckInterval);
         }
     });
+
+    // ── Fechar modal pelo teclado (Escape) ──────────────────────────────────
+    document.addEventListener('keydown', function(evt) {
+        if ((evt.key === 'Escape' || evt.keyCode === 27)) {
+            if (document.getElementById('territory-modal-overlay').style.display !== 'none') {
+                closeTerritoryModal();
+            } else {
+                clearMapSearch();
+            }
+        }
+    });
+
+    // ── Search flutuante no mapa ──────────────────────────────────────
+    var _searchTimer = null;
+
+    document.getElementById('map-search-input').addEventListener('input', function() {
+        var q = this.value.trim();
+        document.getElementById('map-search-clear').style.display = q ? 'block' : 'none';
+        clearTimeout(_searchTimer);
+        if (q.length < 2) {
+            document.getElementById('map-search-results').style.display = 'none';
+            return;
+        }
+        _searchTimer = setTimeout(function() { runMapSearch(q); }, 220);
+    });
+
+    document.getElementById('map-search-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            clearTimeout(_searchTimer);
+            var q = this.value.trim();
+            if (q.length >= 2) runMapSearch(q, true);
+        }
+    });
+
+    // Fecha dropdown ao clicar fora
+    document.addEventListener('click', function(e) {
+        if (!document.getElementById('map-search-box').contains(e.target)) {
+            document.getElementById('map-search-results').style.display = 'none';
+        }
+    });
+
+    function clearMapSearch() {
+        document.getElementById('map-search-input').value = '';
+        document.getElementById('map-search-clear').style.display = 'none';
+        document.getElementById('map-search-results').style.display = 'none';
+        if (_geoPin) { try { map.removeLayer(_geoPin); } catch(e) {} _geoPin = null; }
+    }
+
+    // Marcador temporário de geocodificação
+    var _geoPin = null;
+
+    function _norm(s) {
+        return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function runMapSearch(q, autoSelect) {
+        autoSelect = autoSelect || false;
+        var ql = _norm(q);
+        var localResults = [];
+
+        // ── 1. Busca local nos polígonos do mapa ─────────────────────────────
+        if (geojsonLayer) {
+            geojsonLayer.getLayers().forEach(function(l) {
+                try {
+                    var props = l.feature.properties;
+                    var name  = _norm(props.name);
+                    if (name.indexOf(ql) !== -1) {
+                        localResults.push({
+                            type:     'polygon',
+                            label:    props.name,
+                            sublabel: props.region_type || props.CIDADE || '',
+                            score:    props.risk_score || 0,
+                            layer:    l
+                        });
+                    }
+                } catch(e) {}
+            });
+            localResults.sort(function(a, b) {
+                var aExact = _norm(a.label) === ql ? 0 : 1;
+                var bExact = _norm(b.label) === ql ? 0 : 1;
+                if (aExact !== bExact) return aExact - bExact;
+                return b.score - a.score;
+            });
+        }
+
+        // Auto-select imediato se só há um resultado local
+        if (autoSelect && localResults.length > 0) {
+            clearMapSearch();
+            focusLayerAndShowDetails(localResults[0].layer, 1.2);
+            return;
+        }
+
+        // Mostra resultados locais imediatamente (com spinner de geocodificação)
+        renderSearchResults(localResults, q, true);
+
+        // ── 2. Geocodificação via Nominatim (backend) ─────────────────────────
+        fetch('/api/geocode?q=' + encodeURIComponent(q))
+            .then(function(r) { return r.json(); })
+            .then(function(geoData) {
+                // Filtra resultados que já existem como polígono local (evita duplicatas)
+                var geoResults = (geoData || []).filter(function(g) {
+                    return !localResults.some(function(lr) {
+                        return _norm(lr.label).indexOf(_norm(g.short || g.name.split(',')[0])) !== -1;
+                    });
+                }).map(function(g) {
+                    return {
+                        type:     'geo',
+                        label:    g.short || g.name.split(',')[0],
+                        sublabel: g.name,
+                        lat:      g.lat,
+                        lon:      g.lon,
+                        geoType:  g.type
+                    };
+                });
+
+                var combined = localResults.concat(geoResults);
+                renderSearchResults(combined, q, false);
+            })
+            .catch(function() {
+                // sem geocode — mantém resultado local já exibido
+            });
+    }
+
+    function _flyToGeo(r) {
+        // Remove pin anterior
+        if (_geoPin) { try { map.removeLayer(_geoPin); } catch(e) {} }
+
+        var latlng = [r.lat, r.lon];
+        map.setView(latlng, 15, { animate: true, duration: 0.9 });
+
+        // Cria marcador dourado simples
+        _geoPin = L.marker(latlng, {
+            icon: L.divIcon({
+                className: '',
+                html: '<div style="width:14px;height:14px;background:#FFD700;border:2px solid white;border-radius:50%;box-shadow:0 0 8px rgba(255,215,0,0.8);"></div>',
+                iconSize:   [14, 14],
+                iconAnchor: [7, 7]
+            })
+        }).addTo(map);
+
+        // Popup simples com o nome
+        _geoPin.bindPopup(
+            '<div style="font-size:0.82rem;max-width:220px;word-break:break-word;">'
+            + '<strong style="color:#FFD700;">' + r.label + '</strong><br>'
+            + '<span style="color:#adb5bd;font-size:0.75rem;">' + (r.sublabel || '') + '</span>'
+            + '</div>',
+            { maxWidth: 240 }
+        ).openPopup();
+    }
+
+    function renderSearchResults(results, q, showingSpinner) {
+        var box = document.getElementById('map-search-results');
+
+        if (results.length === 0 && !showingSpinner) {
+            box.innerHTML = '<div style="padding:12px 16px;color:#adb5bd;font-size:0.85rem;">'
+                          + '<i class="fas fa-search me-2"></i>Nenhum resultado encontrado.</div>';
+            box.style.display = 'block';
+            return;
+        }
+
+        var html = '';
+
+        // Cabeçalho "Localidades monitoradas" se houver polígonos
+        var polygons = results.filter(function(r) { return r.type === 'polygon'; });
+        var geos     = results.filter(function(r) { return r.type === 'geo'; });
+
+        if (polygons.length > 0) {
+            html += '<div style="padding:5px 16px 3px;font-size:0.7rem;color:#6c757d;text-transform:uppercase;letter-spacing:0.5px;">Localidades monitoradas</div>';
+            polygons.slice(0, 6).forEach(function(r, i) {
+                var sc = r.score >= 80 ? '#dc3545' : r.score >= 50 ? '#fd7e14' : r.score >= 20 ? '#17a2b8' : '#6c757d';
+                html += '<div class="map-search-item" data-idx="' + i + '" style="display:flex;align-items:center;padding:8px 16px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);gap:10px;" onmouseover="this.style.background=\'rgba(255,255,255,0.07)\'" onmouseout="this.style.background=\'transparent\'">'
+                      + '<i class="fas fa-map-marker-alt" style="color:' + sc + ';font-size:0.82rem;flex-shrink:0;"></i>'
+                      + '<div style="flex:1;min-width:0;">'
+                      + '<div style="color:white;font-size:0.87rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + r.label + '</div>'
+                      + '<div style="color:#6c757d;font-size:0.73rem;">' + (r.sublabel || 'Localidade') + '</div>'
+                      + '</div>'
+                      + '<span style="font-size:0.73rem;font-weight:700;color:' + sc + ';flex-shrink:0;">' + Math.round(r.score) + '%</span>'
+                      + '</div>';
+            });
+        }
+
+        if (geos.length > 0) {
+            html += '<div style="padding:5px 16px 3px;font-size:0.7rem;color:#6c757d;text-transform:uppercase;letter-spacing:0.5px;border-top:1px solid rgba(255,255,255,0.07);">Geolocalização</div>';
+            geos.slice(0, 4).forEach(function(r, i) {
+                var idx = polygons.length + i;
+                html += '<div class="map-search-item" data-idx="' + idx + '" style="display:flex;align-items:center;padding:8px 16px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05);gap:10px;" onmouseover="this.style.background=\'rgba(255,255,255,0.07)\'" onmouseout="this.style.background=\'transparent\'">'
+                      + '<i class="fas fa-location-dot" style="color:#FFD700;font-size:0.82rem;flex-shrink:0;"></i>'
+                      + '<div style="flex:1;min-width:0;">'
+                      + '<div style="color:white;font-size:0.87rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + r.label + '</div>'
+                      + '<div style="color:#6c757d;font-size:0.73rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (r.sublabel || '') + '</div>'
+                      + '</div>'
+                      + '<span style="font-size:0.68rem;color:#adb5bd;flex-shrink:0;">' + (r.geoType || 'lugar') + '</span>'
+                      + '</div>';
+            });
+        }
+
+        if (showingSpinner) {
+            html += '<div style="padding:7px 16px;color:#6c757d;font-size:0.78rem;">'
+                  + '<span class="spinner-border spinner-border-sm me-1" style="width:0.6rem;height:0.6rem;border-width:1.5px;" role="status"></span>'
+                  + 'Buscando no OpenStreetMap...</div>';
+        }
+
+        if (!html) {
+            html = '<div style="padding:12px 16px;color:#adb5bd;font-size:0.85rem;">Nenhum resultado encontrado.</div>';
+        }
+
+        box.innerHTML = html;
+        box.style.display = 'block';
+
+        // Bind clicks
+        box.querySelectorAll('.map-search-item').forEach(function(el) {
+            el.addEventListener('click', function() {
+                var idx = parseInt(el.getAttribute('data-idx'));
+                var r   = results[idx];
+                if (!r) return;
+                clearMapSearch();
+                if (r.type === 'polygon') {
+                    focusLayerAndShowDetails(r.layer, 1.2);
+                } else {
+                    _flyToGeo(r);
+                }
+            });
+        });
+    }
+</script>
+
+<!-- ========== Modal de detalhes do território (centralizado, independente do mapa) ========== -->
+<div id="territory-modal-overlay"
+     style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+            z-index:10000; background:rgba(0,0,0,0.55);
+            align-items:center; justify-content:flex-start; padding-left:3vw;"
+     onclick="if(event.target===this) closeTerritoryModal();">
+
+    <div id="territory-modal"
+         style="position:relative; background:#1a1d20; color:white;
+                border:1px solid rgba(255,255,255,0.12);
+                border-radius:14px; max-width:540px; width:93%;
+                max-height:84vh; overflow-y:auto;
+                box-shadow:0 28px 72px rgba(0,0,0,0.85);">
+
+        <!-- Botão fechar -->
+        <button onclick="closeTerritoryModal()"
+                title="Fechar"
+                style="position:sticky; top:0; float:right; margin:10px 12px 0 0;
+                       background:rgba(255,255,255,0.08); border:1px solid rgba(255,215,0,0.3);
+                       color:#FFD700; font-size:1.3rem; line-height:1; cursor:pointer;
+                       border-radius:50%; width:32px; height:32px; text-align:center;
+                       z-index:1; flex-shrink:0;">&times;</button>
+
+        <div id="territory-modal-body" style="clear:both;"></div>
+    </div>
+</div>
+
+<script>
+    function closeTerritoryModal() {
+        document.getElementById('territory-modal-overlay').style.display = 'none';
+        // Restaura todos os polígonos ao estilo original
+        if (geojsonLayer) {
+            try { geojsonLayer.resetStyle(); } catch(e) {}
+        }
+        selectedLayer = null;
+    }
 </script>
 </body>
 </html>

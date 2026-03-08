@@ -186,40 +186,29 @@ class SpecialistTrainer:
                 
                 if current_p20 > self.best_p20:
                     self.best_p20 = current_p20
-                    save_path = os.path.join(ROOT_DIR, 'models', 'active', f'{self.region_key}_model_active.pth')
+                    save_path = os.path.join(ROOT_DIR, 'models', 'active', f'{self.region_key}_model.pth')
                     torch.save({'model_state_dict': model.state_dict(), 'p20': current_p20}, save_path)
                     logging.info(f"🏆 NOVO RECORDE {region_label}: P@20={current_p20*100:.1f}%")
 
 def main():
     os.makedirs(os.path.join(ROOT_DIR, 'models', 'active'), exist_ok=True)
-    # Configuração Padrão Semanal Viável (Otimizada para CPU)
+    
+    # Configurações Elite ISM (Ajustadas para performance e convergência)
     tasks = [
-        ('fortaleza', 30, 0.01, 16, 0.3, 10.0),
-        ('rmf', 30, 0.01, 16, 0.3, 10.0),
-        ('interior', 30, 0.01, 16, 0.3, 10.0)
+        ('fortaleza', 60, 0.01, 16, 0.4, 20.0),
+        ('rmf', 60, 0.01, 16, 0.4, 25.0),
+        ('interior', 60, 0.01, 16, 0.3, 20.0)
     ]
+    
     for key, epochs, lr, bs, drop, rank_w in tasks:
-        trainer = SpecialistTrainer(key, epochs, lr, bs, drop, rank_w)
-        trainer.train()
+        try:
+            trainer = SpecialistTrainer(key, epochs, lr, bs, drop, rank_w)
+            trainer.train()
+        except Exception as e:
+            logging.error(f"❌ Erro ao treinar especialista {key.upper()}: {str(e)}")
+            continue
     
-    logging.info("\n✅ TREINAMENTO SEMANAL CONCLUÍDO COM SUCESSO PARA TODOS OS ESPECIALISTAS.")
-
-if __name__ == "__main__":
-    main()
-
-def main():
-    os.makedirs(os.path.join(ROOT_DIR, 'models', 'active'), exist_ok=True)
-    # Configurações Elite T32 ISM
-    tasks = [
-        ('fortaleza', 80, 0.05, 32, 0.4, 20.0),
-        ('rmf', 80, 0.05, 32, 0.4, 25.0),
-        ('interior', 80, 0.05, 32, 0.3, 20.0)
-    ]
-    for key, epochs, lr, accum, drop, rank_w in tasks:
-        trainer = SpecialistTrainer(key, epochs, lr, accum, drop, rank_w)
-        trainer.train()
-    
-    logging.info("\n✅ TREINAMENTO SEMANAL CONCLUÍDO PARA TODOS OS ESPECIALISTAS.")
+    logging.info("\n✅ CICLO DE TREINAMENTO CONCLUÍDO.")
 
 if __name__ == "__main__":
     main()

@@ -41,7 +41,7 @@ class StateOrchestrator:
         self.root = project_root
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         
-        # --- CONFIGURACAO CONSOLIDADA (Phase 5/6/7 Active) ---
+        # --- CONFIGURACAO CONSOLIDADA (ISM Production Standard) ---
         self.configs = {
             'fortaleza': {
                 'model_path': os.path.join(self.root, 'models', 'active', 'fortaleza_model.pth'),
@@ -50,13 +50,13 @@ class StateOrchestrator:
                 'window': 120
             },
             'rmf': {
-                'model_path': os.path.join(self.root, 'models', 'active', 'rmf_model_elite.pth'),
+                'model_path': os.path.join(self.root, 'models', 'active', 'rmf_model.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_rmf.pkl'),
                 'class': DeepSTGAT_64,
                 'window': 120
             },
             'interior': {
-                'model_path': os.path.join(self.root, 'models', 'active', 'interior_model_elite.pth'),
+                'model_path': os.path.join(self.root, 'models', 'active', 'interior_model.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_interior.pkl'),
                 'class': DeepSTGAT_64,
                 'window': 120
@@ -143,32 +143,37 @@ class StateOrchestrator:
                 for loc_name, info in exogenous_shocks.items():
                     norm_target = normalize_name(loc_name)
                     if isinstance(info, dict):
-                        intensity = float(info.get('intensity', 0.5))
+                        conf_int = float(info.get('conflict_intensity', 0.0))
+                        supp_int = float(info.get('suppression_intensity', 0.0))
                         is_crit = info.get('is_critical', False)
-                        is_supp = info.get('is_suppression', False)
+
+                        # Fallback to old format
+                        if 'intensity' in info:
+                            if info.get('is_suppression', False):
+                                supp_int += float(info.get('intensity', 0.0))
+                            else:
+                                conf_int += float(info.get('intensity', 0.0))
+
+                        # Limitar intensidade individual máxima para não explodir
+                        conf_int = min(conf_int, 3.0)
+                        supp_int = min(supp_int, 3.0)
+
+                        # Calcula impacto líquido: Conflito aumenta (+), Supressão reduz (-)
+                        impact_value = (2.5 * conf_int) - (2.5 * supp_int)
+
+                        # Escolher um canal predominante apenas para fins visuais no logit (opcional)
+                        channel_idx = 25 if is_crit else (24 if conf_int >= supp_int else 23)
+                        intensity = max(conf_int, supp_int)
                     else:
                         intensity = float(info)
                         is_crit = (intensity >= 0.8)
-                        is_supp = False
-                    
-                    # Definição de Canal:
-                    # 25 = Crítico (Ameaça Alta)
-                    # 24 = Padrão (Tensão/Evento Exógeno)
-                    # 23 = Supressão (Ação Policial/Alívio)
-                    if is_supp:
-                        channel_idx = 23
-                        # Boost Negativo Direto no Logit (Supressão)
-                        impact_value = -2.5 * intensity
-                    else:
                         channel_idx = 25 if is_crit else 24
-                        # Boost Positivo Direto no Logit (Conflito)
                         impact_value = 2.5 * intensity
-                    
+
                     for i, row in data['nodes_gdf'].iterrows():
                         if normalize_name(row['name']) == norm_target:
                             x_raw[i, :, channel_idx] = intensity
                             sim_impact[i] = impact_value
-
             x = torch.from_numpy(x_raw).float().permute(2, 0, 1).unsqueeze(0).to(self.device)
             adj = self._norm_adj(data['adj_geo'], data['adj_conflict'])
             
@@ -196,21 +201,36 @@ class StateOrchestrator:
                 tension_weight = data['nodes_gdf']['tension_index'].values.astype(float) * cp['tension_factor']
                 adjusted_logits = out + tension_weight
                 
-                # Sigmoide sobre os logits ajustados por tensão
-                # Preserva outliers: um território isolado com alta tensão de facção
-                # deve aparecer no topo mesmo sem crimes recentes
-                s = 1 / (1 + np.exp(-(adjusted_logits - adjusted_logits.mean()) / (adjusted_logits.std() + 1e-6)))
+                # --- ESCALA DE RISCO ABSOLUTA (SEM DEPENDÊNCIA DE MÉDIAS) ---
+                # O risco é calculado de forma soberana para cada localidade.
+                # Se um bairro é perigoso, o score será alto, mesmo que todos os outros também sejam.
+                
+                # Boost por Tensão Territorial (Facções) somado direto no logit
+                tension_weight = data['nodes_gdf']['tension_index'].values.astype(float) * cp['tension_factor']
+                
+                # Logit Final: Modelo + Tags Intel + Simulação + Facções
+                final_logits = out + spatial_bias + sim_impact + tension_weight
+                
+                # Mapeamento Sigmoidal com Âncoras Fixas:
+                # Pivot -1.0: Define o ponto de transição para risco Moderado.
+                # Scale 0.7: Define a inclinação da curva (sensibilidade ao aumento de tensão).
+                pivot = -1.0
+                sensitivity = 0.7
+                
+                s = 1 / (1 + np.exp(-sensitivity * (final_logits - pivot)))
                 out_norm = s * 100
                 
-                # Garantia mínima de calor para:
-                # 1. Territórios com CVLI recente (memória de atividade)
-                # 2. Territórios com domínio de facção confirmado (tensão latente, mesmo sem crimes recentes)
+                # Garantia mínima de calor para áreas de tensão latente
                 recent_cvli = data['node_features'][:, -7:, 0].sum(axis=1)
                 factions = data['nodes_gdf']['faction'].values if 'faction' in data['nodes_gdf'].columns else None
                 for i in range(len(out_norm)):
                     has_faction = factions is not None and str(factions[i]).upper() not in ('NEUTRO', 'N/A', '', 'NAN', 'NONE')
+                    # Se houver crime recente OU facção ativa, o risco não cai abaixo do piso de inteligência
                     if (recent_cvli[i] > 0 or has_faction) and sim_impact[i] >= 0:
                         out_norm[i] = max(out_norm[i], cp['min_risk'])
+                
+                # Clipping final de segurança
+                out_norm = np.clip(out_norm, 5.0, 100.0)
                 
                 # DAMPENING REMOVIDO: comprimir outliers altos é irracional para tensão territorial.
                 # Um município isolado com domínio total de facção pode ter score 95%+ legitimamente.

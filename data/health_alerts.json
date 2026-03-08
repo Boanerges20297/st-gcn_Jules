@@ -317,6 +317,225 @@
       "resolved": true,
       "resolved_at": "2026-03-04T15:15:06.344407",
       "resolved_reason": "Região INTERIOR sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
+    },
+    {
+      "timestamp": "2026-03-04T18:44:29.721171",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 22.2% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: CEDRO, CAMOCIM, SENADOR POMPEU",
+      "details": {
+        "region": "interior",
+        "coverage": 0.2222,
+        "threshold": 0.8,
+        "faction_nodes_total": 27,
+        "faction_nodes_in_top20": 6,
+        "missing_sample": [
+          "CEDRO",
+          "CAMOCIM",
+          "SENADOR POMPEU",
+          "JIJOCA DE JERICOACOARA",
+          "ITAREMA"
+        ]
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-05T22:28:00.554689",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 20.0% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: PEDRAS, PLANALTO AYRTON SENNA, PIRAMBU",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.2,
+        "threshold": 0.8,
+        "faction_nodes_total": 40,
+        "faction_nodes_in_top20": 8,
+        "missing_sample": [
+          "PEDRAS",
+          "PLANALTO AYRTON SENNA",
+          "PIRAMBU",
+          "BOM JARDIM",
+          "PRAIA DO FUTURO"
+        ]
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-05T22:28:00.560678",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-05T22:28:01.122017",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 21.1% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: SOBRAL, ARATUBA, SOLONOPOLE",
+      "details": {
+        "region": "interior",
+        "coverage": 0.2105,
+        "threshold": 0.8,
+        "faction_nodes_total": 19,
+        "faction_nodes_in_top20": 4,
+        "missing_sample": [
+          "SOBRAL",
+          "ARATUBA",
+          "SOLONOPOLE",
+          "URUBURETAMA",
+          "CARIRE"
+        ]
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-05T22:28:01.151449",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.1% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.21052631578947367,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-05T22:28:20.837935",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 28.57%",
+      "details": {
+        "error_rate_percent": 28.57142857142857
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-06T13:53:46.196413",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-06T13:53:46.403170",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.1% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.21052631578947367,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-06T15:39:45.806616",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 7.14%",
+      "details": {
+        "error_rate_percent": 7.142857142857142
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-07T22:57:11.167457",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 20.0% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: GRANJA LISBOA, CRISTO REDENTOR, PARQUE SAO JOSE",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.2,
+        "threshold": 0.8,
+        "faction_nodes_total": 40,
+        "faction_nodes_in_top20": 8,
+        "missing_sample": [
+          "GRANJA LISBOA",
+          "CRISTO REDENTOR",
+          "PARQUE SAO JOSE",
+          "BOM JARDIM",
+          "VICENTE PINZON"
+        ]
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-07T22:57:11.182474",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-07T22:57:17.153801",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 21.1% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: VICOSA DO CEARA, IGUATU, CARIRE",
+      "details": {
+        "region": "interior",
+        "coverage": 0.2105,
+        "threshold": 0.8,
+        "faction_nodes_total": 19,
+        "faction_nodes_in_top20": 4,
+        "missing_sample": [
+          "VICOSA DO CEARA",
+          "IGUATU",
+          "CARIRE",
+          "ARATUBA",
+          "SOLONOPOLE"
+        ]
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-07T22:57:17.342712",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.1% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.21052631578947367,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-07T23:02:59.023237",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 7.69%",
+      "details": {
+        "error_rate_percent": 7.6923076923076925
+      },
+      "resolved": false
     }
   ]
 }

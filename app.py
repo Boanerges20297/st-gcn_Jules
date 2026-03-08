@@ -637,6 +637,40 @@ def track_request_end(response):
 @app.route('/connections')
 def connections(): return render_template('connections.html')
 
+@app.route('/api/micronodes')
+def get_micronodes():
+    path = os.path.join(app.root_path, 'data', 'raw', 'inteligencia', 'micronodos_faccoes_2026.geojson')
+    if os.path.exists(path):
+        with open(path, 'r', encoding='utf-8') as f:
+            return jsonify(json.load(f))
+    return jsonify({"type": "FeatureCollection", "features": []})
+
+@app.route('/api/top20_micro_nodes')
+def get_top20_micro_nodes():
+    region = request.args.get('region', 'fortaleza').lower()
+    # Mapear regiao para o arquivo correspondente na pasta outputs
+    filename_map = {
+        'fortaleza': 'top20_micro_nodes_capital.geojson',
+        'rmf': 'top20_micro_nodes_rmf.geojson',
+        'interior': 'top20_micro_nodes_interior.geojson',
+        'all': 'top20_micro_nodes.geojson'
+    }
+    
+    filename = filename_map.get(region, 'top20_micro_nodes_capital.geojson')
+    path = os.path.join(app.root_path, 'outputs', filename)
+    
+    if os.path.exists(path):
+        with open(path, 'r', encoding='utf-8') as f:
+            return jsonify(json.load(f))
+    
+    # Fallback se o regional nao existir
+    fallback_path = os.path.join(app.root_path, 'outputs', 'top20_micro_nodes.geojson')
+    if os.path.exists(fallback_path):
+        with open(fallback_path, 'r', encoding='utf-8') as f:
+            return jsonify(json.load(f))
+            
+    return jsonify({"type": "FeatureCollection", "features": []})
+
 @app.route('/api/risk')
 def get_risk():
     if nodes_gdf is None or orchestrator is None:
@@ -720,10 +754,11 @@ def get_risk():
                     # Intensidade e Criticidade
                     ev_type = str(ev.get('type') or ev.get('natureza') or '').lower()
                     description = str(ev.get('description') or ev.get('resumo') or '').lower()
-                    
+                    conflict_severity = str(ev.get('conflict_severity', '')).upper()
+
                     # Classificação de Supressão e Ajuste de Intensidade Técnica
                     is_supp = ev.get('is_suppression', False) or (ev_type in SUPPRESSION_TYPES) or ('apreen' in ev_type) or ('pris' in ev_type)
-                    
+
                     # Se for supressão, calibramos a intensidade pelo impacto
                     if is_supp:
                         if any(w in description for w in ['fuzil', 'metralhadora', 'fuzi', '7.62', '5.56']):
@@ -739,8 +774,21 @@ def get_risk():
                         else:
                             intensity = float(ev.get('intensity', 0.3))
                     else:
-                        intensity = float(ev.get('intensity', 0.5))
-                    
+                        # Mapeia o conflict_severity fornecido pelo LLM para intensity
+                        if conflict_severity == 'HIGH':
+                            intensity = 0.9
+                        elif conflict_severity == 'MEDIUM':
+                            intensity = 0.6
+                        elif conflict_severity == 'LOW':
+                            intensity = 0.3
+                        else:
+                            intensity = float(ev.get('intensity', 0.5))
+
+                    # Se a localidade for genérica (município inteiro), reduzimos drasticamente o impacto por nó
+                    # para não zerar ou estourar a cidade inteira.
+                    is_city_wide = not bairro_raw and bool(municipio_raw)
+                    if is_city_wide and len(targets) > 1:
+                        intensity = intensity / min(len(targets), 10.0) # Fator de amortecimento para impacto difuso                    
                     # Decisão de Canal: Canal 25 se tipo for crítico, intensidade > 0.7 
                     # OU se a descrição contiver palavras-chave de alerta máximo
                     is_critical = (ev_type in CRITICAL_TYPES) or (not is_supp and intensity > 0.7) or \
@@ -751,17 +799,18 @@ def get_risk():
                     for loc_norm in targets:
                         if loc_norm not in exogenous_shocks:
                             exogenous_shocks[loc_norm] = {
-                                'intensity': intensity,
-                                'is_critical': is_critical,
-                                'is_suppression': is_supp
+                                'conflict_intensity': 0.0,
+                                'suppression_intensity': 0.0,
+                                'is_critical': False
                             }
+                        
+                        # Acumula as intensidades de forma independente
+                        if is_supp:
+                            exogenous_shocks[loc_norm]['suppression_intensity'] += intensity
                         else:
+                            exogenous_shocks[loc_norm]['conflict_intensity'] += intensity
                             if is_critical:
                                 exogenous_shocks[loc_norm]['is_critical'] = True
-                            if is_supp:
-                                exogenous_shocks[loc_norm]['is_suppression'] = True
-                            if intensity > exogenous_shocks[loc_norm]['intensity']:
-                                exogenous_shocks[loc_norm]['intensity'] = intensity
                 except: continue
 
             if not exogenous_shocks:
@@ -776,7 +825,7 @@ def get_risk():
         all_scores = []
         
         # Prepare per-region accumulators
-        region_buckets = {}
+        region_buckets = {'fortaleza': [], 'rmf': [], 'interior': []}
         # Contadores por região para o frontend
         region_stats = {
             'fortaleza': {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0},
@@ -792,84 +841,92 @@ def get_risk():
                     manager_cache = json.load(cf) or {}
         except: pass
 
+        # Carregar Inteligência de Ruas Críticas
+        streets_cache = {}
+        try:
+            streets_path = os.path.join(BASE_DIR, 'data', 'raw', 'ruas_criticas_por_bairro.json')
+            if os.path.exists(streets_path):
+                with open(streets_path, 'r', encoding='utf-8') as sf:
+                    streets_cache = json.load(sf)
+                # Criar versao normalizada do cache para match garantido
+                streets_cache = {normalize_name(k): v for k, v in streets_cache.items() if k}
+                print(f"✅ Inteligência de ruas carregada: {len(streets_cache)} bairros.")
+        except Exception as e: 
+            print(f"❌ Erro ao carregar ruas: {e}")
+
         for i, row in nodes_gdf.iterrows():
-            name = str(row['name'])
-            name_norm = normalize_name(name)
-            score = float(scores_map.get(name_norm, 20.0))
-            trend = trends_map.get(name_norm, 'stable')
-            
-            if np.isnan(score) or np.isinf(score): score = 20.0
-            
-            # Identificação de Região e Status (mantido)
-            reg = str(row.get('regiao', 'fortaleza')).lower()
-            if reg == 'capital': reg = 'fortaleza'
-            rmf_oficial = ['AQUIRAZ', 'CASCAVEL', 'CAUCAIA', 'CHOROZINHO', 'EUSEBIO', 'GUAIUBA', 'HORIZONTE', 'ITAITINGA', 'MARACANAU', 'MARANGUAPE', 'PACAJUS', 'PACATUBA', 'PARAIPABA', 'PARACURU', 'PINDORETAMA', 'SAO GONCALO DO AMARANTE', 'SAO LUIS DO CURU', 'TRAIRI']
-            if name_norm in rmf_oficial: reg = 'rmf'
+            try:
+                name = str(row['name'])
+                name_norm = normalize_name(name)
+                score = float(scores_map.get(name_norm, 20.0))
+                trend = trends_map.get(name_norm, 'stable')
+                
+                if np.isnan(score) or np.isinf(score): score = 20.0
+                
+                # Identificação de Região
+                reg = str(row.get('regiao', 'fortaleza')).lower()
+                if reg == 'capital': reg = 'fortaleza'
+                rmf_oficial = ['AQUIRAZ', 'CASCAVEL', 'CAUCAIA', 'CHOROZINHO', 'EUSEBIO', 'GUAIUBA', 'HORIZONTE', 'ITAITINGA', 'MARACANAU', 'MARANGUAPE', 'PACAJUS', 'PACATUBA', 'PARAIPABA', 'PARACURU', 'PINDORETAMA', 'SAO GONCALO DO AMARANTE', 'SAO LUIS DO CURU', 'TRAIRI']
+                if name_norm in rmf_oficial: reg = 'rmf'
+                
+                if reg not in region_buckets: region_buckets[reg] = []
 
-            if score >= 90: 
-                status, css, color = 'CRÍTICO', 'risk-critico', '#8B0000'
-                if reg in region_stats: region_stats[reg]['crítico'] += 1
-                meta['counts']['crítico'] += 1
-            elif score >= 80: 
-                status, css, color = 'ALTO', 'risk-alto', '#E63946'
-                if reg in region_stats: region_stats[reg]['alto'] += 1
-                meta['counts']['alto'] += 1
-            elif score >= 50: 
-                status, css, color = 'MODERADO', 'risk-moderado', '#F4A261'
-                if reg in region_stats: region_stats[reg]['moderado'] += 1
-                meta['counts']['moderado'] += 1
-            else: 
                 status, css, color = 'BAIXO', 'risk-baixo', '#A8DADC'
-                if reg in region_stats: region_stats[reg]['baixo'] += 1
-                meta['counts']['baixo'] += 1
-            
-            if reg not in region_buckets: region_buckets[reg] = []
-            
-            # --- EXTRAÇÃO DE MÉTRICAS REAIS (DADOS BRUTOS DO MODELO) ---
-            node_metrics = {
-                'cvli_7d': 0,
-                'tension': round(float(row.get('tension_index', 0)), 2),
-                'events_count': 0,
-                'event_types': [],
-                'spatial_influence': score >= 80
-            }
-            
-            # Crimes Reais
-            current_spec = orchestrator.specialists.get(reg)
-            if current_spec:
-                try:
-                    local_idx = next(idx for idx, r in current_spec['data']['nodes_gdf'].iterrows() if normalize_name(r['name']) == name_norm)
-                    node_metrics['cvli_7d'] = int(current_spec['data']['node_features'][local_idx, -7:, 0].sum())
-                except: pass
+                if score >= 90: 
+                    status, css, color = 'CRÍTICO', 'risk-critico', '#8B0000'
+                    if reg in region_stats: region_stats[reg]['crítico'] += 1
+                    meta['counts']['crítico'] += 1
+                elif score >= 80: 
+                    status, css, color = 'ALTO', 'risk-alto', '#E63946'
+                    if reg in region_stats: region_stats[reg]['alto'] += 1
+                    meta['counts']['alto'] += 1
+                elif score >= 50: 
+                    status, css, color = 'MODERADO', 'risk-moderado', '#F4A261'
+                    if reg in region_stats: region_stats[reg]['moderado'] += 1
+                    meta['counts']['moderado'] += 1
+                else: 
+                    if reg in region_stats: region_stats[reg]['baixo'] += 1
+                    meta['counts']['baixo'] += 1
 
-            # Eventos de Inteligência Reais
-            if exogenous_shocks and name_norm in exogenous_shocks:
-                # Filtrar eventos reais para listar os tipos
-                exo_path = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
-                if os.path.exists(exo_path):
+                # Inteligência de Ruas Críticas
+                critical_streets_info = streets_cache.get(name_norm, 'Sem logradouros críticos recentes')
+                if critical_streets_info == 'Sem logradouros críticos recentes':
+                    for k, v in streets_cache.items():
+                        if name_norm in k or k in name_norm:
+                            critical_streets_info = v
+                            break
+
+                node_metrics = {
+                    'cvli_7d': 0,
+                    'tension': round(float(row.get('tension_index', 0)), 2),
+                    'events_count': 0,
+                    'event_types': [],
+                    'critical_streets': critical_streets_info,
+                    'spatial_influence': score >= 80
+                }
+                
+                # Crimes Reais
+                current_spec = orchestrator.specialists.get(reg)
+                if current_spec:
                     try:
-                        with open(exo_path, 'r', encoding='utf-8') as ef:
-                            all_ev = json.load(ef)
-                            node_evs = [e for e in all_ev if normalize_name(e.get('bairro','')) == name_norm or normalize_name(e.get('municipio','')) == name_norm]
-                            node_metrics['events_count'] = len(node_evs)
-                            node_metrics['event_types'] = list(set([e.get('natureza') or e.get('type') for e in node_evs]))
+                        local_idx = next(idx for idx, r in current_spec['data']['nodes_gdf'].iterrows() if normalize_name(r['name']) == name_norm)
+                        node_metrics['cvli_7d'] = int(current_spec['data']['node_features'][local_idx, -7:, 0].sum())
                     except: pass
 
-            # Verificar cache de IA (apenas se existir)
-            node_key = str(i)
-            rich_explanation = manager_cache.get(node_key, {}).get('manager_text')
-
-            all_scores.append(score)
-            results.append({
-                'node_id': i, 'name': name, 'clean_name': name_norm,
-                'tension_score': score, 'risk_score': score,  # tension_score é o campo primário
-                'status_label': status, 'css_class': css,
-                'color': color, 'trend': trend, 
-                'metrics': node_metrics,
-                'reasons_rich': rich_explanation,
-                'faction': str(row.get('faction', 'N/A')), 'region_type': reg
-            })
-            region_buckets[reg].append(results[-1])
+                all_scores.append(score)
+                node_result = {
+                    'node_id': i, 'name': name, 'clean_name': name_norm,
+                    'tension_score': score, 'risk_score': score,
+                    'status_label': status, 'css_class': css,
+                    'color': color, 'trend': trend, 
+                    'metrics': node_metrics,
+                    'faction': str(row.get('faction', 'N/A')), 'region_type': reg
+                }
+                results.append(node_result)
+                region_buckets[reg].append(node_result)
+            except Exception as e:
+                print(f"Erro no nó {i}: {e}")
+                continue
 
         # Adicionar Ranking Info para o Frontend
         if all_scores:
@@ -1214,6 +1271,98 @@ def get_polygons():
             except: pass
     return jsonify({"type": "FeatureCollection", "features": features})
 
+@app.route('/api/geocode')
+def geocode_search():
+    """Geolocaliza uma rua, bairro ou localidade via Nominatim (OpenStreetMap).
+    Restringe busca ao Estado do Ceará para resultados mais relevantes.
+    Parâmetro: ?q=<texto>
+    Retorna: lista de {name, lat, lon, type}
+    """
+    q = request.args.get('q', '').strip()
+    if not q or len(q) < 3:
+        return jsonify([])
+    try:
+        from geopy.geocoders import Nominatim
+        from geopy.exc import GeocoderTimedOut, GeocoderServiceError
+
+        geolocator = Nominatim(
+            user_agent='report_preview_app/1.0',
+            timeout=6
+        )
+        # Restringe ao Ceará para evitar resultados de outros estados
+        query = q + ', Ceará, Brasil'
+        locations = geolocator.geocode(query, exactly_one=False, limit=6, language='pt') or []
+
+        results = []
+        seen = set()
+        for loc in locations:
+            raw = loc.raw or {}
+            display = loc.address or ''
+            # Remove duplicatas por display_name truncado
+            key = display[:60]
+            if key in seen:
+                continue
+            seen.add(key)
+            # Tipo legível
+            loc_type = raw.get('type') or raw.get('class') or 'lugar'
+            results.append({
+                'name':    display,
+                'short':   (raw.get('namedetails') or {}).get('name') or q,
+                'lat':     float(loc.latitude),
+                'lon':     float(loc.longitude),
+                'type':    loc_type,
+                'source':  'nominatim'
+            })
+        return jsonify(results)
+    except Exception as e:
+        logging.warning(f'Geocode error: {e}')
+        return jsonify([])
+
+
+@app.route('/api/streets/critical')
+def get_geo_critical_streets():
+    """Retorna as ruas geolocalizadas mais críticas para um bairro/cidade."""
+    bairro = request.args.get('bairro', '').upper()
+    cidade = request.args.get('cidade', '').upper()
+    
+    cache_path = os.path.join(BASE_DIR, 'data', 'geo_streets_cache.json')
+    if not os.path.exists(cache_path):
+        return jsonify([])
+        
+    try:
+        with open(cache_path, 'r', encoding='utf-8') as f:
+            all_streets = json.load(f)
+            
+        # Normalizar busca
+        bairro_norm = normalize_name(bairro)
+        cidade_norm = normalize_name(cidade)
+        
+        filtered = []
+        for s in all_streets:
+            s_bairro_norm = normalize_name(s.get('bairro', ''))
+            s_cidade_norm = normalize_name(s.get('cidade', ''))
+            
+            # Match robusto: Bairro deve bater (se fornecido) e cidade deve ser compatível
+            match_bairro = False
+            if bairro_norm and s_bairro_norm:
+                if bairro_norm == s_bairro_norm or s_bairro_norm in bairro_norm or bairro_norm in s_bairro_norm:
+                    match_bairro = True
+            
+            match_cidade = False
+            if cidade_norm and s_cidade_norm:
+                if cidade_norm == s_cidade_norm or s_cidade_norm in cidade_norm or cidade_norm in s_cidade_norm:
+                    match_cidade = True
+            elif not s_cidade_norm: # Se o cache não tem cidade, aceitamos se o bairro bateu
+                match_cidade = True
+                
+            if (bairro_norm and match_bairro and match_cidade) or (not bairro_norm and cidade_norm and match_cidade):
+                filtered.append(s)
+                
+        # Limitar às 10 mais críticas para não sobrecarregar
+        return jsonify(filtered[:10])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/model-update-status')
 def model_status(): return jsonify({"status": "idle"})
 
@@ -1362,32 +1511,75 @@ def explain_node(node_id):
                     for e in evts:
                         e_date_str = e.get('date') or e.get('event_date')
                         if not verify_date_consistency(e_date_str, last_date_base): continue
-                        if name_norm in normalize_name(e.get('title', '')) or name_norm in normalize_name(e.get('location','')):
+
+                        # Match robusto por bairro ou município
+                        evt_bairro = normalize_name(str(e.get('bairro', '')))
+                        evt_mun = normalize_name(str(e.get('municipio', '')))
+                        evt_title = normalize_name(str(e.get('title', '')))
+                        evt_loc = normalize_name(str(e.get('location', '')))
+
+                        if (name_norm and (name_norm == evt_bairro or name_norm in evt_title or name_norm in evt_loc)) or \
+                           (not evt_bairro and evt_mun and (evt_mun == name_norm or name_norm in evt_mun)):
                             events.append(e)
         except: events = []
 
         temporal_pattern = 'Increasing' if score_pct > float(np.mean(all_scores)) else 'Stable'
         confidence = min(0.95, 0.6 + (score_10 / 20.0))
 
+        # --- EXTRAÇÃO DE DADOS REAIS DOS TENSORES (PARA EXPLICABILIDADE) ---
+        cvli_recent = 0
+        cvli_prev = 0
         nearby_names = []
-        for nid in nearby:
-            try:
-                nearby_names.append(str(nodes_gdf.loc[nid].get('name') or nodes_gdf.loc[nid].get('bairro') or 'Área Vizinha'))
-            except: pass
+
+        try:
+            reg_key = str(row.get('regiao', 'fortaleza')).lower()
+            if reg_key == 'capital': reg_key = 'fortaleza'
+
+            # Sincronização RMF Oficial
+            if name_norm in ['AQUIRAZ', 'CASCAVEL', 'CAUCAIA', 'CHOROZINHO', 'EUSEBIO', 'GUAIUBA', 'HORIZONTE', 'ITAITINGA', 'MARACANAU', 'MARANGUAPE', 'PACAJUS', 'PACATUBA', 'PARAIPABA', 'PARACURU', 'PINDORETAMA', 'SAO GONCALO DO AMARANTE', 'SAO LUIS DO CURU', 'TRAIRI']:
+                reg_key = 'rmf'            
+            spec = orchestrator.specialists.get(reg_key)
+            if spec:
+                # 1. Encontrar o índice do nó no especialista
+                spec_nodes = spec['data']['nodes_gdf']
+                spec_idx = next((idx for idx, r in spec_nodes.iterrows() if normalize_name(r['name']) == name_norm), None)
+                
+                if spec_idx is not None:
+                    features = spec['data']['node_features'] # (N, T, F)
+                    # Janela Recente (Últimos 14 dias) vs Anterior (14 dias antes disso)
+                    cvli_recent = int(features[spec_idx, -14:, 0].sum())
+                    cvli_prev = int(features[spec_idx, -28:-14, 0].sum())
+                    
+                    # 2. Vizinhos Geográficos Reais (via Matriz de Adjacência)
+                    adj_geo = spec['data']['adj_geo']
+                    neighbor_indices = np.where(adj_geo[spec_idx] > 0)[0]
+                    
+                    # Pegar os 3 vizinhos com maior risco atual para o "efeito de contágio"
+                    n_scores = []
+                    for n_idx in neighbor_indices:
+                        if n_idx == spec_idx: continue
+                        n_name = normalize_name(spec_nodes.iloc[n_idx]['name'])
+                        n_score = float(scores_map.get(n_name, 0))
+                        n_scores.append((n_name, n_score))
+                    
+                    # Ordenar por risco e pegar nomes
+                    n_scores.sort(key=lambda x: x[1], reverse=True)
+                    nearby_names = [x[0] for x in n_scores[:3]]
+                    
+                    logging.info(f"📊 EXPLAIN [{name}]: recent={cvli_recent}, prev={cvli_prev}, neighbors={nearby_names}")
+        except Exception as e:
+            logging.warning(f"Erro ao extrair métricas reais para {name}: {e}")
 
         # Criar contexto esperado por ExplanationGenerator
         try:
             from src.explanation_generator import ExplanationGenerator
             gen = ExplanationGenerator()
             
-            cvli_recent = int(score_pct / 20)
-            cvli_prev = max(0, cvli_recent - 1)
-
             context = {
                 'node_id': int(node_id),
                 'name': name,
                 'score': score_10,
-                'temporal_pattern': temporal_pattern,
+                'temporal_pattern': 'Increasing' if cvli_recent > cvli_prev else 'Stable',
                 'cvli_count_recent': cvli_recent,
                 'cvli_count_prev': cvli_prev,
                 'nearby_nodes': nearby,
@@ -1400,6 +1592,19 @@ def explain_node(node_id):
             explanation = gen.explain_node_ranking(int(node_id), int(rank_pos), context)
             explanation['risk_score_pct'] = float(score_pct)
 
+            # Percentil de confiança na previsão
+            conf_pct = round(float(confidence) * 100.0, 1)
+            if conf_pct >= 80:
+                conf_label = 'Alta'
+            elif conf_pct >= 60:
+                conf_label = 'Moderada'
+            elif conf_pct >= 40:
+                conf_label = 'Baixa'
+            else:
+                conf_label = 'Muito baixa'
+            explanation['confidence_pct']   = conf_pct
+            explanation['confidence_label'] = conf_label
+
             # ENVIAR DIRETAMENTE PARA O FRONTEND (Sem normalização que apaga campos)
             return jsonify(explanation)
         except Exception as e:
@@ -1411,7 +1616,7 @@ def explain_node(node_id):
                 'name': name,
                 'risk_score_pct': float(score_pct),
                 'confidence': float(confidence),
-                'summary': 'Explicação detalhada indisponível',
+                'summary': 'Métricas e explicabilidade indisponíveis',
                 'factors': [],
                 'caveats': [],
                 'explanation_available': False,
