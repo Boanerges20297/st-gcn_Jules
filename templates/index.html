@@ -160,6 +160,83 @@
             padding: 12px;
             border-radius: 4px;
         }
+
+        /* ── Responsividade global ─────────────────────────────────────────── */
+
+        /* Altura dinâmica do mapa: ocupa o que sobra da viewport */
+        #map {
+            min-height: 400px;
+            height: calc(100vh - 170px); /* viewport menos header + cards + padding */
+        }
+
+        /* Sidebar scroll natural */
+        .sidebar-card-body {
+            overflow-y: auto;
+            flex: 1;
+            padding: 10px;
+            font-size: 0.85rem;
+            max-height: calc(100vh - 170px);
+        }
+
+        /* ── Telas grandes (≥1400px / xxl) ─────────────────────────── */
+        @media (min-width: 1400px) {
+            .rp-map-col    { flex: 0 0 82%; max-width: 82%; }
+            .rp-sidebar-col{ flex: 0 0 18%; max-width: 18%; }
+            .sidebar-card-body { font-size: 0.9rem; }
+        }
+
+        /* ── Telas médias-grandes (≥1200px / xl) ───────────────────── */
+        @media (min-width: 1200px) and (max-width: 1399px) {
+            .rp-map-col    { flex: 0 0 80%; max-width: 80%; }
+            .rp-sidebar-col{ flex: 0 0 20%; max-width: 20%; }
+        }
+
+        /* ── Telas médias (≥992px / lg) ────────────────────────────── */
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .rp-map-col    { flex: 0 0 75%; max-width: 75%; }
+            .rp-sidebar-col{ flex: 0 0 25%; max-width: 25%; }
+            #map { height: calc(100vh - 160px); }
+        }
+
+        /* ── Tablets (≥768px / md) ──────────────────────────────────── */
+        @media (min-width: 768px) and (max-width: 991px) {
+            .rp-map-col    { flex: 0 0 100%; max-width: 100%; }
+            .rp-sidebar-col{ flex: 0 0 100%; max-width: 100%; margin-top: 8px; }
+            #map { height: 55vw; min-height: 340px; }
+            .sidebar-card-body { max-height: 40vh; }
+            /* Cards de métrica mais compactos */
+            .metric-card .card-body { padding: 6px 4px !important; }
+        }
+
+        /* ── Mobile (< 768px) ───────────────────────────────────────── */
+        @media (max-width: 767px) {
+            body { padding-top: 6px; }
+            .rp-map-col    { flex: 0 0 100%; max-width: 100%; }
+            .rp-sidebar-col{ flex: 0 0 100%; max-width: 100%; margin-top: 8px; }
+            #map { height: 60vw; min-height: 280px; }
+            .sidebar-card-body { max-height: 35vh; font-size: 0.78rem; }
+            /* Header ultra-compacto */
+            .rp-title { font-size: 1rem !important; }
+            .rp-subtitle { display: none; }
+            /* Oculta badges do header do mapa em telas pequenas */
+            .rp-map-badges { display: none !important; }
+            /* Modal de território ocupa quase tudo */
+            #territory-modal { max-width: 97% !important; max-height: 90vh !important; }
+            /* Search mais estreito */
+            #map-search-box { width: 85% !important; }
+            /* Cards de métrica em linha única */
+            .rp-metric-row .col-md-2 { flex: 0 0 33.33%; max-width: 33.33%; }
+        }
+
+        /* ── Paisagem mobile (< 576px landscape) ───────────────────── */
+        @media (max-width: 575px) and (orientation: landscape) {
+            #map { height: 50vw; min-height: 220px; }
+        }
+
+        /* Garante que mapa e sidebar tenham mesma altura em colunas lado a lado */
+        .rp-main-row { align-items: stretch; }
+        .rp-map-col, .rp-sidebar-col { display: flex; flex-direction: column; }
+        .rp-map-col > .card, .rp-sidebar-col > .card { flex: 1; }
     </style>
 </head>
 <body>
@@ -179,47 +256,47 @@
 </div>
 
 <div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-12 text-center">
-            <h1 class="display-6 fw-bold text-primary"><i class="fas fa-shield-alt"></i> Dashboard de Inteligência Preditiva</h1>
-            <p class="lead text-muted">Termômetro de Tensão Territorial — Áreas Monitoradas</p>
+    <div class="row mb-2">
+        <div class="col-12 text-center py-1">
+            <h4 class="rp-title fw-bold text-primary mb-0"><i class="fas fa-shield-alt"></i> Dashboard de Inteligência Preditiva</h4>
+            <p class="rp-subtitle text-muted mb-0" style="font-size:0.82rem;">Termômetro de Tensão Territorial — Áreas Monitoradas</p>
         </div>
     </div>
-    <div class="row mb-2 justify-content-center">
-        <div class="col-md-3">
-            <div class="card metric-card border-danger mb-0">
-                <div class="card-body text-center">
-                    <h5 class="card-title text-danger">Alta Tensão Crítica</h5>
-                    <p class="card-text display-4 fw-bold" id="high-risk-count">-</p>
-                    <small class="text-muted">Crítico (≥90)</small>
+    <div class="row mb-2 justify-content-center rp-metric-row">
+        <div class="col-md-2 col-4">
+            <div class="card metric-card border-danger mb-0 py-1">
+                <div class="card-body text-center p-2">
+                    <h6 class="card-title text-danger mb-0" style="font-size:0.75rem;">Alta Tensão Crítica</h6>
+                    <p class="card-text fw-bold mb-0" style="font-size:1.6rem;line-height:1.2;" id="high-risk-count">-</p>
+                    <small class="text-muted" style="font-size:0.68rem;">Crítico (≥90)</small>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card metric-card border-warning mb-0">
-                <div class="card-body text-center">
-                    <h5 class="card-title text-warning">Tensão Elevada</h5>
-                    <p class="card-text display-4 fw-bold" id="medium-risk-count">-</p>
-                    <small class="text-muted">Alto (80-89)</small>
+        <div class="col-md-2 col-4">
+            <div class="card metric-card border-warning mb-0 py-1">
+                <div class="card-body text-center p-2">
+                    <h6 class="card-title text-warning mb-0" style="font-size:0.75rem;">Tensão Elevada</h6>
+                    <p class="card-text fw-bold mb-0" style="font-size:1.6rem;line-height:1.2;" id="medium-risk-count">-</p>
+                    <small class="text-muted" style="font-size:0.68rem;">Alto (80-89)</small>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card metric-card border-info mb-0">
-                <div class="card-body text-center">
-                    <h5 class="card-title text-info">Tensão Moderada</h5>
-                    <p class="card-text display-4 fw-bold" id="low-risk-count">-</p>
-                    <small class="text-muted">Moderado (50-79)</small>
+        <div class="col-md-2 col-4">
+            <div class="card metric-card border-info mb-0 py-1">
+                <div class="card-body text-center p-2">
+                    <h6 class="card-title text-info mb-0" style="font-size:0.75rem;">Tensão Moderada</h6>
+                    <p class="card-text fw-bold mb-0" style="font-size:1.6rem;line-height:1.2;" id="low-risk-count">-</p>
+                    <small class="text-muted" style="font-size:0.68rem;">Moderado (50-79)</small>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row align-items-stretch">
-        <div class="col-md-9 d-flex flex-column">
+    <div class="row rp-main-row">
+        <div class="col-md-10 rp-map-col">
             <div class="card shadow-sm h-100 w-100">
                 <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                     <span><i class="fas fa-map-marked-alt"></i> Mapa Tático Operacional</span>
-                    <div>
+                    <div class="rp-map-badges">
                         <span class="badge bg-info me-2">⏱️ Janela 14 Dias</span>
                         <span class="badge bg-success">Motor REPORT PREVIEW Ativo</span>
                     </div>
@@ -255,7 +332,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 d-flex flex-column" style="overflow: hidden;">
+        <div class="col-md-2 rp-sidebar-col" style="overflow: hidden;">
             <div class="card shadow-sm h-100 w-100" style="display: flex; flex-direction: column; overflow: hidden;">
                 <div class="card-header">
                     <strong>Fatores de Tensão</strong>
@@ -263,7 +340,7 @@
                         <i class="fas fa-info-circle"></i> <strong>Nota:</strong> Projeção de tensão territorial para os <strong>próximos 14 dias</strong>, não apenas amanhã
                     </div>
                 </div>
-                <div class="card-body" style="overflow-y: auto; flex: 1; padding: 12px; font-size: 0.9rem;">
+                <div class="card-body sidebar-card-body" style="overflow-y: auto; flex: 1; padding: 12px; font-size: 0.9rem;">
                     <div id="window-info" class="mb-1" style="font-size: 0.8rem;">
                         <small class="text-muted d-block">Janela Histórica: —</small>
                         <small class="text-primary fw-bold" id="horizon-info">Horizonte: —</small>
@@ -1315,7 +1392,7 @@
             try {
                 $('#region-filter').val('fortaleza').trigger('change');
                 if (typeof applyRegionFilter === 'function') applyRegionFilter('fortaleza');
-                map.setView(initialView.center, initialView.zoom);
+                // Não chama map.setView aqui — applyRegionFilter já faz fitBounds
                 map.closePopup();
             } catch (e) {
                 console.warn('Initial view override failed', e);
@@ -1372,7 +1449,7 @@
 
         // Reset View Handler
         $('#btn-reset-view').on('click', function() {
-            map.setView(initialView.center, initialView.zoom);
+            closeTerritoryModal();
             $('#region-filter').val('fortaleza').trigger('change');
             map.closePopup();
         });
@@ -1450,7 +1527,6 @@
                                     try {
                                         $('#region-filter').val('fortaleza').trigger('change');
                                         applyRegionFilter('fortaleza');
-                                        map.setView(initialView.center, initialView.zoom);
                                         map.closePopup();
                                         // Refresh top20 layer if visible
                                         refreshTop20();
@@ -2206,29 +2282,44 @@
         }
     }
 
-    // Apply region filter to map layers (show/hide)
+    // Apply region filter to map layers (show/hide) and fit bounds to visible polygons
     function applyRegionFilter(regionFilter) {
         if (!geojsonLayer) return;
+        var visibleBounds = null;
         geojsonLayer.eachLayer(function(layer) {
             var props = (layer.feature && layer.feature.properties) || {};
             var regionType = props.region_type || 'unknown';
             var show = (regionFilter === 'all') || (regionFilter === regionType);
             try {
                 if (show) {
-                    // restore style and ensure layer is on map
                     if (layer.setStyle) layer.setStyle(style(layer.feature));
                     if (!map.hasLayer(layer)) map.addLayer(layer);
+                    // Acumula bounds dos polígonos visíveis
+                    if (layer.getBounds) {
+                        var b = layer.getBounds();
+                        visibleBounds = visibleBounds ? visibleBounds.extend(b) : b;
+                    }
                 } else {
-                    // hide layer
                     if (layer.setStyle) layer.setStyle({opacity:0, fillOpacity:0});
                     if (map.hasLayer(layer)) map.removeLayer(layer);
                 }
-            } catch (e) {
-                // ignore individual layer errors
-            }
+            } catch (e) {}
         });
 
-        // Polygons are filtered above - no markers to filter
+        // Ajusta zoom/centro para cobrir a região filtrada
+        // Não re-enquadra se usuário já selecionou um território
+        if (visibleBounds && !selectedLayer) {
+            var maxZ = regionFilter === 'fortaleza' ? 12.5
+                     : regionFilter === 'rmf'       ? 11.0
+                     : regionFilter === 'interior'  ? 9.0
+                     : 10.5; // 'all'
+            map.fitBounds(visibleBounds, {
+                padding:  [32, 32],
+                maxZoom:  maxZ,
+                animate:  !initialMapLoad,
+                duration: 0.7
+            });
+        }
     }
 
     // ===== Monitor de Atualização de Modelos =====
