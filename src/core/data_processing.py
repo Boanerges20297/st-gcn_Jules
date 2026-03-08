@@ -71,10 +71,14 @@ def update_geo_streets_cache(df):
                 cache_coords = {(round(float(c['lat']), 3), round(float(c['lng']), 3)): c for c in streets_data}
         except: pass
 
-    # Filtrar CVLIs com coordenadas válidas
+    # Filtrar CVLIs na janela de 14 dias
     df_cvli = df[df['tipo'].str.lower() == 'cvli'].copy()
     if 'latitude' not in df_cvli.columns or 'longitude' not in df_cvli.columns:
         return
+    if not df_cvli.empty and 'data' in df_cvli.columns:
+        cutoff = df_cvli['data'].max() - pd.Timedelta(days=14)
+        df_cvli = df_cvli[df_cvli['data'] >= cutoff]
+        logging.info(f"⏱️ Cache de ruas: janela 14 dias ({cutoff.date()} a {df_cvli['data'].max().date()}) — {len(df_cvli)} CVLIs.")
         
     df_cvli['lat_r'] = pd.to_numeric(df_cvli['latitude'], errors='coerce').round(3)
     df_cvli['lng_r'] = pd.to_numeric(df_cvli['longitude'], errors='coerce').round(3)

@@ -226,7 +226,7 @@ def process_exogenous_text(text: str, block_type: str = None) -> List[Dict[str, 
         "REGRAS:\n"
         "1) 'municipio': Extraia o nome da cidade (ex: FORTALEZA, CAUCAIA, MARACANAU). Se não encontrar, deixe vazio.\n"
         "2) 'bairro': Extraia o bairro. Se for em Fortaleza e o bairro não estiver claro, use o contexto das AIS (ex: AIS18 costuma ser Quintino Cunha/Antônio Bezerra).\n"
-        "3) 'conflict_severity': HIGH para homicídios, facções, execuções, achados de cadáver com sinais de violência. MEDIUM para lesões a bala, expulsões, achados de cadáver (quando violência não for explícita). LOW para o resto.\n"
+        "3) 'conflict_severity': HIGH para homicídios, facções, execuções, achados de cadáver com sinais de violência, retorno de liderança de facção ao território. MEDIUM para lesões a bala, expulsões, achados de cadáver (quando violência não for explícita). LOW para o resto.\n"
         "4) 'raw_text': Mantenha a linha original completa.\n"
         "5) 'is_suppression': true para prisões, apreensões de armas/drogas, recuperação de veículos. false para crimes cometidos.\n"
         f"6) 'date': Use '{header_date}' se este for um bloco de Ações Policiais, caso contrário extraia da linha.\n\n"
@@ -356,6 +356,10 @@ def _deterministic_parse(text: str) -> List[Dict[str, Any]]:
         if 'HOMICIDIO' in norm_upper or 'HOMICÍDIO' in norm_upper:
             severity = 'HIGH'
         elif ('LESAO' in norm_upper or 'LESÃO' in norm_upper) and 'BALA' in norm_upper:
+            severity = 'HIGH'
+        elif (('RETORNO' in norm_upper or 'VOLTA' in norm_upper) and
+              ('LIDER' in norm_upper or 'LIDERANCA' in norm_upper) and
+              ('FACCAO' in norm_upper or 'TERRIT' in norm_upper)):
             severity = 'HIGH'
         elif 'ACHADO DE CADAVER' in norm_upper or 'CADAVER' in norm_upper:
             severity = 'MEDIUM'

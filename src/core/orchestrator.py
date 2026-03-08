@@ -192,41 +192,40 @@ class StateOrchestrator:
                 # Somar Impacto Direto da Simulação (Equipes/Conflitos)
                 out = out + sim_impact
 
-                # Em vez de Z-Score puro (que depende de vizinhos), usamos uma escala logística
-                # Onde o valor 0.5 (50%) é ancorado em uma atividade moderada constante.
-                # Isso impede que 9 mortes/mês virem "Risco 7".
-                
-                # Boost por Tensão Territorial (Facções) somado direto no logit
-                # A tensão é o sinal primário — não é apenas um ajuste, é o propósito do modelo
-                tension_weight = data['nodes_gdf']['tension_index'].values.astype(float) * cp['tension_factor']
-                adjusted_logits = out + tension_weight
-                
-                # --- ESCALA DE RISCO ABSOLUTA (SEM DEPENDÊNCIA DE MÉDIAS) ---
-                # O risco é calculado de forma soberana para cada localidade.
-                # Se um bairro é perigoso, o score será alto, mesmo que todos os outros também sejam.
-                
-                # Boost por Tensão Territorial (Facções) somado direto no logit
-                tension_weight = data['nodes_gdf']['tension_index'].values.astype(float) * cp['tension_factor']
-                
-                # Logit Final: Modelo + Tags Intel + Simulação + Facções
+                # --- PESO DINÂMICO DE FACÇÃO (context-sensitive) ---
+                # Princípio: território de facção sem conflito ativo = domínio consolidado,
+                # não criticidade extrema. O peso sobe apenas quando há evidência real:
+                #   - CVLI recente (14d): atividade violenta confirmada
+                #   - Rival adjacente:    risco latente de disputa territorial
+                recent_14d_cvli = data['node_features'][:, -14:, 0].sum(axis=1)
+                rival_adj = ((data['adj_conflict'] - np.eye(len(data['nodes_gdf']))).sum(axis=1) > 0)
+                has_cvli   = recent_14d_cvli > 0
+
+                # Fatores: calmo=0.10 | rival sem CVLI=0.30 | CVLI sem rival=0.50 | CVLI+rival=0.70
+                dynamic_tension_factor = np.where(
+                    has_cvli,
+                    np.where(rival_adj, 0.70, cp['tension_factor']),   # 0.70 ou 0.50
+                    np.where(rival_adj, 0.30, 0.10)                    # 0.30 ou 0.10
+                )
+                tension_weight = data['nodes_gdf']['tension_index'].values.astype(float) * dynamic_tension_factor
+
+                # Logit Final: Modelo + Tags Intel + Simulação + Facções (dinâmico)
                 final_logits = out + spatial_bias + sim_impact + tension_weight
-                
+
                 # Mapeamento Sigmoidal com Âncoras Fixas:
                 # Pivot -1.0: Define o ponto de transição para risco Moderado.
                 # Scale 0.7: Define a inclinação da curva (sensibilidade ao aumento de tensão).
                 pivot = -1.0
                 sensitivity = 0.7
-                
+
                 s = 1 / (1 + np.exp(-sensitivity * (final_logits - pivot)))
                 out_norm = s * 100
-                
-                # Garantia mínima de calor para áreas de tensão latente
+
+                # Piso mínimo: apenas se houver CVLI recente (não por mera filiação a facção)
+                # Facção calma = domínio territorial; não justifica floor artificial.
                 recent_cvli = data['node_features'][:, -7:, 0].sum(axis=1)
-                factions = data['nodes_gdf']['faction'].values if 'faction' in data['nodes_gdf'].columns else None
                 for i in range(len(out_norm)):
-                    has_faction = factions is not None and str(factions[i]).upper() not in ('NEUTRO', 'N/A', '', 'NAN', 'NONE')
-                    # Se houver crime recente OU facção ativa, o risco não cai abaixo do piso de inteligência
-                    if (recent_cvli[i] > 0 or has_faction) and sim_impact[i] >= 0:
+                    if recent_cvli[i] > 0 and sim_impact[i] >= 0:
                         out_norm[i] = max(out_norm[i], cp['min_risk'])
                 
                 # Clipping final de segurança

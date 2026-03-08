@@ -22,7 +22,7 @@ except Exception:
     HAVE_GEO = False
     gpd = None
 
-BASE_DIR = Path(__file__).resolve().parents[1]
+BASE_DIR = Path(__file__).resolve().parents[2]
 INT_DIR = BASE_DIR / 'data' / 'raw' / 'inteligencia'
 OUT_DIR = BASE_DIR / 'outputs'
 STATIC_DIR = BASE_DIR / 'data' / 'static'
@@ -31,9 +31,16 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 # Define regional classification
 FORTALEZA_CENTER = (-38.5267, -3.8100)  # lon, lat
 
-# RMF cities (Fortaleza metro region)
-RMF_CITIES = {'MARACANAÚ', 'CAUCAIA', 'AQUIRAZ', 'PACATUBA', 'PINDORETAMA', 
-              'ITAITINGA', 'GUAIÚBA', 'CHOROZINHO'}
+# RMF cities (Fortaleza metro region) — normalised, no accents
+import unicodedata as _ud
+def _norm(s): return _ud.normalize('NFKD', s).encode('ascii', 'ignore').decode().upper().strip()
+
+RMF_CITIES = {
+    'AQUIRAZ', 'CASCAVEL', 'CAUCAIA', 'CHOROZINHO', 'EUSEBIO', 'GUAIUBA',
+    'HORIZONTE', 'ITAITINGA', 'MARACANAU', 'MARANGUAPE', 'PACAJUS', 'PACATUBA',
+    'PARAIPABA', 'PARACURU', 'PINDORETAMA', 'SAO GONCALO DO AMARANTE',
+    'SAO LUIS DO CURU', 'TRAIRI',
+}
 
 def haversine(lon1, lat1, lon2, lat2):
     """Calculate distance in meters"""
@@ -89,14 +96,21 @@ def classify_region(municipality_name):
     if not municipality_name:
         return 'interior'
     
-    mun_upper = municipality_name.upper().strip()
+    # Normalise: remove accents, uppercase
+    mun_upper = _norm(municipality_name)
     
+    # Handle distance-fallback strings directly
+    if mun_upper == 'RMF':
+        return 'rmf'
+    if mun_upper == 'INTERIOR':
+        return 'interior'
+
     # Check if it's Fortaleza
     if 'FORTALEZA' in mun_upper or 'CAPITAL' in mun_upper:
         return 'capital'
     
-    # Check if it's RMF
-    if mun_upper in RMF_CITIES or any(city in mun_upper for city in RMF_CITIES):
+    # Check if it's RMF (exact match after normalisation)
+    if mun_upper in RMF_CITIES:
         return 'rmf'
     
     # Otherwise interior/outside Ceará
@@ -107,10 +121,10 @@ def guess_name(props):
     if not isinstance(props, dict):
         return None
     
-    keys = ('name', 'Name', 'NOME', 'nome', 'NOME_BAIRRO', 'AREA', 'area', 
-            'bairro', 'BAIRRO', 'comunidade', 'Comunidade', 'community', 
-            'title', 'Title', 'TITULO', 'titulo', 'descricao', 'Descricao', 
-            'DESCRICAO', 'description', 'Description')
+    keys = ('area_oficial', 'micronodo', 'name', 'Name', 'NOME', 'nome',
+            'NOME_BAIRRO', 'AREA', 'area', 'bairro', 'BAIRRO', 'comunidade',
+            'Comunidade', 'community', 'title', 'Title', 'TITULO', 'titulo',
+            'descricao', 'Descricao', 'DESCRICAO', 'description', 'Description')
     
     for k in keys:
         v = props.get(k)

@@ -1190,25 +1190,27 @@
   },
   {
     "date": "2026-03-08",
-    "total_events": 37,
+    "total_events": 40,
     "brute_cvli": 2,
-    "exogenous": 35,
+    "exogenous": 38,
     "global": {
       "total_nodes": 78,
       "active_locations": 77,
-      "total_events": 91,
+      "total_events": 93,
       "p5": 0.0649,
       "precision5": 1.0,
       "hits5": [
+        "BARROSO",
+        "ITAPAJE",
         "PICI",
         "ANTONIO BEZERRA",
-        "DOM LUSTOSA",
-        "EDSON QUEIROZ",
-        "JANGURUSSU"
+        "DOM LUSTOSA"
       ],
       "p10": 0.1299,
       "precision10": 1.0,
       "hits10": [
+        "BARROSO",
+        "ITAPAJE",
         "PICI",
         "ANTONIO BEZERRA",
         "DOM LUSTOSA",
@@ -1216,13 +1218,13 @@
         "JANGURUSSU",
         "CAJAZEIRAS",
         "MESSEJANA",
-        "PARQUE SANTA MARIA",
-        "BARROSO",
-        "VILA PERI"
+        "PARQUE SANTA MARIA"
       ],
       "p20": 0.2597,
       "precision20": 1.0,
       "hits20": [
+        "BARROSO",
+        "ITAPAJE",
         "PICI",
         "ANTONIO BEZERRA",
         "DOM LUSTOSA",
@@ -1231,18 +1233,16 @@
         "CAJAZEIRAS",
         "MESSEJANA",
         "PARQUE SANTA MARIA",
-        "BARROSO",
-        "VILA PERI",
         "CONJUNTO PALMEIRAS",
-        "PARQUE SAO JOSE",
         "PASSARE",
         "JARDIM DAS OLIVEIRAS",
         "BONSUCESSO",
-        "MONDUBIM",
         "PARQUE DOIS IRMAOS",
         "BARRA DO CEARA",
-        "BOM JARDIM",
-        "GRANJA PORTUGAL"
+        "GRANJA PORTUGAL",
+        "CARLITO PAMPLONA",
+        "VILA VELHA",
+        "QUINTINO CUNHA"
       ]
     },
     "fortaleza": {
@@ -1252,15 +1252,16 @@
       "p5": 0.125,
       "precision5": 1.0,
       "hits5": [
+        "BARROSO",
         "PICI",
         "ANTONIO BEZERRA",
         "DOM LUSTOSA",
-        "EDSON QUEIROZ",
-        "JANGURUSSU"
+        "EDSON QUEIROZ"
       ],
       "p10": 0.25,
       "precision10": 1.0,
       "hits10": [
+        "BARROSO",
         "PICI",
         "ANTONIO BEZERRA",
         "DOM LUSTOSA",
@@ -1269,12 +1270,12 @@
         "CAJAZEIRAS",
         "MESSEJANA",
         "PARQUE SANTA MARIA",
-        "BARROSO",
-        "VILA PERI"
+        "CONJUNTO PALMEIRAS"
       ],
       "p20": 0.5,
       "precision20": 1.0,
       "hits20": [
+        "BARROSO",
         "PICI",
         "ANTONIO BEZERRA",
         "DOM LUSTOSA",
@@ -1283,24 +1284,23 @@
         "CAJAZEIRAS",
         "MESSEJANA",
         "PARQUE SANTA MARIA",
-        "BARROSO",
-        "VILA PERI",
         "CONJUNTO PALMEIRAS",
-        "PARQUE SAO JOSE",
         "PASSARE",
         "JARDIM DAS OLIVEIRAS",
         "BONSUCESSO",
-        "MONDUBIM",
         "PARQUE DOIS IRMAOS",
         "BARRA DO CEARA",
-        "BOM JARDIM",
-        "GRANJA PORTUGAL"
+        "GRANJA PORTUGAL",
+        "CARLITO PAMPLONA",
+        "VILA VELHA",
+        "QUINTINO CUNHA",
+        "GRANJA LISBOA"
       ]
     },
     "rmf": {
       "total_nodes": 18,
       "active_locations": 18,
-      "total_events": 25,
+      "total_events": 27,
       "p5": 0.2778,
       "precision5": 1.0,
       "hits5": [
@@ -1354,8 +1354,8 @@
       "p5": 0.2632,
       "precision5": 1.0,
       "hits5": [
-        "JUAZEIRO DO NORTE",
         "ITAPAJE",
+        "JUAZEIRO DO NORTE",
         "CAPISTRANO",
         "TIANGUA",
         "CARIRE"
@@ -1363,8 +1363,8 @@
       "p10": 0.5263,
       "precision10": 1.0,
       "hits10": [
-        "JUAZEIRO DO NORTE",
         "ITAPAJE",
+        "JUAZEIRO DO NORTE",
         "CAPISTRANO",
         "TIANGUA",
         "CARIRE",
@@ -1377,8 +1377,8 @@
       "p20": 1.0,
       "precision20": 0.95,
       "hits20": [
-        "JUAZEIRO DO NORTE",
         "ITAPAJE",
+        "JUAZEIRO DO NORTE",
         "CAPISTRANO",
         "TIANGUA",
         "CARIRE",

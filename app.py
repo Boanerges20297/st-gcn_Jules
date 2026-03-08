@@ -1341,20 +1341,26 @@ def get_geo_critical_streets():
         for s in all_streets:
             s_bairro_norm = normalize_name(s.get('bairro', ''))
             s_cidade_norm = normalize_name(s.get('cidade', ''))
-            
+
+            # Para micronodos de inteligência sem cidade, tentar derivar do padrão "NOME - CIDADE"
+            if not s_cidade_norm and s.get('source') == 'intelligence':
+                rua_name = s.get('rua', '')
+                if ' - ' in rua_name:
+                    s_cidade_norm = normalize_name(rua_name.rsplit(' - ', 1)[1].strip())
+
             # Match robusto: Bairro deve bater (se fornecido) e cidade deve ser compatível
             match_bairro = False
             if bairro_norm and s_bairro_norm:
                 if bairro_norm == s_bairro_norm or s_bairro_norm in bairro_norm or bairro_norm in s_bairro_norm:
                     match_bairro = True
-            
+
             match_cidade = False
             if cidade_norm and s_cidade_norm:
                 if cidade_norm == s_cidade_norm or s_cidade_norm in cidade_norm or cidade_norm in s_cidade_norm:
                     match_cidade = True
-            elif not s_cidade_norm: # Se o cache não tem cidade, aceitamos se o bairro bateu
+            elif not s_cidade_norm: # Se o cache não tem cidade (e não foi possível derivar), aceita se bairro bateu
                 match_cidade = True
-                
+
             if (bairro_norm and match_bairro and match_cidade) or (not bairro_norm and cidade_norm and match_cidade):
                 filtered.append(s)
                 

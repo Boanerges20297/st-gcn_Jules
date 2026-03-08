@@ -61,10 +61,14 @@ def generate_geo_streets():
     # 3. Processar CVLIs do CSV para Geocoding Reversa
     if os.path.exists(path_occ):
         print("📖 Carregando dados de CVLI para agrupamento geográfico...")
-        df = pd.read_csv(path_occ, usecols=['cidade', 'bairro', 'tipo', 'latitude', 'longitude'], low_memory=False)
+        df = pd.read_csv(path_occ, usecols=['cidade', 'bairro', 'tipo', 'latitude', 'longitude', 'data'], low_memory=False)
+        df['data'] = pd.to_datetime(df['data'], errors='coerce')
         
-        # Filtrar apenas CVLIs com coordenadas válidas
+        # Filtrar apenas CVLIs na janela de 14 dias
         df_cvli = df[df['tipo'].str.lower() == 'cvli'].copy()
+        cutoff = df_cvli['data'].max() - pd.Timedelta(days=14)
+        df_cvli = df_cvli[df_cvli['data'] >= cutoff]
+        print(f"⏱️ Janela: últimos 14 dias ({cutoff.date()} a {df_cvli['data'].max().date()}) — {len(df_cvli)} CVLIs.")
         df_cvli['latitude'] = pd.to_numeric(df_cvli['latitude'], errors='coerce')
         df_cvli['longitude'] = pd.to_numeric(df_cvli['longitude'], errors='coerce')
         df_cvli = df_cvli.dropna(subset=['latitude', 'longitude'])

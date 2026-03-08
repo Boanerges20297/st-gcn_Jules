@@ -18,12 +18,15 @@ def generate_critical_streets():
 
     print(f"📖 Lendo {path_occ} para extração de logradouros...")
     # Carregar dados oficiais (colunas: name para rua, bairro para bairro)
-    df = pd.read_csv(path_occ, usecols=['name', 'bairro', 'tipo', 'tipo_evento'], low_memory=False)
+    df = pd.read_csv(path_occ, usecols=['name', 'bairro', 'tipo', 'tipo_evento', 'data'], low_memory=False)
+    df['data'] = pd.to_datetime(df['data'], errors='coerce')
     
-    # Filtrar apenas CVLIs
+    # Filtrar apenas CVLIs na janela de 14 dias
     df_cvli = df[df['tipo'].str.lower() == 'cvli'].copy()
+    cutoff = df_cvli['data'].max() - timedelta(days=14)
+    df_cvli = df_cvli[df_cvli['data'] >= cutoff]
     
-    print(f"✅ {len(df_cvli)} ocorrências de CVLI encontradas na base oficial.")
+    print(f"✅ {len(df_cvli)} ocorrências de CVLI encontradas nos últimos 14 dias ({cutoff.date()} a {df_cvli['data'].max().date()}).")
     
     # Normalizar
     df_cvli['BairroClean'] = df_cvli['bairro'].apply(normalize_text)
