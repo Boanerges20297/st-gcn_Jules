@@ -196,6 +196,77 @@
 - **Status:** **ATIVO (ENTREGA FINAL).**
 
 
+## Tentativa 33 (FOCO P@10 — MEMBERSHIP RANKING) — 2026-03-09 23:08
+
+### Motivação
+- T32 apresentou overfitting com `ranking_weight=50` + BCE binário (classificação rígida do top-20 memorizava posições exatas do treino).
+- Objetivo: treinar para **identificar quais áreas entram no top-10 de risco** (membressia), não apenas ordenar por valor absoluto de crimes.
+
+### Configuração Técnica
+- **Script:** `scripts/training/Active/train_all_specialists.py`  
+- **Arquitetura:** DeepSTGAT_64 (29 canais, janela 120 dias)
+- **Loss:** `loss_reg (SmoothL1) + ranking_weight × margin_loss`
+  - `margin_loss = ReLU(0.7 − (score_top10 − score_médio))` — k=10, margem 0.7
+  - Sem BCE (removido por causar overfitting em T32)
+- **Hiperparâmetros:**
+
+| Especialista | Epochs | LR     | Batch | Dropout | Rank Weight |
+|--------------|--------|--------|-------|---------|-------------|
+| fortaleza    | 60     | 0.01   | 32    | 0.50    | 30.0        |
+| rmf          | 60     | 0.01   | 32    | 0.50    | 30.0        |
+| interior     | 60     | 0.01   | 32    | 0.45    | 30.0        |
+
+- **Scheduler:** OneCycleLR (max_lr=0.01, atualiza por batch)
+- **Optimizer:** AdamW (weight_decay=1e-4)
+- **Gradient Clip:** norm=1.0
+- **Early Stop:** patience=12 validações sem melhora em **P@10** (valida a cada 5 épocas)
+- **Checkpoint:** salvo pelo melhor **P@10** de validação (não P@20)
+
+### Amostras de Treino
+| Especialista | Amostras treino | Split val | Safety gap |
+|---|---|---|---|
+| fortaleza | 1325 | últimos 60 dias | 14 dias |
+| rmf | — | — | — |
+| interior | — | — | — |
+
+### Métricas por Época — FORTALEZA (Batch logs, início 23:08)
+
+| Época | Batch | LR      | Loss    | P@10   | P@20   |
+|-------|-------|---------|---------|--------|--------|
+| E01   | B005  | 0.0004  | 20.93   | 23.1%  | 49.4%  |
+| E01   | B010  | 0.0004  | 19.79   | 29.7%  | 53.8%  |
+| E01   | B015  | 0.0004  | 19.17   | 33.1%  | 55.3%  |
+| E01   | B020  | 0.0004  | 18.84   | 32.5%  | 55.6%  |
+| E01   | B025  | 0.0004  | 17.52   | 36.2%  | 56.2%  |
+| E02   | B015  | 0.0005  | 7.83    | 32.8%  | 59.7%  |
+| E02   | B020  | 0.0006  | 9.02    | 31.2%  | 57.3%  |
+| E02   | B025  | 0.0006  | 7.25    | 30.9%  | 56.1%  |
+| E02   | B030  | 0.0006  | 7.61    | 29.1%  | 56.1%  |
+| E02   | B035  | 0.0006  | 6.43    | 33.4%  | 58.1%  |
+| E02   | B040  | 0.0007  | 6.77    | 26.9%  | 59.7%  |
+| E02   | B042  | 0.0007  | 5.73    | 27.7%  | 57.7%  |
+
+### Métricas de Validação — FORTALEZA
+| Época | Val P@10 | Val P@20 | Recorde? |
+|-------|----------|----------|----------|
+| — | — | — | Em andamento |
+
+### Métricas de Validação — RMF
+| Época | Val P@10 | Val P@20 | Recorde? |
+|-------|----------|----------|----------|
+| — | — | — | Aguardando FORTALEZA |
+
+### Métricas de Validação — INTERIOR
+| Época | Val P@10 | Val P@20 | Recorde? |
+|-------|----------|----------|----------|
+| — | — | — | Aguardando RMF |
+
+### Resultado Final
+- **Status:** EM ANDAMENTO (iniciado 23:08 de 2026-03-09)
+- Atualizar com resultados finais ao término.
+
+---
+
 ## 🛠️ MANUAL DE AJUSTE DE PRIORIDADE DE FACÇÕES (INTEL-BIAS)
 Caso o cenário de inteligência aponte uma guerra específica, o treinamento dos especialistas pode ser "calibrado" para focar em determinadas facções.
 
