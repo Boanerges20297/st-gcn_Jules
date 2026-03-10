@@ -517,9 +517,9 @@ def generate_daily_ranking_report():
                         'faction': str(row.get('faction', 'N/A'))
                     })
 
-            # Ordenar por Score (Top 20)
+            # Ordenar por Score (Top 50)
             reg_results.sort(key=lambda x: x['score'], reverse=True)
-            top_20 = reg_results[:20]
+            top_20 = reg_results[:50]
 
             # Escrever o arquivo Markdown
             with open(filepath, 'w', encoding='utf-8') as f:

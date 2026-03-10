@@ -122,5 +122,61 @@
         }
       }
     ]
+  },
+  "rmf": {
+    "steps": 3,
+    "history": [
+      {
+        "timestamp": "2026-03-09T22:14:26.563573",
+        "trigger": "rmf.faction_coverage=16.7% < 80%",
+        "step": 1,
+        "old_params": {
+          "tension_factor": 0.5,
+          "min_risk": 30.0,
+          "tag_bias_direct": 1.5,
+          "tag_bias_neighbor": 0.5
+        },
+        "new_params": {
+          "tension_factor": 0.7,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 30.0
+        }
+      },
+      {
+        "timestamp": "2026-03-09T22:18:37.823793",
+        "trigger": "rmf.faction_coverage=16.7% < 80%",
+        "step": 2,
+        "old_params": {
+          "tension_factor": 0.7,
+          "min_risk": 30.0,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6
+        },
+        "new_params": {
+          "tension_factor": 0.9,
+          "tag_bias_direct": 2.1,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0
+        }
+      },
+      {
+        "timestamp": "2026-03-09T22:24:12.288748",
+        "trigger": "rmf.faction_coverage=16.7% < 80%",
+        "step": 3,
+        "old_params": {
+          "tension_factor": 0.9,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.1,
+          "tag_bias_neighbor": 0.7
+        },
+        "new_params": {
+          "tension_factor": 1.1,
+          "tag_bias_direct": 2.4,
+          "tag_bias_neighbor": 0.8,
+          "min_risk": 30.0
+        }
+      }
+    ]
   }
 }

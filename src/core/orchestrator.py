@@ -115,29 +115,52 @@ class StateOrchestrator:
         for region, spec in self.specialists.items():
             model, data, window = spec['model'], spec['data'], spec['window']
             cp = self.calib_params.get(region, self.calib_params['fortaleza'])
+            num_nodes = len(data['nodes_gdf'])
             
             # Prepara tensor de entrada (Últimos dias da base)
             x_raw = data['node_features'][:, -window:, :].copy()
             
             # --- NOVO: CÁLCULO DE TAG-BIAS (Trigger Alert Graph Bias) ---
             # Identifica gatilhos (L.B. em Facção) nos últimos 3 dias
-            spatial_bias = self._compute_spatial_bias(x_raw, data['adj_geo'])
+            spatial_bias = self._compute_spatial_bias(x_raw, data['adj_geo'], cp)
             
-            # Cálculo de Tendência Real (Se solicitado)
+            # --- PESO DINÂMICO DE FACÇÃO (calculado antes para uso na tendência) ---
+            recent_14d_cvli = data['node_features'][:, -14:, 0].sum(axis=1)
+            rival_adj = ((data['adj_conflict'] - np.eye(num_nodes)).sum(axis=1) > 0)
+            has_cvli   = recent_14d_cvli > 0
+
+            dynamic_tension_factor = np.where(
+                has_cvli,
+                np.where(rival_adj, 0.70, cp['tension_factor']),   # 0.70 ou 0.50
+                np.where(rival_adj, 0.30, 0.10)                    # 0.30 ou 0.10
+            )
+            tension_weight = data['nodes_gdf']['tension_index'].values.astype(float) * dynamic_tension_factor
+
+            # --- CÁLCULO DE TENDÊNCIA DINÂMICA (Baseada em Score e Janela) ---
+            # Se solicitado, calculamos a tendência comparando o risco 'atual' com o risco 'anterior' (janela -1)
+            # Isso captura mudanças mesmo quando não há crimes recentes (ex: aproximação de fds, shocks)
+            out_norm_prev = None
             if return_trends:
-                # CVLI é o canal 0. Comparamos última semana vs penúltima
-                last_7 = data['node_features'][:, -7:, 0].sum(axis=1)
-                prev_7 = data['node_features'][:, -14:-7, 0].sum(axis=1)
-                for i, row in data['nodes_gdf'].iterrows():
-                    name_norm = normalize_name(row['name'])
-                    diff = last_7[i] - prev_7[i]
-                    # Valor da tendência: positive (subindo), negative (descendo), neutral (igual)
-                    if diff > 0: trends[name_norm] = 'up'
-                    elif diff < 0: trends[name_norm] = 'down'
-                    else: trends[name_norm] = 'stable'
+                try:
+                    # Janela anterior (deslocada em 1 dia para o passado)
+                    x_prev_raw = data['node_features'][:, -window-1:-1, :].copy()
+                    x_prev = torch.from_numpy(x_prev_raw).float().permute(2, 0, 1).unsqueeze(0).to(self.device)
+                    adj_prev = self._norm_adj(data['adj_geo'], data['adj_conflict'])
+                    
+                    with torch.no_grad():
+                        out_prev_raw = model(x_prev, adj_prev).squeeze().cpu().numpy()
+                    
+                    # Para tendência, calculamos o score normalizado simplificado da janela anterior
+                    # (sem os choques dinâmicos da simulação atual, para ser uma base histórica justa)
+                    prev_logits = out_prev_raw + spatial_bias + tension_weight
+                    s_prev = 1 / (1 + np.exp(-0.7 * (prev_logits - (-1.0))))
+                    out_norm_prev = s_prev * 100
+                except Exception as e:
+                    print(f"Aviso: Falha ao calcular tendência dinâmica em {region}: {e}")
+                    out_norm_prev = None
 
             # --- DEBUG: INJEÇÃO DE EVENTOS DINÂMICOS (Canais 23, 24 e 25) ---
-            sim_impact = np.zeros(len(data['nodes_gdf']))
+            sim_impact = np.zeros(num_nodes)
             if exogenous_shocks:
                 # Esperamos exogenous_shocks = {'NOME': {'intensity': 1.0, 'is_critical': True, 'is_suppression': False}}
                 for loc_name, info in exogenous_shocks.items():
@@ -183,7 +206,7 @@ class StateOrchestrator:
             
             # --- CORREÇÃO: NORMALIZAÇÃO ROBUSTA E AMORTECIMENTO (DAMPENING) ---
             # --- NORMALIZAÇÃO REFINADA (SENSÍVEL A CONSISTÊNCIA) ---
-            if len(out) > 1:
+            if num_nodes > 1:
                 # INJEÇÃO PÓS-MODELO (ADITIVA) DO TAG-BIAS E SIMULAÇÃO
                 # O bias agora é somado diretamente aos logits, garantindo impacto linear
                 if spatial_bias is not None:
@@ -192,25 +215,9 @@ class StateOrchestrator:
                 # Somar Impacto Direto da Simulação (Equipes/Conflitos)
                 out = out + sim_impact
 
-                # --- PESO DINÂMICO DE FACÇÃO (context-sensitive) ---
-                # Princípio: território de facção sem conflito ativo = domínio consolidado,
-                # não criticidade extrema. O peso sobe apenas quando há evidência real:
-                #   - CVLI recente (14d): atividade violenta confirmada
-                #   - Rival adjacente:    risco latente de disputa territorial
-                recent_14d_cvli = data['node_features'][:, -14:, 0].sum(axis=1)
-                rival_adj = ((data['adj_conflict'] - np.eye(len(data['nodes_gdf']))).sum(axis=1) > 0)
-                has_cvli   = recent_14d_cvli > 0
-
-                # Fatores: calmo=0.10 | rival sem CVLI=0.30 | CVLI sem rival=0.50 | CVLI+rival=0.70
-                dynamic_tension_factor = np.where(
-                    has_cvli,
-                    np.where(rival_adj, 0.70, cp['tension_factor']),   # 0.70 ou 0.50
-                    np.where(rival_adj, 0.30, 0.10)                    # 0.30 ou 0.10
-                )
-                tension_weight = data['nodes_gdf']['tension_index'].values.astype(float) * dynamic_tension_factor
-
                 # Logit Final: Modelo + Tags Intel + Simulação + Facções (dinâmico)
-                final_logits = out + spatial_bias + sim_impact + tension_weight
+                # NOTA: out já contém spatial_bias + sim_impact; apenas tension_weight é adicionado aqui
+                final_logits = out + tension_weight
 
                 # Mapeamento Sigmoidal com Âncoras Fixas:
                 # Pivot -1.0: Define o ponto de transição para risco Moderado.
@@ -224,15 +231,23 @@ class StateOrchestrator:
                 # Piso mínimo: apenas se houver CVLI recente (não por mera filiação a facção)
                 # Facção calma = domínio territorial; não justifica floor artificial.
                 recent_cvli = data['node_features'][:, -7:, 0].sum(axis=1)
-                for i in range(len(out_norm)):
+                for i in range(num_nodes):
                     if recent_cvli[i] > 0 and sim_impact[i] >= 0:
                         out_norm[i] = max(out_norm[i], cp['min_risk'])
                 
-                # Clipping final de segurança
+                # clipping final de segurança
                 out_norm = np.clip(out_norm, 5.0, 100.0)
                 
-                # DAMPENING REMOVIDO: comprimir outliers altos é irracional para tensão territorial.
-                # Um município isolado com domínio total de facção pode ter score 95%+ legitimamente.
+                # --- POPULA TENDÊNCIAS (Se solicitado) ---
+                if return_trends and out_norm_prev is not None:
+                    for i, row in data['nodes_gdf'].iterrows():
+                        name_norm = normalize_name(row['name'])
+                        # Compara o score final normalizado (mais estável que logits brutos)
+                        # Threshold de 3.0% para considerar mudança real (evitar falsos positivos por ruído)
+                        diff = out_norm[i] - out_norm_prev[i]
+                        if diff > 3.0: trends[name_norm] = 'up'
+                        elif diff < -3.0: trends[name_norm] = 'down'
+                        else: trends[name_norm] = 'stable'
             else:
                 out_norm = np.zeros_like(out) + 30.0
             
@@ -249,7 +264,7 @@ class StateOrchestrator:
             return combined_scores, trends
         return combined_scores
 
-    def _compute_spatial_bias(self, x_raw, adj_geo):
+    def _compute_spatial_bias(self, x_raw, adj_geo, cp):
         """
         Calcula o TAG-Bias (Trigger Alert Graph Bias) como um VETOR ADITIVO.
         Retorna: array de shape (N,) com valores a serem somados aos logits.

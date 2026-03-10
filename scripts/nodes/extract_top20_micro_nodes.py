@@ -42,6 +42,12 @@ RMF_CITIES = {
     'SAO LUIS DO CURU', 'TRAIRI',
 }
 
+# Bairros/áreas que cruzam a fronteira municipal e são incorretamente classificados
+# pelo polígono do município. Forçar município e região corretos.
+AREA_MUNICIPALITY_OVERRIDE = {
+    'MARECHAL RONDON': ('Caucaia', 'rmf'),
+}
+
 def haversine(lon1, lat1, lon2, lat2):
     """Calculate distance in meters"""
     lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
@@ -51,69 +57,67 @@ def haversine(lon1, lat1, lon2, lat2):
     c = 2 * asin(sqrt(a))
     return 6371000 * c
 
-# Preload municipality boundaries
+# ---------------------------------------------------------------------------
+# Pure-Python point-in-polygon (ray casting) — sem geopandas, sem fallback
+# ---------------------------------------------------------------------------
+def _pip_ring(px, py, ring):
+    inside = False
+    n = len(ring)
+    j = n - 1
+    for i in range(n):
+        xi, yi = ring[i][0], ring[i][1]
+        xj, yj = ring[j][0], ring[j][1]
+        if ((yi > py) != (yj > py)) and (px < (xj - xi) * (py - yi) / (yj - yi) + xi):
+            inside = not inside
+        j = i
+    return inside
+
+def _pip_geom(lon, lat, geom):
+    gt = geom['type']
+    if gt == 'Polygon':
+        return _pip_ring(lon, lat, geom['coordinates'][0])
+    elif gt == 'MultiPolygon':
+        for poly in geom['coordinates']:
+            if _pip_ring(lon, lat, poly[0]):
+                return True
+    return False
+
+# Preload municipality boundaries (pure JSON, sem geopandas)
 print('Carregando dados de municípios para classificação geográfica...')
-MUNICIPAL_GDF = None
+MUN_DATA = []  # list of (name_raw, geom)
 try:
     mun_file = STATIC_DIR / 'municipios_ceara.geojson'
-    if mun_file.exists() and HAVE_GEO:
-        MUNICIPAL_GDF = gpd.read_file(mun_file)
-        print(f'  ✓ {len(MUNICIPAL_GDF)} municípios carregados')
+    with open(mun_file, 'r', encoding='utf-8') as _f:        _mun_fc = json.load(_f)
+    for _feat in _mun_fc['features']:
+        _name = (_feat['properties'].get('name') or
+                 _feat['properties'].get('NAME') or
+                 _feat['properties'].get('nome') or '')
+        MUN_DATA.append((_name, _feat['geometry']))
+    print(f'  OK {len(MUN_DATA)} municipios carregados (pure-Python PIP)')
 except Exception as e:
-    print(f'  Aviso: Não foi possível carregar municípios ({e}). Usando classificação por distância.')
+    print(f'  ERRO ao carregar municípios: {e}')
+    raise SystemExit('municipios_ceara.geojson e necessario -- abortando.')
 
 def get_municipality_from_geometry(lon, lat):
-    """Determine municipality based on coordinates"""
-    try:
-        if MUNICIPAL_GDF is None:
-            return get_region_by_distance(lon, lat)
-        
-        point = Point(lon, lat)
-        
-        # Find containing municipality
-        for idx, row in MUNICIPAL_GDF.iterrows():
-            if row.geometry.contains(point):
-                return row.get('name') or row.get('NAME') or row.get('nome') or 'Unknown'
-        
-        # Not in Ceará - use distance fallback
-        return get_region_by_distance(lon, lat)
-    
-    except Exception as e:
-        return get_region_by_distance(lon, lat)
-
-def get_region_by_distance(lon, lat):
-    """Fallback: classify by distance from Fortaleza center"""
-    d = haversine(lon, lat, FORTALEZA_CENTER[0], FORTALEZA_CENTER[1])
-    if d <= 5000:  # ~5km from center = likely Fortaleza
-        return 'Fortaleza'
-    elif d <= 50000:  # ~50km = RMF range
-        return 'RMF'
-    else:
-        return 'Interior'
+    """Retorna o nome do município via PIP. Retorna None se fora do Ceará."""
+    for name, geom in MUN_DATA:
+        if _pip_geom(lon, lat, geom):
+            return name
+    return None  # ponto fora do Ceará — será ignorado
 
 def classify_region(municipality_name):
     """Classify municipality into region: capital, rmf, interior"""
     if not municipality_name:
-        return 'interior'
-    
-    # Normalise: remove accents, uppercase
-    mun_upper = _norm(municipality_name)
-    
-    # Handle distance-fallback strings directly
-    if mun_upper == 'RMF':
-        return 'rmf'
-    if mun_upper == 'INTERIOR':
-        return 'interior'
+        return None  # sem município → ignorar
 
-    # Check if it's Fortaleza
-    if 'FORTALEZA' in mun_upper or 'CAPITAL' in mun_upper:
+    mun_upper = _norm(municipality_name)
+
+    if 'FORTALEZA' in mun_upper:
         return 'capital'
-    
-    # Check if it's RMF (exact match after normalisation)
+
     if mun_upper in RMF_CITIES:
         return 'rmf'
-    
-    # Otherwise interior/outside Ceará
+
     return 'interior'
 
 def guess_name(props):
@@ -274,9 +278,18 @@ for fp in faction_files:
             name = guess_name(props)
             
             # Determine municipality and region
-            municipality = get_municipality_from_geometry(lon, lat)
-            region = classify_region(municipality)
-            
+            # Check area_oficial first for known boundary-crossing neighborhoods
+            area_oficial = _norm(props.get('area_oficial', '') or '')
+            if area_oficial in AREA_MUNICIPALITY_OVERRIDE:
+                municipality, region = AREA_MUNICIPALITY_OVERRIDE[area_oficial]
+            else:
+                municipality = get_municipality_from_geometry(lon, lat)
+                if municipality is None:
+                    continue  # ponto fora do Ceará — descartado
+                region = classify_region(municipality)
+                if region is None:
+                    continue  # não classificável — descartado
+
             all_features.append({
                 'name': name,
                 'source': fp.name,
@@ -330,11 +343,11 @@ for region_name in ['capital', 'rmf', 'interior']:
     # Sort by score (descending)
     sorted_feats = sorted(feats, key=lambda x: x['score'], reverse=True)
     
-    # INTERIOR: take ALL features, CAPITAL/RMF: take top 20 only
+    # INTERIOR: take ALL features, CAPITAL/RMF: take top 50 only
     if region_name == 'interior':
         selected = sorted_feats  # ALL interior features
     else:
-        selected = sorted_feats[:20]  # Top 20 for capital and RMF
+        selected = sorted_feats[:50]  # Top 50 for capital and RMF
     
     print(f'\n  {region_name.upper()}: {len(selected)} features selecionadas ({"TODAS" if region_name == "interior" else "Top 20"})')
     

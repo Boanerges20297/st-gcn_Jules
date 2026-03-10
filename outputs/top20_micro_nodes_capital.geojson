@@ -4,440 +4,1150 @@
     {
       "type": "Feature",
       "properties": {
+        "node_id": 1,
         "rank": 1,
-        "name": "CURIÓ",
-        "micronodo": "10",
-        "faction": "CV",
+        "name": "JACARECANGA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
         "municipality": "Fortaleza",
         "region": "capital",
-        "cvli_count": 17,
-        "cvli_score": 12.197,
-        "score": 12.197,
-        "geometry_type": "Point"
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.472105,
-          -3.824489
+          -38.541644,
+          -3.717304
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
+        "node_id": 2,
         "rank": 2,
-        "name": "LAGOA REDONDA",
-        "micronodo": "Favela Do Abc",
-        "faction": "CV",
+        "name": "CRISTO REDENTOR",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
         "municipality": "Fortaleza",
         "region": "capital",
-        "cvli_count": 17,
-        "cvli_score": 11.634,
-        "score": 11.634,
-        "geometry_type": "Point"
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.467212,
-          -3.822448
+          -38.563232,
+          -3.7066603
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
+        "node_id": 3,
         "rank": 3,
-        "name": "SÃO MIGUEL",
-        "micronodo": "São Miguel",
-        "faction": "CV",
+        "name": "MANOEL SÁTIRO",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
         "municipality": "Fortaleza",
         "region": "capital",
-        "cvli_count": 15,
-        "cvli_score": 11.355,
-        "score": 11.355,
-        "geometry_type": "Point"
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.47273,
-          -3.822959
+          -38.5816977,
+          -3.7973553
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
+        "node_id": 4,
         "rank": 4,
-        "name": "BARROSO",
-        "micronodo": "Lago Azul - Barroso I",
-        "faction": "CV",
-        "municipality": "Fortaleza",
-        "region": "capital",
-        "cvli_count": 12,
-        "cvli_score": 8.425,
-        "score": 8.425,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.508342,
-          -3.820033
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 5,
-        "name": "JOSÉ DE ALENCAR",
-        "micronodo": "Coqueiral",
-        "faction": "CV",
-        "municipality": "Fortaleza",
-        "region": "capital",
-        "cvli_count": 11,
-        "cvli_score": 7.183,
-        "score": 7.183,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.472577,
-          -3.815896
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 6,
-        "name": "MONDUBIM",
-        "micronodo": "Titanic",
-        "faction": "CV",
-        "municipality": "Fortaleza",
-        "region": "capital",
-        "cvli_count": 10,
-        "cvli_score": 7.062,
-        "score": 7.062,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.574668,
-          -3.818819
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 7,
-        "name": "GUAJERU",
-        "micronodo": "TDG",
-        "faction": "CV",
-        "municipality": "Fortaleza",
-        "region": "capital",
-        "cvli_count": 9,
-        "cvli_score": 6.54,
-        "score": 6.54,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.47484,
-          -3.828769
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 8,
-        "name": "PARQUE IRACEMA",
-        "micronodo": "Caveca",
-        "faction": "MASSA",
-        "municipality": "Fortaleza",
-        "region": "capital",
-        "cvli_count": 9,
-        "cvli_score": 6.502,
-        "score": 6.502,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.501399,
-          -3.816362
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 9,
-        "name": "NOVO MONDUBIM",
-        "micronodo": "Conj. Novo Modumbi ",
-        "faction": "CV",
-        "municipality": "Fortaleza",
-        "region": "capital",
-        "cvli_count": 9,
-        "cvli_score": 6.42,
-        "score": 6.42,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.586334,
-          -3.808029
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 10,
-        "name": "PLANALTO AYRTON SENNA",
-        "micronodo": "Comunidade da Portelinha- Planalto Ayrton Senna",
-        "faction": "CV",
-        "municipality": "Fortaleza",
-        "region": "capital",
-        "cvli_count": 9,
-        "cvli_score": 6.053,
-        "score": 6.053,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.572835,
-          -3.825671
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 11,
-        "name": "PREFEITO JOSÉ WALTER",
-        "micronodo": "Cidade Jardim V",
-        "faction": "CV",
-        "municipality": "Fortaleza",
-        "region": "capital",
-        "cvli_count": 8,
-        "cvli_score": 5.922,
-        "score": 5.922,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.550745,
-          -3.831035
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 12,
-        "name": "CONJUNTO ESPERANÇA",
-        "micronodo": "Conjunto Esperança",
-        "faction": "CV",
-        "municipality": "Fortaleza",
-        "region": "capital",
-        "cvli_count": 8,
-        "cvli_score": 5.879,
-        "score": 5.879,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.592724,
-          -3.813851
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 13,
-        "name": "CANINDEZINHO",
-        "micronodo": "Comunidade dos Índios",
-        "faction": "CV",
-        "municipality": "Fortaleza",
-        "region": "capital",
-        "cvli_count": 9,
-        "cvli_score": 5.812,
-        "score": 5.812,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.596921,
-          -3.807354
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 14,
-        "name": "CAJAZEIRAS",
-        "micronodo": "Jardim Violeta",
-        "faction": "CV",
-        "municipality": "Fortaleza",
-        "region": "capital",
-        "cvli_count": 9,
-        "cvli_score": 5.728,
-        "score": 5.728,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.511652,
-          -3.8119
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 15,
-        "name": "ALTO ALEGRE II",
-        "micronodo": "Alto Alegre",
-        "faction": "CV",
-        "municipality": "Fortaleza",
-        "region": "capital",
-        "cvli_count": 8,
-        "cvli_score": 5.359,
-        "score": 5.359,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.606355,
-          -3.825874
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 16,
-        "name": "PARQUE PRESIDENTE VARGAS",
-        "micronodo": "Vacaria",
-        "faction": "CV",
-        "municipality": "Fortaleza",
-        "region": "capital",
-        "cvli_count": 8,
-        "cvli_score": 5.107,
-        "score": 5.107,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.605389,
-          -3.826433
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 17,
         "name": "PARQUE SĂO JOSÉ",
-        "micronodo": "Favela do Terminal do Siqueira / Favela da Paloma",
-        "faction": "CV",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
         "municipality": "Fortaleza",
         "region": "capital",
-        "cvli_count": 8,
-        "cvli_score": 4.573,
-        "score": 4.573,
-        "geometry_type": "Point"
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.587896,
-          -3.790516
+          -38.5856349,
+          -3.7982361
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "rank": 18,
-        "name": "BONSUCESSO",
-        "micronodo": "Beco da Morte",
-        "faction": "CV",
+        "node_id": 5,
+        "rank": 5,
+        "name": "PRAIA DE IRACEMA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
         "municipality": "Fortaleza",
         "region": "capital",
-        "cvli_count": 7,
-        "cvli_score": 4.559,
-        "score": 4.559,
-        "geometry_type": "Point"
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.592497,
-          -3.785975
+          -38.522107,
+          -3.719924
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "rank": 19,
-        "name": "MARECHAL RONDON",
-        "micronodo": "Comunidade da Feira - Jurema",
-        "faction": "CV",
-        "municipality": "Fortaleza",
-        "region": "capital",
-        "cvli_count": 6,
-        "cvli_score": 4.236,
-        "score": 4.236,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.618405,
-          -3.771044
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 20,
+        "node_id": 6,
+        "rank": 6,
         "name": "BARRA DO CEARÁ",
-        "micronodo": "4 Varas",
-        "faction": "CV",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
         "municipality": "Fortaleza",
         "region": "capital",
-        "cvli_count": 5,
-        "cvli_score": 4.16,
-        "score": 4.16,
-        "geometry_type": "Point"
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.574713,
-          -3.699739
+          -38.578012,
+          -3.710539
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 7,
+        "rank": 7,
+        "name": "ÁLVARO WEYNE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.570425,
+          -3.715882
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 8,
+        "rank": 8,
+        "name": "PADRE ANDRADE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.582491,
+          -3.732816
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 9,
+        "rank": 9,
+        "name": "CRISTO REDENTOR",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.566482,
+          -3.7089
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 10,
+        "rank": 10,
+        "name": "PIRAMBU",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.554717,
+          -3.707691
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 11,
+        "rank": 11,
+        "name": "PIRAMBU",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.548857,
+          -3.713492
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 12,
+        "rank": 12,
+        "name": "PIRAMBU",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.548328,
+          -3.711503
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 13,
+        "rank": 13,
+        "name": "PIRAMBU",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.553089,
+          -3.711025
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 14,
+        "rank": 14,
+        "name": "CRISTO REDENTOR",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.562346,
+          -3.706892
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 15,
+        "rank": 15,
+        "name": "BARRA DO CEARÁ",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.584311,
+          -3.710836
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 16,
+        "rank": 16,
+        "name": "BARRA DO CEARÁ",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.581253,
+          -3.712872
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 17,
+        "rank": 17,
+        "name": "FLORESTA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.579789,
+          -3.720462
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 18,
+        "rank": 18,
+        "name": "PRESIDENTE KENNEDY",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.570377,
+          -3.728091
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 19,
+        "rank": 19,
+        "name": "PRESIDENTE KENNEDY",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.574947,
+          -3.729864
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 20,
+        "rank": 20,
+        "name": "JARDIM IRACEMA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.587813,
+          -3.717602
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 21,
+        "rank": 21,
+        "name": "ELLERY",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.558028,
+          -3.722032
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 22,
+        "rank": 22,
+        "name": "JACARECANGA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.545856,
+          -3.724804
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 23,
+        "rank": 23,
+        "name": "CARLITO PAMPLONA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.556036,
+          -3.715605
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 24,
+        "rank": 24,
+        "name": "JARDIM GUANABARA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.587942,
+          -3.71758
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 25,
+        "rank": 25,
+        "name": "VILA VELHA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.603015,
+          -3.719899
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 26,
+        "rank": 26,
+        "name": "QUINTINO CUNHA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.6056,
+          -3.72143
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 27,
+        "rank": 27,
+        "name": "CARLITO PAMPLONA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.558498,
+          -3.718576
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 28,
+        "rank": 28,
+        "name": "COUTO FERNANDES",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.561718,
+          -3.757707
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 29,
+        "rank": 29,
+        "name": "AUTRAN NUNES",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.598305,
+          -3.755741
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 30,
+        "rank": 30,
+        "name": "BARROSO",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.520461,
+          -3.830271
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 31,
+        "rank": 31,
+        "name": "BARROSO",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.512665,
+          -3.832008
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 32,
+        "rank": 32,
+        "name": "BARROSO",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.524367,
+          -3.831662
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 33,
+        "rank": 33,
+        "name": "MEIRELES",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.502111,
+          -3.72798
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 34,
+        "rank": 34,
+        "name": "PARQUE DOIS IRMĂOS",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.548305,
+          -3.80748
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 35,
+        "rank": 35,
+        "name": "PARQUE DOIS IRMĂOS",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.545247,
+          -3.806581
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 36,
+        "rank": 36,
+        "name": "DIONÍSIO TORRES",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.497894,
+          -3.74502
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 37,
+        "rank": 37,
+        "name": "VILA UNIĂO",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.528993,
+          -3.772807
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 38,
+        "rank": 38,
+        "name": "VILA UNIĂO",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.530301,
+          -3.764867
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 39,
+        "rank": 39,
+        "name": "VILA UNIĂO",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.534812,
+          -3.770201
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 40,
+        "rank": 40,
+        "name": "VILA UNIĂO",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.5366,
+          -3.770199
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 41,
+        "rank": 41,
+        "name": "RACHEL DE QUEIROZ",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.556082,
+          -3.798581
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 42,
+        "rank": 42,
+        "name": "RACHEL DE QUEIROZ",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.55134,
+          -3.801124
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 43,
+        "rank": 43,
+        "name": "JÓQUEI CLUBE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.574263,
+          -3.759869
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 44,
+        "rank": 44,
+        "name": "PICI",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.568253,
+          -3.74918
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 45,
+        "rank": 45,
+        "name": "ANTÔNIO BEZERRA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.590028,
+          -3.742756
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 46,
+        "rank": 46,
+        "name": "BOM JARDIM",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.610207,
+          -3.797176
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 47,
+        "rank": 47,
+        "name": "SIQUEIRA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.615778,
+          -3.798663
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 48,
+        "rank": 48,
+        "name": "BONSUCESSO",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.58855,
+          -3.786075
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 49,
+        "rank": 49,
+        "name": "SIQUEIRA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.62018,
+          -3.800201
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 50,
+        "rank": 50,
+        "name": "SIQUEIRA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Fortaleza",
+        "region": "capital",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.624935,
+          -3.799243
         ]
       }
     }

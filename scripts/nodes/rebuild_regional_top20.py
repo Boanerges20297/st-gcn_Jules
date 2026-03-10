@@ -267,7 +267,7 @@ all_features = []
 
 for region in ('capital', 'rmf', 'interior'):
     feats = by_region[region]
-    # For capital/rmf: pick top20 unique by (name+municipality) — still sorted by cvli_score
+    # For capital/rmf: pick top50 unique by (name+municipality) — still sorted by cvli_score
     if region in ('capital', 'rmf'):
         selected = []
         seen_nm = set()
@@ -276,7 +276,7 @@ for region in ('capital', 'rmf', 'interior'):
             if key not in seen_nm:
                 seen_nm.add(key)
                 selected.append(item)
-            if len(selected) == 20:
+            if len(selected) == 50:
                 break
     else:
         selected = feats  # all interior, ranked by cvli_score

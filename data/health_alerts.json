@@ -564,6 +564,185 @@
         "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
       },
       "resolved": false
+    },
+    {
+      "timestamp": "2026-03-09T13:44:51.193450",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 20.0% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: BARRA DO CEARA, VICENTE PINZON, CONJUNTO PALMEIRAS",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.2,
+        "threshold": 0.8,
+        "faction_nodes_total": 40,
+        "faction_nodes_in_top20": 8,
+        "missing_sample": [
+          "BARRA DO CEARA",
+          "VICENTE PINZON",
+          "CONJUNTO PALMEIRAS",
+          "PLANALTO AYRTON SENNA",
+          "CURIO"
+        ]
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-09T13:44:51.197212",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-09T13:44:51.435317",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 21.1% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: VICOSA DO CEARA, ARATUBA, SOLONOPOLE",
+      "details": {
+        "region": "interior",
+        "coverage": 0.2105,
+        "threshold": 0.8,
+        "faction_nodes_total": 19,
+        "faction_nodes_in_top20": 4,
+        "missing_sample": [
+          "VICOSA DO CEARA",
+          "ARATUBA",
+          "SOLONOPOLE",
+          "BATURITE",
+          "JIJOCA DE JERICOACOARA"
+        ]
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-09T13:44:51.435317",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.1% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.21052631578947367,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-09T13:45:09.103090",
+      "type": "high_cpu",
+      "severity": "HIGH",
+      "message": "CPU alta: 100.0%",
+      "details": {
+        "cpu_percent": 100.0
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-09T14:13:21.699601",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 25.00%",
+      "details": {
+        "error_rate_percent": 25.0
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-09T22:14:26.554874",
+      "type": "faction_coverage_rmf",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — RMF: apenas 16.7% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: EUSEBIO, SAO LUIS DO CURU, ITAITINGA",
+      "details": {
+        "region": "rmf",
+        "coverage": 0.1667,
+        "threshold": 0.8,
+        "faction_nodes_total": 18,
+        "faction_nodes_in_top20": 3,
+        "missing_sample": [
+          "EUSEBIO",
+          "SAO LUIS DO CURU",
+          "ITAITINGA",
+          "PACAJUS",
+          "BEBERIBE"
+        ]
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-09T22:14:26.572369",
+      "type": "auto_calibration_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração RMF] Passo 1/3 — FACTION_COVERAGE=16.7% abaixo de 80%. tension_factor=0.7, tag_bias=1.8",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "step": 1,
+        "new_params": {
+          "tension_factor": 0.7,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 30.0
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-09T22:18:37.939452",
+      "type": "auto_calibration_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração RMF] Passo 2/3 — FACTION_COVERAGE=16.7% abaixo de 80%. tension_factor=0.9, tag_bias=2.1",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "step": 2,
+        "new_params": {
+          "tension_factor": 0.9,
+          "tag_bias_direct": 2.1,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-09T22:24:12.288748",
+      "type": "auto_calibration_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração RMF] Passo 3/3 — FACTION_COVERAGE=16.7% abaixo de 80%. tension_factor=1.1, tag_bias=2.4",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "step": 3,
+        "new_params": {
+          "tension_factor": 1.1,
+          "tag_bias_direct": 2.4,
+          "tag_bias_neighbor": 0.8,
+          "min_risk": 30.0
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-09T22:24:44.662046",
+      "type": "calibration_maxed_rmf",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — RMF: FACTION_COVERAGE=16.7% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "current_value": 0.16666666666666666,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": false
     }
   ]
 }

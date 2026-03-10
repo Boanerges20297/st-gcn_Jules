@@ -494,7 +494,7 @@
                             </select>
                             <div class="form-check mt-2">
                                 <input class="form-check-input" type="checkbox" id="toggle-top20">
-                                <label class="form-check-label small" for="toggle-top20">Mostrar Top20 Predições (alfinetes)</label>
+                                <label class="form-check-label small" for="toggle-top20">Mostrar Top50 Predições (alfinetes)</label>
                             </div>
                             <div class="form-check mt-1">
                                 <input class="form-check-input" type="checkbox" id="toggle-micronodes-kml">
@@ -743,16 +743,24 @@
     }
 
     function updateTop20ForRegion(region){
-        if (!$('#toggle-top20').is(':checked')) return;
         // If already loaded for this region, just ensure layer is visible
         if (top20LoadedRegion === region){
+            // Reset cache to force reload when region changes
+            if (!$('#toggle-top20').is(':checked')) {
+                try{ top20Layer.clearLayers(); }catch(e){}
+                return;
+            }
             if (!map.hasLayer(top20Layer)) map.addLayer(top20Layer);
             return;
         }
-        // else load
+        
+        // Always load the data (even if checkbox is unchecked - visibility is controlled separately)
         loadTop20(region, function(err){
-            if (err){ console.warn('Top20 load error', err); alert('Erro ao carregar Top20 micro‑nós'); return; }
-            if (!map.hasLayer(top20Layer)) map.addLayer(top20Layer);
+            if (err){ console.warn('Top20 load error', err); return; }
+            // Only add to map if checkbox is checked
+            if ($('#toggle-top20').is(':checked')) {
+                if (!map.hasLayer(top20Layer)) map.addLayer(top20Layer);
+            }
         });
     }
 
@@ -945,11 +953,21 @@
                 // Fallback: contar direto das camadas visíveis (apenas features com score numérico)
                 var criticalRisk = 0, highRisk = 0, mediumRisk = 0, stableAreas = 0;
                 if (geojsonLayer) {
+                    // Função para normalizar regions  
+                    function normalizeRegion(region) {
+                        if (!region) return 'unknown';
+                        var r = String(region).toLowerCase();
+                        if (r === 'fortaleza' || r === 'capital') return 'capital';
+                        return r;
+                    }
+                    var normalizedFilter = normalizeRegion(regionFilter);
+                    
                     geojsonLayer.eachLayer(function(layer) {
                         var props = layer.feature.properties;
-                        var regionType = props.region_type || 'unknown';
+                        var regionValue = props.region || props.region_type || 'unknown';
+                        var normalizedRegion = normalizeRegion(regionValue);
                         var score = (typeof props.risk_score === 'number') ? props.risk_score : (typeof props.risk_score_cvli === 'number' ? props.risk_score_cvli : null);
-                        if (regionFilter === 'all' || regionFilter === regionType) {
+                        if (normalizedFilter === 'all' || normalizedFilter === normalizedRegion) {
                             if (score === null) return;
                             if (score >= 90) criticalRisk++;
                             else if (score >= 80) highRisk++;
@@ -2115,16 +2133,26 @@
 
         // Map to array for sorting
         var items = [];
-            layers.forEach(function(layer) {
+        // Função para normalizar regions  
+        function normalizeRegion(region) {
+            if (!region) return 'unknown';
+            var r = String(region).toLowerCase();
+            if (r === 'fortaleza' || r === 'capital') return 'capital';
+            return r;
+        }
+        var normalizedFilter = normalizeRegion(regionFilter);
+        
+        layers.forEach(function(layer) {
             var props = layer.feature.properties;
             var score = (typeof props.risk_score === 'number') ? props.risk_score : (typeof props.risk_score_cvli === 'number' ? props.risk_score_cvli : null);
 
-            // Filter Logic: usar region_type do backend
-            var regionType = props.region_type || 'unknown';
+            // Filter Logic: usar region (micronodes) ou region_type (polígonos)
+            var regionValue = props.region || props.region_type || 'unknown';
+            var normalizedRegion = normalizeRegion(regionValue);
             var include = false;
 
-            if (regionFilter === 'all') include = true;
-            else if (regionFilter === regionType) include = true;
+            if (normalizedFilter === 'all') include = true;
+            else if (normalizedFilter === normalizedRegion) include = true;
 
             if (include && score !== null) {
                 items.push({
@@ -2286,10 +2314,23 @@
     function applyRegionFilter(regionFilter) {
         if (!geojsonLayer) return;
         var visibleBounds = null;
+        
+        // Normalizar ambos: UI usa 'fortaleza', dados podem usar 'capital' ou 'fortaleza'
+        function normalizeRegion(region) {
+            if (!region) return 'unknown';
+            var r = String(region).toLowerCase();
+            if (r === 'fortaleza' || r === 'capital') return 'capital';
+            return r; // 'rmf', 'interior', etc
+        }
+        
+        var normalizedFilter = normalizeRegion(regionFilter);
+        
         geojsonLayer.eachLayer(function(layer) {
             var props = (layer.feature && layer.feature.properties) || {};
-            var regionType = props.region_type || 'unknown';
-            var show = (regionFilter === 'all') || (regionFilter === regionType);
+            // Procurar por 'region' (micronodes) ou 'region_type' (polígonos de bairros)
+            var regionValue = props.region || props.region_type || 'unknown';
+            var normalizedRegion = normalizeRegion(regionValue);
+            var show = (normalizedFilter === 'all') || (normalizedFilter === normalizedRegion);
             try {
                 if (show) {
                     if (layer.setStyle) layer.setStyle(style(layer.feature));
@@ -2320,6 +2361,11 @@
                 duration: 0.7
             });
         }
+        
+        // Carrega os Top20/50 micronodes para a região selecionada
+        // Isso garante que os micronodes sejam pré-carregados ao trocar de região,
+        // mesmo se o checkbox não estiver marcado no momento
+        updateTop20ForRegion(regionFilter);
     }
 
     // ===== Monitor de Atualização de Modelos =====

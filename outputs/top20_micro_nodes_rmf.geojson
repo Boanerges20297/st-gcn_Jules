@@ -4,440 +4,1150 @@
     {
       "type": "Feature",
       "properties": {
+        "node_id": 51,
         "rank": 1,
-        "name": "MARACANAÚ",
-        "micronodo": "Campo do Palmeiras",
-        "faction": "CV",
-        "municipality": "Maranguape",
-        "region": "rmf",
-        "cvli_count": 16,
-        "cvli_score": 11.716,
-        "score": 11.716,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.670645,
-          -3.877235
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 2,
-        "name": "CIDADE NOVA",
-        "micronodo": "Sem Terra",
-        "faction": "CV",
-        "municipality": "Maracanaú",
-        "region": "rmf",
-        "cvli_count": 16,
-        "cvli_score": 11.376,
-        "score": 11.376,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.587237,
-          -3.872364
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 3,
-        "name": "MARACANAÚ",
-        "micronodo": "Passarela ",
-        "faction": "CV",
-        "municipality": "Maracanaú",
-        "region": "rmf",
-        "cvli_count": 11,
-        "cvli_score": 8.281,
-        "score": 8.281,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.622398,
-          -3.880358
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 4,
-        "name": "CIDADE NOVA",
-        "micronodo": "Torrões",
-        "faction": "CV",
-        "municipality": "Pacatuba",
-        "region": "rmf",
-        "cvli_count": 12,
-        "cvli_score": 7.978,
-        "score": 7.978,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.585204,
-          -3.879538
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 5,
-        "name": "MARACANAÚ",
-        "micronodo": "Boa Vista - Maracanaú",
-        "faction": "CV",
-        "municipality": "Pacatuba",
-        "region": "rmf",
-        "cvli_count": 10,
-        "cvli_score": 6.766,
-        "score": 6.766,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.621286,
-          -3.889482
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 6,
-        "name": "GUADALAJARA",
-        "micronodo": "Favela do Trilho",
-        "faction": "CV",
-        "municipality": "Caucaia",
-        "region": "rmf",
-        "cvli_count": 9,
-        "cvli_score": 6.314,
-        "score": 6.314,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.625438,
-          -3.76694
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 7,
-        "name": "PARQUE SOLEDADE",
-        "micronodo": "CONJUNTO METROPOLITANO - PICUÍ",
-        "faction": "CV",
-        "municipality": "Caucaia",
-        "region": "rmf",
-        "cvli_count": 9,
-        "cvli_score": 5.769,
-        "score": 5.769,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.658127,
-          -3.7551317
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 8,
-        "name": "PARQUE DAS NAÇÕES",
-        "micronodo": "Favela do Lameral",
-        "faction": "CV",
-        "municipality": "Caucaia",
-        "region": "rmf",
-        "cvli_count": 8,
-        "cvli_score": 5.714,
-        "score": 5.714,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.60909,
-          -3.744565
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 9,
-        "name": "INDUSTRIAL",
-        "micronodo": "Jardim Bandeirantes",
-        "faction": "CV",
-        "municipality": "Maracanaú",
-        "region": "rmf",
-        "cvli_count": 8,
-        "cvli_score": 5.479,
-        "score": 5.479,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.592729,
-          -3.86809
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 10,
-        "name": "SÃO MIGUEL",
-        "micronodo": "Rua do Canal",
-        "faction": "CV",
-        "municipality": "Caucaia",
-        "region": "rmf",
-        "cvli_count": 8,
-        "cvli_score": 5.277,
-        "score": 5.277,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.604669,
-          -3.741816
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 11,
-        "name": "TABAPUÁ",
-        "micronodo": "Tabapuá",
-        "faction": "CV",
-        "municipality": "Caucaia",
-        "region": "rmf",
-        "cvli_count": 7,
-        "cvli_score": 5.164,
-        "score": 5.164,
-        "geometry_type": "Point"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.614585,
-          -3.737903
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "rank": 12,
         "name": "MARECHAL RONDON",
-        "micronodo": "Ruazinha",
-        "faction": "CV",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
         "municipality": "Caucaia",
         "region": "rmf",
-        "cvli_count": 7,
-        "cvli_score": 5.103,
-        "score": 5.103,
-        "geometry_type": "Point"
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.625631,
-          -3.773829
+          -38.625166,
+          -3.780342
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "rank": 13,
+        "node_id": 52,
+        "rank": 2,
+        "name": "GUADALAJARA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Caucaia",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.626758,
+          -3.765675
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 53,
+        "rank": 3,
         "name": "URUCUTUBA",
-        "micronodo": "Nova Metrópole I",
-        "faction": "CV",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
         "municipality": "Caucaia",
         "region": "rmf",
-        "cvli_count": 6,
-        "cvli_score": 4.21,
-        "score": 4.21,
-        "geometry_type": "Point"
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.652963,
-          -3.761724
+          -38.653441,
+          -3.757516
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "rank": 14,
+        "node_id": 54,
+        "rank": 4,
         "name": "ALTO ALEGRE II",
-        "micronodo": "Favela Do 18 ",
-        "faction": "CV",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
         "municipality": "Maracanaú",
         "region": "rmf",
-        "cvli_count": 5,
-        "cvli_score": 3.775,
-        "score": 3.775,
-        "geometry_type": "Point"
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.626589,
-          -3.827346
+          -38.616211,
+          -3.832799
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
+        "node_id": 55,
+        "rank": 5,
+        "name": "PARACURU",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "São Gonçalo do Amarante",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.833733,
+          -3.54686
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 56,
+        "rank": 6,
+        "name": "GUAIÚBA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Guaiúba",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.703464,
+          -4.080645
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 57,
+        "rank": 7,
+        "name": "CHOROZINHO",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Chorozinho",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.510736,
+          -4.295325
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 58,
+        "rank": 8,
+        "name": "HORIZONTE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Horizonte",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.500743,
+          -4.108007
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 59,
+        "rank": 9,
+        "name": "HORIZONTE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Horizonte",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.515247,
+          -4.085022
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 60,
+        "rank": 10,
+        "name": "HORIZONTE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Horizonte",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.510446,
+          -4.096037
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 61,
+        "rank": 11,
+        "name": "HORIZONTE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Horizonte",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.50126,
+          -4.124236
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 62,
+        "rank": 12,
+        "name": "HORIZONTE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Horizonte",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.504696,
+          -4.125122
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 63,
+        "rank": 13,
+        "name": "HORIZONTE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Horizonte",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.499796,
+          -4.10215
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 64,
+        "rank": 14,
+        "name": "HORIZONTE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Horizonte",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.458972,
+          -4.102007
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 65,
         "rank": 15,
-        "name": "IPARANA",
-        "micronodo": "Comunidade Panamirim ",
-        "faction": "MASSA",
-        "municipality": "Caucaia",
+        "name": "HORIZONTE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Horizonte",
         "region": "rmf",
-        "cvli_count": 5,
-        "cvli_score": 3.553,
-        "score": 3.553,
-        "geometry_type": "Point"
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.714041,
-          -3.645814
+          -38.442338,
+          -4.105611
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
+        "node_id": 66,
         "rank": 16,
-        "name": "NOVO ORIENTE",
-        "micronodo": "Novo Oriente",
-        "faction": "CV",
-        "municipality": "Maracanaú",
+        "name": "HORIZONTE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Horizonte",
         "region": "rmf",
-        "cvli_count": 5,
-        "cvli_score": 3.23,
-        "score": 3.23,
-        "geometry_type": "Point"
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.615136,
-          -3.843229
+          -38.492999,
+          -4.10501
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
+        "node_id": 67,
         "rank": 17,
-        "name": "PINDORETAMA",
-        "micronodo": "Caponga",
-        "faction": "CV",
-        "municipality": "Cascavel",
+        "name": "HORIZONTE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Horizonte",
         "region": "rmf",
-        "cvli_count": 4,
-        "cvli_score": 2.95,
-        "score": 2.95,
-        "geometry_type": "Point"
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.204216,
-          -4.036124
+          -38.502905,
+          -4.092022
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
+        "node_id": 68,
         "rank": 18,
         "name": "PACAJUS",
-        "micronodo": "Cipó ",
-        "faction": "CV",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
         "municipality": "Pacajus",
         "region": "rmf",
-        "cvli_count": 4,
-        "cvli_score": 2.723,
-        "score": 2.723,
-        "geometry_type": "Point"
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.445531,
-          -4.16694
+          -38.46889,
+          -4.18634
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
+        "node_id": 69,
         "rank": 19,
-        "name": "TRAIRI",
-        "micronodo": "São Gonçalo ",
-        "faction": "CV",
-        "municipality": "Trairi",
+        "name": "PACAJUS",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Pacajus",
         "region": "rmf",
-        "cvli_count": 3,
-        "cvli_score": 2.428,
-        "score": 2.428,
-        "geometry_type": "Point"
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -39.260968,
-          -3.296669
+          -38.470044,
+          -4.182051
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
+        "node_id": 70,
         "rank": 20,
-        "name": "SIQUEIRA",
-        "micronodo": "Jari - Maracanaú",
-        "faction": "CV",
-        "municipality": "Maracanaú",
+        "name": "PACAJUS",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Pacajus",
         "region": "rmf",
-        "cvli_count": 4,
-        "cvli_score": 2.332,
-        "score": 2.332,
-        "geometry_type": "Point"
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.631429,
-          -3.819028
+          -38.476396,
+          -4.183957
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 71,
+        "rank": 21,
+        "name": "PACAJUS",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Pacajus",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.474137,
+          -4.17889
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 72,
+        "rank": 22,
+        "name": "PACAJUS",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Pacajus",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.470122,
+          -4.180604
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 73,
+        "rank": 23,
+        "name": "GRANJA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Pacajus",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.460808,
+          -4.186113
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 74,
+        "rank": 24,
+        "name": "PACAJUS",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Pacajus",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.456516,
+          -4.18528
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 75,
+        "rank": 25,
+        "name": "PACAJUS",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Pacajus",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.464479,
+          -4.183617
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 76,
+        "rank": 26,
+        "name": "PACAJUS",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Pacajus",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.461432,
+          -4.183104
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 77,
+        "rank": 27,
+        "name": "PACAJUS",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Pacajus",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.455135,
+          -4.176959
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 78,
+        "rank": 28,
+        "name": "PACAJUS",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Pacajus",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.460453,
+          -4.1711
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 79,
+        "rank": 29,
+        "name": "PACAJUS",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Pacajus",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.455396,
+          -4.167761
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 80,
+        "rank": 30,
+        "name": "PACAJUS",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Pacajus",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.522041,
+          -4.176193
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 81,
+        "rank": 31,
+        "name": "HORIZONTE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Pacajus",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.427136,
+          -4.160212
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 82,
+        "rank": 32,
+        "name": "HORIZONTE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Pacajus",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.403513,
+          -4.15434
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 83,
+        "rank": 33,
+        "name": "ACARAPE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Pacajus",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.585865,
+          -4.180908
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 84,
+        "rank": 34,
+        "name": "PACAJUS",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Pacajus",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.574117,
+          -4.221024
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 85,
+        "rank": 35,
+        "name": "PARQUE ALBANO",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Caucaia",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.608773,
+          -3.753625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 86,
+        "rank": 36,
+        "name": "PINDORETAMA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Cascavel",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.251901,
+          -4.141176
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 87,
+        "rank": 37,
+        "name": "PINDORETAMA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Cascavel",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.244396,
+          -4.128251
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 88,
+        "rank": 38,
+        "name": "PINDORETAMA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Cascavel",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.235033,
+          -4.138993
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 89,
+        "rank": 39,
+        "name": "PINDORETAMA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Cascavel",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.246564,
+          -4.112592
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 90,
+        "rank": 40,
+        "name": "PINDORETAMA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Cascavel",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.264234,
+          -4.113575
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 91,
+        "rank": 41,
+        "name": "COAÇU",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Cascavel",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.225183,
+          -4.119026
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 92,
+        "rank": 42,
+        "name": "PINDORETAMA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Cascavel",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.246483,
+          -4.132864
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 93,
+        "rank": 43,
+        "name": "PINDORETAMA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Cascavel",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.246788,
+          -4.118388
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 94,
+        "rank": 44,
+        "name": "PINDORETAMA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Cascavel",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.26225,
+          -4.079018
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 95,
+        "rank": 45,
+        "name": "PINDORETAMA",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Cascavel",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.155749,
+          -4.101654
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 96,
+        "rank": 46,
+        "name": "COAÇU",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Eusébio",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.455834,
+          -3.84627
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 97,
+        "rank": 47,
+        "name": "MARACANAÚ",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Maranguape",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.68015,
+          -3.894359
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 98,
+        "rank": 48,
+        "name": "MARACANAÚ",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Maranguape",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.679223,
+          -3.901225
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 99,
+        "rank": 49,
+        "name": "MARANGUAPE",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Maranguape",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.716231,
+          -4.012789
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 100,
+        "rank": 50,
+        "name": "MARACANAÚ",
+        "source": "micronodos_faccoes_2026.geojson",
+        "score": 1.0,
+        "municipality": "Maranguape",
+        "region": "rmf",
+        "geometry_type": "Point",
+        "source_geometry_type": "Point",
+        "is_centroid": false,
+        "critical_streets": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.682406,
+          -3.882821
         ]
       }
     }
