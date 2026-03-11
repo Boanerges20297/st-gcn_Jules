@@ -267,6 +267,46 @@
 
 ---
 
+## Tentativa 34 (REINICIALIZAÇÃO TOTAL — TRÊS ESPECIALISTAS) — 2026-03-10 22:45
+
+### Motivação
+- Reinicialização do ciclo completo de treinamento após detecção de processos inativos.
+- Foco em consolidar os três especialistas (Fortaleza, RMF e Interior) em uma única execução sequencial.
+- Objetivo: Superar os recordes de P@10 em todas as regiões.
+
+### Configuração Técnica
+- **Script:** `scripts/training/Active/train_all_specialists.py`
+- **Arquitetura:** DeepSTGAT_64 (29 canais, janela 90 dias)
+- **Loss:** `loss_reg (SmoothL1) + ranking_weight × loss_rank`
+  - `loss_rank = ReLU(0.8 − (top_scores - pred.mean()))`
+- **Hiperparâmetros:**
+
+| Especialista | Epochs | LR     | Batch | Dropout | Rank Weight |
+|--------------|--------|--------|-------|---------|-------------|
+| Fortaleza    | 120    | 0.005  | 32    | 0.50    | 30.0        |
+| RMF          | 100    | 0.005  | 32    | 0.50    | 20.0        |
+| Interior     | 100    | 0.005  | 32    | 0.50    | 20.0        |
+
+- **Scheduler:** OneCycleLR
+- **Optimizer:** AdamW (weight_decay=1e-4)
+- **Dispositivo:** CUDA (se disponível)
+
+### Status de Execução
+- **Fortaleza:** CONCLUÍDO (53.8% P@10)
+- **RMF:** CONCLUÍDO (52.5% P@10)
+- **Interior:** CONCLUÍDO (64.3% P@10)
+
+### Resultado Final
+- **Status:** SUCEDIDO (Ganhos massivos em Fortaleza e Interior).
+- **Métricas de Validação em Dados Inéditos (Últimos 30 dias):**
+  - **Fortaleza:** P@10: **81.1%** (Baseline Histórico: 10.0% | Ganho: **+71.1%**)
+  - **Interior:** P@10: **73.8%** (Baseline Histórico: 16.3% | Ganho: **+57.5%**)
+  - **RMF:** P@10: **50.0%** (Empatado com o baseline histórico).
+- **Arquivos Gerados:** `models/active/fortaleza_model.pth`, `models/active/rmf_model.pth`, `models/active/interior_model.pth`.
+- **Conclusão:** O modelo ST-GAT prova-se superior ao cálculo de média histórica, especialmente na Capital, onde o ganho de precisão é crítico.
+
+---
+
 ## 🛠️ MANUAL DE AJUSTE DE PRIORIDADE DE FACÇÕES (INTEL-BIAS)
 Caso o cenário de inteligência aponte uma guerra específica, o treinamento dos especialistas pode ser "calibrado" para focar em determinadas facções.
 

@@ -194,15 +194,20 @@ def process_ism_data():
     # --- NOVO: Atualizar Cache de Ruas Geolocalizadas ---
     update_geo_streets_cache(occ_df)
     
-    # 2. Calcular Estatísticas de CVLI
-    start_d, end_d = occ_df['data'].min(), occ_df['data'].max()
-    # Diferença exata em meses para o cálculo da taxa mensal
-    total_months = (end_d.year - start_d.year) * 12 + (end_d.month - start_d.month) + 1
-    logging.info(f"📅 Período analisado: {total_months} meses ({start_d.date()} a {end_d.date()})")
+    # 2. Calcular Estatísticas de CVLI (Ranking Dinâmico: Últimos 2 Anos)
+    end_d = occ_df['data'].max()
+    two_years_ago = end_d - pd.Timedelta(days=730)
     
-    cvli_counts = occ_df[occ_df['tipo'] == 'cvli'].groupby('loc_clean').size()
+    # Ranking para seleção de nós (últimos 2 anos)
+    cvli_ranking_recent = occ_df[
+        (occ_df['tipo'] == 'cvli') & 
+        (occ_df['data'] >= two_years_ago)
+    ].groupby('loc_clean').size()
+    
+    # Ranking histórico total para estatísticas
+    cvli_counts_total = occ_df[occ_df['tipo'] == 'cvli'].groupby('loc_clean').size()
 
-    # 3. Carregar e Filtrar Nós (Malha Expandida: F40, RMF18, I20)
+    # 3. Carregar e Filtrar Nós (Malha Dinâmica)
     with open(BAIRROS_FILE, 'r', encoding='utf-8') as f:
         nodes_raw = json.load(f)
     
@@ -213,9 +218,10 @@ def process_ism_data():
         
         reg = info.get('regiao', 'interior').lower()
         if c_name in RMF_OFFICIAL: reg = 'rmf'
-        elif reg == 'rmf': continue
         
-        count = cvli_counts.get(c_name, 0)
+        # Usamos o ranking recente para a decisão de seleção, mas o total para metadados
+        recent_count = cvli_ranking_recent.get(c_name, 0)
+        total_count = cvli_counts_total.get(c_name, 0)
         
         # Inteligência de Facções
         intel = faccoes_dict.get(c_name, {})
@@ -227,30 +233,31 @@ def process_ism_data():
         pre_records.append({
             'name': c_name, 'lat': info['lat'], 'long': info['long'],
             'regiao': reg, 'faction': faction, 'tension_index': tension_index,
-            'total_cvli': count
+            'recent_cvli': recent_count,
+            'total_cvli': total_count
         })
     
     df_pool = pd.DataFrame(pre_records).drop_duplicates(subset=['name'])
     
-    # Seleção Top-K por Região
+    # Seleção Top-K por Região baseada no ranking de 2 ANOS
     final_records = []
     
-    # 1. Fortaleza: Top 40
-    f40 = df_pool[df_pool['regiao'] == 'fortaleza'].sort_values('total_cvli', ascending=False).head(40)
+    # 1. Fortaleza: Top 40 (Dinâmico 2 anos)
+    f40 = df_pool[df_pool['regiao'] == 'fortaleza'].sort_values('recent_cvli', ascending=False).head(40)
     final_records.extend(f40.to_dict('records'))
     
-    # 2. RMF: Todos (18)
-    rmf = df_pool[df_pool['regiao'] == 'rmf']
+    # 2. RMF: Todos os 18 Oficiais (Ordenados por criticidade recente)
+    rmf = df_pool[df_pool['regiao'] == 'rmf'].sort_values('recent_cvli', ascending=False)
     final_records.extend(rmf.to_dict('records'))
     
-    # 3. Interior: Top 20
-    i20 = df_pool[df_pool['regiao'] == 'interior'].sort_values('total_cvli', ascending=False).head(20)
-    final_records.extend(i20.to_dict('records'))
+    # 3. Interior: Top 50 (Dinâmico 2 anos - Expandido)
+    i50 = df_pool[df_pool['regiao'] == 'interior'].sort_values('recent_cvli', ascending=False).head(50)
+    final_records.extend(i50.to_dict('records'))
     
     nodes_df = pd.DataFrame(final_records).reset_index(drop=True)
     nodes_gdf = gpd.GeoDataFrame(nodes_df, geometry=gpd.points_from_xy(nodes_df.long, nodes_df.lat), crs="EPSG:4326")
     
-    logging.info(f"📊 Malha Final: Fortaleza({len(f40)}), RMF({len(rmf)}), Interior({len(i20)})")
+    logging.info(f"📊 Malha Final: Fortaleza({len(f40)}), RMF({len(rmf)}), Interior({len(i50)})")
     nodes_gdf = gpd.GeoDataFrame(nodes_df, geometry=gpd.points_from_xy(nodes_df.long, nodes_df.lat), crs="EPSG:4326")
 
     # 4. Construir Tensores (Otimizado)
@@ -285,17 +292,21 @@ def process_ism_data():
         cvli_group = reg_occ[reg_occ['tipo'] == 'cvli'].groupby(['n_idx', 't_idx']).size()
         for (n, t), val in cvli_group.items(): features[n, t, 0] = val
         
-        # Canal 1: Veiculos
+        # Canal 1: Veiculos (Sinal amplificado conforme DOCUMENTACAO_PESOS_CANAIS.md)
         veic_group = reg_occ[reg_occ['is_veiculo']].groupby(['n_idx', 't_idx']).size()
-        for (n, t), val in veic_group.items(): features[n, t, 1] = val
+        for (n, t), val in veic_group.items(): features[n, t, 1] = val * 2.5
         
-        # Canal 27: Intel
+        # Canal 27: Intel (Gatilhos Dinâmicos - Lesão à Bala, etc.)
         intel_group = reg_occ[reg_occ['is_intel']].groupby(['n_idx', 't_idx']).size()
-        for (n, t), val in intel_group.items(): features[n, t, 27] = val
+        for (n, t), val in intel_group.items(): features[n, t, 27] = val * 2.0
         
         # Preenchimento de Datas e Calendário (Vetorizado)
         for d_idx, date in enumerate(date_range):
             features[:, d_idx, 3 + date.weekday()] = 1.0
+            # Reforço de Sexta-feira (Weekday 4) para todas as regiões (Sinal 1.5x)
+            if date.weekday() == 4:
+                features[:, d_idx, 7] = 1.5
+            
             features[:, d_idx, 10 + date.month - 1] = 1.0
             if date.weekday() >= 5: features[:, d_idx, 22] = 1.0
             

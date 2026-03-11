@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Preview - Training Dashboard ELITE P10</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #e0e0e0; margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+        .controls { display: flex; gap: 15px; }
+        select { background-color: #333; color: white; border: 1px solid #555; padding: 8px; border-radius: 4px; cursor: pointer; }
+        .card { background-color: #1e1e1e; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        #last-update { font-size: 0.8em; color: #888; }
+        .status-dot { height: 10px; width: 10px; background-color: #4caf50; border-radius: 50%; display: inline-block; margin-right: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>🧠 Training Dashboard <span style="color: #4caf50;">ELITE P10</span></h1>
+            <div id="last-update">Aguardando primeira sincronização...</div>
+        </div>
+        <div class="controls">
+            <select id="region-selector" onchange="updateDashboard()">
+                <option value="fortaleza">Fortaleza (Capital)</option>
+                <option value="rmf">RMF (Metropolitana)</option>
+                <option value="interior">Interior (Estado)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <div id="loss-chart"></div>
+        </div>
+        <div class="card">
+            <div id="p10-chart"></div>
+        </div>
+    </div>
+    <div class="card">
+        <div id="grad-chart"></div>
+    </div>
+
+    <script>
+        const REFRESH_INTERVAL = 30000; // 30 segundos
+
+        async function fetchData(region) {
+            try {
+                // Em ambiente local (file://), o browser pode bloquear o fetch de JSON local.
+                // Se rodar via VS Code Live Server ou similar, funciona perfeito.
+                const response = await fetch(`../logs/metrics_${region}_ELITE.json?t=${new Date().getTime()}`);
+                if (!response.ok) throw new Error("Aguardando início do log...");
+                return await response.ok ? await response.json() : [];
+            } catch (e) {
+                console.error("Erro ao carregar métricas:", e);
+                return [];
+            }
+        }
+
+        function createChart(elementId, title, yData, xData, color, yTitle) {
+            const trace = {
+                x: xData,
+                y: yData,
+                type: 'scatter',
+                mode: 'lines+markers',
+                marker: { color: color, size: 8 },
+                line: { color: color, width: 3, shape: 'spline' },
+                fill: 'tozeroy',
+                fillcolor: color.replace(')', ', 0.1)').replace('rgb', 'rgba')
+            };
+
+            const layout = {
+                title: { text: title, font: { color: '#e0e0e0', size: 18 } },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                xaxis: { title: 'Época', color: '#888', gridcolor: '#333' },
+                yaxis: { title: yTitle, color: '#888', gridcolor: '#333' },
+                margin: { t: 40, b: 40, l: 60, r: 20 },
+                showlegend: false
+            };
+
+            Plotly.newPlot(elementId, [trace], layout, {responsive: true, displayModeBar: false});
+        }
+
+        async function updateDashboard() {
+            const region = document.getElementById('region-selector').value;
+            const data = await fetchData(region);
+
+            if (data.length === 0) {
+                document.getElementById('last-update').innerHTML = `<span style="color: #ff9800;">Aguardando dados de ${region.toUpperCase()}...</span>`;
+                return;
+            }
+
+            const epochs = data.map(d => d.epoch);
+            const loss = data.map(d => d.loss);
+            const p10 = data.map(d => d.p10 * 100);
+            const grad = data.map(d => d.grad);
+
+            createChart('loss-chart', 'Curva de Convergência (Loss)', loss, epochs, 'rgb(244, 67, 54)', 'Loss');
+            createChart('p10-chart', 'Precisão Tática (P@10 %)', p10, epochs, 'rgb(33, 150, 243)', 'P@10 %');
+            createChart('grad-chart', 'Evolução da Norma do Gradiente (L2)', grad, epochs, 'rgb(76, 175, 80)', 'Grad Norm');
+
+            document.getElementById('last-update').innerHTML = `<span class="status-dot"></span> Sincronizado: ${new Date().toLocaleTimeString()} (Época ${epochs[epochs.length-1]})`;
+        }
+
+        // Loop de atualização automática
+        updateDashboard();
+        setInterval(updateDashboard, REFRESH_INTERVAL);
+    </script>
+</body>
+</html>

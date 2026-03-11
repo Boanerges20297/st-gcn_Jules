@@ -47,19 +47,19 @@ class StateOrchestrator:
                 'model_path': os.path.join(self.root, 'models', 'active', 'fortaleza_model.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_fortaleza.pkl'),
                 'class': DeepSTGAT_64,
-                'window': 120
+                'window': 90
             },
             'rmf': {
                 'model_path': os.path.join(self.root, 'models', 'active', 'rmf_model.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_rmf.pkl'),
                 'class': DeepSTGAT_64,
-                'window': 120
+                'window': 90
             },
             'interior': {
                 'model_path': os.path.join(self.root, 'models', 'active', 'interior_model.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_interior.pkl'),
                 'class': DeepSTGAT_64,
-                'window': 120
+                'window': 90
             }
         }
         
@@ -182,16 +182,29 @@ class StateOrchestrator:
                         supp_int = min(supp_int, 3.0)
 
                         # Calcula impacto líquido: Conflito aumenta (+), Supressão reduz (-)
-                        impact_value = (2.5 * conf_int) - (2.5 * supp_int)
+                        # Impacto de supressão seletivo: alto apenas para eventos de grande magnitude (>= 0.8)
+                        supp_multiplier = 4.5 if supp_int >= 0.8 else 2.0
+                        
+                        # Reatividade a tensões exógenas: RMF aumentada (3.0), Fortaleza reduzida (1.8) conforme MD
+                        conf_multiplier = 3.0 if reg == 'rmf' else (1.8 if reg == 'fortaleza' else 2.5)
+                        impact_value = (conf_multiplier * conf_int) - (supp_multiplier * supp_int)
 
                         # Escolher um canal predominante apenas para fins visuais no logit (opcional)
                         channel_idx = 25 if is_crit else (24 if conf_int >= supp_int else 23)
                         intensity = max(conf_int, supp_int)
+                        
+                        # Dobrar sinal de entrada para o Canal 23 para compensar baixa magnitude (0.05 -> 0.10)
+                        if channel_idx == 23:
+                            intensity = intensity * 2.0
+                        # Reforço de sinal para Canal 24 na RMF
+                        if channel_idx == 24 and reg == 'rmf':
+                            intensity = intensity * 1.2
                     else:
                         intensity = float(info)
                         is_crit = (intensity >= 0.8)
                         channel_idx = 25 if is_crit else 24
-                        impact_value = 2.5 * intensity
+                        conf_multiplier = 3.0 if reg == 'rmf' else (1.8 if reg == 'fortaleza' else 2.5)
+                        impact_value = conf_multiplier * intensity
 
                     for i, row in data['nodes_gdf'].iterrows():
                         if normalize_name(row['name']) == norm_target:

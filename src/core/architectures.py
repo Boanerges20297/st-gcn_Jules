@@ -37,7 +37,7 @@ class FastRelationalGCN(nn.Module):
         out = h_self + h_geo + h_conf
         BT, N, C = out.shape
         out = self.bn(out.view(-1, C)).view(BT, N, C)
-        return self.dropout(F.elu(out))
+        return self.dropout(F.leaky_relu(out, 0.2))
 
 class GlobalSpatialAttention(nn.Module):
     def __init__(self, channels, heads=4):
@@ -60,7 +60,7 @@ class STGCNBlock(nn.Module):
 
     def forward(self, x, adj_list):
         res = self.residual(x)
-        x = F.elu(self.time_conv(x))
+        x = F.leaky_relu(self.time_conv(x), 0.2)
         B, C, N, T = x.shape
         x_flat = x.permute(0, 3, 2, 1).reshape(B * T, N, C)
         x_spatial = self.spatial_transformer(x_flat)
@@ -79,7 +79,7 @@ class DeepSTGAT_64(nn.Module):
         self.layer2 = STGCNBlock(32, 64, time_steps, dropout)
         self.layer3 = STGCNBlock(64, 64, time_steps, dropout)
         self.final_conv = nn.Conv2d(64, 64, kernel_size=(1, time_steps))
-        self.fc = nn.Sequential(nn.Linear(64, 32), nn.ReLU(), nn.Linear(32, 1))
+        self.fc = nn.Sequential(nn.Linear(64, 32), nn.LeakyReLU(0.2), nn.Linear(32, 1))
 
     def forward(self, x, adj_list):
         x = self.layer1(x, adj_list)
@@ -100,7 +100,7 @@ class TemperatureExpertGAT(nn.Module):
         # FC CLASSICA: 64 -> 32 -> 1
         self.fc = nn.Sequential(
             nn.Linear(64, 32),
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.Dropout(dropout),
             nn.Linear(32, 1)
         )
@@ -119,7 +119,7 @@ class DeepSTGAT_32(nn.Module):
         self.layer2 = STGCNBlock(32, 32, time_steps, dropout)
         self.layer3 = STGCNBlock(32, 32, time_steps, dropout)
         self.final_conv = nn.Conv2d(32, 32, kernel_size=(1, time_steps))
-        self.fc = nn.Sequential(nn.Linear(32, 16), nn.ReLU(), nn.Linear(16, 1))
+        self.fc = nn.Sequential(nn.Linear(32, 16), nn.LeakyReLU(0.2), nn.Linear(16, 1))
 
     def forward(self, x, adj_list):
         x = self.layer1(x, adj_list)
