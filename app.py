@@ -260,13 +260,20 @@ def run_background_efficiency_monitor():
                             for reg in ['fortaleza', 'rmf', 'interior']:
                                 reg_data = metrics.get(reg, {})
                                 if reg_data and isinstance(reg_data, dict):
+                                    p10_score = reg_data.get('p10', 0)
                                     region_metrics[reg] = {
-                                        'p10': reg_data.get('p10', 0),
+                                        'p10': p10_score,
                                         'p20': reg_data.get('p20', 0),
-                                        'precision': reg_data.get('p10', 0),
+                                        'precision': p10_score,
                                         'recall': reg_data.get('p20', 0),
                                         'f1_score': 0.0
                                     }
+                                    
+                                    # --- ATUALIZAÇÃO: AUTO-CURRICULUM TEMPORAL (Shrinkage) ---
+                                    # Orquestrador reage dinamicamente a quedas de eficiência em tempo de produção
+                                    if orchestrator is not None:
+                                        orchestrator.adjust_temporal_focus(reg, p10_score)
+                                        
                             confidence_tracker.record_evaluation(eval_date, global_metrics, region_metrics)
                             
                             # === ALERTAS DE COBERTURA TERRITORIAL (termômetro de tensão) ===
@@ -542,20 +549,29 @@ def load_data_and_models():
     
     # Limpeza de eventos exógenos antigos
     archive_old_exogenous_events()
-    
+
+    # --- ATUALIZAÇÃO DINÂMICA DE RUAS CRÍTICAS (CACHE GEO) ---
+    try:
+        from scripts.gerar_geo_ruas_criticas import generate_geo_streets_dynamic
+        print("🌐 Atualizando Cache de Ruas Críticas (Dinâmico 30 dias)...")
+        generate_geo_streets_dynamic()
+        print("✅ Cache Geográfico de Ruas Atualizado com Sucesso.")
+    except Exception as e:
+        print(f"⚠️ Aviso: Falha ao atualizar cache de ruas: {e}")
+
     # Load all regional metadata
-    import geopandas as gpd
     dfs = []
     for reg in ['fortaleza', 'rmf', 'interior']:
         path = os.path.join(BASE_DIR, "data", "processed", f"processed_{reg}.pkl")
         if os.path.exists(path):
             try:
-                with open(path, "rb") as f:
-                    reg_gdf = pickle.load(f).get("nodes_gdf")
-                    if reg_gdf is not None:
-                        dfs.append(reg_gdf)
+                # Carregamento limpo e direto
+                data = pd.read_pickle(path)
+                reg_gdf = data.get("nodes_gdf")
+                if reg_gdf is not None:
+                    dfs.append(reg_gdf)
             except Exception as e:
-                print(f"⚠️ Aviso: Erro ao carregar {path}: {e}")
+                print(f"❌ Erro crítico ao carregar {path}: {e}")
         else:
             print(f"❌ Erro: Metadados não encontrados em {path}.")
             

@@ -28,6 +28,7 @@ class FastRelationalGCN(nn.Module):
         self.W_conf = nn.Linear(in_features, out_features)
         self.dropout = nn.Dropout(dropout)
         self.bn = nn.BatchNorm1d(out_features)
+        self.prelu = nn.PReLU()
 
     def forward(self, x, adj_list):
         adj_geo, adj_conf = adj_list[0], adj_list[1]
@@ -37,7 +38,7 @@ class FastRelationalGCN(nn.Module):
         out = h_self + h_geo + h_conf
         BT, N, C = out.shape
         out = self.bn(out.view(-1, C)).view(BT, N, C)
-        return self.dropout(F.leaky_relu(out, 0.2))
+        return self.dropout(self.prelu(out))
 
 class GlobalSpatialAttention(nn.Module):
     def __init__(self, channels, heads=4):
@@ -53,6 +54,7 @@ class STGCNBlock(nn.Module):
     def __init__(self, in_channels, out_channels, time_steps, dropout=0.4):
         super().__init__()
         self.time_conv = nn.Conv2d(in_channels, out_channels, (1, 3), padding=(0, 1))
+        self.prelu = nn.PReLU()
         self.spatial_transformer = GlobalSpatialAttention(out_channels)
         self.gcn = FastRelationalGCN(out_channels, out_channels, dropout)
         self.temp_attn = MultiHeadTemporalAttention(out_channels)
@@ -60,7 +62,7 @@ class STGCNBlock(nn.Module):
 
     def forward(self, x, adj_list):
         res = self.residual(x)
-        x = F.leaky_relu(self.time_conv(x), 0.2)
+        x = self.prelu(self.time_conv(x))
         B, C, N, T = x.shape
         x_flat = x.permute(0, 3, 2, 1).reshape(B * T, N, C)
         x_spatial = self.spatial_transformer(x_flat)
@@ -79,7 +81,7 @@ class DeepSTGAT_64(nn.Module):
         self.layer2 = STGCNBlock(32, 64, time_steps, dropout)
         self.layer3 = STGCNBlock(64, 64, time_steps, dropout)
         self.final_conv = nn.Conv2d(64, 64, kernel_size=(1, time_steps))
-        self.fc = nn.Sequential(nn.Linear(64, 32), nn.LeakyReLU(0.2), nn.Linear(32, 1))
+        self.fc = nn.Sequential(nn.Linear(64, 32), nn.PReLU(), nn.Linear(32, 1))
 
     def forward(self, x, adj_list):
         x = self.layer1(x, adj_list)

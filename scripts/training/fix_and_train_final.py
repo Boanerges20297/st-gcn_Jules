@@ -123,6 +123,12 @@ def rebuild_datasets():
             })
     
     nodes_df = pd.DataFrame(records).drop_duplicates(subset=['name']).reset_index(drop=True)
+    
+    # Ensure all string columns use object dtype, not StringDtype
+    for col in nodes_df.columns:
+        if nodes_df[col].dtype == 'object':
+            nodes_df[col] = nodes_df[col].astype(str)
+    
     nodes_gdf = gpd.GeoDataFrame(nodes_df, geometry=gpd.points_from_xy(nodes_df.long, nodes_df.lat), crs="EPSG:4326")
 
     # 3. Construir Tensores de 29 Canais
@@ -165,7 +171,13 @@ def rebuild_datasets():
         dist_mat = cdist(reg_nodes[['lat', 'long']].values, reg_nodes[['lat', 'long']].values, 'euclidean')
         adj_geo = (dist_mat < 0.05).astype(float)
         
-        dataset = {'node_features': features, 'adj_geo': adj_geo, 'adj_conflict': np.eye(N), 'nodes_gdf': reg_nodes, 'dates': date_range}
+        # Ensure consistent dtypes before saving
+        reg_nodes_save = reg_nodes.copy()
+        for col in reg_nodes_save.columns:
+            if reg_nodes_save[col].dtype == 'object' and col != 'geometry':
+                reg_nodes_save[col] = reg_nodes_save[col].astype(str)
+        
+        dataset = {'node_features': features, 'adj_geo': adj_geo, 'adj_conflict': np.eye(N), 'nodes_gdf': reg_nodes_save, 'dates': date_range}
         with open(f'data/processed/processed_{reg}.pkl', 'wb') as f:
             pickle.dump(dataset, f)
         logging.info(f"✅ {reg.upper()} Dataset Pronto (29 Canais, {N} nós).")

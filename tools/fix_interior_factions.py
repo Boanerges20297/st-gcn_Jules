@@ -226,6 +226,12 @@ for name, info in nodes_raw.items():
         })
 
 nodes_df = pd.DataFrame(final_records).drop_duplicates(subset=['name']).reset_index(drop=True)
+
+# Ensure all string columns use object dtype, not StringDtype
+for col in nodes_df.columns:
+    if nodes_df[col].dtype == 'object':
+        nodes_df[col] = nodes_df[col].astype(str)
+
 nodes_gdf = gpd.GeoDataFrame(
     nodes_df,
     geometry=gpd.points_from_xy(nodes_df.long, nodes_df.lat),
@@ -277,11 +283,17 @@ for n in range(N):
 dist_mat = cdist(nodes_gdf[['lat', 'long']].values, nodes_gdf[['lat', 'long']].values, 'euclidean')
 adj_geo  = (dist_mat < 0.5).astype(float)  # 0.5 grau (~55km) para municípios do interior
 
+# Ensure consistent dtypes before saving
+nodes_gdf_save = nodes_gdf.copy()
+for col in nodes_gdf_save.columns:
+    if nodes_gdf_save[col].dtype == 'object' and col != 'geometry':
+        nodes_gdf_save[col] = nodes_gdf_save[col].astype(str)
+
 result = {
     'node_features': features,
     'adj_geo':       adj_geo,
     'adj_conflict':  np.eye(N),
-    'nodes_gdf':     nodes_gdf,
+    'nodes_gdf':     nodes_gdf_save,
     'dates':         date_range
 }
 

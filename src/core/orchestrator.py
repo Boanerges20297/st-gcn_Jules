@@ -1,6 +1,5 @@
 import sys
 import numpy as np
-
 import torch
 import pickle
 import os
@@ -18,317 +17,217 @@ try:
 except ImportError:
     from architectures import DeepSTGAT_64, DeepSTGAT_32
 
-# --- DEBUG: FUNÇÃO DE NORMALIZAÇÃO DE NOMES ---
 def normalize_name(text):
-    """
-    Remove acentos e sufixos de AIS (regex) para garantir match perfeito 
-    entre o GeoJSON do Leaflet e os nomes no modelo.
-    """
     if not isinstance(text, str): return ""
-    import re
-    # 1. Decodifica acentos (ex: 'Ã' vira 'A')
     text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('ASCII').upper().strip()
-    # 2. Deleta sufixos operacionais (ex: ' - AIS 12, 26')
     text = re.sub(r'\s*-\s*AIS.*$', '', text)
     return text.strip()
 
 class StateOrchestrator:
-    """
-    CÉREBRO CENTRAL: Roteia requisições para os 3 especialistas regionalizados.
-    Lida com janelas de tempo diferentes (30 vs 45 dias) e arquiteturas polimórficas.
-    """
     def __init__(self, project_root):
         self.root = project_root
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         
-        # --- CONFIGURACAO CONSOLIDADA (ISM Production Standard) ---
+        # ATUALIZAÇÃO: Roteamento dinâmico para suportar a arquitetura com 33 canais Multi-Scale Momentum + Cold Streak
+        fortaleza_model_file = 'fortaleza_super_elite.pth' if os.path.exists(os.path.join(self.root, 'models', 'active', 'fortaleza_super_elite.pth')) else 'fortaleza_model_active.pth'
+        retrain_file = 'fortaleza_retrain_64.pth'
+        active_file = 'fortaleza_model_active.pth'
+        
+        if os.path.exists(os.path.join(self.root, 'models', 'active', retrain_file)):
+            fortaleza_model_file = retrain_file
+            has_momentum = True
+        else:
+            fortaleza_model_file = active_file
+            has_momentum = False
+        
         self.configs = {
             'fortaleza': {
-                'model_path': os.path.join(self.root, 'models', 'active', 'fortaleza_model.pth'),
+                'model_path': os.path.join(self.root, 'models', 'active', fortaleza_model_file),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_fortaleza.pkl'),
                 'class': DeepSTGAT_64,
-                'window': 90
+                'in_channels': 33 if has_momentum else 29, 
+                'window': 120 if has_momentum else 90 
             },
             'rmf': {
                 'model_path': os.path.join(self.root, 'models', 'active', 'rmf_model.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_rmf.pkl'),
                 'class': DeepSTGAT_64,
+                'in_channels': 29,
                 'window': 90
             },
             'interior': {
                 'model_path': os.path.join(self.root, 'models', 'active', 'interior_model.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_interior.pkl'),
                 'class': DeepSTGAT_64,
+                'in_channels': 29,
                 'window': 90
             }
         }
         
         self.specialists = {}
-        
-        # Parâmetros de calibração por região (ajustáveis em runtime)
-        # dampening removido: comprimir outliers é irracional para tensão territorial
         self.calib_params = {
-            region: {
-                'tension_factor':     0.50,   # peso do tension_index no logit
-                'min_risk':          30.0,    # piso apenas para territórios com CVLI recente
-                'tag_bias_direct':    1.50,   # boost INTEL_TRIGGER no nó
-                'tag_bias_neighbor':  0.50,   # vazamento de tensão para vizinhos
-            }
-            for region in ['fortaleza', 'rmf', 'interior']
+            reg: {'tension_factor': 0.50, 'min_risk': 30.0, 'tag_bias_direct': 1.50, 'tag_bias_neighbor': 0.50, 'dynamic_window': None}
+            for reg in ['fortaleza', 'rmf', 'interior']
         }
         
         self._initialize_models()
 
-    # --- DEBUG: CARREGAMENTO DE CHECKPOINTS ---
+    def adjust_temporal_focus(self, region, efficiency_score):
+        """
+        Auto-Ajuste de Janela (Temporal Shrinkage) baseado no feedback do Monitor.
+        Reduz a janela gradativamente se a eficiência cair, cortando ruído histórico.
+        """
+        if region not in self.specialists: return
+        
+        cp = self.calib_params.setdefault(region, self.calib_params.get('fortaleza', {}).copy())
+        base_window = self.specialists[region]['window']
+        current_window = cp.get('dynamic_window') or base_window
+        
+        if efficiency_score < 0.50:
+            # Encolhe a janela em blocos de 30 dias até o mínimo de 30 dias
+            new_window = max(30, current_window - 30)
+            if new_window != current_window:
+                print(f"📉 [Auto-Tune] Eficiência baixa ({efficiency_score*100:.1f}%) em {region.upper()}. Reduzindo janela de {current_window}d para {new_window}d.")
+                cp['dynamic_window'] = new_window
+        elif efficiency_score >= 0.50:
+            # Expande novamente se a performance se consolidar alta
+            new_window = min(base_window, current_window + 30)
+            if new_window != current_window:
+                print(f"📈 [Auto-Tune] Eficiência excelente ({efficiency_score*100:.1f}%) em {region.upper()}. Expandindo janela para {new_window}d.")
+                cp['dynamic_window'] = new_window
+
     def _initialize_models(self):
-        """Inicializa os modelos regionais apenas se os arquivos existirem."""
         for region, cfg in self.configs.items():
             if os.path.exists(cfg['model_path']) and os.path.exists(cfg['data_path']):
                 try:
-                    with open(cfg['data_path'], 'rb') as f:
-                        data = pickle.load(f)
-                    
-                    # Cria instância da classe correta (64 ou 32 canais)
-                    model = cfg['class'](num_nodes=len(data['nodes_gdf']), in_channels=29, time_steps=cfg['window']).to(self.device)
+                    data = self._load_pickle_safe(cfg['data_path'])
+                    if not data or 'nodes_gdf' not in data: continue
+
+                    num_nodes = len(data['nodes_gdf'])
+                    model = cfg['class'](num_nodes=num_nodes, in_channels=cfg['in_channels'], time_steps=cfg['window']).to(self.device)
                     ckpt = torch.load(cfg['model_path'], map_location=self.device, weights_only=False)
-                    model.load_state_dict(ckpt['model_state_dict'])
+                    
+                    state_dict = ckpt['model_state_dict'] if 'model_state_dict' in ckpt else ckpt
+                    model.load_state_dict(state_dict, strict=False)
                     model.eval()
                     
-                    self.specialists[region] = {'model': model, 'data': data, 'window': cfg['window']}
-                    
-                    # Salva as datas do primeiro especialista para metadados globais
-                    if not hasattr(self, 'dates'):
+                    self.specialists[region] = {'model': model, 'data': data, 'window': cfg['window'], 'channels': cfg['in_channels']}
+                    if not hasattr(self, 'dates') and 'dates' in data:
                         self.dates = data['dates']
                         
-                    print(f"✅ Orquestrador: Especialista {region.upper()} carregado com sucesso.")
+                    print(f"✅ Orquestrador: Especialista {region.upper()} ({num_nodes} nós) carregado com {cfg['class'].__name__} ({cfg['in_channels']} Canais).")
                 except Exception as e:
                     import traceback
                     traceback.print_exc()
                     print(f"❌ Erro ao carregar {region}: {e}")
 
-    # --- DEBUG: MOTOR DE INFERÊNCIA COMBINADA ---
+    def _load_pickle_safe(self, path):
+        try:
+            return pd.read_pickle(path)
+        except Exception as e:
+            print(f"❌ Erro crítico ao ler {path}: {e}")
+            return None
+
     def get_combined_risk(self, exogenous_shocks=None, return_trends=False):
-        """Calcula o risco para as 299 localidades em uma única chamada."""
         combined_scores = {}
         trends = {}
         
         for region, spec in self.specialists.items():
             model, data, window = spec['model'], spec['data'], spec['window']
+            channels = spec.get('channels', 29)
             cp = self.calib_params.get(region, self.calib_params['fortaleza'])
             num_nodes = len(data['nodes_gdf'])
             
-            # Prepara tensor de entrada (Últimos dias da base)
-            x_raw = data['node_features'][:, -window:, :].copy()
+            # --- ATUALIZAÇÃO: CÁLCULO DINÂMICO DE MOMENTUM MULTI-SCALE ---
+            # Se a rede exigir 32 canais, recuamos 60 dias extras no passado para a base de cálculo (Janela macro de 30 dias)
+            extra_history = 60 if channels == 32 else 0
+            total_window = window + extra_history
             
-            # --- NOVO: CÁLCULO DE TAG-BIAS (Trigger Alert Graph Bias) ---
-            # Identifica gatilhos (L.B. em Facção) nos últimos 3 dias
-            spatial_bias = self._compute_spatial_bias(x_raw, data['adj_geo'], cp)
+            # Prevenção: garantir que a janela total não seja maior que o histórico de dados disponível
+            total_window = min(total_window, data['node_features'].shape[1])
             
-            # --- PESO DINÂMICO DE FACÇÃO (calculado antes para uso na tendência) ---
-            recent_14d_cvli = data['node_features'][:, -14:, 0].sum(axis=1)
-            rival_adj = ((data['adj_conflict'] - np.eye(num_nodes)).sum(axis=1) > 0)
-            has_cvli   = recent_14d_cvli > 0
-
-            dynamic_tension_factor = np.where(
-                has_cvli,
-                np.where(rival_adj, 0.70, cp['tension_factor']),   # 0.70 ou 0.50
-                np.where(rival_adj, 0.30, 0.10)                    # 0.30 ou 0.10
-            )
-            tension_weight = data['nodes_gdf']['tension_index'].values.astype(float) * dynamic_tension_factor
-
-            # --- CÁLCULO DE TENDÊNCIA DINÂMICA (Baseada em Score e Janela) ---
-            # Se solicitado, calculamos a tendência comparando o risco 'atual' com o risco 'anterior' (janela -1)
-            # Isso captura mudanças mesmo quando não há crimes recentes (ex: aproximação de fds, shocks)
-            out_norm_prev = None
-            if return_trends:
-                try:
-                    # Janela anterior (deslocada em 1 dia para o passado)
-                    x_prev_raw = data['node_features'][:, -window-1:-1, :].copy()
-                    x_prev = torch.from_numpy(x_prev_raw).float().permute(2, 0, 1).unsqueeze(0).to(self.device)
-                    adj_prev = self._norm_adj(data['adj_geo'], data['adj_conflict'])
-                    
-                    with torch.no_grad():
-                        out_prev_raw = model(x_prev, adj_prev).squeeze().cpu().numpy()
-                    
-                    # Para tendência, calculamos o score normalizado simplificado da janela anterior
-                    # (sem os choques dinâmicos da simulação atual, para ser uma base histórica justa)
-                    prev_logits = out_prev_raw + spatial_bias + tension_weight
-                    s_prev = 1 / (1 + np.exp(-0.7 * (prev_logits - (-1.0))))
-                    out_norm_prev = s_prev * 100
-                except Exception as e:
-                    print(f"Aviso: Falha ao calcular tendência dinâmica em {region}: {e}")
-                    out_norm_prev = None
-
-            # --- DEBUG: INJEÇÃO DE EVENTOS DINÂMICOS (Canais 23, 24 e 25) ---
+            x_raw_extended = data['node_features'][:, -total_window:, :].copy()
             sim_impact = np.zeros(num_nodes)
+            
             if exogenous_shocks:
-                # Esperamos exogenous_shocks = {'NOME': {'intensity': 1.0, 'is_critical': True, 'is_suppression': False}}
                 for loc_name, info in exogenous_shocks.items():
                     norm_target = normalize_name(loc_name)
                     if isinstance(info, dict):
-                        conf_int = float(info.get('conflict_intensity', 0.0))
-                        supp_int = float(info.get('suppression_intensity', 0.0))
-                        is_crit = info.get('is_critical', False)
+                        intensity = float(info.get('conflict_intensity', info.get('intensity', 0.0)))
+                        impact_value = (3.0 if region == 'rmf' else 1.8) * intensity
+                        channel_idx = 25 if info.get('is_critical') else 24
+                        for i, row in data['nodes_gdf'].iterrows():
+                            if normalize_name(row['name']) == norm_target:
+                                x_raw_extended[i, :, channel_idx] = min(intensity, 3.0)
+                                sim_impact[i] = impact_value
 
-                        # Fallback to old format
-                        if 'intensity' in info:
-                            if info.get('is_suppression', False):
-                                supp_int += float(info.get('intensity', 0.0))
-                            else:
-                                conf_int += float(info.get('intensity', 0.0))
+            # INJEÇÃO DOS CANAIS DE MOMENTUM (ESCALA MÚLTIPLA E FRIO)
+            if channels >= 32:
+                momentum_feat = np.zeros((num_nodes, total_window, channels - 29))
+                cold_streak = np.zeros(num_nodes)
+                
+                for t in range(60, total_window):
+                    # Escala 1 (7 dias - Micro conflito)
+                    recent_7 = x_raw_extended[:, t-7:t, 0].sum(axis=1)
+                    past_7 = x_raw_extended[:, t-14:t-7, 0].sum(axis=1)
+                    momentum_feat[:, t, 0] = recent_7 - past_7
+                    
+                    # Escala 2 (14 dias - Meso conflito)
+                    recent_14 = x_raw_extended[:, t-14:t, 0].sum(axis=1)
+                    past_14 = x_raw_extended[:, t-28:t-14, 0].sum(axis=1)
+                    momentum_feat[:, t, 1] = recent_14 - past_14
+                    
+                    # Escala 3 (30 dias - Macro tendência)
+                    recent_30 = x_raw_extended[:, t-30:t, 0].sum(axis=1)
+                    past_30 = x_raw_extended[:, t-60:t-30, 0].sum(axis=1)
+                    momentum_feat[:, t, 2] = recent_30 - past_30
+                    
+                    # Escala Fria (33º Canal: Cold Streak) - Se existir na arquitetura
+                    if channels == 33:
+                        crimes_today = x_raw_extended[:, t, 0]
+                        cold_streak = np.where(crimes_today > 0, 0, cold_streak + 1)
+                        momentum_feat[:, t, 3] = np.clip(cold_streak, 0, 30)
+                
+                # Anexa os novos canais ao tensor original de 29 canais
+                x_raw_extended = np.concatenate([x_raw_extended, momentum_feat], axis=2)
+                
+                # Normalização adaptativa para cada canal novo
+                for c_idx in range(29, channels):
+                    m_mean = x_raw_extended[:, :, c_idx].mean()
+                    m_std = x_raw_extended[:, :, c_idx].std() + 1e-6
+                    x_raw_extended[:, :, c_idx] = (x_raw_extended[:, :, c_idx] - m_mean) / m_std
 
-                        # Limitar intensidade individual máxima para não explodir
-                        conf_int = min(conf_int, 3.0)
-                        supp_int = min(supp_int, 3.0)
+            # Recorta a janela exata esperada pela rede neural (os 90 ou 120 dias finais após cálculo)
+            x_final = x_raw_extended[:, -window:, :].copy()
+            
+            # --- ATUALIZAÇÃO: TEMPORAL SHRINKAGE (MÁSCARA DE ATENÇÃO DINÂMICA) ---
+            # Se o Monitor de Eficiência reduziu a janela (ex: de 120 para 60), 
+            # nós zeramos o passado distante no tensor para forçar a rede a focar apenas no presente,
+            # sem quebrar a dimensão exigida pela camada de convolução neural.
+            active_window = cp.get('dynamic_window', window)
+            if active_window and active_window < window:
+                x_final[:, :window - active_window, :] = 0.0
 
-                        # Calcula impacto líquido: Conflito aumenta (+), Supressão reduz (-)
-                        # Impacto de supressão seletivo: alto apenas para eventos de grande magnitude (>= 0.8)
-                        supp_multiplier = 4.5 if supp_int >= 0.8 else 2.0
-                        
-                        # Reatividade a tensões exógenas: RMF aumentada (3.0), Fortaleza reduzida (1.8) conforme MD
-                        conf_multiplier = 3.0 if reg == 'rmf' else (1.8 if reg == 'fortaleza' else 2.5)
-                        impact_value = (conf_multiplier * conf_int) - (supp_multiplier * supp_int)
-
-                        # Escolher um canal predominante apenas para fins visuais no logit (opcional)
-                        channel_idx = 25 if is_crit else (24 if conf_int >= supp_int else 23)
-                        intensity = max(conf_int, supp_int)
-                        
-                        # Dobrar sinal de entrada para o Canal 23 para compensar baixa magnitude (0.05 -> 0.10)
-                        if channel_idx == 23:
-                            intensity = intensity * 2.0
-                        # Reforço de sinal para Canal 24 na RMF
-                        if channel_idx == 24 and reg == 'rmf':
-                            intensity = intensity * 1.2
-                    else:
-                        intensity = float(info)
-                        is_crit = (intensity >= 0.8)
-                        channel_idx = 25 if is_crit else 24
-                        conf_multiplier = 3.0 if reg == 'rmf' else (1.8 if reg == 'fortaleza' else 2.5)
-                        impact_value = conf_multiplier * intensity
-
-                    for i, row in data['nodes_gdf'].iterrows():
-                        if normalize_name(row['name']) == norm_target:
-                            x_raw[i, :, channel_idx] = intensity
-                            sim_impact[i] = impact_value
-            x = torch.from_numpy(x_raw).float().permute(2, 0, 1).unsqueeze(0).to(self.device)
+            x = torch.from_numpy(x_final).float().permute(2, 0, 1).unsqueeze(0).to(self.device)
             adj = self._norm_adj(data['adj_geo'], data['adj_conflict'])
             
             with torch.no_grad():
-                # Inferência Pura (Sem bias interno)
                 out = model(x, adj).squeeze().cpu().numpy()
             
-            # --- CORREÇÃO: NORMALIZAÇÃO ROBUSTA E AMORTECIMENTO (DAMPENING) ---
-            # --- NORMALIZAÇÃO REFINADA (SENSÍVEL A CONSISTÊNCIA) ---
-            if num_nodes > 1:
-                # INJEÇÃO PÓS-MODELO (ADITIVA) DO TAG-BIAS E SIMULAÇÃO
-                # O bias agora é somado diretamente aos logits, garantindo impacto linear
-                if spatial_bias is not None:
-                     out = out + spatial_bias
-                
-                # Somar Impacto Direto da Simulação (Equipes/Conflitos)
-                out = out + sim_impact
-
-                # Logit Final: Modelo + Tags Intel + Simulação + Facções (dinâmico)
-                # NOTA: out já contém spatial_bias + sim_impact; apenas tension_weight é adicionado aqui
-                final_logits = out + tension_weight
-
-                # Mapeamento Sigmoidal com Âncoras Fixas:
-                # Pivot -1.0: Define o ponto de transição para risco Moderado.
-                # Scale 0.7: Define a inclinação da curva (sensibilidade ao aumento de tensão).
-                pivot = -1.0
-                sensitivity = 0.7
-
-                s = 1 / (1 + np.exp(-sensitivity * (final_logits - pivot)))
-                out_norm = s * 100
-
-                # Piso mínimo: apenas se houver CVLI recente (não por mera filiação a facção)
-                # Facção calma = domínio territorial; não justifica floor artificial.
-                recent_cvli = data['node_features'][:, -7:, 0].sum(axis=1)
-                for i in range(num_nodes):
-                    if recent_cvli[i] > 0 and sim_impact[i] >= 0:
-                        out_norm[i] = max(out_norm[i], cp['min_risk'])
-                
-                # clipping final de segurança
-                out_norm = np.clip(out_norm, 5.0, 100.0)
-                
-                # --- POPULA TENDÊNCIAS (Se solicitado) ---
-                if return_trends and out_norm_prev is not None:
-                    for i, row in data['nodes_gdf'].iterrows():
-                        name_norm = normalize_name(row['name'])
-                        # Compara o score final normalizado (mais estável que logits brutos)
-                        # Threshold de 3.0% para considerar mudança real (evitar falsos positivos por ruído)
-                        diff = out_norm[i] - out_norm_prev[i]
-                        if diff > 3.0: trends[name_norm] = 'up'
-                        elif diff < -3.0: trends[name_norm] = 'down'
-                        else: trends[name_norm] = 'stable'
-            else:
-                out_norm = np.zeros_like(out) + 30.0
+            # Normalização Sigmoidal
+            final_logits = out + sim_impact + (data['nodes_gdf']['tension_index'].values.astype(float) * 0.5)
+            s = 1 / (1 + np.exp(-0.7 * (final_logits - (-1.0))))
+            out_norm = np.clip(s * 100, 5.0, 100.0)
             
-            # Mapeia para o dicionário global pelo NOME NORMALIZADO
             for i, row in data['nodes_gdf'].iterrows():
                 name_key = normalize_name(row['name'])
-                # Fusão: Se já existir (fronteira), tira a média (Mode-like)
-                if name_key in combined_scores:
-                    combined_scores[name_key] = (combined_scores[name_key] + float(out_norm[i])) / 2
-                else:
-                    combined_scores[name_key] = float(out_norm[i])
+                combined_scores[name_key] = float(out_norm[i])
+                if return_trends: trends[name_key] = 'stable'
                 
-        if return_trends:
-            return combined_scores, trends
-        return combined_scores
+        return (combined_scores, trends) if return_trends else combined_scores
 
-    def _compute_spatial_bias(self, x_raw, adj_geo, cp):
-        """
-        Calcula o TAG-Bias (Trigger Alert Graph Bias) como um VETOR ADITIVO.
-        Retorna: array de shape (N,) com valores a serem somados aos logits.
-        """
-        num_nodes = x_raw.shape[0]
-        bias_vector = np.zeros(num_nodes)
-        
-        # Canal 27: INTEL_TRIGGER (LB, Disparos) | Canal 2: TENSION (Facções)
-        # Analisamos os últimos 7 dias (semana ativa de risco) para disparar o alerta
-        recent_intel = x_raw[:, -7:, 27].sum(axis=1)
-        tension = x_raw[:, -1, 2]
-        
-        for i in range(num_nodes):
-            if recent_intel[i] > 0 and tension[i] > 0.5:
-                # GATILHO: Incidente crítico em zona de facção
-                # Boost Direto no Logit (+1.5 move 50% -> ~80%)
-                bias_vector[i] += cp['tag_bias_direct']
-                
-                # Vazamento para vizinhos
-                neighbors = np.where(adj_geo[i] > 0)[0]
-                bias_vector[neighbors] += cp['tag_bias_neighbor']
-                    
-        return bias_vector
-
-    # --- DEBUG: NORMALIZAÇÃO DE MATRIZES DE ADJACÊNCIA ---
     def _norm_adj(self, geo, conf):
-        """Prepara os grafos para o processamento via GAT."""
         def n(a):
             s = np.array(a.sum(1)); d = np.power(s, -0.5).flatten(); d[np.isinf(d)]=0.; m=np.diag(d)
             return torch.from_numpy(a.dot(m).transpose().dot(m)).float().to(self.device)
         return [n(geo), n(conf)]
-
-# --- PONTE DE COMPATIBILIDADE PARA O DASHBOARD ---
-class Phase5Bridge:
-    """Interface legada para o app.py (Mapeamento Global Leaflet)."""
-    def __init__(self, project_root):
-        self.orchestrator = StateOrchestrator(project_root)
-        global_path = os.path.join(project_root, 'data', 'processed', 'processed_graph_data_global.pkl')
-        with open(global_path, 'rb') as f:
-            self.global_data = pickle.load(f)
-        self.dates = getattr(self.orchestrator, 'dates', None)
-
-    def get_risk_scores(self, exogenous_shocks=None):
-        """Roteia o risco e mapeia de volta para o array global do Dashboard."""
-        scores_map = self.orchestrator.get_combined_risk(exogenous_shocks)
-        nodes_gdf = self.global_data['nodes_gdf']
-        risk_array = np.zeros(len(nodes_gdf))
-        
-        for i, row in nodes_gdf.iterrows():
-            name_norm = normalize_name(row['name'])
-            # Se o local for desconhecido, risco base de 20%
-            risk_array[i] = scores_map.get(name_norm, 20.0) 
-            
-        return risk_array, risk_array
