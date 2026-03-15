@@ -48,6 +48,15 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Cache file for manager-harmonized explanations
 CACHE_FILE = os.path.join(BASE_DIR, 'data', 'manager_explanations_cache.json')
 
+# Metadados de região — populados ao carregar o orquestrador (sem hardcode)
+_RMF_NODES: set = set()          # nomes normalizados dos nós RMF
+_ALL_REGIONS: list = ['fortaleza', 'rmf', 'interior']  # atualizado após load
+REGION_LABELS: dict = {          # rótulos de exibição por região
+    'fortaleza': 'FORTALEZA (CAPITAL)',
+    'rmf': 'REGIÃO METROPOLITANA',
+    'interior': 'INTERIOR DO ESTADO',
+}
+
 import threading
 import time
 
@@ -257,7 +266,7 @@ def run_background_efficiency_monitor():
                             if p + r > 0:
                                 global_metrics['f1_score'] = round(2 * p * r / (p + r), 4)
                             region_metrics = {}
-                            for reg in ['fortaleza', 'rmf', 'interior']:
+                            for reg in (orchestrator.specialists.keys() if orchestrator else _ALL_REGIONS):
                                 reg_data = metrics.get(reg, {})
                                 if reg_data and isinstance(reg_data, dict):
                                     p10_score = reg_data.get('p10', 0)
@@ -299,11 +308,12 @@ def run_background_efficiency_monitor():
                         print(f"   P10: {m.get('p10', 0)*100:.1f}% | Hits: {', '.join(m.get('hits10', []))}")
                         print(f"   P20: {m.get('p20', 0)*100:.1f}% | Hits: {', '.join(m.get('hits20', []))}")
                     
-                    # Exibir RMF e Interior se houver acertos
-                    for reg in ['rmf', 'interior']:
+                    # Exibir demais regiões se houver acertos
+                    for reg in (orchestrator.specialists.keys() if orchestrator else _ALL_REGIONS):
+                        if reg == 'fortaleza': continue
                         if reg in metrics and metrics[reg].get('p10', 0) > 0:
                             m = metrics[reg]
-                            reg_name = "REGIÃO METROPOLITANA" if reg == 'rmf' else "INTERIOR"
+                            reg_name = REGION_LABELS.get(reg, reg.upper())
                             print(f"\n📍 REGIONALIZAÇÃO: {reg_name}")
                             print(f"   P10: {m.get('p10', 0)*100:.1f}% | Hits: {', '.join(m.get('hits10', []))}")
                     
@@ -487,11 +497,7 @@ def generate_daily_ranking_report():
     # Calculamos o risco atual (sem shocks para servir de baseline estável ou com os atuais)
     scores_map = orchestrator.get_combined_risk()
     
-    regions = {
-        'fortaleza': 'FORTALEZA (CAPITAL)',
-        'rmf': 'REGIÃO METROPOLITANA',
-        'interior': 'INTERIOR DO ESTADO'
-    }
+    regions = {reg: REGION_LABELS.get(reg, reg.upper()) for reg in (orchestrator.specialists.keys() if orchestrator else _ALL_REGIONS)}
 
     for reg_key, reg_name in regions.items():
         filename = f"ranking_{today_str}_{reg_key}.md"
@@ -512,9 +518,8 @@ def generate_daily_ranking_report():
                 name = str(row['name'])
                 name_norm = normalize_name(name)
                 
-                # Sincronização RMF Oficial
-                rmf_oficial = ['AQUIRAZ', 'CASCAVEL', 'CAUCAIA', 'CHOROZINHO', 'EUSEBIO', 'GUAIUBA', 'HORIZONTE', 'ITAITINGA', 'MARACANAU', 'MARANGUAPE', 'PACAJUS', 'PACATUBA', 'PARAIPABA', 'PARACURU', 'PINDORETAMA', 'SAO GONCALO DO AMARANTE', 'SAO LUIS DO CURU', 'TRAIRI']
-                if name_norm in rmf_oficial: r = 'rmf'
+                # Sincronização RMF Oficial (via índice dinâmico do orquestrador)
+                if name_norm in _RMF_NODES: r = 'rmf'
                 
                 if r == reg_key:
                     score = float(scores_map.get(name_norm, 20.0))
@@ -559,10 +564,14 @@ def load_data_and_models():
     except Exception as e:
         print(f"⚠️ Aviso: Falha ao atualizar cache de ruas: {e}")
 
-    # Load all regional metadata
+    # Load all regional metadata (auto-discovery via glob)
+    import glob as _glob
     dfs = []
-    for reg in ['fortaleza', 'rmf', 'interior']:
-        path = os.path.join(BASE_DIR, "data", "processed", f"processed_{reg}.pkl")
+    for path in sorted(_glob.glob(os.path.join(BASE_DIR, "data", "processed", "processed_*.pkl"))):
+        reg = os.path.basename(path).replace('processed_', '').replace('.pkl', '')
+        # Ignorar arquivo legado global (gerado com numpy 2.x incompatível); os três regionais o substituem
+        if reg == 'graph_data_global':
+            continue
         if os.path.exists(path):
             try:
                 # Carregamento limpo e direto
@@ -606,7 +615,18 @@ def load_data_and_models():
     try:
         orchestrator = StateOrchestrator(BASE_DIR)
         print("✅ Motor de Inteligência ST-GAT Ativo.")
-        
+
+        # Sincronizar metadados de região do orquestrador (elimina hardcode)
+        global _RMF_NODES, _ALL_REGIONS, REGION_LABELS
+        _ALL_REGIONS = list(orchestrator.specialists.keys())
+        if 'rmf' in orchestrator.specialists:
+            _RMF_NODES = set(
+                normalize_name(r['name'])
+                for _, r in orchestrator.specialists['rmf']['data']['nodes_gdf'].iterrows()
+            )
+            print(f"✅ RMF nodes sincronizados: {len(_RMF_NODES)} municípios.")
+        REGION_LABELS.update({reg: REGION_LABELS.get(reg, reg.upper()) for reg in _ALL_REGIONS})
+
         # Reaplica estado de calibração persistido (evita reset ao reiniciar)
         if model_calibrator is not None:
             model_calibrator.reapply_on_startup(orchestrator)
@@ -738,9 +758,7 @@ def get_risk():
                 'abordagem_positiva', 'desarticulacao_grupo'
             ]
 
-            # Small helper: RMF cities (covers metro municipalities frequently used in reports)
-            RMF_CITIES = {'MARACANAU', 'CAUCAIA', 'AQUIRAZ', 'PACATUBA', 'PINDORETAMA', 'ITAITINGA', 'GUAIUBA', 'CHOROZINHO', 'MARANGUAPE'}
-
+            # Small helper: RMF cities derived from orchestrator index
             for ev in all_raw_events:
                 try:
                     # --- Verificação de Consistência Teórica (Não ver o futuro) ---
@@ -760,7 +778,7 @@ def get_risk():
                         # Determine high-level region from municipality name
                         if 'FORTALEZA' in mun_up:
                             region_key = 'fortaleza'
-                        elif mun_up in RMF_CITIES or any(c in mun_up for c in RMF_CITIES):
+                        elif normalize_name(municipio_raw) in _RMF_NODES or any(n in normalize_name(municipio_raw) for n in _RMF_NODES):
                             region_key = 'rmf'
                         else:
                             region_key = 'interior'
@@ -850,13 +868,9 @@ def get_risk():
         all_scores = []
         
         # Prepare per-region accumulators
-        region_buckets = {'fortaleza': [], 'rmf': [], 'interior': []}
+        region_buckets = {r: [] for r in _ALL_REGIONS}
         # Contadores por região para o frontend
-        region_stats = {
-            'fortaleza': {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0},
-            'rmf': {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0},
-            'interior': {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0}
-        }
+        region_stats = {r: {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0} for r in _ALL_REGIONS}
 
         # Carregar cache de explicações do gestor para uso no dashboard
         manager_cache = {}
@@ -928,8 +942,7 @@ def get_risk():
                 # Identificação de Região
                 reg = str(row.get('regiao', 'fortaleza')).lower()
                 if reg == 'capital': reg = 'fortaleza'
-                rmf_oficial = ['AQUIRAZ', 'CASCAVEL', 'CAUCAIA', 'CHOROZINHO', 'EUSEBIO', 'GUAIUBA', 'HORIZONTE', 'ITAITINGA', 'MARACANAU', 'MARANGUAPE', 'PACAJUS', 'PACATUBA', 'PARAIPABA', 'PARACURU', 'PINDORETAMA', 'SAO GONCALO DO AMARANTE', 'SAO LUIS DO CURU', 'TRAIRI']
-                if name_norm in rmf_oficial: reg = 'rmf'
+                if name_norm in _RMF_NODES: reg = 'rmf'
                 
                 if reg not in region_buckets: region_buckets[reg] = []
 
@@ -1323,8 +1336,7 @@ def simulate_risk():
             # Identificação de Região
             reg = str(row.get('regiao', 'fortaleza')).lower()
             if reg == 'capital': reg = 'fortaleza'
-            rmf_oficial = ['AQUIRAZ', 'CASCAVEL', 'CAUCAIA', 'CHOROZINHO', 'EUSEBIO', 'GUAIUBA', 'HORIZONTE', 'ITAITINGA', 'MARACANAU', 'MARANGUAPE', 'PACAJUS', 'PACATUBA', 'PARAIPABA', 'PARACURU', 'PINDORETAMA', 'SAO GONCALO DO AMARANTE', 'SAO LUIS DO CURU', 'TRAIRI']
-            if name_norm in rmf_oficial: reg = 'rmf'
+            if name_norm in _RMF_NODES: reg = 'rmf'
 
             if score >= 90: 
                 status, css, color = 'CRÍTICO', 'risk-critico', '#8B0000'
@@ -1675,9 +1687,8 @@ def explain_node(node_id):
         try:
             reg_key = str(row.get('regiao', 'fortaleza')).lower()
             if reg_key == 'capital': reg_key = 'fortaleza'
-
-            # Sincronização RMF Oficial
-            if name_norm in ['AQUIRAZ', 'CASCAVEL', 'CAUCAIA', 'CHOROZINHO', 'EUSEBIO', 'GUAIUBA', 'HORIZONTE', 'ITAITINGA', 'MARACANAU', 'MARANGUAPE', 'PACAJUS', 'PACATUBA', 'PARAIPABA', 'PARACURU', 'PINDORETAMA', 'SAO GONCALO DO AMARANTE', 'SAO LUIS DO CURU', 'TRAIRI']:
+            # Sincronização RMF Oficial (via índice dinâmico)
+            if name_norm in _RMF_NODES:
                 reg_key = 'rmf'            
             spec = orchestrator.specialists.get(reg_key)
             if spec:

@@ -1262,6 +1262,58 @@
         "error_rate_percent": 6.25
       },
       "resolved": false
+    },
+    {
+      "timestamp": "2026-03-15T11:13:49.671695",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-15T11:13:49.951424",
+      "type": "calibration_maxed_rmf",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — RMF: FACTION_COVERAGE=15.8% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "current_value": 0.15789473684210525,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-15T11:13:50.221447",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.3% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.2127659574468085,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-15T11:44:56.501630",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 28.57%",
+      "details": {
+        "error_rate_percent": 28.57142857142857
+      },
+      "resolved": false
     }
   ]
 }

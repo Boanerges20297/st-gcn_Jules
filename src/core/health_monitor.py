@@ -572,9 +572,12 @@ class ConfidenceTracker:
                 if p + r > 0:
                     global_metrics['f1_score'] = round(2 * p * r / (p + r), 4)
                 
-                # Regiões
+                # Regiões — dinamic a partir das chaves do entry (sem hardcode)
                 region_metrics = {}
-                for reg in ['fortaleza', 'rmf', 'interior']:
+                skip_keys = {'global', 'date', 'timestamp', 'total_events', 'brute_cvli', 'exogenous'}
+                for reg in entry:
+                    if reg in skip_keys:
+                        continue
                     reg_data = entry.get(reg, {})
                     if reg_data and isinstance(reg_data, dict) and reg_data.get('p10') is not None:
                         region_metrics[reg] = {

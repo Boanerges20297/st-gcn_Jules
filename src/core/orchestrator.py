@@ -72,7 +72,7 @@ class StateOrchestrator:
                 'norm_neural_weight': 0.20, 'dynamic_window': None,
                 'use_historical_fallback': False,
             }
-            for reg in ['fortaleza', 'rmf', 'interior']
+            for reg in self.configs
         }
         
         self._window_state_path = os.path.join(self.root, 'data', 'window_state.json')
@@ -133,7 +133,7 @@ class StateOrchestrator:
         """
         if region not in self.specialists: return
 
-        cp = self.calib_params.setdefault(region, self.calib_params.get('fortaleza', {}).copy())
+        cp = self.calib_params.setdefault(region, next(iter(self.calib_params.values()), {}).copy())
         base_window = self.specialists[region]['window']
         current_window = cp.get('dynamic_window') or base_window
 
@@ -238,6 +238,13 @@ class StateOrchestrator:
                     import traceback
                     traceback.print_exc()
                     print(f"❌ Erro ao carregar {region}: {e}")
+        # Índice de propriedade: cada nome normalizado → região dona
+        # Impede que um especialista emita scores de nós pertencentes a outra região
+        self._node_owners = {
+            normalize_name(str(r['name'])): reg
+            for reg, spec in self.specialists.items()
+            for _, r in spec['data']['nodes_gdf'].iterrows()
+        }
 
     def _load_pickle_safe(self, path):
         try:
@@ -253,7 +260,7 @@ class StateOrchestrator:
         for region, spec in self.specialists.items():
             model, data, window = spec['model'], spec['data'], spec['window']
             channels = spec.get('channels', 29)
-            cp = self.calib_params.get(region, self.calib_params['fortaleza'])
+            cp = self.calib_params.get(region, next(iter(self.calib_params.values())))
             num_nodes = len(data['nodes_gdf'])
             
             # --- CÁLCULO DE MOMENTUM MULTI-SCALE (AGORA PARA TODAS AS REGIÕES) ---
@@ -355,14 +362,13 @@ class StateOrchestrator:
             # Escalonamento Dashboard (5% a 100%)
             out_norm = 5.0 + (final_logic * 95.0)
             
-            # BLOCO DE SEGURANÇA: Garantir que o especialista contribua APENAS com seus bairros
+            # BLOCO DE SEGURANÇA: cada especialista emite scores apenas para seus próprios nós
             for i, row in data['nodes_gdf'].iterrows():
                 name_raw = str(row['name'])
-                # Filtro absoluto anti-poluição (Ex: Tabapuá é RMF/Caucaia)
-                if region == 'fortaleza' and name_raw in ['TABAPUA', 'CAUCAIA', 'MARACANAU']:
-                    continue
-                    
                 name_key = normalize_name(name_raw)
+                # Anti-poluição dinâmica: ignora nós que pertencem a outro especialista
+                if self._node_owners.get(name_key, region) != region:
+                    continue
                 combined_scores[name_key] = float(out_norm[i])
                 if return_trends: trends[name_key] = 'stable'
                 

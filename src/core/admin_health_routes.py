@@ -184,12 +184,14 @@ def create_admin_health_blueprint(health_monitor, confidence_tracker, model_cali
     def get_current_confidence():
         """Retorna confiança atual do modelo por região."""
         try:
-            regions = ['global', 'fortaleza', 'rmf', 'interior']
+            # Deriva regiões dinamicamente do orchestrator (sem hardcode)
+            orch = get_orchestrator() if get_orchestrator else None
+            base_regions = list(orch.specialists.keys()) if orch and hasattr(orch, 'specialists') else ['fortaleza', 'rmf', 'interior']
+            regions = ['global'] + base_regions
             data = {
                 region: confidence_tracker.get_current_confidence(region=region)
                 for region in regions
             }
-            
             return jsonify(data), 200
         except Exception as e:
             logger.error(f"Erro ao obter confiança atual: {e}")
@@ -332,13 +334,12 @@ def create_admin_health_blueprint(health_monitor, confidence_tracker, model_cali
                 except Exception:
                     pass
             
-            # 3. Taxa de completude — regiões com dados processados vs. esperadas
-            regions_expected = ['fortaleza', 'rmf', 'interior']
-            regions_available = [
-                r for r in regions_expected
-                if os.path.exists(os.path.join(base_dir, 'data', 'processed', f'processed_{r}.pkl'))
-            ]
-            completeness_pct = (len(regions_available) / len(regions_expected)) * 100
+            # 3. Taxa de completude — via glob (sem hardcode de regiões)
+            import glob as _glob
+            expected_pkls = _glob.glob(os.path.join(base_dir, 'data', 'processed', 'processed_*.pkl'))
+            regions_all  = [os.path.basename(p).replace('processed_', '').replace('.pkl', '') for p in expected_pkls]
+            regions_available = [r for r in regions_all if os.path.exists(os.path.join(base_dir, 'data', 'processed', f'processed_{r}.pkl'))]
+            completeness_pct = 100.0 if not regions_all else (len(regions_available) / len(regions_all)) * 100
             
             # 4. Anomalias — alertas ativos de severidade CRITICAL ou HIGH
             active_alerts = health_monitor.get_alerts(resolved=False)
@@ -359,7 +360,7 @@ def create_admin_health_blueprint(health_monitor, confidence_tracker, model_cali
                 'exogenous_events_7d': exogenous_events,
                 'completeness_pct': round(completeness_pct, 1),
                 'regions_available': len(regions_available),
-                'regions_expected': len(regions_expected),
+                'regions_expected': len(regions_all),
                 'anomalies': anomalies,
                 'anomaly_details': anomaly_details,
                 'timestamp': datetime.now().isoformat()
@@ -387,20 +388,38 @@ def create_admin_health_blueprint(health_monitor, confidence_tracker, model_cali
                     for region, params in orch.calib_params.items()
                 }
 
+            # Defaults alinhados com ModelCalibrator._default() e orchestrator.calib_params
             defaults = {
-                'tension_factor': 0.50,
-                'min_risk': 30.0, 'tag_bias_direct': 1.50, 'tag_bias_neighbor': 0.50
+                'tension_factor':     0.80,
+                'min_risk':          30.0,
+                'tag_bias_direct':    2.00,
+                'tag_bias_neighbor':  0.60,
+                'norm_neural_weight': 0.20,
             }
 
             # Montar resposta enriquecida por região
+            # Inclui regiões ativas do orchestrator mesmo que ainda não tenham eventos de calibração
+            orch = get_orchestrator() if get_orchestrator else None
+            active_regions = list(orch.specialists.keys()) if orch and hasattr(orch, 'specialists') else list(status.keys())
             enriched = {}
-            for region, info in status.items():
+            for region in active_regions:
+                info = status.get(region, {'steps': 0, 'max_steps': model_calibrator.MAX_STEPS, 'is_degraded': False, 'is_critical': False, 'last_event': None})
+                # Enrich with window state from orchestrator
+                win_state = {}
+                if orch and hasattr(orch, 'calib_params') and region in orch.calib_params:
+                    cp = orch.calib_params[region]
+                    win_state = {
+                        'dynamic_window': cp.get('dynamic_window'),
+                        'use_historical_fallback': cp.get('use_historical_fallback', False),
+                        'historical_top10': cp.get('historical_top10', []),
+                    }
                 hist = model_calibrator.state.get(region, {}).get('history', [])
                 enriched[region] = {
                     **info,
                     'current_params': current_params.get(region, defaults),
                     'default_params': defaults,
                     'last_5_events': hist[-5:] if hist else [],
+                    'window_state': win_state,
                 }
 
             return jsonify({'available': True, 'regions': enriched}), 200
