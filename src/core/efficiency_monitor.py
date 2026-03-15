@@ -81,22 +81,13 @@ class EfficiencyMonitor:
                     except: continue
 
             # 2c. TENSÃO LATENTE: Territórios com domínio de facção confirmado
-            # Um território controlado por facção tem tensão permanente, mesmo sem CVLI recente.
-            # Não incrementa contagem — apenas garante presença no ground truth (peso 1)
+            # NOTA: Não incluímos facções latentes no Ground Truth de Eficiência (P@K)
+            # para não inflar artificialmente as métricas em regiões pequenas.
+            # O monitor de Cobertura Territorial (Health Monitor) já audita isso separadamente.
             total_faction = 0
-            for r_name, spec in self.orchestrator.specialists.items():
-                nodes = spec['data']['nodes_gdf']
-                if 'faction' not in nodes.columns:
-                    continue
-                for _, row in nodes.iterrows():
-                    faction = str(row.get('faction', 'NEUTRO')).upper()
-                    if faction not in ('NEUTRO', 'N/A', '', 'NAN', 'NONE'):
-                        loc_norm = normalize_name(str(row['name']))
-                        if loc_norm not in ground_truth:
-                            ground_truth[loc_norm] = 1  # presença de tensão latente
-                            total_faction += 1
-
-            print(f"📊 [Monitor] Ground Truth Final: {len(ground_truth)} localidades com tensão ativa ({total_brute} CVLI + {total_exo} Exógena + {total_faction} Facção latente)")
+            
+            # Print de diagnóstico para o log
+            print(f"📊 [Monitor] Ground Truth Final: {len(ground_truth)} localidades com eventos ativos ({total_brute} CVLI + {total_exo} Exógena)")
             
             # Diagnóstico: quantos nomes do ranking NÃO matcharam no ground truth
             unmatched = [n for n in scores_map.keys() if n not in ground_truth]
@@ -117,24 +108,21 @@ class EfficiencyMonitor:
             
             # 4. Avaliar cada Região
             for r_name, node_list in regions.items():
+                # Filtrar scores: apenas bairros que pertencem a esta região
                 r_scores = {n: scores_map[n] for n in node_list if n in scores_map}
+                
+                # Filtrar ground truth: apenas eventos desta região
                 r_ground_truth = {n: count for n, count in ground_truth.items() if n in node_list}
                 
                 if not r_scores:
                     results[r_name] = {"status": "no_scores", "p5": 0.0, "p10": 0.0, "p20": 0.0}
                     continue
                 
-                if not r_ground_truth:
-                    results[r_name] = {"status": "no_events_insufficient_window", "p5": 0.0, "p10": 0.0, "p20": 0.0,
-                                       "note": "Ground truth vazio: janela insuficiente para esta região. Não avaliar degradação."}
-                    print(f"⚠️ [Monitor] Região {r_name.upper()}: SKIP — sem eventos CVLI na janela de avaliação. Modelo não penalizado.")
-                    continue
-                    
+                # Ranking regional isolado
                 r_ranking = sorted(r_scores.items(), key=lambda x: x[1], reverse=True)
                 
-                # Mínimo de eventos para avaliação confiável
-                # (evita P@20=0% por acaso em semanas com poucos CVLIs)
-                MIN_EVENTS = max(3, len(r_scores) // 10)  # pelo menos 10% dos nós ou 3 eventos
+                # Mínimo de eventos para avaliação (Reduzido para 1 para todas as regiões em períodos de baixa atividade)
+                MIN_EVENTS = 1
                 if len(r_ground_truth) < MIN_EVENTS:
                     results[r_name] = {
                         "status": f"insufficient_events ({len(r_ground_truth)}<{MIN_EVENTS})",
@@ -142,13 +130,15 @@ class EfficiencyMonitor:
                         "active_locations": len(r_ground_truth),
                         "note": f"Menos de {MIN_EVENTS} localidades com eventos. Avaliação não confiável."
                     }
-                    print(f"⚠️ [Monitor] Região {r_name.upper()}: SKIP — apenas {len(r_ground_truth)} localidades com eventos (mín={MIN_EVENTS}). Modelo não penalizado.")
+                    print(f"⚠️ [Monitor] Região {r_name.upper()}: SKIP — apenas {len(r_ground_truth)} localidades com eventos (mín={MIN_EVENTS}).")
                     continue
                 
                 region_metrics = {
                     "total_nodes": len(r_scores),
                     "active_locations": len(r_ground_truth),
-                    "total_events": sum(r_ground_truth.values())
+                    "total_events": sum(r_ground_truth.values()),
+                    "ranking_top10": [name for name, _ in r_ranking[:10]],
+                    "gt_sample": list(r_ground_truth.keys())[:15]
                 }
                 
                 gt_count = len(r_ground_truth)
@@ -156,18 +146,20 @@ class EfficiencyMonitor:
                     k_adj = min(k, len(r_ranking))
                     top_k = [name for name, score in r_ranking[:k_adj]]
                     hits = [name for name in top_k if name in r_ground_truth]
-                    # Cobertura@K (Recall@K): fração das zonas de tensão conhecidas surfaçadas no top-K
-                    # Métrica correta para termômetro territorial: não penaliza elevação de vizinhos
-                    coverage_k = len(hits) / gt_count if gt_count > 0 else 0
-                    # Precision@K mantida como referência diagnóstica
+                    
+                    # Precisão@K: Fração do Top-K que contém eventos reais (Métrica do Treino)
                     precision_k = len(hits) / k_adj if k_adj > 0 else 0
-                    region_metrics[f"p{k}"] = round(coverage_k, 4)   # compatibilidade: p10/p20 = Cobertura
-                    region_metrics[f"precision{k}"] = round(precision_k, 4)  # diagnóstico
+                    
+                    # Cobertura@K (Recall@K): Fração do Ground Truth capturada no Top-K
+                    coverage_k = len(hits) / gt_count if gt_count > 0 else 0
+                    
+                    # Armazenamos a Precisão nos campos p5/p10/p20 para compatibilidade com o Dashboard
+                    region_metrics[f"p{k}"] = round(precision_k, 4)
+                    region_metrics[f"recall{k}"] = round(coverage_k, 4)
                     region_metrics[f"hits{k}"] = hits
                 
                 results[r_name] = region_metrics
-                misses = [n for n in r_ranking[:min(20, len(r_ranking))] if n[0] not in r_ground_truth][:5]
-                print(f"✅ [Monitor] Região {r_name.upper()}: Cov@10={region_metrics.get('p10', 0)*100:.1f}% | Cov@20={region_metrics.get('p20', 0)*100:.1f}% | Prec@20={region_metrics.get('precision20', 0)*100:.1f}% | GT={len(r_ground_truth)} zonas | Vizinhos-inflados Top-5: {[m[0] for m in misses]}")
+                print(f"✅ [Monitor] Região {r_name.upper()}: P@10={region_metrics.get('p10', 0)*100:.1f}% | P@20={region_metrics.get('p20', 0)*100:.1f}% | GT={len(r_ground_truth)} zonas")
 
             # 5. Salvar Histórico e Retornar
             self.save_to_history(results)

@@ -494,7 +494,9 @@
                             </select>
                             <div class="form-check mt-2">
                                 <input class="form-check-input" type="checkbox" id="toggle-top20">
-                                <label class="form-check-label small" for="toggle-top20">Mostrar Top50 Predições (alfinetes)</label>
+                                <label class="form-check-label small fw-bold text-danger" for="toggle-top20">
+                                    <i class="fas fa-thumbtack"></i> Top 20 Micronodos (Elite P10)
+                                </label>
                             </div>
                             <div class="form-check mt-1">
                                 <input class="form-check-input" type="checkbox" id="toggle-micronodes-kml">
@@ -670,6 +672,7 @@
     // Top20 micro-nodes layer
     var top20Layer = L.layerGroup();
     var top20LoadedRegion = null; // track which region is loaded into top20Layer
+    var top20LoadingRequestId = 0; // track async requests to avoid race conditions
 
     function colorByRankSimple(r){ return r<=3 ? '#8B0000' : r<=10 ? '#FF6B6B' : '#FFA500'; }
     function makePinSimple(color){
@@ -685,16 +688,29 @@
         var url = '/api/top20_micro_nodes';
         if (region) url += '?region=' + region;
         console.log('[Top20] Loading', url);
+        
+        // Increment request ID to handle race conditions
+        top20LoadingRequestId++;
+        var currentRequestId = top20LoadingRequestId;
+        
         fetch(url).then(function(resp){
             if (!resp.ok) throw new Error('Não foi possível carregar Top20: ' + resp.status);
             return resp.json();
         }).then(function(data){
             try{
+                // Ignore this response if a newer request was made
+                if (currentRequestId !== top20LoadingRequestId) {
+                    console.log('[Top20] Ignoring stale response for', url);
+                    return;
+                }
+                
                 top20Layer.clearLayers();
                 var features = data.features || data;
                 console.log('[Top20] Received features:', (features && features.length) || 0);
                 var skippedPolygons = 0;
-            features.forEach(function(f, i){
+                var markersAdded = 0;
+                
+                features.forEach(function(f, i){
                     try{
                         // Only render actual Point geometries as markers.
                         // Prefer the real geometry.type when present; fallback to properties.geometry_type for older files.
@@ -717,6 +733,8 @@
                         var icon = makePinSimple(color);
                         var m = L.marker([lat, lon], {icon: icon});
                         var displayName = (f.properties && (f.properties.name || f.properties.nome)) || 'Área';
+                        var cleanName = displayName.toUpperCase().replace(/\s+/g, ' ').trim();
+                        
                         // Mapeamento do nome do arquivo para facção amigável
                         var faccaoMap = {
                             'COMANDO VERMELHO.geojson': 'Comando Vermelho',
@@ -728,39 +746,119 @@
                             'TERRITÓRIOS FANTASMAS.geojson': 'Territórios Fantasmas',
                         };
                         var faccao = faccaoMap[f.properties.source] || (f.properties.faction || 'Não identificado');
-                        var popup = '<strong>' + (f.properties.rank || '') + '. ' + displayName + '</strong><br/>' +
-                                    '<b>Facção:</b> ' + faccao + '<br/>' +
-                                    (f.properties.score ? '<b>Tensão territorial:</b> ' + Math.round(f.properties.score) + '<br/>' : '');
-                        m.bindPopup(popup);
+                        
+                        // Popup dinâmico que carrega dados adicionais
+                        var popupContent = '<div id="popup-' + rank + '" style="width:300px; padding:8px;">' +
+                                          '<div style="text-align:center; margin-bottom:8px;"><strong>' + rank + '. ' + displayName + '</strong></div>' +
+                                          '<div style="font-size:0.85rem;"><b>Facção:</b> ' + faccao + '</div>' +
+                                          '<div style="font-size:0.85rem; margin-bottom:8px;"><b>Tensão:</b> ' + (f.properties.score ? Math.round(f.properties.score * 100) + '%' : 'N/A') + '</div>' +
+                                          '<div id="streets-' + rank + '" style="font-size:0.8rem; color:#888;">Carregando...</div>' +
+                                          '</div>';
+                        
+                        m.bindPopup(popupContent);
+                        
+                        // Fetch dinâmico de ruas críticas quando popup é aberto
+                        m.on('popupopen', function() {
+                            var streetsDiv = document.getElementById('streets-' + rank);
+                            if (streetsDiv && streetsDiv.textContent === 'Carregando...') {
+                                fetch('/api/territory?name=' + encodeURIComponent(cleanName))
+                                    .then(r => r.json())
+                                    .then(data => {
+                                        if (data && data.metrics && data.metrics.critical_streets) {
+                                            var streets = data.metrics.critical_streets;
+                                            var validStreets = [];
+                                            
+                                            if (Array.isArray(streets)) {
+                                                // Filtrar "AREA SEM NOME" e strings vazias
+                                                validStreets = streets.filter(s => {
+                                                    var cleaned = String(s).trim().toUpperCase();
+                                                    return cleaned !== 'AREA SEM NOME' && cleaned !== '';
+                                                });
+                                            } else if (typeof streets === 'string') {
+                                                var cleaned = streets.trim().toUpperCase();
+                                                if (cleaned !== 'AREA SEM NOME' && cleaned !== '' && cleaned !== 'SEM LOGRADOUROS CRÍTICOS RECENTES') {
+                                                    validStreets = [streets];
+                                                }
+                                            }
+                                            
+                                            // Se não houver ruas válidas, mostrar mensagem
+                                            if (validStreets.length === 0) {
+                                                streetsDiv.innerHTML = '<span style="font-size:0.8rem; color:#999;">Sem registros de logradouros específicos</span>';
+                                            } else {
+                                                var streetsHtml = '<b>🛣️ Logradouros Críticos:</b><ul style="margin:4px 0; padding-left:16px;">';
+                                                validStreets.slice(0, 8).forEach(s => {
+                                                    streetsHtml += '<li style="font-size:0.75rem;">' + s + '</li>';
+                                                });
+                                                streetsHtml += '</ul>';
+                                                if (streetsDiv) streetsDiv.innerHTML = streetsHtml;
+                                            }
+                                        }
+                                    })
+                                    .catch(err => {
+                                        if (streetsDiv) streetsDiv.innerHTML = '<b>🛣️ Logradouros:</b> Indisponíveis';
+                                    });
+                            }
+                        });
                         top20Layer.addLayer(m);
+                        markersAdded++;
                     }catch(e){ console.warn('[Top20] feature error', e, f); }
                 });
-                console.log('[Top20] Built markers:', top20Layer.getLayers().length, ' skippedPolygons:', skippedPolygons);
+                
+                console.log('[Top20] Built markers:', markersAdded, ' skippedPolygons:', skippedPolygons);
                 top20LoadedRegion = region || 'all';
+                
+                // Ensure layer is added to map if checkbox is checked
+                if ($('#toggle-top20').prop('checked')) {
+                    if (!map.hasLayer(top20Layer)) {
+                        map.addLayer(top20Layer);
+                        console.log('[Top20] Layer added to map');
+                    } else {
+                        console.log('[Top20] Layer already on map');
+                    }
+                } else {
+                    console.log('[Top20] Checkbox unchecked, not adding layer');
+                }
+                
                 if (cb) cb(null);
             }catch(err){ console.warn('[Top20] build error', err); if (cb) cb(err); }
         }).catch(function(err){ console.warn('[Top20] fetch error', err); if (cb) cb(err); });
     }
 
     function updateTop20ForRegion(region){
-        // If already loaded for this region, just ensure layer is visible
-        if (top20LoadedRegion === region){
-            // Reset cache to force reload when region changes
-            if (!$('#toggle-top20').is(':checked')) {
-                try{ top20Layer.clearLayers(); }catch(e){}
-                return;
-            }
-            if (!map.hasLayer(top20Layer)) map.addLayer(top20Layer);
+        console.log('[Top20] updateTop20ForRegion: region=' + region + ', checking=' + $('#toggle-top20').prop('checked') + ', topLoadedRegion=' + top20LoadedRegion);
+        
+        // If checkbox is unchecked, remove layer
+        if (!$('#toggle-top20').prop('checked')) {
+            console.log('[Top20] updateTop20ForRegion: Checkbox unchecked, clearing layer');
+            try{ top20Layer.clearLayers(); }catch(e){}
+            if (map.hasLayer(top20Layer)) map.removeLayer(top20Layer);
+            top20LoadedRegion = null; // Reset cache
             return;
         }
         
-        // Always load the data (even if checkbox is unchecked - visibility is controlled separately)
-        loadTop20(region, function(err){
-            if (err){ console.warn('Top20 load error', err); return; }
-            // Only add to map if checkbox is checked
-            if ($('#toggle-top20').is(':checked')) {
-                if (!map.hasLayer(top20Layer)) map.addLayer(top20Layer);
+        // If already loaded for this region, just ensure layer is visible
+        if (top20LoadedRegion === region){
+            var markerCount = top20Layer.getLayers().length;
+            console.log('[Top20] Already loaded for region, markers in layer:', markerCount);
+            if (markerCount === 0) {
+                console.log('[Top20] Layer is empty! Force reloading...');
+                top20LoadedRegion = null; // Reset to force reload
+            } else {
+                if (!map.hasLayer(top20Layer)) {
+                    map.addLayer(top20Layer);
+                    console.log('[Top20] Layer re-added to map, markers:', markerCount);
+                } else {
+                    console.log('[Top20] Layer already on map, markers:', markerCount);
+                }
+                return;
             }
+        }
+        
+        console.log('[Top20] Loading region:', region);
+        // Load the data
+        loadTop20(region, function(err){
+            if (err){ console.warn('[Top20] load error', err); return; }
+            console.log('[Top20] Callback: region=' + region + ', checkbox=' + $('#toggle-top20').prop('checked'));
         });
     }
 
@@ -1201,12 +1299,15 @@
             // Adicionar a camada ao mapa
             geojsonLayer.addTo(map);
 
+            // ATUALIZAÇÃO: Garantir que o filtro regional seja aplicado imediatamente (Fortaleza por padrão)
+            var currentRegion = $('#region-filter').val() || 'fortaleza';
+            applyRegionFilter(currentRegion);
+            
             // Reaplicar o filtro de região preservado para manter a seleção do usuário
             try {
-                if (typeof applyRegionFilter === 'function') applyRegionFilter(preservedRegion);
                 // Also update the Top Critical Areas list to reflect the current filter
                 try { updateTopCriticalAreas(); } catch(e) {}
-            } catch(e) { console.warn('Failed to reapply preserved region filter', e); }
+            } catch(e) { console.warn('Failed to update Top Critical Areas', e); }
 
             // Resolver a promise assim que a camada foi adicionada
             resolve();
@@ -2222,6 +2323,11 @@
     // Filter Handler
     $('#region-filter').on('change', function() {
         var val = $(this).val();
+        
+        // Padronizado para Top 20 para todas as regiões conforme solicitação
+        var labelText = 'Top 20 Micronodos (Elite P10)';
+        $('label[for="toggle-top20"]').html('<i class="fas fa-thumbtack"></i> ' + labelText);
+        
         applyRegionFilter(val);
         updateTopCriticalAreas();
         // update top20 layer for selected region if visible
@@ -2292,20 +2398,22 @@
 
     // Toggle Top20 micro-nodes
     $('#toggle-top20').on('change', function(){
-        var checked = $(this).is(':checked');
+        var checked = $(this).prop('checked');
         var region = $('#region-filter').val();
+        console.log('[Top20] Checkbox change event: checked=' + checked + ', region=' + region);
         if (checked){
             updateTop20ForRegion(region);
         } else {
             try{ top20Layer.clearLayers(); }catch(e){}
             if (map.hasLayer(top20Layer)) map.removeLayer(top20Layer);
+            console.log('[Top20] Checkbox unchecked - layer removed');
         }
     });
 
     // Expose function to refresh Top20 (useful after model updates)
     function refreshTop20(){
         var region = $('#region-filter').val();
-        if ($('#toggle-top20').is(':checked')){
+        if ($('#toggle-top20').prop('checked')){
             loadTop20(region, function(err){ if (err) console.warn('refreshTop20 failed', err); });
         }
     }

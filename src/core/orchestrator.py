@@ -66,35 +66,153 @@ class StateOrchestrator:
         
         self.specialists = {}
         self.calib_params = {
-            reg: {'tension_factor': 0.50, 'min_risk': 30.0, 'tag_bias_direct': 1.50, 'tag_bias_neighbor': 0.50, 'dynamic_window': None}
+            reg: {
+                'tension_factor': 0.80, 'min_risk': 30.0,
+                'tag_bias_direct': 2.00, 'tag_bias_neighbor': 0.60,
+                'norm_neural_weight': 0.20, 'dynamic_window': None,
+                'use_historical_fallback': False,
+            }
             for reg in ['fortaleza', 'rmf', 'interior']
         }
         
+        self._window_state_path = os.path.join(self.root, 'data', 'window_state.json')
         self._initialize_models()
+        self._restore_window_state()  # restaura janelas persistidas após modelos carregados
+
+    def _restore_window_state(self):
+        """Restaura dynamic_window e use_historical_fallback do disco ao reiniciar."""
+        try:
+            if os.path.exists(self._window_state_path):
+                import json
+                with open(self._window_state_path, 'r', encoding='utf-8') as f:
+                    saved = json.load(f)
+                for region, state in saved.items():
+                    if region in self.calib_params:
+                        dw = state.get('dynamic_window')
+                        hf = state.get('use_historical_fallback', False)
+                        self.calib_params[region]['dynamic_window'] = dw
+                        self.calib_params[region]['use_historical_fallback'] = hf
+                        label = f"{dw}d" if dw else "base"
+                        flag = " + fallback histórico ATIVO" if hf else ""
+                        print(f"🔄 [Window State] {region.upper()} restaurado: janela={label}{flag}")
+                        if hf:
+                            self._load_historical_fallback(region)
+        except Exception as e:
+            print(f"⚠️ [Window State] Erro ao restaurar: {e}")
+
+    def _save_window_state(self):
+        """Persiste dynamic_window e use_historical_fallback no disco."""
+        try:
+            import json
+            state = {}
+            for region, cp in self.calib_params.items():
+                state[region] = {
+                    'dynamic_window': cp.get('dynamic_window'),
+                    'use_historical_fallback': cp.get('use_historical_fallback', False),
+                    'historical_top10': cp.get('historical_top10', []),
+                    'updated_at': datetime.now().isoformat(),
+                }
+            os.makedirs(os.path.dirname(self._window_state_path), exist_ok=True)
+            with open(self._window_state_path, 'w', encoding='utf-8') as f:
+                json.dump(state, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            print(f"⚠️ [Window State] Erro ao salvar: {e}")
+
+    # Escada de redução de janela: base (120 ou 90) → 90 → 60 → 30 → fallback histórico
+    _WINDOW_LADDER = [120, 90, 60, 30]
 
     def adjust_temporal_focus(self, region, efficiency_score):
         """
         Auto-Ajuste de Janela (Temporal Shrinkage) baseado no feedback do Monitor.
-        Reduz a janela gradativamente se a eficiência cair, cortando ruído histórico.
+
+        Escada de redução ao detectar eficiência baixa (P10 < 0.50):
+          base_window → 90 → 60 → 30 → fallback top10 histórico do último ano
+
+        Recuperação gradual (P10 >= 0.60):
+          sobe um degrau por ciclo até restaurar a janela base.
         """
         if region not in self.specialists: return
-        
+
         cp = self.calib_params.setdefault(region, self.calib_params.get('fortaleza', {}).copy())
         base_window = self.specialists[region]['window']
         current_window = cp.get('dynamic_window') or base_window
-        
+
         if efficiency_score < 0.50:
-            # Encolhe a janela em blocos de 30 dias até o mínimo de 30 dias
-            new_window = max(30, current_window - 30)
-            if new_window != current_window:
-                print(f"📉 [Auto-Tune] Eficiência baixa ({efficiency_score*100:.1f}%) em {region.upper()}. Reduzindo janela de {current_window}d para {new_window}d.")
-                cp['dynamic_window'] = new_window
-        elif efficiency_score >= 0.50:
-            # Expande novamente se a performance se consolidar alta
-            new_window = min(base_window, current_window + 30)
-            if new_window != current_window:
-                print(f"📈 [Auto-Tune] Eficiência excelente ({efficiency_score*100:.1f}%) em {region.upper()}. Expandindo janela para {new_window}d.")
-                cp['dynamic_window'] = new_window
+            # Encontra o degrau atual e desce um nível
+            ladder = [w for w in self._WINDOW_LADDER if w <= base_window]
+            if not ladder:
+                ladder = [30]
+            # Degrau atual: maior valor da escada <= current_window
+            current_rung = max((w for w in ladder if w <= current_window), default=ladder[0])
+            current_idx = ladder.index(current_rung)
+
+            if current_rung > ladder[-1]:  # ainda há degrau abaixo
+                next_rung = ladder[current_idx + 1] if current_idx + 1 < len(ladder) else ladder[-1]
+                if next_rung != current_window:
+                    print(f"📉 [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. "
+                          f"Reduzindo janela {current_window}d → {next_rung}d.")
+                    cp['dynamic_window'] = next_rung
+                    cp['use_historical_fallback'] = False
+                    self._save_window_state()
+            else:
+                # Já no menor degrau — ativa fallback top10 histórico
+                if not cp.get('use_historical_fallback', False):
+                    print(f"📉 [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. "
+                          f"Janela mínima (30d) mantida — ATIVANDO fallback top10 histórico.")
+                    cp['use_historical_fallback'] = True
+                    self._load_historical_fallback(region)
+                    self._save_window_state()
+                else:
+                    print(f"📚 [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. "
+                          f"Fallback histórico já ativo (30d). Top10: {cp.get('historical_top10', [])[:5]}")
+
+        elif efficiency_score > 0.50:
+            # Sobe um degrau por ciclo
+            ladder = [w for w in self._WINDOW_LADDER if w <= base_window]
+            if not ladder:
+                ladder = [base_window]
+            current_rung = min((w for w in ladder if w >= current_window), default=base_window)
+            current_idx = ladder.index(current_rung)
+
+            if current_rung < base_window:
+                next_rung = ladder[current_idx - 1] if current_idx > 0 else base_window
+                print(f"📈 [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. "
+                      f"Expandindo janela {current_window}d → {next_rung}d.")
+                cp['dynamic_window'] = next_rung
+            else:
+                cp['dynamic_window'] = None  # restaura base
+                print(f"✅ [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. Janela base restaurada.")
+
+            if cp.get('use_historical_fallback'):
+                cp['use_historical_fallback'] = False
+                print(f"✅ [Auto-Tune] Fallback histórico desativado em {region.upper()}.")
+            
+            self._save_window_state()
+
+    def _load_historical_fallback(self, region):
+        """
+        Deriva o top10 histórico diretamente do nodes_gdf já em memória,
+        ordenando por total_cvli decrescente — sem hardcode, sem JSON externo.
+        """
+        if region not in self.specialists:
+            print(f"⚠️ [Fallback] Região {region.upper()} não inicializada.")
+            return
+
+        gdf = self.specialists[region]['data']['nodes_gdf']
+        sort_col = 'total_cvli' if 'total_cvli' in gdf.columns else \
+                   'recent_cvli' if 'recent_cvli' in gdf.columns else None
+
+        if sort_col is None:
+            print(f"⚠️ [Fallback] nodes_gdf de {region.upper()} sem coluna de CVLI para ranking.")
+            return
+
+        ranked = gdf.sort_values(sort_col, ascending=False)
+        regional_top = list(ranked['name'].head(10))
+
+        self.calib_params[region]['historical_top10'] = regional_top
+        print(f"📊 [Fallback] Top10 derivado de {sort_col} para {region.upper()}: {regional_top}")
+        self.calib_params[region]['tag_bias_direct'] = 5.00
+        self.calib_params[region]['tension_factor']  = 3.00
 
     def _initialize_models(self):
         for region, cfg in self.configs.items():
@@ -138,12 +256,10 @@ class StateOrchestrator:
             cp = self.calib_params.get(region, self.calib_params['fortaleza'])
             num_nodes = len(data['nodes_gdf'])
             
-            # --- ATUALIZAÇÃO: CÁLCULO DINÂMICO DE MOMENTUM MULTI-SCALE ---
-            # Se a rede exigir 32 canais, recuamos 60 dias extras no passado para a base de cálculo (Janela macro de 30 dias)
-            extra_history = 60 if channels == 32 else 0
+            # --- CÁLCULO DE MOMENTUM MULTI-SCALE (AGORA PARA TODAS AS REGIÕES) ---
+            # Mesmo que o modelo use 29 canais, calculamos o momentum para o Blend de Inclusão (Peso 0.4)
+            extra_history = 60
             total_window = window + extra_history
-            
-            # Prevenção: garantir que a janela total não seja maior que o histórico de dados disponível
             total_window = min(total_window, data['node_features'].shape[1])
             
             x_raw_extended = data['node_features'][:, -total_window:, :].copy()
@@ -154,59 +270,49 @@ class StateOrchestrator:
                     norm_target = normalize_name(loc_name)
                     if isinstance(info, dict):
                         intensity = float(info.get('conflict_intensity', info.get('intensity', 0.0)))
-                        impact_value = (3.0 if region == 'rmf' else 1.8) * intensity
+                        # Peso exógeno adaptativo: Interior e RMF são mais sensíveis (3.0)
+                        impact_value = (3.0 if region != 'fortaleza' else 2.5) * intensity
                         channel_idx = 25 if info.get('is_critical') else 24
                         for i, row in data['nodes_gdf'].iterrows():
                             if normalize_name(row['name']) == norm_target:
                                 x_raw_extended[i, :, channel_idx] = min(intensity, 3.0)
                                 sim_impact[i] = impact_value
 
-            # INJEÇÃO DOS CANAIS DE MOMENTUM (ESCALA MÚLTIPLA E FRIO)
+            # CÁLCULO DO MOMENTUM (Para uso no Blend de Inclusão e Modelos 33ch)
+            momentum_feat = np.zeros((num_nodes, total_window, 4))
+            cold_streak = np.zeros(num_nodes)
+            
+            for t in range(60, total_window):
+                # Escala 1 (7 dias)
+                recent_7 = x_raw_extended[:, t-7:t, 0].sum(axis=1)
+                past_7 = x_raw_extended[:, t-14:t-7, 0].sum(axis=1)
+                momentum_feat[:, t, 0] = recent_7 - past_7
+                # Escala 2 (14 dias)
+                momentum_feat[:, t, 1] = x_raw_extended[:, t-14:t, 0].sum(axis=1) - x_raw_extended[:, t-28:t-14, 0].sum(axis=1)
+                # Escala 3 (30 dias)
+                momentum_feat[:, t, 2] = x_raw_extended[:, t-30:t, 0].sum(axis=1) - x_raw_extended[:, t-60:t-30, 0].sum(axis=1)
+                # Cold Streak (Invertido)
+                crimes_today = x_raw_extended[:, t, 0]
+                cold_streak = np.where(crimes_today > 0, 0, cold_streak + 1)
+                momentum_feat[:, t, 3] = -np.clip(cold_streak, 0, 30)
+            
+            # Se o modelo exigir canais extras, injetamos no tensor de entrada
             if channels >= 32:
-                momentum_feat = np.zeros((num_nodes, total_window, channels - 29))
-                cold_streak = np.zeros(num_nodes)
-                
-                for t in range(60, total_window):
-                    # Escala 1 (7 dias - Micro conflito)
-                    recent_7 = x_raw_extended[:, t-7:t, 0].sum(axis=1)
-                    past_7 = x_raw_extended[:, t-14:t-7, 0].sum(axis=1)
-                    momentum_feat[:, t, 0] = recent_7 - past_7
-                    
-                    # Escala 2 (14 dias - Meso conflito)
-                    recent_14 = x_raw_extended[:, t-14:t, 0].sum(axis=1)
-                    past_14 = x_raw_extended[:, t-28:t-14, 0].sum(axis=1)
-                    momentum_feat[:, t, 1] = recent_14 - past_14
-                    
-                    # Escala 3 (30 dias - Macro tendência)
-                    recent_30 = x_raw_extended[:, t-30:t, 0].sum(axis=1)
-                    past_30 = x_raw_extended[:, t-60:t-30, 0].sum(axis=1)
-                    momentum_feat[:, t, 2] = recent_30 - past_30
-                    
-                    # Escala Fria (33º Canal: Cold Streak) - Se existir na arquitetura
-                    if channels == 33:
-                        crimes_today = x_raw_extended[:, t, 0]
-                        cold_streak = np.where(crimes_today > 0, 0, cold_streak + 1)
-                        momentum_feat[:, t, 3] = np.clip(cold_streak, 0, 30)
-                
-                # Anexa os novos canais ao tensor original de 29 canais
-                x_raw_extended = np.concatenate([x_raw_extended, momentum_feat], axis=2)
-                
-                # Normalização adaptativa para cada canal novo
-                for c_idx in range(29, channels):
-                    m_mean = x_raw_extended[:, :, c_idx].mean()
-                    m_std = x_raw_extended[:, :, c_idx].std() + 1e-6
-                    x_raw_extended[:, :, c_idx] = (x_raw_extended[:, :, c_idx] - m_mean) / m_std
+                # Prioridade total ao momentum (Boost 10x)
+                momentum_feat_boosted = momentum_feat[:, :, :channels-29] * 10.0
+                x_raw_extended = np.concatenate([x_raw_extended, momentum_feat_boosted], axis=2)
 
-            # Recorta a janela exata esperada pela rede neural (os 90 ou 120 dias finais após cálculo)
-            x_final = x_raw_extended[:, -window:, :].copy()
+            x_final = x_raw_extended[:, -window:, :channels].copy()
             
             # --- ATUALIZAÇÃO: TEMPORAL SHRINKAGE (MÁSCARA DE ATENÇÃO DINÂMICA) ---
             # Se o Monitor de Eficiência reduziu a janela (ex: de 120 para 60), 
-            # nós zeramos o passado distante no tensor para forçar a rede a focar apenas no presente,
-            # sem quebrar a dimensão exigida pela camada de convolução neural.
+            # nós zeramos o passado distante nos canais brutos (0-28) para focar no presente,
+            # mas PRESERVAMOS os canais de Momentum (29-32) que já embutem o histórico macro.
             active_window = cp.get('dynamic_window', window)
             if active_window and active_window < window:
-                x_final[:, :window - active_window, :] = 0.0
+                # Aplica a máscara apenas nos canais originais (0 a 28)
+                x_final[:, :window - active_window, :29] = 0.0
+                # Os canais 29, 30, 31 e 32 permanecem intactos para manter a 'inércia' da inteligência
 
             x = torch.from_numpy(x_final).float().permute(2, 0, 1).unsqueeze(0).to(self.device)
             adj = self._norm_adj(data['adj_geo'], data['adj_conflict'])
@@ -214,13 +320,49 @@ class StateOrchestrator:
             with torch.no_grad():
                 out = model(x, adj).squeeze().cpu().numpy()
             
-            # Normalização Sigmoidal
-            final_logits = out + sim_impact + (data['nodes_gdf']['tension_index'].values.astype(float) * 0.5)
-            s = 1 / (1 + np.exp(-0.7 * (final_logits - (-1.0))))
-            out_norm = np.clip(s * 100, 5.0, 100.0)
+            # --- ESTRATÉGIA DE TRANSIÇÃO (BLEND 20/40/40) ---
+            # Ideal para meses com pouco histórico (como início de março)
             
+            # 1. Componente Neural (Ranking Dinâmico) - Peso 0.2
+            r_min, r_max = out.min(), out.max()
+            norm_neural = (out - r_min) / (r_max - r_min + 1e-6)
+            
+            # 2. Componente de Tensão (Estabilidade Territorial) - Peso 0.4
+            # Fornece a 'âncora' histórica para o ranking não oscilar demais
+            tension_vec = data['nodes_gdf']['tension_index'].values.astype(float)
+            t_min, t_max = tension_vec.min(), tension_vec.max()
+            norm_tension = (tension_vec - t_min) / (t_max - t_min + 1e-6)
+            
+            # 3. Componente de Inclusão (Eventos Recentes) - Peso 0.4
+            # Garante que quem agiu nos últimos 3 dias suba, mas sem dominar 80% do peso
+            recent_crime = x_raw_extended[:, -3:, 0].sum(axis=1) > 0
+            inclusion_signal = (recent_crime | (sim_impact > 0)).astype(float)
+
+            # 4. Fallback Histórico Top10 — ativado quando P10 persiste baixo mesmo em 30d
+            # Substitui o blend normal por: 10% neural + 30% tensão + 20% recente + 40% histórico
+            if cp.get('use_historical_fallback') and cp.get('historical_top10'):
+                historical_top_norms = set(normalize_name(n) for n in cp['historical_top10'])
+                historical_signal = np.array([
+                    1.0 if normalize_name(str(row['name'])) in historical_top_norms else 0.0
+                    for _, row in data['nodes_gdf'].iterrows()
+                ])
+                final_logic = (0.10 * norm_neural) + (0.30 * norm_tension) + (0.20 * inclusion_signal) + (0.40 * historical_signal)
+                print(f"📚 [Blend] {region.upper()} usando fallback histórico top10 ({len(historical_top_norms)} nós).")
+            else:
+                # Cálculo Final: Equilíbrio entre Inteligência, Estabilidade e Reatividade
+                final_logic = (0.2 * norm_neural) + (0.4 * norm_tension) + (0.4 * inclusion_signal)
+            
+            # Escalonamento Dashboard (5% a 100%)
+            out_norm = 5.0 + (final_logic * 95.0)
+            
+            # BLOCO DE SEGURANÇA: Garantir que o especialista contribua APENAS com seus bairros
             for i, row in data['nodes_gdf'].iterrows():
-                name_key = normalize_name(row['name'])
+                name_raw = str(row['name'])
+                # Filtro absoluto anti-poluição (Ex: Tabapuá é RMF/Caucaia)
+                if region == 'fortaleza' and name_raw in ['TABAPUA', 'CAUCAIA', 'MARACANAU']:
+                    continue
+                    
+                name_key = normalize_name(name_raw)
                 combined_scores[name_key] = float(out_norm[i])
                 if return_trends: trends[name_key] = 'stable'
                 

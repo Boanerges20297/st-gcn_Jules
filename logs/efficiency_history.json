@@ -2035,5 +2035,222 @@
         "SOBRAL"
       ]
     }
+  },
+  {
+    "date": "2026-03-14",
+    "total_events": 62,
+    "brute_cvli": 9,
+    "exogenous": 53,
+    "global": {
+      "total_nodes": 108,
+      "active_locations": 22,
+      "total_events": 44,
+      "ranking_top10": [
+        "ITAPAJE",
+        "IGUATU",
+        "JUAZEIRO DO NORTE",
+        "GROAIRAS",
+        "SOBRAL",
+        "ARATUBA",
+        "TIANGUA",
+        "VICOSA DO CEARA",
+        "BATURITE",
+        "LIMOEIRO DO NORTE"
+      ],
+      "gt_sample": [
+        "BARROSO",
+        "ANCURI",
+        "HORIZONTE",
+        "IGUATU",
+        "ITAPAJE",
+        "BARRA DO CEARA",
+        "MARACANAU",
+        "AQUIRAZ",
+        "MARANGUAPE",
+        "MESSEJANA",
+        "PARACURU",
+        "CAUCAIA",
+        "ITAPIPOCA",
+        "CURIO",
+        "JANGURUSSU"
+      ],
+      "p5": 0.4,
+      "recall5": 0.0909,
+      "hits5": [
+        "ITAPAJE",
+        "IGUATU"
+      ],
+      "p10": 0.2,
+      "recall10": 0.0909,
+      "hits10": [
+        "ITAPAJE",
+        "IGUATU"
+      ],
+      "p20": 0.4,
+      "recall20": 0.3636,
+      "hits20": [
+        "ITAPAJE",
+        "IGUATU",
+        "MARACANAU",
+        "CAUCAIA",
+        "BARRA DO CEARA",
+        "HORIZONTE",
+        "MESSEJANA",
+        "BARROSO"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 39,
+      "active_locations": 8,
+      "total_events": 15,
+      "ranking_top10": [
+        "CRISTO REDENTOR",
+        "BARRA DO CEARA",
+        "GRANJA LISBOA",
+        "MESSEJANA",
+        "BARROSO",
+        "JOSE WALTER",
+        "SIQUEIRA",
+        "PLANALTO AYRTON SENNA",
+        "ALTO ALEGRE",
+        "JANGURUSSU"
+      ],
+      "gt_sample": [
+        "BARROSO",
+        "ANCURI",
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "CURIO",
+        "JANGURUSSU",
+        "MONDUBIM",
+        "CANINDEZINHO"
+      ],
+      "p5": 0.6,
+      "recall5": 0.375,
+      "hits5": [
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "BARROSO"
+      ],
+      "p10": 0.4,
+      "recall10": 0.5,
+      "hits10": [
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "BARROSO",
+        "JANGURUSSU"
+      ],
+      "p20": 0.25,
+      "recall20": 0.625,
+      "hits20": [
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "BARROSO",
+        "JANGURUSSU",
+        "ANCURI"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 19,
+      "active_locations": 11,
+      "total_events": 26,
+      "ranking_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "TRAIRI",
+        "EUSEBIO",
+        "PACAJUS",
+        "BEBERIBE",
+        "CHOROZINHO",
+        "PINDORETAMA",
+        "PACATUBA"
+      ],
+      "gt_sample": [
+        "HORIZONTE",
+        "MARACANAU",
+        "AQUIRAZ",
+        "MARANGUAPE",
+        "PARACURU",
+        "CAUCAIA",
+        "TRAIRI",
+        "CASCAVEL",
+        "PARAIPABA",
+        "PACAJUS",
+        "GUAIUBA"
+      ],
+      "p5": 0.8,
+      "recall5": 0.3636,
+      "hits5": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "TRAIRI"
+      ],
+      "p10": 0.5,
+      "recall10": 0.4545,
+      "hits10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "TRAIRI",
+        "PACAJUS"
+      ],
+      "p20": 0.5789,
+      "recall20": 1.0,
+      "hits20": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "TRAIRI",
+        "PACAJUS",
+        "PARAIPABA",
+        "AQUIRAZ",
+        "PARACURU",
+        "MARANGUAPE",
+        "GUAIUBA",
+        "CASCAVEL"
+      ]
+    },
+    "interior": {
+      "total_nodes": 50,
+      "active_locations": 3,
+      "total_events": 3,
+      "ranking_top10": [
+        "ITAPAJE",
+        "IGUATU",
+        "JUAZEIRO DO NORTE",
+        "GROAIRAS",
+        "SOBRAL",
+        "ARATUBA",
+        "TIANGUA",
+        "VICOSA DO CEARA",
+        "BATURITE",
+        "LIMOEIRO DO NORTE"
+      ],
+      "gt_sample": [
+        "IGUATU",
+        "ITAPAJE",
+        "ITAPIPOCA"
+      ],
+      "p5": 0.4,
+      "recall5": 0.6667,
+      "hits5": [
+        "ITAPAJE",
+        "IGUATU"
+      ],
+      "p10": 0.2,
+      "recall10": 0.6667,
+      "hits10": [
+        "ITAPAJE",
+        "IGUATU"
+      ],
+      "p20": 0.1,
+      "recall20": 0.6667,
+      "hits20": [
+        "ITAPAJE",
+        "IGUATU"
+      ]
+    }
   }
 ]

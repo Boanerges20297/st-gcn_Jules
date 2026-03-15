@@ -1,6 +1,6 @@
 {
   "fortaleza": {
-    "steps": 3,
+    "steps": 5,
     "history": [
       {
         "timestamp": "2026-03-01T17:34:24.833789",
@@ -58,11 +58,51 @@
           "tag_bias_neighbor": 0.6,
           "min_risk": 45.0
         }
+      },
+      {
+        "timestamp": "2026-03-14T21:32:52.514269",
+        "trigger": "fortaleza.faction_coverage=17.5% < 80%",
+        "step": 4,
+        "old_params": {
+          "tension_factor": 1.7,
+          "min_risk": 30.0,
+          "tag_bias_direct": 3.5,
+          "tag_bias_neighbor": 1.05,
+          "dynamic_window": 90,
+          "norm_neural_weight": 0.35
+        },
+        "new_params": {
+          "tension_factor": 2.2,
+          "tag_bias_direct": 4.3,
+          "tag_bias_neighbor": 1.25,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.4
+        }
+      },
+      {
+        "timestamp": "2026-03-14T21:33:07.886848",
+        "trigger": "fortaleza.faction_coverage=17.5% < 80%",
+        "step": 5,
+        "old_params": {
+          "tension_factor": 2.0,
+          "min_risk": 30.0,
+          "tag_bias_direct": 4.0,
+          "tag_bias_neighbor": 1.2,
+          "dynamic_window": 90,
+          "norm_neural_weight": 0.4
+        },
+        "new_params": {
+          "tension_factor": 2.5,
+          "tag_bias_direct": 4.8,
+          "tag_bias_neighbor": 1.4,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.45
+        }
       }
     ]
   },
   "interior": {
-    "steps": 3,
+    "steps": 5,
     "history": [
       {
         "timestamp": "2026-03-01T17:34:24.838038",
@@ -120,11 +160,51 @@
           "tag_bias_neighbor": 0.6,
           "min_risk": 45.0
         }
+      },
+      {
+        "timestamp": "2026-03-14T21:32:53.093975",
+        "trigger": "interior.faction_coverage=21.3% < 80%",
+        "step": 4,
+        "old_params": {
+          "tension_factor": 1.7,
+          "min_risk": 30.0,
+          "tag_bias_direct": 3.5,
+          "tag_bias_neighbor": 1.05,
+          "dynamic_window": 60,
+          "norm_neural_weight": 0.35
+        },
+        "new_params": {
+          "tension_factor": 2.2,
+          "tag_bias_direct": 4.3,
+          "tag_bias_neighbor": 1.25,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.4
+        }
+      },
+      {
+        "timestamp": "2026-03-14T21:33:08.383085",
+        "trigger": "interior.faction_coverage=21.3% < 80%",
+        "step": 5,
+        "old_params": {
+          "tension_factor": 2.0,
+          "min_risk": 30.0,
+          "tag_bias_direct": 4.0,
+          "tag_bias_neighbor": 1.2,
+          "dynamic_window": 60,
+          "norm_neural_weight": 0.4
+        },
+        "new_params": {
+          "tension_factor": 2.5,
+          "tag_bias_direct": 4.8,
+          "tag_bias_neighbor": 1.4,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.45
+        }
       }
     ]
   },
   "rmf": {
-    "steps": 3,
+    "steps": 5,
     "history": [
       {
         "timestamp": "2026-03-09T22:14:26.563573",
@@ -175,6 +255,46 @@
           "tag_bias_direct": 2.4,
           "tag_bias_neighbor": 0.8,
           "min_risk": 30.0
+        }
+      },
+      {
+        "timestamp": "2026-03-14T21:32:52.826619",
+        "trigger": "rmf.faction_coverage=15.8% < 80%",
+        "step": 4,
+        "old_params": {
+          "tension_factor": 1.7,
+          "min_risk": 30.0,
+          "tag_bias_direct": 3.5,
+          "tag_bias_neighbor": 1.05,
+          "dynamic_window": null,
+          "norm_neural_weight": 0.35
+        },
+        "new_params": {
+          "tension_factor": 2.2,
+          "tag_bias_direct": 4.3,
+          "tag_bias_neighbor": 1.25,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.4
+        }
+      },
+      {
+        "timestamp": "2026-03-14T21:33:08.136653",
+        "trigger": "rmf.faction_coverage=15.8% < 80%",
+        "step": 5,
+        "old_params": {
+          "tension_factor": 2.0,
+          "min_risk": 30.0,
+          "tag_bias_direct": 4.0,
+          "tag_bias_neighbor": 1.2,
+          "dynamic_window": null,
+          "norm_neural_weight": 0.4
+        },
+        "new_params": {
+          "tension_factor": 2.5,
+          "tag_bias_direct": 4.8,
+          "tag_bias_neighbor": 1.4,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.45
         }
       }
     ]

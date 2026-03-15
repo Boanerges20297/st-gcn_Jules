@@ -81,13 +81,14 @@ class DeepSTGAT_64(nn.Module):
         self.layer2 = STGCNBlock(32, 64, time_steps, dropout)
         self.layer3 = STGCNBlock(64, 64, time_steps, dropout)
         self.final_conv = nn.Conv2d(64, 64, kernel_size=(1, time_steps))
+        self.prelu_final = nn.PReLU()
         self.fc = nn.Sequential(nn.Linear(64, 32), nn.PReLU(), nn.Linear(32, 1))
 
     def forward(self, x, adj_list):
         x = self.layer1(x, adj_list)
         x = self.layer2(x, adj_list)
         x = self.layer3(x, adj_list)
-        x = self.final_conv(x).squeeze(-1).permute(0, 2, 1)
+        x = self.prelu_final(self.final_conv(x)).squeeze(-1).permute(0, 2, 1)
         return self.fc(x)
 
 class TemperatureExpertGAT(nn.Module):

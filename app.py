@@ -616,7 +616,10 @@ def load_data_and_models():
         generate_daily_ranking_report()
         
         # Disparar Monitor em Segundo Plano (Thread Paralela)
-        threading.Thread(target=run_background_efficiency_monitor, daemon=True).start()
+        # Guard: não iniciar no processo filho do Flask reloader
+        import os as _os
+        if _os.environ.get('WERKZEUG_RUN_MAIN') != 'true' or not app.debug:
+            threading.Thread(target=run_background_efficiency_monitor, daemon=True).start()
     except Exception as e:
         print(f"❌ Erro Motor: {e}")
 
@@ -658,7 +661,10 @@ def get_micronodes():
     path = os.path.join(app.root_path, 'data', 'raw', 'inteligencia', 'micronodos_faccoes_2026.geojson')
     if os.path.exists(path):
         with open(path, 'r', encoding='utf-8') as f:
-            return jsonify(json.load(f))
+            data = json.load(f)
+            if isinstance(data, dict) and 'features' in data:
+                data['features'] = data['features'][:20]
+            return jsonify(data)
     return jsonify({"type": "FeatureCollection", "features": []})
 
 @app.route('/api/top20_micro_nodes')
@@ -677,7 +683,10 @@ def get_top20_micro_nodes():
     
     if os.path.exists(path):
         with open(path, 'r', encoding='utf-8') as f:
-            return jsonify(json.load(f))
+            data = json.load(f)
+            if isinstance(data, dict) and 'features' in data:
+                data['features'] = data['features'][:20]
+            return jsonify(data)
     
     # Fallback se o regional nao existir
     fallback_path = os.path.join(app.root_path, 'outputs', 'top20_micro_nodes.geojson')
@@ -860,13 +869,50 @@ def get_risk():
         # Carregar Inteligência de Ruas Críticas
         streets_cache = {}
         try:
+            # Primeiro tenta carregar de ruas_criticas_por_bairro.json (formato dicionário por bairro)
             streets_path = os.path.join(BASE_DIR, 'data', 'raw', 'ruas_criticas_por_bairro.json')
             if os.path.exists(streets_path):
                 with open(streets_path, 'r', encoding='utf-8') as sf:
                     streets_cache = json.load(sf)
                 # Criar versao normalizada do cache para match garantido
                 streets_cache = {normalize_name(k): v for k, v in streets_cache.items() if k}
-                print(f"✅ Inteligência de ruas carregada: {len(streets_cache)} bairros.")
+                print(f"✅ Inteligência de ruas (via bairro.json): {len(streets_cache)} bairros.")
+            else:
+                # Fallback: carregar geo_streets_cache.json (formato array) e agrupar por bairro
+                geo_streets_path = os.path.join(BASE_DIR, 'data', 'geo_streets_cache.json')
+                if os.path.exists(geo_streets_path):
+                    with open(geo_streets_path, 'r', encoding='utf-8') as sf:
+                        geo_streets_array = json.load(sf) or []
+                    
+                    # Agrupar ruas por bairro e contar ocorrências
+                    streets_by_bairro = {}
+                    for item in geo_streets_array:
+                        bairro = (item.get('bairro') or item.get('area') or 'DESCONHECIDO').strip()
+                        rua = (item.get('rua') or item.get('street') or 'AREA SEM NOME').strip()
+                        ocorrencias = item.get('ocorrencias', 1)
+                        
+                        if not bairro or bairro.upper() == 'DESCONHECIDO':
+                            continue  # Pula bairros desconhecidos
+                        
+                        bairro_norm = normalize_name(bairro)
+                        if bairro_norm not in streets_by_bairro:
+                            streets_by_bairro[bairro_norm] = []
+                        
+                        # Adicionar rua com peso de ocorrências
+                        streets_by_bairro[bairro_norm].append({
+                            'name': rua,
+                            'occurrences': ocorrencias
+                        })
+                    
+                    # Ordenar ruas por ocorrências e manter os top N por bairro
+                    streets_cache = {}
+                    for bairro_norm, streets_list in streets_by_bairro.items():
+                        # Ordena por ocorrências (maior primeiro) e pega top 8
+                        sorted_streets = sorted(streets_list, key=lambda x: x.get('occurrences', 0), reverse=True)
+                        top_streets = [s['name'] for s in sorted_streets[:8]]
+                        streets_cache[bairro_norm] = top_streets
+                    
+                    print(f"✅ Inteligência de ruas (via geo_streets_cache.json): {len(streets_cache)} bairros com top ruas.")
         except Exception as e: 
             print(f"❌ Erro ao carregar ruas: {e}")
 
@@ -905,12 +951,17 @@ def get_risk():
                     meta['counts']['baixo'] += 1
 
                 # Inteligência de Ruas Críticas
-                critical_streets_info = streets_cache.get(name_norm, 'Sem logradouros críticos recentes')
-                if critical_streets_info == 'Sem logradouros críticos recentes':
+                critical_streets_info = streets_cache.get(name_norm, None)
+                if critical_streets_info is None:
+                    # Tentar match parcial
                     for k, v in streets_cache.items():
                         if name_norm in k or k in name_norm:
                             critical_streets_info = v
                             break
+                
+                # Se ainda não encontrou, usar fallback
+                if critical_streets_info is None:
+                    critical_streets_info = 'Sem logradouros críticos recentes'
 
                 node_metrics = {
                     'cvli_7d': 0,
@@ -1136,6 +1187,71 @@ def get_risk():
 
         return jsonify({'meta': meta, 'data': results})
     except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/territory')
+def get_territory():
+    """Retorna informações detalhadas de um território/nó específico (incluindo ruas críticas)."""
+    if nodes_gdf is None or orchestrator is None:
+        return jsonify({'error': 'Inicializando...'}), 503
+    
+    try:
+        name_param = request.args.get('name', '').strip().upper()
+        if not name_param:
+            return jsonify({'error': 'Parâmetro name é obrigatório'}), 400
+        
+        # Normalizar o nome
+        name_norm = normalize_name(name_param)
+        
+        # Obter as respostas da API /api/risk para usar os dados já processados
+        risk_response = get_risk()
+        if risk_response.status_code != 200:
+            return jsonify({'error': 'Erro ao obter dados de risco'}), 500
+        
+        risk_data = risk_response.get_json()
+        results = risk_data.get('data', [])
+        
+        # Procurar pelo nó específico
+        node_result = None
+        for item in results:
+            if normalize_name(item.get('name', '')) == name_norm:
+                node_result = item
+                break
+        
+        if not node_result:
+            # Se não encontrar, retornar um objeto vazio com estrutura básica
+            return jsonify({
+                'name': name_param,
+                'node_id': None,
+                'risk_score': 0,
+                'metrics': {
+                    'critical_streets': 'Sem logradouros críticos registrados',
+                    'cvli_7d': 0,
+                    'tension': 0,
+                    'events_count': 0,
+                    'event_types': []
+                }
+            })
+        
+        return jsonify({
+            'name': node_result.get('name'),
+            'node_id': node_result.get('node_id'),
+            'clean_name': node_result.get('clean_name'),
+            'risk_score': node_result.get('risk_score'),
+            'tension_score': node_result.get('tension_score'),
+            'status_label': node_result.get('status_label'),
+            'faction': node_result.get('faction'),
+            'region_type': node_result.get('region_type'),
+            'metrics': node_result.get('metrics', {
+                'critical_streets': 'Indispoível',
+                'cvli_7d': 0,
+                'tension': 0,
+                'events_count': 0,
+                'event_types': []
+            })
+        })
+    except Exception as e:
+        print(f"Erro em /api/territory: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/simulate', methods=['POST'])
@@ -1378,9 +1494,12 @@ def get_geo_critical_streets():
                 match_cidade = True
 
             if (bairro_norm and match_bairro and match_cidade) or (not bairro_norm and cidade_norm and match_cidade):
-                filtered.append(s)
-                
-        # Limitar às 10 mais críticas para não sobrecarregar
+                rua_val = normalize_name(s.get('rua', ''))
+                if rua_val and rua_val != 'AREA SEM NOME':
+                    filtered.append(s)
+
+        # Ordenar por ocorrências e limitar às 10 mais críticas
+        filtered.sort(key=lambda x: x.get('ocorrencias', 0), reverse=True)
         return jsonify(filtered[:10])
     except Exception as e:
         return jsonify({'error': str(e)}), 500

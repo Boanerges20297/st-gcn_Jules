@@ -6,14 +6,15 @@ o calibrador aplica ajustes graduais nos parâmetros do orchestrator sem retrain
 
 Estratégia:
 - Cada degradação detectada aplica 1 passo de ajuste
-- Máximo de 3 passos acumulados por região
-- Após 3 passos sem melhora: alerta CRITICAL pedindo intervenção manual
-- Quando a métrica volta ao normal: reverte 1 passo (recuperação gradual)
+- Máximo de 5 passos acumulados por região (aumentado de 3)
+- Após 5 passos sem melhora: alerta CRITICAL pedindo intervenção manual
+- Quando a métrica volta ao normal: rollback completo para defaults
 
 Parâmetros ajustados:
-  dampening       0.82 → min 0.55  — menos amortecimento = maior contraste entre scores
-  tension_factor  0.50 → max 1.20  — tensão de facção pesa mais no ranking
-  tag_bias_direct 1.50 → max 3.50  — gatilho INTEL_TRIGGER empurra o nó para o topo
+  tension_factor  0.80 → max 3.00  — tensão de facção pesa mais no ranking (base mais alta)
+  tag_bias_direct 2.00 → max 5.00  — gatilho INTEL_TRIGGER empurra o nó para o topo
+  tag_bias_neighbor 0.60 → max 1.50 — influência de vizinhos
+  norm_neural_weight 0.20 → max 0.50 — peso do componente neural no blend final
 """
 
 import os
@@ -25,27 +26,37 @@ from typing import Dict, Optional
 logger = logging.getLogger(__name__)
 
 # Limites absolutos para não degradar a inferência
-# dampening removido — comprimir outliers é irracional para tensão territorial
 _PARAM_LIMITS = {
-    'tension_factor':     (0.50, 2.00),   # ampliado: tensão pode precisar de mais peso
-    'min_risk':           (15.0, 30.0),
-    'tag_bias_direct':    (1.50, 3.50),
-    'tag_bias_neighbor':  (0.50, 1.20),
+    'tension_factor':       (0.80, 3.00),  # base mais alta, máximo mais agressivo
+    'min_risk':             (15.0, 30.0),
+    'tag_bias_direct':      (2.00, 5.00),  # base e teto maiores para INTEL mais forte
+    'tag_bias_neighbor':    (0.60, 1.50),
+    'norm_neural_weight':   (0.20, 0.50),  # quanto o modelo neural contribui no blend
 }
 
-# Quanto cada passo ajusta por métrica
+# Passos calibrados para ter impacto real no ranking
+# Passo 1-2: ajuste suave. Passo 3-4: agressivo. Passo 5: máximo.
 _STEPS = {
     'p20': {
-        'tension_factor':     +0.20,   # mais peso de tensão territorial
-        'tag_bias_direct':    +0.30,   # gatilho INTEL mais forte
-        'tag_bias_neighbor':  +0.10,
-        'min_risk':            0.0,
+        'tension_factor':       +0.30,
+        'tag_bias_direct':      +0.50,
+        'tag_bias_neighbor':    +0.15,
+        'min_risk':              0.0,
+        'norm_neural_weight':   +0.05,
     },
     'p10': {
-        'tension_factor':     +0.30,
-        'tag_bias_direct':    +0.45,
-        'tag_bias_neighbor':  +0.15,
-        'min_risk':            0.0,
+        'tension_factor':       +0.45,
+        'tag_bias_direct':      +0.75,
+        'tag_bias_neighbor':    +0.20,
+        'min_risk':              0.0,
+        'norm_neural_weight':   +0.08,
+    },
+    'faction_coverage': {
+        'tension_factor':       +0.50,
+        'tag_bias_direct':      +0.80,
+        'tag_bias_neighbor':    +0.20,
+        'min_risk':              0.0,
+        'norm_neural_weight':   +0.05,
     },
 }
 
@@ -56,7 +67,7 @@ class ModelCalibrator:
     Estado persiste em data/calibration_state.json.
     """
 
-    MAX_STEPS = 3
+    MAX_STEPS = 5
 
     def __init__(self, base_dir: str, health_monitor=None):
         self.base_dir = base_dir
@@ -165,10 +176,11 @@ class ModelCalibrator:
         params_before = dict(orchestrator.calib_params.get(region, {}))
 
         defaults = {
-            'tension_factor':     0.50,
+            'tension_factor':     0.80,
             'min_risk':          30.0,
-            'tag_bias_direct':    1.50,
-            'tag_bias_neighbor':  0.50,
+            'tag_bias_direct':    2.00,
+            'tag_bias_neighbor':  0.60,
+            'norm_neural_weight': 0.20,
         }
         orchestrator.calib_params[region].update(defaults)
 
@@ -232,28 +244,33 @@ class ModelCalibrator:
             if steps <= 0:
                 continue
             defaults = {
-                'tension_factor': 0.50,
+                'tension_factor': 0.80,
                 'min_risk': 30.0,
-                'tag_bias_direct': 1.50,
-                'tag_bias_neighbor': 0.50,
+                'tag_bias_direct': 2.00,
+                'tag_bias_neighbor': 0.60,
+                'norm_neural_weight': 0.20,
             }
             # Recalcula parâmetros acumulados (p20 steps por simplicidade)
             step = _STEPS['p20']
             new_cp = {}
             for param, delta in step.items():
+                if param not in _PARAM_LIMITS:
+                    continue
                 lo, hi = _PARAM_LIMITS[param]
-                new_val = round(max(lo, min(hi, defaults[param] + delta * steps)), 4)
+                base = defaults.get(param, lo)
+                new_val = round(max(lo, min(hi, base + delta * steps)), 4)
                 new_cp[param] = new_val
             if region in orchestrator.calib_params:
                 orchestrator.calib_params[region].update(new_cp)
                 print(f"🔄 [Calibrator] Reapplied {steps} step(s) for {region}: {new_cp}")
 
-    def _default(self, param: str) -> float:
+    def _default(self, param: str) -> float:  # noqa: E301
         defaults = {
-            'tension_factor': 0.50,
-            'min_risk': 30.0,
-            'tag_bias_direct': 1.50,
-            'tag_bias_neighbor': 0.50,
+            'tension_factor':     0.80,
+            'min_risk':           30.0,
+            'tag_bias_direct':    2.00,
+            'tag_bias_neighbor':  0.60,
+            'norm_neural_weight': 0.20,
         }
         return defaults.get(param, 0.0)
 
