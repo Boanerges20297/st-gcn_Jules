@@ -37,13 +37,16 @@ class EfficiencyMonitor:
             total_brute = 0
             total_exo = 0
 
-            # 2a. EFICIÊNCIA BRUTA: Coletar CVLIs Reais dos últimos 14 dias nos modelos
-            # (ampliado de 7→14 dias para capturar mais CVLIs reais, aproximando do treino)
+            # 2a. EFICIÊNCIA BRUTA: Coletar CVLIs Reais dos últimos N passos de tempo
+            # Interior tem eventos muito esparsos: usar janela mais longa (28 passos)
+            # Fortaleza/RMF usam 14 passos (sinal mais denso, janela menor é suficiente)
+            WINDOW_BY_REGION = {'fortaleza': 14, 'rmf': 14, 'interior': 28}
             for r_name, spec in self.orchestrator.specialists.items():
                 data = spec['data']
                 nf = data['node_features']
-                # Canal 0 é CVLI. Pegamos a soma dos últimos 14 passos de tempo do dataset
-                recent_cvli = nf[:, -14:, 0].sum(axis=1)
+                window = WINDOW_BY_REGION.get(r_name, 14)
+                # Canal 0 é CVLI. Pegamos a soma dos últimos N passos de tempo do dataset
+                recent_cvli = nf[:, -window:, 0].sum(axis=1)
                 for i, row in data['nodes_gdf'].iterrows():
                     count = int(recent_cvli[i])
                     if count > 0:

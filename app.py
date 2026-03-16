@@ -323,8 +323,8 @@ def run_background_efficiency_monitor():
             except Exception as e:
                 print(f"⚠️ [Monitor] Erro na thread de eficiência: {e}")
         
-        # Dorme por 7 dias antes da próxima rodada (604800 segundos)
-        time.sleep(86400)  # reavaliação diária — termômetro deve refletir dados recentes
+        # Reavaliação a cada 30 minutos — auto-ajuste reativo em tempo de produção
+        time.sleep(1800)
 
 def verify_date_consistency(event_date_str, last_base_date):
     """
@@ -564,6 +564,28 @@ def load_data_and_models():
     except Exception as e:
         print(f"⚠️ Aviso: Falha ao atualizar cache de ruas: {e}")
 
+    # --- LOCALIDADES CRÍTICAS POR MUNICÍPIO (RMF / INTERIOR) ---
+    # Roda em background para não bloquear o startup.
+    # Modo rápido (bairros + exógenos, sem geocoding) → resultado imediato.
+    # O geocoding completo é disparado em thread separada e enriquece o arquivo incrementalmente.
+    def _build_municipio_streets_bg():
+        try:
+            from scripts.gerar_streets_municipios import build as _build_mun
+            mun_path = os.path.join(BASE_DIR, 'data', 'streets_by_municipio.json')
+            # Primeiro passo: rápido (sem geocoding) — popula o arquivo imediatamente
+            if not os.path.exists(mun_path):
+                print("🗺️  Gerando localidades por município (modo rápido, 30 dias)...")
+                _build_mun(fast_mode=True, days=30)
+                print("✅ Localidades por município (rápido) geradas.")
+            # Segundo passo: enriquecimento com geocoding — apenas últimos 30 dias
+            print("🌐 Enriquecendo localidades com geocoding (background, 30 dias)...")
+            _build_mun(fast_mode=False, days=30)
+            print("✅ Localidades por município enriquecidas com geocoding.")
+        except Exception as _e:
+            print(f"⚠️ Erro ao gerar localidades por município: {_e}")
+
+    threading.Thread(target=_build_municipio_streets_bg, daemon=True).start()
+
     # Load all regional metadata (auto-discovery via glob)
     import glob as _glob
     dfs = []
@@ -676,15 +698,47 @@ def track_request_end(response):
 @app.route('/connections')
 def connections(): return render_template('connections.html')
 
+_RMF_CITIES = {
+    'CAUCAIA','MARACANAU','MARACANAÚ','PACATUBA','MARANGUAPE','AQUIRAZ',
+    'EUSEBIO','EUSÉBIO','HORIZONTE','ITAITINGA','GUAIUBA','GUAIÚBA',
+    'BEBERIBE','CASCAVEL','CHOROZINHO','PACAJUS','PINDORETAMA',
+    'SAO LUIS DO CURU','PARACURU','PARAIPABA','TRAIRI','GENERAL SAMPAIO',
+    'ITAPIPOCA','ACARAPE','REDENÇÃO','REDENCAO','PALMACIA','PALMÁCIA',
+}
+
+def _classify_region(props: dict) -> str:
+    """Infere região (fortaleza/rmf/interior) a partir das propriedades do micronodo."""
+    mn  = str(props.get('micronodo') or '').upper()
+    lat = props.get('lat') or 0
+    lng = props.get('long') or 0
+    # Fortaleza por bbox
+    if -3.86 <= lat <= -3.69 and -38.64 <= lng <= -38.40:
+        return 'fortaleza'
+    # Extrair município do campo micronodo: formato 'LOC - CIDADE / CE'
+    if ' - ' in mn:
+        cidade_raw = mn.split(' - ')[-1].split('/')[0].strip()
+        cidade_norm = normalize_name(cidade_raw)
+        if cidade_norm in ('FORTALEZA',):
+            return 'fortaleza'
+        if cidade_raw in _RMF_CITIES or normalize_name(cidade_raw) in {normalize_name(c) for c in _RMF_CITIES}:
+            return 'rmf'
+        if cidade_raw:
+            return 'interior'
+    # RMF por coordenadas aproximadas (bbox Grande Fortaleza)
+    if -4.20 <= lat <= -3.60 and -38.90 <= lng <= -38.20:
+        return 'rmf'
+    return 'interior'
+
 @app.route('/api/micronodes')
 def get_micronodes():
     path = os.path.join(app.root_path, 'data', 'raw', 'inteligencia', 'micronodos_faccoes_2026.geojson')
     if os.path.exists(path):
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-            if isinstance(data, dict) and 'features' in data:
-                data['features'] = data['features'][:20]
-            return jsonify(data)
+        if isinstance(data, dict) and 'features' in data:
+            for feat in data['features']:
+                feat['properties']['region'] = _classify_region(feat['properties'])
+        return jsonify(data)
     return jsonify({"type": "FeatureCollection", "features": []})
 
 @app.route('/api/top20_micro_nodes')
@@ -930,6 +984,55 @@ def get_risk():
         except Exception as e: 
             print(f"❌ Erro ao carregar ruas: {e}")
 
+        # Índice de localidades/ruas para RMF e Interior
+        # Fonte primária: streets_by_municipio.json (gerado por gerar_streets_municipios.py)
+        # Fallback inline: bairros + exógenos sem geocoding se o arquivo ainda não existir
+        exo_streets_by_municipio = {}
+        try:
+            _mun_streets_path = os.path.join(BASE_DIR, 'data', 'streets_by_municipio.json')
+            if os.path.exists(_mun_streets_path):
+                with open(_mun_streets_path, 'r', encoding='utf-8') as _msf:
+                    exo_streets_by_municipio = json.load(_msf)
+                print(f"✅ Localidades por município: {len(exo_streets_by_municipio)} municípios carregados.")
+            else:
+                # Fallback: bairros do CSV + exógenos, sem geocoding (para o primeiro boot)
+                from collections import defaultdict, Counter as _Counter
+                _mun_locs: dict = defaultdict(_Counter)
+                _INVALID = ['HOMICIDIO','BALA','FOGO','LESAO','MORTE','CADAVER',
+                            'LATROCINIO','TIRO','EXECUCAO','ACHADO','CVLI','CVP']
+                _csv_path = os.path.join(BASE_DIR, 'data', 'raw', 'dados_status_ocorrencias_gerais_ENRIQUECIDO.csv')
+                if os.path.exists(_csv_path):
+                    import pandas as _pd
+                    _df = _pd.read_csv(_csv_path, usecols=['cidade','bairro','tipo'], low_memory=False)
+                    _df_nf = _df[
+                        _df['cidade'].notna() &
+                        ~_df['cidade'].str.upper().str.contains('FORTALEZA', na=True) &
+                        _df['bairro'].notna() & (_df['bairro'].str.len() > 2)
+                    ]
+                    for _, _rw in _df_nf.iterrows():
+                        _ck = normalize_name(str(_rw['cidade']))
+                        _b  = str(_rw['bairro']).strip().upper()
+                        if _b and not any(t in _b for t in _INVALID):
+                            _peso = 3 if str(_rw.get('tipo','')).lower() == 'cvli' else 1
+                            _mun_locs[_ck][_b] += _peso
+                _exo_path = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
+                if os.path.exists(_exo_path):
+                    with open(_exo_path, 'r', encoding='utf-8') as _ef:
+                        _exo_evs = json.load(_ef)
+                    for _ev in _exo_evs:
+                        _mun = normalize_name(_ev.get('municipio') or '')
+                        if not _mun or _mun == 'fortaleza': continue
+                        _b = str(_ev.get('bairro') or '').strip().upper()
+                        if _b and len(_b) > 2 and not any(t in _b for t in _INVALID):
+                            _mun_locs[_mun][_b] += 5
+                for _mk, _ctr in _mun_locs.items():
+                    _top = [l for l, _ in _ctr.most_common(8) if len(l) > 3]
+                    if _top:
+                        exo_streets_by_municipio[_mk] = _top
+                print(f"✅ Localidades fallback (bairros): {len(exo_streets_by_municipio)} municípios.")
+        except Exception as _exo_err:
+            print(f"⚠️ Erro ao carregar localidades por município: {_exo_err}")
+
         for i, row in nodes_gdf.iterrows():
             try:
                 name = str(row['name'])
@@ -965,13 +1068,20 @@ def get_risk():
 
                 # Inteligência de Ruas Críticas
                 critical_streets_info = streets_cache.get(name_norm, None)
-                if critical_streets_info is None:
-                    # Tentar match parcial
+                if critical_streets_info is None and reg == 'fortaleza':
+                    # Match parcial só para nós de Fortaleza (bairros no cache)
                     for k, v in streets_cache.items():
                         if name_norm in k or k in name_norm:
                             critical_streets_info = v
                             break
-                
+
+                # Para RMF/Interior: índice de localidades por município
+                # O name_norm para esses nodes É o nome do município (ex: 'CAUCAIA', 'MARACANAU')
+                if critical_streets_info is None and reg in ('rmf', 'interior'):
+                    exo_locs = exo_streets_by_municipio.get(name_norm)
+                    if exo_locs:
+                        critical_streets_info = exo_locs
+
                 # Se ainda não encontrou, usar fallback
                 if critical_streets_info is None:
                     critical_streets_info = 'Sem logradouros críticos recentes'
@@ -1512,7 +1622,49 @@ def get_geo_critical_streets():
 
         # Ordenar por ocorrências e limitar às 10 mais críticas
         filtered.sort(key=lambda x: x.get('ocorrencias', 0), reverse=True)
-        return jsonify(filtered[:10])
+        if filtered:
+            return jsonify(filtered[:10])
+
+        # ── Fallback: streets_by_municipio.json (RMF / Interior) ─────────────
+        # Para nós RMF/Interior o bairroParam é o nome do município.
+        # Tentamos: normalize(bairro) e normalize(cidade) como chaves.
+        mun_streets_path = os.path.join(BASE_DIR, 'data', 'streets_by_municipio.json')
+        if os.path.exists(mun_streets_path):
+            try:
+                with open(mun_streets_path, 'r', encoding='utf-8') as _mf:
+                    mun_data = json.load(_mf)
+                candidates = []
+                for key in (bairro_norm, cidade_norm):
+                    if key and key in mun_data:
+                        candidates = mun_data[key]
+                        break
+                # Match parcial se exato não encontrou
+                if not candidates:
+                    for mk, locs in mun_data.items():
+                        if bairro_norm and (bairro_norm == mk or bairro_norm in mk or mk in bairro_norm):
+                            candidates = locs
+                            break
+                if candidates:
+                    # Suporta formato novo [{"loc": ..., "score": ...}] e legado [str]
+                    result = []
+                    for entry in candidates[:10]:
+                        if isinstance(entry, dict):
+                            # cvli = contagem bruta; score = peso ponderado (desempate)
+                            result.append({'rua': entry['loc'], 'bairro': bairro,
+                                           'cidade': bairro,
+                                           'ocorrencias': entry.get('cvli', 0),
+                                           'source': 'intelligence'})
+                        else:
+                            result.append({'rua': entry, 'bairro': bairro,
+                                           'cidade': bairro, 'ocorrencias': 0,
+                                           'source': 'intelligence'})
+                    # Já vem ordenado por cvli desc do JSON; garante ordem aqui também
+                    result.sort(key=lambda x: x['ocorrencias'], reverse=True)
+                    return jsonify(result)
+            except Exception:
+                pass
+
+        return jsonify([])
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

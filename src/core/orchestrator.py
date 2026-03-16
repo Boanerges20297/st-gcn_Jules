@@ -39,6 +39,16 @@ class StateOrchestrator:
         else:
             fortaleza_model_file = active_file
             has_momentum = False
+
+        # Roteamento dinâmico para o Interior (33ch quando retreinado)
+        interior_retrain_file = 'interior_retrain_64.pth'
+        interior_active_file  = 'interior_model.pth'
+        if os.path.exists(os.path.join(self.root, 'models', 'active', interior_retrain_file)):
+            interior_model_file   = interior_retrain_file
+            interior_has_momentum = True
+        else:
+            interior_model_file   = interior_active_file
+            interior_has_momentum = False
         
         self.configs = {
             'fortaleza': {
@@ -56,11 +66,11 @@ class StateOrchestrator:
                 'window': 90
             },
             'interior': {
-                'model_path': os.path.join(self.root, 'models', 'active', 'interior_model.pth'),
+                'model_path': os.path.join(self.root, 'models', 'active', interior_model_file),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_interior.pkl'),
                 'class': DeepSTGAT_64,
-                'in_channels': 29,
-                'window': 90
+                'in_channels': 33 if interior_has_momentum else 29,
+                'window': 120 if interior_has_momentum else 90
             }
         }
         

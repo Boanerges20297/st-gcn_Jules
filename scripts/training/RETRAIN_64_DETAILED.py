@@ -105,20 +105,16 @@ def train_retrain_64():
         momentum_feat[:, t, 2] = recent_30 - past_30
         crimes_today = features[:, t, 0]
         cold_streak = np.where(crimes_today > 0, 0, cold_streak + 1)
-        momentum_feat[:, t, 3] = np.clip(cold_streak, 0, 30)
+        momentum_feat[:, t, 3] = -np.clip(cold_streak, 0, 30)
     
     features_extended = np.concatenate([features, momentum_feat], axis=2)
     C_ext = features_extended.shape[2]
 
-    # Normalização
-    features_norm = features_extended.copy()
-    for c in range(C_ext):
-        m, s = features_extended[:, :, c].mean(), features_extended[:, :, c].std() + 1e-6
-        features_norm[:, :, c] = (features_extended[:, :, c] - m) / s
+    # Dados brutos — sem normalização para preservar picos de criminalidade
 
     X, Y = [], []
     for t in range(WINDOW, T_total - 7):
-        x = torch.tensor(features_norm[:, t-WINDOW:t, :], dtype=torch.float32).permute(2, 0, 1).unsqueeze(0)
+        x = torch.tensor(features_extended[:, t-WINDOW:t, :], dtype=torch.float32).permute(2, 0, 1).unsqueeze(0)
         y = torch.tensor(features[:, t:t+7, 0].sum(axis=1), dtype=torch.float32)
         X.append(x)
         Y.append(y)

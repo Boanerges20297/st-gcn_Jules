@@ -47,16 +47,11 @@ def train_specialist(region_key):
     adj_geo = torch.tensor(normalize_adj(adj_geo_np), dtype=torch.float32).to(DEVICE)
     adj_conf = torch.tensor(adj_conf_np, dtype=torch.float32).to(DEVICE)
     N, T, C = nf.shape
-    
-    # Normalização Z-Score
-    f_norm = nf.copy()
-    for c in range(C):
-        m, s = nf[:,:,c].mean(), nf[:,:,c].std() + 1e-5
-        f_norm[:,:,c] = (nf[:,:,c] - m) / s
+    # Dados brutos — sem normalização para preservar picos de criminalidade
 
     X_list, y_list = [], []
     for t in range(WINDOW, T - 7):
-        X_list.append(torch.tensor(f_norm[:, t-WINDOW:t, :], dtype=torch.float32).permute(2,0,1).unsqueeze(0))
+        X_list.append(torch.tensor(nf[:, t-WINDOW:t, :], dtype=torch.float32).permute(2,0,1).unsqueeze(0))
         y_list.append(torch.tensor(nf[:, t:t+7, 0].sum(axis=1), dtype=torch.float32).unsqueeze(0))
     
     val_size = 60
@@ -80,7 +75,7 @@ def train_specialist(region_key):
             pred = model(bx, [adj_geo, adj_conf]).squeeze()
             target = by.squeeze()
             
-            mse = F.smooth_l1_loss(pred, target / (target.max() + 1e-5))
+            mse = F.smooth_l1_loss(pred, target)
             k_rank = 15 if region_key == 'fortaleza' else 10
             _, top_idx = torch.topk(target, min(k_rank, N))
             num_neg = min(30, N)

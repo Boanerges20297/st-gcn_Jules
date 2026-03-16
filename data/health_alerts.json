@@ -1314,6 +1314,69 @@
         "error_rate_percent": 28.57142857142857
       },
       "resolved": false
+    },
+    {
+      "timestamp": "2026-03-15T17:13:07.890789",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 20.0% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: NOVO MONDUBIM, PARQUE DOIS IRMAOS, PIRAMBU",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.2,
+        "threshold": 0.8,
+        "faction_nodes_total": 40,
+        "faction_nodes_in_top20": 8,
+        "missing_sample": [
+          "NOVO MONDUBIM",
+          "PARQUE DOIS IRMAOS",
+          "PIRAMBU",
+          "BONSUCESSO",
+          "GRANJA PORTUGAL"
+        ]
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-15T17:13:08.130930",
+      "type": "faction_coverage_rmf",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — RMF: apenas 15.8% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: AQUIRAZ, SAO GONCALO DO AMARANTE, CHOROZINHO",
+      "details": {
+        "region": "rmf",
+        "coverage": 0.1579,
+        "threshold": 0.8,
+        "faction_nodes_total": 19,
+        "faction_nodes_in_top20": 3,
+        "missing_sample": [
+          "AQUIRAZ",
+          "SAO GONCALO DO AMARANTE",
+          "CHOROZINHO",
+          "MARANGUAPE",
+          "PACATUBA"
+        ]
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-15T17:13:08.381753",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 21.3% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: ITAREMA, OROS, VARZEA ALEGRE",
+      "details": {
+        "region": "interior",
+        "coverage": 0.2128,
+        "threshold": 0.8,
+        "faction_nodes_total": 47,
+        "faction_nodes_in_top20": 10,
+        "missing_sample": [
+          "ITAREMA",
+          "OROS",
+          "VARZEA ALEGRE",
+          "SANTANA DO ACARAU",
+          "BANABUIU"
+        ]
+      },
+      "resolved": false
     }
   ]
 }

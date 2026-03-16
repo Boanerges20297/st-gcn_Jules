@@ -320,7 +320,7 @@
             }
         }
 
-        /* ===== CALIBRAÃ‡ÃƒO ===== */
+        /* ===== CALIBRAÇÃO ===== */
         .calib-region {
             background: #1e293b;
             border: 1px solid #334155;
@@ -391,12 +391,15 @@
     <div class="container">
         <header>
             <div>
-                <h1>ðŸ›¡ï¸ Admin Dashboard - Health Monitor</h1>
+                <h1>🛡️ Admin Dashboard - Health Monitor</h1>
                 <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">
                     REPORT PREVIEW v2.0 | Monitoramento em Tempo Real
                 </p>
                 <a href="/" style="display:inline-flex; align-items:center; gap:6px; margin-top:8px; padding:6px 14px; background:#1e293b; border:1px solid #64748b; border-radius:6px; color:#cbd5e1; font-size:12px; text-decoration:none; transition:background 0.2s;" onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'">
-                    â† Voltar ao Mapa
+                    <svg width="18" height="18" viewBox="0 0 20 20" fill="#3b82f6" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;">
+                        <path d="M12.5 16a1 1 0 01-1.41 0l-5.3-5.29a1 1 0 010-1.42l5.3-5.29A1 1 0 0113.91 5.7l-4.3 4.3H17a1 1 0 110 2H9.61l4.3 4.3A1 1 0 0112.5 16z"/>
+                    </svg>
+                    <span>Voltar ao Mapa</span>
                 </a>
             </div>
             <div id="status-indicator" class="status-badge">
@@ -407,7 +410,7 @@
         
         <!-- Summary Cards -->
         <div class="section">
-            <h2 class="section-title">ðŸ“Š VisÃ£o Geral do Sistema</h2>
+            <h2 class="section-title">📊 Visão Geral do Sistema</h2>
             <div class="grid">
                 <div class="card">
                     <div class="card-title">CPU</div>
@@ -415,11 +418,11 @@
                     <div class="progress-bar">
                         <div class="progress-fill" id="cpu-bar" style="width: 0%"></div>
                     </div>
-                    <div class="metric-label">de 100% disponÃ­vel</div>
+                    <div class="metric-label">de 100% disponível</div>
                 </div>
                 
                 <div class="card">
-                    <div class="card-title">MemÃ³ria</div>
+                    <div class="card-title">Memória</div>
                     <div class="metric-value" id="memory-value">--</div>
                     <div class="progress-bar">
                         <div class="progress-fill" id="memory-bar" style="width: 0%"></div>
@@ -439,7 +442,7 @@
                 <div class="card">
                     <div class="card-title">Uptime</div>
                     <div class="metric-value" style="font-size: 18px;" id="uptime-value">--</div>
-                    <div class="metric-label">Tempo em operaÃ§Ã£o</div>
+                    <div class="metric-label">Tempo em operação</div>
                 </div>
                 
                 <div class="card">
@@ -448,11 +451,11 @@
                     <div class="progress-bar">
                         <div class="progress-fill" id="error-bar" style="width: 0%"></div>
                     </div>
-                    <div class="metric-label">Ãºltimas 24h</div>
+                    <div class="metric-label">últimas 24h</div>
                 </div>
                 
                 <div class="card">
-                    <div class="card-title">LatÃªncia P95</div>
+                    <div class="card-title">Latência P95</div>
                     <div class="metric-value" id="latency-value">--</div>
                     <div class="metric-label">milissegundos</div>
                 </div>
@@ -462,8 +465,8 @@
         <!-- Alerts Section -->
         <div class="section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 class="section-title" style="margin: 0; border: none;">ðŸ”” Alertas Ativos</h2>
-                <button onclick="refreshAlerts()" class="secondary">â†» Atualizar</button>
+                <h2 class="section-title" style="margin: 0; border: none;">🔔 Alertas Ativos</h2>
+                <button onclick="refreshAlerts()" class="secondary">↻ Atualizar</button>
             </div>
             <div style="max-height: 500px; overflow-y: auto; border: 1px solid #334155; border-radius: 8px;">
                 <div id="alerts-container">
@@ -474,9 +477,9 @@
         
         <!-- API Performance -->
         <div class="section">
-            <h2 class="section-title">âš¡ Performance da API</h2>
+            <h2 class="section-title">⚡ Performance da API</h2>
             <div class="controls">
-                <button onclick="updateApiStats()">â†» Atualizar</button>
+                <button onclick="updateApiStats()">↻ Atualizar</button>
                 <select id="endpoint-filter" onchange="updateApiStats()" style="padding: 8px 12px; background: #475569; color: white; border: 1px solid #64748b; border-radius: 6px;">
                     <option value="">Todos os Endpoints</option>
                 </select>
@@ -486,7 +489,7 @@
                     <thead style="position: sticky; top: 0; z-index: 1; background: #0f172a;">
                         <tr>
                             <th>Endpoint</th>
-                            <th>RequisiÃ§Ãµes</th>
+                            <th>Requisições</th>
                             <th>Taxa Erro</th>
                             <th>P50 (ms)</th>
                             <th>P95 (ms)</th>
@@ -502,9 +505,14 @@
         
         <!-- Confidence Trends -->
         <div class="section">
-            <h2 class="section-title">ðŸŒ¡ï¸ Cobertura Territorial do Modelo</h2>
-            <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:12px 16px; margin-bottom:14px; font-size:13px; color:#94a3b8;">
-                Mede se os territÃ³rios de tensÃ£o conhecida (facÃ§Ãµes ativas, CVLI recente) estÃ£o sendo surfaÃ§ados no topo do ranking. Substitui P@K â€” o modelo nÃ£o Ã© avaliado por prever crimes, mas por cobrir zonas de tensÃ£o.
+            <h2 class="section-title">🗺️ Cobertura Territorial do Modelo</h2>
+            <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:12px 16px; margin-bottom:8px; font-size:13px; color:#94a3b8;">
+                Mede <strong style="color:#e2e8f0;">Precisão@K</strong>: fração do Top-K predito que contém CVLI ou evento real.
+                Fortaleza e RMF usam <strong style="color:#60a5fa;">P@10</strong> (100 e ~30 nós, sinal denso).
+                Interior usa <strong style="color:#f59e0b;">P@20</strong> (50 nós, janela de 28 dias) pois os eventos são esparsos — as mesmas cidades se repetem (Juazeiro, Sobral, Tauá), mas com poucos registros por período.
+            </div>
+            <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.3); border-radius:6px; padding:8px 14px; margin-bottom:14px; font-size:12px; color:#fcd34d;">
+                ⚠️ <strong>Interior:</strong> P@20 &lt; 30% é estrutural — 50 nós, ~2–4 CVLIs por janela. O modelo é considerado saudável se captura Juazeiro do Norte e Sobral no Top-10. Queda abrupta indica mudança de padrão territorial, não falha do modelo.
             </div>
             <div class="controls">
                 <select id="region-filter" onchange="updateConfidenceTrend()" style="padding: 8px 12px; background: #475569; color: white; border: 1px solid #64748b; border-radius: 6px;">
@@ -514,11 +522,11 @@
                     <option value="interior">Interior</option>
                 </select>
                 <select id="period-filter" onchange="updateConfidenceTrend()" style="padding: 8px 12px; background: #475569; color: white; border: 1px solid #64748b; border-radius: 6px;">
-                    <option value="7">Ãšltimos 7 dias</option>
-                    <option value="14">Ãšltimos 14 dias</option>
-                    <option value="30">Ãšltimos 30 dias</option>
+                    <option value="7">Últimos 7 dias</option>
+                    <option value="14">Últimos 14 dias</option>
+                    <option value="30">Últimos 30 dias</option>
                 </select>
-                <button onclick="updateConfidenceTrend()">â†» Atualizar</button>
+                <button onclick="updateConfidenceTrend()">↻ Atualizar</button>
             </div>
             <div class="chart-container">
                 <canvas id="confidence-chart"></canvas>
@@ -529,28 +537,28 @@
                         <th>Data</th>
                         <th>Cov@10 Global</th>
                         <th>Cov@20 Global</th>
-                        <th>Cov@20 Fortaleza</th>
-                        <th>Cov@20 RMF</th>
+                        <th>Cov@10 Fortaleza</th>
+                        <th>Cov@10 RMF</th>
                         <th>Cov@20 Interior</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="confidence-tbody">
-                    <tr><td colspan="6" class="loading">Carregando histÃ³rico...</td></tr>
+                    <tr><td colspan="6" class="loading">Carregando histórico...</td></tr>
                 </tbody>
             </table>
         </div>
         
         <!-- Data Quality -->
         <div class="section">
-            <h2 class="section-title">ðŸ“Š Qualidade de Dados</h2>
+            <h2 class="section-title">📊 Qualidade de Dados</h2>
             <div class="grid">
                 <div class="card">
-                    <div class="card-title">Eventos HistÃ³ricos</div>
+                    <div class="card-title">Eventos Históricos</div>
                     <div class="metric-value" id="historical-events">--</div>
                 </div>
                 <div class="card">
-                    <div class="card-title">Eventos ExÃ³genos (14d)</div>
+                    <div class="card-title">Eventos Exógenos (14d)</div>
                     <div class="metric-value" id="exogenous-events">--</div>
                 </div>
                 <div class="card">
@@ -570,19 +578,19 @@
             </div>
         </div>
         
-        <!-- Auto-Ajuste / CalibraÃ§Ã£o -->
+        <!-- Auto-Ajuste / Calibração -->
         <div class="section">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-                <h2 class="section-title" style="margin:0; border:none;">ðŸŒ¡ï¸ TermÃ´metro â€” Auto-Ajuste Territorial</h2>
-                <button onclick="updateCalibration()" class="secondary">â†» Atualizar</button>
+                <h2 class="section-title" style="margin:0; border:none;">🌡�? Termômetro — Auto-Ajuste Territorial</h2>
+                <button onclick="updateCalibration()" class="secondary">↻ Atualizar</button>
             </div>
             <div id="calibration-container">
-                <div class="loading">Carregando status de calibraÃ§Ã£o...</div>
+                <div class="loading">Carregando status de calibração...</div>
             </div>
         </div>
 
         <div class="refresh-info">
-            <span>â±ï¸ Atualizado automaticamente a cada 30 segundos</span>
+            <span>�?��? Atualizado automaticamente a cada 30 segundos</span>
         </div>
     </div>
     
@@ -629,7 +637,7 @@
             } catch (error) {
                 console.error('Erro ao atualizar dashboard:', error);
                 document.getElementById('status-indicator').innerHTML = 
-                    `<span style="color: #ef4444;">âŒ Erro ao conectar</span>`;
+                    `<span style="color: #ef4444;">�?� Erro ao conectar</span>`;
             }
         }
 
@@ -655,7 +663,7 @@
                 const list = document.getElementById('anomaly-details-list');
                 const details = data.anomaly_details || [];
                 if (details.length === 0) {
-                    list.innerHTML = '<div style="padding:16px; color:#10b981; text-align:center;">âœ… Nenhuma anomalia ativa</div>';
+                    list.innerHTML = '<div style="padding:16px; color:#10b981; text-align:center;">✅ Nenhuma anomalia ativa</div>';
                 } else {
                     const sevColor = { CRITICAL: '#ef4444', HIGH: '#f97316', MEDIUM: '#eab308' };
                     list.innerHTML = details.map(a => {
@@ -733,7 +741,7 @@
             const container = document.getElementById('alerts-container');
             
             if (!alerts || alerts.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #10b981;">âœ… Nenhum alerta ativo</div>';
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #10b981;">✅ Nenhum alerta ativo</div>';
                 return;
             }
             
@@ -779,24 +787,30 @@
                 
                 // Update table
                 const tbody = document.getElementById('confidence-tbody');
-                const rows = (data.history || []).map(record => `
+                const rows = (data.history || []).map(record => {
+                    const gtInt = record.regions?.interior?.active_locations ?? '?';
+                    const gtFor = record.regions?.fortaleza?.active_locations ?? '?';
+                    const gtRmf = record.regions?.rmf?.active_locations ?? '?';
+                    const intP20 = ((record.regions?.interior?.p20 ?? 0) * 100).toFixed(1);
+                    const intColor = parseFloat(intP20) >= 20 ? '#10b981' : parseFloat(intP20) >= 10 ? '#f59e0b' : '#ef4444';
+                    return `
                     <tr>
                         <td>${record.date}</td>
                         <td>${(record.global?.p10 * 100).toFixed(1)}%</td>
                         <td>${(record.global?.p20 * 100).toFixed(1)}%</td>
-                        <td>${((record.regions?.fortaleza?.p20 ?? 0) * 100).toFixed(1)}%</td>
-                        <td>${((record.regions?.rmf?.p20 ?? 0) * 100).toFixed(1)}%</td>
-                        <td>${((record.regions?.interior?.p20 ?? 0) * 100).toFixed(1)}%</td>
-                        <td>${(record.global?.p20 >= 0.8 ? '<span style="color:#10b981">âœ… OK</span>' : record.global?.p20 >= 0.6 ? '<span style="color:#f59e0b">âš ï¸ AtenÃ§Ã£o</span>' : '<span style="color:#ef4444">ðŸ”´ Baixa</span>')}</td>
+                        <td>${((record.regions?.fortaleza?.p10 ?? 0) * 100).toFixed(1)}% <small style="color:#64748b">(GT:${gtFor})</small></td>
+                        <td>${((record.regions?.rmf?.p10 ?? 0) * 100).toFixed(1)}% <small style="color:#64748b">(GT:${gtRmf})</small></td>
+                        <td><span style="color:${intColor}">${intP20}%</span> <small style="color:#64748b">(GT:${gtInt}/50 nós)</small></td>
+                        <td>${(record.global?.p20 >= 0.8 ? '<span style="color:#10b981">✅ OK</span>' : record.global?.p20 >= 0.6 ? '<span style="color:#f59e0b">⚠️ Atenção</span>' : '<span style="color:#ef4444">🔴 Baixa</span>')}</td>
                     </tr>
-                `);
+                `}).join('');
                 
-                tbody.innerHTML = rows.length > 0 ? rows.join('') : '<tr><td colspan="6">Sem dados</td></tr>';
+                tbody.innerHTML = rows.length > 0 ? rows : '<tr><td colspan="7">Sem dados</td></tr>';
                 
                 // Update chart
                 updateConfidenceChart(data.history || [], region);
             } catch (error) {
-                console.error('Erro ao carregar histÃ³rico de confianÃ§a:', error);
+                console.error('Erro ao carregar histórico de confiança:', error);
             }
         }
         
@@ -804,22 +818,27 @@
             const ctx = document.getElementById('confidence-chart').getContext('2d');
             
             const dates = history.map(h => h.date);
-            const p10 = history.map(h => (h.global?.p10 || 0) * 100);
-            const p20 = history.map(h => (h.global?.p20 || 0) * 100);
+            const p10Global = history.map(h => (h.global?.p10 || 0) * 100);
+            const p20Global = history.map(h => (h.global?.p20 || 0) * 100);
 
-            // Determine which region to highlight as the 3rd dataset
+            // Fortaleza e RMF usam P10 (menor conjunto = mais exigente)
+            // Interior usa P20 (maior número de nós)
             const regionKey = (region && region !== 'global') ? region : 'fortaleza';
+            const useP10 = (regionKey !== 'interior');
+            const kLabel = useP10 ? 'P10' : 'P20';
             const regionDisplayNames = { fortaleza: 'Fortaleza', rmf: 'RMF', interior: 'Interior' };
-            const regionLabel = `Cov@20 ${regionDisplayNames[regionKey] || regionKey}`;
-            const p20Region = history.map(h => ((h.regions?.[regionKey]?.p20) ?? 0) * 100);
+            const regionLabel = `Cov@${useP10 ? '10' : '20'} ${regionDisplayNames[regionKey] || regionKey}`;
+            const regionCovData = history.map(h => {
+                const rd = h.regions?.[regionKey];
+                return ((useP10 ? rd?.p10 : rd?.p20) ?? 0) * 100;
+            });
 
-            // Warn visually when coverage is critically low for selected region
-            const avgRegionCov = p20Region.length > 0
-                ? p20Region.reduce((a, b) => a + b, 0) / p20Region.length
+            const avgRegionCov = regionCovData.length > 0
+                ? regionCovData.reduce((a, b) => a + b, 0) / regionCovData.length
                 : null;
             const regionColor = avgRegionCov !== null && avgRegionCov < 20
-                ? '#ef4444'   // red â€” critically low
-                : '#f59e0b';  // amber â€” normal
+                ? '#ef4444'
+                : '#f59e0b';
             
             if (confidenceChart) {
                 confidenceChart.destroy();
@@ -832,7 +851,7 @@
                     datasets: [
                         {
                             label: 'Cov@10 Global',
-                            data: p10,
+                            data: p10Global,
                             borderColor: '#3b82f6',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
                             tension: 0.3,
@@ -840,7 +859,7 @@
                         },
                         {
                             label: 'Cov@20 Global',
-                            data: p20,
+                            data: p20Global,
                             borderColor: '#10b981',
                             backgroundColor: 'rgba(16, 185, 129, 0.1)',
                             tension: 0.3,
@@ -848,7 +867,7 @@
                         },
                         {
                             label: regionLabel,
-                            data: p20Region,
+                            data: regionCovData,
                             borderColor: regionColor,
                             backgroundColor: regionColor === '#ef4444'
                                 ? 'rgba(239, 68, 68, 0.1)'
@@ -870,7 +889,7 @@
                             c.fillStyle = '#ef4444';
                             c.font = 'bold 13px sans-serif';
                             c.textAlign = 'center';
-                            c.fillText(`âš ï¸ Cobertura ${regionDisplayNames[regionKey] || regionKey}: SEM DADOS (0%)`, (left + right) / 2, (top + bottom) / 2);
+                            c.fillText(`⚠�? Cobertura ${regionDisplayNames[regionKey] || regionKey}: SEM DADOS (0%)`, (left + right) / 2, (top + bottom) / 2);
                             c.restore();
                         }
                     }
@@ -899,23 +918,23 @@
             });
         }
 
-        // ===== AUTO-AJUSTE / CALIBRAÃ‡ÃƒO =====
+        // ===== AUTO-AJUSTE / CALIBRAÇÃO =====
         const PARAM_LABELS = {
-            tension_factor:     'âš¡ Peso TensÃ£o',
-            tag_bias_direct:    'ðŸŽ¯ TAG Bias',
-            tag_bias_neighbor:  'ðŸ”— Vizinhos',
-            min_risk:           'ðŸ”¥ Calor MÃ­n',
+            tension_factor:     '⚡ Peso Tensão',
+            tag_bias_direct:    '🎯 TAG Bias',
+            tag_bias_neighbor:  '🔗 Vizinhos',
+            min_risk:           '🔥 Calor Mín',
         };
         const REGION_LABELS = {
-            fortaleza: 'ðŸ™ï¸ Fortaleza',
-            rmf:       'ðŸŒ† RMF',
-            interior:  'ðŸŒ„ Interior',
+            fortaleza: '�?��? Fortaleza',
+            rmf:       '🌆 RMF',
+            interior:  '🌄 Interior',
         };
         const EVENT_ICONS = {
-            full_rollback:    'â†©ï¸',
-            auto_calibration: 'ðŸ”§',
-            degradation:      'âš ï¸',
-            recovery:         'âœ…',
+            full_rollback:    '↩�?',
+            auto_calibration: '🔧',
+            degradation:      '⚠�?',
+            recovery:         '✅',
         };
 
         async function updateCalibration() {
@@ -925,13 +944,13 @@
                 const data = await resp.json();
 
                 if (!data.available) {
-                    container.innerHTML = '<div style="color:#64748b;padding:20px;">Calibrador nÃ£o disponÃ­vel.</div>';
+                    container.innerHTML = '<div style="color:#64748b;padding:20px;">Calibrador não disponível.</div>';
                     return;
                 }
 
                 const regions = data.regions || {};
                 if (Object.keys(regions).length === 0) {
-                    container.innerHTML = '<div style="color:#10b981;padding:20px;">âœ… Cobertura territorial normal. Nenhum ajuste aplicado.</div>';
+                    container.innerHTML = '<div style="color:#10b981;padding:20px;">✅ Cobertura territorial normal. Nenhum ajuste aplicado.</div>';
                     return;
                 }
 
@@ -943,22 +962,22 @@
                     const cardClass = isCritical ? 'critical' : isDegraded ? 'degraded' : 'recovered';
                     const badgeClass = isCritical ? 'critical' : isDegraded ? 'degraded' : 'ok';
                     const badgeLabel = isCritical
-                        ? `âš ï¸ CRÃTICO â€” IntervenÃ§Ã£o Manual (${steps}/${maxSteps})`
+                        ? `⚠�? CR�?TICO — Intervenção Manual (${steps}/${maxSteps})`
                         : isDegraded
-                            ? `ðŸ”§ Ajuste Ativo: Cobertura Territorial (${steps}/${maxSteps})`
-                            : 'âœ… Cobertura Normal';
+                            ? `🔧 Ajuste Ativo: Cobertura Territorial (${steps}/${maxSteps})`
+                            : '✅ Cobertura Normal';
 
                     const cur = info.current_params || {};
                     const def = info.default_params || {};
 
-                    // Obter Ãºltimo trigger para mostrar cobertura
+                    // Obter último trigger para mostrar cobertura
                     const lastEv = (info.last_5_events || []).slice(-1)[0] || {};
                     const triggerText = lastEv.trigger || '';
                     const coverageMatch = triggerText.match(/([\d.]+)%/);
                     const coveragePct = coverageMatch ? parseFloat(coverageMatch[1]) : null;
                     const coverageHtml = coveragePct !== null
                         ? `<div style="margin:8px 0; padding:8px 12px; background:${coveragePct >= 80 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}; border-radius:6px; font-size:13px; color:${coveragePct >= 80 ? '#10b981' : '#ef4444'};">
-                            ðŸŒ¡ï¸ Cobertura territorial: <strong>${coveragePct.toFixed(1)}%</strong>
+                            🌡�? Cobertura territorial: <strong>${coveragePct.toFixed(1)}%</strong>
                             <span style="color:#94a3b8; font-size:11px;"> (limiar: 80%)</span>
                           </div>`
                         : '';
@@ -971,10 +990,10 @@
                         const isDown = diff < -0.001;
                         const isUp   = diff >  0.001;
                         const deltaClass = isDown ? 'delta-down' : isUp ? 'delta-up' : 'delta-none';
-                        const deltaSign  = isDown ? 'â–¼' : isUp ? 'â–²' : 'â€”';
+                        const deltaSign  = isDown ? '▼' : isUp ? '▲' : '—';
                         const deltaStr   = (isDown || isUp)
                             ? `<span class="${deltaClass}">${deltaSign} ${Math.abs(diff).toFixed(3)}</span>`
-                            : `<span class="delta-none">â€”</span>`;
+                            : `<span class="delta-none">—</span>`;
                         const highlight = (isDown || isUp) ? 'color:#fbbf24;' : '';
                         return `
                             <div class="calib-param">
@@ -989,7 +1008,7 @@
                         ? '<div style="color:#475569;font-size:12px;">Sem eventos registrados</div>'
                         : events.map(ev => {
                             const isRollback = ev.event === 'full_rollback';
-                            const icon = isRollback ? 'â†©ï¸' : ev.step ? 'ðŸ”§' : 'âœ…';
+                            const icon = isRollback ? '↩�?' : ev.step ? '🔧' : '✅';
                             const time = ev.timestamp ? new Date(ev.timestamp).toLocaleString('pt-BR') : '';
                             const text = ev.trigger || ev.event || 'Evento';
                             const extra = isRollback
@@ -1005,16 +1024,16 @@
                                 </div>`;
                         }).join('');
 
-                    // Janela dinÃ¢mica e fallback histÃ³rico
+                    // Janela dinâmica e fallback histórico
                     const ws = info.window_state || {};
                     const dynWin = ws.dynamic_window;
                     const useFallback = ws.use_historical_fallback;
                     const top10 = ws.historical_top10 || [];
                     let windowHtml = '';
                     if (dynWin || useFallback) {
-                        const winLabel = dynWin ? `ðŸ—“ï¸ Janela ativa: <strong>${dynWin}d</strong>` : 'ðŸ—“ï¸ Janela: padrÃ£o';
+                        const winLabel = dynWin ? `🗓�? Janela ativa: <strong>${dynWin}d</strong>` : '🗓�? Janela: padrão';
                         const fbLabel = useFallback
-                            ? `<br>ðŸ“š Fallback histÃ³rico ativo â€” Top${top10.length}: ${top10.slice(0,5).join(', ')}${top10.length > 5 ? '...' : ''}`
+                            ? `<br>📚 Fallback histórico ativo — Top${top10.length}: ${top10.slice(0,5).join(', ')}${top10.length > 5 ? '...' : ''}`
                             : '';
                         windowHtml = `<div style="margin:8px 0; padding:8px 12px; background:rgba(99,102,241,0.12); border-radius:6px; font-size:12px; color:#a5b4fc;">${winLabel}${fbLabel}</div>`;
                     }
@@ -1028,14 +1047,14 @@
                             ${coverageHtml}
                             <div class="calib-params-grid">${paramsHtml}</div>
                             <div class="calib-history">
-                                <div class="calib-history-title">Ãšltimos eventos</div>
+                                <div class="calib-history-title">Últimos eventos</div>
                                 ${eventsHtml}
                             </div>
                         </div>`;
                 }).join('');
 
             } catch (err) {
-                container.innerHTML = `<div class="error">Erro ao carregar calibraÃ§Ã£o: ${err.message}</div>`;
+                container.innerHTML = `<div class="error">Erro ao carregar calibração: ${err.message}</div>`;
             }
         }
     </script>

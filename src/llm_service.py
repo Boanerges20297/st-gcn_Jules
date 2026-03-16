@@ -226,7 +226,7 @@ def process_exogenous_text(text: str, block_type: str = None) -> List[Dict[str, 
         "REGRAS:\n"
         "1) 'municipio': Extraia o nome da cidade (ex: FORTALEZA, CAUCAIA, MARACANAU). Se não encontrar, deixe vazio.\n"
         "2) 'bairro': Extraia o bairro. Se for em Fortaleza e o bairro não estiver claro, use o contexto das AIS (ex: AIS18 costuma ser Quintino Cunha/Antônio Bezerra).\n"
-        "3) 'conflict_severity': HIGH para homicídios, facções, execuções, achados de cadáver com sinais de violência, retorno de liderança de facção ao território. MEDIUM para lesões a bala, expulsões, achados de cadáver (quando violência não for explícita). LOW para o resto.\n"
+        "3) 'conflict_severity': HIGH para homicídios, facções, execuções, achados de cadáver com sinais de violência, retorno de liderança de facção ao território. MEDIUM para lesões a bala, expulsões, deslocamento forçado, expulsão de moradores, achados de cadáver (quando violência não for explícita). LOW para o resto.\n"
         "4) 'raw_text': Mantenha a linha original completa.\n"
         "5) 'is_suppression': true para prisões, apreensões de armas/drogas, recuperação de veículos. false para crimes cometidos.\n"
         f"6) 'date': Use '{header_date}' se este for um bloco de Ações Policiais, caso contrário extraia da linha.\n\n"
@@ -240,11 +240,9 @@ def process_exogenous_text(text: str, block_type: str = None) -> List[Dict[str, 
         
         # Enrichment & Normalization
         for ev in events:
-            # Force is_suppression and date if header was present
-            if is_police_header:
-                ev['is_suppression'] = True
-                if header_date:
-                    ev['date'] = header_date
+            # Force date if header was present, but preserve LLM's is_suppression decision
+            if is_police_header and header_date:
+                ev['date'] = header_date
 
             # 1. Ensure nature/text exists
             natureza = ev.get('natureza', 'OCORRENCIA')
@@ -363,11 +361,32 @@ def _deterministic_parse(text: str) -> List[Dict[str, Any]]:
             severity = 'HIGH'
         elif 'ACHADO DE CADAVER' in norm_upper or 'CADAVER' in norm_upper:
             severity = 'MEDIUM'
+        elif 'DESLOCAMENTO FORCADO' in norm_upper or 'DESLOCAMENTO FORÇADO' in norm_upper:
+            severity = 'MEDIUM'
+        elif 'EXPULSAO DE MORADORES' in norm_upper or 'EXPULSÃO DE MORADORES' in norm_upper:
+            severity = 'MEDIUM'
         else:
             severity = 'LOW'
 
         b = busca_bairro(line)
         m = busca_municipio(line) or ('FORTALEZA' if b else '')
+
+        # Detect suppression by keywords: arrests, seizures, vehicle recovery
+        suppression_keywords = [
+            'PRESO', 'PRESA', 'PRESOS', 'DETIDO', 'FLAGRANTE',
+            'APREENS', 'APREENDID', 'LOCALIZADO', 'RECUPERADO',
+            'MANDADO DE PRIS', 'CONDUZIDO',
+        ]
+        crime_keywords = [
+            'LESAO A BALA', 'LESÃO A BALA', 'HOMICIDIO', 'HOMICÍDIO',
+            'ACHADO DE CADAVER', 'ACHADO DE CADÁVER', 'CADAVER', 'CADÁVER',
+            'DESLOCAMENTO FORCADO', 'DESLOCAMENTO FORÇADO',
+            'EXPULSAO DE MORADORES', 'EXPULSÃO DE MORADORES',
+            'EXPULSA', 'EXPULSO',
+        ]
+        norm_upper_line = _normalize_text(line).upper()
+        is_crime = any(kw in norm_upper_line for kw in crime_keywords)
+        is_supp = (not is_crime) and any(kw in norm_upper_line for kw in suppression_keywords)
 
         event = {
             'natureza': natureza,
@@ -380,7 +399,7 @@ def _deterministic_parse(text: str) -> List[Dict[str, Any]]:
             'resumo': f"{natureza} em {b or 'local não identificado'}",
             'raw_text': line,
             'conflict_severity': severity,
-            'is_suppression': is_police_header,
+            'is_suppression': is_supp,
             'date': line_date or header_date
         }
         results.append(event)

@@ -2001,9 +2001,16 @@
             if (data && data.length > 0) {
                 var html = '<ul style="margin: 0; padding-left: 15px; list-style-type: disc; max-height: 200px; overflow-y: auto;">';
                 data.forEach(function(s) {
-                    html += '<li>' + s.rua + (s.ocorrencias > 1 ? ' <small style="color:#e63946;">(' + s.ocorrencias + ')</small>' : '') + '</li>';
+                    var cvliTag = '';
+                    if (s.ocorrencias > 0) {
+                        var cor = s.ocorrencias >= 3 ? '#e63946' : s.ocorrencias >= 1 ? '#f4a261' : '#adb5bd';
+                        var label = s.ocorrencias === 1 ? '1 CVLI' : s.ocorrencias + ' CVLIs';
+                        cvliTag = ' <span style="color:#fff; font-size:0.72rem; font-weight:600; background:' + cor + '; padding:1px 5px; border-radius:3px; margin-left:4px;">' + label + '</span>';
+                    }
+                    html += '<li style="color:#fff;">' + s.rua + cvliTag + '</li>';
                 });
                 html += '</ul>';
+                html += '<div style="margin-top:6px; font-size:0.68rem; color:#6c757d; border-top:1px solid #3d4246; padding-top:4px;">&#9432; Ranking por CVLI registrado nos últimos 30 dias. Localidades sem badge constam em inteligência territorial (KML de facções).</div>';
                 $(listId).html(html);
             } else {
                 $(listId).html('<span style="color: #888;">Nenhum logradouro mapeado nesta área.</span>');
@@ -2356,6 +2363,7 @@
             .then(resp => resp.json())
             .then(data => {
                 micronodesLayer.clearLayers();
+                // Adiciona cada feature individualmente ao layerGroup para permitir filtragem
                 L.geoJson(data, {
                     pointToLayer: function(feature, latlng) {
                         var color = getFactionColor(feature.properties.faction);
@@ -2370,18 +2378,33 @@
                     },
                     onEachFeature: function(feature, layer) {
                         var props = feature.properties;
-                        var popup = `<strong>Micronodo: ${props.micronodo || props.name}</strong><br/>
-                                     <b>Local:</b> ${props.area_oficial || props.area}<br/>
-                                     <b>Facção:</b> <span style="color:${getFactionColor(props.faction)}">${props.faction}</span>`;
+                        var popup = '<strong>Micronodo: ' + (props.micronodo || props.name) + '</strong><br/>' +
+                                    '<b>Local:</b> ' + (props.area_oficial || props.area) + '<br/>' +
+                                    '<b>Região:</b> ' + (props.region || '—') + '<br/>' +
+                                    '<b>Facção:</b> <span style="color:' + getFactionColor(props.faction) + '">' + props.faction + '</span>';
                         layer.bindPopup(popup);
                     }
                 }).addTo(micronodesLayer);
-                
+
                 if ($('#toggle-micronodes-kml').is(':checked')) {
                     map.addLayer(micronodesLayer);
+                    applyMicronodesRegionFilter($('#region-filter').val());
                 }
             })
             .catch(err => console.error('[Micronodes] Erro:', err));
+    }
+
+    function applyMicronodesRegionFilter(regionFilter) {
+        if (micronodesLayer.getLayers().length === 0) return;
+        var rf = String(regionFilter || 'all').toLowerCase();
+        if (rf === 'fortaleza' || rf === 'capital') rf = 'capital';
+        micronodesLayer.eachLayer(function(layer) {
+            var reg = String((layer.feature && layer.feature.properties && layer.feature.properties.region) || 'interior').toLowerCase();
+            if (reg === 'fortaleza') reg = 'capital';
+            var show = (rf === 'all') || (rf === reg);
+            if (show) { if (!map.hasLayer(layer)) map.addLayer(layer); }
+            else       { if (map.hasLayer(layer))  map.removeLayer(layer); }
+        });
     }
 
     $('#toggle-micronodes-kml').on('change', function() {
@@ -2390,9 +2413,16 @@
                 loadMicronodes();
             } else {
                 map.addLayer(micronodesLayer);
+                applyMicronodesRegionFilter($('#region-filter').val());
             }
         } else {
             map.removeLayer(micronodesLayer);
+        }
+    });
+
+    $('#region-filter').on('change', function() {
+        if ($('#toggle-micronodes-kml').is(':checked')) {
+            applyMicronodesRegionFilter($(this).val());
         }
     });
 

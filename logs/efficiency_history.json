@@ -2141,24 +2141,24 @@
   },
   {
     "date": "2026-03-15",
-    "total_events": 61,
+    "total_events": 63,
     "brute_cvli": 9,
-    "exogenous": 52,
+    "exogenous": 54,
     "global": {
       "total_nodes": 109,
       "active_locations": 23,
       "total_events": 45,
       "ranking_top10": [
-        "ITAPAJE",
-        "IGUATU",
         "JUAZEIRO DO NORTE",
-        "GROAIRAS",
-        "SOBRAL",
-        "ARATUBA",
         "TIANGUA",
-        "VICOSA DO CEARA",
+        "ARATUBA",
+        "IGUATU",
+        "SOBRAL",
+        "LIMOEIRO DO NORTE",
+        "GROAIRAS",
         "BATURITE",
-        "LIMOEIRO DO NORTE"
+        "VICOSA DO CEARA",
+        "ITAPAJE"
       ],
       "gt_sample": [
         "BARROSO",
@@ -2177,23 +2177,22 @@
         "PARAIPABA",
         "MESSEJANA"
       ],
-      "p5": 0.4,
-      "recall5": 0.087,
+      "p5": 0.2,
+      "recall5": 0.0435,
       "hits5": [
-        "ITAPAJE",
         "IGUATU"
       ],
       "p10": 0.2,
       "recall10": 0.087,
       "hits10": [
-        "ITAPAJE",
-        "IGUATU"
+        "IGUATU",
+        "ITAPAJE"
       ],
       "p20": 0.35,
       "recall20": 0.3043,
       "hits20": [
-        "ITAPAJE",
         "IGUATU",
+        "ITAPAJE",
         "HORIZONTE",
         "BARRA DO CEARA",
         "MESSEJANA",
@@ -2261,15 +2260,15 @@
       "total_events": 27,
       "ranking_top10": [
         "HORIZONTE",
-        "MARACANAU",
         "CAUCAIA",
+        "MARACANAU",
+        "TRAIRI",
+        "BEBERIBE",
         "EUSEBIO",
+        "CHOROZINHO",
         "PACAJUS",
         "PACATUBA",
-        "ITAITINGA",
-        "PINDORETAMA",
-        "AQUIRAZ",
-        "PARACURU"
+        "ITAITINGA"
       ],
       "gt_sample": [
         "HORIZONTE",
@@ -2288,34 +2287,33 @@
       "recall5": 0.3636,
       "hits5": [
         "HORIZONTE",
-        "MARACANAU",
         "CAUCAIA",
-        "PACAJUS"
+        "MARACANAU",
+        "TRAIRI"
       ],
-      "p10": 0.6,
-      "recall10": 0.5455,
+      "p10": 0.5,
+      "recall10": 0.4545,
       "hits10": [
         "HORIZONTE",
-        "MARACANAU",
         "CAUCAIA",
-        "PACAJUS",
-        "AQUIRAZ",
-        "PARACURU"
+        "MARACANAU",
+        "TRAIRI",
+        "PACAJUS"
       ],
       "p20": 0.5789,
       "recall20": 1.0,
       "hits20": [
         "HORIZONTE",
-        "MARACANAU",
         "CAUCAIA",
+        "MARACANAU",
+        "TRAIRI",
         "PACAJUS",
+        "PARAIPABA",
         "AQUIRAZ",
         "PARACURU",
         "MARANGUAPE",
-        "TRAIRI",
         "GUAIUBA",
-        "CASCAVEL",
-        "PARAIPABA"
+        "CASCAVEL"
       ]
     },
     "interior": {
@@ -2323,39 +2321,38 @@
       "active_locations": 3,
       "total_events": 3,
       "ranking_top10": [
-        "ITAPAJE",
-        "IGUATU",
         "JUAZEIRO DO NORTE",
-        "GROAIRAS",
-        "SOBRAL",
-        "ARATUBA",
         "TIANGUA",
-        "VICOSA DO CEARA",
+        "ARATUBA",
+        "IGUATU",
+        "SOBRAL",
+        "LIMOEIRO DO NORTE",
+        "GROAIRAS",
         "BATURITE",
-        "LIMOEIRO DO NORTE"
+        "VICOSA DO CEARA",
+        "ITAPAJE"
       ],
       "gt_sample": [
         "IGUATU",
         "ITAPAJE",
         "ITAPIPOCA"
       ],
-      "p5": 0.4,
-      "recall5": 0.6667,
+      "p5": 0.2,
+      "recall5": 0.3333,
       "hits5": [
-        "ITAPAJE",
         "IGUATU"
       ],
       "p10": 0.2,
       "recall10": 0.6667,
       "hits10": [
-        "ITAPAJE",
-        "IGUATU"
+        "IGUATU",
+        "ITAPAJE"
       ],
       "p20": 0.1,
       "recall20": 0.6667,
       "hits20": [
-        "ITAPAJE",
-        "IGUATU"
+        "IGUATU",
+        "ITAPAJE"
       ]
     }
   }
