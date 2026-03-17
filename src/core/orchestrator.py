@@ -28,17 +28,10 @@ class StateOrchestrator:
         self.root = project_root
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         
-        # ATUALIZAÇÃO: Roteamento dinâmico para suportar a arquitetura com 33 canais Multi-Scale Momentum + Cold Streak
+        # ⭐ ATUALIZAÇÃO (2026-03-16): Modelo oficial de Fortaleza agora é retreinado com 33 canais (Multi-Scale Momentum + Cold Streak)
+        # P@10: 87.84% — Promoção: fortaleza_retrain_64.pth → fortaleza_model_active.pth
         fortaleza_model_file = 'fortaleza_super_elite.pth' if os.path.exists(os.path.join(self.root, 'models', 'active', 'fortaleza_super_elite.pth')) else 'fortaleza_model_active.pth'
-        retrain_file = 'fortaleza_retrain_64.pth'
-        active_file = 'fortaleza_model_active.pth'
-        
-        if os.path.exists(os.path.join(self.root, 'models', 'active', retrain_file)):
-            fortaleza_model_file = retrain_file
-            has_momentum = True
-        else:
-            fortaleza_model_file = active_file
-            has_momentum = False
+        has_momentum_fortaleza = True  # Modelo oficial agora com 33 canais (momentum)
 
         # Roteamento dinâmico para o Interior (33ch quando retreinado)
         interior_retrain_file = 'interior_retrain_64.pth'
@@ -55,8 +48,8 @@ class StateOrchestrator:
                 'model_path': os.path.join(self.root, 'models', 'active', fortaleza_model_file),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_fortaleza.pkl'),
                 'class': DeepSTGAT_64,
-                'in_channels': 33 if has_momentum else 29, 
-                'window': 120 if has_momentum else 90 
+                'in_channels': 33 if has_momentum_fortaleza else 29, 
+                'window': 120 if has_momentum_fortaleza else 90 
             },
             'rmf': {
                 'model_path': os.path.join(self.root, 'models', 'active', 'rmf_model.pth'),

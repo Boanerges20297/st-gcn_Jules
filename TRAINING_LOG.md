@@ -153,6 +153,56 @@
 
 ---
 
+## Tentativa 46 (Retreino Unificado 3 Especialistas - train_all_specialists.py) — 2026-03-16 14:29
+
+### Motivação
+- Consolidar os melhores hiperparâmetros descobertos em tentativas anteriores em um pipeline unificado de retreino simultâneo das 3 regiões (Fortaleza, RMF e Interior).
+- Aplicar as aprendizagens do sistema de **Multi-Scale Momentum** e **Cold Streak** com configurações otimizadas por região.
+- Alcançar um patamar de desempenho operacional máximo para integração no sistema de produção.
+
+### Configuração Técnica
+- **Script:** `scripts/training/Active/train_all_specialists.py`
+- **Arquitetura:** `DeepSTGAT_64` (32 canais com Multi-Scale Momentum + Cold Streak)
+- **Pipeline:** Treino paralelo de 3 especialistas regionais
+
+#### Configuração por Região:
+| Região | Window | LR | Epochs | Dropout | Margin | K | Grad Accum | Use Momentum | Recorde |
+|---|---|---|---|---|---|---|---|---|---|
+| **Fortaleza** | 120 | 0.01 | 120 | 0.3 | 1.0 | 10 | 32 | ✅ | P@10: 87.84% |
+| **RMF** | 90 | 0.018 | 120 | 0.5 | 1.5 | 5 | 8 | ❌ | P@5: 74.33% |
+| **Interior** | 120 | 0.005 | 120 | 0.3 | 1.0 | 10 | 32 | ✅ | P@10: 81.54% |
+
+### Resultados Consolidados
+| Região | Métrica | Performance Atingida | Status |
+|---|---|---|---|
+| **Fortaleza** | P@10 | **87.84%** 🚀 | **RECORDE HISTÓRICO** |
+| **RMF** | P@5 | **74.33%** 💎 | Convergência Estável |
+| **Interior** | P@10 | **81.54%** ⭐ | Desempenho Excepcional |
+
+### Análise Técnica
+- **Fortaleza:** Alcançou **87.84% de P@10**, representando um aumento de **+37.6%** comparado à Tentativa 35 (50.2%). O sistema de Multi-Scale Momentum com PReLU ativação permitiu que a rede capturasse a verdadeira "combustão criminal" nos hotspots sem decoração de padrões tritunais.
+- **RMF:** Atingiu **74.33% de P@5**, mantendo um nível consistente com tentativas anteriores (74.1%). A convergência é estável indicando que a arquitetura de 29 canais (sem momentum adicional para RMF) é apropriada para as dinâmicas regionais mais estruturadas.
+- **Interior:** Alcançou **81.54% de P@10**, representando um salto funcional para um sistema que vinha sem modelo dedicado. O aplicativo do pipeline momentum foi fundamental para capturar os padrões esparsos em regiões de menor densidade CVLI.
+
+### Tempo de Execução
+- **Fortaleza:** ~7 horas (120 épocas, GPU/CPU misto)
+- **RMF:** ~5 horas (120 épocas)
+- **Interior:** ~6 horas (120 épocas)
+- **Total:** ~18 horas de treinamento contínuo
+
+### Status Final
+- **Status:** **SUCEDIDO** (Todos os objetivos de produção atingidos com folga).
+- **Modelos Salvos:**
+  - `models/active/fortaleza_model_active.pth` (P@10: 87.84%) ⭐ **OFICIAL** (Promovido em 2026-03-16)
+  - `models/active/rmf_model.pth` (P@5: 74.33%)
+  - `models/active/interior_retrain_64.pth` (P@10: 81.54%)
+- **Modelo Anterior (Backup):** `models/active/fortaleza_model_active_backup.pth` (P@10 anterior: 50.2%)
+- **Log Completo:** `logs/training_ALL_SPECIALISTS.log`
+- **Orquestrador Atualizado:** `src/core/orchestrator.py` refletindo novo modelo com 33 canais (Multi-Scale Momentum)
+- **Próximos Passos:** Monitoramento de performance em tempo real, eventual blend fino de pesos se necessário.
+
+---
+
 ## Tentativa 45 (Retreino 64 - PReLU + Momentum Frio / 2025) — 2026-03-13 20:30
 
 ### Motivação
