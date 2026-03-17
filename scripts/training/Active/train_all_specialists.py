@@ -65,7 +65,7 @@ REGION_CONFIGS = {
     'fortaleza': dict(
         window=120, lr=0.01,  epochs=120, dropout=0.3, margin=1.0,
         k_eval=10, use_momentum=True,  grad_accum=32,
-        output_name='fortaleza_retrain_64.pth',
+        output_name='fortaleza_model_active.pth',
     ),
     'rmf': dict(
         window=90,  lr=0.018, epochs=120, dropout=0.5, margin=1.5,
@@ -75,7 +75,7 @@ REGION_CONFIGS = {
     'interior': dict(
         window=120, lr=0.005, epochs=120, dropout=0.3, margin=1.0,
         k_eval=10, use_momentum=True,  grad_accum=32,
-        output_name='interior_retrain_64.pth',
+        output_name='interior_model.pth',
     ),
 }
 

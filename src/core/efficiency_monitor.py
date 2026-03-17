@@ -31,11 +31,16 @@ class EfficiencyMonitor:
             # 1. Obter Predições Consolidadas
             scores_map = self.orchestrator.get_combined_risk(None)
             print(f"🧠 [Monitor] Scores gerados para {len(scores_map)} localidades.")
+            monitored_nodes = set(scores_map.keys())
             
             # 2. Construir Ground Truth Híbrido (Bruta + Exógena)
             ground_truth = {}
             total_brute = 0
             total_exo = 0
+            assigned_brute = 0
+            assigned_exo = 0
+            unmapped_exo = 0
+            unmapped_exo_samples = []
 
             # 2a. EFICIÊNCIA BRUTA: Coletar CVLIs Reais dos últimos N passos de tempo
             # Interior tem eventos muito esparsos: usar janela mais longa (28 passos)
@@ -53,6 +58,8 @@ class EfficiencyMonitor:
                         loc_norm = normalize_name(str(row['name']))
                         ground_truth[loc_norm] = ground_truth.get(loc_norm, 0) + count
                         total_brute += count
+                        if loc_norm in monitored_nodes:
+                            assigned_brute += count
 
             # 2b. COMPLEMENTO EXÓGENO: Carregar eventos recentes de arquivos
             event_files = [os.path.join(self.root, "data", "exogenous_events.json")]
@@ -80,6 +87,12 @@ class EfficiencyMonitor:
                                             loc_norm = normalize_name(str(loc_raw))
                                             ground_truth[loc_norm] = ground_truth.get(loc_norm, 0) + 1
                                             total_exo += 1
+                                            if loc_norm in monitored_nodes:
+                                                assigned_exo += 1
+                                            else:
+                                                unmapped_exo += 1
+                                                if len(unmapped_exo_samples) < 10:
+                                                    unmapped_exo_samples.append(str(loc_raw))
                                 except: continue
                     except: continue
 
@@ -91,6 +104,14 @@ class EfficiencyMonitor:
             
             # Print de diagnóstico para o log
             print(f"📊 [Monitor] Ground Truth Final: {len(ground_truth)} localidades com eventos ativos ({total_brute} CVLI + {total_exo} Exógena)")
+            assigned_total = assigned_brute + assigned_exo
+            unmapped_total = (total_brute + total_exo) - assigned_total
+            print(
+                f"🧾 [Monitor] Eventos mapeados ao ranking: {assigned_total}/{total_brute + total_exo} "
+                f"(CVLI={assigned_brute}, Exógena={assigned_exo}, Não mapeados={unmapped_total})"
+            )
+            if unmapped_exo_samples:
+                print(f"🧾 [Monitor] Amostra de exógenos não mapeados: {unmapped_exo_samples}")
             
             # Diagnóstico: quantos nomes do ranking NÃO matcharam no ground truth
             unmatched = [n for n in scores_map.keys() if n not in ground_truth]
@@ -106,7 +127,13 @@ class EfficiencyMonitor:
                 "date": str(today), 
                 "total_events": total_brute + total_exo,
                 "brute_cvli": total_brute,
-                "exogenous": total_exo
+                "exogenous": total_exo,
+                "assigned_total_events": assigned_total,
+                "unmapped_total_events": unmapped_total,
+                "assigned_brute_cvli": assigned_brute,
+                "assigned_exogenous": assigned_exo,
+                "unmapped_exogenous": unmapped_exo,
+                "unmapped_exogenous_sample": unmapped_exo_samples,
             }
             
             # 4. Avaliar cada Região

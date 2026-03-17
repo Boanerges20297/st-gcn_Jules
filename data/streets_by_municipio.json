@@ -1,6 +1,11 @@
 {
   "CAUCAIA": [
     {
+      "loc": "GUADALAJARA",
+      "cvli": 3,
+      "score": 12
+    },
+    {
       "loc": "ESTRADA BARRA NOVA",
       "cvli": 2,
       "score": 8
@@ -11,7 +16,7 @@
       "score": 8
     },
     {
-      "loc": "GUADALAJARA",
+      "loc": "ANTONIO BEZERRA",
       "cvli": 1,
       "score": 5
     },
@@ -21,14 +26,19 @@
       "score": 4
     },
     {
+      "loc": "GENIPABÚ",
+      "cvli": 1,
+      "score": 4
+    },
+    {
       "loc": "GARROTE",
       "cvli": 1,
       "score": 4
     },
     {
-      "loc": "GENIPABÚ",
+      "loc": "BARRA DO CEARA",
       "cvli": 1,
-      "score": 4
+      "score": 3
     },
     {
       "loc": "BOQUEIRAO",
@@ -37,16 +47,6 @@
     },
     {
       "loc": "TOCO",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "CARRAPICHO",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "SITIOS NOVOS",
       "cvli": 0,
       "score": 16
     }
@@ -250,7 +250,7 @@
     {
       "loc": "HORIZONTE",
       "cvli": 1,
-      "score": 3
+      "score": 4
     },
     {
       "loc": "VILA CATU",
@@ -280,6 +280,67 @@
       "score": 1
     }
   ],
+  "LIMOEIRO DO NORTE": [
+    {
+      "loc": "CE-265",
+      "cvli": 1,
+      "score": 4
+    },
+    {
+      "loc": "SANTA MARIA",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "LIMOEIRO DO NORTE",
+      "cvli": 0,
+      "score": 1
+    }
+  ],
+  "EUSEBIO": [
+    {
+      "loc": "JABUTI",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "ANCURI",
+      "cvli": 0,
+      "score": 1
+    }
+  ],
+  "ITAITINGA": [
+    {
+      "loc": "ANCURI",
+      "cvli": 1,
+      "score": 3
+    },
+    {
+      "loc": "PEDRAS",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "BAIRRO ALTO DO BODE",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "CARAPIO",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "MULTIRAO",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "LAJE DOS GATOS",
+      "cvli": 0,
+      "score": 16
+    }
+  ],
   "COREAU": [
     {
       "loc": "RODOVIA RAIMUNDO CUNHA BRITO",
@@ -302,68 +363,30 @@
       "score": 8
     }
   ],
-  "ARACATI": [
+  "TAUA": [
     {
-      "loc": "RUA PARGO",
+      "loc": "AVENIDA CHERMONT ALVES DE OLIVEIRA",
       "cvli": 1,
       "score": 4
     },
     {
-      "loc": "MORRINHOS",
+      "loc": "RUA BIBIANA PEREIRA",
       "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "OLHO D AGUA",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "CACIMBA FUNDA",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "VELAME",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "RUA DOS PASSOS",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "OUTEIRO",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "JARDIM",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "SANTA TEREZINHA",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "LAGOA DO MATO",
-      "cvli": 0,
-      "score": 16
+      "score": 1
     }
   ],
-  "LIMOEIRO DO NORTE": [
+  "MARTINOPOLE": [
     {
-      "loc": "CE-265",
+      "loc": "RUA RUFINO PEREIRA",
       "cvli": 1,
       "score": 4
-    },
+    }
+  ],
+  "IPUEIRAS": [
     {
-      "loc": "SANTA MARIA",
-      "cvli": 0,
-      "score": 16
+      "loc": "RUA ANTÔNIO SILVA LIMA",
+      "cvli": 1,
+      "score": 4
     }
   ],
   "MISSAO VELHA": [
@@ -378,9 +401,38 @@
       "score": 16
     }
   ],
+  "TABULEIRO DO NORTE": [
+    {
+      "loc": "RUA B",
+      "cvli": 1,
+      "score": 4
+    }
+  ],
+  "PARACURU": [
+    {
+      "loc": "BECO 2",
+      "cvli": 1,
+      "score": 4
+    },
+    {
+      "loc": "LAGOA",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "RUA JOSÉ B. DE ALMEIDA",
+      "cvli": 0,
+      "score": 1
+    }
+  ],
   "PEDRA BRANCA": [
     {
       "loc": "TRAVESSA DOCA BELO",
+      "cvli": 1,
+      "score": 4
+    },
+    {
+      "loc": "RUA RAIMUNDO SOARES GONDIM",
       "cvli": 1,
       "score": 4
     }
@@ -437,6 +489,40 @@
       "score": 16
     }
   ],
+  "QUIXERE": [
+    {
+      "loc": "RUA MESTRE FELIPE",
+      "cvli": 1,
+      "score": 4
+    }
+  ],
+  "SOBRAL": [
+    {
+      "loc": "RUA FRANCISCO EVANDRO SOUSA FILHO",
+      "cvli": 1,
+      "score": 4
+    },
+    {
+      "loc": "RUA FRANCISCO DAS CHAGAS BARRETO LIMA",
+      "cvli": 1,
+      "score": 4
+    },
+    {
+      "loc": "COMUNIDADE DO GATO MORTO",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "RUA TABELIÃO ILDEFONSO CAVALCANTE",
+      "cvli": 0,
+      "score": 3
+    },
+    {
+      "loc": "RUA DOUTOR JOÃO DO MONTE",
+      "cvli": 0,
+      "score": 2
+    }
+  ],
   "SENADOR POMPEU": [
     {
       "loc": "RODOVIA DO ALGODÃO",
@@ -462,120 +548,6 @@
       "loc": "ALTO SAO JOSE",
       "cvli": 0,
       "score": 16
-    }
-  ],
-  "SOBRAL": [
-    {
-      "loc": "RUA FRANCISCO DAS CHAGAS BARRETO LIMA",
-      "cvli": 1,
-      "score": 4
-    },
-    {
-      "loc": "RUA FRANCISCO EVANDRO SOUSA FILHO",
-      "cvli": 1,
-      "score": 4
-    },
-    {
-      "loc": "COMUNIDADE DO GATO MORTO",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "RUA TABELIÃO ILDEFONSO CAVALCANTE",
-      "cvli": 0,
-      "score": 3
-    },
-    {
-      "loc": "RUA DOUTOR JOÃO DO MONTE",
-      "cvli": 0,
-      "score": 2
-    }
-  ],
-  "TABULEIRO DO NORTE": [
-    {
-      "loc": "RUA B",
-      "cvli": 1,
-      "score": 4
-    }
-  ],
-  "TAUA": [
-    {
-      "loc": "AVENIDA CHERMONT ALVES DE OLIVEIRA",
-      "cvli": 1,
-      "score": 4
-    },
-    {
-      "loc": "RUA BIBIANA PEREIRA",
-      "cvli": 0,
-      "score": 1
-    }
-  ],
-  "TEJUCUOCA": [
-    {
-      "loc": "RUA JOSÉ ANDRADE DE SOUSA",
-      "cvli": 1,
-      "score": 4
-    }
-  ],
-  "TIANGUA": [
-    {
-      "loc": "RUA MAESTRO QUINCAS BEZERRIL",
-      "cvli": 1,
-      "score": 4
-    },
-    {
-      "loc": "OLINDA UBAJARA",
-      "cvli": 0,
-      "score": 16
-    }
-  ],
-  "TRAIRI": [
-    {
-      "loc": "RUA DOS OLIVEIRAS",
-      "cvli": 1,
-      "score": 4
-    },
-    {
-      "loc": "RUA JOSÉ FERREIRA DA CUNHA",
-      "cvli": 1,
-      "score": 4
-    },
-    {
-      "loc": "SAO FRANCISCO",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "VILA NOVA",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "GUALDRAPRAS",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "GUAJIRU",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "CRIANCO",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "COTESA",
-      "cvli": 0,
-      "score": 16
-    }
-  ],
-  "URUOCA": [
-    {
-      "loc": "AVENIDA BRASÍLIA",
-      "cvli": 1,
-      "score": 4
     }
   ],
   "ASSARE": [
@@ -622,6 +594,100 @@
       "score": 16
     }
   ],
+  "TRAIRI": [
+    {
+      "loc": "RUA JOSÉ FERREIRA DA CUNHA",
+      "cvli": 1,
+      "score": 4
+    },
+    {
+      "loc": "RUA DOS OLIVEIRAS",
+      "cvli": 1,
+      "score": 4
+    },
+    {
+      "loc": "SAO FRANCISCO",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "VILA NOVA",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "GUALDRAPRAS",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "GUAJIRU",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "CRIANCO",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "COTESA",
+      "cvli": 0,
+      "score": 16
+    }
+  ],
+  "ARACATI": [
+    {
+      "loc": "RUA PARGO",
+      "cvli": 1,
+      "score": 4
+    },
+    {
+      "loc": "ROTA DO SOL NASCENTE",
+      "cvli": 1,
+      "score": 4
+    },
+    {
+      "loc": "MORRINHOS",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "OLHO D AGUA",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "CACIMBA FUNDA",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "VELAME",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "RUA DOS PASSOS",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "OUTEIRO",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "JARDIM",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "SANTA TEREZINHA",
+      "cvli": 0,
+      "score": 16
+    }
+  ],
   "BOA VIAGEM": [
     {
       "loc": "RUA CORONEL LUIZ AMARO BEZERRA",
@@ -642,6 +708,38 @@
       "loc": "VILA AZUL",
       "cvli": 0,
       "score": 8
+    }
+  ],
+  "CANINDE": [
+    {
+      "loc": "RUA DOUTOR PEIXOTO",
+      "cvli": 1,
+      "score": 4
+    },
+    {
+      "loc": "MONTE",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "CAMPINAS",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "PALESTINA",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "ALTO DA GUARAMIRANGA",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "MINHA CASA MINHA VIDA",
+      "cvli": 0,
+      "score": 16
     }
   ],
   "CASCAVEL": [
@@ -671,7 +769,45 @@
       "score": 16
     }
   ],
+  "FRECHEIRINHA": [
+    {
+      "loc": "RUA FREI ANASTÁCIO",
+      "cvli": 1,
+      "score": 4
+    }
+  ],
+  "CATARINA": [
+    {
+      "loc": "RUA MARIA CECÍLIA DE CARVALHO",
+      "cvli": 1,
+      "score": 4
+    }
+  ],
+  "TIANGUA": [
+    {
+      "loc": "RUA MAESTRO QUINCAS BEZERRIL",
+      "cvli": 1,
+      "score": 4
+    },
+    {
+      "loc": "OLINDA UBAJARA",
+      "cvli": 0,
+      "score": 16
+    }
+  ],
+  "TEJUCUOCA": [
+    {
+      "loc": "RUA JOSÉ ANDRADE DE SOUSA",
+      "cvli": 1,
+      "score": 4
+    }
+  ],
   "CRATO": [
+    {
+      "loc": "ALTO DA PENHA",
+      "cvli": 1,
+      "score": 4
+    },
     {
       "loc": "TRAVESSA CARIRIAÇU",
       "cvli": 1,
@@ -679,6 +815,11 @@
     },
     {
       "loc": "AVENIDA THOMAZ OSTERNE DE ALENCAR",
+      "cvli": 1,
+      "score": 4
+    },
+    {
+      "loc": "RUA FRANCISCO BEZERRA",
       "cvli": 1,
       "score": 4
     },
@@ -711,28 +852,60 @@
       "loc": "BELA VISTA",
       "cvli": 0,
       "score": 16
-    },
-    {
-      "loc": "BAIRRO DO SEMINARIO",
-      "cvli": 0,
-      "score": 8
-    },
-    {
-      "loc": "BATATEIRAS",
-      "cvli": 0,
-      "score": 8
     }
   ],
-  "FRECHEIRINHA": [
+  "URUOCA": [
     {
-      "loc": "RUA FREI ANASTÁCIO",
+      "loc": "AVENIDA BRASÍLIA",
       "cvli": 1,
       "score": 4
     }
   ],
-  "BREJO SANTO": [
+  "SAO GONCALO DO AMARANTE": [
     {
-      "loc": "RUA BALBINA VIANA ARRAES",
+      "loc": "RUA JOSÉ FIRMINO",
+      "cvli": 0,
+      "score": 1
+    }
+  ],
+  "ACARAU": [
+    {
+      "loc": "DAS PIRANHAS",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "PEDRINHA",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "MONGUBAS",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "CORREGO DO URUBU",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "MORADA NOVA",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "BURITI",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "PERSEGUIDAS",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "AVENIDA JOSÉ GIFFONE DA SILVEIRA",
       "cvli": 0,
       "score": 1
     }
@@ -766,9 +939,38 @@
       "score": 1
     }
   ],
+  "BREJO SANTO": [
+    {
+      "loc": "RUA BALBINA VIANA ARRAES",
+      "cvli": 0,
+      "score": 1
+    }
+  ],
   "ICO": [
     {
       "loc": "AVENIDA JOSEFA NOGUEIRA MONTEIRO",
+      "cvli": 0,
+      "score": 1
+    }
+  ],
+  "RUSSAS": [
+    {
+      "loc": "BOQUEIRAO DE CESARIO",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "PEIXE",
+      "cvli": 0,
+      "score": 8
+    },
+    {
+      "loc": "SITIO CANTO",
+      "cvli": 0,
+      "score": 8
+    },
+    {
+      "loc": "CENTRO",
       "cvli": 0,
       "score": 1
     }
@@ -791,25 +993,6 @@
     },
     {
       "loc": "RUA ANANIAS AMARAL",
-      "cvli": 0,
-      "score": 1
-    }
-  ],
-  "PARACURU": [
-    {
-      "loc": "LAGOA",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "RUA JOSÉ B. DE ALMEIDA",
-      "cvli": 0,
-      "score": 1
-    }
-  ],
-  "SAO GONCALO DO AMARANTE": [
-    {
-      "loc": "RUA JOSÉ FIRMINO",
       "cvli": 0,
       "score": 1
     }
@@ -866,28 +1049,6 @@
       "score": 1
     }
   ],
-  "RUSSAS": [
-    {
-      "loc": "BOQUEIRAO DE CESARIO",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "PEIXE",
-      "cvli": 0,
-      "score": 8
-    },
-    {
-      "loc": "SITIO CANTO",
-      "cvli": 0,
-      "score": 8
-    },
-    {
-      "loc": "CENTRO",
-      "cvli": 0,
-      "score": 1
-    }
-  ],
   "VARJOTA": [
     {
       "loc": "BAIRRO ARARIRANHA",
@@ -930,6 +1091,18 @@
       "loc": "CE 060",
       "cvli": 0,
       "score": 3
+    }
+  ],
+  "SAO LUIS DO CURU": [
+    {
+      "loc": "PANTANAL",
+      "cvli": 0,
+      "score": 16
+    },
+    {
+      "loc": "SAO LUIZ DO CURU",
+      "cvli": 0,
+      "score": 5
     }
   ],
   "PARAMBU": [
@@ -1272,33 +1445,6 @@
       "score": 16
     }
   ],
-  "ITAITINGA": [
-    {
-      "loc": "PEDRAS",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "BAIRRO ALTO DO BODE",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "CARAPIO",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "MULTIRAO",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "LAJE DOS GATOS",
-      "cvli": 0,
-      "score": 16
-    }
-  ],
   "DE MARCO OU BLOCOS": [
     {
       "loc": "CONJUNTO HABITACIONAL 1",
@@ -1450,33 +1596,6 @@
     },
     {
       "loc": "VILA DO FELIX",
-      "cvli": 0,
-      "score": 16
-    }
-  ],
-  "CANINDE": [
-    {
-      "loc": "MONTE",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "CAMPINAS",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "PALESTINA",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "ALTO DA GUARAMIRANGA",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "MINHA CASA MINHA VIDA",
       "cvli": 0,
       "score": 16
     }
@@ -1741,13 +1860,6 @@
       "score": 16
     }
   ],
-  "EUSEBIO": [
-    {
-      "loc": "JABUTI",
-      "cvli": 0,
-      "score": 16
-    }
-  ],
   "ALVARO WEYNE": [
     {
       "loc": "LAGOA DO URUBU",
@@ -1940,50 +2052,6 @@
   "TIA JOANA": [
     {
       "loc": "CONJ",
-      "cvli": 0,
-      "score": 16
-    }
-  ],
-  "ACARAU": [
-    {
-      "loc": "DAS PIRANHAS",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "PEDRINHA",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "MONGUBAS",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "CORREGO DO URUBU",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "MORADA NOVA",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "BURITI",
-      "cvli": 0,
-      "score": 16
-    },
-    {
-      "loc": "PERSEGUIDAS",
-      "cvli": 0,
-      "score": 16
-    }
-  ],
-  "SAO LUIS DO CURU": [
-    {
-      "loc": "PANTANAL",
       "cvli": 0,
       "score": 16
     }

@@ -33,15 +33,10 @@ class StateOrchestrator:
         fortaleza_model_file = 'fortaleza_super_elite.pth' if os.path.exists(os.path.join(self.root, 'models', 'active', 'fortaleza_super_elite.pth')) else 'fortaleza_model_active.pth'
         has_momentum_fortaleza = True  # Modelo oficial agora com 33 canais (momentum)
 
-        # Roteamento dinâmico para o Interior (33ch quando retreinado)
-        interior_retrain_file = 'interior_retrain_64.pth'
-        interior_active_file  = 'interior_model.pth'
-        if os.path.exists(os.path.join(self.root, 'models', 'active', interior_retrain_file)):
-            interior_model_file   = interior_retrain_file
-            interior_has_momentum = True
-        else:
-            interior_model_file   = interior_active_file
-            interior_has_momentum = False
+        # ⭐ ATUALIZAÇÃO (2026-03-16): Modelo oficial Interior agora é retreinado com 33 canais (Multi-Scale Momentum + Cold Streak)
+        # P@10: 81.54% — Promoção: interior_retrain_64.pth → interior_model.pth
+        interior_model_file   = 'interior_model.pth'
+        interior_has_momentum = True  # Modelo oficial agora com 33 canais (momentum)
         
         self.configs = {
             'fortaleza': {
@@ -139,6 +134,7 @@ class StateOrchestrator:
         cp = self.calib_params.setdefault(region, next(iter(self.calib_params.values()), {}).copy())
         base_window = self.specialists[region]['window']
         current_window = cp.get('dynamic_window') or base_window
+        current_window = min(current_window, base_window)
 
         if efficiency_score < 0.50:
             # Encontra o degrau atual e desce um nível
@@ -169,7 +165,7 @@ class StateOrchestrator:
                     print(f"📚 [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. "
                           f"Fallback histórico já ativo (30d). Top10: {cp.get('historical_top10', [])[:5]}")
 
-        elif efficiency_score > 0.50:
+        elif efficiency_score >= 0.60:
             # Sobe um degrau por ciclo
             ladder = [w for w in self._WINDOW_LADDER if w <= base_window]
             if not ladder:
@@ -191,6 +187,8 @@ class StateOrchestrator:
                 print(f"✅ [Auto-Tune] Fallback histórico desativado em {region.upper()}.")
             
             self._save_window_state()
+        else:
+            print(f"⏸️ [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. Janela mantida em {current_window}d.")
 
     def _load_historical_fallback(self, region):
         """
@@ -308,9 +306,19 @@ class StateOrchestrator:
             
             # Se o modelo exigir canais extras, injetamos no tensor de entrada
             if channels >= 32:
-                # Prioridade total ao momentum (Boost 10x)
-                momentum_feat_boosted = momentum_feat[:, :, :channels-29] * 10.0
-                x_raw_extended = np.concatenate([x_raw_extended, momentum_feat_boosted], axis=2)
+                # Canais de momentum concatenados com valores brutos (sem boost)
+                # O modelo foi treinado com momentum bruto — manter consistência treino/inferência
+                x_raw_extended = np.concatenate([x_raw_extended, momentum_feat[:, :, :channels-29]], axis=2)
+                
+                # AJUSTE PARA REGIÕES ESPARSAS (ex: Interior com muitos dias frios)
+                # Se a maioria dos nós tem cold_streak alto (>7 dias), isso indica uma região segura, não ameaçada
+                # Invertemos a interpretação do canal 32 (cold_streak) como fator de segurança
+                if region in ['interior']:
+                    # Para Interior: alto cold_streak = zona segura = reduz urgência
+                    # Clipamos para evitar dominância total: max +5 em vez de -30
+                    momentum_feat_adj = momentum_feat.copy()
+                    momentum_feat_adj[:, :, 3] = np.clip(momentum_feat[:, :, 3] / 6.0, -5, 5)  # Suaviza: [-5, 5] em vez de [-30, 0]
+                    x_raw_extended[:, :, -1] = momentum_feat_adj[:, :, 3]
 
             x_final = x_raw_extended[:, -window:, :channels].copy()
             
@@ -349,18 +357,25 @@ class StateOrchestrator:
             inclusion_signal = (recent_crime | (sim_impact > 0)).astype(float)
 
             # 4. Fallback Histórico Top10 — ativado quando P10 persiste baixo mesmo em 30d
-            # Substitui o blend normal por: 10% neural + 30% tensão + 20% recente + 40% histórico
+            # Blend com fallback: 50% neural + 20% tensão + 10% recente + 20% histórico
             if cp.get('use_historical_fallback') and cp.get('historical_top10'):
                 historical_top_norms = set(normalize_name(n) for n in cp['historical_top10'])
                 historical_signal = np.array([
                     1.0 if normalize_name(str(row['name'])) in historical_top_norms else 0.0
                     for _, row in data['nodes_gdf'].iterrows()
                 ])
-                final_logic = (0.10 * norm_neural) + (0.30 * norm_tension) + (0.20 * inclusion_signal) + (0.40 * historical_signal)
+                final_logic = (0.50 * norm_neural) + (0.20 * norm_tension) + (0.10 * inclusion_signal) + (0.20 * historical_signal)
                 print(f"📚 [Blend] {region.upper()} usando fallback histórico top10 ({len(historical_top_norms)} nós).")
             else:
-                # Cálculo Final: Equilíbrio entre Inteligência, Estabilidade e Reatividade
-                final_logic = (0.2 * norm_neural) + (0.4 * norm_tension) + (0.4 * inclusion_signal)
+                # Blend padrão: ajustado por região
+                # Interior com alta sparsidade em crime → aumentar confiança no neural (40%)
+                # Regiões com crime regular → manter neural em 60%
+                neural_weight = 0.40 if region == 'interior' else 0.60
+                tension_weight = 0.25 if region == 'interior' else 0.20
+                inclusion_weight = 0.35 if region == 'interior' else 0.20  # Inclusão importante quando há crime
+                
+                # Modelo treinado com dados brutos — inferência deve refletir saída neural
+                final_logic = (neural_weight * norm_neural) + (tension_weight * norm_tension) + (inclusion_weight * inclusion_signal)
             
             # Escalonamento Dashboard (5% a 100%)
             out_norm = 5.0 + (final_logic * 95.0)

@@ -315,7 +315,7 @@ def create_admin_health_blueprint(health_monitor, confidence_tracker, model_cali
                         eff_history = json.load(f)
                     if eff_history:
                         latest = eff_history[-1]
-                        historical_events = latest.get('total_events', 0) or latest.get('brute_cvli', 0)
+                        historical_events = latest.get('assigned_total_events', latest.get('total_events', 0) or latest.get('brute_cvli', 0))
                 except Exception:
                     pass
             
@@ -351,13 +351,29 @@ def create_admin_health_blueprint(health_monitor, confidence_tracker, model_cali
                     'message': a.get('message'),
                     'timestamp': a.get('timestamp'),
                     'type': a.get('type'),
+                    'category': a.get('category', 'other'),
                 }
                 for a in anomaly_list
             ]
+
+            latest_efficiency = {}
+            if os.path.exists(efficiency_path):
+                try:
+                    with open(efficiency_path, 'r', encoding='utf-8') as f:
+                        eff_history = json.load(f)
+                    if eff_history:
+                        latest_efficiency = eff_history[-1]
+                except Exception:
+                    latest_efficiency = {}
             
             return jsonify({
                 'historical_events': historical_events,
                 'exogenous_events_7d': exogenous_events,
+                'assigned_total_events': latest_efficiency.get('assigned_total_events', historical_events),
+                'unmapped_total_events': latest_efficiency.get('unmapped_total_events', 0),
+                'assigned_exogenous': latest_efficiency.get('assigned_exogenous', 0),
+                'unmapped_exogenous': latest_efficiency.get('unmapped_exogenous', 0),
+                'unmapped_exogenous_sample': latest_efficiency.get('unmapped_exogenous_sample', []),
                 'completeness_pct': round(completeness_pct, 1),
                 'regions_available': len(regions_available),
                 'regions_expected': len(regions_all),

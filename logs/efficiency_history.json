@@ -1,154 +1,5 @@
 [
   {
-    "date": "2026-03-02",
-    "total_events": 51,
-    "brute_cvli": 0,
-    "exogenous": 51,
-    "global": {
-      "total_nodes": 96,
-      "active_locations": 57,
-      "total_events": 78,
-      "p5": 0.0351,
-      "precision5": 0.4,
-      "hits5": [
-        "CAUCAIA",
-        "MARACANAU"
-      ],
-      "p10": 0.0702,
-      "precision10": 0.4,
-      "hits10": [
-        "CAUCAIA",
-        "MARACANAU",
-        "BARROSO",
-        "CARLITO PAMPLONA"
-      ],
-      "p20": 0.1228,
-      "precision20": 0.35,
-      "hits20": [
-        "CAUCAIA",
-        "MARACANAU",
-        "BARROSO",
-        "CARLITO PAMPLONA",
-        "JANGURUSSU",
-        "LAGOA REDONDA",
-        "MESSEJANA"
-      ]
-    },
-    "fortaleza": {
-      "total_nodes": 34,
-      "active_locations": 7,
-      "total_events": 12,
-      "p5": 0.1429,
-      "precision5": 0.2,
-      "hits5": [
-        "BARROSO"
-      ],
-      "p10": 0.2857,
-      "precision10": 0.2,
-      "hits10": [
-        "BARROSO",
-        "CARLITO PAMPLONA"
-      ],
-      "p20": 0.7143,
-      "precision20": 0.25,
-      "hits20": [
-        "BARROSO",
-        "CARLITO PAMPLONA",
-        "JANGURUSSU",
-        "LAGOA REDONDA",
-        "MESSEJANA"
-      ]
-    },
-    "rmf": {
-      "total_nodes": 18,
-      "active_locations": 11,
-      "total_events": 27,
-      "p5": 0.3636,
-      "precision5": 0.8,
-      "hits5": [
-        "CAUCAIA",
-        "MARACANAU",
-        "AQUIRAZ",
-        "CHOROZINHO"
-      ],
-      "p10": 0.7273,
-      "precision10": 0.8,
-      "hits10": [
-        "CAUCAIA",
-        "MARACANAU",
-        "AQUIRAZ",
-        "CHOROZINHO",
-        "EUSEBIO",
-        "HORIZONTE",
-        "ITAITINGA",
-        "MARANGUAPE"
-      ],
-      "p20": 1.0,
-      "precision20": 0.6111,
-      "hits20": [
-        "CAUCAIA",
-        "MARACANAU",
-        "AQUIRAZ",
-        "CHOROZINHO",
-        "EUSEBIO",
-        "HORIZONTE",
-        "ITAITINGA",
-        "MARANGUAPE",
-        "PACATUBA",
-        "PARACURU",
-        "TRAIRI"
-      ]
-    },
-    "interior": {
-      "total_nodes": 44,
-      "active_locations": 39,
-      "total_events": 39,
-      "p5": 0.1282,
-      "precision5": 1.0,
-      "hits5": [
-        "ACOPIARA",
-        "ALTO SANTO",
-        "AMONTADA",
-        "ARACATI",
-        "ARATUBA"
-      ],
-      "p10": 0.2308,
-      "precision10": 0.9,
-      "hits10": [
-        "ACOPIARA",
-        "ALTO SANTO",
-        "AMONTADA",
-        "ARACATI",
-        "ARATUBA",
-        "BARBALHA",
-        "BOA VIAGEM",
-        "CAMOCIM",
-        "CEDRO"
-      ],
-      "p20": 0.4359,
-      "precision20": 0.85,
-      "hits20": [
-        "ACOPIARA",
-        "ALTO SANTO",
-        "AMONTADA",
-        "ARACATI",
-        "ARATUBA",
-        "BARBALHA",
-        "BOA VIAGEM",
-        "CAMOCIM",
-        "CEDRO",
-        "CRATO",
-        "IBICUITINGA",
-        "IGUATU",
-        "ITAPIPOCA",
-        "ITAREMA",
-        "JAGUARETAMA",
-        "JAGUARIBE",
-        "JIJOCA DE JERICOACOARA"
-      ]
-    }
-  },
-  {
     "date": "2026-03-03",
     "total_events": 52,
     "brute_cvli": 0,
@@ -2353,6 +2204,242 @@
       "hits20": [
         "IGUATU",
         "ITAPAJE"
+      ]
+    }
+  },
+  {
+    "date": "2026-03-16",
+    "total_events": 87,
+    "brute_cvli": 19,
+    "exogenous": 68,
+    "assigned_total_events": 67,
+    "unmapped_total_events": 20,
+    "assigned_brute_cvli": 19,
+    "assigned_exogenous": 48,
+    "unmapped_exogenous": 20,
+    "unmapped_exogenous_sample": [
+      "Paupina",
+      "Henrique Jorge",
+      "Aldeota",
+      "Monte Castelo",
+      "Sabiaguaba",
+      "Pentecoste",
+      "Rodolfo Te\u00f3filo",
+      "Itaperi",
+      "Barreira",
+      "Pici"
+    ],
+    "global": {
+      "total_nodes": 109,
+      "active_locations": 28,
+      "total_events": 67,
+      "ranking_top10": [
+        "TIANGUA",
+        "MARACANAU",
+        "GROAIRAS",
+        "CAUCAIA",
+        "JUAZEIRO DO NORTE",
+        "MORADA NOVA",
+        "CARIRE",
+        "DEPUTADO IRAPUAN PINHEIRO",
+        "MILAGRES",
+        "CAPISTRANO"
+      ],
+      "gt_sample": [
+        "BARRA DO CEARA",
+        "BARROSO",
+        "SIQUEIRA",
+        "BOM JARDIM",
+        "ANCURI",
+        "ANTONIO BEZERRA",
+        "CAUCAIA",
+        "HORIZONTE",
+        "IGUATU",
+        "ITAPAJE",
+        "AURORA",
+        "CURIO",
+        "JANGURUSSU",
+        "TRAIRI",
+        "CASCAVEL"
+      ],
+      "p5": 0.4,
+      "recall5": 0.0714,
+      "hits5": [
+        "MARACANAU",
+        "CAUCAIA"
+      ],
+      "p10": 0.2,
+      "recall10": 0.0714,
+      "hits10": [
+        "MARACANAU",
+        "CAUCAIA"
+      ],
+      "p20": 0.25,
+      "recall20": 0.1786,
+      "hits20": [
+        "MARACANAU",
+        "CAUCAIA",
+        "JANGURUSSU",
+        "IGUATU",
+        "SIQUEIRA"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 40,
+      "active_locations": 13,
+      "total_events": 29,
+      "ranking_top10": [
+        "JANGURUSSU",
+        "PEDRAS",
+        "SIQUEIRA",
+        "LAGOA REDONDA",
+        "PARQUE SANTA MARIA",
+        "ANCURI",
+        "ALTO ALEGRE",
+        "CONJUNTO PALMEIRAS",
+        "PIRAMBU",
+        "CURIO"
+      ],
+      "gt_sample": [
+        "BARRA DO CEARA",
+        "BARROSO",
+        "SIQUEIRA",
+        "BOM JARDIM",
+        "ANCURI",
+        "ANTONIO BEZERRA",
+        "CURIO",
+        "JANGURUSSU",
+        "MESSEJANA",
+        "MONDUBIM",
+        "CANINDEZINHO",
+        "LAGOA REDONDA",
+        "JARDIM DAS OLIVEIRAS"
+      ],
+      "p5": 0.6,
+      "recall5": 0.2308,
+      "hits5": [
+        "JANGURUSSU",
+        "SIQUEIRA",
+        "LAGOA REDONDA"
+      ],
+      "p10": 0.5,
+      "recall10": 0.3846,
+      "hits10": [
+        "JANGURUSSU",
+        "SIQUEIRA",
+        "LAGOA REDONDA",
+        "ANCURI",
+        "CURIO"
+      ],
+      "p20": 0.35,
+      "recall20": 0.5385,
+      "hits20": [
+        "JANGURUSSU",
+        "SIQUEIRA",
+        "LAGOA REDONDA",
+        "ANCURI",
+        "CURIO",
+        "MESSEJANA",
+        "CANINDEZINHO"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 19,
+      "active_locations": 12,
+      "total_events": 35,
+      "ranking_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "EUSEBIO",
+        "TRAIRI",
+        "HORIZONTE",
+        "PINDORETAMA",
+        "CHOROZINHO",
+        "PACAJUS",
+        "BEBERIBE",
+        "PACATUBA"
+      ],
+      "gt_sample": [
+        "CAUCAIA",
+        "HORIZONTE",
+        "TRAIRI",
+        "CASCAVEL",
+        "PARAIPABA",
+        "PARACURU",
+        "MARANGUAPE",
+        "PACAJUS",
+        "GUAIUBA",
+        "MARACANAU",
+        "AQUIRAZ",
+        "SAO GONCALO DO AMARANTE"
+      ],
+      "p5": 0.8,
+      "recall5": 0.3333,
+      "hits5": [
+        "MARACANAU",
+        "CAUCAIA",
+        "TRAIRI",
+        "HORIZONTE"
+      ],
+      "p10": 0.5,
+      "recall10": 0.4167,
+      "hits10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "TRAIRI",
+        "HORIZONTE",
+        "PACAJUS"
+      ],
+      "p20": 0.6316,
+      "recall20": 1.0,
+      "hits20": [
+        "MARACANAU",
+        "CAUCAIA",
+        "TRAIRI",
+        "HORIZONTE",
+        "PACAJUS",
+        "PARAIPABA",
+        "AQUIRAZ",
+        "PARACURU",
+        "MARANGUAPE",
+        "GUAIUBA",
+        "CASCAVEL",
+        "SAO GONCALO DO AMARANTE"
+      ]
+    },
+    "interior": {
+      "total_nodes": 50,
+      "active_locations": 3,
+      "total_events": 3,
+      "ranking_top10": [
+        "TIANGUA",
+        "GROAIRAS",
+        "JUAZEIRO DO NORTE",
+        "MORADA NOVA",
+        "CARIRE",
+        "DEPUTADO IRAPUAN PINHEIRO",
+        "MILAGRES",
+        "CAPISTRANO",
+        "IRACEMA",
+        "SOBRAL"
+      ],
+      "gt_sample": [
+        "IGUATU",
+        "ITAPAJE",
+        "AURORA"
+      ],
+      "p5": 0.0,
+      "recall5": 0.0,
+      "hits5": [],
+      "p10": 0.0,
+      "recall10": 0.0,
+      "hits10": [],
+      "p20": 0.15,
+      "recall20": 1.0,
+      "hits20": [
+        "IGUATU",
+        "ITAPAJE",
+        "AURORA"
       ]
     }
   }

@@ -512,7 +512,7 @@
                 Interior usa <strong style="color:#f59e0b;">P@20</strong> (50 nós, janela de 28 dias) pois os eventos são esparsos — as mesmas cidades se repetem (Juazeiro, Sobral, Tauá), mas com poucos registros por período.
             </div>
             <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.3); border-radius:6px; padding:8px 14px; margin-bottom:14px; font-size:12px; color:#fcd34d;">
-                ⚠️ <strong>Interior:</strong> P@20 &lt; 30% é estrutural — 50 nós, ~2–4 CVLIs por janela. O modelo é considerado saudável se captura Juazeiro do Norte e Sobral no Top-10. Queda abrupta indica mudança de padrão territorial, não falha do modelo.
+                ⚠️ <strong>Interior:</strong> P@20 isolado pode subestimar o modelo quando há só 2–4 alvos reais na janela. Leia junto com <strong>R@20</strong>: recall alto indica que o modelo capturou parte relevante do ground truth mesmo com precisão baixa.
             </div>
             <div class="controls">
                 <select id="region-filter" onchange="updateConfidenceTrend()" style="padding: 8px 12px; background: #475569; color: white; border: 1px solid #64748b; border-radius: 6px;">
@@ -539,12 +539,12 @@
                         <th>Cov@20 Global</th>
                         <th>Cov@10 Fortaleza</th>
                         <th>Cov@10 RMF</th>
-                        <th>Cov@20 Interior</th>
+                        <th>Cov@20 / R@20 Interior</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="confidence-tbody">
-                    <tr><td colspan="6" class="loading">Carregando histórico...</td></tr>
+                    <tr><td colspan="7" class="loading">Carregando histórico...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -554,11 +554,11 @@
             <h2 class="section-title">📊 Qualidade de Dados</h2>
             <div class="grid">
                 <div class="card">
-                    <div class="card-title">Eventos Históricos</div>
+                    <div class="card-title">Eventos no Ranking</div>
                     <div class="metric-value" id="historical-events">--</div>
                 </div>
                 <div class="card">
-                    <div class="card-title">Eventos Exógenos (14d)</div>
+                    <div class="card-title">Exógenos Não Mapeados</div>
                     <div class="metric-value" id="exogenous-events">--</div>
                 </div>
                 <div class="card">
@@ -647,9 +647,11 @@
                 const data = await response.json();
                 
                 document.getElementById('historical-events').textContent =
-                    data.historical_events !== undefined ? data.historical_events.toLocaleString('pt-BR') : '--';
+                    data.assigned_total_events !== undefined
+                        ? `${data.assigned_total_events.toLocaleString('pt-BR')} / ${(data.assigned_total_events + (data.unmapped_total_events || 0)).toLocaleString('pt-BR')}`
+                        : '--';
                 document.getElementById('exogenous-events').textContent =
-                    data.exogenous_events_7d !== undefined ? data.exogenous_events_7d.toLocaleString('pt-BR') : '--';
+                    data.unmapped_exogenous !== undefined ? data.unmapped_exogenous.toLocaleString('pt-BR') : '--';
                 document.getElementById('completeness').textContent =
                     data.completeness_pct !== undefined
                         ? data.completeness_pct.toFixed(1) + '% (' + data.regions_available + '/' + data.regions_expected + ')'
@@ -666,6 +668,13 @@
                     list.innerHTML = '<div style="padding:16px; color:#10b981; text-align:center;">✅ Nenhuma anomalia ativa</div>';
                 } else {
                     const sevColor = { CRITICAL: '#ef4444', HIGH: '#f97316', MEDIUM: '#eab308' };
+                    const catLabel = {
+                        territorial_coverage: 'Cobertura Territorial',
+                        predictive_degradation: 'Degradação Preditiva',
+                        calibration: 'Calibração',
+                        system: 'Sistema',
+                        other: 'Outro'
+                    };
                     list.innerHTML = details.map(a => {
                         const color = sevColor[a.severity] || '#94a3b8';
                         const ts = a.timestamp ? new Date(a.timestamp).toLocaleString('pt-BR') : '--';
@@ -673,7 +682,7 @@
                             <span style="background:${color}; color:#fff; font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; flex-shrink:0; margin-top:2px;">${a.severity}</span>
                             <div style="flex:1;">
                                 <div style="color:#e2e8f0; font-size:13px; line-height:1.4;">${a.message}</div>
-                                <div style="color:#64748b; font-size:11px; margin-top:4px;">${ts} &bull; ${a.type || 'alerta'}</div>
+                                <div style="color:#64748b; font-size:11px; margin-top:4px;">${ts} &bull; ${catLabel[a.category] || 'Outro'} &bull; ${a.type || 'alerta'}</div>
                             </div>
                         </div>`;
                     }).join('');
@@ -739,6 +748,13 @@
         
         function displayAlerts(alerts) {
             const container = document.getElementById('alerts-container');
+            const catLabel = {
+                territorial_coverage: 'Cobertura Territorial',
+                predictive_degradation: 'Degradação Preditiva',
+                calibration: 'Calibração',
+                system: 'Sistema',
+                other: 'Outro'
+            };
             
             if (!alerts || alerts.length === 0) {
                 container.innerHTML = '<div style="text-align: center; padding: 40px; color: #10b981;">✅ Nenhum alerta ativo</div>';
@@ -748,6 +764,7 @@
             container.innerHTML = alerts.map(alert => `
                 <div class="alert-box alert-${alert.severity.toLowerCase()}">
                     <span class="alert-badge">${alert.severity}</span>
+                    <span class="alert-badge" style="margin-left:8px; background:#334155; color:#cbd5e1;">${catLabel[alert.category] || 'Outro'}</span>
                     <div class="alert-title">${alert.message}</div>
                     <div class="alert-time">${new Date(alert.timestamp).toLocaleString('pt-BR')}</div>
                 </div>
@@ -792,7 +809,14 @@
                     const gtFor = record.regions?.fortaleza?.active_locations ?? '?';
                     const gtRmf = record.regions?.rmf?.active_locations ?? '?';
                     const intP20 = ((record.regions?.interior?.p20 ?? 0) * 100).toFixed(1);
+                    const intR20 = ((record.regions?.interior?.recall20 ?? record.regions?.interior?.recall ?? 0) * 100).toFixed(1);
                     const intColor = parseFloat(intP20) >= 20 ? '#10b981' : parseFloat(intP20) >= 10 ? '#f59e0b' : '#ef4444';
+                    const interiorRecall = (record.regions?.interior?.recall20 ?? record.regions?.interior?.recall ?? 0);
+                    const statusHtml = interiorRecall >= 0.5
+                        ? '<span style="color:#10b981">✅ Recall saudável</span>'
+                        : (record.global?.p20 >= 0.6
+                            ? '<span style="color:#f59e0b">⚠️ Atenção</span>'
+                            : '<span style="color:#ef4444">🔴 Baixa</span>');
                     return `
                     <tr>
                         <td>${record.date}</td>
@@ -800,8 +824,8 @@
                         <td>${(record.global?.p20 * 100).toFixed(1)}%</td>
                         <td>${((record.regions?.fortaleza?.p10 ?? 0) * 100).toFixed(1)}% <small style="color:#64748b">(GT:${gtFor})</small></td>
                         <td>${((record.regions?.rmf?.p10 ?? 0) * 100).toFixed(1)}% <small style="color:#64748b">(GT:${gtRmf})</small></td>
-                        <td><span style="color:${intColor}">${intP20}%</span> <small style="color:#64748b">(GT:${gtInt}/50 nós)</small></td>
-                        <td>${(record.global?.p20 >= 0.8 ? '<span style="color:#10b981">✅ OK</span>' : record.global?.p20 >= 0.6 ? '<span style="color:#f59e0b">⚠️ Atenção</span>' : '<span style="color:#ef4444">🔴 Baixa</span>')}</td>
+                        <td><span style="color:${intColor}">${intP20}%</span> <small style="color:#64748b">| R20:${intR20}% (GT:${gtInt}/50 nós)</small></td>
+                        <td>${statusHtml}</td>
                     </tr>
                 `}).join('');
                 

@@ -1377,6 +1377,111 @@
         ]
       },
       "resolved": false
+    },
+    {
+      "timestamp": "2026-03-16T22:29:57.925836",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 20.0% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: VILA VELHA, PARQUE SAO JOSE, ANTONIO BEZERRA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.2,
+        "threshold": 0.8,
+        "faction_nodes_total": 40,
+        "faction_nodes_in_top20": 8,
+        "missing_sample": [
+          "VILA VELHA",
+          "PARQUE SAO JOSE",
+          "ANTONIO BEZERRA",
+          "PARQUE IRACEMA",
+          "ALTO ALEGRE"
+        ]
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-16T22:29:57.925836",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-16T22:29:58.096493",
+      "type": "faction_coverage_rmf",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — RMF: apenas 15.8% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: MARANGUAPE, PARAIPABA, AQUIRAZ",
+      "details": {
+        "region": "rmf",
+        "coverage": 0.1579,
+        "threshold": 0.8,
+        "faction_nodes_total": 19,
+        "faction_nodes_in_top20": 3,
+        "missing_sample": [
+          "MARANGUAPE",
+          "PARAIPABA",
+          "AQUIRAZ",
+          "SAO LUIS DO CURU",
+          "PACATUBA"
+        ]
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-16T22:29:58.103021",
+      "type": "calibration_maxed_rmf",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — RMF: FACTION_COVERAGE=15.8% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "current_value": 0.15789473684210525,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-16T22:34:43.276907",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 21.7% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: FRECHEIRINHA, PEREIRO, ITAREMA",
+      "details": {
+        "region": "interior",
+        "coverage": 0.2174,
+        "threshold": 0.8,
+        "faction_nodes_total": 46,
+        "faction_nodes_in_top20": 10,
+        "missing_sample": [
+          "FRECHEIRINHA",
+          "PEREIRO",
+          "ITAREMA",
+          "ITAPIPOCA",
+          "CEDRO"
+        ]
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-16T22:34:43.318134",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.7% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.21739130434782608,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": false
     }
   ]
 }

@@ -269,6 +269,25 @@ class HealthMonitor:
         self._save_history()
         
         logger.warning(f"🔔 [{severity}] {alert_type}: {message}")
+
+    @staticmethod
+    def classify_alert(alert_type: str) -> str:
+        """Classifica alertas por domínio para separação no dashboard."""
+        alert_type = (alert_type or '').lower()
+        if 'faction_coverage' in alert_type:
+            return 'territorial_coverage'
+        if 'model_degraded' in alert_type:
+            return 'predictive_degradation'
+        if 'auto_calibration' in alert_type or 'calibration_maxed' in alert_type:
+            return 'calibration'
+        if alert_type.startswith('high_') or 'error_rate' in alert_type:
+            return 'system'
+        return 'other'
+
+    def _enrich_alert(self, alert: Dict) -> Dict:
+        enriched = dict(alert)
+        enriched['category'] = self.classify_alert(alert.get('type', ''))
+        return enriched
     
     def get_alerts(self, limit: int = 100, resolved: Optional[bool] = None) -> List[Dict]:
         """
@@ -287,7 +306,8 @@ class HealthMonitor:
             alerts = [a for a in alerts if a['resolved'] == resolved]
         
         # Retornar mais recentes primeiro
-        return sorted(alerts, key=lambda x: x['timestamp'], reverse=True)[:limit]
+        alerts = sorted(alerts, key=lambda x: x['timestamp'], reverse=True)[:limit]
+        return [self._enrich_alert(a) for a in alerts]
     
     def check_system_health(self, thresholds: Dict = None) -> Tuple[str, List[str]]:
         """
@@ -391,6 +411,13 @@ class HealthMonitor:
                 'critical': len([a for a in alerts_active if a['severity'] == 'CRITICAL']),
                 'high': len([a for a in alerts_active if a['severity'] == 'HIGH']),
                 'medium': len([a for a in alerts_active if a['severity'] == 'MEDIUM']),
+                'by_category': {
+                    'territorial_coverage': len([a for a in alerts_active if a.get('category') == 'territorial_coverage']),
+                    'predictive_degradation': len([a for a in alerts_active if a.get('category') == 'predictive_degradation']),
+                    'calibration': len([a for a in alerts_active if a.get('category') == 'calibration']),
+                    'system': len([a for a in alerts_active if a.get('category') == 'system']),
+                    'other': len([a for a in alerts_active if a.get('category') == 'other']),
+                },
                 'recent': alerts_active[:10]
             }
         }
@@ -563,7 +590,14 @@ class ConfidenceTracker:
                     'p10': global_data.get('p10', 0),
                     'p20': global_data.get('p20', 0),
                     'precision': global_data.get('p10', 0),  # p10 ≈ precision@10
-                    'recall': global_data.get('p20', 0),     # p20 ≈ recall proxy
+                    'recall': global_data.get('recall20', global_data.get('p20', 0)),
+                    'recall10': global_data.get('recall10', 0),
+                    'recall20': global_data.get('recall20', 0),
+                    'active_locations': global_data.get('active_locations', 0),
+                    'total_nodes': global_data.get('total_nodes', 0),
+                    'total_events': global_data.get('total_events', 0),
+                    'assigned_total_events': entry.get('assigned_total_events', 0),
+                    'unmapped_total_events': entry.get('unmapped_total_events', 0),
                     'f1_score': 0.0
                 }
                 # Calcular f1 se precision e recall disponíveis
@@ -584,7 +618,12 @@ class ConfidenceTracker:
                             'p10': reg_data.get('p10', 0),
                             'p20': reg_data.get('p20', 0),
                             'precision': reg_data.get('p10', 0),
-                            'recall': reg_data.get('p20', 0),
+                            'recall': reg_data.get('recall20', reg_data.get('p20', 0)),
+                            'recall10': reg_data.get('recall10', 0),
+                            'recall20': reg_data.get('recall20', 0),
+                            'active_locations': reg_data.get('active_locations', 0),
+                            'total_nodes': reg_data.get('total_nodes', 0),
+                            'total_events': reg_data.get('total_events', 0),
                             'f1_score': 0.0
                         }
                         rp = region_metrics[reg]['precision']

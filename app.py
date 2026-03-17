@@ -259,7 +259,14 @@ def run_background_efficiency_monitor():
                                 'p10': global_data.get('p10', 0),
                                 'p20': global_data.get('p20', 0),
                                 'precision': global_data.get('p10', 0),
-                                'recall': global_data.get('p20', 0),
+                                'recall': global_data.get('recall20', global_data.get('p20', 0)),
+                                'recall10': global_data.get('recall10', 0),
+                                'recall20': global_data.get('recall20', 0),
+                                'active_locations': global_data.get('active_locations', 0),
+                                'total_nodes': global_data.get('total_nodes', 0),
+                                'total_events': global_data.get('total_events', 0),
+                                'assigned_total_events': metrics.get('assigned_total_events', 0),
+                                'unmapped_total_events': metrics.get('unmapped_total_events', 0),
                                 'f1_score': 0.0
                             }
                             p, r = global_metrics['precision'], global_metrics['recall']
@@ -274,7 +281,12 @@ def run_background_efficiency_monitor():
                                         'p10': p10_score,
                                         'p20': reg_data.get('p20', 0),
                                         'precision': p10_score,
-                                        'recall': reg_data.get('p20', 0),
+                                        'recall': reg_data.get('recall20', reg_data.get('p20', 0)),
+                                        'recall10': reg_data.get('recall10', 0),
+                                        'recall20': reg_data.get('recall20', 0),
+                                        'active_locations': reg_data.get('active_locations', 0),
+                                        'total_nodes': reg_data.get('total_nodes', 0),
+                                        'total_events': reg_data.get('total_events', 0),
                                         'f1_score': 0.0
                                     }
                                     
@@ -299,14 +311,14 @@ def run_background_efficiency_monitor():
                         print(f"\n🌍 REGIONALIZAÇÃO: GLOBAL")
                         print(f"   P5:  {m.get('p5', 0)*100:.1f}% | Hits: {', '.join(m.get('hits5', []))}")
                         print(f"   P10: {m.get('p10', 0)*100:.1f}% | Hits: {', '.join(m.get('hits10', []))}")
-                        print(f"   P20: {m.get('p20', 0)*100:.1f}% | Hits: {', '.join(m.get('hits20', []))}")
+                        print(f"   P20: {m.get('p20', 0)*100:.1f}% | R20: {m.get('recall20', 0)*100:.1f}% | Hits: {', '.join(m.get('hits20', []))}")
                     
                     # Exibir Fortaleza
                     if 'fortaleza' in metrics:
                         m = metrics['fortaleza']
                         print(f"\n🏙️  REGIONALIZAÇÃO: FORTALEZA")
                         print(f"   P10: {m.get('p10', 0)*100:.1f}% | Hits: {', '.join(m.get('hits10', []))}")
-                        print(f"   P20: {m.get('p20', 0)*100:.1f}% | Hits: {', '.join(m.get('hits20', []))}")
+                        print(f"   P20: {m.get('p20', 0)*100:.1f}% | R20: {m.get('recall20', 0)*100:.1f}% | Hits: {', '.join(m.get('hits20', []))}")
                     
                     # Exibir demais regiões se houver acertos
                     for reg in (orchestrator.specialists.keys() if orchestrator else _ALL_REGIONS):
