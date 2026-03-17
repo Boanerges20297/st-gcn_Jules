@@ -300,6 +300,7 @@ def create_admin_health_blueprint(health_monitor, confidence_tracker, model_cali
         Retorna métricas de qualidade de dados:
         - Eventos históricos (do último ciclo de avaliação)
         - Eventos exógenos dos últimos 7 dias
+        - Janela operacional vigente de validação
         - Taxa de completude dos dados regionais
         - Anomalias detectadas (alertas ativos de severidade alta+)
         """
@@ -367,6 +368,7 @@ def create_admin_health_blueprint(health_monitor, confidence_tracker, model_cali
                     latest_efficiency = {}
             
             return jsonify({
+                'validation_window_days': 14,
                 'historical_events': historical_events,
                 'exogenous_events_7d': exogenous_events,
                 'assigned_total_events': latest_efficiency.get('assigned_total_events', historical_events),

@@ -15,6 +15,13 @@ Incorpora os melhores achados do TRAINING_LOG.md (até Tentativa 45):
 
 Cold Streak: negativo (0 a -30) — nós ativos quebram a sequência, nós frios
 ficam em -30. Consistente com inferência em orchestrator.py.
+
+Estratégia ativa de retreino (2026-03-16):
+- Canal 0 (CVLI bruto) preservado sem normalização.
+- Canal 24 reconstruído em memória como soma móvel 7d do CVLI bruto,
+  substituindo a média móvel legada dos arquivos processados.
+- Horizonte alvo de previsão ajustado para 14 dias.
+- Objetivo: não suprimir picos/outliers que podem anteceder conflito iminente.
 """
 import pickle
 import numpy as np
@@ -52,7 +59,7 @@ logging.basicConfig(
 )
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-PREDICT_HORIZON = 7
+PREDICT_HORIZON = 14
 
 # ─────────────────────────────────────────────
 # Configuração por região
@@ -65,16 +72,19 @@ REGION_CONFIGS = {
     'fortaleza': dict(
         window=120, lr=0.01,  epochs=120, dropout=0.3, margin=1.0,
         k_eval=10, use_momentum=True,  grad_accum=32,
+        raw_cvli_context=True,
         output_name='fortaleza_model_active.pth',
     ),
     'rmf': dict(
         window=90,  lr=0.018, epochs=120, dropout=0.5, margin=1.5,
         k_eval=5,  use_momentum=False, grad_accum=8,
+        raw_cvli_context=True,
         output_name='rmf_model.pth',
     ),
     'interior': dict(
         window=120, lr=0.005, epochs=120, dropout=0.3, margin=1.0,
         k_eval=10, use_momentum=True,  grad_accum=32,
+        raw_cvli_context=True,
         output_name='interior_model.pth',
     ),
 }
@@ -122,6 +132,23 @@ def build_momentum_features(features):
     return momentum_feat
 
 
+def rebuild_raw_cvli_context(features):
+    """
+    Reconstrói canais derivados de CVLI diretamente do sinal bruto.
+
+    Hoje corrigimos explicitamente o canal 24, que nos artefatos legados pode vir
+    como média móvel 7d. Para retreino operacional, usamos soma móvel 7d para não
+    amortecer picos pequenos porém relevantes.
+    """
+    rebuilt = features.copy()
+    num_nodes = rebuilt.shape[0]
+    for node_idx in range(num_nodes):
+        rebuilt[node_idx, :, 24] = (
+            np.convolve(rebuilt[node_idx, :, 0], np.ones(7, dtype=np.float32), mode='full')[:rebuilt.shape[1]]
+        )
+    return rebuilt
+
+
 class ContrastiveTopKLoss(nn.Module):
     """
     Força o score dos top-K nós (por CVLI verdadeiro) a superar
@@ -158,6 +185,7 @@ class SpecialistTrainer:
         self.dropout      = cfg['dropout']
         self.k_eval       = cfg['k_eval']
         self.use_momentum = cfg['use_momentum']
+        self.raw_cvli_context = cfg.get('raw_cvli_context', True)
         self.grad_accum   = cfg['grad_accum']
         self.output_name  = cfg['output_name']
         self.margin       = cfg['margin']
@@ -170,6 +198,8 @@ class SpecialistTrainer:
             f"lr={self.lr} | epochs={self.epochs} | dropout={self.dropout} | "
             f"margin={self.margin} | K={self.k_eval} | "
             f"{'33ch+momentum' if self.use_momentum else '29ch'} | "
+            f"target_horizon={PREDICT_HORIZON}d | "
+            f"raw_cvli_context={'on' if self.raw_cvli_context else 'off'} | "
             f"grad_accum={self.grad_accum} | device={DEVICE}"
         )
         logging.info("="*80)
@@ -178,10 +208,14 @@ class SpecialistTrainer:
         with open(path, 'rb') as f:
             data = pickle.load(f)
 
-        nf           = data['node_features']          # (N, T, 29)
+        nf           = data['node_features'].copy()   # (N, T, 29)
         adj_geo_np   = data['adj_geo']
         adj_conf_np  = data['adj_conflict']
         N, T, C_base = nf.shape
+
+        if self.raw_cvli_context:
+            logging.info("🧱 Reconstruindo canal 24 com soma móvel 7d do CVLI bruto (sem média)...")
+            nf = rebuild_raw_cvli_context(nf)
 
         # Adjacências normalizadas
         adj_geo  = torch.tensor(normalize_adj(adj_geo_np),  dtype=torch.float32).to(DEVICE)
@@ -206,7 +240,7 @@ class SpecialistTrainer:
         # Dados brutos — sem normalização para preservar picos de criminalidade
 
         # Construção dos pares (X, Y)
-        # Y = soma de CVLI bruto nos próximos 7 dias
+        # Y = soma de CVLI bruto nos próximos 14 dias
         X_list, Y_list = [], []
         for t in range(self.window, T - PREDICT_HORIZON):
             x = torch.tensor(
@@ -324,6 +358,9 @@ class SpecialistTrainer:
                         'arch':        'DeepSTGAT_64',
                         'in_channels': C_ext,
                         'region':      self.region_key,
+                        'predict_horizon_days': PREDICT_HORIZON,
+                        'raw_cvli_context': self.raw_cvli_context,
+                        'channel24_mode': 'rolling_sum_7d',
                     }
                 }, output_path)
                 logging.info(f"💎 NOVO RECORDE [{self.region_key.upper()}]: P@{self.k_eval}={self.best_pk*100:.2f}% → {self.output_name}")

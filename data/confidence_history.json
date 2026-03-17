@@ -545,33 +545,33 @@
   },
   {
     "date": "2026-03-16",
-    "timestamp": "2026-03-16T23:24:02.005547",
+    "timestamp": "2026-03-16T23:43:07.264286",
     "global": {
-      "p10": 0.2,
-      "p20": 0.25,
-      "precision": 0.2,
-      "recall": 0.1786,
-      "recall10": 0.0714,
-      "recall20": 0.1786,
+      "p10": 0.4,
+      "p20": 0.4,
+      "precision": 0.4,
+      "recall": 0.2857,
+      "recall10": 0.1429,
+      "recall20": 0.2857,
       "active_locations": 28,
       "total_nodes": 109,
       "total_events": 67,
       "assigned_total_events": 67,
       "unmapped_total_events": 20,
-      "f1_score": 0.1887
+      "f1_score": 0.3333
     },
     "regions": {
       "fortaleza": {
         "p10": 0.5,
-        "p20": 0.35,
+        "p20": 0.45,
         "precision": 0.5,
-        "recall": 0.5385,
+        "recall": 0.6923,
         "recall10": 0.3846,
-        "recall20": 0.5385,
+        "recall20": 0.6923,
         "active_locations": 13,
         "total_nodes": 40,
         "total_events": 29,
-        "f1_score": 0.5185
+        "f1_score": 0.0
       },
       "rmf": {
         "p10": 0.5,
@@ -583,7 +583,7 @@
         "active_locations": 12,
         "total_nodes": 19,
         "total_events": 35,
-        "f1_score": 0.6667
+        "f1_score": 0.0
       },
       "interior": {
         "p10": 0.0,

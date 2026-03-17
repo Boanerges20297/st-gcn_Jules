@@ -74,6 +74,13 @@ docker-compose up -d --build
 
 ## Monitoramento
 
+### Janela Operacional de Validação
+
+- A régua vigente para validar melhoria de modelo em produção é de **14 dias corridos**.
+- Não promover modelo por pico curto de 1 a 7 dias; exigir sustentação por 14 dias nas métricas operacionais.
+- Fortaleza e RMF devem ser acompanhadas principalmente por **P@10**.
+- Interior deve ser acompanhado por **P@20 + R@20**, junto com cobertura territorial.
+
 ### Dashboards
 
 | Dashboard | URL | Credenciais | Propósito |

@@ -311,8 +311,9 @@ def process_ism_data():
             if date.weekday() >= 5: features[:, d_idx, 22] = 1.0
             
         for n in range(N):
-            # Canal 24: Média Móvel (Tensão Padrão)
-            features[n, :, 24] = pd.Series(features[n, :, 0]).rolling(window=7, min_periods=1).mean().values
+            # Canal 24: Soma móvel 7d do CVLI bruto.
+            # Evita suavizar outliers/anomalias que podem anteceder conflito iminente.
+            features[n, :, 24] = pd.Series(features[n, :, 0]).rolling(window=7, min_periods=1).sum().values
             # Canal 2: Tensão de Facções (Estático do mapeamento)
             features[n, :, 2] = reg_nodes.iloc[n]['tension_index']
             # Canal 28: Somatório Global (Contexto)

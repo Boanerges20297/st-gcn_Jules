@@ -51,22 +51,27 @@ Sistema de **predição de crime por ranking** que identifica os **top-5 bairros
 
 | Aspecto | Valor | Nota |
 |---------|-------|------|
-| **Horizonte de Predição** | **7 dias** | Para os próximos 168 horas |
+| **Horizonte de Predição** | **14 dias** | Para os próximos 14 dias corridos |
 | **Janela Histórica** | 30 dias | Dados usados para calcular risco |
 | **Janela de Treinamento** | 30 dias | Modelo foi treinado com 30d de features |
-| **Granularidade** | Por dia | Predições são por bairro/dia dentro dos 7d |
+| **Granularidade** | Por dia | Predições são avaliadas por bairro/dia dentro dos 14d |
 
 ### O que "Áreas de Alto Risco" Significa
 
 ❌ **NÃO significa**: "Vai ter crime amanhã com 100% certeza"  
-✅ **SIGNIFICA**: "Baseado em padrões históricos, este bairro tem **alta probabilidade** (P@5 > 80%) de estar entre os 5 com maior risco nos próximos 7 dias"
+✅ **SIGNIFICA**: "Baseado em padrões históricos, este bairro tem **alta probabilidade** (P@5 > 80%) de estar entre os 5 com maior risco nos próximos 14 dias"
 
-### Agregação de Risco de 7 Dias
+### Agregação de Risco de 14 Dias
 
 O sistema não prediz risco **diário** separado, mas sim:
-- **Risco Agregado**: Combina sinais de todos os próximos 7 dias
+- **Risco Agregado**: Combina sinais de todos os próximos 14 dias
 - **Ranking Consolidado**: Top 5 bairros mais críticos no horizonte
-- **Atualização Diária**: A cada novo dia, a janela se move (hoje + 6 dias adiante)
+- **Atualização Diária**: A cada novo dia, a janela se move (hoje + 13 dias adiante)
+
+### Régua Operacional Vigente
+
+- A validação operacional e a decisão de promoção devem considerar **14 dias corridos** de estabilidade, não apenas 7 dias.
+- Para Fortaleza e RMF, o foco continua em **P@10**; para Interior, a leitura correta continua sendo **P@20 junto com R@20**.
 
 ### Componentes de Confiança
 

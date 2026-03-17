@@ -511,6 +511,9 @@
                 Fortaleza e RMF usam <strong style="color:#60a5fa;">P@10</strong> (100 e ~30 nós, sinal denso).
                 Interior usa <strong style="color:#f59e0b;">P@20</strong> (50 nós, janela de 28 dias) pois os eventos são esparsos — as mesmas cidades se repetem (Juazeiro, Sobral, Tauá), mas com poucos registros por período.
             </div>
+            <div style="background:rgba(96,165,250,0.08); border:1px solid rgba(96,165,250,0.25); border-radius:6px; padding:8px 14px; margin-bottom:10px; font-size:12px; color:#bfdbfe;">
+                Régua operacional vigente: <strong style="color:#e2e8f0;">14 dias corridos</strong> para validar melhora real de modelo antes de promoção.
+            </div>
             <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.3); border-radius:6px; padding:8px 14px; margin-bottom:14px; font-size:12px; color:#fcd34d;">
                 ⚠️ <strong>Interior:</strong> P@20 isolado pode subestimar o modelo quando há só 2–4 alvos reais na janela. Leia junto com <strong>R@20</strong>: recall alto indica que o modelo capturou parte relevante do ground truth mesmo com precisão baixa.
             </div>
@@ -523,7 +526,7 @@
                 </select>
                 <select id="period-filter" onchange="updateConfidenceTrend()" style="padding: 8px 12px; background: #475569; color: white; border: 1px solid #64748b; border-radius: 6px;">
                     <option value="7">Últimos 7 dias</option>
-                    <option value="14">Últimos 14 dias</option>
+                    <option value="14" selected>Últimos 14 dias</option>
                     <option value="30">Últimos 30 dias</option>
                 </select>
                 <button onclick="updateConfidenceTrend()">↻ Atualizar</button>
@@ -565,6 +568,10 @@
                     <div class="card-title">Taxa Completude</div>
                     <div class="metric-value" id="completeness">--</div>
                 </div>
+                <div class="card">
+                    <div class="card-title">Janela Operacional</div>
+                    <div class="metric-value" id="validation-window">--</div>
+                </div>
                 <div class="card" style="cursor:pointer;" onclick="toggleAnomalyDetails()" title="Clique para ver detalhes">
                     <div class="card-title">Anomalias Detectadas <span style="font-size:11px; color:#94a3b8;">(CRITICAL/HIGH)</span></div>
                     <div class="metric-value" id="anomalies" style="color:#ef4444;">--</div>
@@ -581,7 +588,7 @@
         <!-- Auto-Ajuste / Calibração -->
         <div class="section">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-                <h2 class="section-title" style="margin:0; border:none;">🌡�? Termômetro — Auto-Ajuste Territorial</h2>
+                <h2 class="section-title" style="margin:0; border:none;">🌡️ Termômetro - Auto-Ajuste Territorial</h2>
                 <button onclick="updateCalibration()" class="secondary">↻ Atualizar</button>
             </div>
             <div id="calibration-container">
@@ -590,7 +597,7 @@
         </div>
 
         <div class="refresh-info">
-            <span>�?��? Atualizado automaticamente a cada 30 segundos</span>
+            <span>↻ Atualizado automaticamente a cada 30 segundos</span>
         </div>
     </div>
     
@@ -637,7 +644,7 @@
             } catch (error) {
                 console.error('Erro ao atualizar dashboard:', error);
                 document.getElementById('status-indicator').innerHTML = 
-                    `<span style="color: #ef4444;">�?� Erro ao conectar</span>`;
+                    `<span style="color: #ef4444;">⚠️ Erro ao conectar</span>`;
             }
         }
 
@@ -655,6 +662,10 @@
                 document.getElementById('completeness').textContent =
                     data.completeness_pct !== undefined
                         ? data.completeness_pct.toFixed(1) + '% (' + data.regions_available + '/' + data.regions_expected + ')'
+                        : '--';
+                document.getElementById('validation-window').textContent =
+                    data.validation_window_days !== undefined
+                        ? `${data.validation_window_days} dias`
                         : '--';
                 const count = data.anomalies !== undefined ? data.anomalies : '--';
                 document.getElementById('anomalies').textContent = count;
@@ -797,7 +808,7 @@
         async function updateConfidenceTrend() {
             try {
                 const region = document.getElementById('region-filter').value || 'global';
-                const days = document.getElementById('period-filter').value || '7';
+                const days = document.getElementById('period-filter').value || '14';
                 
                 const response = await fetch(`/api/admin/health/confidence-history?region=${region}&days=${days}`, { cache: 'no-store' });
                 const data = await response.json();
@@ -913,7 +924,7 @@
                             c.fillStyle = '#ef4444';
                             c.font = 'bold 13px sans-serif';
                             c.textAlign = 'center';
-                            c.fillText(`⚠�? Cobertura ${regionDisplayNames[regionKey] || regionKey}: SEM DADOS (0%)`, (left + right) / 2, (top + bottom) / 2);
+                            c.fillText(`⚠️ Cobertura ${regionDisplayNames[regionKey] || regionKey}: SEM DADOS (0%)`, (left + right) / 2, (top + bottom) / 2);
                             c.restore();
                         }
                     }
@@ -950,14 +961,14 @@
             min_risk:           '🔥 Calor Mín',
         };
         const REGION_LABELS = {
-            fortaleza: '�?��? Fortaleza',
+            fortaleza: '🏙️ Fortaleza',
             rmf:       '🌆 RMF',
             interior:  '🌄 Interior',
         };
         const EVENT_ICONS = {
-            full_rollback:    '↩�?',
+            full_rollback:    '↩️',
             auto_calibration: '🔧',
-            degradation:      '⚠�?',
+            degradation:      '⚠️',
             recovery:         '✅',
         };
 
@@ -986,7 +997,7 @@
                     const cardClass = isCritical ? 'critical' : isDegraded ? 'degraded' : 'recovered';
                     const badgeClass = isCritical ? 'critical' : isDegraded ? 'degraded' : 'ok';
                     const badgeLabel = isCritical
-                        ? `⚠�? CR�?TICO — Intervenção Manual (${steps}/${maxSteps})`
+                        ? `⚠️ CRÍTICO - Intervenção Manual (${steps}/${maxSteps})`
                         : isDegraded
                             ? `🔧 Ajuste Ativo: Cobertura Territorial (${steps}/${maxSteps})`
                             : '✅ Cobertura Normal';
@@ -1001,7 +1012,7 @@
                     const coveragePct = coverageMatch ? parseFloat(coverageMatch[1]) : null;
                     const coverageHtml = coveragePct !== null
                         ? `<div style="margin:8px 0; padding:8px 12px; background:${coveragePct >= 80 ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'}; border-radius:6px; font-size:13px; color:${coveragePct >= 80 ? '#10b981' : '#ef4444'};">
-                            🌡�? Cobertura territorial: <strong>${coveragePct.toFixed(1)}%</strong>
+                            🌡️ Cobertura territorial: <strong>${coveragePct.toFixed(1)}%</strong>
                             <span style="color:#94a3b8; font-size:11px;"> (limiar: 80%)</span>
                           </div>`
                         : '';
@@ -1032,7 +1043,7 @@
                         ? '<div style="color:#475569;font-size:12px;">Sem eventos registrados</div>'
                         : events.map(ev => {
                             const isRollback = ev.event === 'full_rollback';
-                            const icon = isRollback ? '↩�?' : ev.step ? '🔧' : '✅';
+                            const icon = isRollback ? '↩️' : ev.step ? '🔧' : '✅';
                             const time = ev.timestamp ? new Date(ev.timestamp).toLocaleString('pt-BR') : '';
                             const text = ev.trigger || ev.event || 'Evento';
                             const extra = isRollback
@@ -1055,7 +1066,7 @@
                     const top10 = ws.historical_top10 || [];
                     let windowHtml = '';
                     if (dynWin || useFallback) {
-                        const winLabel = dynWin ? `🗓�? Janela ativa: <strong>${dynWin}d</strong>` : '🗓�? Janela: padrão';
+                        const winLabel = dynWin ? `🗓️ Janela ativa: <strong>${dynWin}d</strong>` : '🗓️ Janela: padrão';
                         const fbLabel = useFallback
                             ? `<br>📚 Fallback histórico ativo — Top${top10.length}: ${top10.slice(0,5).join(', ')}${top10.length > 5 ? '...' : ''}`
                             : '';

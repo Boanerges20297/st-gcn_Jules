@@ -355,8 +355,14 @@ class StateOrchestrator:
             # Garante que quem agiu nos últimos 3 dias suba, mas sem dominar 80% do peso
             recent_crime = x_raw_extended[:, -3:, 0].sum(axis=1) > 0
             inclusion_signal = (recent_crime | (sim_impact > 0)).astype(float)
+            
+            # 4. Sinal de Calmaria (dias consecutivos sem CVLI)
+            # O cold_streak entra no modelo, mas o blend final precisa penalizar explicitamente
+            # zonas frias; caso contrário, a tensão histórica mantém o score artificialmente alto.
+            calm_days = np.clip(-momentum_feat[:, -1, 3], 0, 30)
+            calm_signal = calm_days / 30.0
 
-            # 4. Fallback Histórico Top10 — ativado quando P10 persiste baixo mesmo em 30d
+            # 5. Fallback Histórico Top10 — ativado quando P10 persiste baixo mesmo em 30d
             # Blend com fallback: 50% neural + 20% tensão + 10% recente + 20% histórico
             if cp.get('use_historical_fallback') and cp.get('historical_top10'):
                 historical_top_norms = set(normalize_name(n) for n in cp['historical_top10'])
@@ -364,7 +370,14 @@ class StateOrchestrator:
                     1.0 if normalize_name(str(row['name'])) in historical_top_norms else 0.0
                     for _, row in data['nodes_gdf'].iterrows()
                 ])
-                final_logic = (0.50 * norm_neural) + (0.20 * norm_tension) + (0.10 * inclusion_signal) + (0.20 * historical_signal)
+                calm_penalty = 0.20 if region == 'interior' else 0.10
+                final_logic = (
+                    (0.50 * norm_neural)
+                    + (0.20 * norm_tension)
+                    + (0.10 * inclusion_signal)
+                    + (0.20 * historical_signal)
+                    - (calm_penalty * calm_signal)
+                )
                 print(f"📚 [Blend] {region.upper()} usando fallback histórico top10 ({len(historical_top_norms)} nós).")
             else:
                 # Blend padrão: ajustado por região
@@ -373,12 +386,21 @@ class StateOrchestrator:
                 neural_weight = 0.40 if region == 'interior' else 0.60
                 tension_weight = 0.25 if region == 'interior' else 0.20
                 inclusion_weight = 0.35 if region == 'interior' else 0.20  # Inclusão importante quando há crime
+                calm_penalty = 0.25 if region == 'interior' else 0.10
                 
                 # Modelo treinado com dados brutos — inferência deve refletir saída neural
-                final_logic = (neural_weight * norm_neural) + (tension_weight * norm_tension) + (inclusion_weight * inclusion_signal)
+                final_logic = (
+                    (neural_weight * norm_neural)
+                    + (tension_weight * norm_tension)
+                    + (inclusion_weight * inclusion_signal)
+                    - (calm_penalty * calm_signal)
+                )
             
-            # Escalonamento Dashboard (5% a 100%)
-            out_norm = 5.0 + (final_logic * 95.0)
+            final_logic = np.clip(final_logic, 0.0, 1.0)
+            
+            # Escalonamento Dashboard (0% a 100%)
+            # Remover piso artificial para que dias de calmaria apareçam de fato como risco muito baixo.
+            out_norm = final_logic * 100.0
             
             # BLOCO DE SEGURANÇA: cada especialista emite scores apenas para seus próprios nós
             for i, row in data['nodes_gdf'].iterrows():

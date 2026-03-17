@@ -2234,16 +2234,16 @@
       "active_locations": 28,
       "total_events": 67,
       "ranking_top10": [
-        "TIANGUA",
-        "MARACANAU",
-        "GROAIRAS",
         "CAUCAIA",
+        "MARACANAU",
+        "TIANGUA",
+        "GROAIRAS",
         "JUAZEIRO DO NORTE",
+        "SIQUEIRA",
+        "JANGURUSSU",
         "MORADA NOVA",
         "CARIRE",
-        "DEPUTADO IRAPUAN PINHEIRO",
-        "MILAGRES",
-        "CAPISTRANO"
+        "DEPUTADO IRAPUAN PINHEIRO"
       ],
       "gt_sample": [
         "BARRA DO CEARA",
@@ -2265,23 +2265,28 @@
       "p5": 0.4,
       "recall5": 0.0714,
       "hits5": [
-        "MARACANAU",
-        "CAUCAIA"
-      ],
-      "p10": 0.2,
-      "recall10": 0.0714,
-      "hits10": [
-        "MARACANAU",
-        "CAUCAIA"
-      ],
-      "p20": 0.25,
-      "recall20": 0.1786,
-      "hits20": [
-        "MARACANAU",
         "CAUCAIA",
+        "MARACANAU"
+      ],
+      "p10": 0.4,
+      "recall10": 0.1429,
+      "hits10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "SIQUEIRA",
+        "JANGURUSSU"
+      ],
+      "p20": 0.4,
+      "recall20": 0.2857,
+      "hits20": [
+        "CAUCAIA",
+        "MARACANAU",
+        "SIQUEIRA",
         "JANGURUSSU",
         "IGUATU",
-        "SIQUEIRA"
+        "AURORA",
+        "HORIZONTE",
+        "TRAIRI"
       ]
     },
     "fortaleza": {
@@ -2289,12 +2294,12 @@
       "active_locations": 13,
       "total_events": 29,
       "ranking_top10": [
+        "SIQUEIRA",
         "JANGURUSSU",
         "PEDRAS",
-        "SIQUEIRA",
+        "ANCURI",
         "LAGOA REDONDA",
         "PARQUE SANTA MARIA",
-        "ANCURI",
         "ALTO ALEGRE",
         "CONJUNTO PALMEIRAS",
         "PIRAMBU",
@@ -2315,32 +2320,35 @@
         "LAGOA REDONDA",
         "JARDIM DAS OLIVEIRAS"
       ],
-      "p5": 0.6,
-      "recall5": 0.2308,
+      "p5": 0.8,
+      "recall5": 0.3077,
       "hits5": [
-        "JANGURUSSU",
         "SIQUEIRA",
+        "JANGURUSSU",
+        "ANCURI",
         "LAGOA REDONDA"
       ],
       "p10": 0.5,
       "recall10": 0.3846,
       "hits10": [
-        "JANGURUSSU",
         "SIQUEIRA",
-        "LAGOA REDONDA",
+        "JANGURUSSU",
         "ANCURI",
+        "LAGOA REDONDA",
         "CURIO"
       ],
-      "p20": 0.35,
-      "recall20": 0.5385,
+      "p20": 0.45,
+      "recall20": 0.6923,
       "hits20": [
-        "JANGURUSSU",
         "SIQUEIRA",
-        "LAGOA REDONDA",
+        "JANGURUSSU",
         "ANCURI",
+        "LAGOA REDONDA",
         "CURIO",
         "MESSEJANA",
-        "CANINDEZINHO"
+        "ANTONIO BEZERRA",
+        "CANINDEZINHO",
+        "BOM JARDIM"
       ]
     },
     "rmf": {
@@ -2348,11 +2356,11 @@
       "active_locations": 12,
       "total_events": 35,
       "ranking_top10": [
-        "MARACANAU",
         "CAUCAIA",
+        "MARACANAU",
+        "HORIZONTE",
         "EUSEBIO",
         "TRAIRI",
-        "HORIZONTE",
         "PINDORETAMA",
         "CHOROZINHO",
         "PACAJUS",
@@ -2376,27 +2384,27 @@
       "p5": 0.8,
       "recall5": 0.3333,
       "hits5": [
-        "MARACANAU",
         "CAUCAIA",
-        "TRAIRI",
-        "HORIZONTE"
+        "MARACANAU",
+        "HORIZONTE",
+        "TRAIRI"
       ],
       "p10": 0.5,
       "recall10": 0.4167,
       "hits10": [
-        "MARACANAU",
         "CAUCAIA",
-        "TRAIRI",
+        "MARACANAU",
         "HORIZONTE",
+        "TRAIRI",
         "PACAJUS"
       ],
       "p20": 0.6316,
       "recall20": 1.0,
       "hits20": [
-        "MARACANAU",
         "CAUCAIA",
-        "TRAIRI",
+        "MARACANAU",
         "HORIZONTE",
+        "TRAIRI",
         "PACAJUS",
         "PARAIPABA",
         "AQUIRAZ",
@@ -2438,8 +2446,8 @@
       "recall20": 1.0,
       "hits20": [
         "IGUATU",
-        "ITAPAJE",
-        "AURORA"
+        "AURORA",
+        "ITAPAJE"
       ]
     }
   }
