@@ -194,17 +194,23 @@ def process_ism_data():
     # --- NOVO: Atualizar Cache de Ruas Geolocalizadas ---
     update_geo_streets_cache(occ_df)
     
-    # 2. Calcular Estatísticas de CVLI (Ranking Dinâmico: Últimos 2 Anos)
+    # 2. Calcular Estatísticas de CVLI para Seleção de Nós (BLINDAGEM TEMPORAL)
+    # Para evitar "Selection Leakage", o ranking de importância dos bairros
+    # deve ser baseado apenas em dados até o final de 2025.
+    selection_cutoff = pd.Timestamp('2025-12-31')
     end_d = occ_df['data'].max()
-    two_years_ago = end_d - pd.Timedelta(days=730)
+    two_years_ago = selection_cutoff - pd.Timedelta(days=730)
     
-    # Ranking para seleção de nós (últimos 2 anos)
+    logging.info(f"🛡️ Seleção de nós baseada no período: {two_years_ago.date()} até {selection_cutoff.date()}")
+    
+    # Ranking para seleção de nós (usando apenas dados até o cutoff)
     cvli_ranking_recent = occ_df[
         (occ_df['tipo'] == 'cvli') & 
-        (occ_df['data'] >= two_years_ago)
+        (occ_df['data'] >= two_years_ago) &
+        (occ_df['data'] <= selection_cutoff)
     ].groupby('loc_clean').size()
     
-    # Ranking histórico total para estatísticas
+    # Ranking histórico total apenas para metadados (não afeta seleção)
     cvli_counts_total = occ_df[occ_df['tipo'] == 'cvli'].groupby('loc_clean').size()
 
     # 3. Carregar e Filtrar Nós (Malha Dinâmica)

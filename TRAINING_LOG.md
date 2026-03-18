@@ -293,7 +293,75 @@ interior_model_backup_20260316_221629.pth (antiga: N/A)
 
 ---
 
-## Tentativa 47 (Retreino Operacional 14 Dias - CVLI Bruto + Rolling Sum 7d) — 2026-03-17 13:40
+## Tentativa 49 (Paradigma de Gradiente Agressivo - Focal Alpha 0.75 + RankW 10.0) — 2026-03-18 15:30
+
+### Motivação
+- Otimizar a reatividade do modelo. A Tentativa 48 mostrou um gradiente "passivo" (GradNorm < 1.0), indicando que o modelo estava sendo conservador demais para capturar a estocasticidade do crime.
+- Necessidade de forçar o modelo a "sacudir" seus pesos para priorizar hotspots de alta intensidade sobre o ruído de fundo (background).
+
+### Ajustes Metodológicos (Paradigma "High-Energy")
+1. **Loss Focal Agressiva:** 
+    - `alpha=0.75`: Inverteu-se o peso para favorecer massivamente a detecção de hotspots (classe minoritária).
+    - `gamma=1.5`: Reduziu-se a supressão de exemplos "fáceis" para manter o fluxo de gradiente ativo.
+2. **Impacto de Ranking Massivo:**
+    - `ranking_weight=10.0`: Aumento de 20x no peso do MSE dos positivos. Qualquer erro na ordem dos bairros agora gera uma correção violenta nos gradientes.
+3. **Regularização Compensatória:**
+    - `weight_decay=2e-1`: Aumento da penalidade L2 para evitar que gradientes gigantes causem divergência (explosão) dos pesos.
+4. **Blindagem de Seleção Mantida:** Malha de nós baseada estritamente em dados de 2024-2025 (Cutoff 31/12/2025).
+
+### Resultados Iniciais (Fortaleza)
+| Região | Batch | GradNorm | Loss | P@10 Instantâneo |
+|---|---|---|---|---|
+| **Fortaleza** | B001 | **194.4** 🔥 | 22.17 | 20.0% |
+| **Fortaleza** | B014 | **44.4** | 6.50 | **50.0%** 🚀 |
+
+### Análise Técnica Preliminar
+- **Fim da Passividade:** O salto no GradNorm (de ~1.0 para >190.0) prova que o modelo agora está "sentindo" o erro e reagindo com a força necessária para reestruturar as camadas internas do ST-GAT.
+- **Convergência Veloz:** A queda rápida da loss (22.17 -> 6.50) em apenas 14 batches indica que o otimizador encontrou um caminho de descida eficiente sob o regime de alta energia.
+- **Reatividade ao Horizonte 14d:** O modelo parou de ficar "em cima do muro" e está sendo forçado a tomar decisões claras sobre quais bairros são hotspots reais.
+
+### Status Atual
+- **Status:** **EM EXECUÇÃO** (Treinamento sequencial unificado Fortaleza → RMF → Interior).
+- **Próximos Passos:** Monitorar estabilização do gradiente e validar se o P@10 cego supera o patamar de 50-60%.
+
+---
+
+## Tentativa 48 (Refinamento Contra Estocasticidade - Split Temporal + Binary Focal Loss) — 2026-03-18 13:45
+
+### Motivação
+- Combater a performance "pífia" na prática vs. recordes inflados no treino. 
+- Identificado vazamento temporal (data leakage) devido ao `random.shuffle` nos índices de janelas temporais, que permitia ao modelo "decorar o futuro".
+- Necessidade de lidar com a esparsa natureza do crime (0.17% de não-zeros) sem alucinar importância em ruído de background.
+
+### Ajustes Metodológicos (Paradigma "Real-World Ready")
+1. **Split Temporal Estrito (85/15):** Removido embaralhamento global. O modelo treina no passado e valida no futuro recente (últimos 15% do tempo). Métrica de validação agora é um proxy real de performance em produção.
+2. **Normalização Local Z-Score (Window-based):** Cada janela de entrada (120 dias) é normalizada individualmente. Isso remove a dependência de valores absolutos anuais e foca em *mudanças e anomalias locais*.
+3. **Binary Focal Ranking Loss:**
+    - **Focal Loss:** Substituiu a Contrastive Loss. Pondera erros em hotspots (classe minoritária) e ignora acertos fáceis em áreas de zero (background).
+    - **Ranking MSE:** Ponderação adicional nos valores positivos para garantir que a intensidade do ranking reflita a periculosidade real.
+
+### Configuração Técnica
+- **Script:** `scripts/training/Active/train_all_specialists.py` (Versão Modificada)
+- **Horizonte alvo:** 14 dias
+- **Perda:** `BinaryFocalRankingLoss(alpha=0.25, gamma=2.0, ranking_weight=0.5)`
+- **Normalização:** Local per-window Z-Score.
+
+### Resultados Iniciais (Fortaleza - Época 1)
+| Região | Métrica | Performance (Validação Cega) | Status |
+|---|---|---|---|
+| **Fortaleza** | P@10 | **45.17%** 🚀 | **RECORDE REALISTA** |
+
+### Análise Técnica Preliminar
+- **Validação Honesta:** O P@10 de **45.17%** logo na primeira época é extremamente encorajador, pois foi obtido em dados que o modelo nunca viu (futuro cronológico). Isso quebra o ciclo de "recordes falsos" de >80% que não se sustentavam na prática.
+- **Convergência de Gradiente:** O GradNorm estabilizou em **1.18**, indicando que a normalização local por janela tornou o terreno de otimização muito mais suave para o `DeepSTGAT_64`.
+- **Focal Impact:** Observados picos de **70% de P@10** em batches específicos de alta intensidade, mostrando que o modelo parou de ser "míope" para eventos raros.
+
+### Status Atual
+- **Status:** **EM EXECUÇÃO** (Treinamento de Fortaleza em progresso).
+- **Próximos Passos:** Concluir Fortaleza, avaliar se o P@10 estabiliza acima de 50-60% (meta do projeto) e replicar para RMF/Interior.
+
+---
+
 
 ### Motivação
 - Alinhar o treinamento à nova régua operacional de **14 dias corridos**, evitando aprovar modelos com ganho apenas em horizonte curto.

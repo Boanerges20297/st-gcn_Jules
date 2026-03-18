@@ -149,27 +149,36 @@ def rebuild_raw_cvli_context(features):
     return rebuilt
 
 
-class ContrastiveTopKLoss(nn.Module):
+class BinaryFocalRankingLoss(nn.Module):
     """
-    Força o score dos top-K nós (por CVLI verdadeiro) a superar
-    a média de fundo por `margin`. Penaliza frouxidão nos hotspots.
+    Focal Loss adaptada para Ranking. 
+    Foca nos hotspots (classe minoritária) e penaliza erros em áreas críticas.
     """
-    def __init__(self, k=10, margin=1.0):
+    def __init__(self, alpha=0.25, gamma=2.0, ranking_weight=1.0):
         super().__init__()
-        self.k = k
-        self.margin = margin
+        self.alpha = alpha
+        self.gamma = gamma
+        self.ranking_weight = ranking_weight
 
     def forward(self, pred, target):
-        k_eff = min(self.k, (target > 0).sum().item())
-        if k_eff == 0:
-            return 0.01 * torch.norm(pred, 2)
-        _, topk_idx = torch.topk(target, k_eff)
-        mask = torch.zeros_like(target, dtype=torch.bool)
-        mask[topk_idx] = True
-        hotspot_scores = pred[mask]
-        bg_mean = pred[~mask].mean()
-        loss = F.relu(self.margin - (hotspot_scores - bg_mean)).mean()
-        return loss + 0.01 * torch.norm(pred, 2)
+        # Target binário para Focal (houve ou não crime no horizonte)
+        target_bin = (target > 0).float()
+        
+        # Binary Focal Loss
+        probs = torch.sigmoid(pred)
+        bce_loss = F.binary_cross_entropy_with_logits(pred, target_bin, reduction='none')
+        p_t = probs * target_bin + (1 - probs) * (1 - target_bin)
+        focal_loss = self.alpha * (1 - p_t)**self.gamma * bce_loss
+        focal_loss = focal_loss.mean()
+
+        # Ranking Loss (MSE apenas nos positivos para forçar intensidade correta)
+        if target_bin.sum() > 0:
+            pos_mask = target_bin > 0
+            rank_loss = F.mse_loss(pred[pos_mask], target[pos_mask])
+        else:
+            rank_loss = 0.0
+
+        return focal_loss + self.ranking_weight * rank_loss + 0.01 * torch.norm(pred, 2)
 
 
 # ─────────────────────────────────────────────
@@ -192,17 +201,21 @@ class SpecialistTrainer:
         self.best_pk      = 0.0
 
     def train(self):
-        logging.info("\n" + "="*80)
+        # Parâmetros da Focal Loss Agressiva (Tentativa 49 - Gradiente Ativo)
+        focal_alpha = 0.75
+        focal_gamma = 1.5
+        ranking_w   = 10.0
+
+        logging.info("\n" + "═"*80)
+        logging.info(f"🚀 ESPECIALISTA: {self.region_key.upper()} (TENTATIVA 49 - AGGRESSIVE GRADIENT)")
+        logging.info(f"📊 METODOLOGIA: Split Temporal (85/15) | Blindagem de Seleção (Cutoff 2025)")
+        logging.info(f"📉 LOSS: Aggressive Focal Ranking (alpha={focal_alpha}, gamma={focal_gamma}, rank_w={ranking_w})")
         logging.info(
-            f"🚀 {self.region_key.upper()} | window={self.window} | "
-            f"lr={self.lr} | epochs={self.epochs} | dropout={self.dropout} | "
-            f"margin={self.margin} | K={self.k_eval} | "
-            f"{'33ch+momentum' if self.use_momentum else '29ch'} | "
-            f"target_horizon={PREDICT_HORIZON}d | "
-            f"raw_cvli_context={'on' if self.raw_cvli_context else 'off'} | "
-            f"grad_accum={self.grad_accum} | device={DEVICE}"
+            f"⚙️ ARQ: DeepSTGAT_64 | window={self.window} | lr={self.lr} | dropout={self.dropout} | "
+            f"K={self.k_eval} | {'33ch+momentum' if self.use_momentum else '29ch'} | "
+            f"target_horizon={PREDICT_HORIZON}d | grad_accum={self.grad_accum} | device={DEVICE}"
         )
-        logging.info("="*80)
+        logging.info("═"*80)
 
         path = os.path.join(ROOT_DIR, 'data', 'processed', f'processed_{self.region_key}.pkl')
         with open(path, 'rb') as f:
@@ -235,17 +248,23 @@ class SpecialistTrainer:
         # Diagnóstico CVLI
         cvli_flat = features[:, :, 0].flatten()
         nz = (cvli_flat > 0).sum()
-        logging.info(f"📊 CVLI não-zero: {nz}/{len(cvli_flat)} ({nz/len(cvli_flat)*100:.2f}%)")
+        logging.info(f"📊 CVLI não-zero (Canal 0): {nz}/{len(cvli_flat)} ({nz/len(cvli_flat)*100:.2f}%)")
 
-        # Dados brutos — sem normalização para preservar picos de criminalidade
-
-        # Construção dos pares (X, Y)
-        # Y = soma de CVLI bruto nos próximos 14 dias
+        # Construção dos pares (X, Y) com SPLIT TEMPORAL (sem shuffle)
+        logging.info("🔄 Gerando janelas com Normalização Z-Score Local (per-window)...")
         X_list, Y_list = [], []
         for t in range(self.window, T - PREDICT_HORIZON):
-            x = torch.tensor(
-                features[:, t-self.window:t, :], dtype=torch.float32
-            ).permute(2, 0, 1).unsqueeze(0)
+            # Janela de entrada
+            x_window = features[:, t-self.window:t, :].copy()
+            
+            # 🔄 NORMALIZAÇÃO LOCAL POR JANELA (Z-Score)
+            # Para cada canal, normaliza com base na média/std da própria janela
+            for c in range(C_ext):
+                m = x_window[:, :, c].mean()
+                s = x_window[:, :, c].std() + 1e-6
+                x_window[:, :, c] = (x_window[:, :, c] - m) / s
+            
+            x = torch.tensor(x_window, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0)
             y = torch.tensor(
                 nf[:, t:t+PREDICT_HORIZON, 0].sum(axis=1), dtype=torch.float32
             )
@@ -254,23 +273,19 @@ class SpecialistTrainer:
 
         logging.info(f"📐 Janelas construídas: {len(X_list)}")
 
-        # Split aleatório 85/15 (seed fixo para reprodutibilidade)
-        indices = list(range(len(X_list)))
-        random.seed(42)
-        random.shuffle(indices)
-        split = int(len(indices) * 0.85)
-        train_idx = indices[:split]
-        val_idx   = indices[split:]
-        train_X = [X_list[i] for i in train_idx]
-        train_Y = [Y_list[i] for i in train_idx]
-        val_X   = [X_list[i] for i in val_idx]
-        val_Y   = [Y_list[i] for i in val_idx]
-        logging.info(f"🔀 Split: {len(train_X)} treino | {len(val_X)} validação")
+        # ⏳ SPLIT TEMPORAL ESTRITO (Sem shuffle)
+        # 85% passado para treino, 15% futuro recente para validação
+        split = int(len(X_list) * 0.85)
+        train_X = X_list[:split]
+        train_Y = Y_list[:split]
+        val_X   = X_list[split:]
+        val_Y   = Y_list[split:]
+        logging.info(f"⏳ Split Temporal: {len(train_X)} treino (Passado) | {len(val_X)} validação (Futuro)")
 
         # Modelo e otimizador
         model     = DeepSTGAT_64(num_nodes=N, in_channels=C_ext, time_steps=self.window, dropout=self.dropout).to(DEVICE)
-        optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-1)
-        criterion = ContrastiveTopKLoss(k=self.k_eval, margin=self.margin)
+        optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=2e-1)
+        criterion = BinaryFocalRankingLoss(alpha=focal_alpha, gamma=focal_gamma, ranking_weight=ranking_w)
 
         steps_per_epoch = (len(train_X) // self.grad_accum) + 1
         scheduler = torch.optim.lr_scheduler.OneCycleLR(
@@ -278,6 +293,7 @@ class SpecialistTrainer:
             steps_per_epoch=steps_per_epoch,
             epochs=self.epochs, pct_start=0.2
         )
+
 
         output_path = os.path.join(ROOT_DIR, 'models', 'active', self.output_name)
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
