@@ -515,7 +515,7 @@
                 Régua operacional vigente: <strong style="color:#e2e8f0;">14 dias corridos</strong> para validar melhora real de modelo antes de promoção.
             </div>
             <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.3); border-radius:6px; padding:8px 14px; margin-bottom:14px; font-size:12px; color:#fcd34d;">
-                ⚠️ <strong>Interior:</strong> P@20 isolado pode subestimar o modelo quando há só 2–4 alvos reais na janela. Leia junto com <strong>R@20</strong>: recall alto indica que o modelo capturou parte relevante do ground truth mesmo com precisão baixa.
+                ⚠️ <strong>Interior:</strong> Em janelas com poucas localidades ativas, o <strong>P@20</strong> fica estatisticamente instavel e pode parecer pior do que a cobertura real. Leia junto com <strong>R@20</strong> e com o total de localidades ativas: quando o ground truth recente e muito pequeno, a precisao isolada deixa de ser conclusiva.
             </div>
             <div class="controls">
                 <select id="region-filter" onchange="updateConfidenceTrend()" style="padding: 8px 12px; background: #475569; color: white; border: 1px solid #64748b; border-radius: 6px;">

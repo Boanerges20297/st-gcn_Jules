@@ -268,7 +268,7 @@
                 <div class="card-body text-center p-2">
                     <h6 class="card-title text-danger mb-0" style="font-size:0.75rem;">Alta Tensão Crítica</h6>
                     <p class="card-text fw-bold mb-0" style="font-size:1.6rem;line-height:1.2;" id="high-risk-count">-</p>
-                    <small class="text-muted" style="font-size:0.68rem;">Crítico (≥90)</small>
+                    <small class="text-muted" style="font-size:0.68rem;">Crítico (≥71)</small>
                 </div>
             </div>
         </div>
@@ -277,7 +277,7 @@
                 <div class="card-body text-center p-2">
                     <h6 class="card-title text-warning mb-0" style="font-size:0.75rem;">Tensão Elevada</h6>
                     <p class="card-text fw-bold mb-0" style="font-size:1.6rem;line-height:1.2;" id="medium-risk-count">-</p>
-                    <small class="text-muted" style="font-size:0.68rem;">Alto (80-89)</small>
+                    <small class="text-muted" style="font-size:0.68rem;">Alto (51-70)</small>
                 </div>
             </div>
         </div>
@@ -286,7 +286,7 @@
                 <div class="card-body text-center p-2">
                     <h6 class="card-title text-info mb-0" style="font-size:0.75rem;">Tensão Moderada</h6>
                     <p class="card-text fw-bold mb-0" style="font-size:1.6rem;line-height:1.2;" id="low-risk-count">-</p>
-                    <small class="text-muted" style="font-size:0.68rem;">Moderado (50-79)</small>
+                    <small class="text-muted" style="font-size:0.68rem;">Moderado (31-50)</small>
                 </div>
             </div>
         </div>
@@ -360,8 +360,9 @@
                         </div>
                         
                         <div class="alert alert-info alert-sm mt-2 mb-2 p-2" id="ranking-info" style="display:none;">
-                            <small><strong>Sistema de Ranking:</strong></small><br>
+                                <small><strong>Sistema de Ranking Dinamico:</strong></small><br>
                             <small id="ranking-details" class="text-muted"></small>
+                                <small id="risk-band-details" class="text-muted d-block mt-1"></small>
                         </div>
                     </div>
 
@@ -564,12 +565,10 @@
     });
 
     function getColor(d) {
-        // Alinhado com o backend (app.py) - Novo Sistema Granular
-        return d >= 95 ? '#8B0000' : // Crítico (Vermelho Escuro)
-               d >= 80 ? '#E63946' : // Alerta (Vermelho Vivo)
-               d >= 50 ? '#F4A261' : // Moderado (Laranja)
-               d >= 20 ? '#A8DADC' : // Baixo (Ciano/Azul Claro)
-                        '#CCCCCC'; // Estável (Cinza)
+         return d >= 71 ? '#8B0000' :
+             d >= 51 ? '#E63946' :
+             d >= 31 ? '#F4A261' :
+                    '#A8DADC';
     }
 
     function style(feature) {
@@ -587,18 +586,16 @@
         var isPoint = (feature.geometry && feature.geometry.type === 'Point');
         
         // Opacidade baseada no risco para refletir o ranking visualmente
-        var isHigh = (score >= 50);
-        var isModerate = (score >= 20);
+        var isHigh = (score >= 51);
         
         var borderColor = isHigh ? 'white' : '#999999';
         var borderWeight = isPoint ? 2 : (isHigh ? 2 : 1);
         
         // Opacidade dinâmica para dar destaque ao Top do Ranking
         var fillOpacity = isPoint ? 1.0 : 
-                          (score >= 90 ? 0.60 : 
-                          (score >= 80 ? 0.45 : 
-                          (score >= 50 ? 0.30 : 
-                          (score >= 20 ? 0.15 : 0.05))));
+                          (score >= 71 ? 0.60 : 
+                          (score >= 51 ? 0.45 : 
+                          (score >= 31 ? 0.28 : 0.12)));
 
         return {
             radius: isPoint ? 10 : 10,
@@ -613,22 +610,20 @@
     }
 
     function getStatus(score, type) {
-        // Alinhado com app.py
-        if (score >= 95) return { label: 'CRÍTICO (' + type + ')', class: 'bg-danger' };
-        if (score >= 80) return { label: 'ALTO (' + type + ')', class: 'bg-danger opacity-75' };
-        if (score >= 50) return { label: 'MODERADO (' + type + ')', class: 'bg-warning text-dark' };
-        if (score >= 20) return { label: 'BAIXO (' + type + ')', class: 'bg-info text-dark' };
-        return { label: 'ESTÁVEL (' + type + ')', class: 'bg-secondary text-white' };
+        if (score >= 71) return { label: 'CRÍTICO (' + type + ')', class: 'bg-danger' };
+        if (score >= 51) return { label: 'ALTO (' + type + ')', class: 'bg-danger opacity-75' };
+        if (score >= 31) return { label: 'MODERADO (' + type + ')', class: 'bg-warning text-dark' };
+        return { label: 'BAIXO (' + type + ')', class: 'bg-info text-dark' };
     }
 
     var legend = L.control({position: 'bottomright'});
     legend.onAdd = function (map) {
         var div = L.DomUtil.create('div', 'legend');
         div.innerHTML = '<strong>Tensão Territorial (Ranking)</strong><br>';
-        div.innerHTML += '<i style="background:' + getColor(95) + '"></i> Crítico (≥ 95)<br>';
-        div.innerHTML += '<i style="background:' + getColor(85) + '"></i> Alerta (80–94)<br>';
-        div.innerHTML += '<i style="background:' + getColor(65) + '"></i> Moderado (50–79)<br>';
-        div.innerHTML += '<i style="background:' + getColor(35) + '"></i> Baixo (20–49)<br>';
+        div.innerHTML += '<i style="background:' + getColor(75) + '"></i> Crítico (≥ 71)<br>';
+        div.innerHTML += '<i style="background:' + getColor(60) + '"></i> Alto (51–70)<br>';
+        div.innerHTML += '<i style="background:' + getColor(40) + '"></i> Moderado (31–50)<br>';
+        div.innerHTML += '<i style="background:' + getColor(20) + '"></i> Baixo (0–30)<br>';
         div.innerHTML += '<hr style="margin: 5px 0; opacity: 0.5;"><small style="color: #666;">🕐 <strong>Janela:</strong> Próximos 14 dias<br/><strong>📊 Ranking:</strong> Cobertura Territorial (Cov@K)</small>';
         return div;
     };
@@ -966,10 +961,20 @@
             // Mostra informações de ranking se disponível
             if (metaDataGlobal && metaDataGlobal.ranking_info) {
                 var rankInfo = metaDataGlobal.ranking_info;
-                var rankText = 'Top 1%: >' + rankInfo.top_1_percent_threshold.toFixed(0) + '% | ' +
-                              'Top 5%: >' + rankInfo.top_5_percent_threshold.toFixed(0) + '% | ' +
-                              'Top 10%: >' + rankInfo.top_10_percent_threshold.toFixed(0) + '%';
+                var rankText = 'Top 1% atual: >=' + rankInfo.top_1_percent_threshold.toFixed(0) + '% | ' +
+                              'Top 5% atual: >=' + rankInfo.top_5_percent_threshold.toFixed(0) + '% | ' +
+                              'Top 10% atual: >=' + rankInfo.top_10_percent_threshold.toFixed(0) + '%';
                 $('#ranking-details').text(rankText);
+                if (rankInfo.risk_bands) {
+                    var riskBands = rankInfo.risk_bands;
+                    var bandText = 'Faixas oficiais: Baixo 0-' + riskBands.low_max.toFixed(0) +
+                                  ' | Moderado ' + riskBands.moderate_min.toFixed(0) + '-50' +
+                                  ' | Alto ' + riskBands.high_min.toFixed(0) + '-70' +
+                                  ' | Critico >=' + riskBands.critical_min.toFixed(0);
+                    $('#risk-band-details').text(bandText).show();
+                } else {
+                    $('#risk-band-details').hide();
+                }
                 $('#ranking-info').show();
             } else {
                 $('#ranking-info').hide();
@@ -1749,13 +1754,10 @@
     }
 
         function getRiskLevel(score) {
-            // Align frontend display thresholds with backend (`risk_score`): five bands
-            // >=90 -> Crítico, >=80 -> Alto, >=50 -> Moderado, >=20 -> Baixo, else Sem Risco
-            if (score >= 90) return { label: 'Crítico', class: 'bg-danger text-white' };
-            if (score >= 80) return { label: 'Alto', class: 'bg-warning text-dark' };
-            if (score >= 50) return { label: 'Moderado', class: 'bg-info text-dark' };
-            if (score >= 20) return { label: 'Baixo', class: 'bg-secondary text-white' };
-            return { label: 'Sem Tensão', class: 'bg-success text-white' };
+            if (score >= 71) return { label: 'Crítico', class: 'bg-danger text-white' };
+            if (score >= 51) return { label: 'Alto', class: 'bg-warning text-dark' };
+            if (score >= 31) return { label: 'Moderado', class: 'bg-info text-dark' };
+            return { label: 'Baixo', class: 'bg-secondary text-white' };
         }
     
         // Focus a layer: zoom to polygon bounds and show details popup

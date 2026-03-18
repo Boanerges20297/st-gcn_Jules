@@ -1,15 +1,26 @@
 {
   "fortaleza": {
-    "dynamic_window": 60,
+    "dynamic_window": null,
     "use_historical_fallback": false,
     "historical_top10": [],
-    "updated_at": "2026-03-16T23:22:33.558927"
+    "updated_at": "2026-03-17T23:43:17.148395"
   },
   "rmf": {
-    "dynamic_window": 90,
-    "use_historical_fallback": false,
-    "historical_top10": [],
-    "updated_at": "2026-03-16T23:22:33.558927"
+    "dynamic_window": 30,
+    "use_historical_fallback": true,
+    "historical_top10": [
+      "CAUCAIA",
+      "MARACANAU",
+      "HORIZONTE",
+      "PACAJUS",
+      "PACATUBA",
+      "PINDORETAMA",
+      "EUSEBIO",
+      "ITAITINGA",
+      "PARAIPABA",
+      "SAO LUIS DO CURU"
+    ],
+    "updated_at": "2026-03-17T23:43:17.148395"
   },
   "interior": {
     "dynamic_window": 30,
@@ -26,6 +37,6 @@
       "VICOSA DO CEARA",
       "ARATUBA"
     ],
-    "updated_at": "2026-03-16T23:22:33.558927"
+    "updated_at": "2026-03-17T23:43:17.148395"
   }
 }

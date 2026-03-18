@@ -102,7 +102,7 @@
     ]
   },
   "interior": {
-    "steps": 5,
+    "steps": 0,
     "history": [
       {
         "timestamp": "2026-03-01T17:34:24.838038",
@@ -200,11 +200,45 @@
           "min_risk": 30.0,
           "norm_neural_weight": 0.45
         }
+      },
+      {
+        "timestamp": "2026-03-17T23:40:04.914039",
+        "event": "full_rollback",
+        "trigger": "interior.faction_coverage=100.0% recuperado acima do limite",
+        "steps_reverted": 5,
+        "params_before": {
+          "tension_factor": 2.3,
+          "min_risk": 30.0,
+          "tag_bias_direct": 4.5,
+          "tag_bias_neighbor": 1.35,
+          "norm_neural_weight": 0.45,
+          "dynamic_window": 30,
+          "use_historical_fallback": true,
+          "historical_top10": [
+            "JUAZEIRO DO NORTE",
+            "IGUATU",
+            "SOBRAL",
+            "GROAIRAS",
+            "ITAPAJE",
+            "LIMOEIRO DO NORTE",
+            "BATURITE",
+            "TIANGUA",
+            "VICOSA DO CEARA",
+            "ARATUBA"
+          ]
+        },
+        "params_after": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
       }
     ]
   },
   "rmf": {
-    "steps": 5,
+    "steps": 0,
     "history": [
       {
         "timestamp": "2026-03-09T22:14:26.563573",
@@ -295,6 +329,40 @@
           "tag_bias_neighbor": 1.4,
           "min_risk": 30.0,
           "norm_neural_weight": 0.45
+        }
+      },
+      {
+        "timestamp": "2026-03-17T23:41:14.529125",
+        "event": "full_rollback",
+        "trigger": "rmf.faction_coverage=66.7% recuperado acima do limite",
+        "steps_reverted": 5,
+        "params_before": {
+          "tension_factor": 3.0,
+          "min_risk": 30.0,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 1.35,
+          "norm_neural_weight": 0.45,
+          "dynamic_window": 30,
+          "use_historical_fallback": true,
+          "historical_top10": [
+            "CAUCAIA",
+            "MARACANAU",
+            "HORIZONTE",
+            "PACAJUS",
+            "PACATUBA",
+            "PINDORETAMA",
+            "EUSEBIO",
+            "ITAITINGA",
+            "PARAIPABA",
+            "SAO LUIS DO CURU"
+          ]
+        },
+        "params_after": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
         }
       }
     ]

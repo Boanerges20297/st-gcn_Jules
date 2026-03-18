@@ -340,7 +340,7 @@
             
             <div style="font-size: 12px; color: #bbb; margin-bottom: 12px;">
                 <strong>Modo de Análise:</strong><br>
-                📍 <strong>Apenas Alto (80-89%) e Crítico (≥90%)</strong><br>
+                📍 <strong>Apenas Alto (51-70%) e Crítico (≥71%)</strong><br>
                 🔗 <strong>Com conexões significativas (&gt;5%)</strong><br>
                 ➜ <strong>Independente de ranking ou limite</strong><br>
                 🎨 <strong>Cores:</strong> Facções criminosas<br>
@@ -373,7 +373,7 @@
                     <strong>📊 Modo:</strong>
                 </div>
                 <div style="font-size: 12px; color: #e0e0e0; line-height: 1.6;">
-                    ✓ Apenas Alto (80-89%) e Crítico (≥90%)<br>
+                    ✓ Apenas Alto (51-70%) e Crítico (≥71%)<br>
                     ✓ Com conexões significativas (&gt;5%)<br>
                     ✓ Independente de ranking
                 </div>
@@ -409,11 +409,11 @@
                     <strong style="color: #6495ED; display: block; margin-bottom: 6px;">Nível de Risco</strong>
                     <div class="legend-item">
                         <div class="legend-color" style="background: #8B0000;"></div>
-                        <span>Crítico (≥90%)</span>
+                        <span>Crítico (≥71%)</span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-color" style="background: #FF8C00;"></div>
-                        <span>Alto (80-89%)</span>
+                        <span>Alto (51-70%)</span>
                     </div>
                 </div>
             </div>
@@ -473,9 +473,9 @@
         };
         
         function getRiskColor(risk) {
-            if (risk >= 90) return '#8B0000';
-            if (risk >= 80) return '#FF8C00';
-            if (risk >= 50) return '#FFC107';
+            if (risk >= 71) return '#8B0000';
+            if (risk >= 51) return '#FF8C00';
+            if (risk >= 31) return '#FFC107';
             return '#6495ED';
         }
         

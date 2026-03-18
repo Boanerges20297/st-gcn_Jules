@@ -177,6 +177,37 @@ def busca_municipio(text: str):
             return original
     return None
 
+
+def _classify_police_action(text: str) -> Dict[str, Any]:
+    norm_upper = _normalize_text(text).upper()
+    crime_keywords = [
+        'LESAO A BALA', 'HOMICIDIO', 'ACHADO DE CADAVER', 'CADAVER',
+        'DESLOCAMENTO FORCADO', 'EXPULSAO DE MORADORES', 'CHACINA', 'EXECUC'
+    ]
+    qualified_keywords = [
+        'TRAFIC', 'ENTORPEC', 'DROGA', 'APREENS', 'ARMA', 'FUZIL', 'PISTOLA',
+        'REVOLV', 'PORTE ILEGAL', 'MANDADO DE PRIS', 'FLAGRANTE', 'DESARTIC',
+        'LIDER', 'LIDERANCA', 'CHEFE', 'COMANDO'
+    ]
+    admin_keywords = [
+        'VEICULO LOCALIZADO', 'RECUPERAD', 'LOCALIZAD', 'CELULAR COM ALERTA',
+        'CELULAR COM QUEIXA', 'RECEPTA', 'CONDUZID', 'PESSOA SITUACAO SUSPEITA',
+        'DIRECAO PERIGOSA', 'CLONADO', 'QUEIXA DE ROUBO'
+    ]
+
+    is_crime = any(kw in norm_upper for kw in crime_keywords)
+    has_qualified_signal = any(kw in norm_upper for kw in qualified_keywords)
+    has_admin_signal = any(kw in norm_upper for kw in admin_keywords)
+    has_arrest_only = any(kw in norm_upper for kw in ['PRESO', 'PRESA', 'PRISAO', 'DETIDO'])
+
+    if is_crime:
+        return {'is_suppression': False, 'is_qualified_suppression': False, 'suppression_class': 'conflict'}
+    if has_qualified_signal or (has_arrest_only and not has_admin_signal):
+        return {'is_suppression': True, 'is_qualified_suppression': True, 'suppression_class': 'qualified'}
+    if has_admin_signal:
+        return {'is_suppression': False, 'is_qualified_suppression': False, 'suppression_class': 'administrative'}
+    return {'is_suppression': False, 'is_qualified_suppression': False, 'suppression_class': 'neutral'}
+
 def process_exogenous_text(text: str, block_type: str = None) -> List[Dict[str, Any]]:
     '''Process police log text into structured event data.'''
     if not text or not text.strip():
@@ -211,8 +242,8 @@ def process_exogenous_text(text: str, block_type: str = None) -> List[Dict[str, 
     prompt_header_context = ""
     if is_police_header:
         prompt_header_context = (
-            f"IMPORTANTE: Este bloco de texto refere-se a AÇÕES POLICIAIS (supressão de risco).\n"
-            f"Todos os eventos DEVEM ter 'is_suppression': true.\n"
+            f"IMPORTANTE: Este bloco refere-se a AÇÕES POLICIAIS, mas nem toda ação policial reduz risco preditivo.\n"
+            f"Marque 'is_suppression': true APENAS para ações qualificadas com retirada real de capacidade criminosa.\n"
         )
         if header_date:
             prompt_header_context += f"A data da ocorrência para todos estes eventos é {header_date}.\n"
@@ -228,7 +259,7 @@ def process_exogenous_text(text: str, block_type: str = None) -> List[Dict[str, 
         "2) 'bairro': Extraia o bairro. Se for em Fortaleza e o bairro não estiver claro, use o contexto das AIS (ex: AIS18 costuma ser Quintino Cunha/Antônio Bezerra).\n"
         "3) 'conflict_severity': HIGH para homicídios, facções, execuções, achados de cadáver com sinais de violência, retorno de liderança de facção ao território. MEDIUM para lesões a bala, expulsões, deslocamento forçado, expulsão de moradores, achados de cadáver (quando violência não for explícita). LOW para o resto.\n"
         "4) 'raw_text': Mantenha a linha original completa.\n"
-        "5) 'is_suppression': true para prisões, apreensões de armas/drogas, recuperação de veículos. false para crimes cometidos.\n"
+        "5) 'is_suppression': true apenas para prisões qualificadas, apreensões de armas/drogas, mandados e desarticulação com potencial real de reduzir violência. Use false para crimes cometidos, recuperações/localizações administrativas, condução simples e receptação sem apreensão relevante.\n"
         f"6) 'date': Use '{header_date}' se este for um bloco de Ações Policiais, caso contrário extraia da linha.\n\n"
         "LOGS:\n" + text
     )
@@ -269,6 +300,15 @@ def process_exogenous_text(text: str, block_type: str = None) -> List[Dict[str, 
             ev.setdefault('is_suppression', False)
             if not ev.get('date') and header_date:
                 ev['date'] = header_date
+
+            classification = _classify_police_action(' '.join([
+                str(ev.get('natureza', '')),
+                str(ev.get('descricao', '')),
+                str(ev.get('raw_text', '')),
+            ]))
+            ev['is_suppression'] = classification['is_suppression']
+            ev['is_qualified_suppression'] = classification['is_qualified_suppression']
+            ev['suppression_class'] = classification['suppression_class']
             
         return events
     except Exception as e:
@@ -371,22 +411,7 @@ def _deterministic_parse(text: str) -> List[Dict[str, Any]]:
         b = busca_bairro(line)
         m = busca_municipio(line) or ('FORTALEZA' if b else '')
 
-        # Detect suppression by keywords: arrests, seizures, vehicle recovery
-        suppression_keywords = [
-            'PRESO', 'PRESA', 'PRESOS', 'DETIDO', 'FLAGRANTE',
-            'APREENS', 'APREENDID', 'LOCALIZADO', 'RECUPERADO',
-            'MANDADO DE PRIS', 'CONDUZIDO',
-        ]
-        crime_keywords = [
-            'LESAO A BALA', 'LESÃO A BALA', 'HOMICIDIO', 'HOMICÍDIO',
-            'ACHADO DE CADAVER', 'ACHADO DE CADÁVER', 'CADAVER', 'CADÁVER',
-            'DESLOCAMENTO FORCADO', 'DESLOCAMENTO FORÇADO',
-            'EXPULSAO DE MORADORES', 'EXPULSÃO DE MORADORES',
-            'EXPULSA', 'EXPULSO',
-        ]
-        norm_upper_line = _normalize_text(line).upper()
-        is_crime = any(kw in norm_upper_line for kw in crime_keywords)
-        is_supp = (not is_crime) and any(kw in norm_upper_line for kw in suppression_keywords)
+        classification = _classify_police_action(line)
 
         event = {
             'natureza': natureza,
@@ -399,7 +424,9 @@ def _deterministic_parse(text: str) -> List[Dict[str, Any]]:
             'resumo': f"{natureza} em {b or 'local não identificado'}",
             'raw_text': line,
             'conflict_severity': severity,
-            'is_suppression': is_supp,
+            'is_suppression': classification['is_suppression'],
+            'is_qualified_suppression': classification['is_qualified_suppression'],
+            'suppression_class': classification['suppression_class'],
             'date': line_date or header_date
         }
         results.append(event)

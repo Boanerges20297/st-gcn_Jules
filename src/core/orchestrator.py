@@ -272,19 +272,26 @@ class StateOrchestrator:
             
             x_raw_extended = data['node_features'][:, -total_window:, :].copy()
             sim_impact = np.zeros(num_nodes)
+            sim_relief = np.zeros(num_nodes)
             
             if exogenous_shocks:
                 for loc_name, info in exogenous_shocks.items():
                     norm_target = normalize_name(loc_name)
                     if isinstance(info, dict):
                         intensity = float(info.get('conflict_intensity', info.get('intensity', 0.0)))
+                        suppression_intensity = float(info.get('suppression_intensity', 0.0))
                         # Peso exógeno adaptativo: Interior e RMF são mais sensíveis (3.0)
                         impact_value = (3.0 if region != 'fortaleza' else 2.5) * intensity
+                        relief_value = (1.6 if region != 'fortaleza' else 1.3) * suppression_intensity
                         channel_idx = 25 if info.get('is_critical') else 24
                         for i, row in data['nodes_gdf'].iterrows():
                             if normalize_name(row['name']) == norm_target:
-                                x_raw_extended[i, :, channel_idx] = min(intensity, 3.0)
-                                sim_impact[i] = impact_value
+                                if intensity > 0:
+                                    x_raw_extended[i, :, channel_idx] = min(intensity, 3.0)
+                                    sim_impact[i] = impact_value
+                                if suppression_intensity > 0:
+                                    x_raw_extended[i, :, 23] = min(suppression_intensity, 3.0)
+                                    sim_relief[i] = relief_value
 
             # CÁLCULO DO MOMENTUM (Para uso no Blend de Inclusão e Modelos 33ch)
             momentum_feat = np.zeros((num_nodes, total_window, 4))
@@ -345,16 +352,25 @@ class StateOrchestrator:
             r_min, r_max = out.min(), out.max()
             norm_neural = (out - r_min) / (r_max - r_min + 1e-6)
             
-            # 2. Componente de Tensão (Estabilidade Territorial) - Peso 0.4
+            # 2. Componente de Tensão (Estabilidade Territorial)
             # Fornece a 'âncora' histórica para o ranking não oscilar demais
             tension_vec = data['nodes_gdf']['tension_index'].values.astype(float)
             t_min, t_max = tension_vec.min(), tension_vec.max()
             norm_tension = (tension_vec - t_min) / (t_max - t_min + 1e-6)
-            
-            # 3. Componente de Inclusão (Eventos Recentes) - Peso 0.4
-            # Garante que quem agiu nos últimos 3 dias suba, mas sem dominar 80% do peso
-            recent_crime = x_raw_extended[:, -3:, 0].sum(axis=1) > 0
-            inclusion_signal = (recent_crime | (sim_impact > 0)).astype(float)
+
+            # 3. Componente de Inclusão (Eventos Recentes + Exógenos)
+            # Alinha a inferência com a régua operacional: 14d para Fortaleza/RMF, 28d para Interior.
+            inclusion_horizon = 28 if region == 'interior' else 14
+            recent_crime_signal = np.clip(x_raw_extended[:, -inclusion_horizon:, 0].sum(axis=1), 0, 2) / 2.0
+
+            direct_bias = cp.get('tag_bias_direct', 2.0)
+            neighbor_bias = cp.get('tag_bias_neighbor', 0.60)
+            direct_signal = np.clip((sim_impact / 2.5) * (direct_bias / 2.0), 0.0, 1.0)
+            suppression_signal = np.clip(sim_relief / 1.5, 0.0, 1.0)
+
+            geo_adj = data['adj_geo']
+            neighbor_signal = np.clip((geo_adj.dot((sim_impact > 0).astype(float))) * (neighbor_bias / 0.60), 0.0, 1.0)
+            inclusion_signal = np.clip(np.maximum.reduce([recent_crime_signal, direct_signal, neighbor_signal]), 0.0, 1.0)
             
             # 4. Sinal de Calmaria (dias consecutivos sem CVLI)
             # O cold_streak entra no modelo, mas o blend final precisa penalizar explicitamente
@@ -381,18 +397,33 @@ class StateOrchestrator:
                 print(f"📚 [Blend] {region.upper()} usando fallback histórico top10 ({len(historical_top_norms)} nós).")
             else:
                 # Blend padrão: ajustado por região
-                # Interior com alta sparsidade em crime → aumentar confiança no neural (40%)
-                # Regiões com crime regular → manter neural em 60%
-                neural_weight = 0.40 if region == 'interior' else 0.60
-                tension_weight = 0.25 if region == 'interior' else 0.20
-                inclusion_weight = 0.35 if region == 'interior' else 0.20  # Inclusão importante quando há crime
+                # Reconecta os parâmetros de calibração ao blend final.
+                base_neural_weight = 0.40 if region == 'interior' else 0.60
+                neural_shift = cp.get('norm_neural_weight', 0.20) - 0.20
+                neural_weight = np.clip(base_neural_weight + neural_shift, 0.35, 0.75)
+
+                tension_base = 0.25 if region == 'interior' else 0.20
+                tension_scale = np.clip(cp.get('tension_factor', 0.80) / 0.80, 0.85, 2.2)
+                tension_weight = tension_base * tension_scale
+
+                inclusion_base = 0.35 if region == 'interior' else 0.20
+                inclusion_scale = np.clip((direct_bias / 2.0 + neighbor_bias / 0.60) / 2.0, 0.9, 1.8)
+                inclusion_weight = inclusion_base * inclusion_scale
                 calm_penalty = 0.25 if region == 'interior' else 0.10
-                
+                suppression_weight = 0.12 if region == 'interior' else 0.08
+
+                total_weight = neural_weight + tension_weight + inclusion_weight
+                if total_weight > 1.0:
+                    neural_weight /= total_weight
+                    tension_weight /= total_weight
+                    inclusion_weight /= total_weight
+
                 # Modelo treinado com dados brutos — inferência deve refletir saída neural
                 final_logic = (
                     (neural_weight * norm_neural)
                     + (tension_weight * norm_tension)
                     + (inclusion_weight * inclusion_signal)
+                    - (suppression_weight * suppression_signal)
                     - (calm_penalty * calm_signal)
                 )
             

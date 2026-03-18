@@ -57,6 +57,147 @@ REGION_LABELS: dict = {          # rótulos de exibição por região
     'interior': 'INTERIOR DO ESTADO',
 }
 
+RISK_SCORE_THRESHOLDS = {
+    'critical_min': 71.0,
+    'high_min': 51.0,
+    'moderate_min': 31.0,
+}
+
+EXOGENOUS_WINDOW_DAYS = 7
+SUPPRESSION_HALF_LIFE_HOURS = 36.0
+
+QUALIFIED_SUPPRESSION_KEYWORDS = (
+    'TRAFICO', 'TRÁFICO', 'ENTORPEC', 'DROGA', 'APREENS', 'ARMA', 'FUZIL',
+    'PISTOLA', 'REVOLV', 'PORTE ILEGAL', 'MANDADO DE PRIS', 'FLAGRANTE',
+    'DESARTIC', 'LIDER', 'LIDERANCA', 'CHEFE', 'COMANDO'
+)
+
+ADMIN_POLICE_KEYWORDS = (
+    'VEICULO LOCALIZADO', 'VEÍCULO LOCALIZADO', 'RECUPERAD', 'LOCALIZAD',
+    'CELULAR COM ALERTA', 'CELULAR COM QUEIXA', 'RECEPTA', 'CONDUZID',
+    'PESSOA SITUACAO SUSPEITA', 'PESSOA SITUAÇÃO SUSPEITA',
+    'DIRECAO PERIGOSA', 'DIREÇÃO PERIGOSA', 'CLONADO', 'QUEIXA DE ROUBO'
+)
+
+CONFLICT_EVENT_KEYWORDS = (
+    'HOMICID', 'CHACINA', 'EXECUC', 'LESAO A BALA', 'LESÃO A BALA',
+    'TORTURA', 'DESLOCAMENTO FORCADO', 'DESLOCAMENTO FORÇADO',
+    'EXPULSAO DE MORADORES', 'EXPULSÃO DE MORADORES', 'ACHADO DE CADAVER',
+    'ACHADO DE CADÁVER'
+)
+
+RISK_STYLE_BY_LEVEL = {
+    'crítico': ('CRÍTICO', 'risk-critico', '#8B0000'),
+    'alto': ('ALTO', 'risk-alto', '#E63946'),
+    'moderado': ('MODERADO', 'risk-moderado', '#F4A261'),
+    'baixo': ('BAIXO', 'risk-baixo', '#A8DADC'),
+}
+
+
+def normalize_risk_score(score) -> float:
+    """Normaliza score percentual para evitar artefatos de precisão próximos aos cortes."""
+    try:
+        value = float(score)
+    except Exception:
+        value = 0.0
+    if np.isnan(value) or np.isinf(value):
+        value = 0.0
+    return round(max(0.0, min(100.0, value)), 1)
+
+
+def classify_risk_score(score):
+    """Classificação oficial de risco: baixo <=30, moderado 31-50, alto 51-70, crítico >=71."""
+    normalized = normalize_risk_score(score)
+    if normalized >= RISK_SCORE_THRESHOLDS['critical_min']:
+        level = 'crítico'
+    elif normalized >= RISK_SCORE_THRESHOLDS['high_min']:
+        level = 'alto'
+    elif normalized >= RISK_SCORE_THRESHOLDS['moderate_min']:
+        level = 'moderado'
+    else:
+        level = 'baixo'
+
+    status, css, color = RISK_STYLE_BY_LEVEL[level]
+    return level, status, css, color, normalized
+
+
+def get_risk_thresholds_meta():
+    return {
+        'critical_min': RISK_SCORE_THRESHOLDS['critical_min'],
+        'high_min': RISK_SCORE_THRESHOLDS['high_min'],
+        'moderate_min': RISK_SCORE_THRESHOLDS['moderate_min'],
+        'low_max': RISK_SCORE_THRESHOLDS['moderate_min'] - 1,
+    }
+
+
+def parse_event_datetime(event: dict):
+    for field in ('date', 'event_date', 'ingested_at'):
+        value = event.get(field)
+        if not value:
+            continue
+        try:
+            return datetime.fromisoformat(str(value)[:19])
+        except Exception:
+            try:
+                return datetime.strptime(str(value)[:10], '%Y-%m-%d')
+            except Exception:
+                continue
+    return None
+
+
+def classify_exogenous_event(event: dict):
+    text = ' '.join([
+        str(event.get('type') or ''),
+        str(event.get('natureza') or ''),
+        str(event.get('description') or ''),
+        str(event.get('descricao') or ''),
+        str(event.get('resumo') or ''),
+        str(event.get('raw_text') or ''),
+    ]).upper()
+    base_suppression = bool(event.get('is_suppression', False))
+    is_conflict = any(keyword in text for keyword in CONFLICT_EVENT_KEYWORDS)
+    has_qualified_signal = any(keyword in text for keyword in QUALIFIED_SUPPRESSION_KEYWORDS)
+    has_admin_signal = any(keyword in text for keyword in ADMIN_POLICE_KEYWORDS)
+    has_arrest_only = any(keyword in text for keyword in ('PRESO', 'PRESA', 'PRISAO', 'PRISÃO', 'DETIDO'))
+
+    if is_conflict:
+        return {
+            'is_conflict': True,
+            'is_suppression': False,
+            'is_qualified_suppression': False,
+            'signal_class': 'conflict',
+        }
+
+    if has_qualified_signal or ((base_suppression or has_arrest_only) and not has_admin_signal):
+        return {
+            'is_conflict': False,
+            'is_suppression': True,
+            'is_qualified_suppression': True,
+            'signal_class': 'qualified_suppression',
+        }
+
+    if has_admin_signal or base_suppression:
+        return {
+            'is_conflict': False,
+            'is_suppression': False,
+            'is_qualified_suppression': False,
+            'signal_class': 'administrative_police',
+        }
+
+    return {
+        'is_conflict': False,
+        'is_suppression': False,
+        'is_qualified_suppression': False,
+        'signal_class': 'neutral',
+    }
+
+
+def suppression_decay_factor(event_dt):
+    if event_dt is None:
+        return 1.0
+    age_hours = max(0.0, (datetime.now() - event_dt).total_seconds() / 3600.0)
+    return 0.5 ** (age_hours / SUPPRESSION_HALF_LIFE_HOURS)
+
 import threading
 import time
 
@@ -106,6 +247,60 @@ except Exception as e:
 # Se cair abaixo disso, o modelo está "esquecendo" zonas de tensão conhecidas.
 _FACTION_COVERAGE_MIN = 0.80  # 80% dos territórios de facção devem aparecer no top-20%
 
+
+def _resolve_territorial_alerts_for_region(region_name: str, now: datetime, reason: str):
+    if health_monitor is None:
+        return 0
+    stale_types = {
+        f"faction_coverage_{region_name}",
+        f"calibration_maxed_{region_name}",
+        f"auto_calibration_{region_name}",
+    }
+    resolved_count = 0
+    for alert in health_monitor.alerts_history:
+        if alert.get('type') in stale_types and not alert.get('resolved'):
+            alert['resolved'] = True
+            alert['resolved_at'] = now.isoformat()
+            alert['resolved_reason'] = reason
+            resolved_count += 1
+    if resolved_count:
+        health_monitor._save_history()
+    return resolved_count
+
+
+def _select_faction_targets(nodes_df, target_count: int):
+    faction_candidates = []
+    for _, row in nodes_df.iterrows():
+        faction = str(row.get('faction', 'NEUTRO')).upper()
+        if faction in ('NEUTRO', 'N/A', '', 'NAN', 'NONE'):
+            continue
+        tension_score = float(row.get('tension_index', 0.0) or 0.0)
+        historical_cvli = float(row.get('total_cvli', row.get('recent_cvli', 0.0)) or 0.0)
+        faction_candidates.append((normalize_name(str(row['name'])), tension_score, historical_cvli))
+
+    if not faction_candidates:
+        return []
+
+    faction_candidates.sort(key=lambda item: (item[1], item[2]), reverse=True)
+    unique_targets = []
+    seen = set()
+    for name_norm, _, _ in faction_candidates:
+        if name_norm in seen:
+            continue
+        seen.add(name_norm)
+        unique_targets.append(name_norm)
+        if len(unique_targets) >= target_count:
+            break
+    return unique_targets
+
+
+def _effective_faction_coverage_threshold(target_count: int) -> float:
+    if target_count <= 0:
+        return _FACTION_COVERAGE_MIN
+    required_hits = max(2, round(target_count * _FACTION_COVERAGE_MIN))
+    required_hits = min(target_count, required_hits)
+    return required_hits / target_count
+
 def _check_faction_coverage_alerts(metrics: dict):
     """
     Avalia se o modelo está cobrindo adequadamente os territórios de tensão conhecida.
@@ -142,29 +337,12 @@ def _check_faction_coverage_alerts(metrics: dict):
         if recent_cvli_total == 0:
             print(f"⏭️ [Cobertura Territorial] {r_name.upper()}: SKIP — CVLI=0 nos últimos 14 dias. "
                   f"Região genuinamente fria. Scores baixos são corretos, sem calibração.")
-            # Resolver alertas obsoletos de faction_coverage e calibration_maxed para esta região
-            stale_types = {f"faction_coverage_{r_name}", f"calibration_maxed_{r_name}"}
-            resolved_count = 0
-            for alert in health_monitor.alerts_history:
-                if alert.get('type') in stale_types and not alert.get('resolved'):
-                    alert['resolved'] = True
-                    alert['resolved_at'] = now.isoformat()
-                    alert['resolved_reason'] = f"Região {r_name.upper()} sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
-                    resolved_count += 1
-            if resolved_count:
-                health_monitor._save_history()
-                print(f"✅ [Cobertura Territorial] {r_name.upper()}: {resolved_count} alerta(s) obsoletos resolvidos (região fria).")
-            continue
-
-        # Identificar territórios com facção ativa nesta região
-        faction_nodes = set()
-        for _, row in nodes.iterrows():
-            faction = str(row.get('faction', 'NEUTRO')).upper()
-            if faction not in ('NEUTRO', 'N/A', '', 'NAN', 'NONE'):
-                from src.core.orchestrator import normalize_name
-                faction_nodes.add(normalize_name(str(row['name'])))
-
-        if not faction_nodes:
+            resolved_count = _resolve_territorial_alerts_for_region(
+                r_name,
+                now,
+                f"Região {r_name.upper()} sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
+            )
+            print(f"✅ [Cobertura Territorial] {r_name.upper()}: {resolved_count} alerta(s) obsoletos resolvidos (região fria).")
             continue
 
         # Obter scores desta região e calcular top-20%
@@ -186,12 +364,43 @@ def _check_faction_coverage_alerts(metrics: dict):
         top20_count = max(1, len(region_scores) // 5)
         top20_names = set(n for n, _ in sorted(region_scores.items(), key=lambda x: -x[1])[:top20_count])
 
-        faction_in_top20 = faction_nodes & top20_names
-        coverage = len(faction_in_top20) / len(faction_nodes) if faction_nodes else 1.0
+        # Se a região está operacionalmente fria/esparsa, a régua territorial não é informativa.
+        active_locations = int(reg_data.get('active_locations', 0) or 0)
+        min_active_locations = max(2, top20_count // 2)
+        if active_locations < min_active_locations:
+            print(f"⏭️ [Cobertura Territorial] {r_name.upper()}: SKIP — apenas {active_locations} localidades ativas. Régua territorial desativada em baixa atividade.")
+            resolved_count = _resolve_territorial_alerts_for_region(
+                r_name,
+                now,
+                f"Região {r_name.upper()} com baixa atividade operacional ({active_locations} localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+            )
+            if resolved_count:
+                print(f"✅ [Cobertura Territorial] {r_name.upper()}: {resolved_count} alerta(s) obsoletos resolvidos (baixa atividade).")
+            if model_calibrator is not None:
+                model_calibrator.on_recovery(orchestrator, r_name, 'faction_coverage', 1.0)
+            continue
 
-        print(f"🌡️ [Cobertura Territorial] {r_name.upper()}: {len(faction_in_top20)}/{len(faction_nodes)} facções no top-20% ({coverage*100:.1f}%)")
+        # A cobertura deve ser avaliada sobre um conjunto-alvo factível de territórios prioritários,
+        # não sobre todos os nós com facção atribuída, senão a métrica fica matematicamente impossível.
+        faction_targets = _select_faction_targets(nodes, top20_count)
+        if not faction_targets:
+            continue
 
-        if coverage < _FACTION_COVERAGE_MIN:
+        effective_threshold = _effective_faction_coverage_threshold(len(faction_targets))
+
+        faction_in_top20 = set(faction_targets) & top20_names
+        coverage = len(faction_in_top20) / len(faction_targets) if faction_targets else 1.0
+
+        print(f"🌡️ [Cobertura Territorial] {r_name.upper()}: {len(faction_in_top20)}/{len(faction_targets)} territórios prioritários no top-20% ({coverage*100:.1f}%)")
+
+        # A avaliação territorial mais recente substitui alertas antigos deste domínio para a região.
+        _resolve_territorial_alerts_for_region(
+            r_name,
+            now,
+            f"Região {r_name.upper()} reavaliada pela nova régua territorial ({coverage*100:.1f}% de cobertura)."
+        )
+
+        if coverage < effective_threshold:
             # --- DEGRADAÇÃO: modelo não está surfaçando tensão conhecida ---
             alert_type = f"faction_coverage_{r_name}"
             cutoff = (now - suppression).isoformat()
@@ -200,19 +409,20 @@ def _check_faction_coverage_alerts(metrics: dict):
                 for a in health_monitor.alerts_history
             )
             if not already_fired:
-                missing = faction_nodes - top20_names
+                missing = set(faction_targets) - top20_names
                 msg = (
                     f"Tensão territorial subestimada — {r_name.upper()}: apenas {coverage*100:.1f}% "
-                    f"dos territórios de facção no top-20% (mínimo: {_FACTION_COVERAGE_MIN*100:.0f}%). "
+                    f"dos territórios prioritários de facção no top-20% (mínimo efetivo: {effective_threshold*100:.1f}%). "
                     f"Ausentes: {', '.join(list(missing)[:3])}"
                 )
                 health_monitor.add_alert(
                     alert_type=alert_type, severity='HIGH', message=msg,
                     details={
                         'region': r_name, 'coverage': round(coverage, 4),
-                        'threshold': _FACTION_COVERAGE_MIN,
-                        'faction_nodes_total': len(faction_nodes),
+                        'threshold': effective_threshold,
+                        'faction_nodes_total': len(faction_targets),
                         'faction_nodes_in_top20': len(faction_in_top20),
+                        'active_locations': active_locations,
                         'missing_sample': list(missing)[:5],
                     }
                 )
@@ -220,11 +430,18 @@ def _check_faction_coverage_alerts(metrics: dict):
 
             if model_calibrator is not None:
                 model_calibrator.on_degradation(
-                    orchestrator, r_name, 'faction_coverage', coverage, _FACTION_COVERAGE_MIN
+                    orchestrator, r_name, 'faction_coverage', coverage, effective_threshold
                 )
 
-        elif coverage >= _FACTION_COVERAGE_MIN:
+        elif coverage >= effective_threshold:
             # --- RECUPERAÇÃO: cobertura voltou ao normal ---
+            resolved_count = _resolve_territorial_alerts_for_region(
+                r_name,
+                now,
+                f"Região {r_name.upper()} recuperou cobertura territorial pela nova régua operacional ({coverage*100:.1f}%)."
+            )
+            if resolved_count:
+                print(f"✅ [Cobertura Territorial] {r_name.upper()}: {resolved_count} alerta(s) obsoletos resolvidos (cobertura normalizada).")
             if model_calibrator is not None:
                 reg_state = model_calibrator.state.get(r_name, {})
                 if reg_state.get('steps', 0) > 0:
@@ -804,8 +1021,8 @@ def get_risk():
                             all_raw_events.extend(json.load(xf) or [])
                     except: pass
 
-            # Considerar eventos nos últimos 7 dias
-            cutoff = datetime.now().date() - timedelta(days=7)
+            # Considerar apenas a janela exógena operacional vigente do arquivo canônico (7 dias)
+            cutoff = datetime.now().date() - timedelta(days=EXOGENOUS_WINDOW_DAYS)
             
             # Limite superior baseado nos dados do orquestrador (evita inconsistência teórica)
             last_date_base = None
@@ -831,6 +1048,9 @@ def get_risk():
                     ev_date_str = ev.get('date') or ev.get('event_date')
                     if not verify_date_consistency(ev_date_str, last_date_base):
                         continue # Pula evento futuro em relação ao estado do modelo
+                    event_dt = parse_event_datetime(ev)
+                    if event_dt and event_dt.date() < cutoff:
+                        continue
 
                     # Extração e Normalização da Localidade
                     bairro_raw = (ev.get('bairro') or '').strip()
@@ -862,11 +1082,20 @@ def get_risk():
 
                     # Intensidade e Criticidade
                     ev_type = str(ev.get('type') or ev.get('natureza') or '').lower()
-                    description = str(ev.get('description') or ev.get('resumo') or '').lower()
+                    description = ' '.join([
+                        str(ev.get('description') or ''),
+                        str(ev.get('descricao') or ''),
+                        str(ev.get('resumo') or ''),
+                        str(ev.get('raw_text') or ''),
+                    ]).lower()
                     conflict_severity = str(ev.get('conflict_severity', '')).upper()
+                    classification = classify_exogenous_event(ev)
 
-                    # Classificação de Supressão e Ajuste de Intensidade Técnica
-                    is_supp = ev.get('is_suppression', False) or (ev_type in SUPPRESSION_TYPES) or ('apreen' in ev_type) or ('pris' in ev_type)
+                    # Classificação exógena: conflito real, supressão qualificada ou ação policial administrativa.
+                    is_supp = classification['is_qualified_suppression']
+                    is_conflict = classification['is_conflict']
+                    if classification['signal_class'] == 'administrative_police':
+                        continue
 
                     # Se for supressão, calibramos a intensidade pelo impacto
                     if is_supp:
@@ -882,6 +1111,7 @@ def get_risk():
                             intensity = 0.4
                         else:
                             intensity = float(ev.get('intensity', 0.3))
+                        intensity *= suppression_decay_factor(event_dt)
                     else:
                         # Mapeia o conflict_severity fornecido pelo LLM para intensity
                         if conflict_severity == 'HIGH':
@@ -900,7 +1130,7 @@ def get_risk():
                         intensity = intensity / min(len(targets), 10.0) # Fator de amortecimento para impacto difuso                    
                     # Decisão de Canal: Canal 25 se tipo for crítico, intensidade > 0.7 
                     # OU se a descrição contiver palavras-chave de alerta máximo
-                    is_critical = (ev_type in CRITICAL_TYPES) or (not is_supp and intensity > 0.7) or \
+                    is_critical = (ev_type in CRITICAL_TYPES) or (is_conflict and intensity > 0.7) or \
                                   ('execuc' in description) or ('facç' in description) or \
                                   ('morte' in description and 'facç' in description)
                     
@@ -916,7 +1146,7 @@ def get_risk():
                         # Acumula as intensidades de forma independente
                         if is_supp:
                             exogenous_shocks[loc_norm]['suppression_intensity'] += intensity
-                        else:
+                        elif is_conflict:
                             exogenous_shocks[loc_norm]['conflict_intensity'] += intensity
                             if is_critical:
                                 exogenous_shocks[loc_norm]['is_critical'] = True
@@ -1049,10 +1279,8 @@ def get_risk():
             try:
                 name = str(row['name'])
                 name_norm = normalize_name(name)
-                score = float(scores_map.get(name_norm, 20.0))
+                score = normalize_risk_score(scores_map.get(name_norm, 20.0))
                 trend = trends_map.get(name_norm, 'stable')
-                
-                if np.isnan(score) or np.isinf(score): score = 20.0
                 
                 # Identificação de Região
                 reg = str(row.get('regiao', 'fortaleza')).lower()
@@ -1061,22 +1289,10 @@ def get_risk():
                 
                 if reg not in region_buckets: region_buckets[reg] = []
 
-                status, css, color = 'BAIXO', 'risk-baixo', '#A8DADC'
-                if score >= 90: 
-                    status, css, color = 'CRÍTICO', 'risk-critico', '#8B0000'
-                    if reg in region_stats: region_stats[reg]['crítico'] += 1
-                    meta['counts']['crítico'] += 1
-                elif score >= 80: 
-                    status, css, color = 'ALTO', 'risk-alto', '#E63946'
-                    if reg in region_stats: region_stats[reg]['alto'] += 1
-                    meta['counts']['alto'] += 1
-                elif score >= 50: 
-                    status, css, color = 'MODERADO', 'risk-moderado', '#F4A261'
-                    if reg in region_stats: region_stats[reg]['moderado'] += 1
-                    meta['counts']['moderado'] += 1
-                else: 
-                    if reg in region_stats: region_stats[reg]['baixo'] += 1
-                    meta['counts']['baixo'] += 1
+                level, status, css, color, score = classify_risk_score(score)
+                if reg in region_stats:
+                    region_stats[reg][level] += 1
+                meta['counts'][level] += 1
 
                 # Inteligência de Ruas Críticas
                 critical_streets_info = streets_cache.get(name_norm, None)
@@ -1136,10 +1352,16 @@ def get_risk():
             meta['ranking_info'] = {
                 'top_1_percent_threshold': float(np.percentile(all_scores, 99)),
                 'top_5_percent_threshold': float(np.percentile(all_scores, 95)),
-                'top_10_percent_threshold': float(np.percentile(all_scores, 90))
+                    'top_10_percent_threshold': float(np.percentile(all_scores, 90)),
+                    'risk_bands': get_risk_thresholds_meta()
             }
         else:
-            meta['ranking_info'] = {'top_1_percent_threshold': 99, 'top_5_percent_threshold': 95, 'top_10_percent_threshold': 90}
+                meta['ranking_info'] = {
+                    'top_1_percent_threshold': 99,
+                    'top_5_percent_threshold': 95,
+                    'top_10_percent_threshold': 90,
+                    'risk_bands': get_risk_thresholds_meta()
+                }
 
         # --- Métricas focadas no gestor: confiança do ranking e "temperatura do estado" ---
         try:
@@ -1197,26 +1419,22 @@ def get_risk():
 
             # Temperatura do estado (visão gerencial): mapeia média para níveis claros
             state_pct = round(s_mean, 1)
-            if state_pct >= 90:
+            if state_pct >= RISK_SCORE_THRESHOLDS['critical_min']:
                 temp_label = 'Crítico'
                 temp_color = '#8B0000'
                 recommendation = 'Intervenção imediata e mobilização de recursos.'
-            elif state_pct >= 70:
-                temp_label = 'Muito Quente'
+            elif state_pct >= RISK_SCORE_THRESHOLDS['high_min']:
+                temp_label = 'Alto'
                 temp_color = '#E63946'
                 recommendation = 'Aumentar vigilância e priorizar ações no top 10.'
-            elif state_pct >= 50:
-                temp_label = 'Quente'
+            elif state_pct >= RISK_SCORE_THRESHOLDS['moderate_min']:
+                temp_label = 'Moderado'
                 temp_color = '#F4A261'
                 recommendation = 'Reforçar monitoramento e revisar alocação de recursos.'
-            elif state_pct >= 30:
-                temp_label = 'Morno'
+            else:
+                temp_label = 'Baixo'
                 temp_color = '#A8DADC'
                 recommendation = 'Manter operações regulares e monitorar tendências.'
-            else:
-                temp_label = 'Frio'
-                temp_color = '#4CAF50'
-                recommendation = 'Situação estável; operações normais.'
 
             meta['manager_view'] = {
                 'confidence_pct': confidence_pct,
@@ -1233,10 +1451,12 @@ def get_risk():
                 'confidence_pct': 50.0,
                 'confidence_label': 'Moderada',
                 'state_temperature_pct': meta.get('stats_overall_mean', 30.0),
-                'state_temperature_label': 'Morno',
+                'state_temperature_label': 'Baixo',
                 'recommendation': 'Monitorar',
                 'source': 'fallback'
             }
+
+        meta['risk_thresholds'] = get_risk_thresholds_meta()
 
         # Build counts by region and top10 by region
         try:
@@ -1245,15 +1465,8 @@ def get_risk():
             for region_key, items in region_buckets.items():
                 c = {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0}
                 for it in items:
-                    sc = it.get('risk_score', 0)
-                    if sc >= 90:
-                        c['crítico'] += 1
-                    elif sc >= 80:
-                        c['alto'] += 1
-                    elif sc >= 50:
-                        c['moderado'] += 1
-                    else:
-                        c['baixo'] += 1
+                    level, _, _, _, _ = classify_risk_score(it.get('risk_score', 0))
+                    c[level] += 1
                 meta['counts_by_region'][region_key] = c
 
                 sorted_region = sorted(items, key=lambda x: x.get('risk_score', 0), reverse=True)
@@ -1450,28 +1663,16 @@ def simulate_risk():
         for i, row in nodes_gdf.iterrows():
             name = str(row['name'])
             name_norm = normalize_name(name)
-            score = float(scores_map.get(name_norm, 20.0))
+            score = normalize_risk_score(scores_map.get(name_norm, 20.0))
             trend = trends_map.get(name_norm, 'stable')
-            
-            if np.isnan(score) or np.isinf(score): score = 20.0
             
             # Identificação de Região
             reg = str(row.get('regiao', 'fortaleza')).lower()
             if reg == 'capital': reg = 'fortaleza'
             if name_norm in _RMF_NODES: reg = 'rmf'
 
-            if score >= 90: 
-                status, css, color = 'CRÍTICO', 'risk-critico', '#8B0000'
-                meta['counts']['crítico'] += 1
-            elif score >= 80: 
-                status, css, color = 'ALTO', 'risk-alto', '#E63946'
-                meta['counts']['alto'] += 1
-            elif score >= 50: 
-                status, css, color = 'MODERADO', 'risk-moderado', '#F4A261'
-                meta['counts']['moderado'] += 1
-            else: 
-                status, css, color = 'BAIXO', 'risk-baixo', '#A8DADC'
-                meta['counts']['baixo'] += 1
+            level, status, css, color, score = classify_risk_score(score)
+            meta['counts'][level] += 1
             
             # Métricas Reais (Mesma lógica do get_risk)
             node_metrics = {
@@ -1710,7 +1911,7 @@ def anomaly_status():
         elif tension >= 5.0: label = 'ALERTA'
         else: label = 'ESTÁVEL'
 
-        # 3. Listar Eventos Ativos Reais (Janela de 14 dias)
+        # 3. Listar Eventos Ativos Reais (Janela exógena canônica de 7 dias)
         active_events = []
         try:
             exo_path = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
@@ -1718,7 +1919,7 @@ def anomaly_status():
                 with open(exo_path, 'r', encoding='utf-8') as f:
                     events = json.load(f)
                 
-                cutoff = (datetime.now() - timedelta(days=14)).date()
+                cutoff = (datetime.now() - timedelta(days=EXOGENOUS_WINDOW_DAYS)).date()
                 last_date_base = orchestrator.dates[-1] if (orchestrator and hasattr(orchestrator, 'dates')) else None
                 for e in events:
                     # Tenta pegar a data
@@ -1726,11 +1927,17 @@ def anomaly_status():
                         dstr = e.get('date', '') or e.get('event_date', '')
                         if not verify_date_consistency(dstr, last_date_base):
                             continue # Pula evento futuro
-                            
+
+                        classification = classify_exogenous_event(e)
+                        if classification['signal_class'] == 'administrative_police':
+                            continue
+
                         if dstr and datetime.strptime(dstr[:10], '%Y-%m-%d').date() >= cutoff:
                             active_events.append({
-                                'description': e.get('description') or e.get('resumo', 'Evento Crítico'),
-                                'severity': float(e.get('intensity', 0.5))
+                                'description': e.get('description') or e.get('descricao') or e.get('resumo', 'Evento Crítico'),
+                                'severity': float(e.get('intensity', 0.5)),
+                                'is_suppression': classification['is_suppression'],
+                                'is_qualified_suppression': classification['is_qualified_suppression'],
                             })
                     except: continue
         except: pass

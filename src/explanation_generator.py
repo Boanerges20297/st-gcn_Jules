@@ -71,7 +71,7 @@ class ExplanationGenerator:
             f"REGRAS:\n"
             f"1. Seja direto, técnico e use tom de comando.\n"
             f"2. Explique a influência do aumento de crimes ou dos vizinhos se houver.\n"
-            f"3. Se houver ações policiais (supressão), mencione que o risco está sendo mitigado.\n"
+            f"3. Se houver ações policiais qualificadas de supressão, mencione mitigação parcial e temporária do risco.\n"
             f"4. Retorne APENAS um JSON com as chaves: 'summary' (resumo de 1 frase), 'factors' (lista de 2-3 strings com ícones), 'interpretation' (nota final de confiança).\n"
             f"5. Responda em Português do Brasil."
         )
@@ -137,11 +137,11 @@ class ExplanationGenerator:
 
         if events:
             criticos = [e for e in events if e.get('is_suppression') is False]
-            supressoes = [e for e in events if e.get('is_suppression') is True]
+            supressoes = [e for e in events if e.get('is_qualified_suppression') is True or e.get('is_suppression') is True]
             if criticos:
                 factors.append({'name': 'Eventos Críticos', 'explanation': f"⚡ **Alerta de Conflito**: {len(criticos)} evento(s) grave(s) (homicídios/ataques) registrados no setor recentemente.", 'importance': 'high'})
             if supressoes:
-                factors.append({'name': 'Ações de Supressão', 'explanation': f"🛡️ **Presença Policial**: {len(supressoes)} ação(ões) de supressão detectada(s). O risco está sendo mitigado ativamente.", 'importance': 'medium'})
+                factors.append({'name': 'Ações de Supressão', 'explanation': f"🛡️ **Supressão Qualificada**: {len(supressoes)} ação(ões) policial(is) qualificada(s) detectada(s). O risco pode estar sendo mitigado de forma parcial e temporária.", 'importance': 'medium'})
 
         if not factors:
             factors.append({'name': 'Histórico Estático', 'explanation': "🔄 **Área de Atenção Permanente**: O risco é derivado da base estatística de longo prazo e densidade populacional.", 'importance': 'low'})

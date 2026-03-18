@@ -1,154 +1,5 @@
 [
   {
-    "date": "2026-03-03",
-    "total_events": 52,
-    "brute_cvli": 0,
-    "exogenous": 52,
-    "global": {
-      "total_nodes": 96,
-      "active_locations": 57,
-      "total_events": 79,
-      "p5": 0.0351,
-      "precision5": 0.4,
-      "hits5": [
-        "CAUCAIA",
-        "MARACANAU"
-      ],
-      "p10": 0.0702,
-      "precision10": 0.4,
-      "hits10": [
-        "CAUCAIA",
-        "MARACANAU",
-        "BARROSO",
-        "CARLITO PAMPLONA"
-      ],
-      "p20": 0.1228,
-      "precision20": 0.35,
-      "hits20": [
-        "CAUCAIA",
-        "MARACANAU",
-        "BARROSO",
-        "CARLITO PAMPLONA",
-        "JANGURUSSU",
-        "LAGOA REDONDA",
-        "MESSEJANA"
-      ]
-    },
-    "fortaleza": {
-      "total_nodes": 34,
-      "active_locations": 7,
-      "total_events": 13,
-      "p5": 0.1429,
-      "precision5": 0.2,
-      "hits5": [
-        "BARROSO"
-      ],
-      "p10": 0.2857,
-      "precision10": 0.2,
-      "hits10": [
-        "BARROSO",
-        "CARLITO PAMPLONA"
-      ],
-      "p20": 0.7143,
-      "precision20": 0.25,
-      "hits20": [
-        "BARROSO",
-        "CARLITO PAMPLONA",
-        "JANGURUSSU",
-        "LAGOA REDONDA",
-        "MESSEJANA"
-      ]
-    },
-    "rmf": {
-      "total_nodes": 18,
-      "active_locations": 11,
-      "total_events": 27,
-      "p5": 0.3636,
-      "precision5": 0.8,
-      "hits5": [
-        "CAUCAIA",
-        "MARACANAU",
-        "AQUIRAZ",
-        "CHOROZINHO"
-      ],
-      "p10": 0.7273,
-      "precision10": 0.8,
-      "hits10": [
-        "CAUCAIA",
-        "MARACANAU",
-        "AQUIRAZ",
-        "CHOROZINHO",
-        "EUSEBIO",
-        "HORIZONTE",
-        "ITAITINGA",
-        "MARANGUAPE"
-      ],
-      "p20": 1.0,
-      "precision20": 0.6111,
-      "hits20": [
-        "CAUCAIA",
-        "MARACANAU",
-        "AQUIRAZ",
-        "CHOROZINHO",
-        "EUSEBIO",
-        "HORIZONTE",
-        "ITAITINGA",
-        "MARANGUAPE",
-        "PACATUBA",
-        "PARACURU",
-        "TRAIRI"
-      ]
-    },
-    "interior": {
-      "total_nodes": 44,
-      "active_locations": 39,
-      "total_events": 39,
-      "p5": 0.1282,
-      "precision5": 1.0,
-      "hits5": [
-        "ACOPIARA",
-        "ALTO SANTO",
-        "AMONTADA",
-        "ARACATI",
-        "ARATUBA"
-      ],
-      "p10": 0.2308,
-      "precision10": 0.9,
-      "hits10": [
-        "ACOPIARA",
-        "ALTO SANTO",
-        "AMONTADA",
-        "ARACATI",
-        "ARATUBA",
-        "BARBALHA",
-        "BOA VIAGEM",
-        "CAMOCIM",
-        "CEDRO"
-      ],
-      "p20": 0.4359,
-      "precision20": 0.85,
-      "hits20": [
-        "ACOPIARA",
-        "ALTO SANTO",
-        "AMONTADA",
-        "ARACATI",
-        "ARATUBA",
-        "BARBALHA",
-        "BOA VIAGEM",
-        "CAMOCIM",
-        "CEDRO",
-        "CRATO",
-        "IBICUITINGA",
-        "IGUATU",
-        "ITAPIPOCA",
-        "ITAREMA",
-        "JAGUARETAMA",
-        "JAGUARIBE",
-        "JIJOCA DE JERICOACOARA"
-      ]
-    }
-  },
-  {
     "date": "2026-03-04",
     "total_events": 57,
     "brute_cvli": 5,
@@ -2448,6 +2299,222 @@
         "IGUATU",
         "AURORA",
         "ITAPAJE"
+      ]
+    }
+  },
+  {
+    "date": "2026-03-17",
+    "total_events": 30,
+    "brute_cvli": 19,
+    "exogenous": 11,
+    "exogenous_conflict": 11,
+    "police_qualified_actions_7d": 20,
+    "police_administrative_events_7d": 31,
+    "assigned_total_events": 24,
+    "unmapped_total_events": 6,
+    "assigned_brute_cvli": 19,
+    "assigned_exogenous": 5,
+    "unmapped_exogenous": 6,
+    "assigned_police_qualified_actions": 13,
+    "unmapped_police_qualified_actions": 7,
+    "unmapped_exogenous_sample": [
+      "Itaperi",
+      "Jos\u00e9 de Alencar",
+      "Pici",
+      "Coc\u00f3",
+      "Parangaba",
+      "NOVA CIGANA"
+    ],
+    "global": {
+      "total_nodes": 109,
+      "active_locations": 13,
+      "total_events": 24,
+      "ranking_top10": [
+        "CAUCAIA",
+        "ITAPAJE",
+        "BARROSO",
+        "GROAIRAS",
+        "TIANGUA",
+        "ANCURI",
+        "MARACANAU",
+        "CRATO",
+        "IGUATU",
+        "IRACEMA"
+      ],
+      "gt_sample": [
+        "BARRA DO CEARA",
+        "BARROSO",
+        "SIQUEIRA",
+        "BOM JARDIM",
+        "ANCURI",
+        "ANTONIO BEZERRA",
+        "CAUCAIA",
+        "HORIZONTE",
+        "IGUATU",
+        "ITAPAJE",
+        "AURORA",
+        "MONDUBIM",
+        "PASSARE"
+      ],
+      "p5": 0.6,
+      "recall5": 0.2308,
+      "hits5": [
+        "CAUCAIA",
+        "ITAPAJE",
+        "BARROSO"
+      ],
+      "p10": 0.5,
+      "recall10": 0.3846,
+      "hits10": [
+        "CAUCAIA",
+        "ITAPAJE",
+        "BARROSO",
+        "ANCURI",
+        "IGUATU"
+      ],
+      "p20": 0.3,
+      "recall20": 0.4615,
+      "hits20": [
+        "CAUCAIA",
+        "ITAPAJE",
+        "BARROSO",
+        "ANCURI",
+        "IGUATU",
+        "AURORA"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 40,
+      "active_locations": 8,
+      "total_events": 16,
+      "ranking_top10": [
+        "BARROSO",
+        "ANCURI",
+        "LAGOA REDONDA",
+        "ALTO ALEGRE",
+        "MONDUBIM",
+        "SIQUEIRA",
+        "ANTONIO BEZERRA",
+        "PEDRAS",
+        "BARRA DO CEARA",
+        "SAO MIGUEL"
+      ],
+      "gt_sample": [
+        "BARRA DO CEARA",
+        "BARROSO",
+        "SIQUEIRA",
+        "BOM JARDIM",
+        "ANCURI",
+        "ANTONIO BEZERRA",
+        "MONDUBIM",
+        "PASSARE"
+      ],
+      "p5": 0.6,
+      "recall5": 0.375,
+      "hits5": [
+        "BARROSO",
+        "ANCURI",
+        "MONDUBIM"
+      ],
+      "p10": 0.6,
+      "recall10": 0.75,
+      "hits10": [
+        "BARROSO",
+        "ANCURI",
+        "MONDUBIM",
+        "SIQUEIRA",
+        "ANTONIO BEZERRA",
+        "BARRA DO CEARA"
+      ],
+      "p20": 0.35,
+      "recall20": 0.875,
+      "hits20": [
+        "BARROSO",
+        "ANCURI",
+        "MONDUBIM",
+        "SIQUEIRA",
+        "ANTONIO BEZERRA",
+        "BARRA DO CEARA",
+        "BOM JARDIM"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 19,
+      "active_locations": 2,
+      "total_events": 5,
+      "ranking_top10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "EUSEBIO",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "ITAITINGA",
+        "PARAIPABA",
+        "SAO LUIS DO CURU",
+        "HORIZONTE"
+      ],
+      "gt_sample": [
+        "CAUCAIA",
+        "HORIZONTE"
+      ],
+      "p5": 0.2,
+      "recall5": 0.5,
+      "hits5": [
+        "CAUCAIA"
+      ],
+      "p10": 0.2,
+      "recall10": 1.0,
+      "hits10": [
+        "CAUCAIA",
+        "HORIZONTE"
+      ],
+      "p20": 0.1053,
+      "recall20": 1.0,
+      "hits20": [
+        "CAUCAIA",
+        "HORIZONTE"
+      ]
+    },
+    "interior": {
+      "total_nodes": 50,
+      "active_locations": 3,
+      "total_events": 3,
+      "ranking_top10": [
+        "ITAPAJE",
+        "GROAIRAS",
+        "TIANGUA",
+        "CRATO",
+        "IGUATU",
+        "IRACEMA",
+        "SOBRAL",
+        "CAPISTRANO",
+        "SOLONOPOLE",
+        "JUAZEIRO DO NORTE"
+      ],
+      "gt_sample": [
+        "IGUATU",
+        "ITAPAJE",
+        "AURORA"
+      ],
+      "p5": 0.4,
+      "recall5": 0.6667,
+      "hits5": [
+        "ITAPAJE",
+        "IGUATU"
+      ],
+      "p10": 0.2,
+      "recall10": 0.6667,
+      "hits10": [
+        "ITAPAJE",
+        "IGUATU"
+      ],
+      "p20": 0.15,
+      "recall20": 1.0,
+      "hits20": [
+        "ITAPAJE",
+        "IGUATU",
+        "AURORA"
       ]
     }
   }

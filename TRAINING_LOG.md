@@ -250,23 +250,23 @@ O c√°lculo das derivadas temporais foi externalizado do treinamento para o momen
 
 ---
 
-## Tentativa 46+ (PromoÁ„o de Modelos - 2026-03-16 22:12)
+## Tentativa 46+ (PromoÔøΩÔøΩo de Modelos - 2026-03-16 22:12)
 
-### PromoÁ„o para ProduÁ„o
-Baseada na an·lise do ˙ltimo treinamento 	rain_all_specialists.py (2026-03-16 14:29-20:42), todos os modelos retrain_64 foram promovidos para os modelos oficiais:
+### PromoÔøΩÔøΩo para ProduÔøΩÔøΩo
+Baseada na anÔøΩlise do ÔøΩltimo treinamento 	rain_all_specialists.py (2026-03-16 14:29-20:42), todos os modelos retrain_64 foram promovidos para os modelos oficiais:
 
 #### Modelos Promovidos:
-| Regi„o | Anterior | Novo Modelo | Performance | Status |
+| RegiÔøΩo | Anterior | Novo Modelo | Performance | Status |
 |--------|----------|-------------|-------------|--------|
 | **Fortaleza** | P@10: 50.2% | fortaleza_retrain_64  fortaleza_model_active.pth | **P@10: 87.84%**  |  ATIVO |
 | **RMF** | P@5: 72% | rmf_model.pth (mantido) | **P@5: 74.33%** |  ATIVO |
 | **Interior** | P@10: N/A | interior_retrain_64  interior_model.pth | **P@10: 81.54%**  |  ATIVO |
 
-### An·lise de Sa˙de do Treinamento
--  **Sem overfitting detectado** - Loss controlado, validaÁ„o est·vel
--  **Sem degradaÁ„o de gradiente** - Grad entre 0.23-1.46 (muito saud·vel)
--  **ConvergÍncia robusta** - Todas as regiıes convergiram bem
--  **Pronto para produÁ„o** - Modelos salvos em models/active/
+### AnÔøΩlise de SaÔøΩde do Treinamento
+-  **Sem overfitting detectado** - Loss controlado, validaÔøΩÔøΩo estÔøΩvel
+-  **Sem degradaÔøΩÔøΩo de gradiente** - Grad entre 0.23-1.46 (muito saudÔøΩvel)
+-  **ConvergÔøΩncia robusta** - Todas as regiÔøΩes convergiram bem
+-  **Pronto para produÔøΩÔøΩo** - Modelos salvos em models/active/
 
 ### Backups Realizados
 `
@@ -275,18 +275,74 @@ rmf_model_backup_20260316_221629.pth (antiga: 74.33%)
 interior_model_backup_20260316_221629.pth (antiga: N/A)
 `
 
-### PrÛximos Passos
-1. Monitorar performance em produÁ„o via EfficiencyMonitor
+### PrÔøΩximos Passos
+1. Monitorar performance em produÔøΩÔøΩo via EfficiencyMonitor
 2. Avaliar improvement de Fortaleza (+37.64%) em tempo real
-3. Fine-tuning eventual se degradaÁ„o > 2% for detectada
+3. Fine-tuning eventual se degradaÔøΩÔøΩo > 2% for detectada
 
-### ReorganizaÁ„o Final de Modelos (2026-03-16 22:15)
+### ReorganizaÔøΩÔøΩo Final de Modelos (2026-03-16 22:15)
 -  Modelos oficiais promovidos e atualizados em models/active/
 -  Script train_all_specialists.py reconfigurado para salvar diretamente nos modelos oficiais
--  Backup de versıes antigas preservadas em models/backups/
--  **PRONTO PARA PRODU«√O**
+-  Backup de versÔøΩes antigas preservadas em models/backups/
+-  **PRONTO PARA PRODUÔøΩÔøΩO**
 
-### ReorganizaÁ„o Final de Modelos (2026-03-16 22:15)
+### ReorganizaÔøΩÔøΩo Final de Modelos (2026-03-16 22:15)
 - OK Modelos oficiais promovidos e atualizados em models/active/
 - OK train_all_specialists.py reconfigurado para salvar direto
 - OK PRONTO PARA PRODUCAO
+
+---
+
+## Tentativa 47 (Retreino Operacional 14 Dias - CVLI Bruto + Rolling Sum 7d) ‚Äî 2026-03-17 13:40
+
+### Motiva√ß√£o
+- Alinhar o treinamento √† nova r√©gua operacional de **14 dias corridos**, evitando aprovar modelos com ganho apenas em horizonte curto.
+- Preservar o **CVLI bruto sem normaliza√ß√£o** no alvo e reconstruir o **canal 24** como **soma m√≥vel 7d**, removendo a m√©dia m√≥vel legada que podia amortecer sinais fracos de escalada.
+- Validar se a estrat√©gia mais aderente √† opera√ß√£o sustentaria os recordes offline da Tentativa 46.
+
+### Configura√ß√£o T√©cnica
+- **Script:** `scripts/training/Active/train_all_specialists.py`
+- **Horizonte alvo:** **14 dias** (`predict_horizon_days=14`)
+- **Contexto CVLI:** `raw_cvli_context=True`
+- **Canal 24:** `rolling_sum_7d`
+- **Arquitetura salva nos checkpoints:** `DeepSTGAT_64`
+
+#### Configura√ß√£o por Regi√£o
+| Regi√£o | Window | LR | Epochs | Dropout | Margin | K | Grad Accum | Canais | Melhor M√©trica |
+|---|---|---|---|---|---|---|---|---|---|
+| **Fortaleza** | 120 | 0.01 | 120 | 0.3 | 1.0 | 10 | 32 | 33 | **P@10: 78.09%** |
+| **RMF** | 90 | 0.018 | 120 | 0.5 | 1.5 | 5 | 8 | 29 | **P@5: 71.43%** |
+| **Interior** | 120 | 0.005 | 120 | 0.3 | 1.0 | 10 | 32 | 33 | **P@10: 78.11%** |
+
+### Resultados Consolidados
+| Regi√£o | Tentativa 46 | Tentativa 47 | Delta | Leitura |
+|---|---|---|---|---|
+| **Fortaleza** | P@10: **87.84%** | P@10: **78.09%** | **-9.75 pp** | Queda relevante |
+| **RMF** | P@5: **74.33%** | P@5: **71.43%** | **-2.90 pp** | Queda moderada |
+| **Interior** | P@10: **81.54%** | P@10: **78.11%** | **-3.43 pp** | Queda moderada |
+
+### An√°lise T√©cnica
+- **Fortaleza:** continuou forte, mas perdeu quase 10 pontos frente ao recorde de 7 dias. O novo alvo de 14 dias ficou claramente mais duro e menos permissivo do que o setup anterior.
+- **RMF:** permaneceu est√°vel em patamar alto. A perda foi pequena, indicando que a regi√£o continua estruturalmente previs√≠vel mesmo com horizonte mais longo.
+- **Interior:** manteve desempenho alto para um cen√°rio esparso, mas tamb√©m abaixo do baseline anterior. O melhor checkpoint foi salvo corretamente antes da degrada√ß√£o final das √∫ltimas √©pocas.
+- **Sa√∫de do treino:** n√£o houve quebra de gradiente nem colapso de loss. Os runs convergiram de forma saud√°vel, com leve overfitting tardio no Interior, sem comprometer o melhor artefato salvo.
+
+### Veredito da Estrat√©gia
+- **Efetiva em alinhamento operacional:** SIM.
+- **Efetiva em recorde offline:** N√ÉO.
+- **Conclus√£o:** a estrat√©gia de **horizonte 14d + CVLI bruto + canal 24 em soma 7d** deixou o treino mais fiel ao uso real em produ√ß√£o, por√©m reduziu a m√©trica offline em todas as regi√µes quando comparada √† Tentativa 46.
+
+### Status Final
+- **Status:** **SUCEDIDO TECNICAMENTE / INFERIOR AO BASELINE OFFLINE**
+- **Checkpoints salvos:**
+  - `models/active/fortaleza_model_active.pth` ‚Üí `P@10 = 78.09%`
+  - `models/active/rmf_model.pth` ‚Üí `P@5 = 71.43%`
+  - `models/active/interior_model.pth` ‚Üí `P@10 = 78.11%`
+- **Metadados persistidos nos checkpoints:**
+  - `predict_horizon_days = 14`
+  - `raw_cvli_context = true`
+  - `channel24_mode = rolling_sum_7d`
+
+### Pr√≥ximo Passo Operacional
+1. Validar os novos checkpoints por **14 dias corridos** via `EfficiencyMonitor` antes de decidir promo√ß√£o definitiva ou rollback estrat√©gico.
+2. Se a m√©trica operacional n√£o superar o baseline recente, considerar blend entre o modelo campe√£o offline (Tentativa 46) e o modelo mais alinhado ao horizonte real (Tentativa 47).

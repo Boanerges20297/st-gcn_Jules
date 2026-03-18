@@ -162,7 +162,7 @@
 
                 <div class="input-group input-group-sm">
                     <span class="input-group-text">Limiar crítico</span>
-                    <input type="number" id="critical-threshold" class="form-control" value="90" min="0" max="100">
+                    <input type="number" id="critical-threshold" class="form-control" value="71" min="0" max="100">
                     <button id="apply-filters" class="btn btn-glass">Aplicar</button>
                 </div>
             </div>
@@ -192,15 +192,15 @@
             <div class="small fw-bold mb-2">Nível de Risco (Borda):</div>
             <div class="legend-item">
                 <div class="legend-color" style="background: #8B0000;"></div>
-                <span>Crítico (≥90%)</span>
+                <span>Crítico (≥71%)</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background: #FF8C00;"></div>
-                <span>Alto (80-89%)</span>
+                <span>Alto (51-70%)</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background: #E31A1C;"></div>
-                <span>Moderado (50-79%)</span>
+                <span>Moderado (31-50%)</span>
             </div>
         </div>
         
@@ -238,11 +238,10 @@
         const elem = document.getElementById('graph');
 
         function getColor(score) {
-            if (score >= 90) return '#8B0000';
-            if (score >= 80) return '#FF8C00';
-            if (score >= 50) return '#E31A1C';
-            if (score >= 20) return '#FEB24C';
-            return '#00C851';
+            if (score >= 71) return '#8B0000';
+            if (score >= 51) return '#FF8C00';
+            if (score >= 31) return '#E31A1C';
+            return '#FEB24C';
         }
 
         const factionColors = {};
@@ -314,7 +313,7 @@
                         document.getElementById('d-faction').textContent = node.faction || 'Não Identificado';
                         document.getElementById('d-faction').style.backgroundColor = getFactionColor(node.faction);
                         document.getElementById('d-risk').textContent = 'Risco: ' + node.risk.toFixed(1) + '%';
-                        document.getElementById('d-risk').className = 'badge ' + (node.risk >= 90 ? 'bg-danger' : node.risk >= 80 ? 'bg-warning text-dark' : 'bg-secondary');
+                        document.getElementById('d-risk').className = 'badge ' + (node.risk >= 71 ? 'bg-danger' : node.risk >= 51 ? 'bg-warning text-dark' : node.risk >= 31 ? 'bg-info text-dark' : 'bg-secondary');
 
                         const incoming = incomingMap[node.id];
                         const inDiv = document.getElementById('d-incoming');
@@ -374,7 +373,7 @@
                     const fontSize = 13 / (globalScale || 1);
                     const r = 5;
 
-                    if (Number(node.risk) >= 80) {
+                    if (Number(node.risk) >= 51) {
                         ctx.beginPath();
                         ctx.arc(node.x, node.y, r + 3, 0, 2 * Math.PI, false);
                         const gradient = ctx.createRadialGradient(node.x, node.y, r, node.x, node.y, r + 3);
@@ -421,14 +420,14 @@
         }
 
         // Initial load (Fortaleza default)
-        const defaultOpts = { region: 'fortaleza', critical_only: false, risk_threshold: 90 };
+        const defaultOpts = { region: 'fortaleza', critical_only: false, risk_threshold: 71 };
         loadGraph(defaultOpts);
 
         // Hook apply button
         document.getElementById('apply-filters').addEventListener('click', () => {
             const region = document.getElementById('filter-region').value;
             const critical_only = document.getElementById('filter-critical').checked;
-            const risk_threshold = Number(document.getElementById('critical-threshold').value) || 90;
+            const risk_threshold = Number(document.getElementById('critical-threshold').value) || 71;
             // Clear previous graph by re-initializing
             document.getElementById('graph').innerHTML = '';
             loadGraph({ region, critical_only, risk_threshold });
