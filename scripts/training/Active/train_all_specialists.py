@@ -74,18 +74,21 @@ REGION_CONFIGS = {
         k_eval=10, use_momentum=True,  grad_accum=32,
         raw_cvli_context=True,
         output_name='fortaleza_model_active.pth',
+        focal_alpha=0.75, focal_gamma=1.5, ranking_weight=10.0
     ),
     'rmf': dict(
         window=90,  lr=0.018, epochs=120, dropout=0.5, margin=1.5,
         k_eval=5,  use_momentum=False, grad_accum=8,
         raw_cvli_context=True,
         output_name='rmf_model.pth',
+        focal_alpha=0.50, focal_gamma=2.0, ranking_weight=7.0
     ),
     'interior': dict(
         window=120, lr=0.005, epochs=120, dropout=0.3, margin=1.0,
         k_eval=10, use_momentum=True,  grad_accum=32,
         raw_cvli_context=True,
         output_name='interior_model.pth',
+        focal_alpha=0.40, focal_gamma=2.0, ranking_weight=4.0
     ),
 }
 
@@ -201,15 +204,15 @@ class SpecialistTrainer:
         self.best_pk      = 0.0
 
     def train(self):
-        # Parâmetros da Focal Loss Agressiva (Tentativa 49 - Gradiente Ativo)
-        focal_alpha = 0.75
-        focal_gamma = 1.5
-        ranking_w   = 10.0
+        cfg = REGION_CONFIGS[self.region_key]
+        focal_alpha = cfg.get('focal_alpha', 0.25)
+        focal_gamma = cfg.get('focal_gamma', 2.0)
+        ranking_w   = cfg.get('ranking_weight', 1.0)
 
         logging.info("\n" + "═"*80)
-        logging.info(f"🚀 ESPECIALISTA: {self.region_key.upper()} (TENTATIVA 49 - AGGRESSIVE GRADIENT)")
+        logging.info(f"🚀 ESPECIALISTA: {self.region_key.upper()} (TENTATIVA 49 - REGIONALIZED AGGRESSION)")
         logging.info(f"📊 METODOLOGIA: Split Temporal (85/15) | Blindagem de Seleção (Cutoff 2025)")
-        logging.info(f"📉 LOSS: Aggressive Focal Ranking (alpha={focal_alpha}, gamma={focal_gamma}, rank_w={ranking_w})")
+        logging.info(f"📉 LOSS: Regional Focal Ranking (alpha={focal_alpha}, gamma={focal_gamma}, rank_w={ranking_w})")
         logging.info(
             f"⚙️ ARQ: DeepSTGAT_64 | window={self.window} | lr={self.lr} | dropout={self.dropout} | "
             f"K={self.k_eval} | {'33ch+momentum' if self.use_momentum else '29ch'} | "
