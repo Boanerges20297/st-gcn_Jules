@@ -2042,6 +2042,354 @@
           "GRANJA LISBOA"
         ]
       },
+      "resolved": true,
+      "resolved_at": "2026-03-20T13:21:26.653525",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T13:21:26.754771",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T13:51:27.569842",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T13:21:26.761901",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=37.5% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.375,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T13:51:27.569842",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T13:21:39.486019",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 92.7%",
+      "details": {
+        "memory_percent": 92.7
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T13:51:27.780675",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T14:21:28.606549",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T13:51:45.568203",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 92.0%",
+      "details": {
+        "memory_percent": 92.0
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T14:21:28.788147",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T14:51:29.465441",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T14:21:51.675170",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 85.2%",
+      "details": {
+        "memory_percent": 85.2
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T14:51:29.647814",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T15:21:30.403153",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T14:51:57.752982",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 85.8%",
+      "details": {
+        "memory_percent": 85.8
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T15:21:30.596472",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T15:51:31.324734",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T15:22:03.879313",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 86.3%",
+      "details": {
+        "memory_percent": 86.3
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T15:51:31.522177",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T16:21:32.248117",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T15:52:09.974548",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 90.3%",
+      "details": {
+        "memory_percent": 90.3
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T16:21:32.427650",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T16:51:33.160124",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T16:22:16.059222",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 87.0%",
+      "details": {
+        "memory_percent": 87.0
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T16:51:33.338460",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T17:21:33.874169",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T17:21:34.047965",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T17:51:34.719553",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T17:47:33.172155",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 88.0%",
+      "details": {
+        "memory_percent": 88.0
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T17:51:34.900968",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T17:53:08.880707",
+      "resolved_reason": "Região FORTALEZA reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-03-20T17:54:04.382593",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 10.00%",
+      "details": {
+        "error_rate_percent": 10.0
+      },
       "resolved": false
     }
   ]

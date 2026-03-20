@@ -13,6 +13,8 @@ import numpy as np
 import os
 import pickle
 import json
+import shutil
+import subprocess
 import warnings
 import logging
 import unicodedata
@@ -47,6 +49,10 @@ logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_SCREENSHOT_REPO_DIR = os.path.normpath(os.path.join(BASE_DIR, '..', 'screenshot-report_preview'))
+STATIC_SCREENSHOT_PUBLIC_DATA_DIR = os.path.join(STATIC_SCREENSHOT_REPO_DIR, 'public', 'data')
+STATIC_EXPORT_SCRIPT = os.path.join(BASE_DIR, 'scripts', 'export_static_snapshot.py')
+STATIC_EXPORT_OUTPUT_DIR = os.path.join(BASE_DIR, 'static_export', 'data')
 
 # Cache file for manager-harmonized explanations
 CACHE_FILE = os.path.join(BASE_DIR, 'data', 'manager_explanations_cache.json')
@@ -211,6 +217,7 @@ health_monitor = None
 confidence_tracker = None
 
 _MICRONODE_POLYGON_CACHE = None
+_TOP_MICRONODE_FACTION_CACHE = None
 
 # === REGISTRAR HEALTH MONITOR BLUEPRINT (antes de load_data_and_models) ===
 model_calibrator = None
@@ -308,149 +315,32 @@ def _effective_faction_coverage_threshold(target_count: int) -> float:
 
 def _check_faction_coverage_alerts(metrics: dict):
     """
-    Avalia se o modelo está cobrindo adequadamente os territórios de tensão conhecida.
-    Lógica de termômetro territorial: o modelo deve surfaçar zonas de facção no topo,
-    independentemente de haver CVLI recente.
+    Régua territorial por facção desativada.
 
-    Trigger: se < 80% dos territórios de facção estão no top-20% do score → calibração.
+    Alertas do health dashboard devem ser guiados pelas métricas regionais de
+    performance (P10/P20/Recall), não pela simples presença de territórios
+    faccionados no topo do ranking. Território faccionado calmo não é, por si só,
+    sinal de degradação do modelo.
 
-    EXCEÇÃO: Se CVLI=0 para todos os nós da região nos últimos 14 dias, a região
-    está genuinamente fria/silenciosa. Scores baixos são corretos — não é degradação
-    do modelo, é ausência de ocorrências. Não calibrar nem disparar alertas.
+    Esta rotina agora apenas resolve alertas/calibrações legadas desse domínio.
     """
-    from datetime import datetime, timedelta
+    from datetime import datetime
     if orchestrator is None or health_monitor is None:
         return
 
     now = datetime.now()
-    suppression = timedelta(hours=24)
-
-    for r_name, spec in orchestrator.specialists.items():
-        nodes = spec['data']['nodes_gdf']
-        if 'faction' not in nodes.columns:
-            continue
-
-        # === VERIFICAÇÃO: Região fria (CVLI=0 em todos os nós) ===
-        # Se não há ocorrências reais no intervalo, o modelo está correto em
-        # classificar como frio. Não é degradação — é comportamento esperado.
-        try:
-            node_features = spec['data']['node_features']
-            recent_cvli_total = int(node_features[:, -14:, 0].sum())
-        except Exception:
-            recent_cvli_total = -1  # não foi possível verificar, continua
-
-        if recent_cvli_total == 0:
-            print(f"⏭️ [Cobertura Territorial] {r_name.upper()}: SKIP — CVLI=0 nos últimos 14 dias. "
-                  f"Região genuinamente fria. Scores baixos são corretos, sem calibração.")
-            resolved_count = _resolve_territorial_alerts_for_region(
-                r_name,
-                now,
-                f"Região {r_name.upper()} sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
-            )
-            print(f"✅ [Cobertura Territorial] {r_name.upper()}: {resolved_count} alerta(s) obsoletos resolvidos (região fria).")
-            continue
-
-        # Obter scores desta região e calcular top-20%
-        reg_data = metrics.get(r_name, {})
-        if not reg_data or reg_data.get('status', ''):
-            continue
-
-        # Reconstruir ranking da região a partir do scores_map global (via orchestrator)
-        try:
-            scores_map = orchestrator.get_combined_risk(None)
-        except Exception:
-            continue
-
-        region_node_names = set(normalize_name(n) for n in nodes['name'])
-        region_scores = {n: s for n, s in scores_map.items() if n in region_node_names}
-        if not region_scores:
-            continue
-
-        top20_count = max(1, len(region_scores) // 5)
-        top20_names = set(n for n, _ in sorted(region_scores.items(), key=lambda x: -x[1])[:top20_count])
-
-        # Se a região está operacionalmente fria/esparsa, a régua territorial não é informativa.
-        active_locations = int(reg_data.get('active_locations', 0) or 0)
-        min_active_locations = max(2, top20_count // 2)
-        if active_locations < min_active_locations:
-            print(f"⏭️ [Cobertura Territorial] {r_name.upper()}: SKIP — apenas {active_locations} localidades ativas. Régua territorial desativada em baixa atividade.")
-            resolved_count = _resolve_territorial_alerts_for_region(
-                r_name,
-                now,
-                f"Região {r_name.upper()} com baixa atividade operacional ({active_locations} localidades ativas). Alerta territorial suspenso por baixa densidade recente."
-            )
-            if resolved_count:
-                print(f"✅ [Cobertura Territorial] {r_name.upper()}: {resolved_count} alerta(s) obsoletos resolvidos (baixa atividade).")
-            if model_calibrator is not None:
-                model_calibrator.on_recovery(orchestrator, r_name, 'faction_coverage', 1.0)
-            continue
-
-        # A cobertura deve ser avaliada sobre um conjunto-alvo factível de territórios prioritários,
-        # não sobre todos os nós com facção atribuída, senão a métrica fica matematicamente impossível.
-        faction_targets = _select_faction_targets(nodes, top20_count)
-        if not faction_targets:
-            continue
-
-        effective_threshold = _effective_faction_coverage_threshold(len(faction_targets))
-
-        faction_in_top20 = set(faction_targets) & top20_names
-        coverage = len(faction_in_top20) / len(faction_targets) if faction_targets else 1.0
-
-        print(f"🌡️ [Cobertura Territorial] {r_name.upper()}: {len(faction_in_top20)}/{len(faction_targets)} territórios prioritários no top-20% ({coverage*100:.1f}%)")
-
-        # A avaliação territorial mais recente substitui alertas antigos deste domínio para a região.
-        _resolve_territorial_alerts_for_region(
+    for r_name in orchestrator.specialists.keys():
+        resolved_count = _resolve_territorial_alerts_for_region(
             r_name,
             now,
-            f"Região {r_name.upper()} reavaliada pela nova régua territorial ({coverage*100:.1f}% de cobertura)."
+            f"Região {r_name.upper()} reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
         )
-
-        if coverage < effective_threshold:
-            # --- DEGRADAÇÃO: modelo não está surfaçando tensão conhecida ---
-            alert_type = f"faction_coverage_{r_name}"
-            cutoff = (now - suppression).isoformat()
-            already_fired = any(
-                a['type'] == alert_type and a['timestamp'] >= cutoff and not a['resolved']
-                for a in health_monitor.alerts_history
-            )
-            if not already_fired:
-                missing = set(faction_targets) - top20_names
-                msg = (
-                    f"Tensão territorial subestimada — {r_name.upper()}: apenas {coverage*100:.1f}% "
-                    f"dos territórios prioritários de facção no top-20% (mínimo efetivo: {effective_threshold*100:.1f}%). "
-                    f"Ausentes: {', '.join(list(missing)[:3])}"
-                )
-                health_monitor.add_alert(
-                    alert_type=alert_type, severity='HIGH', message=msg,
-                    details={
-                        'region': r_name, 'coverage': round(coverage, 4),
-                        'threshold': effective_threshold,
-                        'faction_nodes_total': len(faction_targets),
-                        'faction_nodes_in_top20': len(faction_in_top20),
-                        'active_locations': active_locations,
-                        'missing_sample': list(missing)[:5],
-                    }
-                )
-                print(f"🔔 [ALERTA TERRITORIAL] {msg}")
-
-            if model_calibrator is not None:
-                model_calibrator.on_degradation(
-                    orchestrator, r_name, 'faction_coverage', coverage, effective_threshold
-                )
-
-        elif coverage >= effective_threshold:
-            # --- RECUPERAÇÃO: cobertura voltou ao normal ---
-            resolved_count = _resolve_territorial_alerts_for_region(
-                r_name,
-                now,
-                f"Região {r_name.upper()} recuperou cobertura territorial pela nova régua operacional ({coverage*100:.1f}%)."
-            )
-            if resolved_count:
-                print(f"✅ [Cobertura Territorial] {r_name.upper()}: {resolved_count} alerta(s) obsoletos resolvidos (cobertura normalizada).")
-            if model_calibrator is not None:
-                reg_state = model_calibrator.state.get(r_name, {})
-                if reg_state.get('steps', 0) > 0:
-                    model_calibrator.on_recovery(orchestrator, r_name, 'faction_coverage', coverage)
+        if resolved_count:
+            print(f"✅ [Cobertura Territorial] {r_name.upper()}: {resolved_count} alerta(s) legados resolvidos.")
+        if model_calibrator is not None:
+            reg_state = model_calibrator.state.get(r_name, {})
+            if reg_state.get('steps', 0) > 0:
+                model_calibrator.on_recovery(orchestrator, r_name, 'faction_coverage', 1.0)
 
 
 def run_background_efficiency_monitor():
@@ -1025,6 +915,33 @@ def _load_micronode_polygon_cache():
 
     return _MICRONODE_POLYGON_CACHE
 
+
+def _load_top_micronode_faction_cache():
+    global _TOP_MICRONODE_FACTION_CACHE
+    if _TOP_MICRONODE_FACTION_CACHE is not None:
+        return _TOP_MICRONODE_FACTION_CACHE
+
+    factions_path = os.path.join(BASE_DIR, 'data', 'raw', 'inteligencia_faccoes.csv')
+    if not os.path.exists(factions_path):
+        _TOP_MICRONODE_FACTION_CACHE = {}
+        return _TOP_MICRONODE_FACTION_CACHE
+
+    try:
+        fac_df = pd.read_csv(factions_path, encoding='utf-8')
+        cache = {}
+        for _, row in fac_df.iterrows():
+            area_name = row.get('local')
+            faction = str(row.get('faccao_predominante') or '').strip().upper()
+            if not area_name or not faction:
+                continue
+            cache[_normalize_polygon_lookup_name(area_name)] = faction
+        _TOP_MICRONODE_FACTION_CACHE = cache
+    except Exception as error:
+        print(f"⚠️ [Top Micronodes] Falha ao carregar cache de facções: {error}")
+        _TOP_MICRONODE_FACTION_CACHE = {}
+
+    return _TOP_MICRONODE_FACTION_CACHE
+
 @app.route('/api/micronodes')
 def get_micronodes():
     path = os.path.join(app.root_path, 'data', 'raw', 'inteligencia', 'micronodos_faccoes_2026.geojson')
@@ -1057,17 +974,21 @@ def get_top20_micro_nodes():
 
     def _decorate_top_features(payload):
         polygon_cache = _load_micronode_polygon_cache()
+        faction_cache = _load_top_micronode_faction_cache()
         features = payload.get('features', [])[:limit]
         decorated = []
         for feature in features:
             props = dict(feature.get('properties') or {})
             lookup_key = _normalize_polygon_lookup_name(props.get('name') or props.get('micronodo'))
             polygon_geometry = polygon_cache.get(lookup_key)
+            faction = props.get('faction') or faction_cache.get(lookup_key)
             if polygon_geometry:
                 feature['geometry'] = polygon_geometry
                 props['geometry_type'] = polygon_geometry.get('type', 'Polygon')
                 props['source_geometry_type'] = polygon_geometry.get('type', 'Polygon')
                 props['is_centroid'] = False
+            if faction:
+                props['faction'] = faction
             feature['properties'] = props
             decorated.append(feature)
         payload['features'] = decorated
@@ -1829,6 +1750,160 @@ def get_polygons():
                         features.append(feat)
             except: pass
     return jsonify({"type": "FeatureCollection", "features": features})
+
+
+def _is_valid_screenshot_repo(repo_dir: str) -> bool:
+    return os.path.isdir(repo_dir) and os.path.exists(os.path.join(repo_dir, 'package.json'))
+
+
+def _run_git_command(repo_dir: str, args: list[str]) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        ['git', *args],
+        cwd=repo_dir,
+        capture_output=True,
+        text=True,
+        encoding='utf-8',
+        errors='replace',
+        timeout=180,
+        check=False,
+        env={
+            **os.environ,
+            'PYTHONIOENCODING': 'utf-8',
+        },
+    )
+
+
+def _sync_static_snapshot_to_screenshot_app(target_data_dir: str):
+    if not os.path.exists(STATIC_EXPORT_SCRIPT):
+        raise FileNotFoundError(f'Exporter não encontrado em {STATIC_EXPORT_SCRIPT}')
+
+    target_repo_dir = os.path.dirname(os.path.dirname(target_data_dir))
+    if not _is_valid_screenshot_repo(target_repo_dir):
+        raise FileNotFoundError(
+            f'Repositório screenshot-report_preview não encontrado ou inválido em {target_repo_dir}'
+        )
+
+    os.makedirs(target_data_dir, exist_ok=True)
+    logging.info('[SCREENSHOT EXPORT] Iniciando exportação estática')
+    logging.info('[SCREENSHOT EXPORT] Export script: %s', STATIC_EXPORT_SCRIPT)
+    logging.info('[SCREENSHOT EXPORT] Output dir: %s', STATIC_EXPORT_OUTPUT_DIR)
+    logging.info('[SCREENSHOT EXPORT] Target repo: %s', target_repo_dir)
+    logging.info('[SCREENSHOT EXPORT] Target data dir: %s', target_data_dir)
+
+    completed = subprocess.run(
+        [sys.executable, STATIC_EXPORT_SCRIPT, '--output-dir', STATIC_EXPORT_OUTPUT_DIR],
+        cwd=BASE_DIR,
+        capture_output=True,
+        text=True,
+        encoding='utf-8',
+        errors='replace',
+        timeout=600,
+        check=False,
+        env={
+            **os.environ,
+            'PYTHONIOENCODING': 'utf-8',
+        },
+    )
+    if completed.returncode != 0:
+        raise RuntimeError(
+            'Falha ao exportar snapshot estático. '
+            f'stdout={completed.stdout.strip()} stderr={completed.stderr.strip()}'
+        )
+    logging.info('[SCREENSHOT EXPORT] Exportação concluída com sucesso')
+
+    copied_files = []
+    for filename in sorted(os.listdir(STATIC_EXPORT_OUTPUT_DIR)):
+        if not filename.endswith(('.json', '.geojson')):
+            continue
+        source_path = os.path.join(STATIC_EXPORT_OUTPUT_DIR, filename)
+        if not os.path.isfile(source_path):
+            continue
+        destination_path = os.path.join(target_data_dir, filename)
+        shutil.copy2(source_path, destination_path)
+        copied_files.append(filename)
+    logging.info('[SCREENSHOT EXPORT] %s arquivos sincronizados para a app screenshot', len(copied_files))
+    if copied_files:
+        logging.info('[SCREENSHOT EXPORT] Arquivos: %s', ', '.join(copied_files))
+
+    return {
+        'target_repo_dir': target_repo_dir,
+        'export_output_dir': STATIC_EXPORT_OUTPUT_DIR,
+        'target_data_dir': target_data_dir,
+        'copied_files': copied_files,
+        'stdout': completed.stdout.strip(),
+    }
+
+
+def _publish_screenshot_repo(repo_dir: str) -> Dict[str, Any]:
+    logging.info('[SCREENSHOT EXPORT] Iniciando publicação git do repositório screenshot')
+    status_result = _run_git_command(repo_dir, ['status', '--porcelain'])
+    if status_result.returncode != 0:
+        raise RuntimeError(f'Falha ao consultar status git: {status_result.stderr.strip() or status_result.stdout.strip()}')
+
+    changed_entries = [line for line in status_result.stdout.splitlines() if line.strip()]
+    if not changed_entries:
+        logging.info('[SCREENSHOT EXPORT] Nenhuma alteração local para publicar')
+        return {
+            'published': False,
+            'commit_created': False,
+            'push_executed': False,
+            'message': 'Nenhuma alteração detectada no repositório screenshot.',
+        }
+
+    add_result = _run_git_command(repo_dir, ['add', '-A'])
+    if add_result.returncode != 0:
+        raise RuntimeError(f'Falha no git add: {add_result.stderr.strip() or add_result.stdout.strip()}')
+
+    commit_message = f'chore: sync static snapshot {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
+    commit_result = _run_git_command(repo_dir, ['commit', '-m', commit_message])
+    if commit_result.returncode != 0:
+        combined_output = (commit_result.stderr or commit_result.stdout or '').strip()
+        if 'nothing to commit' not in combined_output.lower():
+            raise RuntimeError(f'Falha no git commit: {combined_output}')
+
+    push_result = _run_git_command(repo_dir, ['push', 'origin', 'main'])
+    if push_result.returncode != 0:
+        raise RuntimeError(f'Falha no git push: {push_result.stderr.strip() or push_result.stdout.strip()}')
+
+    logging.info('[SCREENSHOT EXPORT] Publicação git concluída com sucesso')
+    return {
+        'published': True,
+        'commit_created': True,
+        'push_executed': True,
+        'commit_message': commit_message,
+        'message': 'Snapshot sincronizado e publicado no repositório screenshot.',
+    }
+
+
+@app.route('/api/export_static_snapshot', methods=['POST'])
+def export_static_snapshot_to_screenshot_app():
+    try:
+        payload = request.get_json(silent=True) or {}
+        target_repo_dir = payload.get('target_repo_dir') or STATIC_SCREENSHOT_REPO_DIR
+        target_data_dir = payload.get('target_data_dir') or os.path.join(target_repo_dir, 'public', 'data')
+        publish_repo = bool(payload.get('publish_repo', False))
+
+        sync_info = _sync_static_snapshot_to_screenshot_app(target_data_dir)
+        publish_info = None
+        if publish_repo:
+            publish_info = _publish_screenshot_repo(sync_info['target_repo_dir'])
+
+        return jsonify({
+            'ok': True,
+            'message': (
+                'Snapshot exportado, sincronizado e publicado no repositório screenshot.'
+                if publish_repo else
+                'Snapshot exportado e sincronizado com a aplicação screenshot.'
+            ),
+            **sync_info,
+            'publish_info': publish_info,
+        })
+    except FileNotFoundError as exc:
+        return jsonify({'ok': False, 'error': str(exc)}), 404
+    except subprocess.TimeoutExpired:
+        return jsonify({'ok': False, 'error': 'Timeout ao exportar snapshot estático.'}), 504
+    except Exception as exc:
+        return jsonify({'ok': False, 'error': str(exc)}), 500
 
 @app.route('/api/geocode')
 def geocode_search():

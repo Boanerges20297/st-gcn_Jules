@@ -393,6 +393,12 @@
                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exogenousModal">
                             <i class="fas fa-file-import"></i> Inserir Eventos (CIOPS)
                         </button>
+                        <button class="btn btn-outline-success btn-sm" id="btn-export-screenshot" title="Exportar snapshot estático e sincronizar com a aplicação screenshot">
+                            <i class="fas fa-cloud-upload-alt"></i> Atualizar App Screenshot
+                        </button>
+                        <button class="btn btn-success btn-sm" id="btn-export-screenshot-publish" title="Exportar snapshot, sincronizar e publicar no repositório screenshot">
+                            <i class="fas fa-upload"></i> Atualizar e Publicar Git
+                        </button>
                         <a href="/connections" class="btn btn-outline-dark btn-sm">
                             <i class="fas fa-chart-line"></i> Dashboard Estratégico
                         </a>
@@ -400,6 +406,7 @@
                             <i class="fas fa-heartbeat"></i> Monitor de Saúde
                         </a>
                     </div>
+                    <div id="export-screenshot-status" class="small text-muted mb-2" style="display:none;"></div>
 
                     <div class="d-grid gap-1 mb-2 simulation-ui-container" style="gap: 6px !important;">
                         <div class="btn-group" role="group">
@@ -972,6 +979,81 @@
         } catch(e) {
             console.warn('invalidateSize/hide overlay failed', e);
         }
+    }
+
+    function setExportScreenshotStatus(message, tone) {
+        var el = $('#export-screenshot-status');
+        if (!message) {
+            el.hide().removeClass('text-success text-danger text-muted').text('');
+            return;
+        }
+        el.removeClass('text-success text-danger text-muted');
+        if (tone === 'success') el.addClass('text-success');
+        else if (tone === 'error') el.addClass('text-danger');
+        else el.addClass('text-muted');
+        el.text(message).show();
+    }
+
+    function exportSnapshotToScreenshotApp(publishRepo) {
+        var isPublish = !!publishRepo;
+        var btn = isPublish ? $('#btn-export-screenshot-publish') : $('#btn-export-screenshot');
+        var otherBtn = isPublish ? $('#btn-export-screenshot') : $('#btn-export-screenshot-publish');
+        if (!btn.length || btn.prop('disabled')) {
+            return;
+        }
+
+        btn.prop('disabled', true);
+        otherBtn.prop('disabled', true);
+        setExportScreenshotStatus(
+            isPublish
+                ? 'Exportando snapshot, sincronizando arquivos e publicando no repositório screenshot...'
+                : 'Exportando snapshot e sincronizando aplicação screenshot local...',
+            'muted'
+        );
+        showLoading(
+            isPublish ? 'Atualizando e publicando aplicação screenshot...' : 'Atualizando aplicação screenshot...',
+            isPublish
+                ? 'Gerando snapshot estático, copiando os artefatos e executando git add/commit/push.'
+                : 'Gerando snapshot estático e copiando os artefatos para a Vite app.'
+        );
+
+        fetch('/api/export_static_snapshot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ publish_repo: isPublish })
+        })
+        .then(function(resp) {
+            return resp.json().then(function(data) {
+                return { ok: resp.ok, status: resp.status, data: data };
+            });
+        })
+        .then(function(result) {
+            if (!result.ok || !result.data || !result.data.ok) {
+                var errorMessage = (result.data && (result.data.error || result.data.message)) || ('Falha HTTP ' + result.status);
+                throw new Error(errorMessage);
+            }
+
+            var copied = result.data.copied_files || [];
+            var message = isPublish ? 'Snapshot sincronizado e publicado com sucesso' : 'Snapshot sincronizado com sucesso';
+            if (copied.length) {
+                message += ' (' + copied.length + ' arquivos).';
+            } else {
+                message += '.';
+            }
+            if (isPublish && result.data.publish_info && result.data.publish_info.commit_message) {
+                message += ' ' + result.data.publish_info.commit_message;
+            }
+            setExportScreenshotStatus(message, 'success');
+        })
+        .catch(function(error) {
+            console.error('Erro ao exportar snapshot para screenshot app:', error);
+            setExportScreenshotStatus('Falha ao atualizar a aplicação screenshot: ' + error.message, 'error');
+        })
+        .finally(function() {
+            btn.prop('disabled', false);
+            otherBtn.prop('disabled', false);
+            hideLoading(true);
+        });
     }
 
     function updateDashboard(mode) {
@@ -2673,6 +2755,9 @@
 
     // Inicia monitoramento ao carregar página
     $(document).ready(function() {
+        $('#btn-export-screenshot').on('click', function() { exportSnapshotToScreenshotApp(false); });
+        $('#btn-export-screenshot-publish').on('click', function() { exportSnapshotToScreenshotApp(true); });
+
         // Verifica status a cada 5 minutos (300000ms) ou ao salvar dados
         modelUpdateCheckInterval = setInterval(checkModelUpdateStatus, 300000);
         checkModelUpdateStatus();
