@@ -19,6 +19,9 @@ import unicodedata
 from datetime import datetime, timedelta
 import re
 from shapely.geometry import Point
+from shapely.geometry import mapping
+from shapely.geometry import shape
+from shapely.ops import unary_union
 
 # --- Orquestrador Regional ST-GAT ---
 try:
@@ -206,6 +209,8 @@ orchestrator = None
 efficiency_monitor = None
 health_monitor = None
 confidence_tracker = None
+
+_MICRONODE_POLYGON_CACHE = None
 
 # === REGISTRAR HEALTH MONITOR BLUEPRINT (antes de load_data_and_models) ===
 model_calibrator = None
@@ -784,6 +789,14 @@ def load_data_and_models():
     # Limpeza de eventos exógenos antigos
     archive_old_exogenous_events()
 
+    # --- ATUALIZAÇÃO OFICIAL DO ORCRIMS NO STARTUP ---
+    try:
+        from data.raw.inteligencia.import_orcrim_kml import refresh_orcrim_from_official
+        refresh_result = refresh_orcrim_from_official()
+        print(f"🧭 [ORCRIMS] Resultado do refresh no startup: {refresh_result}")
+    except Exception as e:
+        print(f"⚠️ [ORCRIMS] Falha ao atualizar ORCRIMS no startup: {e}")
+
     # --- ATUALIZAÇÃO DINÂMICA DE RUAS CRÍTICAS (CACHE GEO) ---
     try:
         from scripts.gerar_geo_ruas_criticas import generate_geo_streets_dynamic
@@ -958,6 +971,60 @@ def _classify_region(props: dict) -> str:
         return 'rmf'
     return 'interior'
 
+
+def _normalize_polygon_lookup_name(text: str) -> str:
+    return re.sub(r'\s+', ' ', normalize_name(text or '')).strip()
+
+
+def _load_micronode_polygon_cache():
+    global _MICRONODE_POLYGON_CACHE
+    if _MICRONODE_POLYGON_CACHE is not None:
+        return _MICRONODE_POLYGON_CACHE
+
+    polygon_path = os.path.join(app.root_path, 'data', 'raw', 'inteligencia', 'micronodos_faccoes_2026.geojson')
+    polygon_groups = {}
+    if not os.path.exists(polygon_path):
+        _MICRONODE_POLYGON_CACHE = {}
+        return _MICRONODE_POLYGON_CACHE
+
+    try:
+        with open(polygon_path, 'r', encoding='utf-8') as file_obj:
+            data = json.load(file_obj)
+
+        for feature in data.get('features', []):
+            geometry = feature.get('geometry') or {}
+            if geometry.get('type') not in ('Polygon', 'MultiPolygon'):
+                continue
+
+            properties = feature.get('properties') or {}
+            keys = {
+                _normalize_polygon_lookup_name(properties.get('area_oficial')),
+                _normalize_polygon_lookup_name(properties.get('micronodo')),
+                _normalize_polygon_lookup_name(properties.get('name')),
+            }
+            keys = {key for key in keys if key}
+            if not keys:
+                continue
+
+            geometry_obj = shape(geometry)
+            if geometry_obj.is_empty:
+                continue
+
+            for key in keys:
+                polygon_groups.setdefault(key, []).append(geometry_obj)
+
+        cache = {}
+        for key, geometries in polygon_groups.items():
+            merged = unary_union(geometries)
+            if not merged.is_empty:
+                cache[key] = mapping(merged)
+        _MICRONODE_POLYGON_CACHE = cache
+    except Exception as error:
+        print(f"⚠️ [Top Micronodes] Falha ao carregar cache de polígonos ORCRIMS: {error}")
+        _MICRONODE_POLYGON_CACHE = {}
+
+    return _MICRONODE_POLYGON_CACHE
+
 @app.route('/api/micronodes')
 def get_micronodes():
     path = os.path.join(app.root_path, 'data', 'raw', 'inteligencia', 'micronodos_faccoes_2026.geojson')
@@ -973,6 +1040,10 @@ def get_micronodes():
 @app.route('/api/top20_micro_nodes')
 def get_top20_micro_nodes():
     region = request.args.get('region', 'fortaleza').lower()
+    try:
+        limit = max(1, min(int(request.args.get('limit', 30)), 100))
+    except Exception:
+        limit = 30
     # Mapear regiao para o arquivo correspondente na pasta outputs
     filename_map = {
         'fortaleza': 'top20_micro_nodes_capital.geojson',
@@ -983,19 +1054,40 @@ def get_top20_micro_nodes():
     
     filename = filename_map.get(region, 'top20_micro_nodes_capital.geojson')
     path = os.path.join(app.root_path, 'outputs', filename)
+
+    def _decorate_top_features(payload):
+        polygon_cache = _load_micronode_polygon_cache()
+        features = payload.get('features', [])[:limit]
+        decorated = []
+        for feature in features:
+            props = dict(feature.get('properties') or {})
+            lookup_key = _normalize_polygon_lookup_name(props.get('name') or props.get('micronodo'))
+            polygon_geometry = polygon_cache.get(lookup_key)
+            if polygon_geometry:
+                feature['geometry'] = polygon_geometry
+                props['geometry_type'] = polygon_geometry.get('type', 'Polygon')
+                props['source_geometry_type'] = polygon_geometry.get('type', 'Polygon')
+                props['is_centroid'] = False
+            feature['properties'] = props
+            decorated.append(feature)
+        payload['features'] = decorated
+        return payload
     
     if os.path.exists(path):
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
             if isinstance(data, dict) and 'features' in data:
-                data['features'] = data['features'][:20]
+                data = _decorate_top_features(data)
             return jsonify(data)
     
     # Fallback se o regional nao existir
     fallback_path = os.path.join(app.root_path, 'outputs', 'top20_micro_nodes.geojson')
     if os.path.exists(fallback_path):
         with open(fallback_path, 'r', encoding='utf-8') as f:
-            return jsonify(json.load(f))
+            data = json.load(f)
+            if isinstance(data, dict) and 'features' in data:
+                data = _decorate_top_features(data)
+            return jsonify(data)
             
     return jsonify({"type": "FeatureCollection", "features": []})
 

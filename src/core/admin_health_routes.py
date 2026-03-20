@@ -306,6 +306,15 @@ def create_admin_health_blueprint(health_monitor, confidence_tracker, model_cali
         """
         try:
             base_dir = health_monitor.base_dir
+            orcrim_status = {}
+            try:
+                from data.raw.inteligencia.import_orcrim_kml import get_orcrim_update_status
+                orcrim_status = get_orcrim_update_status()
+            except Exception as import_error:
+                orcrim_status = {
+                    'status': 'unavailable',
+                    'last_error': str(import_error),
+                }
             
             # 1. Eventos históricos — do último registro de eficiência
             historical_events = 0
@@ -381,6 +390,18 @@ def create_admin_health_blueprint(health_monitor, confidence_tracker, model_cali
                 'regions_expected': len(regions_all),
                 'anomalies': anomalies,
                 'anomaly_details': anomaly_details,
+                'orcrim': {
+                    'status': orcrim_status.get('status', 'unknown'),
+                    'last_checked_at': orcrim_status.get('last_checked_at'),
+                    'last_updated_at': orcrim_status.get('last_updated_at'),
+                    'fallback_used': bool(orcrim_status.get('fallback_used', False)),
+                    'source_url': orcrim_status.get('source_url', ''),
+                    'last_error': orcrim_status.get('last_error', ''),
+                    'download_sha256': orcrim_status.get('download_sha256', ''),
+                    'working_kml': (orcrim_status.get('paths') or {}).get('kml_working'),
+                    'static_kml': (orcrim_status.get('paths') or {}).get('kml_static'),
+                    'intelligence_csv': (orcrim_status.get('paths') or {}).get('intelligence_csv'),
+                },
                 'timestamp': datetime.now().isoformat()
             }), 200
         except Exception as e:

@@ -234,9 +234,32 @@
         }
 
         /* Garante que mapa e sidebar tenham mesma altura em colunas lado a lado */
-        .rp-main-row { align-items: stretch; }
-        .rp-map-col, .rp-sidebar-col { display: flex; flex-direction: column; }
+        .rp-main-row {
+            align-items: stretch;
+            --bs-gutter-x: 0.75rem;
+        }
+        .rp-map-col, .rp-sidebar-col {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
         .rp-map-col > .card, .rp-sidebar-col > .card { flex: 1; }
+
+        /* No desktop, impede a quebra da sidebar para baixo do mapa. */
+        @media (min-width: 992px) {
+            .rp-main-row {
+                display: flex;
+                flex-wrap: nowrap;
+            }
+            .rp-map-col {
+                flex: 1 1 auto;
+                max-width: none;
+            }
+            .rp-sidebar-col {
+                flex: 0 0 clamp(290px, 20vw, 360px);
+                max-width: clamp(290px, 20vw, 360px);
+            }
+        }
     </style>
 </head>
 <body>
@@ -342,10 +365,10 @@
                 </div>
                 <div class="card-body sidebar-card-body" style="overflow-y: auto; flex: 1; padding: 12px; font-size: 0.9rem;">
                     <div id="window-info" class="mb-1" style="font-size: 0.8rem;">
-                        <small class="text-muted d-block">Janela Histórica: —</small>
-                        <small class="text-primary fw-bold" id="horizon-info">Horizonte: —</small>
-                        <small class="text-success d-block" id="validity-info">📅 Previsão válida até: —</small>
-                        <small class="text-secondary d-block" id="model-window-info">Modelo: —</small>
+                        <small class="text-muted d-block" id="base-historica-info">Base Histórica: 19/11/2025 → 19/03/2026 (120 dias)</small>
+                        <small class="text-primary fw-bold" id="horizon-info">Horizonte de Predição: 7 dias</small>
+                        <small class="text-success d-block" id="validity-info">📅 Janela de Inteligência: Projeção 7 dias (Tempo Real)</small>
+                        <small class="text-secondary d-block" id="model-window-info">Modelo: ST-GAT Elite v3 (Janela: 120d)</small>
                         
                         <!-- Indicador de Áreas Estáveis -->
                         <div class="alert alert-success mt-2 mb-2 p-2">
@@ -354,9 +377,9 @@
                                     <i class="fas fa-check-circle me-1"></i>
                                     <strong>Áreas Estáveis:</strong>
                                 </small>
-                                <span class="badge bg-success" id="stable-areas-count">-</span>
+                                <span class="badge bg-success" id="stable-areas-count">29</span>
                             </div>
-                            <small class="text-muted d-block" style="font-size: 0.75rem;">Baixa Tensão (&lt;50)</small>
+                            <small class="text-muted d-block" style="font-size: 0.75rem;">Baixa Tensão (&lt;30)</small>
                         </div>
                         
                         <div class="alert alert-info alert-sm mt-2 mb-2 p-2" id="ranking-info" style="display:none;">
@@ -496,7 +519,7 @@
                             <div class="form-check mt-2">
                                 <input class="form-check-input" type="checkbox" id="toggle-top20">
                                 <label class="form-check-label small fw-bold text-danger" for="toggle-top20">
-                                    <i class="fas fa-thumbtack"></i> Top 20 Micronodos (Elite P10)
+                                    <i class="fas fa-thumbtack"></i> Top 30 Micronodos (Elite P10)
                                 </label>
                             </div>
                             <div class="form-check mt-1">
@@ -556,6 +579,15 @@
         subdomains: 'abcd',
         maxZoom: 19
     }).addTo(map);
+
+    map.createPane('areaPolygonsPane');
+    map.getPane('areaPolygonsPane').style.zIndex = 410;
+
+    map.createPane('topMicronodesPane');
+    map.getPane('topMicronodesPane').style.zIndex = 640;
+
+    map.createPane('micronodesPane');
+    map.getPane('micronodesPane').style.zIndex = 650;
 
     // Global Map Click for Simulation (handling gaps between polygons)
     map.on('click', function(e) {
@@ -664,7 +696,7 @@
     var metaDataGlobal = null;
     var _effMetricsPrintedDate = null; // guard: print termômetro apenas 1x por data de avaliação
 
-    // Top20 micro-nodes layer
+    // Top30 micro-nodes layer
     var top20Layer = L.layerGroup();
     var top20LoadedRegion = null; // track which region is loaded into top20Layer
     var top20LoadingRequestId = 0; // track async requests to avoid race conditions
@@ -681,7 +713,10 @@
     function loadTop20(region, cb){
         // region optional: capital|rmf|interior
         var url = '/api/top20_micro_nodes';
-        if (region) url += '?region=' + region;
+        var query = [];
+        if (region) query.push('region=' + encodeURIComponent(region));
+        query.push('limit=30');
+        if (query.length) url += '?' + query.join('&');
         console.log('[Top20] Loading', url);
         
         // Increment request ID to handle race conditions
@@ -689,7 +724,7 @@
         var currentRequestId = top20LoadingRequestId;
         
         fetch(url).then(function(resp){
-            if (!resp.ok) throw new Error('Não foi possível carregar Top20: ' + resp.status);
+            if (!resp.ok) throw new Error('Não foi possível carregar Top30: ' + resp.status);
             return resp.json();
         }).then(function(data){
             try{
@@ -702,104 +737,112 @@
                 top20Layer.clearLayers();
                 var features = data.features || data;
                 console.log('[Top20] Received features:', (features && features.length) || 0);
-                var skippedPolygons = 0;
-                var markersAdded = 0;
-                
-                features.forEach(function(f, i){
-                    try{
-                        // Only render actual Point geometries as markers.
-                        // Prefer the real geometry.type when present; fallback to properties.geometry_type for older files.
-                        var geomType = (f.geometry && f.geometry.type) || (f.properties && f.properties.geometry_type) || '';
-                        if (geomType){
-                            if (String(geomType).toLowerCase() !== 'point'){
-                                skippedPolygons += 1; // not a point - skip
-                                return;
-                            }
-                        } else {
-                            // No geometry info at all - skip to be safe
-                            skippedPolygons += 1;
-                            return;
-                        }
-
-                        var lon = f.geometry.coordinates[0];
-                        var lat = f.geometry.coordinates[1];
-                        var rank = f.properties.rank || 0;
+                var builtLayer = L.geoJson({ type: 'FeatureCollection', features: features }, {
+                    pane: 'topMicronodesPane',
+                    style: function(feature) {
+                        var rank = (feature.properties && feature.properties.rank) || 0;
                         var color = colorByRankSimple(rank);
-                        var icon = makePinSimple(color);
-                        var m = L.marker([lat, lon], {icon: icon});
-                        var displayName = (f.properties && (f.properties.name || f.properties.nome)) || 'Área';
-                        var cleanName = displayName.toUpperCase().replace(/\s+/g, ' ').trim();
-                        
-                        // Mapeamento do nome do arquivo para facção amigável
-                        var faccaoMap = {
-                            'COMANDO VERMELHO.geojson': 'Comando Vermelho',
-                            'TERCEIRO COMANDO PURO.geojson': 'Terceiro Comando Puro',
-                            'MASSA.geojson': 'Massa',
-                            'PRIMEIRO COMANDO DA CAPITAL.geojson': 'Primeiro Comando da Capital',
-                            'COMUNIDADES EM DISPUTA.geojson': 'Comunidades em Disputa',
-                            'OKAIDA.geojson': 'Okaida',
-                            'TERRITÓRIOS FANTASMAS.geojson': 'Territórios Fantasmas',
+                        return {
+                            color: color,
+                            weight: rank <= 3 ? 2.4 : 1.8,
+                            opacity: 0.95,
+                            fillColor: color,
+                            fillOpacity: rank <= 3 ? 0.30 : 0.18
                         };
-                        var faccao = faccaoMap[f.properties.source] || (f.properties.faction || 'Não identificado');
-                        
-                        // Popup dinâmico que carrega dados adicionais
-                        var popupContent = '<div id="popup-' + rank + '" style="width:300px; padding:8px;">' +
-                                          '<div style="text-align:center; margin-bottom:8px;"><strong>' + rank + '. ' + displayName + '</strong></div>' +
-                                          '<div style="font-size:0.85rem;"><b>Facção:</b> ' + faccao + '</div>' +
-                                          '<div style="font-size:0.85rem; margin-bottom:8px;"><b>Tensão:</b> ' + (f.properties.score ? Math.round(f.properties.score * 100) + '%' : 'N/A') + '</div>' +
-                                          '<div id="streets-' + rank + '" style="font-size:0.8rem; color:#888;">Carregando...</div>' +
-                                          '</div>';
-                        
-                        m.bindPopup(popupContent);
-                        
-                        // Fetch dinâmico de ruas críticas quando popup é aberto
-                        m.on('popupopen', function() {
-                            var streetsDiv = document.getElementById('streets-' + rank);
-                            if (streetsDiv && streetsDiv.textContent === 'Carregando...') {
-                                fetch('/api/territory?name=' + encodeURIComponent(cleanName))
-                                    .then(r => r.json())
-                                    .then(data => {
-                                        if (data && data.metrics && data.metrics.critical_streets) {
-                                            var streets = data.metrics.critical_streets;
-                                            var validStreets = [];
-                                            
-                                            if (Array.isArray(streets)) {
-                                                // Filtrar "AREA SEM NOME" e strings vazias
-                                                validStreets = streets.filter(s => {
-                                                    var cleaned = String(s).trim().toUpperCase();
-                                                    return cleaned !== 'AREA SEM NOME' && cleaned !== '';
-                                                });
-                                            } else if (typeof streets === 'string') {
-                                                var cleaned = streets.trim().toUpperCase();
-                                                if (cleaned !== 'AREA SEM NOME' && cleaned !== '' && cleaned !== 'SEM LOGRADOUROS CRÍTICOS RECENTES') {
-                                                    validStreets = [streets];
+                    },
+                    pointToLayer: function(feature, latlng) {
+                        var rank = (feature.properties && feature.properties.rank) || 0;
+                        var color = colorByRankSimple(rank);
+                        return L.marker(latlng, {icon: makePinSimple(color)});
+                    },
+                    onEachFeature: function(f, layer) {
+                        try {
+                            var rank = f.properties.rank || 0;
+                            var displayName = (f.properties && (f.properties.name || f.properties.nome)) || 'Área';
+                            var cleanName = displayName.toUpperCase().replace(/\s+/g, ' ').trim();
+                            var faccaoMap = {
+                                'COMANDO VERMELHO.geojson': 'Comando Vermelho',
+                                'TERCEIRO COMANDO PURO.geojson': 'Terceiro Comando Puro',
+                                'MASSA.geojson': 'Massa',
+                                'PRIMEIRO COMANDO DA CAPITAL.geojson': 'Primeiro Comando da Capital',
+                                'COMUNIDADES EM DISPUTA.geojson': 'Comunidades em Disputa',
+                                'OKAIDA.geojson': 'Okaida',
+                                'TERRITÓRIOS FANTASMAS.geojson': 'Territórios Fantasmas',
+                            };
+                            var faccao = faccaoMap[f.properties.source] || (f.properties.faction || 'Não identificado');
+                            var scoreRaw = f.properties.score;
+                            var scoreText = scoreRaw !== undefined && scoreRaw !== null ? Math.round(scoreRaw * 100) + '%' : 'N/A';
+                            var popupContent = '<div id="popup-' + rank + '" style="width:300px; padding:8px;">' +
+                                              '<div style="text-align:center; margin-bottom:8px;"><strong>' + rank + '. ' + displayName + '</strong></div>' +
+                                              '<div style="font-size:0.85rem;"><b>Facção:</b> ' + faccao + '</div>' +
+                                              '<div style="font-size:0.85rem;"><b>Município:</b> ' + (f.properties.municipality || 'N/A') + '</div>' +
+                                              '<div style="font-size:0.85rem; margin-bottom:8px;"><b>Tensão:</b> ' + scoreText + '</div>' +
+                                              '<div id="streets-' + rank + '" style="font-size:0.8rem; color:#888;">Carregando...</div>' +
+                                              '</div>';
+                            layer.bindPopup(popupContent);
+
+                            if (layer.setStyle) {
+                                var baseStyle = {
+                                    weight: rank <= 3 ? 2.4 : 1.8,
+                                    fillOpacity: rank <= 3 ? 0.30 : 0.18
+                                };
+                                layer.on('mouseover', function() {
+                                    layer.setStyle({ weight: baseStyle.weight + 0.8, fillOpacity: Math.min(baseStyle.fillOpacity + 0.12, 0.5) });
+                                    if (layer.bringToFront) layer.bringToFront();
+                                });
+                                layer.on('mouseout', function() {
+                                    layer.setStyle(baseStyle);
+                                });
+                            }
+
+                            layer.on('popupopen', function() {
+                                var streetsDiv = document.getElementById('streets-' + rank);
+                                if (streetsDiv && streetsDiv.textContent === 'Carregando...') {
+                                    fetch('/api/territory?name=' + encodeURIComponent(cleanName))
+                                        .then(r => r.json())
+                                        .then(data => {
+                                            if (data && data.metrics && data.metrics.critical_streets) {
+                                                var streets = data.metrics.critical_streets;
+                                                var validStreets = [];
+                                                if (Array.isArray(streets)) {
+                                                    validStreets = streets.filter(function(s) {
+                                                        var cleaned = String(s).trim().toUpperCase();
+                                                        return cleaned !== 'AREA SEM NOME' && cleaned !== '';
+                                                    });
+                                                } else if (typeof streets === 'string') {
+                                                    var cleaned = streets.trim().toUpperCase();
+                                                    if (cleaned !== 'AREA SEM NOME' && cleaned !== '' && cleaned !== 'SEM LOGRADOUROS CRÍTICOS RECENTES') {
+                                                        validStreets = [streets];
+                                                    }
+                                                }
+                                                if (validStreets.length === 0) {
+                                                    streetsDiv.innerHTML = '<span style="font-size:0.8rem; color:#999;">Sem registros de logradouros específicos</span>';
+                                                } else {
+                                                    var streetsHtml = '<b>🛣️ Logradouros Críticos:</b><ul style="margin:4px 0; padding-left:16px;">';
+                                                    validStreets.slice(0, 8).forEach(function(s) {
+                                                        streetsHtml += '<li style="font-size:0.75rem;">' + s + '</li>';
+                                                    });
+                                                    streetsHtml += '</ul>';
+                                                    streetsDiv.innerHTML = streetsHtml;
                                                 }
                                             }
-                                            
-                                            // Se não houver ruas válidas, mostrar mensagem
-                                            if (validStreets.length === 0) {
-                                                streetsDiv.innerHTML = '<span style="font-size:0.8rem; color:#999;">Sem registros de logradouros específicos</span>';
-                                            } else {
-                                                var streetsHtml = '<b>🛣️ Logradouros Críticos:</b><ul style="margin:4px 0; padding-left:16px;">';
-                                                validStreets.slice(0, 8).forEach(s => {
-                                                    streetsHtml += '<li style="font-size:0.75rem;">' + s + '</li>';
-                                                });
-                                                streetsHtml += '</ul>';
-                                                if (streetsDiv) streetsDiv.innerHTML = streetsHtml;
-                                            }
-                                        }
-                                    })
-                                    .catch(err => {
-                                        if (streetsDiv) streetsDiv.innerHTML = '<b>🛣️ Logradouros:</b> Indisponíveis';
-                                    });
-                            }
-                        });
-                        top20Layer.addLayer(m);
-                        markersAdded++;
-                    }catch(e){ console.warn('[Top20] feature error', e, f); }
+                                        })
+                                        .catch(function() {
+                                            if (streetsDiv) streetsDiv.innerHTML = '<b>🛣️ Logradouros:</b> Indisponíveis';
+                                        });
+                                }
+                            });
+                        } catch (e) {
+                            console.warn('[Top20] feature error', e, f);
+                        }
+                    }
                 });
-                
-                console.log('[Top20] Built markers:', markersAdded, ' skippedPolygons:', skippedPolygons);
+
+                builtLayer.eachLayer(function(layer) {
+                    top20Layer.addLayer(layer);
+                });
+
+                console.log('[Top20] Built layers:', top20Layer.getLayers().length);
                 top20LoadedRegion = region || 'all';
                 
                 // Ensure layer is added to map if checkbox is checked
@@ -932,31 +975,29 @@
     }
 
     function updateDashboard(mode) {
-        // Mode is always CVLI - CVP is only a prediction criterion
+        // Mode is always CVLI
         mode = 'CVLI';
         
-        // Update Window Info via Backend Meta
-        var startDate = metaDataGlobal.start_cvli || '—';
-        var lastBaseDate = metaDataGlobal.last_date_base || '—';
-        var days = metaDataGlobal.window_cvli || '—';
-        var intelLabel = metaDataGlobal.intelligence_label || 'Janela de Inteligência: Ativa';
+        // Update Window Info via Backend Meta - Apenas se existirem dados válidos
+        if (metaDataGlobal && metaDataGlobal.start_cvli) {
+            var startDate = metaDataGlobal.start_cvli;
+            var lastBaseDate = metaDataGlobal.last_date_base || '—';
+            var days = metaDataGlobal.window_cvli || '120';
+            var dateText = formatDate(startDate) + ' → ' + formatDate(lastBaseDate);
+            $('#base-historica-info').text('Base Histórica: ' + dateText + ' (' + days + ' dias)');
+        }
 
-        var dateText = formatDate(startDate) + ' → ' + lastBaseDate;
-        $('#window-info small.text-muted').text('Base Histórica: ' + dateText + ' (' + days + ' dias)');
-
+        // Horizonte e Inteligência são fixos para o modelo Elite
         $('#horizon-info').text('Horizonte de Predição: 7 dias');
-        $('#validity-info').html('<i class="fas fa-brain"></i> ' + intelLabel);
+        if (metaDataGlobal && metaDataGlobal.intelligence_label) {
+            $('#validity-info').html('<i class="fas fa-brain"></i> ' + metaDataGlobal.intelligence_label);
+        }
 
-        // Show model's internal window and architecture (from backend meta)
+        // Show model's internal window and architecture
         try {
-            var modelArch = metaDataGlobal && metaDataGlobal.model_architecture;
-            var modelWindow = metaDataGlobal && metaDataGlobal.model_window_cvli;
-            
-            if (modelArch) {
-                $('#model-window-info').html('Modelo: <strong>' + modelArch + '</strong> (Janela: ' + (modelWindow || 30) + 'd)');
-            } else {
-                $('#model-window-info').text('Modelo: —');
-            }
+            var modelArch = (metaDataGlobal && metaDataGlobal.model_architecture) || 'ST-GAT Elite v3';
+            var modelWindow = (metaDataGlobal && metaDataGlobal.model_window_cvli) || 120;
+            $('#model-window-info').html('Modelo: <strong>' + modelArch + '</strong> (Janela: ' + modelWindow + 'd)');
             
             // Mostra informações de ranking se disponível
             if (metaDataGlobal && metaDataGlobal.ranking_info) {
@@ -1256,6 +1297,7 @@
 
             // Recriar a camada GeoJSON com os novos dados
             geojsonLayer = L.geoJson(geojson, {
+                pane: 'areaPolygonsPane',
                 style: style,
                 pointToLayer: function(feature, latlng) {
                     var featureStyle = style(feature);
@@ -1419,6 +1461,7 @@
 
         // Initialize Map
         geojsonLayer = L.geoJson(geojson, {
+            pane: 'areaPolygonsPane',
             style: style,
             onEachFeature: function(feature, layer) {
                 // Hover effects for better UX
@@ -2333,8 +2376,8 @@
     $('#region-filter').on('change', function() {
         var val = $(this).val();
         
-        // Padronizado para Top 20 para todas as regiões conforme solicitação
-        var labelText = 'Top 20 Micronodos (Elite P10)';
+        // Padronizado para Top 30 para todas as regiões conforme solicitação
+        var labelText = 'Top 30 Micronodos (Elite P10)';
         $('label[for="toggle-top20"]').html('<i class="fas fa-thumbtack"></i> ' + labelText);
         
         applyRegionFilter(val);
@@ -2365,8 +2408,19 @@
             .then(resp => resp.json())
             .then(data => {
                 micronodesLayer.clearLayers();
-                // Adiciona cada feature individualmente ao layerGroup para permitir filtragem
-                L.geoJson(data, {
+                // Materializa cada micronodo como camada individual para permitir filtragem por região.
+                var builtLayer = L.geoJson(data, {
+                    pane: 'micronodesPane',
+                    style: function(feature) {
+                        var color = getFactionColor(feature.properties.faction);
+                        return {
+                            color: color,
+                            weight: 1.2,
+                            opacity: 0.95,
+                            fillColor: color,
+                            fillOpacity: 0.22
+                        };
+                    },
                     pointToLayer: function(feature, latlng) {
                         var color = getFactionColor(feature.properties.faction);
                         return L.circleMarker(latlng, {
@@ -2384,9 +2438,24 @@
                                     '<b>Local:</b> ' + (props.area_oficial || props.area) + '<br/>' +
                                     '<b>Região:</b> ' + (props.region || '—') + '<br/>' +
                                     '<b>Facção:</b> <span style="color:' + getFactionColor(props.faction) + '">' + props.faction + '</span>';
+                        if (layer.setStyle) {
+                            layer.on('mouseover', function() {
+                                layer.setStyle({ weight: 2.2, fillOpacity: 0.35 });
+                                if (layer.bringToFront) layer.bringToFront();
+                            });
+                            layer.on('mouseout', function() {
+                                layer.setStyle({ weight: 1.2, fillOpacity: 0.22 });
+                            });
+                        }
                         layer.bindPopup(popup);
                     }
-                }).addTo(micronodesLayer);
+                });
+
+                builtLayer.eachLayer(function(layer) {
+                    micronodesLayer.addLayer(layer);
+                });
+
+                console.log('[Micronodes] Camadas carregadas:', micronodesLayer.getLayers().length);
 
                 if ($('#toggle-micronodes-kml').is(':checked')) {
                     map.addLayer(micronodesLayer);
@@ -2428,7 +2497,7 @@
         }
     });
 
-    // Toggle Top20 micro-nodes
+    // Toggle Top30 micro-nodes
     $('#toggle-top20').on('change', function(){
         var checked = $(this).prop('checked');
         var region = $('#region-filter').val();
@@ -2442,7 +2511,7 @@
         }
     });
 
-    // Expose function to refresh Top20 (useful after model updates)
+    // Expose function to refresh Top30 (useful after model updates)
     function refreshTop20(){
         var region = $('#region-filter').val();
         if ($('#toggle-top20').prop('checked')){
@@ -2502,7 +2571,7 @@
             });
         }
         
-        // Carrega os Top20/50 micronodes para a região selecionada
+        // Carrega os Top30 micronodes para a região selecionada
         // Isso garante que os micronodes sejam pré-carregados ao trocar de região,
         // mesmo se o checkbox não estiver marcado no momento
         updateTop20ForRegion(regionFilter);

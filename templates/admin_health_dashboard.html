@@ -572,6 +572,16 @@
                     <div class="card-title">Janela Operacional</div>
                     <div class="metric-value" id="validation-window">--</div>
                 </div>
+                <div class="card">
+                    <div class="card-title">ORCRIMS Status</div>
+                    <div class="metric-value" id="orcrim-status" style="font-size:20px;">--</div>
+                    <div class="metric-label" id="orcrim-detail">aguardando leitura</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">ORCRIMS Última Atualização</div>
+                    <div class="metric-value" id="orcrim-updated-at" style="font-size:20px;">--</div>
+                    <div class="metric-label" id="orcrim-check-at">sem verificação registrada</div>
+                </div>
                 <div class="card" style="cursor:pointer;" onclick="toggleAnomalyDetails()" title="Clique para ver detalhes">
                     <div class="card-title">Anomalias Detectadas <span style="font-size:11px; color:#94a3b8;">(CRITICAL/HIGH)</span></div>
                     <div class="metric-value" id="anomalies" style="color:#ef4444;">--</div>
@@ -652,6 +662,7 @@
             try {
                 const response = await fetch('/api/admin/health/data-quality', { cache: 'no-store' });
                 const data = await response.json();
+                const orcrim = data.orcrim || {};
                 
                 document.getElementById('historical-events').textContent =
                     data.assigned_total_events !== undefined
@@ -671,6 +682,29 @@
                 document.getElementById('anomalies').textContent = count;
                 // Cor do card conforme severidade
                 document.getElementById('anomalies').style.color = count > 0 ? '#ef4444' : '#10b981';
+
+                const orcrimStatusMap = {
+                    updated: { label: 'Atualizado', color: '#10b981' },
+                    no_change: { label: 'Sem mudança', color: '#60a5fa' },
+                    fallback_restored: { label: 'Fallback ativo', color: '#f59e0b' },
+                    download_failed: { label: 'Falha download', color: '#ef4444' },
+                    no_official_link_found: { label: 'Sem link oficial', color: '#f97316' },
+                    manual_import: { label: 'Importação manual', color: '#a78bfa' },
+                    unavailable: { label: 'Indisponível', color: '#ef4444' },
+                    unknown: { label: 'Desconhecido', color: '#94a3b8' },
+                };
+                const orcrimStatus = orcrimStatusMap[orcrim.status] || orcrimStatusMap.unknown;
+                document.getElementById('orcrim-status').textContent = orcrimStatus.label;
+                document.getElementById('orcrim-status').style.color = orcrimStatus.color;
+
+                const workingKml = orcrim.working_kml || {};
+                const fallbackLabel = orcrim.fallback_used ? ' | fallback da última base válida aplicado' : '';
+                document.getElementById('orcrim-detail').textContent = orcrim.last_error
+                    ? `${orcrim.last_error}${fallbackLabel}`
+                    : `${workingKml.modified_at || 'sem KML local'}${fallbackLabel}`;
+
+                document.getElementById('orcrim-updated-at').textContent = formatAdminDate(orcrim.last_updated_at);
+                document.getElementById('orcrim-check-at').textContent = `checado: ${formatAdminDate(orcrim.last_checked_at)}`;
 
                 // Renderizar painel de detalhes
                 const list = document.getElementById('anomaly-details-list');
@@ -701,6 +735,17 @@
             } catch (error) {
                 console.error('Erro ao carregar qualidade de dados:', error);
             }
+        }
+
+        function formatAdminDate(value) {
+            if (!value) {
+                return '--';
+            }
+            const parsed = new Date(value);
+            if (Number.isNaN(parsed.getTime())) {
+                return value;
+            }
+            return parsed.toLocaleString('pt-BR');
         }
 
         function toggleAnomalyDetails() {

@@ -1834,6 +1834,214 @@
           "JANGURUSSU"
         ]
       },
+      "resolved": true,
+      "resolved_at": "2026-03-19T09:32:28.649412",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T09:32:31.674222",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: JANGURUSSU, PLANALTO AYRTON SENNA, MESSEJANA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "JANGURUSSU",
+          "PLANALTO AYRTON SENNA",
+          "MESSEJANA",
+          "SIQUEIRA",
+          "GRANJA LISBOA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T09:47:16.479959",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T09:32:32.041989",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=37.5% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.375,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T09:47:16.479959",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T09:47:16.733652",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: PLANALTO AYRTON SENNA, GRANJA LISBOA, JANGURUSSU",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "PLANALTO AYRTON SENNA",
+          "GRANJA LISBOA",
+          "JANGURUSSU",
+          "MESSEJANA",
+          "SIQUEIRA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T10:17:18.207587",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T10:17:18.918974",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: PLANALTO AYRTON SENNA, GRANJA LISBOA, JANGURUSSU",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "PLANALTO AYRTON SENNA",
+          "GRANJA LISBOA",
+          "JANGURUSSU",
+          "MESSEJANA",
+          "SIQUEIRA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T19:32:40.939182",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T19:32:46.009443",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: JANGURUSSU, PLANALTO AYRTON SENNA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "JANGURUSSU",
+          "PLANALTO AYRTON SENNA",
+          "GRANJA LISBOA",
+          "SIQUEIRA",
+          "MESSEJANA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T19:35:23.335095",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T19:35:23.699286",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, PLANALTO AYRTON SENNA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU",
+          "GRANJA LISBOA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T20:05:24.801921",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T20:05:25.026269",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, PLANALTO AYRTON SENNA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU",
+          "GRANJA LISBOA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T20:35:26.567093",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T20:35:27.492758",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, PLANALTO AYRTON SENNA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU",
+          "GRANJA LISBOA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T21:05:29.824520",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T21:05:29.990362",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, PLANALTO AYRTON SENNA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU",
+          "GRANJA LISBOA"
+        ]
+      },
       "resolved": false
     }
   ]
