@@ -65,47 +65,39 @@ def sync_google_sheets(csv_url: str, exogenous_file_path: str):
             logger.warning("Could not import process_exogenous_text. Will use fallback logic.")
         
         for r in data_rows:
-            # Need at least up to column 6, pad with empty if missing
             row = r + [''] * (7 - len(r))
             
             ev_id = row[0].strip()
             if not ev_id or ev_id in existing_ids:
-                continue # Skip empty or already imported
+                continue
                 
             iso_time = row[1].strip()
-            natureza = row[2].strip()
-            municipio = row[3].strip()
-            bairro = row[4].strip()
+            # Coluna F (index 5) contém o texto compilado:
+            # "NATUREZA - RELATO - BAIRRO - MUNICIPIO - HORARIO"
             descricao = row[5].strip()
+            if not descricao:
+                # Fallback: tenta juntar colunas C-F caso descricao esteja vazia
+                descricao = ' - '.join(c.strip() for c in row[2:6] if c.strip())
             
-            # Debug: log what we got from CSV
-            logger.info(f"CSV row [{ev_id[:8]}]: natureza='{natureza}' municipio='{municipio}' bairro='{bairro}' descricao='{descricao[:50]}'")
+            logger.info(f"CSV row [{ev_id[:8]}]: descricao='{descricao[:80]}'")
             
-            # Use LLM only for severity classification, not for extracting structured fields
+            # LLM extrai natureza, bairro, municipio e severity do texto compilado
+            natureza = ""
+            municipio = ""
+            bairro = ""
             severity = "LOW"
+            
             if process_exogenous_text and descricao:
                 try:
-                    text_for_severity = f"Natureza: {natureza}\nMunicípio: {municipio}\nBairro: {bairro}\nRelato: {descricao}"
-                    parsed_items = process_exogenous_text(text_for_severity)
+                    parsed_items = process_exogenous_text(descricao)
                     if parsed_items and len(parsed_items) > 0:
-                        severity = parsed_items[0].get('conflict_severity', 'LOW')
-                        # Only fill empty fields from LLM if CSV had them empty
-                        if not bairro:
-                            bairro = parsed_items[0].get('bairro', '')
-                        if not municipio:
-                            municipio = parsed_items[0].get('municipio', '')
-                        if not natureza:
-                            natureza = parsed_items[0].get('natureza', '') or 'OUTROS'
+                        p = parsed_items[0]
+                        severity = p.get('conflict_severity', 'LOW')
+                        natureza = p.get('natureza', '')
+                        municipio = p.get('municipio', '')
+                        bairro = p.get('bairro', '')
                 except Exception as e:
-                    logger.warning(f"Failed to get severity via LLM for id {ev_id}: {e}")
-            
-            # Try to extract bairro from description if still empty
-            if not bairro and descricao:
-                import re
-                # Pattern: (BAIRRO NAME) — common in CIOPS format
-                paren_match = re.search(r'\(([A-ZÀ-Ú\s]{3,})\)', descricao)
-                if paren_match:
-                    bairro = paren_match.group(1).strip()
+                    logger.warning(f"LLM parse failed for id {ev_id}: {e}")
 
             # Format time
             try:
@@ -122,11 +114,11 @@ def sync_google_sheets(csv_url: str, exogenous_file_path: str):
                 "conflict_severity": severity,
                 "descricao": descricao,
                 "is_suppression": False,
-                "localizacao_completa": f"{bairro}, {municipio} - {descricao[:40]}..." if bairro and municipio else descricao[:60],
+                "localizacao_completa": descricao[:80],
                 "municipio": municipio.upper() if municipio else "",
                 "natureza": natureza.upper() if natureza else "OUTROS",
                 "raw_text": descricao,
-                "resumo": f"{natureza.upper()} em {bairro or municipio or 'local'}" if natureza else descricao[:40],
+                "resumo": descricao[:60],
                 "sexo": "",
                 "timestamp": short_time,
                 "ingested_at": now_str,
