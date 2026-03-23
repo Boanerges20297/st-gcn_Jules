@@ -724,7 +724,7 @@ def load_data_and_models():
     for path in sorted(_glob.glob(os.path.join(BASE_DIR, "data", "processed", "processed_*.pkl"))):
         reg = os.path.basename(path).replace('processed_', '').replace('.pkl', '')
         # Ignorar arquivo legado global (gerado com numpy 2.x incompatível); os três regionais o substituem
-        if reg == 'graph_data_global':
+        if reg in ['graph_data_global', 'graph_data']:
             continue
         if os.path.exists(path):
             try:

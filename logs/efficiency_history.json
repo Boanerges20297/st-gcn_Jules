@@ -1,216 +1,5 @@
 [
   {
-    "date": "2026-03-09",
-    "total_events": 55,
-    "brute_cvli": 9,
-    "exogenous": 46,
-    "global": {
-      "total_nodes": 78,
-      "active_locations": 77,
-      "total_events": 98,
-      "p5": 0.0649,
-      "precision5": 1.0,
-      "hits5": [
-        "BARROSO",
-        "IGUATU",
-        "ITAPAJE",
-        "HORIZONTE",
-        "ANCURI"
-      ],
-      "p10": 0.1299,
-      "precision10": 1.0,
-      "hits10": [
-        "BARROSO",
-        "IGUATU",
-        "ITAPAJE",
-        "HORIZONTE",
-        "ANCURI",
-        "PICI",
-        "ANTONIO BEZERRA",
-        "DOM LUSTOSA",
-        "EDSON QUEIROZ",
-        "JANGURUSSU"
-      ],
-      "p20": 0.2597,
-      "precision20": 1.0,
-      "hits20": [
-        "BARROSO",
-        "IGUATU",
-        "ITAPAJE",
-        "HORIZONTE",
-        "ANCURI",
-        "PICI",
-        "ANTONIO BEZERRA",
-        "DOM LUSTOSA",
-        "EDSON QUEIROZ",
-        "JANGURUSSU",
-        "CAJAZEIRAS",
-        "MESSEJANA",
-        "PARQUE SANTA MARIA",
-        "CONJUNTO PALMEIRAS",
-        "PASSARE",
-        "JARDIM DAS OLIVEIRAS",
-        "BONSUCESSO",
-        "PARQUE DOIS IRMAOS",
-        "BARRA DO CEARA",
-        "GRANJA PORTUGAL"
-      ]
-    },
-    "fortaleza": {
-      "total_nodes": 40,
-      "active_locations": 40,
-      "total_events": 52,
-      "p5": 0.125,
-      "precision5": 1.0,
-      "hits5": [
-        "BARROSO",
-        "ANCURI",
-        "PICI",
-        "ANTONIO BEZERRA",
-        "DOM LUSTOSA"
-      ],
-      "p10": 0.25,
-      "precision10": 1.0,
-      "hits10": [
-        "BARROSO",
-        "ANCURI",
-        "PICI",
-        "ANTONIO BEZERRA",
-        "DOM LUSTOSA",
-        "EDSON QUEIROZ",
-        "JANGURUSSU",
-        "CAJAZEIRAS",
-        "MESSEJANA",
-        "PARQUE SANTA MARIA"
-      ],
-      "p20": 0.5,
-      "precision20": 1.0,
-      "hits20": [
-        "BARROSO",
-        "ANCURI",
-        "PICI",
-        "ANTONIO BEZERRA",
-        "DOM LUSTOSA",
-        "EDSON QUEIROZ",
-        "JANGURUSSU",
-        "CAJAZEIRAS",
-        "MESSEJANA",
-        "PARQUE SANTA MARIA",
-        "CONJUNTO PALMEIRAS",
-        "PASSARE",
-        "JARDIM DAS OLIVEIRAS",
-        "BONSUCESSO",
-        "PARQUE DOIS IRMAOS",
-        "BARRA DO CEARA",
-        "GRANJA PORTUGAL",
-        "CARLITO PAMPLONA",
-        "QUINTINO CUNHA",
-        "VILA VELHA"
-      ]
-    },
-    "rmf": {
-      "total_nodes": 18,
-      "active_locations": 18,
-      "total_events": 27,
-      "p5": 0.2778,
-      "precision5": 1.0,
-      "hits5": [
-        "HORIZONTE",
-        "CAUCAIA",
-        "MARACANAU",
-        "AQUIRAZ",
-        "CASCAVEL"
-      ],
-      "p10": 0.5556,
-      "precision10": 1.0,
-      "hits10": [
-        "HORIZONTE",
-        "CAUCAIA",
-        "MARACANAU",
-        "AQUIRAZ",
-        "CASCAVEL",
-        "CHOROZINHO",
-        "EUSEBIO",
-        "GUAIUBA",
-        "ITAITINGA",
-        "MARANGUAPE"
-      ],
-      "p20": 1.0,
-      "precision20": 1.0,
-      "hits20": [
-        "HORIZONTE",
-        "CAUCAIA",
-        "MARACANAU",
-        "AQUIRAZ",
-        "CASCAVEL",
-        "CHOROZINHO",
-        "EUSEBIO",
-        "GUAIUBA",
-        "ITAITINGA",
-        "MARANGUAPE",
-        "PACAJUS",
-        "PACATUBA",
-        "PARACURU",
-        "PINDORETAMA",
-        "SAO GONCALO DO AMARANTE",
-        "SAO LUIS DO CURU",
-        "TRAIRI",
-        "BEBERIBE"
-      ]
-    },
-    "interior": {
-      "total_nodes": 20,
-      "active_locations": 19,
-      "total_events": 19,
-      "p5": 0.2632,
-      "precision5": 1.0,
-      "hits5": [
-        "IGUATU",
-        "ITAPAJE",
-        "ITAPIUNA",
-        "ARATUBA",
-        "TIANGUA"
-      ],
-      "p10": 0.5263,
-      "precision10": 1.0,
-      "hits10": [
-        "IGUATU",
-        "ITAPAJE",
-        "ITAPIUNA",
-        "ARATUBA",
-        "TIANGUA",
-        "GROAIRAS",
-        "NOVA OLINDA",
-        "JIJOCA DE JERICOACOARA",
-        "ALTO SANTO",
-        "MULUNGU"
-      ],
-      "p20": 1.0,
-      "precision20": 0.95,
-      "hits20": [
-        "IGUATU",
-        "ITAPAJE",
-        "ITAPIUNA",
-        "ARATUBA",
-        "TIANGUA",
-        "GROAIRAS",
-        "NOVA OLINDA",
-        "JIJOCA DE JERICOACOARA",
-        "ALTO SANTO",
-        "MULUNGU",
-        "VICOSA DO CEARA",
-        "URUBURETAMA",
-        "LIMOEIRO DO NORTE",
-        "CAPISTRANO",
-        "BATURITE",
-        "SOBRAL",
-        "SOLONOPOLE",
-        "CARIRE",
-        "JUAZEIRO DO NORTE"
-      ]
-    }
-  },
-  {
     "date": "2026-03-12",
     "total_events": 39,
     "brute_cvli": 10,
@@ -2554,6 +2343,245 @@
         "ITAPAJE",
         "IGUATU",
         "AURORA"
+      ]
+    }
+  },
+  {
+    "date": "2026-03-23",
+    "total_events": 39,
+    "brute_cvli": 30,
+    "exogenous": 9,
+    "exogenous_conflict": 9,
+    "police_qualified_actions_7d": 10,
+    "police_administrative_events_7d": 19,
+    "assigned_total_events": 36,
+    "unmapped_total_events": 3,
+    "assigned_brute_cvli": 30,
+    "assigned_exogenous": 6,
+    "unmapped_exogenous": 3,
+    "assigned_police_qualified_actions": 7,
+    "unmapped_police_qualified_actions": 3,
+    "unmapped_exogenous_sample": [
+      "Parangaba",
+      "NOVA CIGANA",
+      "PLANALTO AYRTON  SENNA"
+    ],
+    "global": {
+      "total_nodes": 109,
+      "active_locations": 19,
+      "total_events": 36,
+      "ranking_top10": [
+        "CAUCAIA",
+        "ITAPAJE",
+        "IGUATU",
+        "BARROSO",
+        "MARACANAU",
+        "JUAZEIRO DO NORTE",
+        "GROAIRAS",
+        "CARIRE",
+        "IRACEMA",
+        "SOBRAL"
+      ],
+      "gt_sample": [
+        "SIQUEIRA",
+        "BARROSO",
+        "BOM JARDIM",
+        "ANTONIO BEZERRA",
+        "ANCURI",
+        "CAUCAIA",
+        "SAO LUIS DO CURU",
+        "IGUATU",
+        "ITAPAJE",
+        "CARIRE",
+        "VARZEA ALEGRE",
+        "OROS",
+        "IRACEMA",
+        "AURORA",
+        "CRATO"
+      ],
+      "p5": 0.8,
+      "recall5": 0.2105,
+      "hits5": [
+        "CAUCAIA",
+        "ITAPAJE",
+        "IGUATU",
+        "BARROSO"
+      ],
+      "p10": 0.6,
+      "recall10": 0.3158,
+      "hits10": [
+        "CAUCAIA",
+        "ITAPAJE",
+        "IGUATU",
+        "BARROSO",
+        "CARIRE",
+        "IRACEMA"
+      ],
+      "p20": 0.6,
+      "recall20": 0.6316,
+      "hits20": [
+        "CAUCAIA",
+        "ITAPAJE",
+        "IGUATU",
+        "BARROSO",
+        "CARIRE",
+        "IRACEMA",
+        "ANTONIO BEZERRA",
+        "SIQUEIRA",
+        "BOM JARDIM",
+        "ANCURI",
+        "VARZEA ALEGRE",
+        "CRATO"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 40,
+      "active_locations": 9,
+      "total_events": 21,
+      "ranking_top10": [
+        "BARROSO",
+        "ANTONIO BEZERRA",
+        "SIQUEIRA",
+        "BOM JARDIM",
+        "ANCURI",
+        "MESSEJANA",
+        "CURIO",
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "NOVO MONDUBIM"
+      ],
+      "gt_sample": [
+        "SIQUEIRA",
+        "BARROSO",
+        "BOM JARDIM",
+        "ANTONIO BEZERRA",
+        "ANCURI",
+        "PASSARE",
+        "CURIO",
+        "PADRE ANDRADE",
+        "VICENTE PINZON"
+      ],
+      "p5": 1.0,
+      "recall5": 0.5556,
+      "hits5": [
+        "BARROSO",
+        "ANTONIO BEZERRA",
+        "SIQUEIRA",
+        "BOM JARDIM",
+        "ANCURI"
+      ],
+      "p10": 0.6,
+      "recall10": 0.6667,
+      "hits10": [
+        "BARROSO",
+        "ANTONIO BEZERRA",
+        "SIQUEIRA",
+        "BOM JARDIM",
+        "ANCURI",
+        "CURIO"
+      ],
+      "p20": 0.4,
+      "recall20": 0.8889,
+      "hits20": [
+        "BARROSO",
+        "ANTONIO BEZERRA",
+        "SIQUEIRA",
+        "BOM JARDIM",
+        "ANCURI",
+        "CURIO",
+        "PASSARE",
+        "PADRE ANDRADE"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 19,
+      "active_locations": 2,
+      "total_events": 6,
+      "ranking_top10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "SAO LUIS DO CURU",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "ITAITINGA",
+        "PARAIPABA",
+        "EUSEBIO"
+      ],
+      "gt_sample": [
+        "CAUCAIA",
+        "SAO LUIS DO CURU"
+      ],
+      "p5": 0.4,
+      "recall5": 1.0,
+      "hits5": [
+        "CAUCAIA",
+        "SAO LUIS DO CURU"
+      ],
+      "p10": 0.2,
+      "recall10": 1.0,
+      "hits10": [
+        "CAUCAIA",
+        "SAO LUIS DO CURU"
+      ],
+      "p20": 0.1053,
+      "recall20": 1.0,
+      "hits20": [
+        "CAUCAIA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "interior": {
+      "total_nodes": 50,
+      "active_locations": 8,
+      "total_events": 9,
+      "ranking_top10": [
+        "ITAPAJE",
+        "IGUATU",
+        "JUAZEIRO DO NORTE",
+        "GROAIRAS",
+        "CARIRE",
+        "IRACEMA",
+        "SOBRAL",
+        "LIMOEIRO DO NORTE",
+        "TIANGUA",
+        "ARATUBA"
+      ],
+      "gt_sample": [
+        "IGUATU",
+        "ITAPAJE",
+        "CARIRE",
+        "VARZEA ALEGRE",
+        "OROS",
+        "IRACEMA",
+        "AURORA",
+        "CRATO"
+      ],
+      "p5": 0.6,
+      "recall5": 0.375,
+      "hits5": [
+        "ITAPAJE",
+        "IGUATU",
+        "CARIRE"
+      ],
+      "p10": 0.4,
+      "recall10": 0.5,
+      "hits10": [
+        "ITAPAJE",
+        "IGUATU",
+        "CARIRE",
+        "IRACEMA"
+      ],
+      "p20": 0.3,
+      "recall20": 0.75,
+      "hits20": [
+        "ITAPAJE",
+        "IGUATU",
+        "CARIRE",
+        "IRACEMA",
+        "VARZEA ALEGRE",
+        "CRATO"
       ]
     }
   }
