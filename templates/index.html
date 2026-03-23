@@ -393,8 +393,8 @@
                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exogenousModal">
                             <i class="fas fa-file-import"></i> Inserir Eventos (CIOPS)
                         </button>
-                        <button class="btn btn-outline-success btn-sm" id="btn-export-screenshot" title="Exportar snapshot estático e sincronizar com a aplicação screenshot">
-                            <i class="fas fa-cloud-upload-alt"></i> Atualizar App Screenshot
+                        <button class="btn btn-outline-info btn-sm" id="btn-sync-sheets" title="Importar eventos exógenos registrados na planilha Google Sheets">
+                            <i class="fas fa-table"></i> Importar Eventos (Sheets)
                         </button>
                         <button class="btn btn-success btn-sm" id="btn-export-screenshot-publish" title="Exportar snapshot, sincronizar e publicar no repositório screenshot">
                             <i class="fas fa-upload"></i> Atualizar e Publicar Git
@@ -992,6 +992,35 @@
         else if (tone === 'error') el.addClass('text-danger');
         else el.addClass('text-muted');
         el.text(message).show();
+    }
+
+    function syncSheetsEvents() {
+        var btn = $('#btn-sync-sheets');
+        var originalHtml = btn.html();
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Importando...');
+        setExportScreenshotStatus('Buscando eventos na planilha Google Sheets...', 'muted');
+
+        fetch('/api/exogenous/sync-sheets', { method: 'POST' })
+            .then(function(resp) { return resp.json(); })
+            .then(function(data) {
+                if (data.status === 'success') {
+                    var msg = data.imported > 0
+                        ? '✅ ' + data.imported + ' evento(s) importado(s) com sucesso!'
+                        : '✅ Nenhum evento novo encontrado na planilha.';
+                    setExportScreenshotStatus(msg, 'success');
+                    // Reload anomaly status to reflect new events
+                    if (typeof loadAnomalyStatus === 'function') loadAnomalyStatus();
+                } else {
+                    setExportScreenshotStatus('❌ Erro: ' + (data.message || 'Falha na importação'), 'error');
+                }
+            })
+            .catch(function(err) {
+                console.error('Erro ao sincronizar Google Sheets:', err);
+                setExportScreenshotStatus('❌ Falha na comunicação: ' + err.message, 'error');
+            })
+            .finally(function() {
+                btn.prop('disabled', false).html(originalHtml);
+            });
     }
 
     function exportSnapshotToScreenshotApp(publishRepo) {
@@ -2755,7 +2784,7 @@
 
     // Inicia monitoramento ao carregar página
     $(document).ready(function() {
-        $('#btn-export-screenshot').on('click', function() { exportSnapshotToScreenshotApp(false); });
+        $('#btn-sync-sheets').on('click', function() { syncSheetsEvents(); });
         $('#btn-export-screenshot-publish').on('click', function() { exportSnapshotToScreenshotApp(true); });
 
         // Verifica status a cada 5 minutos (300000ms) ou ao salvar dados
@@ -2769,7 +2798,51 @@
         // NOVO: Inicia Radar Report Preview (Anomalias)
         loadAnomalyStatus();
         setInterval(loadAnomalyStatus, 60000); // Atualiza a cada 1 min
+        
+        // NOVO: Verifica eventos pendentes na planilha Google Sheets a cada 30 min
+        checkPendingSheetEvents();
+        setInterval(checkPendingSheetEvents, 1800000); // 30 minutos
     });
+
+    function checkPendingSheetEvents() {
+        fetch('/api/exogenous/pending-count')
+            .then(function(resp) { return resp.json(); })
+            .then(function(data) {
+                var btn = $('#btn-sync-sheets');
+                // Remove existing badge
+                btn.find('.pending-badge').remove();
+                
+                if (data.pending > 0) {
+                    // Add badge to button
+                    btn.append(' <span class="badge bg-danger pending-badge" style="font-size:0.7rem;">' + data.pending + '</span>');
+                    
+                    // Show toast notification
+                    var toastHtml = '<div id="sheets-toast" class="alert alert-warning alert-dismissible fade show" ' +
+                        'style="position:fixed; bottom:20px; right:20px; z-index:9999; min-width:320px; ' +
+                        'box-shadow:0 4px 16px rgba(0,0,0,0.3); border-radius:8px;" role="alert">' +
+                        '<i class="fas fa-table me-2"></i>' +
+                        '<strong>' + data.pending + ' evento(s) pendente(s)</strong> na planilha Google Sheets não importado(s).' +
+                        '<br><small class="text-muted">Total na planilha: ' + data.total_sheet + ' | Importados: ' + data.total_local + '</small>' +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                        '</div>';
+                    
+                    // Remove previous toast if exists
+                    $('#sheets-toast').remove();
+                    $('body').append(toastHtml);
+                    
+                    // Auto-dismiss after 15 seconds
+                    setTimeout(function() { $('#sheets-toast').fadeOut(500, function() { $(this).remove(); }); }, 15000);
+                    
+                    console.log('[Sheets] ' + data.pending + ' evento(s) pendente(s) detectado(s).');
+                } else {
+                    console.log('[Sheets] Nenhum evento pendente.');
+                }
+            })
+            .catch(function(err) {
+                console.warn('[Sheets] Erro ao verificar pendentes:', err);
+            });
+    }
+
 
     // Para o monitoramento ao sair da página
     $(window).on('beforeunload', function() {

@@ -1834,7 +1834,7 @@ def _sync_static_snapshot_to_screenshot_app(target_data_dir: str):
     }
 
 
-def _publish_screenshot_repo(repo_dir: str) -> Dict[str, Any]:
+def _publish_screenshot_repo(repo_dir: str) -> dict[str, any]:
     logging.info('[SCREENSHOT EXPORT] Iniciando publicação git do repositório screenshot')
     status_result = _run_git_command(repo_dir, ['status', '--porcelain'])
     if status_result.returncode != 0:
@@ -2559,7 +2559,74 @@ def get_exogenous_events_list():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/exogenous/sync-sheets', methods=['POST'])
+def sync_exogenous_from_sheets():
+    """Sync exogenous events from Google Sheets CSV URL"""
+    try:
+        from src.google_sheets_sync import sync_google_sheets
+        from dotenv import load_dotenv
+        load_dotenv()
+        
+        csv_url = os.environ.get("GOOGLE_SHEETS_CSV_URL")
+        payload = request.get_json(silent=True) or {}
+        if not csv_url:
+             csv_url = payload.get("csv_url")
+             
+        if not csv_url:
+            return jsonify({"status": "error", "message": "GOOGLE_SHEETS_CSV_URL não configurada no .env e não enviada no payload."}), 400
+            
+        exogenous_path = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
+        result = sync_google_sheets(csv_url, exogenous_path)
+        
+        return jsonify(result), 200 if result.get("status") == "success" else 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/exogenous/pending-count')
+def get_pending_exogenous_count():
+    """Check how many new events in Google Sheets haven't been imported yet."""
+    try:
+        import csv as csv_mod
+        from io import StringIO
+        from dotenv import load_dotenv
+        load_dotenv()
+        
+        csv_url = os.environ.get("GOOGLE_SHEETS_CSV_URL")
+        if not csv_url:
+            return jsonify({"pending": 0, "total_sheet": 0, "total_local": 0}), 200
+        
+        resp = requests.get(csv_url, timeout=10)
+        resp.encoding = 'utf-8'
+        resp.raise_for_status()
+        
+        reader = csv_mod.reader(StringIO(resp.text))
+        rows = list(reader)
+        sheet_ids = set()
+        for r in rows[1:]:
+            if r and r[0].strip():
+                sheet_ids.add(r[0].strip())
+        
+        exogenous_path = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
+        local_ids = set()
+        if os.path.exists(exogenous_path):
+            with open(exogenous_path, 'r', encoding='utf-8') as f:
+                try:
+                    events = json.load(f)
+                    local_ids = {ev.get("id") for ev in events if ev.get("id")}
+                except json.JSONDecodeError:
+                    pass
+        
+        pending = len(sheet_ids - local_ids)
+        return jsonify({
+            "pending": pending,
+            "total_sheet": len(sheet_ids),
+            "total_local": len(local_ids),
+        }), 200
+    except Exception as e:
+        return jsonify({"pending": 0, "error": str(e)}), 200
+
 @app.route('/api/efficiency-latest')
+
 def get_efficiency_latest():
     """Retorna as métricas mais recentes do monitor de eficiência."""
     try:
