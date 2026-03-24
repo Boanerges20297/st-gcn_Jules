@@ -595,7 +595,8 @@
             $('#count-critical').text(critical);
             $('#count-high').text(high);
             
-            const p10 = eff.global ? (eff.global.p20 * 100).toFixed(1) + '%' : 'N/A';
+            const effRegion = eff[currentRegion] || eff.global;
+            const p10 = effRegion && effRegion.p20 !== undefined ? (effRegion.p20 * 100).toFixed(1) + '%' : 'N/A';
             $('#p10-global').text(p10);
             
             const activeEvents = eff.global ? eff.global.total_events : 0;

@@ -1153,8 +1153,14 @@ def get_risk():
                             exogenous_shocks[loc_norm] = {
                                 'conflict_intensity': 0.0,
                                 'suppression_intensity': 0.0,
-                                'is_critical': False
+                                'is_critical': False,
+                                'events_count': 0,
+                                'event_types': set()
                             }
+                        
+                        exogenous_shocks[loc_norm]['events_count'] += 1
+                        if ev_type:
+                            exogenous_shocks[loc_norm]['event_types'].add(ev_type)
                         
                         # Acumula as intensidades de forma independente
                         if is_supp:
@@ -1165,6 +1171,7 @@ def get_risk():
                                 exogenous_shocks[loc_norm]['is_critical'] = True
                 except: continue
 
+            exogenous_shocks_map = exogenous_shocks
             if not exogenous_shocks:
                 exogenous_shocks = None
         except Exception as e:
@@ -1326,12 +1333,16 @@ def get_risk():
                 # Se ainda não encontrou, usar fallback
                 if critical_streets_info is None:
                     critical_streets_info = 'Sem logradouros críticos recentes'
+                
+                events_info = (exogenous_shocks_map or {}).get(name_norm, {}) if 'exogenous_shocks_map' in locals() else {}
+                ev_count = events_info.get('events_count', 0)
+                ev_types = list(events_info.get('event_types', set()))
 
                 node_metrics = {
                     'cvli_7d': 0,
                     'tension': round(float(row.get('tension_index', 0)), 2),
-                    'events_count': 0,
-                    'event_types': [],
+                    'events_count': ev_count,
+                    'event_types': ev_types[:3],
                     'critical_streets': critical_streets_info,
                     'spatial_influence': score >= 80
                 }
@@ -1341,7 +1352,7 @@ def get_risk():
                 if current_spec:
                     try:
                         local_idx = next(idx for idx, r in current_spec['data']['nodes_gdf'].iterrows() if normalize_name(r['name']) == name_norm)
-                        node_metrics['cvli_7d'] = int(current_spec['data']['node_features'][local_idx, -7:, 0].sum())
+                        node_metrics['cvli_7d'] = int(current_spec['data']['node_features'][local_idx, -14:, 0].sum())
                     except: pass
 
                 all_scores.append(score)
@@ -1527,14 +1538,17 @@ def get_risk():
                 meta['model_architecture'] = "Deep ST-GAT Elite (Regionalizado)"
                 meta['model_window_cvli'] = 120 # Nova janela de 120 dias para todos
                 
-                # Incluir Eficiência Recente do Monitor
-                if efficiency_monitor:
-                    meta['efficiency_metrics'] = efficiency_monitor.get_latest_metrics()
             else:
                 meta['intelligence_label'] = "Janela de Inteligência: Projeção 7 dias (Tempo Real)"
                 meta['last_date_base'] = 'N/A'
                 meta['model_architecture'] = "ST-GAT Elite v3"
                 meta['model_window_cvli'] = 120
+                
+            # Adicionar métricas de eficiência separadamente para que frontend (Cov@20) não fique com N/A
+            if 'efficiency_monitor' in globals() and efficiency_monitor:
+                _latest_metrics = efficiency_monitor.get_latest_metrics()
+                if _latest_metrics:
+                    meta['efficiency_metrics'] = _latest_metrics
         except Exception as e:
             print(f"Erro ao calcular datas de inteligência: {e}")
             meta['intelligence_label'] = "Janela de Inteligência: Ativa"
