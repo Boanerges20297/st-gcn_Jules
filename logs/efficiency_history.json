@@ -2348,16 +2348,16 @@
   },
   {
     "date": "2026-03-23",
-    "total_events": 39,
+    "total_events": 40,
     "brute_cvli": 30,
-    "exogenous": 9,
-    "exogenous_conflict": 9,
+    "exogenous": 10,
+    "exogenous_conflict": 10,
     "police_qualified_actions_7d": 10,
     "police_administrative_events_7d": 19,
-    "assigned_total_events": 36,
+    "assigned_total_events": 37,
     "unmapped_total_events": 3,
     "assigned_brute_cvli": 30,
-    "assigned_exogenous": 6,
+    "assigned_exogenous": 7,
     "unmapped_exogenous": 3,
     "assigned_police_qualified_actions": 7,
     "unmapped_police_qualified_actions": 3,
@@ -2369,7 +2369,7 @@
     "global": {
       "total_nodes": 109,
       "active_locations": 19,
-      "total_events": 36,
+      "total_events": 37,
       "ranking_top10": [
         "CAUCAIA",
         "ITAPAJE",
@@ -2377,10 +2377,10 @@
         "BARROSO",
         "MARACANAU",
         "JUAZEIRO DO NORTE",
+        "ANTONIO BEZERRA",
         "GROAIRAS",
-        "CARIRE",
-        "IRACEMA",
-        "SOBRAL"
+        "SIQUEIRA",
+        "CARIRE"
       ],
       "gt_sample": [
         "SIQUEIRA",
@@ -2407,48 +2407,47 @@
         "IGUATU",
         "BARROSO"
       ],
-      "p10": 0.6,
-      "recall10": 0.3158,
+      "p10": 0.7,
+      "recall10": 0.3684,
       "hits10": [
         "CAUCAIA",
         "ITAPAJE",
         "IGUATU",
         "BARROSO",
-        "CARIRE",
-        "IRACEMA"
+        "ANTONIO BEZERRA",
+        "SIQUEIRA",
+        "CARIRE"
       ],
-      "p20": 0.6,
-      "recall20": 0.6316,
+      "p20": 0.5,
+      "recall20": 0.5263,
       "hits20": [
         "CAUCAIA",
         "ITAPAJE",
         "IGUATU",
         "BARROSO",
-        "CARIRE",
-        "IRACEMA",
         "ANTONIO BEZERRA",
         "SIQUEIRA",
+        "CARIRE",
         "BOM JARDIM",
-        "ANCURI",
-        "VARZEA ALEGRE",
-        "CRATO"
+        "IRACEMA",
+        "ANCURI"
       ]
     },
     "fortaleza": {
       "total_nodes": 40,
       "active_locations": 9,
-      "total_events": 21,
+      "total_events": 22,
       "ranking_top10": [
         "BARROSO",
         "ANTONIO BEZERRA",
         "SIQUEIRA",
         "BOM JARDIM",
+        "BARRA DO CEARA",
         "ANCURI",
         "MESSEJANA",
         "CURIO",
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "NOVO MONDUBIM"
+        "NOVO MONDUBIM",
+        "PARQUE IRACEMA"
       ],
       "gt_sample": [
         "SIQUEIRA",
@@ -2461,14 +2460,13 @@
         "PADRE ANDRADE",
         "VICENTE PINZON"
       ],
-      "p5": 1.0,
-      "recall5": 0.5556,
+      "p5": 0.8,
+      "recall5": 0.4444,
       "hits5": [
         "BARROSO",
         "ANTONIO BEZERRA",
         "SIQUEIRA",
-        "BOM JARDIM",
-        "ANCURI"
+        "BOM JARDIM"
       ],
       "p10": 0.6,
       "recall10": 0.6667,
@@ -2489,8 +2487,8 @@
         "BOM JARDIM",
         "ANCURI",
         "CURIO",
-        "PASSARE",
-        "PADRE ANDRADE"
+        "PADRE ANDRADE",
+        "PASSARE"
       ]
     },
     "rmf": {
