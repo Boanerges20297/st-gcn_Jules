@@ -1875,6 +1875,10 @@ def _publish_screenshot_repo(repo_dir: str) -> dict[str, any]:
         if 'nothing to commit' not in combined_output.lower():
             raise RuntimeError(f'Falha no git commit: {combined_output}')
 
+    pull_result = _run_git_command(repo_dir, ['pull', '--rebase', '-X', 'theirs', 'origin', 'main'])
+    if pull_result.returncode != 0:
+        logging.warning(f'[SCREENSHOT EXPORT] Alerta no git pull: {pull_result.stderr.strip() or pull_result.stdout.strip()}')
+
     push_result = _run_git_command(repo_dir, ['push', 'origin', 'main'])
     if push_result.returncode != 0:
         raise RuntimeError(f'Falha no git push: {push_result.stderr.strip() or push_result.stdout.strip()}')
