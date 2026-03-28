@@ -72,6 +72,7 @@ class StateOrchestrator:
         }
         
         self._window_state_path = os.path.join(self.root, 'data', 'window_state.json')
+        self.dates = None
         self._initialize_models()
         self._restore_window_state()
 
@@ -183,6 +184,8 @@ class StateOrchestrator:
                     model.load_state_dict(state_dict, strict=False)
                     model.eval()
                     self.specialists[region] = {'model': model, 'data': data, 'window': cfg['window'], 'channels': cfg['in_channels']}
+                    if self.dates is None:
+                        self.dates = data.get('dates')
                     print(f"✅ Orquestrador: Especialista {region.upper()} carregado ({cfg['in_channels']} Canais).")
                 except Exception as e:
                     print(f"❌ Erro ao carregar {region}: {e}")

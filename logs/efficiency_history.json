@@ -2158,6 +2158,7 @@
     }
   },
   {
+<<<<<<< HEAD
     "date": "2026-03-24",
     "total_events": 42,
     "brute_cvli": 30,
@@ -2175,12 +2176,34 @@
     "unmapped_exogenous_sample": [
       "Parangaba",
       "NOVA CIGANA",
+=======
+    "date": "2026-03-25",
+    "total_events": 35,
+    "brute_cvli": 29,
+    "exogenous": 6,
+    "exogenous_conflict": 6,
+    "police_qualified_actions_7d": 10,
+    "police_administrative_events_7d": 11,
+    "assigned_total_events": 34,
+    "unmapped_total_events": 1,
+    "assigned_brute_cvli": 29,
+    "assigned_exogenous": 5,
+    "unmapped_exogenous": 1,
+    "assigned_police_qualified_actions": 7,
+    "unmapped_police_qualified_actions": 3,
+    "unmapped_exogenous_sample": [
+>>>>>>> 1c8590440cd2e88b9305a5cd506e3f410949aa9c
       "PLANALTO AYRTON  SENNA"
     ],
     "global": {
       "total_nodes": 109,
+<<<<<<< HEAD
       "active_locations": 19,
       "total_events": 39,
+=======
+      "active_locations": 18,
+      "total_events": 34,
+>>>>>>> 1c8590440cd2e88b9305a5cd506e3f410949aa9c
       "ranking_top10": [
         "ITAPAJE",
         "CAUCAIA",
@@ -2208,6 +2231,7 @@
         "OROS",
         "IRACEMA",
         "AURORA",
+<<<<<<< HEAD
         "CRATO"
       ],
       "p5": 0.8,
@@ -2449,6 +2473,12 @@
       ],
       "p5": 0.8,
       "recall5": 0.2105,
+=======
+        "CURIO"
+      ],
+      "p5": 0.8,
+      "recall5": 0.2222,
+>>>>>>> 1c8590440cd2e88b9305a5cd506e3f410949aa9c
       "hits5": [
         "ITAPAJE",
         "CAUCAIA",
@@ -2456,7 +2486,11 @@
         "IGUATU"
       ],
       "p10": 0.7,
+<<<<<<< HEAD
       "recall10": 0.3684,
+=======
+      "recall10": 0.3889,
+>>>>>>> 1c8590440cd2e88b9305a5cd506e3f410949aa9c
       "hits10": [
         "ITAPAJE",
         "CAUCAIA",
@@ -2467,7 +2501,11 @@
         "BOM JARDIM"
       ],
       "p20": 0.5,
+<<<<<<< HEAD
       "recall20": 0.5263,
+=======
+      "recall20": 0.5556,
+>>>>>>> 1c8590440cd2e88b9305a5cd506e3f410949aa9c
       "hits20": [
         "ITAPAJE",
         "CAUCAIA",
@@ -2484,7 +2522,11 @@
     "fortaleza": {
       "total_nodes": 40,
       "active_locations": 9,
+<<<<<<< HEAD
       "total_events": 21,
+=======
+      "total_events": 20,
+>>>>>>> 1c8590440cd2e88b9305a5cd506e3f410949aa9c
       "ranking_top10": [
         "BARROSO",
         "ANTONIO BEZERRA",
@@ -2580,16 +2622,27 @@
     },
     "interior": {
       "total_nodes": 50,
+<<<<<<< HEAD
       "active_locations": 8,
       "total_events": 9,
+=======
+      "active_locations": 7,
+      "total_events": 8,
+>>>>>>> 1c8590440cd2e88b9305a5cd506e3f410949aa9c
       "ranking_top10": [
         "ITAPAJE",
         "IGUATU",
         "GROAIRAS",
         "TIANGUA",
+<<<<<<< HEAD
         "LIMOEIRO DO NORTE",
         "SOBRAL",
         "CARIRE",
+=======
+        "SOBRAL",
+        "CARIRE",
+        "LIMOEIRO DO NORTE",
+>>>>>>> 1c8590440cd2e88b9305a5cd506e3f410949aa9c
         "IRACEMA",
         "CAPISTRANO",
         "GRACA"
@@ -2601,31 +2654,282 @@
         "VARZEA ALEGRE",
         "OROS",
         "IRACEMA",
+<<<<<<< HEAD
         "AURORA",
         "CRATO"
       ],
       "p5": 0.4,
       "recall5": 0.25,
+=======
+        "AURORA"
+      ],
+      "p5": 0.4,
+      "recall5": 0.2857,
+>>>>>>> 1c8590440cd2e88b9305a5cd506e3f410949aa9c
       "hits5": [
         "ITAPAJE",
         "IGUATU"
       ],
       "p10": 0.4,
+<<<<<<< HEAD
       "recall10": 0.5,
+=======
+      "recall10": 0.5714,
+>>>>>>> 1c8590440cd2e88b9305a5cd506e3f410949aa9c
       "hits10": [
         "ITAPAJE",
         "IGUATU",
         "CARIRE",
         "IRACEMA"
       ],
+<<<<<<< HEAD
       "p20": 0.25,
       "recall20": 0.625,
+=======
+      "p20": 0.2,
+      "recall20": 0.5714,
+>>>>>>> 1c8590440cd2e88b9305a5cd506e3f410949aa9c
       "hits20": [
         "ITAPAJE",
         "IGUATU",
         "CARIRE",
+<<<<<<< HEAD
         "IRACEMA",
         "CRATO"
+=======
+        "IRACEMA"
+      ]
+    }
+  },
+  {
+    "date": "2026-03-27",
+    "total_events": 37,
+    "brute_cvli": 29,
+    "exogenous": 8,
+    "exogenous_conflict": 8,
+    "police_qualified_actions_7d": 21,
+    "police_administrative_events_7d": 11,
+    "assigned_total_events": 34,
+    "unmapped_total_events": 3,
+    "assigned_brute_cvli": 29,
+    "assigned_exogenous": 5,
+    "unmapped_exogenous": 3,
+    "assigned_police_qualified_actions": 12,
+    "unmapped_police_qualified_actions": 9,
+    "unmapped_exogenous_sample": [
+      "PLANALTO AYRTON  SENNA",
+      "Jardim Cearense",
+      "Catuana"
+    ],
+    "global": {
+      "total_nodes": 109,
+      "active_locations": 18,
+      "total_events": 34,
+      "ranking_top10": [
+        "ITAPAJE",
+        "CAUCAIA",
+        "MARACANAU",
+        "BARROSO",
+        "IGUATU",
+        "ANTONIO BEZERRA",
+        "GROAIRAS",
+        "SIQUEIRA",
+        "BOM JARDIM",
+        "TIANGUA"
+      ],
+      "gt_sample": [
+        "SIQUEIRA",
+        "BARROSO",
+        "BOM JARDIM",
+        "ANTONIO BEZERRA",
+        "ANCURI",
+        "CAUCAIA",
+        "SAO LUIS DO CURU",
+        "IGUATU",
+        "ITAPAJE",
+        "CARIRE",
+        "VARZEA ALEGRE",
+        "OROS",
+        "IRACEMA",
+        "AURORA",
+        "PADRE ANDRADE"
+      ],
+      "p5": 0.8,
+      "recall5": 0.2222,
+      "hits5": [
+        "ITAPAJE",
+        "CAUCAIA",
+        "BARROSO",
+        "IGUATU"
+      ],
+      "p10": 0.7,
+      "recall10": 0.3889,
+      "hits10": [
+        "ITAPAJE",
+        "CAUCAIA",
+        "BARROSO",
+        "IGUATU",
+        "ANTONIO BEZERRA",
+        "SIQUEIRA",
+        "BOM JARDIM"
+      ],
+      "p20": 0.5,
+      "recall20": 0.5556,
+      "hits20": [
+        "ITAPAJE",
+        "CAUCAIA",
+        "BARROSO",
+        "IGUATU",
+        "ANTONIO BEZERRA",
+        "SIQUEIRA",
+        "BOM JARDIM",
+        "ANCURI",
+        "CARIRE",
+        "IRACEMA"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 40,
+      "active_locations": 9,
+      "total_events": 21,
+      "ranking_top10": [
+        "BARROSO",
+        "ANTONIO BEZERRA",
+        "SIQUEIRA",
+        "BOM JARDIM",
+        "BARRA DO CEARA",
+        "ANCURI",
+        "MESSEJANA",
+        "CURIO",
+        "NOVO MONDUBIM",
+        "PARQUE IRACEMA"
+      ],
+      "gt_sample": [
+        "SIQUEIRA",
+        "BARROSO",
+        "BOM JARDIM",
+        "ANTONIO BEZERRA",
+        "ANCURI",
+        "PADRE ANDRADE",
+        "VICENTE PINZON",
+        "PASSARE",
+        "EDSON QUEIROZ"
+      ],
+      "p5": 0.8,
+      "recall5": 0.4444,
+      "hits5": [
+        "BARROSO",
+        "ANTONIO BEZERRA",
+        "SIQUEIRA",
+        "BOM JARDIM"
+      ],
+      "p10": 0.5,
+      "recall10": 0.5556,
+      "hits10": [
+        "BARROSO",
+        "ANTONIO BEZERRA",
+        "SIQUEIRA",
+        "BOM JARDIM",
+        "ANCURI"
+      ],
+      "p20": 0.35,
+      "recall20": 0.7778,
+      "hits20": [
+        "BARROSO",
+        "ANTONIO BEZERRA",
+        "SIQUEIRA",
+        "BOM JARDIM",
+        "ANCURI",
+        "PADRE ANDRADE",
+        "PASSARE"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 19,
+      "active_locations": 2,
+      "total_events": 5,
+      "ranking_top10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "SAO LUIS DO CURU",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "ITAITINGA",
+        "PARAIPABA",
+        "EUSEBIO"
+      ],
+      "gt_sample": [
+        "CAUCAIA",
+        "SAO LUIS DO CURU"
+      ],
+      "p5": 0.4,
+      "recall5": 1.0,
+      "hits5": [
+        "CAUCAIA",
+        "SAO LUIS DO CURU"
+      ],
+      "p10": 0.2,
+      "recall10": 1.0,
+      "hits10": [
+        "CAUCAIA",
+        "SAO LUIS DO CURU"
+      ],
+      "p20": 0.1053,
+      "recall20": 1.0,
+      "hits20": [
+        "CAUCAIA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "interior": {
+      "total_nodes": 50,
+      "active_locations": 7,
+      "total_events": 8,
+      "ranking_top10": [
+        "ITAPAJE",
+        "IGUATU",
+        "GROAIRAS",
+        "TIANGUA",
+        "SOBRAL",
+        "CARIRE",
+        "LIMOEIRO DO NORTE",
+        "IRACEMA",
+        "CAPISTRANO",
+        "GRACA"
+      ],
+      "gt_sample": [
+        "IGUATU",
+        "ITAPAJE",
+        "CARIRE",
+        "VARZEA ALEGRE",
+        "OROS",
+        "IRACEMA",
+        "AURORA"
+      ],
+      "p5": 0.4,
+      "recall5": 0.2857,
+      "hits5": [
+        "ITAPAJE",
+        "IGUATU"
+      ],
+      "p10": 0.4,
+      "recall10": 0.5714,
+      "hits10": [
+        "ITAPAJE",
+        "IGUATU",
+        "CARIRE",
+        "IRACEMA"
+      ],
+      "p20": 0.2,
+      "recall20": 0.5714,
+      "hits20": [
+        "ITAPAJE",
+        "IGUATU",
+        "CARIRE",
+        "IRACEMA"
+>>>>>>> 1c8590440cd2e88b9305a5cd506e3f410949aa9c
       ]
     }
   }

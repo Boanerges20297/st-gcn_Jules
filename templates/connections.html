@@ -595,11 +595,28 @@
             $('#count-critical').text(critical);
             $('#count-high').text(high);
             
+<<<<<<< HEAD
             const effRegion = eff[currentRegion] || eff.global;
             const p10 = effRegion && effRegion.p20 !== undefined ? (effRegion.p20 * 100).toFixed(1) + '%' : 'N/A';
             $('#p10-global').text(p10);
+=======
+            // Prioriza métrica da região selecionada, fallback para global
+            const regEff = eff[currentRegion] || eff.global;
+>>>>>>> 1c8590440cd2e88b9305a5cd506e3f410949aa9c
             
-            const activeEvents = eff.global ? eff.global.total_events : 0;
+            // Cobertura Territorial (Cov@20): Usa recall20 (Recall) ou p20 (Precision) se disponível
+            let covValue = 'Calculando...';
+            if (regEff) {
+                const val = (regEff.recall20 !== undefined) ? regEff.recall20 : regEff.p20;
+                if (val !== undefined) {
+                    covValue = (val * 100).toFixed(1) + '%';
+                }
+            } else {
+                covValue = 'N/A';
+            }
+            $('#p10-global').text(covValue);
+            
+            const activeEvents = regEff ? (regEff.total_events || 0) : 0;
             $('#active-events').text(activeEvents);
         }
 

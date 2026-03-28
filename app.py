@@ -1848,23 +1848,25 @@ def _sync_static_snapshot_to_screenshot_app(target_data_dir: str):
     }
 
 
-def _publish_screenshot_repo(repo_dir: str) -> dict[str, any]:
+def _publish_screenshot_repo(repo_dir: str, data_subdir: str = 'public/data') -> dict[str, any]:
     logging.info('[SCREENSHOT EXPORT] Iniciando publicação git do repositório screenshot')
-    status_result = _run_git_command(repo_dir, ['status', '--porcelain'])
+    # Verifica mudanças apenas na subpasta de dados exportados
+    status_result = _run_git_command(repo_dir, ['status', '--porcelain', data_subdir])
     if status_result.returncode != 0:
         raise RuntimeError(f'Falha ao consultar status git: {status_result.stderr.strip() or status_result.stdout.strip()}')
 
     changed_entries = [line for line in status_result.stdout.splitlines() if line.strip()]
     if not changed_entries:
-        logging.info('[SCREENSHOT EXPORT] Nenhuma alteração local para publicar')
+        logging.info('[SCREENSHOT EXPORT] Nenhuma alteração em %s para publicar', data_subdir)
         return {
             'published': False,
             'commit_created': False,
             'push_executed': False,
-            'message': 'Nenhuma alteração detectada no repositório screenshot.',
+            'message': f'Nenhuma alteração detectada em {data_subdir} no repositório screenshot.',
         }
 
-    add_result = _run_git_command(repo_dir, ['add', '-A'])
+    # Adiciona APENAS a subpasta de dados, não o repo inteiro
+    add_result = _run_git_command(repo_dir, ['add', data_subdir])
     if add_result.returncode != 0:
         raise RuntimeError(f'Falha no git add: {add_result.stderr.strip() or add_result.stdout.strip()}')
 
@@ -1875,11 +1877,15 @@ def _publish_screenshot_repo(repo_dir: str) -> dict[str, any]:
         if 'nothing to commit' not in combined_output.lower():
             raise RuntimeError(f'Falha no git commit: {combined_output}')
 
+<<<<<<< HEAD
     pull_result = _run_git_command(repo_dir, ['pull', '--rebase', '-X', 'theirs', 'origin', 'main'])
     if pull_result.returncode != 0:
         logging.warning(f'[SCREENSHOT EXPORT] Alerta no git pull: {pull_result.stderr.strip() or pull_result.stdout.strip()}')
 
     push_result = _run_git_command(repo_dir, ['push', 'origin', 'main'])
+=======
+    push_result = _run_git_command(repo_dir, ['push', 'origin', 'main', '--force'])
+>>>>>>> 1c8590440cd2e88b9305a5cd506e3f410949aa9c
     if push_result.returncode != 0:
         raise RuntimeError(f'Falha no git push: {push_result.stderr.strip() or push_result.stdout.strip()}')
 
@@ -1889,7 +1895,7 @@ def _publish_screenshot_repo(repo_dir: str) -> dict[str, any]:
         'commit_created': True,
         'push_executed': True,
         'commit_message': commit_message,
-        'message': 'Snapshot sincronizado e publicado no repositório screenshot.',
+        'message': f'Snapshot de {data_subdir} sincronizado e publicado no repositório screenshot.',
     }
 
 
