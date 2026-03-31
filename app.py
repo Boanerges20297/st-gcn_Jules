@@ -1877,15 +1877,11 @@ def _publish_screenshot_repo(repo_dir: str, data_subdir: str = 'public/data') ->
         if 'nothing to commit' not in combined_output.lower():
             raise RuntimeError(f'Falha no git commit: {combined_output}')
 
-<<<<<<< HEAD
     pull_result = _run_git_command(repo_dir, ['pull', '--rebase', '-X', 'theirs', 'origin', 'main'])
     if pull_result.returncode != 0:
         logging.warning(f'[SCREENSHOT EXPORT] Alerta no git pull: {pull_result.stderr.strip() or pull_result.stdout.strip()}')
 
     push_result = _run_git_command(repo_dir, ['push', 'origin', 'main'])
-=======
-    push_result = _run_git_command(repo_dir, ['push', 'origin', 'main', '--force'])
->>>>>>> 1c8590440cd2e88b9305a5cd506e3f410949aa9c
     if push_result.returncode != 0:
         raise RuntimeError(f'Falha no git push: {push_result.stderr.strip() or push_result.stdout.strip()}')
 
