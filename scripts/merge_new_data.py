@@ -6,6 +6,25 @@ import json
 import unicodedata
 import subprocess
 import sys
+from datetime import datetime
+
+# Importação de Enriquecimento (V33)
+sys.path.append(os.getcwd())
+try:
+    from src.enrichment import (
+        get_day_of_week_pt, 
+        is_brazil_holiday, 
+        is_cvp_hot_day, 
+        get_real_weather, 
+        get_weather_label
+    )
+except ImportError:
+    print("⚠️ Aviso: src.enrichment não encontrado. Algumas variáveis de clima/calendário serão ignoradas.")
+    get_day_of_week_pt = lambda x: ""
+    is_brazil_holiday = lambda x: False
+    is_cvp_hot_day = lambda x: False
+    get_real_weather = lambda x, **kw: 0.0
+    get_weather_label = lambda x: "Desconhecido"
 
 # Configurações de Caminhos
 BASE_DIR = os.getcwd()
@@ -179,20 +198,19 @@ def merge(new_data_path):
     # Termos de natureza para disparar geolocalizacao reversa
     invalid_street_terms = ['HOMICIDIO', 'BALA', 'FOGO', 'LESAO', 'MORTE', 'CADAVER', 'LATROCINIO', 'TIRO']
 
-    print(f"\nEnriquecendo {len(df_new)} registros (Bairro + Rua)...")
+    print(f"\nEnriquecendo {len(df_new)} registros (Bairro + Rua + Clima)...")
     for idx, row in df_new.iterrows():
         lat = pd.to_numeric(row.get('latitude'), errors='coerce')
         lon = pd.to_numeric(row.get('longitude'), errors='coerce')
         b_at = row.get('bairro')
         street_at = str(row.get('name', row.get('LocalOcor', ''))).upper()
         
+        # 1. Enriquecimento de Bairro e Rua (Geográfico)
         if not pd.isna(lat) and not pd.isna(lon) and lat != 0 and lon != 0:
-            # 1. Enriquecimento de Bairro
             bairro = find_closest_bairro(lat, lon, node_coords, node_names)
             if bairro:
                 df_new.at[idx, 'bairro'] = bairro
             
-            # 2. Enriquecimento de Rua (Nominatim com rate limiting)
             needs_reverse = (pd.isna(street_at) or len(street_at) < 4 or any(t in street_at for t in invalid_street_terms))
             if needs_reverse:
                 street_found = get_street_from_coords(lat, lon)
@@ -200,8 +218,49 @@ def merge(new_data_path):
                     df_new.at[idx, 'name'] = street_found
                     print(f"  ✓ {idx+1}/{len(df_new)}: {street_found}")
 
-        # Normalização
+        # Normalização de Bairro
         df_new.at[idx, 'bairro'] = normalize_text(df_new.at[idx, 'bairro'])
+
+        # 2. Enriquecimento Temporal e Climático (V33)
+        dt_str = row.get('data')
+        if dt_str and not pd.isna(dt_str):
+            try:
+                dt = pd.to_datetime(dt_str)
+                df_new.at[idx, 'dia_semana'] = get_day_of_week_pt(dt)
+                df_new.at[idx, 'eh_feriado'] = is_brazil_holiday(dt)
+                df_new.at[idx, 'dia_quente_cvp'] = is_cvp_hot_day(dt)
+                
+                # Coordenadas para clima (fallback para Fortaleza se ausente)
+                c_lat = lat if not pd.isna(lat) and lat != 0 else -3.717
+                c_lon = lon if not pd.isna(lon) and lon != 0 else -38.543
+                
+                precip = get_real_weather(dt, lat=c_lat, lon=c_lon)
+                df_new.at[idx, 'precipitacao_mm'] = float(precip) if precip is not None else 0.0
+                df_new.at[idx, 'clima'] = get_weather_label(precip)
+            except Exception:
+                pass 
+
+        # 3. Mapeamento de Novas Variáveis (Demográficas e Identificadores)
+        if 'tipo_evento' in row:
+            natureza_str = str(row['tipo_evento']).upper()
+            df_new.at[idx, 'nature'] = natureza_str
+            df_new.at[idx, 'tipo_evento'] = natureza_str
+            # CRÍTICO: Mapeamento para o Canal 0 do modelo (CVLI)
+            if 'CVLI' in natureza_str or 'HOMICIDIO' in natureza_str:
+                df_new.at[idx, 'tipo'] = 'cvli'
+        
+        if 'nome_vitima' in row:
+            df_new.at[idx, 'vitima'] = normalize_text(row['nome_vitima'])
+            df_new.at[idx, 'nome_vitima'] = normalize_text(row['nome_vitima'])
+            
+        if 'sexo' in row:
+            df_new.at[idx, 'sexo'] = str(row['sexo']).upper()
+            
+        if 'idade' in row:
+            df_new.at[idx, 'idade'] = row['idade']
+            
+        if 'id_evento' in row:
+            df_new.at[idx, 'id_evento'] = row['id_evento']
 
     # Mesclagem e remoção de duplicatas
     print("\nMesclando com base oficial...")
@@ -209,9 +268,23 @@ def merge(new_data_path):
     df_combined['temp_key'] = df_combined['id'].astype(str) + "_" + df_combined['data'].astype(str) + "_" + df_combined['hora'].astype(str)
     df_combined = df_combined.drop_duplicates(subset=['temp_key'], keep='first').drop(columns=['temp_key'])
     
+    # --- AJUSTE DE ORDEM DE COLUNAS (Solicitação do Usuário) ---
+    # Ordem: ... version, dia_semana, eh_feriado, dia_quente_cvp, clima, precipitacao_mm, ... restante
+    cols = list(df_combined.columns)
+    new_v33_cols = ['dia_semana', 'eh_feriado', 'dia_quente_cvp', 'clima', 'precipitacao_mm']
+    
+    # Remove as novas colunas da lista atual para reinceri-las na posição certa
+    for c in new_v33_cols:
+        if c in cols: cols.remove(c)
+    
+    if 'version' in cols:
+        v_idx = cols.index('version') + 1
+        # Reconstrói a lista de colunas na ordem exata
+        final_cols = cols[:v_idx] + new_v33_cols + cols[v_idx:]
+        df_combined = df_combined[final_cols]
     
     df_combined.to_csv(OFFICIAL_CSV, index=False, encoding='utf-8')
-    print(f"✅ SUCESSO! Base atualizada em {OFFICIAL_CSV}")
+    print(f"✅ SUCESSO! Base atualizada em {OFFICIAL_CSV} com colunas ordenadas.")
 
     # Construir cache de ruas críticas geolocalizadas
     print("\n📍 Construindo cache de ruas críticas...")

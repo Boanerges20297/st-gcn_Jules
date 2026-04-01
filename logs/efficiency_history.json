@@ -228,19 +228,19 @@
   },
   {
     "date": "2026-03-31",
-    "total_events": 21,
+    "total_events": 22,
     "brute_cvli": 14,
-    "exogenous": 7,
-    "exogenous_conflict": 7,
-    "police_qualified_actions_7d": 40,
-    "police_administrative_events_7d": 24,
-    "assigned_total_events": 17,
+    "exogenous": 8,
+    "exogenous_conflict": 8,
+    "police_qualified_actions_7d": 42,
+    "police_administrative_events_7d": 25,
+    "assigned_total_events": 18,
     "unmapped_total_events": 4,
     "assigned_brute_cvli": 14,
-    "assigned_exogenous": 3,
+    "assigned_exogenous": 4,
     "unmapped_exogenous": 4,
     "assigned_police_qualified_actions": 26,
-    "unmapped_police_qualified_actions": 14,
+    "unmapped_police_qualified_actions": 16,
     "unmapped_exogenous_sample": [
       "Jardim Cearense",
       "Catuana",
@@ -249,8 +249,8 @@
     ],
     "global": {
       "total_nodes": 109,
-      "active_locations": 16,
-      "total_events": 17,
+      "active_locations": 17,
+      "total_events": 18,
       "ranking_top10": [
         "CAUCAIA",
         "MARACANAU",
@@ -281,13 +281,13 @@
         "EDSON QUEIROZ"
       ],
       "p5": 0.4,
-      "recall5": 0.125,
+      "recall5": 0.1176,
       "hits5": [
         "LIMOEIRO DO NORTE",
         "VARZEA ALEGRE"
       ],
       "p10": 0.6,
-      "recall10": 0.375,
+      "recall10": 0.3529,
       "hits10": [
         "LIMOEIRO DO NORTE",
         "VARZEA ALEGRE",
@@ -297,7 +297,7 @@
         "ANCURI"
       ],
       "p20": 0.5,
-      "recall20": 0.625,
+      "recall20": 0.5882,
       "hits20": [
         "LIMOEIRO DO NORTE",
         "VARZEA ALEGRE",
@@ -313,8 +313,8 @@
     },
     "fortaleza": {
       "total_nodes": 40,
-      "active_locations": 7,
-      "total_events": 8,
+      "active_locations": 8,
+      "total_events": 9,
       "ranking_top10": [
         "MESSEJANA",
         "BOM JARDIM",
@@ -334,10 +334,11 @@
         "ANCURI",
         "PASSARE",
         "EDSON QUEIROZ",
-        "MESSEJANA"
+        "MESSEJANA",
+        "GRANJA LISBOA"
       ],
       "p5": 0.8,
-      "recall5": 0.5714,
+      "recall5": 0.5,
       "hits5": [
         "MESSEJANA",
         "BOM JARDIM",
@@ -345,7 +346,7 @@
         "ANCURI"
       ],
       "p10": 0.5,
-      "recall10": 0.7143,
+      "recall10": 0.625,
       "hits10": [
         "MESSEJANA",
         "BOM JARDIM",
@@ -354,7 +355,7 @@
         "SIQUEIRA"
       ],
       "p20": 0.25,
-      "recall20": 0.7143,
+      "recall20": 0.625,
       "hits20": [
         "MESSEJANA",
         "BOM JARDIM",
