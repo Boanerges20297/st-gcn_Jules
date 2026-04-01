@@ -64,6 +64,25 @@ def _sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def _get_content_hash(kml_bytes: bytes) -> str:
+    """
+    Gera um hash baseado apenas no conteúdo estrutural do KML,
+    ignorando metadados dinâmicos da Google (timestamps, IDs de sessão, etc).
+    """
+    try:
+        content = kml_bytes.decode('utf-8', errors='ignore')
+        # Remover tags de TimeStamp que mudam a cada exportação
+        content = re.sub(r'<gx:TimeStamp>.*?</gx:TimeStamp>', '', content, flags=re.DOTALL)
+        content = re.sub(r'<TimeStamp>.*?</TimeStamp>', '', content, flags=re.DOTALL)
+        # Remover metadados de visualização/sessão da Google
+        content = re.sub(r'<LookAt>.*?</LookAt>', '', content, flags=re.DOTALL)
+        # Remover espaços em branco extras para estabilidade
+        content = re.sub(r'\s+', ' ', content).strip()
+        return _sha256_bytes(content.encode('utf-8'))
+    except Exception:
+        return _sha256_bytes(kml_bytes)
+
+
 def _sha256_file(path: str) -> str:
     if not os.path.exists(path):
         return ''
@@ -373,16 +392,38 @@ def _generate_intelligence_from_kml(kml_working_path: str):
         final_rows.append({'local': official_area, 'faccao_predominante': faction, 'grau_dominio': 0.85 if not row.empty else 0.0})
 
     df_final = pd.DataFrame(final_rows)
-    df_micro.to_csv(INTELLIGENCE_OUTPUTS[0], index=False)
-    df_final.to_csv(INTELLIGENCE_OUTPUTS[1], index=False)
-    df_final.to_csv(INTELLIGENCE_OUTPUTS[2], index=False)
+    
+    # --- OTIMIZAÇÃO: ESCREVER APENAS SE HOUVER MUDANÇA REAL ---
+    def _write_if_changed(df, path, is_geojson=False):
+        if os.path.exists(path):
+            try:
+                if is_geojson:
+                    # Para GeoJSON, comparamos o conteúdo JSON carregado
+                    with open(path, 'r', encoding='utf-8') as f:
+                        old_data = json.load(f)
+                    new_data = json.loads(df.to_json())
+                    if old_data == new_data: return
+                else:
+                    # Para CSV, comparamos dataframes (ignorando pequenas variações de float se necessário)
+                    old_df = pd.read_csv(path)
+                    if old_df.equals(df): return
+            except: pass
+            
+        if is_geojson:
+            with open(path, 'w', encoding='utf-8') as f:
+                f.write(df.to_json())
+        else:
+            df.to_csv(path, index=False)
+        print(f"💾 [ORCRIMS] Arquivo atualizado: {os.path.basename(path)}")
 
+    _write_if_changed(df_micro, INTELLIGENCE_OUTPUTS[0])
+    _write_if_changed(df_final, INTELLIGENCE_OUTPUTS[1])
+    _write_if_changed(df_final, INTELLIGENCE_OUTPUTS[2])
     gdf_records = [record for record in micronode_geometries if record.get('geometry') is not None]
     gdf = gpd.GeoDataFrame(gdf_records, geometry='geometry', crs='EPSG:4326')
-    with open(INTELLIGENCE_OUTPUTS[3], 'w', encoding='utf-8') as file_obj:
-        file_obj.write(gdf.to_json())
+    _write_if_changed(gdf, INTELLIGENCE_OUTPUTS[3], is_geojson=True)
 
-    print(f"✅ [ORCRIMS] Inteligência territorial atualizada: micronodos={len(df_micro)} | áreas oficiais={len(df_final)}")
+    print(f"✅ [ORCRIMS] Inteligência territorial processada: micronodos={len(df_micro)} | áreas oficiais={len(df_final)}")
 
 
 def refresh_orcrim_from_official(force: bool = False):
@@ -418,12 +459,20 @@ def refresh_orcrim_from_official(force: bool = False):
         _write_update_status(current_status)
         return {'updated': False, 'reason': 'download_failed', 'fallback_used': fallback_available, 'error': str(error)}
 
-    downloaded_hash = _sha256_bytes(kml_bytes)
-    current_hash = _sha256_file(CURRENT_KML_PATH)
-    static_hash = _sha256_file(STATIC_KML_PATH)
+    downloaded_hash = _get_content_hash(kml_bytes)
+    
+    # Para comparação local, precisamos normalizar o que já temos em disco também
+    def _get_file_content_hash(path):
+        if not os.path.exists(path): return ''
+        with open(path, 'rb') as f:
+            return _get_content_hash(f.read())
+
+    current_hash = _get_file_content_hash(CURRENT_KML_PATH)
+    static_hash = _get_file_content_hash(STATIC_KML_PATH)
+    
     changed = force or (downloaded_hash != current_hash) or (downloaded_hash != static_hash)
     print(
-        f"🔎 [ORCRIMS] Comparação de versão: novo={downloaded_hash[:12]}... | "
+        f"🔎 [ORCRIMS] Comparação de conteúdo (SHA256 normalizado): novo={downloaded_hash[:12]}... | "
         f"atual={current_hash[:12] if current_hash else 'N/A'}... | "
         f"estático={static_hash[:12] if static_hash else 'N/A'}..."
     )
