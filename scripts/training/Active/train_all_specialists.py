@@ -78,7 +78,7 @@ REGION_CONFIGS = {
     ),
     'rmf': dict(
         window=90,  lr=0.018, epochs=120, dropout=0.5, margin=1.5,
-        k_eval=5,  use_momentum=False, grad_accum=8,
+        k_eval=5,  use_momentum=True, grad_accum=8,
         raw_cvli_context=True,
         output_name='rmf_model.pth',
         focal_alpha=0.50, focal_gamma=2.0, ranking_weight=7.0
@@ -215,7 +215,7 @@ class SpecialistTrainer:
         logging.info(f"📉 LOSS: Regional Focal Ranking (alpha={focal_alpha}, gamma={focal_gamma}, rank_w={ranking_w})")
         logging.info(
             f"⚙️ ARQ: DeepSTGAT_64 | window={self.window} | lr={self.lr} | dropout={self.dropout} | "
-            f"K={self.k_eval} | {'33ch+momentum' if self.use_momentum else '29ch'} | "
+            f"K={self.k_eval} | 37ch (V37 Elite) | "
             f"target_horizon={PREDICT_HORIZON}d | grad_accum={self.grad_accum} | device={DEVICE}"
         )
         logging.info("═"*80)
@@ -241,7 +241,11 @@ class SpecialistTrainer:
         if self.use_momentum:
             logging.info("🔧 Calculando canais de Multi-Scale Momentum + Cold Streak (negativo)...")
             momentum_feat = build_momentum_features(nf)
-            features = np.concatenate([nf, momentum_feat], axis=2)   # (N, T, 33)
+            features = nf.copy()
+            if features.shape[2] >= 37:
+                features[:, :, 33:37] = momentum_feat
+            else:
+                features = np.concatenate([nf, momentum_feat], axis=2)
         else:
             features = nf.copy()
 
@@ -261,11 +265,12 @@ class SpecialistTrainer:
             x_window = features[:, t-self.window:t, :].copy()
             
             # 🔄 NORMALIZAÇÃO LOCAL POR JANELA (Z-Score)
-            # Para cada canal, normaliza com base na média/std da própria janela
+            # Para cada canal, normaliza com base na média/std da própria janela (exceto binários/sazonais)
             for c in range(C_ext):
-                m = x_window[:, :, c].mean()
-                s = x_window[:, :, c].std() + 1e-6
-                x_window[:, :, c] = (x_window[:, :, c] - m) / s
+                if c in [0, 1, 2, 24, 27, 28, 31, 33, 34, 35, 36]:
+                    m = x_window[:, :, c].mean()
+                    s = x_window[:, :, c].std() + 1e-6
+                    x_window[:, :, c] = (x_window[:, :, c] - m) / s
             
             x = torch.tensor(x_window, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0)
             y = torch.tensor(

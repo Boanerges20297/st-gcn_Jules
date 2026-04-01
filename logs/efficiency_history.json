@@ -225,5 +225,33 @@
         "AURORA"
       ]
     }
+  },
+  {
+    "date": "2026-03-31",
+    "total_events": 4,
+    "brute_cvli": 0,
+    "exogenous": 4,
+    "exogenous_conflict": 4,
+    "police_qualified_actions_7d": 17,
+    "police_administrative_events_7d": 7,
+    "assigned_total_events": 0,
+    "unmapped_total_events": 4,
+    "assigned_brute_cvli": 0,
+    "assigned_exogenous": 0,
+    "unmapped_exogenous": 4,
+    "assigned_police_qualified_actions": 0,
+    "unmapped_police_qualified_actions": 17,
+    "unmapped_exogenous_sample": [
+      "Jardim Cearense",
+      "Passar\u00e9",
+      "Catuana",
+      "Edson Queiroz"
+    ],
+    "global": {
+      "status": "no_scores",
+      "p5": 0.0,
+      "p10": 0.0,
+      "p20": 0.0
+    }
   }
 ]

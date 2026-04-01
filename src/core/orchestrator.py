@@ -41,22 +41,22 @@ class StateOrchestrator:
                 'model_path': os.path.join(self.root, 'models', 'active', fortaleza_model_file),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_fortaleza.pkl'),
                 'class': DeepSTGAT_64,
-                'in_channels': 33 if has_momentum_fortaleza else 29, 
-                'window': 120 if has_momentum_fortaleza else 90 
+                'in_channels': 37, 
+                'window': 120 
             },
             'rmf': {
                 'model_path': os.path.join(self.root, 'models', 'active', 'rmf_model.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_rmf.pkl'),
                 'class': DeepSTGAT_64,
-                'in_channels': 29,
+                'in_channels': 37,
                 'window': 90
             },
             'interior': {
                 'model_path': os.path.join(self.root, 'models', 'active', interior_model_file),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_interior.pkl'),
                 'class': DeepSTGAT_64,
-                'in_channels': 33 if interior_has_momentum else 29,
-                'window': 120 if interior_has_momentum else 90
+                'in_channels': 37,
+                'window': 120
             }
         }
         
@@ -238,17 +238,21 @@ class StateOrchestrator:
                 cold_streak = np.where(x_raw_extended[:, t, 0] > 0, 0, cold_streak + 1)
                 momentum_feat[:, t, 3] = -np.clip(cold_streak, 0, 30)
             
-            if channels >= 32:
-                x_raw_extended = np.concatenate([x_raw_extended, momentum_feat[:, :, :channels-29]], axis=2)
+            # --- INJEÇÃO DE MOMENTUM (V37 Elite) ---
+            if channels >= 37:
+                # Preenche os canais 33-36 (Momentum calculado on-the-fly)
+                x_raw_extended[:, :, 33:37] = momentum_feat[:, :, :4]
 
             x_final = x_raw_extended[:, -window:, :channels].copy()
             
-            # ⭐ ATUALIZAÇÃO (2026-03-18): NORMALIZAÇÃO Z-SCORE LOCAL EM RUNTIME
-            # Garante consistência com a nova metodologia de treino Tentativa 49
+            # ⭐ NORMALIZAÇÃO Z-SCORE (V37 Elite)
             for c in range(channels):
-                m_c = x_final[:, :, c].mean()
-                s_c = x_final[:, :, c].std() + 1e-6
-                x_final[:, :, c] = (x_final[:, :, c] - m_c) / s_c
+                # Evitamos normalizar canais binários/sazonais fixos (3-22, 29, 30, 32)
+                # Normalizamos apenas: Crime(0), Veículos(1), Tensão(2), Intel(27), Global(28), Chuva(31), Momentum(33-36)
+                if c in [0, 1, 2, 24, 27, 28, 31, 33, 34, 35, 36]:
+                    m_c = x_final[:, :, c].mean()
+                    s_c = x_final[:, :, c].std() + 1e-6
+                    x_final[:, :, c] = (x_final[:, :, c] - m_c) / s_c
 
             active_window = cp.get('dynamic_window', window)
             if active_window and active_window < window:

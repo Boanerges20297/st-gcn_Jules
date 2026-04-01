@@ -1,5 +1,7 @@
-import json
+import sys
 import os
+sys.path.append(os.getcwd())
+import json
 import pickle
 import numpy as np
 import pandas as pd
@@ -286,43 +288,59 @@ def process_ism_data():
         if N == 0: continue
         
         logging.info(f"⏳ Processando tensores para {reg.upper()} ({N} nós)...")
-        features = np.zeros((N, len(date_range), 29))
+        features = np.zeros((N, len(date_range), 37)) # Expandido para 37 (V37 Elite)
         node_map = {row['name']: i for i, row in reg_nodes.iterrows()}
         
         # Filtrar ocorrencias da regiao
         reg_occ = occ_df[occ_df['loc_clean'].isin(node_map)].copy()
-        reg_occ['n_idx'] = reg_occ['loc_clean'].map(node_map)
+        if not reg_occ.empty:
+            reg_occ['n_idx'] = reg_occ['loc_clean'].map(node_map)
         
-        # Preenchimento vetorizado via agrupação
-        # Canal 0: CVLI
-        cvli_group = reg_occ[reg_occ['tipo'] == 'cvli'].groupby(['n_idx', 't_idx']).size()
-        for (n, t), val in cvli_group.items(): features[n, t, 0] = val
-        
-        # Canal 1: Veiculos (Sinal amplificado conforme DOCUMENTACAO_PESOS_CANAIS.md)
-        veic_group = reg_occ[reg_occ['is_veiculo']].groupby(['n_idx', 't_idx']).size()
-        for (n, t), val in veic_group.items(): features[n, t, 1] = val * 2.5
-        
-        # Canal 27: Intel (Gatilhos Dinâmicos - Lesão à Bala, etc.)
-        intel_group = reg_occ[reg_occ['is_intel']].groupby(['n_idx', 't_idx']).size()
-        for (n, t), val in intel_group.items(): features[n, t, 27] = val * 2.0
-        
-        # Preenchimento de Datas e Calendário (Vetorizado)
-        for d_idx, date in enumerate(date_range):
-            features[:, d_idx, 3 + date.weekday()] = 1.0
-            # Reforço de Sexta-feira (Weekday 4) para todas as regiões (Sinal 1.5x)
-            if date.weekday() == 4:
-                features[:, d_idx, 7] = 1.5
+        # Preenchimento de ocorrências
+        if not reg_occ.empty:
+            cvli_group = reg_occ[reg_occ['tipo'] == 'cvli'].groupby(['n_idx', 't_idx']).size()
+            for (n, t), val in cvli_group.items(): features[n, t, 0] = val
             
+            veic_group = reg_occ[reg_occ['is_veiculo']].groupby(['n_idx', 't_idx']).size()
+            for (n, t), val in veic_group.items(): features[n, t, 1] = val * 2.5
+            
+            intel_group = reg_occ[reg_occ['is_intel']].groupby(['n_idx', 't_idx']).size()
+            for (n, t), val in intel_group.items(): features[n, t, 27] = val * 2.0
+        
+        # Preenchimento de Datas, Clima e Calendário
+        from src.enrichment import is_brazil_holiday, is_cvp_hot_day, CACHE_FILE
+        weather_cache = {}
+        if os.path.exists(CACHE_FILE):
+            with open(CACHE_FILE, 'r') as f:
+                weather_cache = json.load(f)
+
+        
+        for d_idx, date in enumerate(date_range):
+            # Dia da Semana (3-9)
+            features[:, d_idx, 3 + date.weekday()] = 1.0
+            if date.weekday() == 4: features[:, d_idx, 7] = 1.5 # Reforço Sexta
+            
+            # Meses (10-21)
             features[:, d_idx, 10 + date.month - 1] = 1.0
+            
+            # Fim de Semana (22)
             if date.weekday() >= 5: features[:, d_idx, 22] = 1.0
             
+            # --- NOVOS CANAIS (V33) ---
+            # 29: Feriado
+            if is_brazil_holiday(date): features[:, d_idx, 29] = 1.0
+            
+            # 30: Dias Quentes CVP (01-10, 30, 31)
+            if is_cvp_hot_day(date): features[:, d_idx, 30] = 1.0
+            
+            # 31 & 32: Clima Real (API Open-Meteo Cache)
+            precip = weather_cache.get(date.date(), 0.0)
+            features[:, d_idx, 31] = float(precip)
+            if precip > 5.0: features[:, d_idx, 32] = 1.0 # Chuva significativa
+            
         for n in range(N):
-            # Canal 24: Soma móvel 7d do CVLI bruto.
-            # Evita suavizar outliers/anomalias que podem anteceder conflito iminente.
             features[n, :, 24] = pd.Series(features[n, :, 0]).rolling(window=7, min_periods=1).sum().values
-            # Canal 2: Tensão de Facções (Estático do mapeamento)
             features[n, :, 2] = reg_nodes.iloc[n]['tension_index']
-            # Canal 28: Somatório Global (Contexto)
             features[n, :, 28] = features[:, :, 0].sum(axis=0)
 
         # Matrizes de Adjacência
@@ -330,19 +348,18 @@ def process_ism_data():
         adj_geo = (dist_mat < 0.05).astype(float)
         
         adj_conflict = np.eye(N)
-        # Otimização do loop de conflito
         factions = reg_nodes['faction'].values
         for i in range(N):
             if factions[i] == 'NEUTRO': continue
-            # Encontrar vizinhos
             neighbors = np.where(dist_mat[i] < 0.06)[0]
             for j in neighbors:
                 if i != j and factions[j] != 'NEUTRO' and factions[i] != factions[j]:
                     adj_conflict[i, j] = 1.0
         
+        os.makedirs('data/processed', exist_ok=True)
         with open(f'data/processed/processed_{reg}.pkl', 'wb') as f:
             pickle.dump({'node_features': features, 'adj_geo': adj_geo, 'adj_conflict': adj_conflict, 'nodes_gdf': reg_nodes, 'dates': date_range}, f)
-        logging.info(f"✅ {reg.upper()} Concluído.")
+        logging.info(f"✅ {reg.upper()} Concluído (V33 Features).")
 
 if __name__ == "__main__":
     process_ism_data()
