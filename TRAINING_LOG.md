@@ -413,3 +413,41 @@ interior_model_backup_20260316_221629.pth (antiga: N/A)
 ### Próximo Passo Operacional
 1. Validar os novos checkpoints por **14 dias corridos** via `EfficiencyMonitor` antes de decidir promoção definitiva ou rollback estratégico.
 2. Se a métrica operacional não superar o baseline recente, considerar blend entre o modelo campeão offline (Tentativa 46) e o modelo mais alinhado ao horizonte real (Tentativa 47).
+
+---
+
+## Tentativa 48 (Foco CVP: Treino Otimizado Paradigm) — 2026-03-27
+
+### Motivação
+Explorar a configuração de hiperparâmetros (Learning Rate = 0.004, Dropout = 0.45 e Ranking Weight = 4.0) especificamente para Crimes Contra o Patrimônio (CVP) com o modelo Paradigm, buscando maximizar a eficiência de cobertura sem colapsar a predição.
+
+### Configuração
+- **Learning Rate:** 0.004
+- **Dropout:** 0.45
+- **Ranking Weight:** 4.0
+- **Logging:** Salvamento incremental `logs/training_CVP_PARADIGM.log`.
+
+### Resultados Obtidos (Offline)
+- **Recorde P@10:** 33.88% (Alcançado na Época 28)
+- **Recorde P@20:** 43.38% (Alcançado na Época 37)
+- **Status:** SUCESSO. Excelente equilíbrio e retenção de recorde consistente.
+
+---
+
+## Tentativa 49 (Foco CVP: Telemetria STGCN v5.1) — 2026-03-30
+
+### Motivação
+Validar a performance da abordagem STGCN v5.1 com telemetria detalhada para CVP, utilizando OneCycleLR que atinge picos de Learning Rate ao redor de `0.005`.
+
+### Configuração
+- **Arquitetura:** STGCN v5.1 (Device: CPU)
+- **Learning Rate Scheduler:** OneCycleLR (max `0.005` na época 30, terminando perto de `0` na época 100).
+- **Logging:** `logs/training_CVP_STGCN.log`.
+
+### Resultados Obtidos (Offline)
+- **Dinâmica de Treino:** A P@10 escalou estavelmente atingindo `23.13%` (Época 12).
+- **Colapso:** Por volta da época 23, a função de perda sofreu *Vanishing Gradients* e *Dying ReLUs* (gradiente em torno de `0.045`).
+- **Métrica Final:** Amarra permaneceu artificialmente estagnada em P@10 `5.46%` e P@20 `15.62%` a partir da Época 23 até a Época 100.
+- **Status:** FALHA TÉCNICA (Colapso de Gradientes).
+
+---

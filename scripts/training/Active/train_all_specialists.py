@@ -44,6 +44,9 @@ try:
 except ImportError:
     from src.core.architectures import DeepSTGAT_64
 
+import re
+from datetime import datetime
+
 # Configuração de Log
 log_file = os.path.join(ROOT_DIR, 'logs', 'training_ALL_SPECIALISTS.log')
 os.makedirs(os.path.dirname(log_file), exist_ok=True)
@@ -95,6 +98,47 @@ REGION_CONFIGS = {
 # ─────────────────────────────────────────────
 # Utilitários
 # ─────────────────────────────────────────────
+def autosave_training_log(region_key, config):
+    """Grava as configurações de treinamento no TRAINING_LOG.md de forma permanente e incremental."""
+    log_path = os.path.join(ROOT_DIR, 'TRAINING_LOG.md')
+    if not os.path.exists(log_path):
+        return
+
+    try:
+        with open(log_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Encontra o número máximo de Tentativa atual
+        attempts = re.findall(r'## Tentativa (\d+)', content)
+        next_attempt = max([int(x) for x in attempts]) + 1 if attempts else 1
+
+        now_str = datetime.now().strftime('%Y-%m-%d %H:%M')
+
+        new_entry = f"\n\n## Tentativa {next_attempt} (Autolog - {region_key.upper()}) — {now_str}\n"
+        new_entry += f"**Arquivo de Origem:** `train_all_specialists.py`\n\n"
+        new_entry += f"### 1. Hiperparâmetros (Carga Automática)\n"
+        new_entry += f"- **Target (Horizonte)**: {PREDICT_HORIZON} dias\n"
+        new_entry += f"- **Janela (Window)**: {config.get('window', 'N/A')} dias\n"
+        new_entry += f"- **Learning Rate**: {config.get('lr', 'N/A')}\n"
+        new_entry += f"- **Dropout**: {config.get('dropout', 'N/A')}\n"
+        new_entry += f"- **Épocas**: {config.get('epochs', 'N/A')}\n"
+        new_entry += f"- **Grad Accumulation**: {config.get('grad_accum', 'N/A')}\n\n"
+        new_entry += f"### 2. Loss & Ranking\n"
+        new_entry += f"- **Focal Alpha**: {config.get('focal_alpha', 'N/A')}\n"
+        new_entry += f"- **Focal Gamma**: {config.get('focal_gamma', 'N/A')}\n"
+        new_entry += f"- **Ranking Weight**: {config.get('ranking_weight', 'N/A')}\n"
+        new_entry += f"- **Métrica de Avaliação**: P@{config.get('k_eval', 'N/A')}\n\n"
+        new_entry += f"### 3. Resultados\n"
+        new_entry += f"- *(A preencher após a conclusão)*\n\n"
+        new_entry += f"---\n"
+
+        with open(log_path, 'a', encoding='utf-8') as f:
+            f.write(new_entry)
+
+        logging.info(f"📝 Auto-log incremental: Tentativa {next_attempt} registrada no TRAINING_LOG.md")
+    except Exception as e:
+        logging.error(f"❌ Erro ao escrever log auto-incremental em TRAINING_LOG.md: {e}")
+
 def normalize_adj(adj):
     adj = adj + np.eye(adj.shape[0])
     d = np.array(adj.sum(1))
@@ -219,6 +263,9 @@ class SpecialistTrainer:
             f"target_horizon={PREDICT_HORIZON}d | grad_accum={self.grad_accum} | device={DEVICE}"
         )
         logging.info("═"*80)
+
+        # Regista automaticamente no Markdown (LOG INCREMENTAL)
+        autosave_training_log(self.region_key, cfg)
 
         path = os.path.join(ROOT_DIR, 'data', 'processed', f'processed_{self.region_key}.pkl')
         with open(path, 'rb') as f:

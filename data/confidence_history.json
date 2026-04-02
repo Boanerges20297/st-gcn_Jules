@@ -110,5 +110,117 @@
         "f1_score": 0.0
       }
     }
+  },
+  {
+    "date": "2026-04-01",
+    "timestamp": "2026-04-01T23:49:09.730700",
+    "global": {
+      "p10": 0.6,
+      "p20": 0.55,
+      "precision": 0.6,
+      "recall": 0.6111,
+      "recall10": 0.3333,
+      "recall20": 0.6111,
+      "active_locations": 18,
+      "total_nodes": 109,
+      "total_events": 20,
+      "assigned_total_events": 20,
+      "unmapped_total_events": 4,
+      "f1_score": 0.6055
+    },
+    "regions": {
+      "fortaleza": {
+        "p10": 0.5,
+        "p20": 0.25,
+        "precision": 0.5,
+        "recall": 0.625,
+        "recall10": 0.625,
+        "recall20": 0.625,
+        "active_locations": 8,
+        "total_nodes": 40,
+        "total_events": 9,
+        "f1_score": 0.0
+      },
+      "rmf": {
+        "p10": 0.2,
+        "p20": 0.1053,
+        "precision": 0.2,
+        "recall": 1.0,
+        "recall10": 1.0,
+        "recall20": 1.0,
+        "active_locations": 2,
+        "total_nodes": 19,
+        "total_events": 2,
+        "f1_score": 0.0
+      },
+      "interior": {
+        "p10": 0.6,
+        "p20": 0.3,
+        "precision": 0.6,
+        "recall": 0.75,
+        "recall10": 0.75,
+        "recall20": 0.75,
+        "active_locations": 8,
+        "total_nodes": 50,
+        "total_events": 9,
+        "f1_score": 0.0
+      }
+    }
+  },
+  {
+    "date": "2026-04-02",
+    "timestamp": "2026-04-02T07:49:11.412657",
+    "global": {
+      "p10": 0.6,
+      "p20": 0.55,
+      "precision": 0.6,
+      "recall": 0.6471,
+      "recall10": 0.3529,
+      "recall20": 0.6471,
+      "active_locations": 17,
+      "total_nodes": 109,
+      "total_events": 19,
+      "assigned_total_events": 19,
+      "unmapped_total_events": 2,
+      "f1_score": 0.6227
+    },
+    "regions": {
+      "fortaleza": {
+        "p10": 0.5,
+        "p20": 0.25,
+        "precision": 0.5,
+        "recall": 0.7143,
+        "recall10": 0.7143,
+        "recall20": 0.7143,
+        "active_locations": 7,
+        "total_nodes": 40,
+        "total_events": 8,
+        "f1_score": 0.0
+      },
+      "rmf": {
+        "p10": 0.2,
+        "p20": 0.1053,
+        "precision": 0.2,
+        "recall": 1.0,
+        "recall10": 1.0,
+        "recall20": 1.0,
+        "active_locations": 2,
+        "total_nodes": 19,
+        "total_events": 2,
+        "f1_score": 0.0
+      },
+      "interior": {
+        "p10": 0.6,
+        "p20": 0.3,
+        "precision": 0.6,
+        "recall": 0.75,
+        "recall10": 0.75,
+        "recall20": 0.75,
+        "active_locations": 8,
+        "total_nodes": 50,
+        "total_events": 9,
+        "f1_score": 0.0
+      }
+    }
   }
 ]

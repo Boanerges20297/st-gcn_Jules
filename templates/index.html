@@ -545,7 +545,7 @@
     </div>
     <div class="row mt-4">
         <div class="col-12 text-center text-muted">
-            <small>Sistema desenvolvido para apoio à decisão tática. Baseado em modelo ST-GCN.</small>
+            <small>Sistema desenvolvido para apoio à decisão tática. Baseado em modelo ST-GAT.</small>
         </div>
     </div>
 </div>
@@ -2066,7 +2066,18 @@
             var cidadeParam = region || '';
             var streetsContainerId = 'streets-list-' + feature.properties.node_id;
     
-                    var popupContent = `
+            // Calcular latLng base do polígono/ponto para o Ponto de Fuga ST-GCN
+            var cLat = -3.71722, cLng = -38.54306; // Básico (Fortaleza) Fallback
+            if (layer.getBounds) {
+                var center = layer.getBounds().getCenter();
+                cLat = center.lat;
+                cLng = center.lng;
+            } else if (feature.geometry && feature.geometry.type === 'Point') {
+                cLng = feature.geometry.coordinates[0];
+                cLat = feature.geometry.coordinates[1];
+            }
+            
+            var popupContent = `
                         <div style="font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 14px; width: 100%; padding: 0; background: #1a1d20; color: white; border-radius: 4px;">
                             <div style="background: #000000; color: white; padding: 8px 10px; border-radius: 4px 4px 0 0; margin-bottom: 8px; border-bottom: 2px solid ${score >= 80 ? '#dc3545' : '#0d6efd'}; display:flex; align-items:center; gap:12px;">
                                 <div id="poly-snap-${feature.properties.node_id}" style="flex-shrink:0;"></div>
@@ -2115,6 +2126,11 @@
             
                                 <div style="font-size: 0.7rem; color: #6c757d; margin-top: 10px; border-top: 1px solid #3d4246; padding-top: 6px; font-style: italic;">
                                     <span id="model-note-${feature.properties.node_id}" style="color: #adb5bd;">Carregando metadados do modelo...</span>
+                                </div>
+                                <div style="margin-top: 10px; padding-top: 8px;">
+                                    <button class="btn btn-sm btn-outline-danger w-100 fw-bold" onclick="simulateEscapeRoutes(${cLat}, ${cLng}, '${bairroParam.replace(/'/g,"\\'").toUpperCase()}')" style="border-radius:20px; font-size:0.75rem;">
+                                        <i class="fas fa-route"></i> Simular ST-GCN: Fuga por Ruas Críticas
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -3112,6 +3128,78 @@
         }
         selectedLayer = null;
     }
+
+    // --- ST-GCN ST-GCN ESCAPE ROUTES ---
+    var escapeRoutesLayer = null;
+
+    function simulateEscapeRoutes(lat, lng, bairroName) {
+        // Fechar modal lateral atual e simular fuga na malha
+        document.getElementById('territory-modal-overlay').style.display = 'none';
+        
+        // Exibir overlay de carregamento
+        showLoadingOverlay();
+        document.getElementById('loading-overlay-text').textContent = "Processando malha viária criminal e construindo vetores (ST-GCN)...";
+        
+        // Remove old routes
+        if (escapeRoutesLayer) {
+            map.removeLayer(escapeRoutesLayer);
+            escapeRoutesLayer = null;
+        }
+        
+        fetch('/api/stgcn/escape-routes?lat=' + lat + '&lon=' + lng + '&bairro=' + encodeURIComponent(bairroName))
+            .then(res => {
+                hideLoadingOverlay();
+                if (!res.ok) throw new Error("Erro na rede ou script interno ST-GCN");
+                return res.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    alert('Erro no Simulador ST-GCN: ' + data.error);
+                    return;
+                }
+                
+                if (!data.features || data.features.length === 0) {
+                    alert('Não foram computadas rotas de fuga para essa área na malha atual.');
+                    return;
+                }
+                
+                // Exibir na tela (Render Layer)
+                escapeRoutesLayer = L.geoJSON(data, {
+                    style: function(feature) {
+                        return {
+                            color: '#ff2d55', // Neon red/pink alert
+                            weight: feature.properties.rank === 1 ? 5 : (feature.properties.rank === 2 ? 4 : 2),
+                            opacity: feature.properties.probability / 100,
+                            dashArray: feature.properties.rank > 2 ? '5, 5' : ''
+                        };
+                    },
+                    onEachFeature: function(f, layer) {
+                        layer.bindPopup(
+                            '<div style="background:#fff; color:#000; padding:8px; border-radius:4px; font-size:14px;">' +
+                            '<b>Fuga Preditiva (ST-GCN)</b><br/>' +
+                            '<b>Eixo Principal:</b> ' + f.properties.main_axis + '<br/>' +
+                            '<b>Probabilidade:</b> ' + f.properties.probability + '%<br/>' +
+                            '<b>Tempo Est:</b> ' + f.properties.time_estimate + 
+                            '</div>'
+                        );
+                    }
+                }).addTo(map);
+                
+                // Mover mapa pra região
+                map.flyTo([lat, lng], 16, { animate: true, duration: 1.5 });
+                setTimeout(function() {
+                    if (escapeRoutesLayer) {
+                        escapeRoutesLayer.bringToFront();
+                    }
+                }, 1600);
+            })
+            .catch(err => {
+                hideLoadingOverlay();
+                console.error(err);
+                alert("Falha ao comunicar com o simulador ST-GCN. O terminal GraphML já foi construído?");
+            });
+    }
+
 </script>
 </body>
 </html>

@@ -2645,8 +2645,31 @@ def get_pending_exogenous_count():
     except Exception as e:
         return jsonify({"pending": 0, "error": str(e)}), 200
 
-@app.route('/api/efficiency-latest')
+stgcn_engine = None
 
+@app.route('/api/stgcn/escape-routes', methods=['GET'])
+def predict_escape():
+    """Calcula vetores de fuga prováveis (ST-GCN) a partir de um ponto geolocalizado."""
+    global stgcn_engine
+    try:
+        lat = float(request.args.get('lat'))
+        lon = float(request.args.get('lon'))
+    except (TypeError, ValueError):
+        return jsonify({"error": "Parâmetros lat e lon são necessários e devem ser números."}), 400
+        
+    try:
+        if stgcn_engine is None:
+            from src.core.stgcn_escape_engine import STGCNEscapeEngine
+            stgcn_engine = STGCNEscapeEngine(data_dir=os.path.join(BASE_DIR, 'data', 'static'))
+        
+        result = stgcn_engine.predict_escape_routes(lat, lon, max_distance=1500)
+        return jsonify(result), 200
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/efficiency-latest')
 def get_efficiency_latest():
     """Retorna as métricas mais recentes do monitor de eficiência."""
     try:
