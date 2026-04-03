@@ -64,6 +64,103 @@ def _sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def _detect_faction_from_folder(folder_name: str) -> str:
+    folder_name = (folder_name or '').upper()
+    if 'COMANDO VERMELHO' in folder_name or ' CV ' in folder_name:
+        return 'CV'
+    if 'TCP' in folder_name or 'GDE' in folder_name:
+        return 'TCP/GDE'
+    if 'PCC' in folder_name:
+        return 'PCC'
+    if 'MASSA' in folder_name:
+        return 'MASSA'
+    if 'OKAIDA' in folder_name:
+        return 'OKAIDA'
+    if 'DISPUTA' in folder_name:
+        return 'DISPUTA'
+    return 'NEUTRO'
+
+
+def _canonicalize_coordinate_sequence(raw_coordinates: str):
+    coordinates = []
+    for lon, lat in _parse_kml_coordinates(raw_coordinates):
+        coordinates.append((round(float(lon), 6), round(float(lat), 6)))
+    return coordinates
+
+
+def _build_semantic_signature_entries(kml_bytes: bytes):
+    """
+    Gera uma assinatura semântica baseada apenas nos territórios efetivamente
+    extraídos para facções, ignorando estilos, ids e outros metadados do Google.
+    """
+    try:
+        root = ET.fromstring(kml_bytes.decode('utf-8', errors='ignore'))
+    except Exception:
+        return []
+
+    namespaces = {'kml': 'http://www.opengis.net/kml/2.2'}
+    signature_entries = []
+
+    for folder in root.findall('.//kml:Folder', namespaces):
+        folder_name = folder.findtext('kml:name', default='', namespaces=namespaces)
+        faction = _detect_faction_from_folder(folder_name)
+        if faction == 'NEUTRO':
+            continue
+
+        for placemark in folder.findall('./kml:Placemark', namespaces):
+            placemark_name = placemark.findtext('kml:name', default='S/N', namespaces=namespaces)
+            polygon_signatures = []
+            point_signature = None
+
+            for polygon_elem in placemark.findall('.//kml:Polygon', namespaces):
+                outer_text = polygon_elem.findtext(
+                    './/kml:outerBoundaryIs//kml:LinearRing//kml:coordinates',
+                    default='',
+                    namespaces=namespaces,
+                )
+                outer_coords = _canonicalize_coordinate_sequence(outer_text)
+                inner_signatures = []
+                for inner_elem in polygon_elem.findall('.//kml:innerBoundaryIs', namespaces):
+                    inner_text = inner_elem.findtext(
+                        './/kml:LinearRing//kml:coordinates',
+                        default='',
+                        namespaces=namespaces,
+                    )
+                    inner_coords = _canonicalize_coordinate_sequence(inner_text)
+                    if inner_coords:
+                        inner_signatures.append(inner_coords)
+
+                if outer_coords:
+                    polygon_signatures.append({
+                        'outer': outer_coords,
+                        'inners': sorted(inner_signatures, key=lambda ring: json.dumps(ring, ensure_ascii=False)),
+                    })
+
+            if not polygon_signatures:
+                coords_elem = placemark.find('.//kml:Point//kml:coordinates', namespaces)
+                if coords_elem is not None and coords_elem.text:
+                    point_coords = _canonicalize_coordinate_sequence(coords_elem.text)
+                    if point_coords:
+                        point_signature = point_coords[0]
+
+            signature_entries.append({
+                'faction': faction,
+                'name': normalize_text(placemark_name),
+                'geometry': sorted(polygon_signatures, key=lambda item: json.dumps(item, ensure_ascii=False)) if polygon_signatures else point_signature,
+            })
+
+    signature_entries.sort(key=lambda item: (item['faction'], item['name'], json.dumps(item['geometry'], ensure_ascii=False)))
+    return signature_entries
+
+
+def _get_semantic_content_hash(kml_bytes: bytes) -> str:
+    signature_entries = _build_semantic_signature_entries(kml_bytes)
+    if not signature_entries:
+        return _get_content_hash(kml_bytes)
+    canonical_payload = json.dumps(signature_entries, ensure_ascii=False, separators=(',', ':'))
+    return _sha256_bytes(canonical_payload.encode('utf-8'))
+
+
 def _get_content_hash(kml_bytes: bytes) -> str:
     """
     Gera um hash baseado apenas no conteúdo estrutural do KML,
@@ -325,19 +422,7 @@ def _generate_intelligence_from_kml(kml_working_path: str):
     for folder in root.findall('.//kml:Folder', namespaces):
         name_elem = folder.find('kml:name', namespaces)
         folder_name = name_elem.text.upper() if name_elem is not None and name_elem.text else ''
-        faction = 'NEUTRO'
-        if 'COMANDO VERMELHO' in folder_name or ' CV ' in folder_name:
-            faction = 'CV'
-        elif 'TCP' in folder_name or 'GDE' in folder_name:
-            faction = 'TCP/GDE'
-        elif 'PCC' in folder_name:
-            faction = 'PCC'
-        elif 'MASSA' in folder_name:
-            faction = 'MASSA'
-        elif 'OKAIDA' in folder_name:
-            faction = 'OKAIDA'
-        elif 'DISPUTA' in folder_name:
-            faction = 'DISPUTA'
+        faction = _detect_faction_from_folder(folder_name)
 
         if faction == 'NEUTRO':
             continue
@@ -459,32 +544,52 @@ def refresh_orcrim_from_official(force: bool = False):
         _write_update_status(current_status)
         return {'updated': False, 'reason': 'download_failed', 'fallback_used': fallback_available, 'error': str(error)}
 
-    downloaded_hash = _get_content_hash(kml_bytes)
+    downloaded_raw_hash = _get_content_hash(kml_bytes)
+    downloaded_semantic_hash = _get_semantic_content_hash(kml_bytes)
     
-    # Para comparação local, precisamos normalizar o que já temos em disco também
-    def _get_file_content_hash(path):
-        if not os.path.exists(path): return ''
+    # Para comparação local, geramos hashes equivalentes sobre os arquivos persistidos.
+    def _get_file_hashes(path):
+        if not os.path.exists(path):
+            return {'raw': '', 'semantic': ''}
         with open(path, 'rb') as f:
-            return _get_content_hash(f.read())
+            file_bytes = f.read()
+        return {
+            'raw': _get_content_hash(file_bytes),
+            'semantic': _get_semantic_content_hash(file_bytes),
+        }
 
-    current_hash = _get_file_content_hash(CURRENT_KML_PATH)
-    static_hash = _get_file_content_hash(STATIC_KML_PATH)
+    current_hashes = _get_file_hashes(CURRENT_KML_PATH)
+    static_hashes = _get_file_hashes(STATIC_KML_PATH)
     
-    changed = force or (downloaded_hash != current_hash) or (downloaded_hash != static_hash)
-    print(
-        f"🔎 [ORCRIMS] Comparação de conteúdo (SHA256 normalizado): novo={downloaded_hash[:12]}... | "
-        f"atual={current_hash[:12] if current_hash else 'N/A'}... | "
-        f"estático={static_hash[:12] if static_hash else 'N/A'}..."
+    semantic_changed = force or (
+        downloaded_semantic_hash != current_hashes['semantic']
+        or downloaded_semantic_hash != static_hashes['semantic']
     )
+    raw_changed = force or (
+        downloaded_raw_hash != current_hashes['raw']
+        or downloaded_raw_hash != static_hashes['raw']
+    )
+    print(
+        f"🔎 [ORCRIMS] Comparação semântica: novo={downloaded_semantic_hash[:12]}... | "
+        f"atual={current_hashes['semantic'][:12] if current_hashes['semantic'] else 'N/A'}... | "
+        f"estático={static_hashes['semantic'][:12] if static_hashes['semantic'] else 'N/A'}..."
+    )
+    if raw_changed and not semantic_changed:
+        print(
+            f"ℹ️ [ORCRIMS] Diferença detectada apenas no XML bruto/metadados: bruto={downloaded_raw_hash[:12]}... | "
+            f"atual={current_hashes['raw'][:12] if current_hashes['raw'] else 'N/A'}... | "
+            f"estático={static_hashes['raw'][:12] if static_hashes['raw'] else 'N/A'}..."
+        )
 
-    if not changed:
+    if not semantic_changed:
         print('ℹ️ [ORCRIMS] Nenhuma mudança detectada em relação à última base local. Reprocessamento dispensado.')
         current_status.update({
             'last_checked_at': _iso_now(),
             'source_url': source_url,
             'status': 'no_change',
             'fallback_used': False,
-            'download_sha256': downloaded_hash,
+            'download_sha256': downloaded_raw_hash,
+            'download_semantic_sha256': downloaded_semantic_hash,
             'headers': headers,
             'last_error': '',
         })
@@ -505,7 +610,8 @@ def refresh_orcrim_from_official(force: bool = False):
             'source_url': source_url,
             'status': 'fallback_restored',
             'fallback_used': True,
-            'download_sha256': downloaded_hash,
+            'download_sha256': downloaded_raw_hash,
+            'download_semantic_sha256': downloaded_semantic_hash,
             'headers': headers,
             'last_error': str(error),
         })
@@ -518,7 +624,8 @@ def refresh_orcrim_from_official(force: bool = False):
         'source_url': source_url,
         'status': 'updated',
         'fallback_used': False,
-        'download_sha256': downloaded_hash,
+        'download_sha256': downloaded_raw_hash,
+        'download_semantic_sha256': downloaded_semantic_hash,
         'headers': headers,
         'last_error': '',
     })

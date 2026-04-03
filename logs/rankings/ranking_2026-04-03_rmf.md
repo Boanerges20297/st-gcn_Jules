@@ -1,0 +1,28 @@
+# 🛡️ Relatório de Risco Diário - REGIÃO METROPOLITANA
+**Data de Geração:** 03/04/2026 19:11:00
+**Estado da Base Histórica:** 2026-03-27 00:00:00
+
+| Pos | Localidade | Risco (%) | Facção Predominante |
+|:---:|:---|:---:|:---:|
+| 1 | CAUCAIA | 84.33% | CV |
+| 2 | MARACANAU | 76.03% | CV |
+| 3 | PARAIPABA | 29.60% | CV |
+| 4 | SAO LUIS DO CURU | 23.93% | CV |
+| 5 | HORIZONTE | 18.91% | CV |
+| 6 | EUSEBIO | 13.06% | CV |
+| 7 | PINDORETAMA | 10.37% | CV |
+| 8 | PACAJUS | 10.37% | CV |
+| 9 | PACATUBA | 10.21% | CV |
+| 10 | ITAITINGA | 10.03% | CV |
+| 11 | AQUIRAZ | 0.00% | CV |
+| 12 | PARACURU | 0.00% | CV |
+| 13 | MARANGUAPE | 0.00% | CV |
+| 14 | GUAIUBA | 0.00% | CV |
+| 15 | TRAIRI | 0.00% | CV |
+| 16 | CHOROZINHO | 0.00% | CV |
+| 17 | CASCAVEL | 0.00% | CV |
+| 18 | SAO GONCALO DO AMARANTE | 0.00% | CV |
+| 19 | BEBERIBE | 0.00% | CV |
+
+
+*Nota: Este ranking reflete o estado de inteligência do modelo no início do dia operacional.*

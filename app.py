@@ -2197,6 +2197,13 @@ def explain_node(node_id):
         sorted_by_score = sorted(node_score_pairs, key=lambda x: x[1], reverse=True)
         ranks = {nid: idx + 1 for idx, (nid, _) in enumerate(sorted_by_score)}
         rank_pos = ranks.get(node_id, len(sorted_by_score))
+        total_nodes = len(sorted_by_score)
+        score_mean = float(np.mean(all_scores)) if all_scores else 0.0
+        score_std = float(np.std(all_scores)) if len(all_scores) > 1 else 0.0
+        score_median = float(np.median(all_scores)) if all_scores else 0.0
+        score_gap_pct = float(score_pct - score_mean)
+        score_zscore = float(score_gap_pct / score_std) if score_std > 1e-6 else 0.0
+        top_slice_pct = float((rank_pos / max(1, total_nodes)) * 100.0)
 
         pct_rank = rank_pos / max(1, len(sorted_by_score))
         if rank_pos <= 5: tier = 'top_5'
@@ -2234,12 +2241,94 @@ def explain_node(node_id):
                             events.append(e)
         except: events = []
 
-        temporal_pattern = 'Increasing' if score_pct > float(np.mean(all_scores)) else 'Stable'
-        confidence = min(0.95, 0.6 + (score_10 / 20.0))
+        region_type = str(row.get('region_type') or row.get('regiao') or '').lower()
+        faction = str(row.get('faction') or 'NEUTRO').upper()
+        tension_index = float(row.get('tension_index', 0.0) or 0.0)
+
+        event_types = []
+        total_event_intensity = 0.0
+        critical_event_count = 0
+        suppression_event_count = 0
+        conflict_intensity = 0.0
+        suppression_intensity = 0.0
+        for event in events:
+            raw_intensity = event.get('intensity') or event.get('severity') or 1.0
+            try:
+                intensity = float(raw_intensity)
+            except (TypeError, ValueError):
+                intensity = 1.0
+            total_event_intensity += intensity
+
+            is_suppression = bool(event.get('is_qualified_suppression') is True or event.get('is_suppression') is True)
+            if is_suppression:
+                suppression_event_count += 1
+                suppression_intensity += intensity
+            else:
+                critical_event_count += 1
+                conflict_intensity += intensity
+
+            event_type = str(event.get('natureza') or event.get('tipo') or event.get('title') or event.get('descricao') or '').strip()
+            if event_type and event_type not in event_types:
+                event_types.append(event_type)
+
+        critical_streets = 'Sem logradouros críticos recentes'
+        critical_streets_count = 0
+        try:
+            if region_type == 'fortaleza':
+                streets_path = os.path.join(BASE_DIR, 'data', 'raw', 'ruas_criticas_por_bairro.json')
+                if os.path.exists(streets_path):
+                    with open(streets_path, 'r', encoding='utf-8') as sf:
+                        streets_cache = json.load(sf) or {}
+                    normalized_cache = {normalize_name(k): v for k, v in streets_cache.items() if k}
+                    critical_streets = normalized_cache.get(name_norm)
+                    if critical_streets is None:
+                        for cache_key, cache_value in normalized_cache.items():
+                            if name_norm in cache_key or cache_key in name_norm:
+                                critical_streets = cache_value
+                                break
+            else:
+                streets_path = os.path.join(BASE_DIR, 'data', 'streets_by_municipio.json')
+                if os.path.exists(streets_path):
+                    with open(streets_path, 'r', encoding='utf-8') as sf:
+                        streets_by_city = json.load(sf) or {}
+                    critical_streets = streets_by_city.get(name_norm)
+        except Exception as e:
+            logging.warning(f"Erro ao carregar ruas críticas para explicação de {name}: {e}")
+            critical_streets = 'Sem logradouros críticos recentes'
+
+        if isinstance(critical_streets, list):
+            critical_streets = [str(item).strip() for item in critical_streets if str(item).strip()]
+            critical_streets_count = len(critical_streets)
+            if not critical_streets:
+                critical_streets = 'Sem logradouros críticos recentes'
+        else:
+            critical_streets = str(critical_streets or 'Sem logradouros críticos recentes').strip()
+            if critical_streets and not critical_streets.lower().startswith('sem logradouros'):
+                critical_streets_count = len([part for part in re.split(r',|;', critical_streets) if part.strip()])
+
+        temporal_pattern = 'Increasing' if score_pct > score_mean else 'Stable'
+        heuristic_confidence = min(0.95, 0.6 + (score_10 / 20.0))
 
         # --- EXTRAÇÃO DE DADOS REAIS DOS TENSORES (PARA EXPLICABILIDADE) ---
+        cvli_recent_7 = 0
+        cvli_prev_7 = 0
         cvli_recent = 0
         cvli_prev = 0
+        cvli_recent_30 = 0
+        vehicles_recent_14 = 0.0
+        intel_recent_14 = 0.0
+        rolling_cvli_7d = 0.0
+        global_cvli_latest = 0.0
+        rain_acc_14 = 0.0
+        rainy_days_14 = 0
+        holiday_days_14 = 0
+        hot_days_14 = 0
+        weekend_days_14 = 0
+        geo_neighbor_count = 0
+        conflict_neighbor_count = 0
+        high_risk_neighbor_count = 0
+        neighbor_mean_score = 0.0
+        neighbor_max_score = 0.0
         nearby_names = []
 
         try:
@@ -2257,12 +2346,27 @@ def explain_node(node_id):
                 if spec_idx is not None:
                     features = spec['data']['node_features'] # (N, T, F)
                     # Janela Recente (Últimos 14 dias) vs Anterior (14 dias antes disso)
+                    cvli_recent_7 = int(features[spec_idx, -7:, 0].sum())
+                    cvli_prev_7 = int(features[spec_idx, -14:-7, 0].sum()) if features.shape[1] >= 14 else 0
                     cvli_recent = int(features[spec_idx, -14:, 0].sum())
                     cvli_prev = int(features[spec_idx, -28:-14, 0].sum())
+                    cvli_recent_30 = int(features[spec_idx, -30:, 0].sum()) if features.shape[1] >= 30 else cvli_recent
+                    vehicles_recent_14 = float(features[spec_idx, -14:, 1].sum()) if features.shape[2] > 1 else 0.0
+                    intel_recent_14 = float(features[spec_idx, -14:, 27].sum()) if features.shape[2] > 27 else 0.0
+                    rolling_cvli_7d = float(features[spec_idx, -1, 24]) if features.shape[2] > 24 else 0.0
+                    global_cvli_latest = float(features[spec_idx, -1, 28]) if features.shape[2] > 28 else 0.0
+                    holiday_days_14 = int(features[spec_idx, -14:, 29].sum()) if features.shape[2] > 29 else 0
+                    hot_days_14 = int(features[spec_idx, -14:, 30].sum()) if features.shape[2] > 30 else 0
+                    rain_acc_14 = float(features[spec_idx, -14:, 31].sum()) if features.shape[2] > 31 else 0.0
+                    rainy_days_14 = int(features[spec_idx, -14:, 32].sum()) if features.shape[2] > 32 else 0
+                    weekend_days_14 = int(features[spec_idx, -14:, 22].sum()) if features.shape[2] > 22 else 0
                     
                     # 2. Vizinhos Geográficos Reais (via Matriz de Adjacência)
                     adj_geo = spec['data']['adj_geo']
                     neighbor_indices = np.where(adj_geo[spec_idx] > 0)[0]
+                    geo_neighbor_count = max(0, len(neighbor_indices) - 1)
+                    adj_conflict = spec['data']['adj_conflict']
+                    conflict_neighbor_count = max(0, int(np.sum(adj_conflict[spec_idx] > 0)) - 1)
                     
                     # Pegar os 3 vizinhos com maior risco atual para o "efeito de contágio"
                     n_scores = []
@@ -2275,6 +2379,11 @@ def explain_node(node_id):
                     # Ordenar por risco e pegar nomes
                     n_scores.sort(key=lambda x: x[1], reverse=True)
                     nearby_names = [x[0] for x in n_scores[:3]]
+                    if n_scores:
+                        neighbor_values = [item[1] for item in n_scores]
+                        neighbor_mean_score = float(np.mean(neighbor_values))
+                        neighbor_max_score = float(np.max(neighbor_values))
+                        high_risk_neighbor_count = sum(1 for _, n_score in n_scores if n_score >= 50.0)
                     
                     logging.info(f"📊 EXPLAIN [{name}]: recent={cvli_recent}, prev={cvli_prev}, neighbors={nearby_names}")
         except Exception as e:
@@ -2289,21 +2398,60 @@ def explain_node(node_id):
                 'node_id': int(node_id),
                 'name': name,
                 'score': score_10,
+                'score_pct': float(score_pct),
+                'avg_score_pct': score_mean,
+                'median_score_pct': score_median,
+                'score_gap_pct': score_gap_pct,
+                'score_zscore': score_zscore,
                 'temporal_pattern': 'Increasing' if cvli_recent > cvli_prev else 'Stable',
+                'cvli_recent_7': cvli_recent_7,
+                'cvli_prev_7': cvli_prev_7,
                 'cvli_count_recent': cvli_recent,
                 'cvli_count_prev': cvli_prev,
+                'cvli_recent_30': cvli_recent_30,
+                'vehicles_recent_14': vehicles_recent_14,
+                'intel_recent_14': intel_recent_14,
+                'rolling_cvli_7d': rolling_cvli_7d,
+                'global_cvli_latest': global_cvli_latest,
+                'rain_acc_14': rain_acc_14,
+                'rainy_days_14': rainy_days_14,
+                'holiday_days_14': holiday_days_14,
+                'hot_days_14': hot_days_14,
+                'weekend_days_14': weekend_days_14,
                 'nearby_nodes': nearby,
                 'nearby_impact_names': nearby_names,
+                'geo_neighbor_count': geo_neighbor_count,
+                'conflict_neighbor_count': conflict_neighbor_count,
+                'high_risk_neighbor_count': high_risk_neighbor_count,
+                'neighbor_mean_score': neighbor_mean_score,
+                'neighbor_max_score': neighbor_max_score,
                 'events': events,
-                'confidence': float(confidence),
-                'tier': tier
+                'events_count_total': len(events),
+                'critical_event_count': critical_event_count,
+                'suppression_event_count': suppression_event_count,
+                'event_types': event_types,
+                'event_types_count': len(event_types),
+                'total_event_intensity': total_event_intensity,
+                'conflict_intensity': conflict_intensity,
+                'suppression_intensity': suppression_intensity,
+                'confidence': float(heuristic_confidence),
+                'heuristic_confidence_seed': float(heuristic_confidence),
+                'tier': tier,
+                'total_nodes': total_nodes,
+                'top_slice_pct': top_slice_pct,
+                'region_type': region_type,
+                'faction': faction,
+                'tension_index': tension_index,
+                'trend_label': str(temporal_pattern).lower(),
+                'critical_streets': critical_streets,
+                'critical_streets_count': critical_streets_count,
             }
 
             explanation = gen.explain_node_ranking(int(node_id), int(rank_pos), context)
             explanation['risk_score_pct'] = float(score_pct)
 
             # Percentil de confiança na previsão
-            conf_pct = round(float(confidence) * 100.0, 1)
+            conf_pct = float(explanation.get('confidence_pct', round(float(explanation.get('confidence', heuristic_confidence)) * 100.0, 1)))
             if conf_pct >= 80:
                 conf_label = 'Alta'
             elif conf_pct >= 60:
@@ -2312,8 +2460,8 @@ def explain_node(node_id):
                 conf_label = 'Baixa'
             else:
                 conf_label = 'Muito baixa'
-            explanation['confidence_pct']   = conf_pct
-            explanation['confidence_label'] = conf_label
+            explanation['confidence_pct'] = conf_pct
+            explanation['confidence_label'] = explanation.get('confidence_label') or conf_label
 
             # ENVIAR DIRETAMENTE PARA O FRONTEND (Sem normalização que apaga campos)
             return jsonify(explanation)
@@ -2325,7 +2473,7 @@ def explain_node(node_id):
                 'node_id': node_id,
                 'name': name,
                 'risk_score_pct': float(score_pct),
-                'confidence': float(confidence),
+                'confidence': float(heuristic_confidence),
                 'summary': 'Métricas e explicabilidade indisponíveis',
                 'factors': [],
                 'caveats': [],

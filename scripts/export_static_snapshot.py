@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Tuple
 
+import numpy as np
+
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
@@ -25,6 +27,10 @@ REGION_EXPORTS = (
 )
 MOMENTUM_WINDOW_DAYS = 14
 RECENT_EXOGENOUS_WINDOW_DAYS = 14
+
+
+def _safe_feature_name(index: int) -> str:
+    return f"channel_{index:02d}"
 
 
 def _ensure_dir(path: Path) -> None:
@@ -328,6 +334,338 @@ def _build_explainability(risk_items: List[Dict[str, Any]]) -> Dict[str, Dict[st
     return explainability
 
 
+def _compute_momentum_channels(features, spec_idx: int) -> Dict[int, float]:
+    series = features[spec_idx, :, 0]
+    total_steps = len(series)
+    if total_steps < 2:
+        return {33: 0.0, 34: 0.0, 35: 0.0, 36: 0.0}
+
+    recent_7 = float(series[max(0, total_steps - 7): total_steps].sum())
+    prev_7 = float(series[max(0, total_steps - 14): max(0, total_steps - 7)].sum()) if total_steps >= 14 else 0.0
+    recent_14 = float(series[max(0, total_steps - 14): total_steps].sum())
+    prev_14 = float(series[max(0, total_steps - 28): max(0, total_steps - 14)].sum()) if total_steps >= 28 else 0.0
+    recent_30 = float(series[max(0, total_steps - 30): total_steps].sum())
+    prev_30 = float(series[max(0, total_steps - 60): max(0, total_steps - 30)].sum()) if total_steps >= 60 else 0.0
+
+    cold_streak = 0
+    for value in reversed(series):
+        if value > 0:
+            break
+        cold_streak += 1
+
+    return {
+        33: recent_7 - prev_7,
+        34: recent_14 - prev_14,
+        35: recent_30 - prev_30,
+        36: -float(min(cold_streak, 30)),
+    }
+
+
+def _extract_feature_channel_windows(features, spec_idx: int, gen) -> Dict[str, Dict[str, float]]:
+    catalog = gen.get_feature_channel_catalog()
+    latest = {}
+    sum_7d = {}
+    sum_14d = {}
+    sum_30d = {}
+    channels = features.shape[2]
+    momentum_channels = _compute_momentum_channels(features, spec_idx)
+
+    for channel_index in range(channels):
+        channel_meta = catalog.get(str(channel_index), {})
+        channel_name = channel_meta.get('key') or _safe_feature_name(channel_index)
+        latest[channel_name] = round(float(features[spec_idx, -1, channel_index]), 6)
+        sum_7d[channel_name] = round(float(features[spec_idx, -7:, channel_index].sum()), 6)
+        sum_14d[channel_name] = round(float(features[spec_idx, -14:, channel_index].sum()), 6)
+        sum_30d[channel_name] = round(float(features[spec_idx, -30:, channel_index].sum()), 6) if features.shape[1] >= 30 else round(float(features[spec_idx, :, channel_index].sum()), 6)
+
+    for channel_index, value in momentum_channels.items():
+        channel_meta = catalog.get(str(channel_index), {})
+        channel_name = channel_meta.get('key') or _safe_feature_name(channel_index)
+        latest[channel_name] = round(float(value), 6)
+        sum_7d[channel_name] = round(float(value), 6)
+        sum_14d[channel_name] = round(float(value), 6)
+        sum_30d[channel_name] = round(float(value), 6)
+
+    return {
+        'latest': latest,
+        'sum_7d': sum_7d,
+        'sum_14d': sum_14d,
+        'sum_30d': sum_30d,
+    }
+
+
+def _load_critical_streets_for_academics(region_type: str, name_norm: str):
+    critical_streets = 'Sem logradouros críticos recentes'
+    if region_type == 'fortaleza':
+        streets_path = ROOT_DIR / 'data' / 'raw' / 'ruas_criticas_por_bairro.json'
+        if streets_path.exists():
+            streets_cache = json.loads(streets_path.read_text(encoding='utf-8')) or {}
+            normalized_cache = {report_app.normalize_name(k): v for k, v in streets_cache.items() if k}
+            critical_streets = normalized_cache.get(name_norm)
+            if critical_streets is None:
+                for cache_key, cache_value in normalized_cache.items():
+                    if name_norm in cache_key or cache_key in name_norm:
+                        critical_streets = cache_value
+                        break
+    else:
+        streets_path = ROOT_DIR / 'data' / 'streets_by_municipio.json'
+        if streets_path.exists():
+            streets_by_city = json.loads(streets_path.read_text(encoding='utf-8')) or {}
+            critical_streets = streets_by_city.get(name_norm)
+
+    if critical_streets is None:
+        critical_streets = 'Sem logradouros críticos recentes'
+    return critical_streets
+
+
+def _match_events_for_node(name_norm: str, events: List[Dict[str, Any]], last_date_base) -> List[Dict[str, Any]]:
+    matched = []
+    for event in events:
+        event_date_str = event.get('date') or event.get('event_date')
+        if not report_app.verify_date_consistency(event_date_str, last_date_base):
+            continue
+        evt_bairro = report_app.normalize_name(str(event.get('bairro', '')))
+        evt_mun = report_app.normalize_name(str(event.get('municipio', '')))
+        evt_title = report_app.normalize_name(str(event.get('title', '')))
+        evt_loc = report_app.normalize_name(str(event.get('location', '')))
+        if (name_norm and (name_norm == evt_bairro or name_norm in evt_title or name_norm in evt_loc)) or \
+           (not evt_bairro and evt_mun and (evt_mun == name_norm or name_norm in evt_mun)):
+            matched.append(event)
+    return matched
+
+
+def _build_explainability_academics(risk_items: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    from src.explanation_generator import ExplanationGenerator
+
+    gen = ExplanationGenerator()
+    explainability_academics: Dict[str, Dict[str, Any]] = {
+        '_meta': {
+            'artifact': 'explainability_academics',
+            'schema_version': '1.0',
+            'purpose': 'Artefato acadêmico paralelo para pesquisa complementar e modelos auxiliares de distribuição de equipes.',
+            'frontend_visible': False,
+            'feature_channel_catalog': gen.get_feature_channel_catalog(),
+        }
+    }
+
+    if report_app.nodes_gdf is None or report_app.orchestrator is None:
+        return explainability_academics
+
+    scores = []
+    node_score_pairs = []
+    score_by_name = {}
+    for item in risk_items:
+        node_id = item.get('node_id')
+        if node_id is None:
+            continue
+        score = _safe_float(item.get('risk_score'))
+        clean_name = str(item.get('clean_name') or report_app.normalize_name(str(item.get('name') or '')))
+        scores.append(score)
+        node_score_pairs.append((int(node_id), score))
+        score_by_name[clean_name] = score
+
+    sorted_by_score = sorted(node_score_pairs, key=lambda x: x[1], reverse=True)
+    ranks = {nid: idx + 1 for idx, (nid, _) in enumerate(sorted_by_score)}
+    total_nodes = len(sorted_by_score)
+    score_mean = float(np.mean(scores)) if scores else 0.0
+    score_std = float(np.std(scores)) if len(scores) > 1 else 0.0
+    score_median = float(np.median(scores)) if scores else 0.0
+    exogenous_events = _load_exogenous_events()
+    orchestrator_dates = getattr(report_app.orchestrator, 'dates', None)
+    last_date_base = orchestrator_dates[-1] if orchestrator_dates is not None and len(orchestrator_dates) > 0 else None
+
+    for item in risk_items:
+        node_id = item.get('node_id')
+        if node_id is None:
+            continue
+        try:
+            row = report_app.nodes_gdf.loc[int(node_id)]
+        except Exception:
+            continue
+
+        name = str(row.get('name') or row.get('bairro') or row.get('municipio') or item.get('name') or f'Localidade {node_id}')
+        name_norm = report_app.normalize_name(name)
+        score_pct = _safe_float(item.get('risk_score'))
+        score_10 = score_pct / 10.0
+        rank_pos = ranks.get(int(node_id), total_nodes)
+        pct_rank = rank_pos / max(1, total_nodes)
+        if rank_pos <= 5:
+            tier = 'top_5'
+        elif pct_rank <= 0.2:
+            tier = 'long_tail_20'
+        elif pct_rank <= 0.5:
+            tier = 'long_tail_50'
+        else:
+            tier = 'tail'
+
+        score_gap_pct = float(score_pct - score_mean)
+        score_zscore = float(score_gap_pct / score_std) if score_std > 1e-6 else 0.0
+        top_slice_pct = float((rank_pos / max(1, total_nodes)) * 100.0)
+
+        region_type = str(row.get('region_type') or row.get('regiao') or item.get('region_type') or '').lower()
+        faction = str(row.get('faction') or item.get('faction') or 'NEUTRO').upper()
+        tension_index = float(row.get('tension_index', 0.0) or 0.0)
+        critical_streets = _load_critical_streets_for_academics(region_type, name_norm)
+        if isinstance(critical_streets, list):
+            critical_streets_count = len([item for item in critical_streets if str(item).strip()])
+        else:
+            streets_text = str(critical_streets or '').strip()
+            critical_streets_count = len([part for part in streets_text.replace(';', ',').split(',') if part.strip()]) if streets_text and not streets_text.lower().startswith('sem logradouros') else 0
+        matched_events = _match_events_for_node(name_norm, exogenous_events, last_date_base)
+
+        event_types = []
+        total_event_intensity = 0.0
+        critical_event_count = 0
+        suppression_event_count = 0
+        conflict_intensity = 0.0
+        suppression_intensity = 0.0
+        for event in matched_events:
+            raw_intensity = event.get('intensity') or event.get('severity') or 1.0
+            intensity = _safe_float(raw_intensity, 1.0)
+            total_event_intensity += intensity
+            is_suppression = bool(event.get('is_qualified_suppression') is True or event.get('is_suppression') is True)
+            if is_suppression:
+                suppression_event_count += 1
+                suppression_intensity += intensity
+            else:
+                critical_event_count += 1
+                conflict_intensity += intensity
+            event_type = str(event.get('natureza') or event.get('tipo') or event.get('title') or event.get('descricao') or '').strip()
+            if event_type and event_type not in event_types:
+                event_types.append(event_type)
+
+        cvli_recent_7 = 0
+        cvli_prev_7 = 0
+        cvli_recent = 0
+        cvli_prev = 0
+        cvli_recent_30 = 0
+        vehicles_recent_14 = 0.0
+        intel_recent_14 = 0.0
+        rolling_cvli_7d = 0.0
+        global_cvli_latest = 0.0
+        rain_acc_14 = 0.0
+        rainy_days_14 = 0
+        holiday_days_14 = 0
+        hot_days_14 = 0
+        weekend_days_14 = 0
+        geo_neighbor_count = 0
+        conflict_neighbor_count = 0
+        high_risk_neighbor_count = 0
+        neighbor_mean_score = 0.0
+        neighbor_max_score = 0.0
+        nearby_names = []
+        feature_windows = {'latest': {}, 'sum_7d': {}, 'sum_14d': {}, 'sum_30d': {}}
+
+        try:
+            reg_key = str(row.get('regiao', region_type or 'fortaleza')).lower()
+            if reg_key == 'capital':
+                reg_key = 'fortaleza'
+            if name_norm in getattr(report_app, '_RMF_NODES', set()):
+                reg_key = 'rmf'
+            spec = report_app.orchestrator.specialists.get(reg_key)
+            if spec:
+                spec_nodes = spec['data']['nodes_gdf']
+                spec_idx = next((idx for idx, r in spec_nodes.iterrows() if report_app.normalize_name(r['name']) == name_norm), None)
+                if spec_idx is not None:
+                    features = spec['data']['node_features']
+                    cvli_recent_7 = int(features[spec_idx, -7:, 0].sum())
+                    cvli_prev_7 = int(features[spec_idx, -14:-7, 0].sum()) if features.shape[1] >= 14 else 0
+                    cvli_recent = int(features[spec_idx, -14:, 0].sum())
+                    cvli_prev = int(features[spec_idx, -28:-14, 0].sum()) if features.shape[1] >= 28 else 0
+                    cvli_recent_30 = int(features[spec_idx, -30:, 0].sum()) if features.shape[1] >= 30 else cvli_recent
+                    vehicles_recent_14 = float(features[spec_idx, -14:, 1].sum()) if features.shape[2] > 1 else 0.0
+                    intel_recent_14 = float(features[spec_idx, -14:, 27].sum()) if features.shape[2] > 27 else 0.0
+                    rolling_cvli_7d = float(features[spec_idx, -1, 24]) if features.shape[2] > 24 else 0.0
+                    global_cvli_latest = float(features[spec_idx, -1, 28]) if features.shape[2] > 28 else 0.0
+                    holiday_days_14 = int(features[spec_idx, -14:, 29].sum()) if features.shape[2] > 29 else 0
+                    hot_days_14 = int(features[spec_idx, -14:, 30].sum()) if features.shape[2] > 30 else 0
+                    rain_acc_14 = float(features[spec_idx, -14:, 31].sum()) if features.shape[2] > 31 else 0.0
+                    rainy_days_14 = int(features[spec_idx, -14:, 32].sum()) if features.shape[2] > 32 else 0
+                    weekend_days_14 = int(features[spec_idx, -14:, 22].sum()) if features.shape[2] > 22 else 0
+                    feature_windows = _extract_feature_channel_windows(features, spec_idx, gen)
+
+                    adj_geo = spec['data']['adj_geo']
+                    neighbor_indices = np.where(adj_geo[spec_idx] > 0)[0]
+                    geo_neighbor_count = max(0, len(neighbor_indices) - 1)
+                    adj_conflict = spec['data']['adj_conflict']
+                    conflict_neighbor_count = max(0, int(np.sum(adj_conflict[spec_idx] > 0)) - 1)
+
+                    neighbor_scores = []
+                    for neighbor_index in neighbor_indices:
+                        if neighbor_index == spec_idx:
+                            continue
+                        neighbor_name = report_app.normalize_name(spec_nodes.iloc[neighbor_index]['name'])
+                        neighbor_score = float(score_by_name.get(neighbor_name, 0.0))
+                        neighbor_scores.append((neighbor_name, neighbor_score))
+                    neighbor_scores.sort(key=lambda x: x[1], reverse=True)
+                    nearby_names = [entry[0] for entry in neighbor_scores[:5]]
+                    if neighbor_scores:
+                        neighbor_values = [entry[1] for entry in neighbor_scores]
+                        neighbor_mean_score = float(np.mean(neighbor_values))
+                        neighbor_max_score = float(np.max(neighbor_values))
+                        high_risk_neighbor_count = sum(1 for _, value in neighbor_scores if value >= 50.0)
+        except Exception:
+            pass
+
+        context = {
+            'node_id': int(node_id),
+            'name': name,
+            'score': score_10,
+            'score_pct': score_pct,
+            'avg_score_pct': score_mean,
+            'median_score_pct': score_median,
+            'score_gap_pct': score_gap_pct,
+            'score_zscore': score_zscore,
+            'cvli_recent_7': cvli_recent_7,
+            'cvli_prev_7': cvli_prev_7,
+            'cvli_count_recent': cvli_recent,
+            'cvli_count_prev': cvli_prev,
+            'cvli_recent_30': cvli_recent_30,
+            'vehicles_recent_14': vehicles_recent_14,
+            'intel_recent_14': intel_recent_14,
+            'rolling_cvli_7d': rolling_cvli_7d,
+            'global_cvli_latest': global_cvli_latest,
+            'rain_acc_14': rain_acc_14,
+            'rainy_days_14': rainy_days_14,
+            'holiday_days_14': holiday_days_14,
+            'hot_days_14': hot_days_14,
+            'weekend_days_14': weekend_days_14,
+            'nearby_impact_names': nearby_names,
+            'geo_neighbor_count': geo_neighbor_count,
+            'conflict_neighbor_count': conflict_neighbor_count,
+            'high_risk_neighbor_count': high_risk_neighbor_count,
+            'neighbor_mean_score': neighbor_mean_score,
+            'neighbor_max_score': neighbor_max_score,
+            'events_count_total': len(matched_events),
+            'critical_event_count': critical_event_count,
+            'suppression_event_count': suppression_event_count,
+            'event_types': event_types,
+            'event_types_count': len(event_types),
+            'total_event_intensity': total_event_intensity,
+            'conflict_intensity': conflict_intensity,
+            'suppression_intensity': suppression_intensity,
+            'confidence': min(0.95, 0.6 + (score_10 / 20.0)),
+            'heuristic_confidence_seed': min(0.95, 0.6 + (score_10 / 20.0)),
+            'tier': tier,
+            'total_nodes': total_nodes,
+            'top_slice_pct': top_slice_pct,
+            'region_type': region_type,
+            'faction': faction,
+            'tension_index': tension_index,
+            'critical_streets': critical_streets,
+            'critical_streets_count': critical_streets_count,
+            'feature_channels_latest': feature_windows['latest'],
+            'feature_channels_sum_7d': feature_windows['sum_7d'],
+            'feature_channels_sum_14d': feature_windows['sum_14d'],
+            'feature_channels_sum_30d': feature_windows['sum_30d'],
+        }
+
+        item_id = _snapshot_item_id(str(item.get('region_type') or region_type), str(item.get('clean_name') or name_norm))
+        explainability_academics[item_id] = gen.build_academic_node_ranking(int(node_id), int(rank_pos), context)
+
+    return explainability_academics
+
+
 def _copy_top_layer(region: str, target_path: Path) -> Dict[str, Any]:
     payload = _request_json(
         f"/api/top20_micro_nodes?region={region}&limit=30",
@@ -562,9 +900,25 @@ def export_snapshot(output_dir: Path) -> Path:
     )
     _write_json(output_dir / "territory_details.json", territory_details)
     _write_json(output_dir / "explainability.json", explainability_index)
+    _write_json(output_dir / "explainability_academics.json", _build_explainability_academics(risk_items))
     _write_json(output_dir / "polygons.geojson", _enrich_polygons_with_risk(polygons_payload, risk_items))
     _write_json(output_dir / "micronodes.geojson", micronodes_payload)
 
+    return output_dir
+
+
+def export_academic_explainability(output_dir: Path) -> Path:
+    if report_app.nodes_gdf is None or report_app.orchestrator is None:
+        report_app.load_data_and_models()
+
+    if report_app.nodes_gdf is None or report_app.orchestrator is None:
+        raise RuntimeError("Aplicação ainda não inicializada; exporter acadêmico não pode continuar.")
+
+    _ensure_dir(output_dir)
+    risk_payload = _request_json("/api/risk", report_app.get_risk)
+    risk_items = _dedupe_risk_items(list(risk_payload.get("data", [])))
+    risk_items.sort(key=lambda item: _safe_float(item.get("risk_score")), reverse=True)
+    _write_json(output_dir / "explainability_academics.json", _build_explainability_academics(risk_items))
     return output_dir
 
 
@@ -577,6 +931,11 @@ def parse_args() -> argparse.Namespace:
         default=str(DEFAULT_OUTPUT_DIR),
         help="Diretório de saída para os artefatos estáticos.",
     )
+    parser.add_argument(
+        "--academics-only",
+        action="store_true",
+        help="Gera apenas o artefato explainability_academics.json sem reexportar o snapshot completo.",
+    )
     return parser.parse_args()
 
 
@@ -584,7 +943,10 @@ def main() -> int:
     args = parse_args()
     output_dir = Path(args.output_dir).resolve()
     try:
-        export_snapshot(output_dir)
+        if args.academics_only:
+            export_academic_explainability(output_dir)
+        else:
+            export_snapshot(output_dir)
     except Exception as exc:
         print(f"ERRO: {exc}")
         return 1

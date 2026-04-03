@@ -2541,6 +2541,26 @@
         "memory_percent": 91.1
       },
       "resolved": false
+    },
+    {
+      "timestamp": "2026-04-03T19:44:38.718203",
+      "type": "high_cpu",
+      "severity": "HIGH",
+      "message": "CPU alta: 89.5%",
+      "details": {
+        "cpu_percent": 89.5
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-04-03T19:49:39.868481",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 5.56%",
+      "details": {
+        "error_rate_percent": 5.555555555555555
+      },
+      "resolved": false
     }
   ]
 }

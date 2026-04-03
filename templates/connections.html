@@ -595,14 +595,8 @@
             $('#count-critical').text(critical);
             $('#count-high').text(high);
             
-<<<<<<< HEAD
-            const effRegion = eff[currentRegion] || eff.global;
-            const p10 = effRegion && effRegion.p20 !== undefined ? (effRegion.p20 * 100).toFixed(1) + '%' : 'N/A';
-            $('#p10-global').text(p10);
-=======
             // Prioriza métrica da região selecionada, fallback para global
             const regEff = eff[currentRegion] || eff.global;
->>>>>>> 1c8590440cd2e88b9305a5cd506e3f410949aa9c
             
             // Cobertura Territorial (Cov@20): Usa recall20 (Recall) ou p20 (Precision) se disponível
             let covValue = 'Calculando...';
