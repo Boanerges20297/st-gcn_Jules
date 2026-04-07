@@ -33,6 +33,7 @@ import sys
 import logging
 import random
 import gc
+import subprocess
 
 # Caminhos de sistema
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -194,6 +195,69 @@ def rebuild_raw_cvli_context(features):
             np.convolve(rebuilt[node_idx, :, 0], np.ones(7, dtype=np.float32), mode='full')[:rebuilt.shape[1]]
         )
     return rebuilt
+
+
+def run_repo_git_command(args):
+    return subprocess.run(
+        ['git', *args],
+        cwd=ROOT_DIR,
+        capture_output=True,
+        text=True,
+        encoding='utf-8',
+        errors='replace',
+        timeout=180,
+        check=False,
+        env={
+            **os.environ,
+            'PYTHONIOENCODING': 'utf-8',
+        },
+    )
+
+
+def publish_training_artifacts(trained_regions, failed_regions):
+    logging.info("📤 Verificando alterações git do repositório principal após o treino...")
+
+    status_result = run_repo_git_command(['status', '--porcelain'])
+    if status_result.returncode != 0:
+        raise RuntimeError(
+            f"Falha ao consultar status git do repositório principal: "
+            f"{status_result.stderr.strip() or status_result.stdout.strip()}"
+        )
+
+    changed_entries = [line for line in status_result.stdout.splitlines() if line.strip()]
+    if not changed_entries:
+        logging.info("ℹ️ Nenhuma alteração detectada para publicar no repositório principal.")
+        return
+
+    add_result = run_repo_git_command(['add', '-A'])
+    if add_result.returncode != 0:
+        raise RuntimeError(f"Falha no git add do repositório principal: {add_result.stderr.strip() or add_result.stdout.strip()}")
+
+    trained_label = '-'.join(trained_regions) if trained_regions else 'sem-regioes'
+    status_label = 'partial' if failed_regions else 'complete'
+    commit_message = (
+        f"chore: finalize specialists training {status_label} "
+        f"[{trained_label}] {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    )
+
+    commit_result = run_repo_git_command(['commit', '-m', commit_message])
+    if commit_result.returncode != 0:
+        combined_output = (commit_result.stderr or commit_result.stdout or '').strip()
+        if 'nothing to commit' not in combined_output.lower():
+            raise RuntimeError(f"Falha no git commit do repositório principal: {combined_output}")
+
+    pull_result = run_repo_git_command(['pull', '--rebase', 'origin', 'main'])
+    if pull_result.returncode != 0:
+        logging.warning(
+            f"⚠️ Falha no git pull --rebase antes do push: "
+            f"{pull_result.stderr.strip() or pull_result.stdout.strip()}"
+        )
+
+    push_result = run_repo_git_command(['push', 'origin', 'main'])
+    if push_result.returncode != 0:
+        raise RuntimeError(f"Falha no git push do repositório principal: {push_result.stderr.strip() or push_result.stdout.strip()}")
+
+    logging.info(f"✅ Alterações do treino publicadas no repositório principal com commit: {commit_message}")
 
 
 class BinaryFocalRankingLoss(nn.Module):
@@ -450,16 +514,27 @@ def main():
     # Treina sequencialmente: fortaleza → rmf → interior
     # Para treinar apenas uma região: comente as outras ou passe argv
     regions = sys.argv[1:] if len(sys.argv) > 1 else list(REGION_CONFIGS.keys())
+    trained_regions = []
+    failed_regions = []
     for region in regions:
         if region not in REGION_CONFIGS:
             logging.error(f"❌ Região desconhecida: {region}. Opções: {list(REGION_CONFIGS.keys())}")
+            failed_regions.append(region)
             continue
         try:
             SpecialistTrainer(region).train()
+            trained_regions.append(region)
         except Exception as exc:
+            failed_regions.append(region)
             logging.error(f"❌ ERRO CRÍTICO em {region.upper()}: {exc}")
             import traceback
             traceback.print_exc()
+
+    if trained_regions:
+        try:
+            publish_training_artifacts(trained_regions, failed_regions)
+        except Exception as exc:
+            logging.error(f"❌ ERRO AO PUBLICAR ALTERAÇÕES DO TREINO NO GIT PRINCIPAL: {exc}")
 
 if __name__ == "__main__":
     main()
