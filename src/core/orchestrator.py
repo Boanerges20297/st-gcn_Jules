@@ -1,4 +1,5 @@
 import sys
+import json
 import numpy as np
 import torch
 import pickle
@@ -290,7 +291,33 @@ class StateOrchestrator:
                 if self._node_owners.get(name_key, region) == region:
                     combined_scores[name_key] = float(out_norm[i])
                     if return_trends: trends[name_key] = 'stable'
+        self._log_predict_p10(combined_scores)
         return (combined_scores, trends) if return_trends else combined_scores
+
+    def _log_predict_p10(self, scores_map):
+        """Registra o top-10 predito por região a cada cálculo de risco para análise e validação."""
+        try:
+            log_path = os.path.join(self.root, 'logs', 'predict_p10.jsonl')
+            os.makedirs(os.path.dirname(log_path), exist_ok=True)
+
+            record = {'timestamp': datetime.now().isoformat(timespec='seconds'), 'regions': {}}
+
+            for region, spec in self.specialists.items():
+                region_nodes = {
+                    normalize_name(str(row['name']))
+                    for _, row in spec['data']['nodes_gdf'].iterrows()
+                }
+                region_scores = {n: s for n, s in scores_map.items() if n in region_nodes}
+                top10 = sorted(region_scores.items(), key=lambda x: x[1], reverse=True)[:10]
+                record['regions'][region] = [{'name': n, 'score': round(s, 2)} for n, s in top10]
+
+            global_top10 = sorted(scores_map.items(), key=lambda x: x[1], reverse=True)[:10]
+            record['global_top10'] = [{'name': n, 'score': round(s, 2)} for n, s in global_top10]
+
+            with open(log_path, 'a', encoding='utf-8') as f:
+                f.write(json.dumps(record, ensure_ascii=False) + '\n')
+        except Exception as e:
+            print(f"⚠️ [P10 Log] Erro ao registrar predição: {e}")
 
     def _norm_adj(self, geo, conf):
         def n(a):

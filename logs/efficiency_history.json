@@ -456,6 +456,7 @@
     }
   },
   {
+<<<<<<< HEAD
     "date": "2026-04-01",
     "total_events": 24,
     "brute_cvli": 16,
@@ -692,13 +693,24 @@
     "date": "2026-04-02",
     "total_events": 21,
     "brute_cvli": 16,
+=======
+    "date": "2026-04-02",
+    "total_events": 23,
+    "brute_cvli": 18,
+>>>>>>> 2156ec37b79ed16fed7c7a26a6a09ee8522244f0
     "exogenous": 5,
     "exogenous_conflict": 5,
     "police_qualified_actions_7d": 31,
     "police_administrative_events_7d": 19,
+<<<<<<< HEAD
     "assigned_total_events": 19,
     "unmapped_total_events": 2,
     "assigned_brute_cvli": 16,
+=======
+    "assigned_total_events": 21,
+    "unmapped_total_events": 2,
+    "assigned_brute_cvli": 18,
+>>>>>>> 2156ec37b79ed16fed7c7a26a6a09ee8522244f0
     "assigned_exogenous": 3,
     "unmapped_exogenous": 2,
     "assigned_police_qualified_actions": 20,
@@ -709,6 +721,7 @@
     ],
     "global": {
       "total_nodes": 109,
+<<<<<<< HEAD
       "active_locations": 17,
       "total_events": 19,
       "ranking_top10": [
@@ -716,12 +729,26 @@
         "MARACANAU",
         "CRATO",
         "LIMOEIRO DO NORTE",
+=======
+      "active_locations": 16,
+      "total_events": 21,
+      "ranking_top10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "LIMOEIRO DO NORTE",
+        "BARROSO",
+>>>>>>> 2156ec37b79ed16fed7c7a26a6a09ee8522244f0
         "JUAZEIRO DO NORTE",
         "VARZEA ALEGRE",
         "MESSEJANA",
         "BOM JARDIM",
+<<<<<<< HEAD
         "BARROSO",
         "MONDUBIM"
+=======
+        "MONDUBIM",
+        "ANCURI"
+>>>>>>> 2156ec37b79ed16fed7c7a26a6a09ee8522244f0
       ],
       "gt_sample": [
         "SIQUEIRA",
@@ -737,6 +764,7 @@
         "OROS",
         "IRACEMA",
         "AURORA",
+<<<<<<< HEAD
         "CRATO",
         "EDSON QUEIROZ"
       ],
@@ -765,6 +793,35 @@
         "MESSEJANA",
         "BOM JARDIM",
         "BARROSO",
+=======
+        "EDSON QUEIROZ",
+        "MESSEJANA"
+      ],
+      "p5": 0.4,
+      "recall5": 0.125,
+      "hits5": [
+        "LIMOEIRO DO NORTE",
+        "BARROSO"
+      ],
+      "p10": 0.6,
+      "recall10": 0.375,
+      "hits10": [
+        "LIMOEIRO DO NORTE",
+        "BARROSO",
+        "VARZEA ALEGRE",
+        "MESSEJANA",
+        "BOM JARDIM",
+        "ANCURI"
+      ],
+      "p20": 0.5,
+      "recall20": 0.625,
+      "hits20": [
+        "LIMOEIRO DO NORTE",
+        "BARROSO",
+        "VARZEA ALEGRE",
+        "MESSEJANA",
+        "BOM JARDIM",
+>>>>>>> 2156ec37b79ed16fed7c7a26a6a09ee8522244f0
         "ANCURI",
         "SIQUEIRA",
         "CARIRE",
@@ -775,6 +832,7 @@
     "fortaleza": {
       "total_nodes": 40,
       "active_locations": 7,
+<<<<<<< HEAD
       "total_events": 8,
       "ranking_top10": [
         "MESSEJANA",
@@ -787,6 +845,20 @@
         "CURIO",
         "BARRA DO CEARA",
         "ANTONIO BEZERRA"
+=======
+      "total_events": 10,
+      "ranking_top10": [
+        "BARROSO",
+        "MESSEJANA",
+        "BOM JARDIM",
+        "MONDUBIM",
+        "ANCURI",
+        "SIQUEIRA",
+        "CURIO",
+        "ALTO ALEGRE",
+        "BARRA DO CEARA",
+        "PARQUE IRACEMA"
+>>>>>>> 2156ec37b79ed16fed7c7a26a6a09ee8522244f0
       ],
       "gt_sample": [
         "SIQUEIRA",
@@ -800,26 +872,44 @@
       "p5": 0.8,
       "recall5": 0.5714,
       "hits5": [
+<<<<<<< HEAD
         "MESSEJANA",
         "BOM JARDIM",
         "BARROSO",
+=======
+        "BARROSO",
+        "MESSEJANA",
+        "BOM JARDIM",
+>>>>>>> 2156ec37b79ed16fed7c7a26a6a09ee8522244f0
         "ANCURI"
       ],
       "p10": 0.5,
       "recall10": 0.7143,
       "hits10": [
+<<<<<<< HEAD
         "MESSEJANA",
         "BOM JARDIM",
         "BARROSO",
+=======
+        "BARROSO",
+        "MESSEJANA",
+        "BOM JARDIM",
+>>>>>>> 2156ec37b79ed16fed7c7a26a6a09ee8522244f0
         "ANCURI",
         "SIQUEIRA"
       ],
       "p20": 0.25,
       "recall20": 0.7143,
       "hits20": [
+<<<<<<< HEAD
         "MESSEJANA",
         "BOM JARDIM",
         "BARROSO",
+=======
+        "BARROSO",
+        "MESSEJANA",
+        "BOM JARDIM",
+>>>>>>> 2156ec37b79ed16fed7c7a26a6a09ee8522244f0
         "ANCURI",
         "SIQUEIRA"
       ]
@@ -827,7 +917,11 @@
     "rmf": {
       "total_nodes": 19,
       "active_locations": 2,
+<<<<<<< HEAD
       "total_events": 2,
+=======
+      "total_events": 3,
+>>>>>>> 2156ec37b79ed16fed7c7a26a6a09ee8522244f0
       "ranking_top10": [
         "CAUCAIA",
         "MARACANAU",
@@ -865,10 +959,16 @@
     },
     "interior": {
       "total_nodes": 50,
+<<<<<<< HEAD
       "active_locations": 8,
       "total_events": 9,
       "ranking_top10": [
         "CRATO",
+=======
+      "active_locations": 7,
+      "total_events": 8,
+      "ranking_top10": [
+>>>>>>> 2156ec37b79ed16fed7c7a26a6a09ee8522244f0
         "LIMOEIRO DO NORTE",
         "JUAZEIRO DO NORTE",
         "VARZEA ALEGRE",
@@ -877,7 +977,12 @@
         "IRACEMA",
         "GROAIRAS",
         "IGUATU",
+<<<<<<< HEAD
         "TIANGUA"
+=======
+        "TIANGUA",
+        "ARATUBA"
+>>>>>>> 2156ec37b79ed16fed7c7a26a6a09ee8522244f0
       ],
       "gt_sample": [
         "IGUATU",
@@ -886,6 +991,7 @@
         "LIMOEIRO DO NORTE",
         "OROS",
         "IRACEMA",
+<<<<<<< HEAD
         "AURORA",
         "CRATO"
       ],
@@ -900,16 +1006,264 @@
       "recall10": 0.75,
       "hits10": [
         "CRATO",
+=======
+        "AURORA"
+      ],
+      "p5": 0.6,
+      "recall5": 0.4286,
+      "hits5": [
+        "LIMOEIRO DO NORTE",
+        "VARZEA ALEGRE",
+        "CARIRE"
+      ],
+      "p10": 0.5,
+      "recall10": 0.7143,
+      "hits10": [
+>>>>>>> 2156ec37b79ed16fed7c7a26a6a09ee8522244f0
         "LIMOEIRO DO NORTE",
         "VARZEA ALEGRE",
         "CARIRE",
         "IRACEMA",
         "IGUATU"
       ],
+<<<<<<< HEAD
       "p20": 0.3,
       "recall20": 0.75,
       "hits20": [
         "CRATO",
+=======
+      "p20": 0.25,
+      "recall20": 0.7143,
+      "hits20": [
+        "LIMOEIRO DO NORTE",
+        "VARZEA ALEGRE",
+        "CARIRE",
+        "IRACEMA",
+        "IGUATU"
+      ]
+    }
+  },
+  {
+    "date": "2026-04-03",
+    "total_events": 25,
+    "brute_cvli": 18,
+    "exogenous": 7,
+    "exogenous_conflict": 7,
+    "police_qualified_actions_7d": 32,
+    "police_administrative_events_7d": 21,
+    "assigned_total_events": 20,
+    "unmapped_total_events": 5,
+    "assigned_brute_cvli": 18,
+    "assigned_exogenous": 2,
+    "unmapped_exogenous": 5,
+    "assigned_police_qualified_actions": 22,
+    "unmapped_police_qualified_actions": 10,
+    "unmapped_exogenous_sample": [
+      "Parangaba",
+      "Montese",
+      "Aldeota",
+      "Padre Romualdo",
+      "Benfica"
+    ],
+    "global": {
+      "total_nodes": 109,
+      "active_locations": 15,
+      "total_events": 20,
+      "ranking_top10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "LIMOEIRO DO NORTE",
+        "BARROSO",
+        "JUAZEIRO DO NORTE",
+        "VARZEA ALEGRE",
+        "MESSEJANA",
+        "BOM JARDIM",
+        "MONDUBIM",
+        "ANCURI"
+      ],
+      "gt_sample": [
+        "SIQUEIRA",
+        "BARROSO",
+        "BOM JARDIM",
+        "ANCURI",
+        "PARAIPABA",
+        "SAO LUIS DO CURU",
+        "IGUATU",
+        "CARIRE",
+        "VARZEA ALEGRE",
+        "LIMOEIRO DO NORTE",
+        "OROS",
+        "IRACEMA",
+        "AURORA",
+        "MESSEJANA",
+        "GRANJA LISBOA"
+      ],
+      "p5": 0.4,
+      "recall5": 0.1333,
+      "hits5": [
+        "LIMOEIRO DO NORTE",
+        "BARROSO"
+      ],
+      "p10": 0.6,
+      "recall10": 0.4,
+      "hits10": [
+        "LIMOEIRO DO NORTE",
+        "BARROSO",
+        "VARZEA ALEGRE",
+        "MESSEJANA",
+        "BOM JARDIM",
+        "ANCURI"
+      ],
+      "p20": 0.5,
+      "recall20": 0.6667,
+      "hits20": [
+        "LIMOEIRO DO NORTE",
+        "BARROSO",
+        "VARZEA ALEGRE",
+        "MESSEJANA",
+        "BOM JARDIM",
+        "ANCURI",
+        "SIQUEIRA",
+        "CARIRE",
+        "IRACEMA",
+        "IGUATU"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 40,
+      "active_locations": 6,
+      "total_events": 9,
+      "ranking_top10": [
+        "BARROSO",
+        "MESSEJANA",
+        "BOM JARDIM",
+        "MONDUBIM",
+        "ANCURI",
+        "SIQUEIRA",
+        "CURIO",
+        "ALTO ALEGRE",
+        "BARRA DO CEARA",
+        "PARQUE IRACEMA"
+      ],
+      "gt_sample": [
+        "SIQUEIRA",
+        "BARROSO",
+        "BOM JARDIM",
+        "ANCURI",
+        "MESSEJANA",
+        "GRANJA LISBOA"
+      ],
+      "p5": 0.8,
+      "recall5": 0.6667,
+      "hits5": [
+        "BARROSO",
+        "MESSEJANA",
+        "BOM JARDIM",
+        "ANCURI"
+      ],
+      "p10": 0.5,
+      "recall10": 0.8333,
+      "hits10": [
+        "BARROSO",
+        "MESSEJANA",
+        "BOM JARDIM",
+        "ANCURI",
+        "SIQUEIRA"
+      ],
+      "p20": 0.25,
+      "recall20": 0.8333,
+      "hits20": [
+        "BARROSO",
+        "MESSEJANA",
+        "BOM JARDIM",
+        "ANCURI",
+        "SIQUEIRA"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 19,
+      "active_locations": 2,
+      "total_events": 3,
+      "ranking_top10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "PARAIPABA",
+        "SAO LUIS DO CURU",
+        "HORIZONTE",
+        "EUSEBIO",
+        "PINDORETAMA",
+        "PACAJUS",
+        "PACATUBA",
+        "ITAITINGA"
+      ],
+      "gt_sample": [
+        "PARAIPABA",
+        "SAO LUIS DO CURU"
+      ],
+      "p5": 0.4,
+      "recall5": 1.0,
+      "hits5": [
+        "PARAIPABA",
+        "SAO LUIS DO CURU"
+      ],
+      "p10": 0.2,
+      "recall10": 1.0,
+      "hits10": [
+        "PARAIPABA",
+        "SAO LUIS DO CURU"
+      ],
+      "p20": 0.1053,
+      "recall20": 1.0,
+      "hits20": [
+        "PARAIPABA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "interior": {
+      "total_nodes": 50,
+      "active_locations": 7,
+      "total_events": 8,
+      "ranking_top10": [
+        "LIMOEIRO DO NORTE",
+        "JUAZEIRO DO NORTE",
+        "VARZEA ALEGRE",
+        "ITAPAJE",
+        "CARIRE",
+        "IRACEMA",
+        "GROAIRAS",
+        "IGUATU",
+        "TIANGUA",
+        "ARATUBA"
+      ],
+      "gt_sample": [
+        "IGUATU",
+        "CARIRE",
+        "VARZEA ALEGRE",
+        "LIMOEIRO DO NORTE",
+        "OROS",
+        "IRACEMA",
+        "AURORA"
+      ],
+      "p5": 0.6,
+      "recall5": 0.4286,
+      "hits5": [
+        "LIMOEIRO DO NORTE",
+        "VARZEA ALEGRE",
+        "CARIRE"
+      ],
+      "p10": 0.5,
+      "recall10": 0.7143,
+      "hits10": [
+        "LIMOEIRO DO NORTE",
+        "VARZEA ALEGRE",
+        "CARIRE",
+        "IRACEMA",
+        "IGUATU"
+      ],
+      "p20": 0.25,
+      "recall20": 0.7143,
+      "hits20": [
+>>>>>>> 2156ec37b79ed16fed7c7a26a6a09ee8522244f0
         "LIMOEIRO DO NORTE",
         "VARZEA ALEGRE",
         "CARIRE",

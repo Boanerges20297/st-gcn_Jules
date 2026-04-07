@@ -2543,16 +2543,26 @@
       "resolved": false
     },
     {
+<<<<<<< HEAD
       "timestamp": "2026-04-01T13:45:43.387514",
       "type": "high_memory",
       "severity": "HIGH",
       "message": "Memória alta: 87.5%",
       "details": {
         "memory_percent": 87.5
+=======
+      "timestamp": "2026-04-03T19:44:38.718203",
+      "type": "high_cpu",
+      "severity": "HIGH",
+      "message": "CPU alta: 89.5%",
+      "details": {
+        "cpu_percent": 89.5
+>>>>>>> 2156ec37b79ed16fed7c7a26a6a09ee8522244f0
       },
       "resolved": false
     },
     {
+<<<<<<< HEAD
       "timestamp": "2026-04-01T14:16:55.661914",
       "type": "high_memory",
       "severity": "HIGH",
@@ -2699,6 +2709,14 @@
       "message": "Memória alta: 85.8%",
       "details": {
         "memory_percent": 85.8
+=======
+      "timestamp": "2026-04-03T19:49:39.868481",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 5.56%",
+      "details": {
+        "error_rate_percent": 5.555555555555555
+>>>>>>> 2156ec37b79ed16fed7c7a26a6a09ee8522244f0
       },
       "resolved": false
     }
