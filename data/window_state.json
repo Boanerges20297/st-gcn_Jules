@@ -1,9 +1,20 @@
 {
   "fortaleza": {
-    "dynamic_window": null,
-    "use_historical_fallback": false,
-    "historical_top10": [],
-    "updated_at": "2026-04-02T07:49:11.411931"
+    "dynamic_window": 30,
+    "use_historical_fallback": true,
+    "historical_top10": [
+      "ALTO ALEGRE",
+      "BARRA DO CEARA",
+      "JANGURUSSU",
+      "BARROSO",
+      "PLANALTO AYRTON SENNA",
+      "GRANJA LISBOA",
+      "SIQUEIRA",
+      "MESSEJANA",
+      "JOSE WALTER",
+      "CRISTO REDENTOR"
+    ],
+    "updated_at": "2026-04-08T14:57:01.698350"
   },
   "rmf": {
     "dynamic_window": 30,
@@ -20,12 +31,12 @@
       "PARAIPABA",
       "SAO LUIS DO CURU"
     ],
-    "updated_at": "2026-04-02T07:49:11.411938"
+    "updated_at": "2026-04-08T14:57:01.698357"
   },
   "interior": {
     "dynamic_window": null,
     "use_historical_fallback": false,
     "historical_top10": [],
-    "updated_at": "2026-04-02T07:49:11.411941"
+    "updated_at": "2026-04-08T14:57:01.698360"
   }
 }

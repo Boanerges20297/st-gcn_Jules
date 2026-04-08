@@ -515,8 +515,22 @@ def refresh_orcrim_from_official(force: bool = False):
     print('🔄 [ORCRIMS] Iniciando atualização no startup...')
     _log_existing_state()
 
-    source_url = _resolve_official_url()
     current_status = _read_update_status()
+    
+    # Cooldown de 1 hora para evitar downloads sucessivos a cada inicialização (Google My Maps não envia ETag).
+    if not force:
+        last_checked_str = current_status.get('last_checked_at')
+        if last_checked_str:
+            try:
+                last_checked = datetime.fromisoformat(last_checked_str)
+                from datetime import datetime as dt
+                if (dt.now() - last_checked).total_seconds() < 3600:
+                    print(f'⏱️ [ORCRIMS] Cooldown ativo. Última checagem foi recente ({last_checked_str}). Pulando download.')
+                    return {'updated': False, 'reason': 'cooldown_active'}
+            except Exception:
+                pass
+
+    source_url = _resolve_official_url()
     fallback_available = bool(os.path.exists(CURRENT_KML_PATH) and os.path.exists(STATIC_KML_PATH))
     if not source_url:
         print('⚠️ [ORCRIMS] Nenhum NetworkLink oficial foi encontrado no KMZ existente. Mantendo base atual.')
