@@ -1,7 +1,6 @@
 [
   {
-    "date": "2026-04-08",
-<<<<<<< HEAD
+    "date": "2026-04-10",
     "total_events": 15,
     "brute_cvli": 15,
     "exogenous": 0,
@@ -23,14 +22,14 @@
       "ranking_top10": [
         "CAUCAIA",
         "JUAZEIRO DO NORTE",
-        "MARACANAU",
         "BARROSO",
+        "MARACANAU",
         "LIMOEIRO DO NORTE",
         "VARZEA ALEGRE",
         "IRACEMA",
-        "ANCURI",
         "TIANGUA",
-        "ARATUBA"
+        "ARATUBA",
+        "ANCURI"
       ],
       "gt_sample": [
         "BARROSO",
@@ -66,8 +65,8 @@
         "LIMOEIRO DO NORTE",
         "VARZEA ALEGRE",
         "IRACEMA",
-        "ANCURI",
-        "TIANGUA"
+        "TIANGUA",
+        "ANCURI"
       ],
       "p20": 0.6,
       "recall20": 0.8,
@@ -78,8 +77,8 @@
         "LIMOEIRO DO NORTE",
         "VARZEA ALEGRE",
         "IRACEMA",
-        "ANCURI",
         "TIANGUA",
+        "ANCURI",
         "CEDRO",
         "SANTANA DO ACARAU",
         "JIJOCA DE JERICOACOARA",
@@ -95,12 +94,12 @@
         "ANCURI",
         "MESSEJANA",
         "BARRA DO CEARA",
-        "ANTONIO BEZERRA",
         "CURIO",
         "BOM JARDIM",
-        "QUINTINO CUNHA",
-        "NOVO MONDUBIM",
-        "VICENTE PINZON"
+        "ANTONIO BEZERRA",
+        "ALTO ALEGRE",
+        "MONDUBIM",
+        "NOVO MONDUBIM"
       ],
       "gt_sample": [
         "BARROSO",
@@ -132,14 +131,14 @@
       "ranking_top10": [
         "CAUCAIA",
         "MARACANAU",
-        "SAO LUIS DO CURU",
-        "PARAIPABA",
+        "TRAIRI",
+        "PACAJUS",
         "HORIZONTE",
-        "EUSEBIO",
-        "PINDORETAMA",
         "PACATUBA",
+        "PINDORETAMA",
         "ITAITINGA",
-        "PACAJUS"
+        "EUSEBIO",
+        "PARAIPABA"
       ],
       "gt_sample": [
         "CAUCAIA"
@@ -220,334 +219,6 @@
         "IRACEMA",
         "TIANGUA",
         "CEDRO",
-        "SANTANA DO ACARAU",
-        "JIJOCA DE JERICOACOARA",
-        "CARIRE"
-      ]
-    }
-  },
-  {
-    "date": "2026-04-10",
-    "total_events": 15,
-    "brute_cvli": 15,
-    "exogenous": 0,
-    "exogenous_conflict": 0,
-    "police_qualified_actions_7d": 1,
-    "police_administrative_events_7d": 1,
-    "assigned_total_events": 15,
-    "unmapped_total_events": 0,
-    "assigned_brute_cvli": 15,
-    "assigned_exogenous": 0,
-    "unmapped_exogenous": 0,
-    "assigned_police_qualified_actions": 1,
-    "unmapped_police_qualified_actions": 0,
-    "unmapped_exogenous_sample": [],
-    "global": {
-      "total_nodes": 109,
-      "active_locations": 15,
-      "total_events": 15,
-=======
-    "total_events": 20,
-    "brute_cvli": 16,
-    "exogenous": 4,
-    "exogenous_conflict": 4,
-    "police_qualified_actions_7d": 8,
-    "police_administrative_events_7d": 4,
-    "assigned_total_events": 17,
-    "unmapped_total_events": 3,
-    "assigned_brute_cvli": 16,
-    "assigned_exogenous": 1,
-    "unmapped_exogenous": 3,
-    "assigned_police_qualified_actions": 5,
-    "unmapped_police_qualified_actions": 3,
-    "unmapped_exogenous_sample": [
-      "Aldeota",
-      "Padre Romualdo",
-      "Benfica"
-    ],
-    "global": {
-      "total_nodes": 109,
-      "active_locations": 17,
-      "total_events": 17,
->>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
-      "ranking_top10": [
-        "CAUCAIA",
-        "JUAZEIRO DO NORTE",
-        "MARACANAU",
-        "BARROSO",
-        "MESSEJANA",
-        "ALTO ALEGRE",
-        "LIMOEIRO DO NORTE",
-        "VARZEA ALEGRE",
-        "BARRA DO CEARA",
-        "IRACEMA"
-      ],
-      "gt_sample": [
-        "BARROSO",
-        "ANCURI",
-        "CAUCAIA",
-        "JUAZEIRO DO NORTE",
-        "TIANGUA",
-        "CARIRE",
-        "JIJOCA DE JERICOACOARA",
-        "ACOPIARA",
-        "VARZEA ALEGRE",
-        "LIMOEIRO DO NORTE",
-        "OROS",
-        "IRACEMA",
-<<<<<<< HEAD
-        "CEDRO",
-        "SANTANA DO ACARAU",
-        "AURORA"
-      ],
-      "p5": 0.6,
-      "recall5": 0.2,
-=======
-        "SANTANA DO ACARAU",
-        "CEDRO",
-        "AURORA"
-      ],
-      "p5": 0.6,
-      "recall5": 0.1765,
->>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
-      "hits5": [
-        "CAUCAIA",
-        "JUAZEIRO DO NORTE",
-        "BARROSO"
-      ],
-      "p10": 0.6,
-      "recall10": 0.3529,
-      "hits10": [
-        "CAUCAIA",
-        "JUAZEIRO DO NORTE",
-        "BARROSO",
-        "LIMOEIRO DO NORTE",
-        "VARZEA ALEGRE",
-        "IRACEMA"
-      ],
-<<<<<<< HEAD
-      "p20": 0.55,
-      "recall20": 0.7333,
-=======
-      "p20": 0.6,
-      "recall20": 0.7059,
->>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
-      "hits20": [
-        "CAUCAIA",
-        "JUAZEIRO DO NORTE",
-        "BARROSO",
-        "LIMOEIRO DO NORTE",
-        "VARZEA ALEGRE",
-        "IRACEMA",
-        "TIANGUA",
-        "CEDRO",
-<<<<<<< HEAD
-=======
-        "CRATO",
->>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
-        "SANTANA DO ACARAU",
-        "JIJOCA DE JERICOACOARA",
-        "CARIRE"
-      ]
-    },
-    "fortaleza": {
-      "total_nodes": 40,
-<<<<<<< HEAD
-      "active_locations": 2,
-      "total_events": 2,
-=======
-      "active_locations": 3,
-      "total_events": 3,
->>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
-      "ranking_top10": [
-        "BARROSO",
-        "MESSEJANA",
-        "ALTO ALEGRE",
-        "BARRA DO CEARA",
-        "PLANALTO AYRTON SENNA",
-        "SIQUEIRA",
-        "MONDUBIM",
-        "CURIO",
-        "JOSE WALTER",
-        "CRISTO REDENTOR"
-      ],
-      "gt_sample": [
-        "BARROSO",
-<<<<<<< HEAD
-        "ANCURI"
-      ],
-      "p5": 0.2,
-      "recall5": 0.5,
-      "hits5": [
-        "BARROSO"
-      ],
-      "p10": 0.1,
-      "recall10": 0.5,
-      "hits10": [
-        "BARROSO"
-      ],
-      "p20": 0.1,
-      "recall20": 1.0,
-      "hits20": [
-        "BARROSO",
-=======
-        "ANCURI",
-        "JOSE WALTER"
-      ],
-      "p5": 0.2,
-      "recall5": 0.3333,
-      "hits5": [
-        "BARROSO"
-      ],
-      "p10": 0.2,
-      "recall10": 0.6667,
-      "hits10": [
-        "BARROSO",
-        "JOSE WALTER"
-      ],
-      "p20": 0.15,
-      "recall20": 1.0,
-      "hits20": [
-        "BARROSO",
-        "JOSE WALTER",
->>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
-        "ANCURI"
-      ]
-    },
-    "rmf": {
-      "total_nodes": 19,
-      "active_locations": 1,
-      "total_events": 1,
-      "ranking_top10": [
-        "CAUCAIA",
-        "MARACANAU",
-        "SAO LUIS DO CURU",
-        "PARAIPABA",
-        "HORIZONTE",
-        "EUSEBIO",
-        "PINDORETAMA",
-        "PACATUBA",
-        "ITAITINGA",
-        "PACAJUS"
-      ],
-      "gt_sample": [
-        "CAUCAIA"
-      ],
-      "p5": 0.2,
-      "recall5": 1.0,
-      "hits5": [
-        "CAUCAIA"
-      ],
-      "p10": 0.1,
-      "recall10": 1.0,
-      "hits10": [
-        "CAUCAIA"
-      ],
-      "p20": 0.0526,
-      "recall20": 1.0,
-      "hits20": [
-        "CAUCAIA"
-      ]
-    },
-    "interior": {
-      "total_nodes": 50,
-<<<<<<< HEAD
-      "active_locations": 12,
-      "total_events": 12,
-=======
-      "active_locations": 13,
-      "total_events": 13,
->>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
-      "ranking_top10": [
-        "JUAZEIRO DO NORTE",
-        "LIMOEIRO DO NORTE",
-        "VARZEA ALEGRE",
-        "IRACEMA",
-        "TIANGUA",
-        "ARATUBA",
-        "CEDRO",
-<<<<<<< HEAD
-        "SANTANA DO ACARAU",
-        "JIJOCA DE JERICOACOARA",
-        "GROAIRAS"
-=======
-        "CRATO",
-        "SANTANA DO ACARAU",
-        "JIJOCA DE JERICOACOARA"
->>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
-      ],
-      "gt_sample": [
-        "JUAZEIRO DO NORTE",
-        "TIANGUA",
-        "CARIRE",
-        "JIJOCA DE JERICOACOARA",
-        "ACOPIARA",
-        "VARZEA ALEGRE",
-        "LIMOEIRO DO NORTE",
-        "OROS",
-        "IRACEMA",
-<<<<<<< HEAD
-        "CEDRO",
-        "SANTANA DO ACARAU",
-        "AURORA"
-      ],
-      "p5": 1.0,
-      "recall5": 0.4167,
-=======
-        "SANTANA DO ACARAU",
-        "CEDRO",
-        "AURORA",
-        "CRATO"
-      ],
-      "p5": 1.0,
-      "recall5": 0.3846,
->>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
-      "hits5": [
-        "JUAZEIRO DO NORTE",
-        "LIMOEIRO DO NORTE",
-        "VARZEA ALEGRE",
-        "IRACEMA",
-        "TIANGUA"
-      ],
-<<<<<<< HEAD
-      "p10": 0.8,
-      "recall10": 0.6667,
-=======
-      "p10": 0.9,
-      "recall10": 0.6923,
->>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
-      "hits10": [
-        "JUAZEIRO DO NORTE",
-        "LIMOEIRO DO NORTE",
-        "VARZEA ALEGRE",
-        "IRACEMA",
-        "TIANGUA",
-        "CEDRO",
-<<<<<<< HEAD
-        "SANTANA DO ACARAU",
-        "JIJOCA DE JERICOACOARA"
-      ],
-      "p20": 0.45,
-      "recall20": 0.75,
-=======
-        "CRATO",
-        "SANTANA DO ACARAU",
-        "JIJOCA DE JERICOACOARA"
-      ],
-      "p20": 0.5,
-      "recall20": 0.7692,
->>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
-      "hits20": [
-        "JUAZEIRO DO NORTE",
-        "LIMOEIRO DO NORTE",
-        "VARZEA ALEGRE",
-        "IRACEMA",
-        "TIANGUA",
-        "CEDRO",
-<<<<<<< HEAD
-=======
-        "CRATO",
->>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
         "SANTANA DO ACARAU",
         "JIJOCA DE JERICOACOARA",
         "CARIRE"

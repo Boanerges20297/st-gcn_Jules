@@ -1,8 +1,7 @@
 [
   {
-    "date": "2026-04-08",
-<<<<<<< HEAD
-    "timestamp": "2026-04-08T00:13:45.060440",
+    "date": "2026-04-10",
+    "timestamp": "2026-04-10T21:01:42.939203",
     "global": {
       "p10": 0.8,
       "p20": 0.6,
@@ -16,107 +15,14 @@
       "assigned_total_events": 15,
       "unmapped_total_events": 0,
       "f1_score": 0.8
-=======
-    "timestamp": "2026-04-08T14:57:01.699371",
-    "global": {
-      "p10": 0.6,
-      "p20": 0.6,
-      "precision": 0.6,
-      "recall": 0.7059,
-      "recall10": 0.3529,
-      "recall20": 0.7059,
-      "active_locations": 17,
-      "total_nodes": 109,
-      "total_events": 17,
-      "assigned_total_events": 17,
-      "unmapped_total_events": 3,
-      "f1_score": 0.6487
->>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
     },
     "regions": {
       "fortaleza": {
         "p10": 0.2,
-<<<<<<< HEAD
         "p20": 0.1,
         "precision": 0.2,
         "recall": 1.0,
         "recall10": 1.0,
-        "recall20": 1.0,
-        "active_locations": 2,
-        "total_nodes": 40,
-        "total_events": 2,
-        "f1_score": 0.0
-      },
-      "rmf": {
-        "p10": 0.1,
-        "p20": 0.0526,
-        "precision": 0.1,
-        "recall": 1.0,
-        "recall10": 1.0,
-        "recall20": 1.0,
-=======
-        "p20": 0.15,
-        "precision": 0.2,
-        "recall": 1.0,
-        "recall10": 0.6667,
-        "recall20": 1.0,
-        "active_locations": 3,
-        "total_nodes": 40,
-        "total_events": 3,
-        "f1_score": 0.0
-      },
-      "rmf": {
-        "p10": 0.1,
-        "p20": 0.0526,
-        "precision": 0.1,
-        "recall": 1.0,
-        "recall10": 1.0,
-        "recall20": 1.0,
->>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
-        "active_locations": 1,
-        "total_nodes": 19,
-        "total_events": 1,
-        "f1_score": 0.0
-      },
-      "interior": {
-<<<<<<< HEAD
-        "p10": 0.8,
-        "p20": 0.45,
-        "precision": 0.8,
-        "recall": 0.75,
-        "recall10": 0.6667,
-        "recall20": 0.75,
-        "active_locations": 12,
-        "total_nodes": 50,
-        "total_events": 12,
-        "f1_score": 0.0
-      }
-    }
-  },
-  {
-    "date": "2026-04-10",
-    "timestamp": "2026-04-10T21:00:35.624626",
-    "global": {
-      "p10": 0.6,
-      "p20": 0.55,
-      "precision": 0.6,
-      "recall": 0.7333,
-      "recall10": 0.4,
-      "recall20": 0.7333,
-      "active_locations": 15,
-      "total_nodes": 109,
-      "total_events": 15,
-      "assigned_total_events": 15,
-      "unmapped_total_events": 0,
-      "f1_score": 0.66
-    },
-    "regions": {
-      "fortaleza": {
-        "p10": 0.1,
-        "p20": 0.1,
-        "precision": 0.1,
-        "recall": 1.0,
-        "recall10": 0.5,
         "recall20": 1.0,
         "active_locations": 2,
         "total_nodes": 40,
@@ -145,17 +51,6 @@
         "active_locations": 12,
         "total_nodes": 50,
         "total_events": 12,
-=======
-        "p10": 0.9,
-        "p20": 0.5,
-        "precision": 0.9,
-        "recall": 0.7692,
-        "recall10": 0.6923,
-        "recall20": 0.7692,
-        "active_locations": 13,
-        "total_nodes": 50,
-        "total_events": 13,
->>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
         "f1_score": 0.0
       }
     }
