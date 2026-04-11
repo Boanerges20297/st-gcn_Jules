@@ -1,5 +1,9 @@
 # 🛡️ Relatório de Risco Diário - FORTALEZA (CAPITAL)
+<<<<<<< HEAD
 **Data de Geração:** 08/04/2026 00:12:29
+=======
+**Data de Geração:** 08/04/2026 14:27:17
+>>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
 **Estado da Base Histórica:** 2026-04-06 00:00:00
 
 | Pos | Localidade | Risco (%) | Facção Predominante |

@@ -1,6 +1,7 @@
 {
   "alerts": [
     {
+<<<<<<< HEAD
       "timestamp": "2026-03-01T17:29:49.376931",
       "type": "model_degraded_fortaleza_p20",
       "severity": "HIGH",
@@ -2559,6 +2560,14 @@
       "message": "Taxa de erro elevada: 5.56%",
       "details": {
         "error_rate_percent": 5.555555555555555
+=======
+      "timestamp": "2026-04-08T14:27:41.253538",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 85.4%",
+      "details": {
+        "memory_percent": 85.4
+>>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
       },
       "resolved": false
     }
