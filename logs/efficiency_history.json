@@ -1,28 +1,29 @@
 [
   {
     "date": "2026-04-08",
-    "total_events": 20,
+    "total_events": 22,
     "brute_cvli": 16,
-    "exogenous": 4,
-    "exogenous_conflict": 4,
+    "exogenous": 6,
+    "exogenous_conflict": 6,
     "police_qualified_actions_7d": 8,
-    "police_administrative_events_7d": 4,
-    "assigned_total_events": 17,
-    "unmapped_total_events": 3,
+    "police_administrative_events_7d": 5,
+    "assigned_total_events": 18,
+    "unmapped_total_events": 4,
     "assigned_brute_cvli": 16,
-    "assigned_exogenous": 1,
-    "unmapped_exogenous": 3,
+    "assigned_exogenous": 2,
+    "unmapped_exogenous": 4,
     "assigned_police_qualified_actions": 5,
     "unmapped_police_qualified_actions": 3,
     "unmapped_exogenous_sample": [
       "Aldeota",
       "Padre Romualdo",
-      "Benfica"
+      "Benfica",
+      "Condom\u00ednio da Santa"
     ],
     "global": {
       "total_nodes": 109,
-      "active_locations": 17,
-      "total_events": 17,
+      "active_locations": 18,
+      "total_events": 18,
       "ranking_top10": [
         "CAUCAIA",
         "JUAZEIRO DO NORTE",
@@ -53,14 +54,14 @@
         "AURORA"
       ],
       "p5": 0.6,
-      "recall5": 0.1765,
+      "recall5": 0.1667,
       "hits5": [
         "CAUCAIA",
         "JUAZEIRO DO NORTE",
         "BARROSO"
       ],
       "p10": 0.6,
-      "recall10": 0.3529,
+      "recall10": 0.3333,
       "hits10": [
         "CAUCAIA",
         "JUAZEIRO DO NORTE",
@@ -70,7 +71,7 @@
         "IRACEMA"
       ],
       "p20": 0.6,
-      "recall20": 0.7059,
+      "recall20": 0.6667,
       "hits20": [
         "CAUCAIA",
         "JUAZEIRO DO NORTE",
@@ -128,8 +129,8 @@
     },
     "rmf": {
       "total_nodes": 19,
-      "active_locations": 1,
-      "total_events": 1,
+      "active_locations": 2,
+      "total_events": 2,
       "ranking_top10": [
         "CAUCAIA",
         "MARACANAU",
@@ -143,22 +144,24 @@
         "PACAJUS"
       ],
       "gt_sample": [
-        "CAUCAIA"
+        "CAUCAIA",
+        "MARANGUAPE"
       ],
       "p5": 0.2,
-      "recall5": 1.0,
+      "recall5": 0.5,
       "hits5": [
         "CAUCAIA"
       ],
       "p10": 0.1,
-      "recall10": 1.0,
+      "recall10": 0.5,
       "hits10": [
         "CAUCAIA"
       ],
-      "p20": 0.0526,
+      "p20": 0.1053,
       "recall20": 1.0,
       "hits20": [
-        "CAUCAIA"
+        "CAUCAIA",
+        "MARANGUAPE"
       ]
     },
     "interior": {
