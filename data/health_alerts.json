@@ -1,12 +1,2573 @@
 {
   "alerts": [
     {
+<<<<<<< HEAD
+      "timestamp": "2026-03-01T17:29:49.376931",
+      "type": "model_degraded_fortaleza_p20",
+      "severity": "HIGH",
+      "message": "Modelo degradado — Fortaleza P20: 40.0% (mínimo esperado: 50%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "value": 0.4,
+        "threshold": 0.5,
+        "evaluation_date": "2026-03-01"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-01T17:29:49.379944",
+      "type": "model_degraded_interior_p20",
+      "severity": "HIGH",
+      "message": "Modelo degradado — Interior P20: 0.0% (mínimo esperado: 50%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "value": 0.0,
+        "threshold": 0.5,
+        "evaluation_date": "2026-03-01"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-01T17:34:24.833789",
+      "type": "auto_calibration_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração FORTALEZA] Passo 1/3 — P20=40.0% abaixo de 50%. dampening=0.76, tension_factor=0.62, tag_bias=1.8",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "step": 1,
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:43:17.155406",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-01T17:34:24.839593",
+      "type": "auto_calibration_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração INTERIOR] Passo 1/3 — P20=0.0% abaixo de 50%. dampening=0.76, tension_factor=0.62, tag_bias=1.8",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "step": 1,
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:43:17.155406",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-01T17:35:10.100614",
+      "type": "auto_calibration_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração FORTALEZA] Passo 2/3 — P20=40.0% abaixo de 50%. dampening=0.76, tension_factor=0.62, tag_bias=1.8",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "step": 2,
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:43:17.155406",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-01T17:35:10.118328",
+      "type": "auto_calibration_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração INTERIOR] Passo 2/3 — P20=0.0% abaixo de 50%. dampening=0.76, tension_factor=0.62, tag_bias=1.8",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "step": 2,
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:43:17.155406",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-01T17:37:00.636275",
+      "type": "auto_calibration_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração FORTALEZA] Passo 3/3 — P20=40.0% abaixo de 50%. dampening=0.76, tension_factor=0.62, tag_bias=1.8",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "step": 3,
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:43:17.155406",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-01T17:37:00.660234",
+      "type": "auto_calibration_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração INTERIOR] Passo 3/3 — P20=0.0% abaixo de 50%. dampening=0.76, tension_factor=0.62, tag_bias=1.8",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "step": 3,
+        "new_params": {
+          "dampening": 0.76,
+          "tension_factor": 0.62,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 45.0
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:43:17.155406",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-01T17:38:50.958117",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 2.78%",
+      "details": {
+        "error_rate_percent": 2.7777777777777777
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-01T17:41:31.011215",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: P20=40.0% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "current_value": 0.4,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-04T15:15:06.344407",
+      "resolved_reason": "Região FORTALEZA sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
+    },
+    {
+      "timestamp": "2026-03-01T17:41:31.352390",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: P20=0.0% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "current_value": 0.0,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-04T15:15:06.344407",
+      "resolved_reason": "Região INTERIOR sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
+    },
+    {
+      "timestamp": "2026-03-01T19:22:24.924571",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 33.33%",
+      "details": {
+        "error_rate_percent": 33.33333333333333
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-01T19:57:20.614552",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 2.86%",
+      "details": {
+        "error_rate_percent": 2.857142857142857
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-01T20:27:26.216652",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 6.25%",
+      "details": {
+        "error_rate_percent": 6.25
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-02T14:11:51.772873",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 45.45%",
+      "details": {
+        "error_rate_percent": 45.45454545454545
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-02T14:32:18.842113",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 17.9% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: MORADA NOVA, QUIXERE, MIRAIMA",
+      "details": {
+        "region": "interior",
+        "coverage": 0.1795,
+        "threshold": 0.8,
+        "faction_nodes_total": 39,
+        "faction_nodes_in_top20": 7,
+        "missing_sample": [
+          "MORADA NOVA",
+          "QUIXERE",
+          "MIRAIMA",
+          "PENTECOSTE",
+          "ICO"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-04T15:15:06.344407",
+      "resolved_reason": "Região INTERIOR sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
+    },
+    {
+      "timestamp": "2026-03-02T14:32:20.434330",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=17.9% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.1794871794871795,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-04T15:15:06.344407",
+      "resolved_reason": "Região INTERIOR sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
+    },
+    {
+      "timestamp": "2026-03-03T19:22:39.894691",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 17.9% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: PEDRA BRANCA, MORADA NOVA, SOBRAL",
+      "details": {
+        "region": "interior",
+        "coverage": 0.1795,
+        "threshold": 0.8,
+        "faction_nodes_total": 39,
+        "faction_nodes_in_top20": 7,
+        "missing_sample": [
+          "PEDRA BRANCA",
+          "MORADA NOVA",
+          "SOBRAL",
+          "TEJUCUOCA",
+          "CRATEUS"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-04T15:15:06.344407",
+      "resolved_reason": "Região INTERIOR sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
+    },
+    {
+      "timestamp": "2026-03-03T19:22:39.947141",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=17.9% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.1794871794871795,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-04T15:15:06.344407",
+      "resolved_reason": "Região INTERIOR sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
+    },
+    {
+      "timestamp": "2026-03-04T13:31:35.026093",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=17.9% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.1794871794871795,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-04T15:15:06.344407",
+      "resolved_reason": "Região INTERIOR sem CVLI nos últimos 14 dias — classificada como fria. Alerta suprimido automaticamente."
+    },
+    {
+      "timestamp": "2026-03-04T18:44:29.721171",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 22.2% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: CEDRO, CAMOCIM, SENADOR POMPEU",
+      "details": {
+        "region": "interior",
+        "coverage": 0.2222,
+        "threshold": 0.8,
+        "faction_nodes_total": 27,
+        "faction_nodes_in_top20": 6,
+        "missing_sample": [
+          "CEDRO",
+          "CAMOCIM",
+          "SENADOR POMPEU",
+          "JIJOCA DE JERICOACOARA",
+          "ITAREMA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-05T22:28:00.554689",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 20.0% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: PEDRAS, PLANALTO AYRTON SENNA, PIRAMBU",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.2,
+        "threshold": 0.8,
+        "faction_nodes_total": 40,
+        "faction_nodes_in_top20": 8,
+        "missing_sample": [
+          "PEDRAS",
+          "PLANALTO AYRTON SENNA",
+          "PIRAMBU",
+          "BOM JARDIM",
+          "PRAIA DO FUTURO"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-05T22:28:00.560678",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-05T22:28:01.122017",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 21.1% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: SOBRAL, ARATUBA, SOLONOPOLE",
+      "details": {
+        "region": "interior",
+        "coverage": 0.2105,
+        "threshold": 0.8,
+        "faction_nodes_total": 19,
+        "faction_nodes_in_top20": 4,
+        "missing_sample": [
+          "SOBRAL",
+          "ARATUBA",
+          "SOLONOPOLE",
+          "URUBURETAMA",
+          "CARIRE"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-05T22:28:01.151449",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.1% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.21052631578947367,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-05T22:28:20.837935",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 28.57%",
+      "details": {
+        "error_rate_percent": 28.57142857142857
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-06T13:53:46.196413",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-06T13:53:46.403170",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.1% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.21052631578947367,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-06T15:39:45.806616",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 7.14%",
+      "details": {
+        "error_rate_percent": 7.142857142857142
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-07T22:57:11.167457",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 20.0% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: GRANJA LISBOA, CRISTO REDENTOR, PARQUE SAO JOSE",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.2,
+        "threshold": 0.8,
+        "faction_nodes_total": 40,
+        "faction_nodes_in_top20": 8,
+        "missing_sample": [
+          "GRANJA LISBOA",
+          "CRISTO REDENTOR",
+          "PARQUE SAO JOSE",
+          "BOM JARDIM",
+          "VICENTE PINZON"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-07T22:57:11.182474",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-07T22:57:17.153801",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 21.1% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: VICOSA DO CEARA, IGUATU, CARIRE",
+      "details": {
+        "region": "interior",
+        "coverage": 0.2105,
+        "threshold": 0.8,
+        "faction_nodes_total": 19,
+        "faction_nodes_in_top20": 4,
+        "missing_sample": [
+          "VICOSA DO CEARA",
+          "IGUATU",
+          "CARIRE",
+          "ARATUBA",
+          "SOLONOPOLE"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-07T22:57:17.342712",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.1% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.21052631578947367,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-07T23:02:59.023237",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 7.69%",
+      "details": {
+        "error_rate_percent": 7.6923076923076925
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-08T11:02:11.913230",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-08T11:02:12.560573",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.1% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.21052631578947367,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-09T13:44:51.193450",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 20.0% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: BARRA DO CEARA, VICENTE PINZON, CONJUNTO PALMEIRAS",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.2,
+        "threshold": 0.8,
+        "faction_nodes_total": 40,
+        "faction_nodes_in_top20": 8,
+        "missing_sample": [
+          "BARRA DO CEARA",
+          "VICENTE PINZON",
+          "CONJUNTO PALMEIRAS",
+          "PLANALTO AYRTON SENNA",
+          "CURIO"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-09T13:44:51.197212",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-09T13:44:51.435317",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 21.1% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: VICOSA DO CEARA, ARATUBA, SOLONOPOLE",
+      "details": {
+        "region": "interior",
+        "coverage": 0.2105,
+        "threshold": 0.8,
+        "faction_nodes_total": 19,
+        "faction_nodes_in_top20": 4,
+        "missing_sample": [
+          "VICOSA DO CEARA",
+          "ARATUBA",
+          "SOLONOPOLE",
+          "BATURITE",
+          "JIJOCA DE JERICOACOARA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-09T13:44:51.435317",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.1% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.21052631578947367,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-09T13:45:09.103090",
+      "type": "high_cpu",
+      "severity": "HIGH",
+      "message": "CPU alta: 100.0%",
+      "details": {
+        "cpu_percent": 100.0
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-09T14:13:21.699601",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 25.00%",
+      "details": {
+        "error_rate_percent": 25.0
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-09T22:14:26.554874",
+      "type": "faction_coverage_rmf",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — RMF: apenas 16.7% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: EUSEBIO, SAO LUIS DO CURU, ITAITINGA",
+      "details": {
+        "region": "rmf",
+        "coverage": 0.1667,
+        "threshold": 0.8,
+        "faction_nodes_total": 18,
+        "faction_nodes_in_top20": 3,
+        "missing_sample": [
+          "EUSEBIO",
+          "SAO LUIS DO CURU",
+          "ITAITINGA",
+          "PACAJUS",
+          "BEBERIBE"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-09T22:14:26.572369",
+      "type": "auto_calibration_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração RMF] Passo 1/3 — FACTION_COVERAGE=16.7% abaixo de 80%. tension_factor=0.7, tag_bias=1.8",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "step": 1,
+        "new_params": {
+          "tension_factor": 0.7,
+          "tag_bias_direct": 1.8,
+          "tag_bias_neighbor": 0.6,
+          "min_risk": 30.0
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:43:17.155406",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-09T22:18:37.939452",
+      "type": "auto_calibration_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração RMF] Passo 2/3 — FACTION_COVERAGE=16.7% abaixo de 80%. tension_factor=0.9, tag_bias=2.1",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "step": 2,
+        "new_params": {
+          "tension_factor": 0.9,
+          "tag_bias_direct": 2.1,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:43:17.155406",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-09T22:24:12.288748",
+      "type": "auto_calibration_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração RMF] Passo 3/3 — FACTION_COVERAGE=16.7% abaixo de 80%. tension_factor=1.1, tag_bias=2.4",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "step": 3,
+        "new_params": {
+          "tension_factor": 1.1,
+          "tag_bias_direct": 2.4,
+          "tag_bias_neighbor": 0.8,
+          "min_risk": 30.0
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:43:17.155406",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-09T22:24:44.662046",
+      "type": "calibration_maxed_rmf",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — RMF: FACTION_COVERAGE=16.7% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "current_value": 0.16666666666666666,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-12T15:03:07.544564",
+      "type": "faction_coverage_rmf",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — RMF: apenas 15.8% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: EUSEBIO, BEBERIBE, PARACURU",
+      "details": {
+        "region": "rmf",
+        "coverage": 0.1579,
+        "threshold": 0.8,
+        "faction_nodes_total": 19,
+        "faction_nodes_in_top20": 3,
+        "missing_sample": [
+          "EUSEBIO",
+          "BEBERIBE",
+          "PARACURU",
+          "ITAITINGA",
+          "SAO LUIS DO CURU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-12T15:03:07.550940",
+      "type": "calibration_maxed_rmf",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — RMF: FACTION_COVERAGE=15.8% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "current_value": 0.15789473684210525,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-12T15:03:07.800954",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 21.3% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: ACOPIARA, FRECHEIRINHA, ARATUBA",
+      "details": {
+        "region": "interior",
+        "coverage": 0.2128,
+        "threshold": 0.8,
+        "faction_nodes_total": 47,
+        "faction_nodes_in_top20": 10,
+        "missing_sample": [
+          "ACOPIARA",
+          "FRECHEIRINHA",
+          "ARATUBA",
+          "ANTONINA DO NORTE",
+          "ITAPIUNA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-12T15:03:07.807873",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.3% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.2127659574468085,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-12T15:03:27.118753",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 28.57%",
+      "details": {
+        "error_rate_percent": 28.57142857142857
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-12T15:06:32.036624",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 91.9%",
+      "details": {
+        "memory_percent": 91.9
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-12T15:11:33.079688",
+      "type": "high_cpu",
+      "severity": "HIGH",
+      "message": "CPU alta: 94.9%",
+      "details": {
+        "cpu_percent": 94.9
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-12T15:25:34.104150",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 20.0% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: CURIO, CANINDEZINHO, NOVO MONDUBIM",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.2,
+        "threshold": 0.8,
+        "faction_nodes_total": 40,
+        "faction_nodes_in_top20": 8,
+        "missing_sample": [
+          "CURIO",
+          "CANINDEZINHO",
+          "NOVO MONDUBIM",
+          "TABAPUA",
+          "CAJAZEIRAS"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-12T15:25:34.111816",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-13T13:52:06.275466",
+      "type": "calibration_maxed_rmf",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — RMF: FACTION_COVERAGE=15.8% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "current_value": 0.15789473684210525,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-13T13:52:06.322797",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.3% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.2127659574468085,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-13T13:52:26.657101",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 91.7%",
+      "details": {
+        "memory_percent": 91.7
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-13T15:27:51.341915",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 20.0% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: SAO MIGUEL, CARLITO PAMPLONA, PARQUE SAO JOSE",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.2,
+        "threshold": 0.8,
+        "faction_nodes_total": 40,
+        "faction_nodes_in_top20": 8,
+        "missing_sample": [
+          "SAO MIGUEL",
+          "CARLITO PAMPLONA",
+          "PARQUE SAO JOSE",
+          "ANCURI",
+          "BOM JARDIM"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-13T15:27:51.356231",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-13T15:27:51.835405",
+      "type": "faction_coverage_rmf",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — RMF: apenas 15.8% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: MARANGUAPE, PACATUBA, SAO GONCALO DO AMARANTE",
+      "details": {
+        "region": "rmf",
+        "coverage": 0.1579,
+        "threshold": 0.8,
+        "faction_nodes_total": 19,
+        "faction_nodes_in_top20": 3,
+        "missing_sample": [
+          "MARANGUAPE",
+          "PACATUBA",
+          "SAO GONCALO DO AMARANTE",
+          "PARAIPABA",
+          "PACAJUS"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-13T15:27:52.246180",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 21.3% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: GROAIRAS, IGUATU, JAGUARUANA",
+      "details": {
+        "region": "interior",
+        "coverage": 0.2128,
+        "threshold": 0.8,
+        "faction_nodes_total": 47,
+        "faction_nodes_in_top20": 10,
+        "missing_sample": [
+          "GROAIRAS",
+          "IGUATU",
+          "JAGUARUANA",
+          "ACOPIARA",
+          "GRACA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-13T15:28:10.769596",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 88.8%",
+      "details": {
+        "memory_percent": 88.8
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-14T16:16:01.623625",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 20.0% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: MESSEJANA, CARLITO PAMPLONA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.2,
+        "threshold": 0.8,
+        "faction_nodes_total": 40,
+        "faction_nodes_in_top20": 8,
+        "missing_sample": [
+          "MESSEJANA",
+          "CARLITO PAMPLONA",
+          "GRANJA LISBOA",
+          "VILA VELHA",
+          "GRANJA PORTUGAL"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-14T16:16:01.670699",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-14T16:16:03.986167",
+      "type": "faction_coverage_rmf",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — RMF: apenas 15.8% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: ITAITINGA, MARANGUAPE, CHOROZINHO",
+      "details": {
+        "region": "rmf",
+        "coverage": 0.1579,
+        "threshold": 0.8,
+        "faction_nodes_total": 19,
+        "faction_nodes_in_top20": 3,
+        "missing_sample": [
+          "ITAITINGA",
+          "MARANGUAPE",
+          "CHOROZINHO",
+          "BEBERIBE",
+          "PACAJUS"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-14T16:16:04.010003",
+      "type": "calibration_maxed_rmf",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — RMF: FACTION_COVERAGE=15.8% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "current_value": 0.15789473684210525,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-14T16:16:06.304333",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 21.3% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: AURORA, GRACA, VICOSA DO CEARA",
+      "details": {
+        "region": "interior",
+        "coverage": 0.2128,
+        "threshold": 0.8,
+        "faction_nodes_total": 47,
+        "faction_nodes_in_top20": 10,
+        "missing_sample": [
+          "AURORA",
+          "GRACA",
+          "VICOSA DO CEARA",
+          "BANABUIU",
+          "BATURITE"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-14T16:16:06.340431",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.3% após 3 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.2127659574468085,
+        "steps_applied": 3,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-14T16:16:10.404881",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 11.11%",
+      "details": {
+        "error_rate_percent": 11.11111111111111
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-14T17:33:26.945500",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 11.11%",
+      "details": {
+        "error_rate_percent": 11.11111111111111
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-14T20:24:49.605352",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 9.09%",
+      "details": {
+        "error_rate_percent": 9.090909090909092
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-14T21:32:52.516868",
+      "type": "auto_calibration_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração FORTALEZA] Passo 4/5 — FACTION_COVERAGE=17.5% abaixo de 80%. tension_factor=2.2, tag_bias=4.3",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "step": 4,
+        "new_params": {
+          "tension_factor": 2.2,
+          "tag_bias_direct": 4.3,
+          "tag_bias_neighbor": 1.25,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.4
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:43:17.155406",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-14T21:32:52.826619",
+      "type": "auto_calibration_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração RMF] Passo 4/5 — FACTION_COVERAGE=15.8% abaixo de 80%. tension_factor=2.2, tag_bias=4.3",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "step": 4,
+        "new_params": {
+          "tension_factor": 2.2,
+          "tag_bias_direct": 4.3,
+          "tag_bias_neighbor": 1.25,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.4
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:43:17.155406",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-14T21:32:53.100597",
+      "type": "auto_calibration_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração INTERIOR] Passo 4/5 — FACTION_COVERAGE=21.3% abaixo de 80%. tension_factor=2.2, tag_bias=4.3",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "step": 4,
+        "new_params": {
+          "tension_factor": 2.2,
+          "tag_bias_direct": 4.3,
+          "tag_bias_neighbor": 1.25,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.4
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:43:17.155406",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-14T21:33:07.886848",
+      "type": "auto_calibration_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração FORTALEZA] Passo 5/5 — FACTION_COVERAGE=17.5% abaixo de 80%. tension_factor=2.5, tag_bias=4.8",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "step": 5,
+        "new_params": {
+          "tension_factor": 2.5,
+          "tag_bias_direct": 4.8,
+          "tag_bias_neighbor": 1.4,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.45
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:43:17.155406",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-14T21:33:08.136653",
+      "type": "auto_calibration_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração RMF] Passo 5/5 — FACTION_COVERAGE=15.8% abaixo de 80%. tension_factor=2.5, tag_bias=4.8",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "step": 5,
+        "new_params": {
+          "tension_factor": 2.5,
+          "tag_bias_direct": 4.8,
+          "tag_bias_neighbor": 1.4,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.45
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:43:17.155406",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-14T21:33:08.383085",
+      "type": "auto_calibration_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração INTERIOR] Passo 5/5 — FACTION_COVERAGE=21.3% abaixo de 80%. tension_factor=2.5, tag_bias=4.8",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "step": 5,
+        "new_params": {
+          "tension_factor": 2.5,
+          "tag_bias_direct": 4.8,
+          "tag_bias_neighbor": 1.4,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.45
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:43:17.155406",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-14T21:38:39.829944",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 6.25%",
+      "details": {
+        "error_rate_percent": 6.25
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-15T11:13:49.671695",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-15T11:13:49.951424",
+      "type": "calibration_maxed_rmf",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — RMF: FACTION_COVERAGE=15.8% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "current_value": 0.15789473684210525,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-15T11:13:50.221447",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.3% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.2127659574468085,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-15T11:44:56.501630",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 28.57%",
+      "details": {
+        "error_rate_percent": 28.57142857142857
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-15T17:13:07.890789",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 20.0% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: NOVO MONDUBIM, PARQUE DOIS IRMAOS, PIRAMBU",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.2,
+        "threshold": 0.8,
+        "faction_nodes_total": 40,
+        "faction_nodes_in_top20": 8,
+        "missing_sample": [
+          "NOVO MONDUBIM",
+          "PARQUE DOIS IRMAOS",
+          "PIRAMBU",
+          "BONSUCESSO",
+          "GRANJA PORTUGAL"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-15T17:13:08.130930",
+      "type": "faction_coverage_rmf",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — RMF: apenas 15.8% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: AQUIRAZ, SAO GONCALO DO AMARANTE, CHOROZINHO",
+      "details": {
+        "region": "rmf",
+        "coverage": 0.1579,
+        "threshold": 0.8,
+        "faction_nodes_total": 19,
+        "faction_nodes_in_top20": 3,
+        "missing_sample": [
+          "AQUIRAZ",
+          "SAO GONCALO DO AMARANTE",
+          "CHOROZINHO",
+          "MARANGUAPE",
+          "PACATUBA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-15T17:13:08.381753",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 21.3% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: ITAREMA, OROS, VARZEA ALEGRE",
+      "details": {
+        "region": "interior",
+        "coverage": 0.2128,
+        "threshold": 0.8,
+        "faction_nodes_total": 47,
+        "faction_nodes_in_top20": 10,
+        "missing_sample": [
+          "ITAREMA",
+          "OROS",
+          "VARZEA ALEGRE",
+          "SANTANA DO ACARAU",
+          "BANABUIU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-16T22:29:57.925836",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 20.0% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: VILA VELHA, PARQUE SAO JOSE, ANTONIO BEZERRA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.2,
+        "threshold": 0.8,
+        "faction_nodes_total": 40,
+        "faction_nodes_in_top20": 8,
+        "missing_sample": [
+          "VILA VELHA",
+          "PARQUE SAO JOSE",
+          "ANTONIO BEZERRA",
+          "PARQUE IRACEMA",
+          "ALTO ALEGRE"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-16T22:29:57.925836",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-16T22:29:58.096493",
+      "type": "faction_coverage_rmf",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — RMF: apenas 15.8% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: MARANGUAPE, PARAIPABA, AQUIRAZ",
+      "details": {
+        "region": "rmf",
+        "coverage": 0.1579,
+        "threshold": 0.8,
+        "faction_nodes_total": 19,
+        "faction_nodes_in_top20": 3,
+        "missing_sample": [
+          "MARANGUAPE",
+          "PARAIPABA",
+          "AQUIRAZ",
+          "SAO LUIS DO CURU",
+          "PACATUBA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-16T22:29:58.103021",
+      "type": "calibration_maxed_rmf",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — RMF: FACTION_COVERAGE=15.8% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "current_value": 0.15789473684210525,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-16T22:34:43.276907",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 21.7% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: FRECHEIRINHA, PEREIRO, ITAREMA",
+      "details": {
+        "region": "interior",
+        "coverage": 0.2174,
+        "threshold": 0.8,
+        "faction_nodes_total": 46,
+        "faction_nodes_in_top20": 10,
+        "missing_sample": [
+          "FRECHEIRINHA",
+          "PEREIRO",
+          "ITAREMA",
+          "ITAPIPOCA",
+          "CEDRO"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-16T22:34:43.318134",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.7% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.21739130434782608,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-17T22:41:41.209304",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 20.0% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: ALTO ALEGRE, CAJAZEIRAS, EDSON QUEIROZ",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.2,
+        "threshold": 0.8,
+        "faction_nodes_total": 40,
+        "faction_nodes_in_top20": 8,
+        "missing_sample": [
+          "ALTO ALEGRE",
+          "CAJAZEIRAS",
+          "EDSON QUEIROZ",
+          "PIRAMBU",
+          "BOM JARDIM"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-17T22:41:41.214803",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=20.0% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.2,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-17T22:41:41.467656",
+      "type": "faction_coverage_rmf",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — RMF: apenas 15.8% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: PARACURU, SAO GONCALO DO AMARANTE, PACAJUS",
+      "details": {
+        "region": "rmf",
+        "coverage": 0.1579,
+        "threshold": 0.8,
+        "faction_nodes_total": 19,
+        "faction_nodes_in_top20": 3,
+        "missing_sample": [
+          "PARACURU",
+          "SAO GONCALO DO AMARANTE",
+          "PACAJUS",
+          "PACATUBA",
+          "CASCAVEL"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-17T22:41:41.471518",
+      "type": "calibration_maxed_rmf",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — RMF: FACTION_COVERAGE=15.8% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "current_value": 0.15789473684210525,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:41:13.678541",
+      "resolved_reason": "Região RMF reavaliada pela nova régua territorial (66.7% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-17T22:41:41.692143",
+      "type": "faction_coverage_interior",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — INTERIOR: apenas 21.7% dos territórios de facção no top-20% (mínimo: 80%). Ausentes: BATURITE, SANTANA DO ACARAU, JAGUARUANA",
+      "details": {
+        "region": "interior",
+        "coverage": 0.2174,
+        "threshold": 0.8,
+        "faction_nodes_total": 46,
+        "faction_nodes_in_top20": 10,
+        "missing_sample": [
+          "BATURITE",
+          "SANTANA DO ACARAU",
+          "JAGUARUANA",
+          "ARATUBA",
+          "VICOSA DO CEARA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-17T22:41:41.698219",
+      "type": "calibration_maxed_interior",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — INTERIOR: FACTION_COVERAGE=21.7% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "current_value": 0.21739130434782608,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:40:04.188401",
+      "resolved_reason": "Região INTERIOR com baixa atividade operacional (3 localidades ativas). Alerta territorial suspenso por baixa densidade recente."
+    },
+    {
+      "timestamp": "2026-03-17T23:40:04.918466",
+      "type": "calibration_rollback_interior",
+      "severity": "LOW",
+      "message": "[Rollback INTERIOR] FACTION_COVERAGE=100.0% — recuperado. 5 passo(s) revertidos, parâmetros restaurados ao estado original.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "steps_reverted": 5,
+        "params_restored": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-17T23:41:14.110452",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: MESSEJANA, GRANJA LISBOA, JANGURUSSU",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "JANGURUSSU",
+          "BARRA DO CEARA",
+          "PLANALTO AYRTON SENNA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:43:17.155406",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-17T23:41:14.529125",
+      "type": "calibration_rollback_rmf",
+      "severity": "LOW",
+      "message": "[Rollback RMF] FACTION_COVERAGE=66.7% — recuperado. 5 passo(s) revertidos, parâmetros restaurados ao estado original.",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "steps_reverted": 5,
+        "params_restored": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-17T23:43:17.379553",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: MESSEJANA, JANGURUSSU, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "MESSEJANA",
+          "JANGURUSSU",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "BARRA DO CEARA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-17T23:44:18.479121",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-17T23:44:18.726192",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: MESSEJANA, PLANALTO AYRTON SENNA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "MESSEJANA",
+          "PLANALTO AYRTON SENNA",
+          "GRANJA LISBOA",
+          "BARRA DO CEARA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T09:32:28.649412",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T09:32:31.674222",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: JANGURUSSU, PLANALTO AYRTON SENNA, MESSEJANA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "JANGURUSSU",
+          "PLANALTO AYRTON SENNA",
+          "MESSEJANA",
+          "SIQUEIRA",
+          "GRANJA LISBOA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T09:47:16.479959",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T09:32:32.041989",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=37.5% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.375,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T09:47:16.479959",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T09:47:16.733652",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: PLANALTO AYRTON SENNA, GRANJA LISBOA, JANGURUSSU",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "PLANALTO AYRTON SENNA",
+          "GRANJA LISBOA",
+          "JANGURUSSU",
+          "MESSEJANA",
+          "SIQUEIRA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T10:17:18.207587",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T10:17:18.918974",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: PLANALTO AYRTON SENNA, GRANJA LISBOA, JANGURUSSU",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "PLANALTO AYRTON SENNA",
+          "GRANJA LISBOA",
+          "JANGURUSSU",
+          "MESSEJANA",
+          "SIQUEIRA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T19:32:40.939182",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T19:32:46.009443",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: JANGURUSSU, PLANALTO AYRTON SENNA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "JANGURUSSU",
+          "PLANALTO AYRTON SENNA",
+          "GRANJA LISBOA",
+          "SIQUEIRA",
+          "MESSEJANA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T19:35:23.335095",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T19:35:23.699286",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, PLANALTO AYRTON SENNA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU",
+          "GRANJA LISBOA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T20:05:24.801921",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T20:05:25.026269",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, PLANALTO AYRTON SENNA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU",
+          "GRANJA LISBOA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T20:35:26.567093",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T20:35:27.492758",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, PLANALTO AYRTON SENNA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU",
+          "GRANJA LISBOA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-19T21:05:29.824520",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-19T21:05:29.990362",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, PLANALTO AYRTON SENNA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU",
+          "GRANJA LISBOA"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T13:21:26.653525",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T13:21:26.754771",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 7,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T13:51:27.569842",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T13:21:26.761901",
+      "type": "calibration_maxed_fortaleza",
+      "severity": "CRITICAL",
+      "message": "INTERVENÇÃO MANUAL NECESSÁRIA — FORTALEZA: FACTION_COVERAGE=37.5% após 5 ajustes automáticos. O modelo pode precisar de retreinamento.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "current_value": 0.375,
+        "steps_applied": 5,
+        "recommendation": "Retreinar o modelo regional ou atualizar os dados de treinamento."
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T13:51:27.569842",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T13:21:39.486019",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 92.7%",
+      "details": {
+        "memory_percent": 92.7
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T13:51:27.780675",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T14:21:28.606549",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T13:51:45.568203",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 92.0%",
+      "details": {
+        "memory_percent": 92.0
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T14:21:28.788147",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T14:51:29.465441",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T14:21:51.675170",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 85.2%",
+      "details": {
+        "memory_percent": 85.2
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T14:51:29.647814",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T15:21:30.403153",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T14:51:57.752982",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 85.8%",
+      "details": {
+        "memory_percent": 85.8
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T15:21:30.596472",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T15:51:31.324734",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T15:22:03.879313",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 86.3%",
+      "details": {
+        "memory_percent": 86.3
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T15:51:31.522177",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T16:21:32.248117",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T15:52:09.974548",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 90.3%",
+      "details": {
+        "memory_percent": 90.3
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T16:21:32.427650",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T16:51:33.160124",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T16:22:16.059222",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 87.0%",
+      "details": {
+        "memory_percent": 87.0
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T16:51:33.338460",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T17:21:33.874169",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T17:21:34.047965",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T17:51:34.719553",
+      "resolved_reason": "Região FORTALEZA reavaliada pela nova régua territorial (37.5% de cobertura)."
+    },
+    {
+      "timestamp": "2026-03-20T17:47:33.172155",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 88.0%",
+      "details": {
+        "memory_percent": 88.0
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T17:51:34.900968",
+      "type": "faction_coverage_fortaleza",
+      "severity": "HIGH",
+      "message": "Tensão territorial subestimada — FORTALEZA: apenas 37.5% dos territórios prioritários de facção no top-20% (mínimo efetivo: 75.0%). Ausentes: SIQUEIRA, MESSEJANA, GRANJA LISBOA",
+      "details": {
+        "region": "fortaleza",
+        "coverage": 0.375,
+        "threshold": 0.75,
+        "faction_nodes_total": 8,
+        "faction_nodes_in_top20": 3,
+        "active_locations": 8,
+        "missing_sample": [
+          "SIQUEIRA",
+          "MESSEJANA",
+          "GRANJA LISBOA",
+          "PLANALTO AYRTON SENNA",
+          "JANGURUSSU"
+        ]
+      },
+      "resolved": true,
+      "resolved_at": "2026-03-20T17:53:08.880707",
+      "resolved_reason": "Região FORTALEZA reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-03-20T17:54:04.382593",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 10.00%",
+      "details": {
+        "error_rate_percent": 10.0
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-20T18:03:50.829332",
+      "type": "high_cpu",
+      "severity": "HIGH",
+      "message": "CPU alta: 84.2%",
+      "details": {
+        "cpu_percent": 84.2
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-22T21:12:49.302147",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 12.50%",
+      "details": {
+        "error_rate_percent": 12.5
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-23T13:33:57.152355",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 89.1%",
+      "details": {
+        "memory_percent": 89.1
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-23T14:04:03.212699",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 85.9%",
+      "details": {
+        "memory_percent": 85.9
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-23T14:34:09.269998",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 88.2%",
+      "details": {
+        "memory_percent": 88.2
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-23T15:41:35.200241",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 92.3%",
+      "details": {
+        "memory_percent": 92.3
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-23T16:11:41.264406",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 89.3%",
+      "details": {
+        "memory_percent": 89.3
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-24T14:01:15.808258",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 90.6%",
+      "details": {
+        "memory_percent": 90.6
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-24T14:32:20.318736",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 92.1%",
+      "details": {
+        "memory_percent": 92.1
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-26T13:21:17.451023",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 88.6%",
+      "details": {
+        "memory_percent": 88.6
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-26T13:57:30.036100",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 86.0%",
+      "details": {
+        "memory_percent": 86.0
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-30T14:43:41.916755",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 87.2%",
+      "details": {
+        "memory_percent": 87.2
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-31T14:18:42.503080",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 86.9%",
+      "details": {
+        "memory_percent": 86.9
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-31T14:50:55.276882",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 86.6%",
+      "details": {
+        "memory_percent": 86.6
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-03-31T15:36:04.440831",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 91.1%",
+      "details": {
+        "memory_percent": 91.1
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-04-03T19:44:38.718203",
+      "type": "high_cpu",
+      "severity": "HIGH",
+      "message": "CPU alta: 89.5%",
+      "details": {
+        "cpu_percent": 89.5
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-04-03T19:49:39.868481",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 5.56%",
+      "details": {
+        "error_rate_percent": 5.555555555555555
+=======
       "timestamp": "2026-04-08T14:27:41.253538",
       "type": "high_memory",
       "severity": "HIGH",
       "message": "Memória alta: 85.4%",
       "details": {
         "memory_percent": 85.4
+>>>>>>> 67e077a8d505686eff978b853746057f8c8443f6
       },
       "resolved": false
     },

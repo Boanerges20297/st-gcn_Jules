@@ -1,5 +1,6 @@
 [
   {
+<<<<<<< HEAD
     "date": "2026-04-08",
     "total_events": 22,
     "brute_cvli": 16,
@@ -24,17 +25,38 @@
       "total_nodes": 109,
       "active_locations": 18,
       "total_events": 18,
+=======
+    "date": "2026-04-10",
+    "total_events": 15,
+    "brute_cvli": 15,
+    "exogenous": 0,
+    "exogenous_conflict": 0,
+    "police_qualified_actions_7d": 0,
+    "police_administrative_events_7d": 0,
+    "assigned_total_events": 15,
+    "unmapped_total_events": 0,
+    "assigned_brute_cvli": 15,
+    "assigned_exogenous": 0,
+    "unmapped_exogenous": 0,
+    "assigned_police_qualified_actions": 0,
+    "unmapped_police_qualified_actions": 0,
+    "unmapped_exogenous_sample": [],
+    "global": {
+      "total_nodes": 109,
+      "active_locations": 15,
+      "total_events": 15,
+>>>>>>> f82eac39b10c2137e4c8b900f8d58d2d569d07ba
       "ranking_top10": [
         "CAUCAIA",
         "JUAZEIRO DO NORTE",
-        "MARACANAU",
         "BARROSO",
-        "MESSEJANA",
-        "ALTO ALEGRE",
+        "MARACANAU",
         "LIMOEIRO DO NORTE",
         "VARZEA ALEGRE",
-        "BARRA DO CEARA",
-        "IRACEMA"
+        "IRACEMA",
+        "TIANGUA",
+        "ARATUBA",
+        "ANCURI"
       ],
       "gt_sample": [
         "BARROSO",
@@ -49,29 +71,46 @@
         "LIMOEIRO DO NORTE",
         "OROS",
         "IRACEMA",
-        "SANTANA DO ACARAU",
         "CEDRO",
+        "SANTANA DO ACARAU",
         "AURORA"
       ],
+<<<<<<< HEAD
       "p5": 0.6,
       "recall5": 0.1667,
+=======
+      "p5": 0.8,
+      "recall5": 0.2667,
+>>>>>>> f82eac39b10c2137e4c8b900f8d58d2d569d07ba
       "hits5": [
         "CAUCAIA",
         "JUAZEIRO DO NORTE",
-        "BARROSO"
+        "BARROSO",
+        "LIMOEIRO DO NORTE"
       ],
+<<<<<<< HEAD
       "p10": 0.6,
       "recall10": 0.3333,
+=======
+      "p10": 0.8,
+      "recall10": 0.5333,
+>>>>>>> f82eac39b10c2137e4c8b900f8d58d2d569d07ba
       "hits10": [
         "CAUCAIA",
         "JUAZEIRO DO NORTE",
         "BARROSO",
         "LIMOEIRO DO NORTE",
         "VARZEA ALEGRE",
-        "IRACEMA"
+        "IRACEMA",
+        "TIANGUA",
+        "ANCURI"
       ],
       "p20": 0.6,
+<<<<<<< HEAD
       "recall20": 0.6667,
+=======
+      "recall20": 0.8,
+>>>>>>> f82eac39b10c2137e4c8b900f8d58d2d569d07ba
       "hits20": [
         "CAUCAIA",
         "JUAZEIRO DO NORTE",
@@ -80,8 +119,8 @@
         "VARZEA ALEGRE",
         "IRACEMA",
         "TIANGUA",
+        "ANCURI",
         "CEDRO",
-        "CRATO",
         "SANTANA DO ACARAU",
         "JIJOCA DE JERICOACOARA",
         "CARIRE"
@@ -89,41 +128,40 @@
     },
     "fortaleza": {
       "total_nodes": 40,
-      "active_locations": 3,
-      "total_events": 3,
+      "active_locations": 2,
+      "total_events": 2,
       "ranking_top10": [
         "BARROSO",
+        "ANCURI",
         "MESSEJANA",
-        "ALTO ALEGRE",
         "BARRA DO CEARA",
-        "PLANALTO AYRTON SENNA",
-        "SIQUEIRA",
-        "MONDUBIM",
         "CURIO",
-        "JOSE WALTER",
-        "CRISTO REDENTOR"
+        "BOM JARDIM",
+        "ANTONIO BEZERRA",
+        "ALTO ALEGRE",
+        "MONDUBIM",
+        "NOVO MONDUBIM"
       ],
       "gt_sample": [
         "BARROSO",
-        "ANCURI",
-        "JOSE WALTER"
+        "ANCURI"
       ],
-      "p5": 0.2,
-      "recall5": 0.3333,
+      "p5": 0.4,
+      "recall5": 1.0,
       "hits5": [
-        "BARROSO"
+        "BARROSO",
+        "ANCURI"
       ],
       "p10": 0.2,
-      "recall10": 0.6667,
+      "recall10": 1.0,
       "hits10": [
         "BARROSO",
-        "JOSE WALTER"
+        "ANCURI"
       ],
-      "p20": 0.15,
+      "p20": 0.1,
       "recall20": 1.0,
       "hits20": [
         "BARROSO",
-        "JOSE WALTER",
         "ANCURI"
       ]
     },
@@ -134,14 +172,14 @@
       "ranking_top10": [
         "CAUCAIA",
         "MARACANAU",
-        "SAO LUIS DO CURU",
-        "PARAIPABA",
+        "TRAIRI",
+        "PACAJUS",
         "HORIZONTE",
-        "EUSEBIO",
-        "PINDORETAMA",
         "PACATUBA",
+        "PINDORETAMA",
         "ITAITINGA",
-        "PACAJUS"
+        "EUSEBIO",
+        "PARAIPABA"
       ],
       "gt_sample": [
         "CAUCAIA",
@@ -166,8 +204,8 @@
     },
     "interior": {
       "total_nodes": 50,
-      "active_locations": 13,
-      "total_events": 13,
+      "active_locations": 12,
+      "total_events": 12,
       "ranking_top10": [
         "JUAZEIRO DO NORTE",
         "LIMOEIRO DO NORTE",
@@ -176,9 +214,9 @@
         "TIANGUA",
         "ARATUBA",
         "CEDRO",
-        "CRATO",
         "SANTANA DO ACARAU",
-        "JIJOCA DE JERICOACOARA"
+        "JIJOCA DE JERICOACOARA",
+        "GROAIRAS"
       ],
       "gt_sample": [
         "JUAZEIRO DO NORTE",
@@ -190,13 +228,12 @@
         "LIMOEIRO DO NORTE",
         "OROS",
         "IRACEMA",
-        "SANTANA DO ACARAU",
         "CEDRO",
-        "AURORA",
-        "CRATO"
+        "SANTANA DO ACARAU",
+        "AURORA"
       ],
       "p5": 1.0,
-      "recall5": 0.3846,
+      "recall5": 0.4167,
       "hits5": [
         "JUAZEIRO DO NORTE",
         "LIMOEIRO DO NORTE",
@@ -204,8 +241,8 @@
         "IRACEMA",
         "TIANGUA"
       ],
-      "p10": 0.9,
-      "recall10": 0.6923,
+      "p10": 0.8,
+      "recall10": 0.6667,
       "hits10": [
         "JUAZEIRO DO NORTE",
         "LIMOEIRO DO NORTE",
@@ -213,12 +250,11 @@
         "IRACEMA",
         "TIANGUA",
         "CEDRO",
-        "CRATO",
         "SANTANA DO ACARAU",
         "JIJOCA DE JERICOACOARA"
       ],
-      "p20": 0.5,
-      "recall20": 0.7692,
+      "p20": 0.45,
+      "recall20": 0.75,
       "hits20": [
         "JUAZEIRO DO NORTE",
         "LIMOEIRO DO NORTE",
@@ -226,7 +262,6 @@
         "IRACEMA",
         "TIANGUA",
         "CEDRO",
-        "CRATO",
         "SANTANA DO ACARAU",
         "JIJOCA DE JERICOACOARA",
         "CARIRE"
