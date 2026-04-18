@@ -2444,7 +2444,7 @@
                 else if (label.toUpperCase().indexOf('ALERT') !== -1 || label.toUpperCase().indexOf('ALTO') !== -1) cls = 'text-warning';
                 else if (label.toUpperCase().indexOf('MODER') !== -1) cls = 'text-info';
 
-                htmlSrv += `<a href="#" class="list-group-item list-group-item-action py-2 ps-2 pe-1" data-nodeid="${item.node_id}">
+                htmlSrv += `<a href="#" class="list-group-item list-group-item-action py-2 ps-2 pe-1" data-nodeid="${item.node_id}" data-name="${item.name}">
                         <div class="d-flex w-100 justify-content-between align-items-center">
                             <span class="mb-1">${displayIdx}. ${item.name}</span>
                             <div class="text-end ms-2" style="min-width: 70px;">
@@ -2456,13 +2456,24 @@
                 displayIdx++;
             });
             $('#top-areas').html(htmlSrv);
-            // bind clicks to focus corresponding layer by node_id
+            // bind clicks to focus corresponding layer by node_id or name fallback
             $('#top-areas a').on('click', function(e) {
                 e.preventDefault();
                 var nodeId = $(this).data('nodeid');
+                var clickName = $(this).data('name') || '';
+                var nClick = typeof normalizeName === 'function' ? normalizeName(clickName) : clickName.toLowerCase();
                 var found = null;
                 geojsonLayer.getLayers().forEach(function(l) {
-                    try { if (l.feature && (l.feature.properties.node_id == nodeId || l.feature.properties.node_id === String(nodeId))) found = l; } catch(e){}
+                    try { 
+                        if (l.feature) {
+                            var p = l.feature.properties;
+                            var lName = p.name || p.Name || p.NOME || '';
+                            var nL = typeof normalizeName === 'function' ? normalizeName(lName) : lName.toLowerCase();
+                            if (p.node_id == nodeId || p.node_id === String(nodeId) || (nClick && nClick === nL)) {
+                                if (!found) found = l;
+                            }
+                        }
+                    } catch(e){}
                 });
                 if (found) focusLayerAndShowDetails(found, 1.5);
             });
