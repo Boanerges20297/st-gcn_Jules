@@ -94,6 +94,8 @@ class EfficiencyMonitor:
                         last_base_date = d_val
                     print(f"📊 [Monitor] Avaliando eficácia com base na data: {last_base_date}")
                 except: pass
+
+            today = last_base_date
             # ---------------------------------------------------
 
             for r_name, spec in self.orchestrator.specialists.items():

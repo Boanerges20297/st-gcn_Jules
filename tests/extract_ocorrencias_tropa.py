@@ -5,10 +5,12 @@ import unicodedata
 from datetime import datetime
 
 # --- GESTÃO DE CAMINHOS ---
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-if not BASE_DIR: BASE_DIR = "."
-ARQUIVO_ENTRADA = os.path.join(BASE_DIR, 'ocorrencias_tropa.csv')
-ARQUIVO_SAIDA = os.path.join(BASE_DIR, 'ocorrencias_tropa_limpo_fortaleza.csv')
+# Garante que aponta para a raiz do repositório, saindo de tests/
+PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_RAW_DIR = os.path.join(PROJECT_DIR, 'data', 'raw')
+
+ARQUIVO_ENTRADA = os.path.join(DATA_RAW_DIR, 'ocorrencias_tropa.csv')
+ARQUIVO_SAIDA = os.path.join(DATA_RAW_DIR, 'ocorrencias_tropa_limpo_fortaleza.csv')
 
 SECTION_KEYWORDS = (
     'TURNO', 'DATA', 'HORA', 'PELOTAO', 'CIA', 'BTL', 'EQUIPE', 'PATRULHA',

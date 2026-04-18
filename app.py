@@ -1,7 +1,12 @@
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
-import sys
 import numpy as np
+
+import sys
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8')
 
 import geopandas as gpd
 import pandas as pd
@@ -1194,6 +1199,11 @@ def get_risk():
             exogenous_shocks = None
 
         scores_map, trends_map = orchestrator.get_combined_risk(exogenous_shocks, return_trends=True)
+        
+        # --- BLEND CHAMPION/CHALLENGER ---
+        if champion_challenger is not None:
+            scores_map = champion_challenger.apply(scores_map)
+            
         results = []
         meta = {'counts': {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0}}
         all_scores = []
@@ -1327,13 +1337,13 @@ def get_risk():
 
                 # DEFINIÇÃO ÚNICA DE STATUS (BACKEND)
                 if score >= 85: 
-                    level, status, css, color = 'crítico', 'CRÍTICO: Ação Imediata', 'risk-critico', '#8B0000' # Vermelho Escuro
+                    level, status, css, color = 'crítico', 'CRÍTICO', 'risk-critico', '#8B0000' # Vermelho Escuro
                 elif score >= 70: 
-                    level, status, css, color = 'alto', 'ALERTA: Prioridade Alta', 'risk-alto', '#FFB3B3' # Vermelho Bem Claro
+                    level, status, css, color = 'alto', 'ALERTA', 'risk-alto', '#FFB3B3' # Vermelho Bem Claro
                 elif score >= 40: 
-                    level, status, css, color = 'moderado', 'RISCO: Patrulhamento', 'risk-moderado', '#FFA500' # Laranja
+                    level, status, css, color = 'moderado', 'RISCO', 'risk-moderado', '#FFA500' # Laranja
                 else: 
-                    level, status, css, color = 'baixo', 'ESTÁVEL: Monitoramento', 'risk-baixo', '#444444'
+                    level, status, css, color = 'baixo', 'ESTÁVEL', 'risk-baixo', '#444444'
 
                 if reg in region_stats:
                     region_stats[reg][level] += 1
@@ -1365,7 +1375,7 @@ def get_risk():
 
                 node_metrics = {
                     'cvli_7d': 0,
-                    'tension': round(float(row.get('tension_index', 0)), 2),
+                    'tension': round(float(np.nan_to_num(row.get('tension_index', 0))), 2),
                     'events_count': ev_count,
                     'event_types': ev_types[:3],
                     'critical_streets': critical_streets_info,
@@ -1519,10 +1529,18 @@ def get_risk():
                 meta['counts_by_region'][region_key] = c
 
                 sorted_region = sorted(items, key=lambda x: x.get('risk_score', 0), reverse=True)
+                
+                deduped_region = []
+                seen_names = set()
+                for r in sorted_region:
+                    if r.get('name') not in seen_names:
+                        seen_names.add(r.get('name'))
+                        deduped_region.append(r)
+                
                 meta['top10_by_region'][region_key] = [{
                     'name': r.get('name'), 'node_id': r.get('node_id'), 'risk_score': r.get('risk_score'),
                     'status_label': r.get('status_label'), 'region_type': r.get('region_type')
-                } for r in sorted_region[:10]]
+                } for r in deduped_region[:10]]
         except Exception:
             meta['counts_by_region'] = {}
             meta['top10_by_region'] = {}
@@ -1531,14 +1549,19 @@ def get_risk():
         try:
             sorted_results = sorted(results, key=lambda x: x.get('risk_score', 0), reverse=True)
             meta['top10'] = []
-            for r in sorted_results[:10]:
-                meta['top10'].append({
-                    'name': r.get('name'),
-                    'node_id': r.get('node_id'),
-                    'risk_score': r.get('risk_score'),
-                    'status_label': r.get('status_label'),
-                    'region_type': r.get('region_type')
-                })
+            seen_names_all = set()
+            for r in sorted_results:
+                if r.get('name') not in seen_names_all:
+                    seen_names_all.add(r.get('name'))
+                    meta['top10'].append({
+                        'name': r.get('name'),
+                        'node_id': r.get('node_id'),
+                        'risk_score': r.get('risk_score'),
+                        'status_label': r.get('status_label'),
+                        'region_type': r.get('region_type')
+                    })
+                    if len(meta['top10']) >= 10:
+                        break
         except Exception:
             meta['top10'] = []
 
@@ -1729,7 +1752,7 @@ def simulate_risk():
             # Métricas Reais (Mesma lógica do get_risk)
             node_metrics = {
                 'cvli_7d': 0,
-                'tension': round(float(row.get('tension_index', 0)), 2),
+                'tension': round(float(np.nan_to_num(row.get('tension_index', 0))), 2),
                 'events_count': 0,
                 'event_types': [],
                 'spatial_influence': score >= 80

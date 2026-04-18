@@ -1,0 +1,17 @@
+INFO:src.core.health_monitor:\u2705 HealthMonitor inicializado
+INFO:src.core.health_monitor:\u2705 ConfidenceTracker populado com 2 registros do efficiency history
+Traceback (most recent call last):
+  File "C:\Users\Boanerges\Desktop\Projetos\Report Preview\app.py", line 245, in <module>
+    print("\u2705 Admin Dashboard Registrado em /api/admin/health")
+  File "C:\Users\Boanerges\AppData\Local\Programs\Python\Python310\lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Boanerges\Desktop\Projetos\Report Preview\app.py", line 261, in <module>
+    print(f"\u26a0\ufe0f Erro ao registrar Health Monitor: {e}")
+  File "C:\Users\Boanerges\AppData\Local\Programs\Python\Python310\lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 0-1: character maps to <undefined>
