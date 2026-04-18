@@ -9,6 +9,15 @@ import unicodedata
 import re
 from datetime import datetime
 
+# --- Champion/Challenger LGBM Lean (Sentinela V3) ---
+try:
+    from .champion_challenger import ChampionChallenger
+except ImportError:
+    try:
+        from champion_challenger import ChampionChallenger
+    except ImportError:
+        ChampionChallenger = None
+
 # ============================================================================
 # ARQUITETURA REGIONAL ST-GAT - ORQUESTRADOR DE ELITE
 # ============================================================================
@@ -76,6 +85,15 @@ class StateOrchestrator:
         self.dates = None
         self._initialize_models()
         self._restore_window_state()
+        
+        # --- Champion/Challenger (Sentinela V3) ---
+        self.champion_challenger = None
+        if ChampionChallenger is not None:
+            try:
+                self.champion_challenger = ChampionChallenger(self.root)
+                print("✅ [Sentinela V3] Refinamento LGBM integrado ao Orquestrador.")
+            except Exception as cc_err:
+                print(f"⚠️ [Sentinela V3] Falha ao integrar: {cc_err}")
 
     def _restore_window_state(self):
         try:
@@ -291,6 +309,15 @@ class StateOrchestrator:
                 if self._node_owners.get(name_key, region) == region:
                     combined_scores[name_key] = float(out_norm[i])
                     if return_trends: trends[name_key] = 'stable'
+        
+        # --- REFINAMENTO SENTINELA V3 (LGBM) ---
+        if self.champion_challenger is not None:
+            try:
+                combined_scores = self.champion_challenger.apply(combined_scores)
+            except Exception as e:
+                print(f"⚠️ [Sentinela V3] Falha ao aplicar refinamento: {e}")
+        # ---------------------------------------
+
         self._log_predict_p10(combined_scores)
         return (combined_scores, trends) if return_trends else combined_scores
 

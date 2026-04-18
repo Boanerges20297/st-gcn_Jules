@@ -1212,10 +1212,9 @@
                     function normalizeRegion(region) {
                         if (!region) return 'unknown';
                         var r = String(region).toLowerCase();
-                        if (r === 'fortaleza' || r === 'capital') return 'capital';
+                        if (r === 'capital' || r === 'fortaleza') return 'fortaleza';
                         return r;
-                    }
-                    var normalizedFilter = normalizeRegion(regionFilter);
+                    }                    var normalizedFilter = normalizeRegion(regionFilter);
                     
                     geojsonLayer.eachLayer(function(layer) {
                         var props = layer.feature.properties;
@@ -2459,7 +2458,7 @@
         function normalizeRegion(region) {
             if (!region) return 'unknown';
             var r = String(region).toLowerCase();
-            if (r === 'fortaleza' || r === 'capital') return 'capital';
+            if (r === 'capital' || r === 'fortaleza') return 'fortaleza';
             return r;
         }
         var normalizedFilter = normalizeRegion(regionFilter);

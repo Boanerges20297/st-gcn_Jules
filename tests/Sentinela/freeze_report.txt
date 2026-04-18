@@ -1,0 +1,55 @@
+====================================================================
+SENTINELA V3 FREEZE — MODELO CANDIDATO A PRODUÇÃO
+Gerado em: 15/04/2026 09:40:05
+Dados até: 2026-04-14 | Horizonte: 14 dias
+====================================================================
+
+PERFORMANCE (validação sombra T57 — Mar→Abr/2026):
+  EWMA-Multi : P@10=50.0% | P@20=65.0%
+  LGBM-Lean  : P@10=30.0% | P@20=70.0%
+  Ensemble   : P@10=30.0% | P@20=70.0%
+  → Thresholds (P@10≥45% OU P@20≥60%): ATINGIDOS ✅
+
+FEATURE IMPORTANCE:
+  chuva_mm              : 0.0%
+  cvp_cvli_ratio        : 18.4%
+  cvp_ewma_14d          : 5.6%
+  cvp_ewma_30d          : 10.2%
+  cvp_ewma_7d           : 5.6%
+  dia_quente_cvp        : 0.0%
+  feriado               : 0.0%
+  hist_pct              : 6.7%
+  intel_ewma_14d        : 9.1%
+  intel_ewma_7d         : 7.7%
+  inter_chuva_hist      : 4.1%
+  inter_feriado_hist    : 0.2%
+  inter_intel_cvli      : 8.9%
+  nbr_cvli_30d          : 8.2%
+  target_enc            : 15.4%
+
+RANKING TOP-20 (score ensemble):
+ Rank                Bairro  Score_Final  feat_cvp_cvli_ratio  feat_intel_ewma_14d  feat_nbr_cvli_30d
+    1                ANCURI       0.9637               4.3060               0.0002                2.0
+    2               BARROSO       0.9467               3.9135               0.5170                4.0
+    3       ANTONIO BEZERRA       0.4660               9.1335               0.2553                0.0
+    4             MESSEJANA       0.4525               6.6690               0.1601                6.0
+    5            BOM JARDIM       0.4250              10.4304               0.3352                0.0
+    6        VICENTE PINZON       0.4197               1.9866               0.4812                0.0
+    7            JANGURUSSU       0.3956               4.9284               1.3779                6.0
+    8              SIQUEIRA       0.3946               7.0602               0.4486                0.0
+    9       CRISTO REDENTOR       0.3837               1.3815               0.1567                0.0
+   10       GRANJA PORTUGAL       0.3808               2.3766               0.0852                0.0
+   11                 CURIO       0.3481               1.5558               0.9235                2.0
+   12          CANINDEZINHO       0.3213               8.1702               0.8724                0.0
+   13        OLAVO OLIVEIRA       0.3147               1.6629               0.0000                0.0
+   14 PLANALTO AYRTON SENNA       0.3145               2.3757               0.0001                0.0
+   15        BARRA DO CEARA       0.2571               2.7727               0.0965                0.0
+   16  PREFEITO JOSE WALTER       0.2553               8.2399               0.0000                2.0
+   17        JOSE BONIFACIO       0.2491               4.4806               0.0000                0.0
+   18    PARQUE SANTA MARIA       0.2458               3.3082               0.0261                6.0
+   19              MONDUBIM       0.2318               4.6104               3.0184                0.0
+   20            VILA VELHA       0.2277               5.7052               0.7878                0.0
+
+====================================================================
+INSTRUÇÃO DE PROMOÇÃO (executar após revisão manual):
+  copy "c:\Users\Boanerges\Desktop\Projetos\Report Preview\tests\Sentinela\lgbm_lean_v3_freeze.pkl" "c:\Users\Boanerges\Desktop\Projetos\Report Preview\models\active\lgbm_lean_v3_freeze.pkl"

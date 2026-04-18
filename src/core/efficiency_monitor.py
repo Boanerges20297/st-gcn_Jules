@@ -81,6 +81,21 @@ class EfficiencyMonitor:
             # Interior tem eventos muito esparsos: usar janela mais longa (28 passos)
             # Fortaleza/RMF usam 14 passos (sinal mais denso, janela menor é suficiente)
             WINDOW_BY_REGION = {'fortaleza': 14, 'rmf': 14, 'interior': 28}
+            
+            # --- AJUSTE DE DATA DE REFERÊNCIA (ANTI-CALMARIA) ---
+            # Se a base de dados estiver defasada, usamos a última data da base como 'hoje' para a avaliação.
+            last_base_date = datetime.now().date()
+            if hasattr(self.orchestrator, 'dates') and self.orchestrator.dates is not None:
+                try:
+                    d_val = self.orchestrator.dates[-1]
+                    if isinstance(d_val, str):
+                        last_base_date = datetime.strptime(d_val[:10], '%Y-%m-%d').date()
+                    else:
+                        last_base_date = d_val
+                    print(f"📊 [Monitor] Avaliando eficácia com base na data: {last_base_date}")
+                except: pass
+            # ---------------------------------------------------
+
             for r_name, spec in self.orchestrator.specialists.items():
                 data = spec['data']
                 nf = data['node_features']
@@ -99,8 +114,7 @@ class EfficiencyMonitor:
             # 2b. COMPLEMENTO EXÓGENO: Carregar eventos recentes de arquivos
             event_files = [os.path.join(self.root, "data", "exogenous_events.json")]
             
-            today = datetime.now().date()
-            window_start = today - timedelta(days=7)
+            window_start = last_base_date - timedelta(days=7)
             total_exo_conflict = 0
             total_police_qualified = 0
             total_police_admin = 0

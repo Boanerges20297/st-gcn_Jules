@@ -1,53 +1,260 @@
-# 🛡️ Report Preview: Sistema de Predição de Risco Criminal (ST-GAT + LLM)
+# 🛡️ Report Preview — Sistema de Predição de Risco Criminal
 
-> **Decisão Tática Baseada em Inteligência Artificial Híbrida**
-
-O **Report Preview** é uma plataforma avançada de monitoramento e predição de risco de segurança pública. Utilizando uma arquitetura híbrida que combina **Redes Neurais em Grafos Espaço-Temporais (ST-GAT)** com **Modelos de Linguagem (LLMs)**, o sistema oferece previsões precisas sobre manchas criminais, dinâmicas de facções e alertas de curto prazo para o estado do Ceará.
+> **Inteligência Criminal Preditiva para o Estado do Ceará**
+> Paradigma Híbrido: ST-GAT (Deep Learning) + Sentinela V3 (LGBM Lean) + Champion/Challenger Dinâmico
 
 ---
 
-## 🚀 Funcionalidades Principais
+## 📌 Visão Geral
 
-*   **Predição Espaço-Temporal:** Utiliza redes ST-GAT para entender não apenas *onde* o crime ocorre, mas *quando* e *como* ele se desloca entre bairros vizinhos.
-*   **Análise de Vínculos (Facções):** O modelo considera a "geografia do conflito", onde a proximidade não é apenas física, mas também definida por alianças e rivalidades entre grupos criminosos.
-*   **Inteligência em Tempo Real (LLM):** Integração com **Google Gemini** para ler logs policiais (CIOPS), extrair entidades e injetar "eventos de choque" no modelo matemático em tempo real.
-*   **Orquestração Regional:** Modelos especialistas distintos para a Capital (Fortaleza), Região Metropolitana e Interior, respeitando as dinâmicas locais de cada área.
-*   **Explicação Tática:** Não é uma "Caixa Preta". O sistema gera justificativas em linguagem natural para cada alerta de risco, explicando se a causa é tendência histórica, contágio vizinho ou evento recente.
+O **Report Preview** é uma plataforma operacional de previsão de crimes violentos letais intencionais (CVLI) desenvolvida para apoiar o planejamento tático de segurança pública no estado do Ceará. O sistema prediz os bairros com maior probabilidade de registrar homicídios nos próximos **14 dias**, com foco na capital **Fortaleza** (40 bairros monitorados).
+
+### Métricas de Performance (Validação Sombra — Abr/2026)
+
+| Modelo | P@10 | P@20 | Janela | Status |
+|--------|------|------|--------|--------|
+| ST-GAT (fortaleza_model_active) | ~42% | — | 120d | ✅ Oficial (champion) |
+| **Sentinela V3 — EWMA-Multi** | **50%** | 65% | 14d | ✅ Challenger ativo |
+| **Sentinela V3 — LGBM Lean** | 30% | **70%** | 14d | ✅ Challenger ativo |
+| **Sentinela V3 — Ensemble** | 30% | **70%** | 14d | ✅ Produção |
+| Baseline aleatório | 25% | 50% | — | Referência |
+
+> **P@K** = Precisão no Top-K: proporção dos K bairros previstos que de fato registraram CVLI no horizonte de 14 dias.
 
 ---
 
 ## 🏗️ Arquitetura do Sistema
 
-O sistema é construído em Python e segue um fluxo pipeline robusto:
+O sistema opera em duas camadas paralelas que convergem num blend dinâmico:
 
-1.  **Ingestão:** Dados históricos + Eventos de Tempo Real (API).
-2.  **Processamento:** Construção de Tensores de 29 Canais (Crimes, Sazonalidade, Eventos Exógenos).
-3.  **Core AI:**
-    *   **Deep ST-GAT:** Processamento da série temporal e grafo espacial.
-    *   **TAG-Bias:** Injeção de viés tático para reatividade imediata a eventos críticos.
-4.  **Interface:** Dashboard interativo baseada em mapas para consciência situacional.
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     CAMADA 1: ST-GAT                        │
+│                                                             │
+│  Dados Históricos (37 canais, 120 dias)                     │
+│      ↓                                                      │
+│  DeepSTGAT_64 (3 camadas GAT + Atenção Temporal)            │
+│      ↓                                                      │
+│  scores_stgat = {bairro: score}  ← orchestrator.py         │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────┐
+│               CHAMPION/CHALLENGER (src/core/                │
+│                champion_challenger.py)                      │
+│                                                             │
+│  Avalia P@10 de ambos contra CVLI real (últimos 14 dias)    │
+│  Ajusta blend via EMA:                                      │
+│    score_final = (1-w) × ST-GAT + w × LGBM Lean            │
+│    w começa em 0%, sobe até 50% se LGBM provar vantagem     │
+│    Decisão persistida em data/cc_state.json                 │
+│    Auditoria em logs/cc_decisions.jsonl                     │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────┐
+│                     CAMADA 2: SENTINELA V3                  │
+│                                                             │
+│  10 Features Lean (calibradas):                             │
+│    cvp_cvli_ratio × sqrt(hist_pct)  ← anti-falso-positivo  │
+│    target_enc, intel_ewma, nbr_cvli, hist_pct, ...          │
+│      ↓                                                      │
+│  LightGBM LambdaRank (300 árvores, reg forte)               │
+│      +                                                      │
+│  EWMA-Multi (7d×0.4 + 14d×0.35 + 30d×0.15 + 90d×0.1)      │
+│      ↓                                                      │
+│  Ensemble 50/50 → ranking Fortaleza                         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Componentes Principais
+
+| Componente | Arquivo | Responsabilidade |
+|-----------|---------|-----------------|
+| **Orquestrador ST-GAT** | `src/core/orchestrator.py` | Modelo oficial — 3 regiões (Fortaleza, RMF, Interior) |
+| **Champion/Challenger** | `src/core/champion_challenger.py` | Blend dinâmico ST-GAT ↔ LGBM, arbitra com dados reais |
+| **Inferência Sentinela** | `tests/Sentinela/sentinela_inference.py` | API limpa do LGBM Lean + alertas de Intel |
+| **Fine-tuner Tempo Real** | `tests/Sentinela/finetune_realtime_v1.py` | LGBM ajustado nos últimos 30 dias (janela deslizante) |
+| **Freeze / Re-treino** | `tests/Sentinela/freeze_total_v3.py` | Re-treino completo ao receber novos dados |
+| **Validação Sombra** | `tests/Sentinela/train_validate_v3.py` | Auditoria out-of-sample periódica |
+| **Promoção de Modelo** | `tests/Sentinela/promote_model.py` | Promoção segura com backup e log |
+| **Monitor de Eficiência** | `src/core/efficiency_monitor.py` | P@10/P@20/Recall avaliados automaticamente |
 
 ---
 
-## 📦 Estrutura do Projeto
+## 🧠 Sentinela V3 — O Novo Paradigma (Tentativas 55–57b)
+
+### Por que migramos do ST-GAT puro para o paradigma híbrido?
+
+Após 54 tentativas de otimização do ST-GAT (T1→T54), o modelo atingiu um teto de ~42% P@10 com alta variância cross-fold. A principal limitação era a **instabilidade com dados esparsos de CVLI** — homicídios são eventos raros, e redes neurais profundas sofrem com esse regime.
+
+O **Sentinela V3** adota uma filosofia diferente:
+
+1. **Menos é mais**: 10 features de alta importância > 42 features ruidosas
+2. **Ranking explícito**: LightGBM LambdaRank otimiza diretamente para NDCG@10, não MSE
+3. **Momentum EWMA**: captura tendências de curto prazo que o GAT (janela 120d) perde
+4. **Calibração de falsos positivos**: `cvp_ratio × sqrt(hist_pct)` elimina bairros comerciais com CVP alto mas sem histórico de CVLI
+
+### As 10 Features do Modelo (por importância)
+
+| # | Feature | Peso% | O que captura |
+|---|---------|-------|---------------|
+| 1 | `cvp_cvli_ratio` (calibrado) | 18.8% | Escalada de crime patrimonial → homicídio |
+| 2 | `target_enc` | 15.7% | Média histórica expanding de CVLI por bairro |
+| 3 | `intel_ewma_14d` | 10.8% | Pressão de operações policiais (armas/drogas/veículos) |
+| 4 | `cvp_ewma_30d` | 10.5% | Tendência de longo prazo de crimes patrimoniais |
+| 5 | `intel_ewma_7d` | 8.8% | Intel de tropa de curto prazo |
+| 6 | `inter_intel_cvli` | 8.5% | Interação simultânea: Intel alta + CVLI recente |
+| 7 | `nbr_cvli_30d` | 8.3% | CVLI em bairros geograficamente vizinhos (retaliação) |
+| 8 | `hist_pct` | 6.9% | Percentil histórico do bairro no ranking de CVLI |
+| 9 | `cvp_ewma_14d` | 6.5% | Tendência de CVP médio prazo |
+| 10 | `cvp_ewma_7d` | 5.2% | Tendência de CVP curto prazo |
+
+### Motor de Inteligência de Tropa (score_intel)
+
+O score de intel por operação policial é calculado assim:
+
+```python
+score_intel = (
+    qtd_armas               × 15.0   # maior preditor de violência
+  + log1p(qtd_drogas)       ×  4.0   # escalonado para evitar outliers
+  + qtd_drogas_itens        ×  2.0
+  + qtd_veiculos_apreendidos×  3.0
+  + peso_natureza                    # APREENSÃO ARMA=15, TRÁFICO=8, etc.
+)
+```
+
+---
+
+## 📁 Estrutura do Projeto
+
+```
+Report Preview/
+│
+├── app.py                          # API Gateway Flask — ponto de entrada
+│
+├── src/core/
+│   ├── orchestrator.py             # ST-GAT: 3 modelos regionais (champion)
+│   ├── architectures.py            # DeepSTGAT_64 — definição da rede neural
+│   ├── champion_challenger.py      # 🆕 Blend dinâmico ST-GAT + LGBM Lean
+│   ├── efficiency_monitor.py       # Avaliação automática P@10/P@20
+│   └── model_calibrator.py         # Auto-ajuste de janela temporal
+│
+├── models/
+│   ├── active/
+│   │   ├── fortaleza_model_active.pth   # ST-GAT oficial (champion)
+│   │   ├── lgbm_lean_v3_freeze.pkl      # 🆕 LGBM V3 promovido (challenger)
+│   │   ├── ranking_atual.csv            # Ranking atual dos 40 bairros
+│   │   └── ranking_atual.json           # Idem, formato JSON
+│   └── archive/                         # Modelos anteriores (backup automático)
+│
+├── tests/Sentinela/                # 🆕 Laboratório Sentinela V3
+│   ├── lgbm_lean_v3_freeze.pkl     # Modelo candidato (pré-promoção)
+│   ├── freeze_total_v3.py          # Re-treino com dados completos
+│   ├── train_validate_v3.py        # Validação sombra out-of-sample
+│   ├── sentinela_inference.py      # Interface de inferência + alertas
+│   ├── finetune_realtime_v1.py     # Fine-tuner janela deslizante 30d
+│   ├── promote_model.py            # Promoção segura para models/active/
+│   └── ROADMAP.md                  # Roadmap detalhado das próximas fases
+│
+├── data/
+│   ├── raw/
+│   │   ├── dados_status_ocorrencias_gerais_ENRIQUECIDO.csv  # CVLI + CVP
+│   │   ├── ocorrencias_tropa_limpo_fortaleza.csv            # Intel de tropa
+│   │   └── bairros_centros_latlong.json                     # Centroides
+│   ├── processed/                  # Pkls pré-processados para ST-GAT
+│   ├── cc_state.json               # 🆕 Estado Champion/Challenger (pesos)
+│   └── exogenous_events.json       # Eventos exógenos de tempo real
+│
+├── logs/
+│   ├── cc_decisions.jsonl          # 🆕 Auditoria de cada decisão CC
+│   ├── predict_p10.jsonl           # Top-10 predito por região (histórico)
+│   └── rankings/                   # Relatórios diários por região
+│
+├── TRAINING_LOG.md                 # Histórico completo de experimentos (T1→T57b)
+└── GEMINI.md                       # Contexto do projeto para IA-assistente
+```
+
+---
+
+## 🔄 Fluxo de Produção
+
+### Ciclo diário (já automatizado)
+
+```
+[Startup do app.py]
+    ↓
+1. StateOrchestrator carrega ST-GAT (fortaleza, rmf, interior)
+2. ChampionChallenger carrega LGBM Lean e estado CC persistido
+3. EfficiencyMonitor avalia P@10/P@20 das últimas duas semanas
+4. Relatório diário Markdown gerado em logs/rankings/
+
+[A cada requisição /api/risk]
+    ↓
+1. ST-GAT gera scores_map {bairro: score} para todas as regiões
+2. CC.apply(scores_map) blenda apenas os bairros de Fortaleza
+3. Pesos CC ajustados automaticamente 1x/hora via EMA
+4. JSON retornado ao frontend (mesmo formato de sempre)
+```
+
+### Ciclo semanal (manual)
 
 ```bash
-st-gcn_jules/
-├── app.py                 # API Gateway (Flask) e Entrypoint
-├── data/                  # Armazenamento de dados
-│   ├── processed/         # Dados históricos enriquecidos e GeoJSONs
-│   └── exogenous_events.json # Eventos de tempo real (Cache)
-├── docs/                  # Documentação detalhada
-├── models/                # Pesos dos modelos treinados (.pth)
-├── src/
-│   ├── core/
-│   │   ├── architectures.py # Definição das Redes Neurais (ST-GAT)
-│   │   ├── orchestrator.py  # Gerenciador dos modelos regionais
-│   │   └── data_processing.py # Pipeline de ETL e Tensores
-│   ├── llm_service.py       # Integração com Google Gemini
-│   └── explanation_generator.py # Motor de explicabilidade
-├── templates/             # Frontend do Dashboard (HTML/JS)
-└── Dockerfile             # Containerização da aplicação
+# 1. Fine-tuner: captura padrões emergentes dos últimos 30 dias
+.\.venv\Scripts\python.exe tests/Sentinela/finetune_realtime_v1.py --janela 30
+
+# 2. Consultar ranking atual com explicações por bairro
+.\.venv\Scripts\python.exe tests/Sentinela/sentinela_inference.py
+```
+
+### Ciclo mensal (ao receber novos dados)
+
+```bash
+# 1. Re-treinar com histórico completo atualizado
+.\.venv\Scripts\python.exe tests/Sentinela/freeze_total_v3.py
+
+# 2. Validar fora da amostra (shadow validation)
+.\.venv\Scripts\python.exe tests/Sentinela/train_validate_v3.py
+
+# 3. Revisar ranking_atual_v3_freeze.csv operacionalmente
+
+# 4. Promover se aprovado (interativo, com backup automático)
+.\.venv\Scripts\python.exe tests/Sentinela/promote_model.py
+```
+
+---
+
+## 🏆 Champion/Challenger — Como Funciona
+
+O CC é a peça central do novo paradigma. Ele resolve o problema de **qual modelo confiar** sem depender de uma decisão humana a cada ciclo:
+
+```
+Novo período (1x/hora):
+  1. Coleta CVLI real dos últimos 14 dias
+  2. Calcula P@10 do ST-GAT  → p10_champ
+  3. Calcula P@10 do LGBM    → p10_chal
+  4. Se p10_chal > p10_champ + 3pp → aumenta w_cc gradualmente (EMA 30%)
+  5. Se p10_champ > p10_chal + 3pp → diminui w_cc gradualmente
+  6. Blend: score = (1-w) × ST-GAT + w × LGBM     [w ∈ 0%, 50%]
+  7. Persiste decisão em logs/cc_decisions.jsonl
+```
+
+**Garantias de segurança:**
+- Começa em `w=0%` (100% ST-GAT) — transição gradual
+- Máximo de `w=50%` — ST-GAT nunca é eliminado
+- Se LGBM falhar: fallback imediato para 100% ST-GAT
+- Sem alteração na interface da API — transparente para o frontend
+
+---
+
+## 🔍 Explicabilidade por Bairro
+
+O `sentinela_inference.py` expõe uma razão principal por bairro, calculada via z-score ponderado por importância:
+
+```
+ANCURI       → Tendência de CVP longa       (ratio acima da média × sqrt(hist_pct))
+BARROSO      → Pressão Intel + CVLI         (intel recente + CVLI simultâneos)
+JANGURUSSU   → Histórico de CVLI elevado    (target_enc alto)
+CURIO        → Intel de tropa recente       (intel_ewma_14d = 0.92, >1σ)
+MONDUBIM     → Intel de tropa recente 🚨    (intel_ewma_14d = 3.02, ALTO)
 ```
 
 ---
@@ -55,72 +262,79 @@ st-gcn_jules/
 ## 🛠️ Instalação e Configuração
 
 ### Pré-requisitos
-*   Python 3.9+
-*   Chave de API do Google Gemini (para funcionalidades LLM)
 
-### 1. Clonar o Repositório
-```bash
-git clone https://github.com/seu-org/st-gcn-jules.git
-cd st-gcn-jules
-```
+- Python 3.9+
+- Chave de API do Google Gemini (funcionalidades LLM)
+- PyTorch (CPU ou CUDA) compatível com o ambiente
 
-### 2. Configurar Ambiente Virtual
+### Setup
+
 ```bash
+# 1. Clonar
+git clone <url-do-repositorio>
+cd "Report Preview"
+
+# 2. Criar ambiente virtual
 python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# Linux/Mac:
-source .venv/bin/activate
-```
+.\.venv\Scripts\activate         # Windows
+# source .venv/bin/activate      # Linux/Mac
 
-### 3. Instalar Dependências
-```bash
+# 3. Instalar dependências
 pip install -r requirements.txt
-```
-*(Nota: Certifique-se de instalar as versões corretas do PyTorch e PyTorch Geometric compatíveis com seu CUDA, se aplicável).*
 
-### 4. Configurar Variáveis de Ambiente
-Crie um arquivo `.env` na raiz:
-```env
-GOOGLE_API_KEY=sua_chave_aqui
-FLASK_ENV=development
-```
+# 4. Configurar variáveis de ambiente
+cp .env.example .env
+# Editar .env e adicionar GOOGLE_API_KEY
 
----
-
-## ▶️ Como Usar
-
-### Iniciar o Servidor
-```bash
+# 5. Iniciar
 python app.py
 ```
+
 O sistema estará acessível em `http://localhost:5000`.
 
-### Endpoints Principais
+---
 
-*   **Dashboard:** `GET /` - Visualização do mapa de risco.
-*   **API de Risco:** `GET /api/risk` - Retorna o JSON com os scores de risco por bairro.
-*   **Inserir Evento:** `POST /api/exogenous/parse`
-    *   Body: `{"text": "Disparo de arma de fogo no bairro Bom Jardim..."}`
-    *   *Processa o texto via LLM e atualiza o risco em tempo real.*
-*   **Explicação:** `GET /api/explain?node_id=XXX` - Gera o relatório do porquê aquele bairro está em risco.
+## 📡 Endpoints Principais
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `GET` | `/` | Dashboard — mapa de risco interativo |
+| `GET` | `/api/risk` | Scores de risco por bairro (blendados CC) |
+| `POST` | `/api/exogenous/parse` | Ingerir evento em linguagem natural (LLM) |
+| `GET` | `/api/explain?node_id=X` | Explicação tática do risco de um bairro |
+| `GET` | `/api/admin/health` | Dashboard de saúde do sistema |
 
 ---
 
-## 📚 Documentação Complementar
+## 📊 Histórico de Evolução do Modelo
 
-Para detalhes profundos sobre cada componente, consulte a pasta `docs/`:
+| Fase | Tentativas | Paradigma | Melhor P@10 |
+|------|-----------|-----------|-------------|
+| ST-GAT Básico | T1–T20 | GAT + RankLoss | ~28% |
+| ST-GAT Avançado | T21–T45 | DeepSTGAT_64 + Intel | ~38% |
+| ST-GAT Elite | T46–T54 | Momentum + Z-Score Local | ~42.9% |
+| **Sentinela V3** | **T55–T57b** | **LGBM Lean + EWMA-Multi** | **50% P@10** |
 
-*   [Fluxo Completo do Sistema](docs/DOCUMENTACAO_FLUXO_COMPLETO.md) - **Recomendado para Engenheiros.**
-*   [Guia de Canais e Tensores](DOCUMENTACAO_CANAIS_REPORT_PREVIEW.md) - Entenda as variáveis de entrada.
-*   [Monitoramento de Anomalias](docs/ANOMALY_MONITORING_GUIDE.md)
-*   [Arquitetura de Referência](docs/ARCHITECTURE_REFERENCE.md)
+> Histórico completo com análise de cada tentativa em [`TRAINING_LOG.md`](TRAINING_LOG.md).
 
 ---
 
-## 🛡️ Licença e Segurança
+## 🗺️ Roadmap
 
-Este software é de uso restrito para fins de análise de segurança pública e inteligência.
-Todos os dados geoespaciais e de ocorrências devem ser tratados com o nível de confidencialidade adequado.
+| Fase | Status | Descrição |
+|------|--------|-----------|
+| Promoção manual | 🔵 Disponível | `promote_model.py` com checklist e backup |
+| Re-treino periódico | ✅ Implementado | `freeze_total_v3.py` |
+| Fine-tuning tempo real | ✅ Implementado | `finetune_realtime_v1.py` |
+| Champion/Challenger | ✅ Integrado | `champion_challenger.py` no app |
+| Hibridismo ST-GAT+LGBM | 🔴 Exploratório | Fase 7 — aguarda ST-GAT estabilizar ≥40% consistente |
 
-**Desenvolvido por:** Equipe de Inteligência Artificial & Tática.
+> Roadmap detalhado em [`tests/Sentinela/ROADMAP.md`](tests/Sentinela/ROADMAP.md).
+
+---
+
+## 🛡️ Segurança e Licença
+
+Este software é de **uso restrito** para fins de análise de segurança pública e inteligência criminal. Todos os dados de ocorrências, localidades e inteligência de facções devem ser tratados com o nível de confidencialidade adequado à sua classificação.
+
+**Desenvolvido por:** Equipe de Inteligência Artificial & Tática — Ceará, 2026.

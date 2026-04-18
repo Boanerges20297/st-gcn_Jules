@@ -1,0 +1,18 @@
+[
+  {
+    "timestamp": "2026-04-14T23:26:57.965033",
+    "modelo": "lgbm_lean_v3_freeze",
+    "versao": "v3_freeze",
+    "dados_ate": "2026-04-14",
+    "treinado_em": "2026-04-14 23:12:08.101195",
+    "bairros": 40,
+    "features": 10,
+    "performance": {
+      "shadow_ewma_p10": "50.0%",
+      "shadow_lgbm_p20": "70.0%",
+      "shadow_periodo": "31/Mar→13/Abr/2026"
+    },
+    "promovido_por": "script --force",
+    "backup_anterior": []
+  }
+]

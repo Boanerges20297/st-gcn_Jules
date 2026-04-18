@@ -1,10 +1,6 @@
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 import sys
-if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
-    sys.stdout.reconfigure(encoding='utf-8')
-if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
-    sys.stderr.reconfigure(encoding='utf-8')
 import numpy as np
 
 import geopandas as gpd
@@ -42,6 +38,12 @@ except ImportError:
         import re
         return re.sub(r'\s*-\s*AIS.*$', '', text).strip()
 
+# --- Champion/Challenger LGBM Lean (Sentinela V3) ---
+try:
+    from src.core.champion_challenger import ChampionChallenger
+except ImportError:
+    ChampionChallenger = None
+
 warnings.filterwarnings('ignore')
 # Configurando logs para garantir visibilidade no terminal
 logging.basicConfig(level=logging.INFO)
@@ -65,6 +67,9 @@ REGION_LABELS: dict = {          # rótulos de exibição por região
     'rmf': 'REGIÃO METROPOLITANA',
     'interior': 'INTERIOR DO ESTADO',
 }
+
+# Champion/Challenger — inicializado no startup
+champion_challenger = None
 
 RISK_SCORE_THRESHOLDS = {
     'critical_min': 71.0,
@@ -620,6 +625,8 @@ def generate_daily_ranking_report():
 
     # Calculamos o risco atual (sem shocks para servir de baseline estável ou com os atuais)
     scores_map = orchestrator.get_combined_risk()
+    if champion_challenger is not None:
+        scores_map = champion_challenger.apply(scores_map)
     
     regions = {reg: REGION_LABELS.get(reg, reg.upper()) for reg in (orchestrator.specialists.keys() if orchestrator else _ALL_REGIONS)}
 
@@ -769,6 +776,14 @@ def load_data_and_models():
     try:
         orchestrator = StateOrchestrator(BASE_DIR)
         print("✅ Motor de Inteligência ST-GAT Ativo.")
+
+        # Champion/Challenger — inicializa após o orchestrator
+        global champion_challenger
+        if ChampionChallenger is not None:
+            try:
+                champion_challenger = ChampionChallenger(BASE_DIR)
+            except Exception as cc_err:
+                print(f"⚠️ [CC] Falha ao inicializar champion_challenger: {cc_err}")
 
         # Sincronizar metadados de região do orquestrador (elimina hardcode)
         global _RMF_NODES, _ALL_REGIONS, REGION_LABELS
@@ -1299,6 +1314,7 @@ def get_risk():
             try:
                 name = str(row['name'])
                 name_norm = normalize_name(name)
+                # SCORE REAL E DIRETO (Sem Amortecimento)
                 score = normalize_risk_score(scores_map.get(name_norm, 20.0))
                 trend = trends_map.get(name_norm, 'stable')
                 
@@ -1309,7 +1325,16 @@ def get_risk():
                 
                 if reg not in region_buckets: region_buckets[reg] = []
 
-                level, status, css, color, score = classify_risk_score(score)
+                # DEFINIÇÃO ÚNICA DE STATUS (BACKEND)
+                if score >= 85: 
+                    level, status, css, color = 'crítico', 'CRÍTICO: Ação Imediata', 'risk-critico', '#8B0000' # Vermelho Escuro
+                elif score >= 70: 
+                    level, status, css, color = 'alto', 'ALERTA: Prioridade Alta', 'risk-alto', '#FFB3B3' # Vermelho Bem Claro
+                elif score >= 40: 
+                    level, status, css, color = 'moderado', 'RISCO: Patrulhamento', 'risk-moderado', '#FFA500' # Laranja
+                else: 
+                    level, status, css, color = 'baixo', 'ESTÁVEL: Monitoramento', 'risk-baixo', '#444444'
+
                 if reg in region_stats:
                     region_stats[reg][level] += 1
                 meta['counts'][level] += 1

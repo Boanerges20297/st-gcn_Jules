@@ -46,8 +46,8 @@ class HealthMonitor:
         })
         
         # Arquivo de persistência
-        self.metrics_file = os.path.join(base_dir, 'data', 'health_metrics.json')
-        self.alerts_file = os.path.join(base_dir, 'data', 'health_alerts.json')
+        self.metrics_file = os.path.join(self.base_dir, 'data', 'health_metrics.json')
+        self.alerts_file = os.path.join(self.base_dir, 'data', 'health_alerts.json')
         
         # Criar diretório data se não existir
         os.makedirs(os.path.dirname(self.metrics_file), exist_ok=True)
@@ -434,7 +434,7 @@ class ConfidenceTracker:
             base_dir: Diretório raiz do projeto
         """
         self.base_dir = base_dir or os.getcwd()
-        self.history_file = os.path.join(base_dir, 'data', 'confidence_history.json')
+        self.history_file = os.path.join(self.base_dir, 'data', 'confidence_history.json')
         
         os.makedirs(os.path.dirname(self.history_file), exist_ok=True)
         self.history = self._load_history()
