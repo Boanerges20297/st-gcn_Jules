@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinela V4 - Dashboard Tático</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0c0f16; color: #e2e8f0; overflow: hidden; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        #map { height: 100vh; width: 100%; z-index: 1; }
+        .sidebar { z-index: 10; width: 400px; height: 95vh; margin: 2.5vh; border-radius: 20px; position: absolute; left: 0; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+        .status-critico { color: #f87171; }
+        .status-alerta { color: #fbbf24; }
+        .status-estavel { color: #34d399; }
+        .rank-card:hover { background: rgba(255, 255, 255, 0.05); cursor: pointer; }
+    </style>
+</head>
+<body class="flex">
+
+    <!-- Sidebar -->
+    <div class="sidebar glass p-6 overflow-y-auto flex flex-col shadow-2xl">
+        <div class="flex items-center space-x-3 mb-8">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-900/40">
+                <span class="text-xl font-bold">V4</span>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight">Sentinela V4</h1>
+                <p class="text-xs text-slate-400 uppercase tracking-widest font-semibold">Inteligência Territorial</p>
+            </div>
+        </div>
+
+        <div class="bg-slate-800/50 rounded-xl p-4 mb-6 border border-slate-700/50">
+            <div class="text-xs text-slate-400 uppercase mb-1">Status da Predição</div>
+            <div class="text-sm font-medium">Horizonte: <span class="text-blue-400">14 Dias</span></div>
+            <div class="text-sm font-medium">Histórico: <span class="text-slate-300">60 Dias</span></div>
+        </div>
+
+        <div id="ranking-list" class="space-y-4">
+            <!-- Ranking items will be injected here -->
+            <div class="animate-pulse flex flex-col space-y-3">
+                <div class="h-12 bg-slate-700/50 rounded-lg w-full"></div>
+                <div class="h-12 bg-slate-700/50 rounded-lg w-full"></div>
+                <div class="h-12 bg-slate-700/50 rounded-lg w-full"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Container -->
+    <div id="map"></div>
+
+    <script>
+        const map = L.map('map', {
+            zoomControl: false,
+            attributionControl: false
+        }).setView([-3.717, -38.543], 11);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        async function initDashboard() {
+            try {
+                const [rankingRes, zonesRes] = await Promise.all([
+                    fetch('ranking_sentinela_v4.json'),
+                    fetch('sentinela_v4_zones.geojson')
+                ]);
+
+                const rankingData = await rankingRes.json();
+                const zonesData = await zonesRes.json();
+                
+                renderRanking(rankingData.ranking);
+                renderZones(zonesData, rankingData.ranking);
+            } catch (err) {
+                console.error("Erro ao carregar dados:", err);
+                document.getElementById('ranking-list').innerHTML = `<p class="text-red-400 text-sm">Erro ao carregar dados. Use o script de Launch para rodar via servidor local.</p>`;
+            }
+        }
+
+        function renderRanking(ranking) {
+            const list = document.getElementById('ranking-list');
+            list.innerHTML = '';
+
+            ranking.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'rank-card glass rounded-xl p-4 transition-all duration-300 border-l-4 ' + 
+                    (item.status === 'CRITICO' ? 'border-l-red-500' : 
+                    (item.status === 'ALTO' ? 'border-l-orange-500' : 
+                    (item.status === 'MODERADO' ? 'border-l-yellow-500' : 'border-l-emerald-500')));
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-bold text-slate-500">#${item.rank}</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-700 font-bold ${getStatusClass(item.status)}">${item.status}</span>
+                    </div>
+                    <div class="text-sm font-bold truncate">${item.zone_id}</div>
+                    <div class="text-[10px] text-slate-400 mb-2 truncate">${item.bairro}</div>
+                    <div class="flex justify-between items-center text-[11px]">
+                        <div>Risco: <span class="font-bold">${item.indice_risco}%</span></div>
+                        <div>GAP Index: <span class="font-bold text-red-400">${item.gap_index}</span></div>
+                    </div>
+                `;
+                
+                card.onclick = () => {
+                    map.flyTo([item.centroide.lat, item.centroide.lng], 15);
+                };
+                
+                list.appendChild(card);
+            });
+        }
+
+        function renderZones(geoData, ranking) {
+            const rankingDict = {};
+            ranking.forEach(r => rankingDict[r.zone_id] = r);
+
+            L.geoJSON(geoData, {
+                style: (feature) => {
+                    const data = rankingDict[feature.properties.zone_id] || {};
+                    const risk = data.indice_risco || 0;
+                    return {
+                        fillColor: risk >= 80 ? '#ef4444' : 
+                                  (risk >= 60 ? '#f97316' : 
+                                  (risk >= 30 ? '#eab308' : '#10b981')),
+                        weight: 1,
+                        opacity: 1,
+                        color: 'white',
+                        dashArray: '3',
+                        fillOpacity: 0.4
+                    };
+                },
+                onEachFeature: (feature, layer) => {
+                    const data = rankingDict[feature.properties.zone_id] || {};
+                    layer.bindPopup(`
+                        <div class="text-slate-900 font-inter">
+                            <div class="font-bold text-lg border-b mb-2 pb-1">${feature.properties.zone_id}</div>
+                            <div class="text-sm">Bairro: <b>${feature.properties.bairro}</b></div>
+                            <div class="text-sm">Índice de Risco: <b class="${getStatusClass(data.status)}">${data.indice_risco || 0}%</b></div>
+                            <div class="text-sm">Classificação: <b>${data.status || 'N/A'}</b></div>
+                            <div class="text-sm">GAP Index: <b class="text-red-600">${data.gap_index || 0}</b></div>
+                            <div class="text-sm">Facção: <b>${data.natureza_critica || 'N/A'}</b></div>
+                        </div>
+                    `);
+                }
+            }).addTo(map);
+
+            const bounds = L.geoJSON(geoData).getBounds();
+            if(bounds.isValid()) map.fitBounds(bounds, { padding: [50, 50] });
+        }
+
+        function getStatusClass(status) {
+            if (status === 'CRITICO') return 'text-red-500';
+            if (status === 'ALTO') return 'text-orange-400';
+            if (status === 'MODERADO') return 'text-yellow-400';
+            return 'text-emerald-400';
+        }
+
+        initDashboard();
+    </script>
+</body>
+</html>

@@ -1,0 +1,2219 @@
+{
+  "timestamp": "2026-04-18 21:52:42.213190",
+  "tipo": "ZONAS_500M_V4",
+  "janela_historica": "60 dias",
+  "horizonte_predicao": "14 dias",
+  "total_zonas": 170,
+  "ranking": [
+    {
+      "rank": 1,
+      "zone_id": "CARIRE_Z4",
+      "bairro": "CARIRE",
+      "indice_risco": 95.0,
+      "status": "CRITICO",
+      "gap_index": 30.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.8370457,
+        "lng": -40.6667391
+      }
+    },
+    {
+      "rank": 2,
+      "zone_id": "BARROSO_Z5",
+      "bairro": "BARROSO",
+      "indice_risco": 81.4,
+      "status": "CRITICO",
+      "gap_index": 20.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.8225414,
+        "lng": -38.5104475
+      }
+    },
+    {
+      "rank": 3,
+      "zone_id": "BARROSO_Z4",
+      "bairro": "BARROSO",
+      "indice_risco": 81.4,
+      "status": "CRITICO",
+      "gap_index": 20.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.8226007,
+        "lng": -38.5097474
+      }
+    },
+    {
+      "rank": 4,
+      "zone_id": "BARROSO_Z3",
+      "bairro": "BARROSO",
+      "indice_risco": 81.4,
+      "status": "CRITICO",
+      "gap_index": 20.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.8228284,
+        "lng": -38.5071653
+      }
+    },
+    {
+      "rank": 5,
+      "zone_id": "ANCURI_Z1",
+      "bairro": "ANCURI",
+      "indice_risco": 67.9,
+      "status": "ALTO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.8635239,
+        "lng": -38.5089218
+      }
+    },
+    {
+      "rank": 6,
+      "zone_id": "ANCURI_Z5",
+      "bairro": "ANCURI",
+      "indice_risco": 67.9,
+      "status": "ALTO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.8626389,
+        "lng": -38.5070331
+      }
+    },
+    {
+      "rank": 7,
+      "zone_id": "ANCURI_Z4",
+      "bairro": "ANCURI",
+      "indice_risco": 67.9,
+      "status": "ALTO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.8628108,
+        "lng": -38.503906
+      }
+    },
+    {
+      "rank": 8,
+      "zone_id": "ANCURI_Z3",
+      "bairro": "ANCURI",
+      "indice_risco": 67.9,
+      "status": "ALTO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.859881,
+        "lng": -38.5024312
+      }
+    },
+    {
+      "rank": 9,
+      "zone_id": "ANCURI_Z2",
+      "bairro": "ANCURI",
+      "indice_risco": 67.9,
+      "status": "ALTO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.865338,
+        "lng": -38.5039272
+      }
+    },
+    {
+      "rank": 10,
+      "zone_id": "LAVRAS DA MANGABEIRA_Z2",
+      "bairro": "LAVRAS DA MANGABEIRA",
+      "indice_risco": 54.3,
+      "status": "MODERADO",
+      "gap_index": 10.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.7548684,
+        "lng": -38.965871
+      }
+    },
+    {
+      "rank": 11,
+      "zone_id": "LAVRAS DA MANGABEIRA_Z4",
+      "bairro": "LAVRAS DA MANGABEIRA",
+      "indice_risco": 54.3,
+      "status": "MODERADO",
+      "gap_index": 10.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.7481794,
+        "lng": -38.9627337
+      }
+    },
+    {
+      "rank": 12,
+      "zone_id": "BARROSO_Z2",
+      "bairro": "BARROSO",
+      "indice_risco": 54.3,
+      "status": "MODERADO",
+      "gap_index": 10.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.8229699,
+        "lng": -38.5053493
+      }
+    },
+    {
+      "rank": 13,
+      "zone_id": "CHAVAL_Z1",
+      "bairro": "CHAVAL",
+      "indice_risco": 40.7,
+      "status": "MODERADO",
+      "gap_index": 10.0,
+      "natureza_critica": "MASSA",
+      "centroide": {
+        "lat": -3.1282123,
+        "lng": -41.1681332
+      }
+    },
+    {
+      "rank": 14,
+      "zone_id": "SAO LUIS DO CURU_Z3",
+      "bairro": "SAO LUIS DO CURU",
+      "indice_risco": 40.7,
+      "status": "MODERADO",
+      "gap_index": 10.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6691119,
+        "lng": -39.2378694
+      }
+    },
+    {
+      "rank": 15,
+      "zone_id": "SAO LUIS DO CURU_Z1",
+      "bairro": "SAO LUIS DO CURU",
+      "indice_risco": 40.7,
+      "status": "MODERADO",
+      "gap_index": 10.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6695683,
+        "lng": -39.2418042
+      }
+    },
+    {
+      "rank": 16,
+      "zone_id": "SAO LUIS DO CURU_Z2",
+      "bairro": "SAO LUIS DO CURU",
+      "indice_risco": 40.7,
+      "status": "MODERADO",
+      "gap_index": 10.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6690102,
+        "lng": -39.2404254
+      }
+    },
+    {
+      "rank": 17,
+      "zone_id": "BOM JARDIM_Z1",
+      "bairro": "BOM JARDIM",
+      "indice_risco": 40.7,
+      "status": "MODERADO",
+      "gap_index": 10.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7881142,
+        "lng": -38.6065522
+      }
+    },
+    {
+      "rank": 18,
+      "zone_id": "IRACEMA_Z1",
+      "bairro": "IRACEMA",
+      "indice_risco": 40.7,
+      "status": "MODERADO",
+      "gap_index": 10.0,
+      "natureza_critica": "TCP/GDE",
+      "centroide": {
+        "lat": -5.8138841,
+        "lng": -38.3051951
+      }
+    },
+    {
+      "rank": 19,
+      "zone_id": "ACOPIARA_Z1",
+      "bairro": "ACOPIARA",
+      "indice_risco": 40.7,
+      "status": "MODERADO",
+      "gap_index": 10.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.0981467,
+        "lng": -39.4531368
+      }
+    },
+    {
+      "rank": 20,
+      "zone_id": "ABAIARA_Z5",
+      "bairro": "ABAIARA",
+      "indice_risco": 40.7,
+      "status": "MODERADO",
+      "gap_index": 10.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -7.3623517,
+        "lng": -39.0520038
+      }
+    },
+    {
+      "rank": 21,
+      "zone_id": "MIRAIMA_Z1",
+      "bairro": "MIRAIMA",
+      "indice_risco": 40.7,
+      "status": "MODERADO",
+      "gap_index": 10.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.5696506,
+        "lng": -39.965027
+      }
+    },
+    {
+      "rank": 22,
+      "zone_id": "JUAZEIRO DO NORTE_Z3",
+      "bairro": "JUAZEIRO DO NORTE",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -7.2478998,
+        "lng": -39.3279918
+      }
+    },
+    {
+      "rank": 23,
+      "zone_id": "BARROSO_Z1",
+      "bairro": "BARROSO",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.8280506,
+        "lng": -38.5106865
+      }
+    },
+    {
+      "rank": 24,
+      "zone_id": "LAVRAS DA MANGABEIRA_Z5",
+      "bairro": "LAVRAS DA MANGABEIRA",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.9025882,
+        "lng": -39.1503501
+      }
+    },
+    {
+      "rank": 25,
+      "zone_id": "LAVRAS DA MANGABEIRA_Z3",
+      "bairro": "LAVRAS DA MANGABEIRA",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.7564712,
+        "lng": -38.9683034
+      }
+    },
+    {
+      "rank": 26,
+      "zone_id": "LAVRAS DA MANGABEIRA_Z1",
+      "bairro": "LAVRAS DA MANGABEIRA",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.8853702,
+        "lng": -39.1704514
+      }
+    },
+    {
+      "rank": 27,
+      "zone_id": "JUAZEIRO DO NORTE_Z5",
+      "bairro": "JUAZEIRO DO NORTE",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -7.2277769,
+        "lng": -39.3235288
+      }
+    },
+    {
+      "rank": 28,
+      "zone_id": "JUAZEIRO DO NORTE_Z4",
+      "bairro": "JUAZEIRO DO NORTE",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -7.212234,
+        "lng": -39.2762317
+      }
+    },
+    {
+      "rank": 29,
+      "zone_id": "JUAZEIRO DO NORTE_Z2",
+      "bairro": "JUAZEIRO DO NORTE",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -7.2487117,
+        "lng": -39.2858917
+      }
+    },
+    {
+      "rank": 30,
+      "zone_id": "AMADEU FURTADO_Z5",
+      "bairro": "AMADEU FURTADO",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7414879,
+        "lng": -38.5572011
+      }
+    },
+    {
+      "rank": 31,
+      "zone_id": "ITAPAJE_Z3",
+      "bairro": "ITAPAJE",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 10.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6816255,
+        "lng": -39.5903968
+      }
+    },
+    {
+      "rank": 32,
+      "zone_id": "ITAPAJE_Z4",
+      "bairro": "ITAPAJE",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 10.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6832087,
+        "lng": -39.5890382
+      }
+    },
+    {
+      "rank": 33,
+      "zone_id": "AMADEU FURTADO_Z1",
+      "bairro": "AMADEU FURTADO",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7454224,
+        "lng": -38.5586616
+      }
+    },
+    {
+      "rank": 34,
+      "zone_id": "AMADEU FURTADO_Z2",
+      "bairro": "AMADEU FURTADO",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.742872,
+        "lng": -38.5569102
+      }
+    },
+    {
+      "rank": 35,
+      "zone_id": "AMADEU FURTADO_Z3",
+      "bairro": "AMADEU FURTADO",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7410549,
+        "lng": -38.5551217
+      }
+    },
+    {
+      "rank": 36,
+      "zone_id": "AMADEU FURTADO_Z4",
+      "bairro": "AMADEU FURTADO",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7421794,
+        "lng": -38.557052
+      }
+    },
+    {
+      "rank": 37,
+      "zone_id": "ITAPAJE_Z5",
+      "bairro": "ITAPAJE",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 10.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6828875,
+        "lng": -39.5885816
+      }
+    },
+    {
+      "rank": 38,
+      "zone_id": "JUAZEIRO DO NORTE_Z1",
+      "bairro": "JUAZEIRO DO NORTE",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -7.2229563,
+        "lng": -39.310518
+      }
+    },
+    {
+      "rank": 39,
+      "zone_id": "AURORA_Z2",
+      "bairro": "AURORA",
+      "indice_risco": 27.1,
+      "status": "BAIXO",
+      "gap_index": 10.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.939528,
+        "lng": -38.9576204
+      }
+    },
+    {
+      "rank": 40,
+      "zone_id": "JIJOCA DE JERICOACOARA_Z1",
+      "bairro": "JIJOCA DE JERICOACOARA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -2.8987379,
+        "lng": -40.4656753
+      }
+    },
+    {
+      "rank": 41,
+      "zone_id": "LIMOEIRO DO NORTE_Z4",
+      "bairro": "LIMOEIRO DO NORTE",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -5.1560164,
+        "lng": -38.095644
+      }
+    },
+    {
+      "rank": 42,
+      "zone_id": "OROS_Z1",
+      "bairro": "OROS",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.1345723,
+        "lng": -38.945662
+      }
+    },
+    {
+      "rank": 43,
+      "zone_id": "MIRAIMA_Z5",
+      "bairro": "MIRAIMA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.5702788,
+        "lng": -39.97134
+      }
+    },
+    {
+      "rank": 44,
+      "zone_id": "MIRAIMA_Z4",
+      "bairro": "MIRAIMA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.5688567,
+        "lng": -39.7665985
+      }
+    },
+    {
+      "rank": 45,
+      "zone_id": "MIRAIMA_Z3",
+      "bairro": "MIRAIMA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.5677772,
+        "lng": -39.7663842
+      }
+    },
+    {
+      "rank": 46,
+      "zone_id": "IRACEMA_Z3",
+      "bairro": "IRACEMA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "TCP/GDE",
+      "centroide": {
+        "lat": -5.8151642,
+        "lng": -38.3181296
+      }
+    },
+    {
+      "rank": 47,
+      "zone_id": "MIRAIMA_Z2",
+      "bairro": "MIRAIMA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.4382865,
+        "lng": -40.0045956
+      }
+    },
+    {
+      "rank": 48,
+      "zone_id": "IRACEMA_Z4",
+      "bairro": "IRACEMA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "TCP/GDE",
+      "centroide": {
+        "lat": -5.8207255,
+        "lng": -38.3055005
+      }
+    },
+    {
+      "rank": 49,
+      "zone_id": "LIMOEIRO DO NORTE_Z5",
+      "bairro": "LIMOEIRO DO NORTE",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -5.1585996,
+        "lng": -38.0981746
+      }
+    },
+    {
+      "rank": 50,
+      "zone_id": "LIMOEIRO DO NORTE_Z3",
+      "bairro": "LIMOEIRO DO NORTE",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -5.1407895,
+        "lng": -38.0873962
+      }
+    },
+    {
+      "rank": 51,
+      "zone_id": "JIJOCA DE JERICOACOARA_Z2",
+      "bairro": "JIJOCA DE JERICOACOARA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -2.9343035,
+        "lng": -40.4380513
+      }
+    },
+    {
+      "rank": 52,
+      "zone_id": "IRACEMA_Z5",
+      "bairro": "IRACEMA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "TCP/GDE",
+      "centroide": {
+        "lat": -5.6791505,
+        "lng": -38.3787817
+      }
+    },
+    {
+      "rank": 53,
+      "zone_id": "LIMOEIRO DO NORTE_Z2",
+      "bairro": "LIMOEIRO DO NORTE",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -5.1658498,
+        "lng": -38.092922
+      }
+    },
+    {
+      "rank": 54,
+      "zone_id": "OROS_Z2",
+      "bairro": "OROS",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.246377,
+        "lng": -38.9122081
+      }
+    },
+    {
+      "rank": 55,
+      "zone_id": "JIJOCA DE JERICOACOARA_Z5",
+      "bairro": "JIJOCA DE JERICOACOARA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -2.9163235,
+        "lng": -40.4732452
+      }
+    },
+    {
+      "rank": 56,
+      "zone_id": "JIJOCA DE JERICOACOARA_Z4",
+      "bairro": "JIJOCA DE JERICOACOARA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -2.8853827,
+        "lng": -40.5195724
+      }
+    },
+    {
+      "rank": 57,
+      "zone_id": "JIJOCA DE JERICOACOARA_Z3",
+      "bairro": "JIJOCA DE JERICOACOARA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -2.8500135,
+        "lng": -40.4635202
+      }
+    },
+    {
+      "rank": 58,
+      "zone_id": "LIMOEIRO DO NORTE_Z1",
+      "bairro": "LIMOEIRO DO NORTE",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -5.2376367,
+        "lng": -37.7939445
+      }
+    },
+    {
+      "rank": 59,
+      "zone_id": "ABAIARA_Z1",
+      "bairro": "ABAIARA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -7.3984638,
+        "lng": -38.9621758
+      }
+    },
+    {
+      "rank": 60,
+      "zone_id": "SANTANA DO ACARAU_Z3",
+      "bairro": "SANTANA DO ACARAU",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.4609939,
+        "lng": -40.2047507
+      }
+    },
+    {
+      "rank": 61,
+      "zone_id": "OROS_Z3",
+      "bairro": "OROS",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.2487061,
+        "lng": -38.91316
+      }
+    },
+    {
+      "rank": 62,
+      "zone_id": "URUBURETAMA_Z2",
+      "bairro": "URUBURETAMA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.624695,
+        "lng": -39.5088925
+      }
+    },
+    {
+      "rank": 63,
+      "zone_id": "TIANGUA_Z1",
+      "bairro": "TIANGUA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7125392,
+        "lng": -40.9741625
+      }
+    },
+    {
+      "rank": 64,
+      "zone_id": "TIANGUA_Z2",
+      "bairro": "TIANGUA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7096923,
+        "lng": -40.9756933
+      }
+    },
+    {
+      "rank": 65,
+      "zone_id": "TIANGUA_Z3",
+      "bairro": "TIANGUA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7291635,
+        "lng": -40.9978171
+      }
+    },
+    {
+      "rank": 66,
+      "zone_id": "TIANGUA_Z4",
+      "bairro": "TIANGUA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.728723,
+        "lng": -40.9963551
+      }
+    },
+    {
+      "rank": 67,
+      "zone_id": "TIANGUA_Z5",
+      "bairro": "TIANGUA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7285027,
+        "lng": -40.99772
+      }
+    },
+    {
+      "rank": 68,
+      "zone_id": "URUBURETAMA_Z1",
+      "bairro": "URUBURETAMA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6147682,
+        "lng": -39.5021996
+      }
+    },
+    {
+      "rank": 69,
+      "zone_id": "URUBURETAMA_Z3",
+      "bairro": "URUBURETAMA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6230533,
+        "lng": -39.5038603
+      }
+    },
+    {
+      "rank": 70,
+      "zone_id": "OROS_Z4",
+      "bairro": "OROS",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.2449404,
+        "lng": -38.9129693
+      }
+    },
+    {
+      "rank": 71,
+      "zone_id": "URUBURETAMA_Z4",
+      "bairro": "URUBURETAMA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.623329,
+        "lng": -39.4540038
+      }
+    },
+    {
+      "rank": 72,
+      "zone_id": "URUBURETAMA_Z5",
+      "bairro": "URUBURETAMA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6208684,
+        "lng": -39.5144201
+      }
+    },
+    {
+      "rank": 73,
+      "zone_id": "VARZEA ALEGRE_Z1",
+      "bairro": "VARZEA ALEGRE",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "TCP/GDE",
+      "centroide": {
+        "lat": -6.7884458,
+        "lng": -39.2960411
+      }
+    },
+    {
+      "rank": 74,
+      "zone_id": "VARZEA ALEGRE_Z2",
+      "bairro": "VARZEA ALEGRE",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "TCP/GDE",
+      "centroide": {
+        "lat": -6.7962216,
+        "lng": -39.2951662
+      }
+    },
+    {
+      "rank": 75,
+      "zone_id": "VARZEA ALEGRE_Z3",
+      "bairro": "VARZEA ALEGRE",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "TCP/GDE",
+      "centroide": {
+        "lat": -6.796475,
+        "lng": -39.3030369
+      }
+    },
+    {
+      "rank": 76,
+      "zone_id": "VARZEA ALEGRE_Z4",
+      "bairro": "VARZEA ALEGRE",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "TCP/GDE",
+      "centroide": {
+        "lat": -6.7976786,
+        "lng": -39.3024511
+      }
+    },
+    {
+      "rank": 77,
+      "zone_id": "SIQUEIRA_Z5",
+      "bairro": "SIQUEIRA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7970515,
+        "lng": -38.6311121
+      }
+    },
+    {
+      "rank": 78,
+      "zone_id": "SIQUEIRA_Z4",
+      "bairro": "SIQUEIRA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.8044074,
+        "lng": -38.6260936
+      }
+    },
+    {
+      "rank": 79,
+      "zone_id": "SIQUEIRA_Z3",
+      "bairro": "SIQUEIRA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7985429,
+        "lng": -38.6312342
+      }
+    },
+    {
+      "rank": 80,
+      "zone_id": "SIQUEIRA_Z2",
+      "bairro": "SIQUEIRA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.8178354,
+        "lng": -38.6165263
+      }
+    },
+    {
+      "rank": 81,
+      "zone_id": "SIQUEIRA_Z1",
+      "bairro": "SIQUEIRA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.8052125,
+        "lng": -38.6269865
+      }
+    },
+    {
+      "rank": 82,
+      "zone_id": "SAO LUIS DO CURU_Z5",
+      "bairro": "SAO LUIS DO CURU",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6647134,
+        "lng": -39.2388571
+      }
+    },
+    {
+      "rank": 83,
+      "zone_id": "SAO LUIS DO CURU_Z4",
+      "bairro": "SAO LUIS DO CURU",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6756364,
+        "lng": -39.2409016
+      }
+    },
+    {
+      "rank": 84,
+      "zone_id": "SANTANA DO ACARAU_Z5",
+      "bairro": "SANTANA DO ACARAU",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.4598547,
+        "lng": -40.1987909
+      }
+    },
+    {
+      "rank": 85,
+      "zone_id": "SANTANA DO ACARAU_Z4",
+      "bairro": "SANTANA DO ACARAU",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.4126578,
+        "lng": -40.2317834
+      }
+    },
+    {
+      "rank": 86,
+      "zone_id": "SANTANA DO ACARAU_Z2",
+      "bairro": "SANTANA DO ACARAU",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.4617516,
+        "lng": -40.20923
+      }
+    },
+    {
+      "rank": 87,
+      "zone_id": "SANTANA DO ACARAU_Z1",
+      "bairro": "SANTANA DO ACARAU",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.4103537,
+        "lng": -40.297607
+      }
+    },
+    {
+      "rank": 88,
+      "zone_id": "PARAIPABA_Z5",
+      "bairro": "PARAIPABA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.4376267,
+        "lng": -39.1482357
+      }
+    },
+    {
+      "rank": 89,
+      "zone_id": "PARAIPABA_Z4",
+      "bairro": "PARAIPABA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.4766856,
+        "lng": -39.1743453
+      }
+    },
+    {
+      "rank": 90,
+      "zone_id": "PARAIPABA_Z3",
+      "bairro": "PARAIPABA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.4392287,
+        "lng": -39.1448717
+      }
+    },
+    {
+      "rank": 91,
+      "zone_id": "PARAIPABA_Z2",
+      "bairro": "PARAIPABA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.4456053,
+        "lng": -39.1486236
+      }
+    },
+    {
+      "rank": 92,
+      "zone_id": "PARAIPABA_Z1",
+      "bairro": "PARAIPABA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.443606,
+        "lng": -39.1683007
+      }
+    },
+    {
+      "rank": 93,
+      "zone_id": "OROS_Z5",
+      "bairro": "OROS",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.2453151,
+        "lng": -38.9153959
+      }
+    },
+    {
+      "rank": 94,
+      "zone_id": "IRACEMA_Z2",
+      "bairro": "IRACEMA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "TCP/GDE",
+      "centroide": {
+        "lat": -5.7765276,
+        "lng": -38.3437106
+      }
+    },
+    {
+      "rank": 95,
+      "zone_id": "VARZEA ALEGRE_Z5",
+      "bairro": "VARZEA ALEGRE",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "TCP/GDE",
+      "centroide": {
+        "lat": -6.7977055,
+        "lng": -39.3020218
+      }
+    },
+    {
+      "rank": 96,
+      "zone_id": "IPARANA_Z5",
+      "bairro": "IPARANA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6909871,
+        "lng": -38.6165569
+      }
+    },
+    {
+      "rank": 97,
+      "zone_id": "BOM JARDIM_Z4",
+      "bairro": "BOM JARDIM",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7964279,
+        "lng": -38.6084659
+      }
+    },
+    {
+      "rank": 98,
+      "zone_id": "CHAVAL_Z3",
+      "bairro": "CHAVAL",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "MASSA",
+      "centroide": {
+        "lat": -3.0395016,
+        "lng": -41.2407433
+      }
+    },
+    {
+      "rank": 99,
+      "zone_id": "CHAVAL_Z2",
+      "bairro": "CHAVAL",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "MASSA",
+      "centroide": {
+        "lat": -3.0345784,
+        "lng": -41.2435119
+      }
+    },
+    {
+      "rank": 100,
+      "zone_id": "CEDRO_Z5",
+      "bairro": "CEDRO",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "TCP/GDE",
+      "centroide": {
+        "lat": -6.6087439,
+        "lng": -39.0627014
+      }
+    },
+    {
+      "rank": 101,
+      "zone_id": "IPARANA_Z4",
+      "bairro": "IPARANA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6937199,
+        "lng": -38.6143302
+      }
+    },
+    {
+      "rank": 102,
+      "zone_id": "CEDRO_Z3",
+      "bairro": "CEDRO",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "TCP/GDE",
+      "centroide": {
+        "lat": -6.6279904,
+        "lng": -39.0606693
+      }
+    },
+    {
+      "rank": 103,
+      "zone_id": "CEDRO_Z2",
+      "bairro": "CEDRO",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "TCP/GDE",
+      "centroide": {
+        "lat": -6.6276773,
+        "lng": -39.0619668
+      }
+    },
+    {
+      "rank": 104,
+      "zone_id": "CEDRO_Z1",
+      "bairro": "CEDRO",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "TCP/GDE",
+      "centroide": {
+        "lat": -6.6095938,
+        "lng": -39.0591176
+      }
+    },
+    {
+      "rank": 105,
+      "zone_id": "CARIRE_Z5",
+      "bairro": "CARIRE",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.8694802,
+        "lng": -40.6872154
+      }
+    },
+    {
+      "rank": 106,
+      "zone_id": "CARIRE_Z3",
+      "bairro": "CARIRE",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -4.0165456,
+        "lng": -40.4768082
+      }
+    },
+    {
+      "rank": 107,
+      "zone_id": "CARIRE_Z2",
+      "bairro": "CARIRE",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -4.0068107,
+        "lng": -40.4455849
+      }
+    },
+    {
+      "rank": 108,
+      "zone_id": "CARIRE_Z1",
+      "bairro": "CARIRE",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.8597384,
+        "lng": -40.6757853
+      }
+    },
+    {
+      "rank": 109,
+      "zone_id": "BOM JARDIM_Z5",
+      "bairro": "BOM JARDIM",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7957909,
+        "lng": -38.6060977
+      }
+    },
+    {
+      "rank": 110,
+      "zone_id": "BOM JARDIM_Z3",
+      "bairro": "BOM JARDIM",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7964318,
+        "lng": -38.6053311
+      }
+    },
+    {
+      "rank": 111,
+      "zone_id": "CHAVAL_Z5",
+      "bairro": "CHAVAL",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "MASSA",
+      "centroide": {
+        "lat": -3.0401864,
+        "lng": -41.238321
+      }
+    },
+    {
+      "rank": 112,
+      "zone_id": "BOM JARDIM_Z2",
+      "bairro": "BOM JARDIM",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7965735,
+        "lng": -38.6040792
+      }
+    },
+    {
+      "rank": 113,
+      "zone_id": "AUTRAN NUNES_Z5",
+      "bairro": "AUTRAN NUNES",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7602644,
+        "lng": -38.5958368
+      }
+    },
+    {
+      "rank": 114,
+      "zone_id": "AUTRAN NUNES_Z4",
+      "bairro": "AUTRAN NUNES",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7509474,
+        "lng": -38.5951383
+      }
+    },
+    {
+      "rank": 115,
+      "zone_id": "AUTRAN NUNES_Z3",
+      "bairro": "AUTRAN NUNES",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7508317,
+        "lng": -38.5929179
+      }
+    },
+    {
+      "rank": 116,
+      "zone_id": "AUTRAN NUNES_Z2",
+      "bairro": "AUTRAN NUNES",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7523247,
+        "lng": -38.5939219
+      }
+    },
+    {
+      "rank": 117,
+      "zone_id": "AUTRAN NUNES_Z1",
+      "bairro": "AUTRAN NUNES",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7544346,
+        "lng": -38.5957632
+      }
+    },
+    {
+      "rank": 118,
+      "zone_id": "ACOPIARA_Z5",
+      "bairro": "ACOPIARA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.1751494,
+        "lng": -39.6638869
+      }
+    },
+    {
+      "rank": 119,
+      "zone_id": "ACOPIARA_Z4",
+      "bairro": "ACOPIARA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.1753151,
+        "lng": -39.6632147
+      }
+    },
+    {
+      "rank": 120,
+      "zone_id": "ACOPIARA_Z3",
+      "bairro": "ACOPIARA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.0755296,
+        "lng": -39.4475799
+      }
+    },
+    {
+      "rank": 121,
+      "zone_id": "ACOPIARA_Z2",
+      "bairro": "ACOPIARA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.0921608,
+        "lng": -39.4487264
+      }
+    },
+    {
+      "rank": 122,
+      "zone_id": "ABAIARA_Z4",
+      "bairro": "ABAIARA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -7.3493637,
+        "lng": -39.0509036
+      }
+    },
+    {
+      "rank": 123,
+      "zone_id": "ABAIARA_Z3",
+      "bairro": "ABAIARA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -7.3645926,
+        "lng": -39.0513853
+      }
+    },
+    {
+      "rank": 124,
+      "zone_id": "CHAVAL_Z4",
+      "bairro": "CHAVAL",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "MASSA",
+      "centroide": {
+        "lat": -3.0676021,
+        "lng": -41.171901
+      }
+    },
+    {
+      "rank": 125,
+      "zone_id": "CEDRO_Z4",
+      "bairro": "CEDRO",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "TCP/GDE",
+      "centroide": {
+        "lat": -6.5474452,
+        "lng": -39.0620593
+      }
+    },
+    {
+      "rank": 126,
+      "zone_id": "CRATO_Z4",
+      "bairro": "CRATO",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -7.2570401,
+        "lng": -39.4039719
+      }
+    },
+    {
+      "rank": 127,
+      "zone_id": "ABAIARA_Z2",
+      "bairro": "ABAIARA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -7.3361593,
+        "lng": -39.0824256
+      }
+    },
+    {
+      "rank": 128,
+      "zone_id": "IPARANA_Z3",
+      "bairro": "IPARANA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6910507,
+        "lng": -38.6146983
+      }
+    },
+    {
+      "rank": 129,
+      "zone_id": "IPARANA_Z2",
+      "bairro": "IPARANA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6925104,
+        "lng": -38.6314313
+      }
+    },
+    {
+      "rank": 130,
+      "zone_id": "IPARANA_Z1",
+      "bairro": "IPARANA",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6940818,
+        "lng": -38.6155036
+      }
+    },
+    {
+      "rank": 131,
+      "zone_id": "CRATO_Z1",
+      "bairro": "CRATO",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -7.2450348,
+        "lng": -39.4037171
+      }
+    },
+    {
+      "rank": 132,
+      "zone_id": "CRATO_Z2",
+      "bairro": "CRATO",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -7.2519924,
+        "lng": -39.422113
+      }
+    },
+    {
+      "rank": 133,
+      "zone_id": "CRATO_Z3",
+      "bairro": "CRATO",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -7.249675,
+        "lng": -39.3824126
+      }
+    },
+    {
+      "rank": 134,
+      "zone_id": "CRATO_Z5",
+      "bairro": "CRATO",
+      "indice_risco": 13.6,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -7.2441578,
+        "lng": -39.4195292
+      }
+    },
+    {
+      "rank": 135,
+      "zone_id": "AURORA_Z3",
+      "bairro": "AURORA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.9385646,
+        "lng": -38.9718917
+      }
+    },
+    {
+      "rank": 136,
+      "zone_id": "AURORA_Z4",
+      "bairro": "AURORA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.9411986,
+        "lng": -38.907146
+      }
+    },
+    {
+      "rank": 137,
+      "zone_id": "AURORA_Z5",
+      "bairro": "AURORA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.9378463,
+        "lng": -38.9757459
+      }
+    },
+    {
+      "rank": 138,
+      "zone_id": "CONJUNTO CEARA I_Z2",
+      "bairro": "CONJUNTO CEARA I",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7688992,
+        "lng": -38.59935
+      }
+    },
+    {
+      "rank": 139,
+      "zone_id": "IGUATU_Z4",
+      "bairro": "IGUATU",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -6.3696953,
+        "lng": -39.300935
+      }
+    },
+    {
+      "rank": 140,
+      "zone_id": "IGUATU_Z3",
+      "bairro": "IGUATU",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -6.3703012,
+        "lng": -39.3009964
+      }
+    },
+    {
+      "rank": 141,
+      "zone_id": "ANTONIO BEZERRA_Z5",
+      "bairro": "ANTONIO BEZERRA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.74556,
+        "lng": -38.5938382
+      }
+    },
+    {
+      "rank": 142,
+      "zone_id": "AURORA_Z1",
+      "bairro": "AURORA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "NEUTRO",
+      "centroide": {
+        "lat": -6.9685592,
+        "lng": -38.8264564
+      }
+    },
+    {
+      "rank": 143,
+      "zone_id": "IGUATU_Z5",
+      "bairro": "IGUATU",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -6.3710577,
+        "lng": -39.3029887
+      }
+    },
+    {
+      "rank": 144,
+      "zone_id": "ANTONIO BEZERRA_Z4",
+      "bairro": "ANTONIO BEZERRA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7434816,
+        "lng": -38.5948521
+      }
+    },
+    {
+      "rank": 145,
+      "zone_id": "ANTONIO BEZERRA_Z3",
+      "bairro": "ANTONIO BEZERRA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7456747,
+        "lng": -38.5945513
+      }
+    },
+    {
+      "rank": 146,
+      "zone_id": "ANTONIO BEZERRA_Z2",
+      "bairro": "ANTONIO BEZERRA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7470838,
+        "lng": -38.5928799
+      }
+    },
+    {
+      "rank": 147,
+      "zone_id": "ANTONIO BEZERRA_Z1",
+      "bairro": "ANTONIO BEZERRA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7377473,
+        "lng": -38.5904656
+      }
+    },
+    {
+      "rank": 148,
+      "zone_id": "ITAPAJE_Z2",
+      "bairro": "ITAPAJE",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.6954994,
+        "lng": -39.5742256
+      }
+    },
+    {
+      "rank": 149,
+      "zone_id": "ITAPAJE_Z1",
+      "bairro": "ITAPAJE",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.8058312,
+        "lng": -39.4520002
+      }
+    },
+    {
+      "rank": 150,
+      "zone_id": "IGUATU_Z2",
+      "bairro": "IGUATU",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -6.3831,
+        "lng": -39.3116943
+      }
+    },
+    {
+      "rank": 151,
+      "zone_id": "BARRA DO CEARA_Z2",
+      "bairro": "BARRA DO CEARA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7033261,
+        "lng": -38.574628
+      }
+    },
+    {
+      "rank": 152,
+      "zone_id": "HORIZONTE_Z5",
+      "bairro": "HORIZONTE",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -4.0992627,
+        "lng": -38.5064093
+      }
+    },
+    {
+      "rank": 153,
+      "zone_id": "GUADALAJARA_Z5",
+      "bairro": "GUADALAJARA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7636411,
+        "lng": -38.6179253
+      }
+    },
+    {
+      "rank": 154,
+      "zone_id": "CONJUNTO CEARA I_Z3",
+      "bairro": "CONJUNTO CEARA I",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7617898,
+        "lng": -38.6048622
+      }
+    },
+    {
+      "rank": 155,
+      "zone_id": "CONJUNTO CEARA I_Z4",
+      "bairro": "CONJUNTO CEARA I",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7627611,
+        "lng": -38.6066878
+      }
+    },
+    {
+      "rank": 156,
+      "zone_id": "CONJUNTO CEARA I_Z5",
+      "bairro": "CONJUNTO CEARA I",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7617491,
+        "lng": -38.6079772
+      }
+    },
+    {
+      "rank": 157,
+      "zone_id": "GUADALAJARA_Z1",
+      "bairro": "GUADALAJARA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7588858,
+        "lng": -38.6175648
+      }
+    },
+    {
+      "rank": 158,
+      "zone_id": "GUADALAJARA_Z2",
+      "bairro": "GUADALAJARA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7585914,
+        "lng": -38.6179002
+      }
+    },
+    {
+      "rank": 159,
+      "zone_id": "GUADALAJARA_Z3",
+      "bairro": "GUADALAJARA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7591996,
+        "lng": -38.6172274
+      }
+    },
+    {
+      "rank": 160,
+      "zone_id": "GUADALAJARA_Z4",
+      "bairro": "GUADALAJARA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7653387,
+        "lng": -38.6226353
+      }
+    },
+    {
+      "rank": 161,
+      "zone_id": "HORIZONTE_Z1",
+      "bairro": "HORIZONTE",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -4.1257329,
+        "lng": -38.4889683
+      }
+    },
+    {
+      "rank": 162,
+      "zone_id": "BARRA DO CEARA_Z1",
+      "bairro": "BARRA DO CEARA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7138912,
+        "lng": -38.5817152
+      }
+    },
+    {
+      "rank": 163,
+      "zone_id": "HORIZONTE_Z2",
+      "bairro": "HORIZONTE",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -4.0910808,
+        "lng": -38.4925176
+      }
+    },
+    {
+      "rank": 164,
+      "zone_id": "HORIZONTE_Z3",
+      "bairro": "HORIZONTE",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -4.107742,
+        "lng": -38.5001295
+      }
+    },
+    {
+      "rank": 165,
+      "zone_id": "HORIZONTE_Z4",
+      "bairro": "HORIZONTE",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -4.1253454,
+        "lng": -38.4886081
+      }
+    },
+    {
+      "rank": 166,
+      "zone_id": "BARRA DO CEARA_Z5",
+      "bairro": "BARRA DO CEARA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7074844,
+        "lng": -38.5876925
+      }
+    },
+    {
+      "rank": 167,
+      "zone_id": "BARRA DO CEARA_Z4",
+      "bairro": "BARRA DO CEARA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7109293,
+        "lng": -38.5814459
+      }
+    },
+    {
+      "rank": 168,
+      "zone_id": "BARRA DO CEARA_Z3",
+      "bairro": "BARRA DO CEARA",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7013581,
+        "lng": -38.575409
+      }
+    },
+    {
+      "rank": 169,
+      "zone_id": "CONJUNTO CEARA I_Z1",
+      "bairro": "CONJUNTO CEARA I",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -3.7623399,
+        "lng": -38.6051441
+      }
+    },
+    {
+      "rank": 170,
+      "zone_id": "IGUATU_Z1",
+      "bairro": "IGUATU",
+      "indice_risco": 0.0,
+      "status": "BAIXO",
+      "gap_index": 0.0,
+      "natureza_critica": "CV",
+      "centroide": {
+        "lat": -6.3245066,
+        "lng": -39.343881
+      }
+    }
+  ]
+}
