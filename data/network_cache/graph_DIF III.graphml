@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d17" for="edge" attr.name="geometry" attr.type="string" />
+  <key id="d16" for="edge" attr.name="length" attr.type="string" />
+  <key id="d15" for="edge" attr.name="reversed" attr.type="string" />
+  <key id="d14" for="edge" attr.name="ref" attr.type="string" />
+  <key id="d13" for="edge" attr.name="oneway" attr.type="string" />
+  <key id="d12" for="edge" attr.name="name" attr.type="string" />
+  <key id="d11" for="edge" attr.name="maxspeed" attr.type="string" />
+  <key id="d10" for="edge" attr.name="lanes" attr.type="string" />
+  <key id="d9" for="edge" attr.name="highway" attr.type="string" />
+  <key id="d8" for="edge" attr.name="osmid" attr.type="string" />
+  <key id="d7" for="node" attr.name="highway" attr.type="string" />
+  <key id="d6" for="node" attr.name="street_count" attr.type="string" />
+  <key id="d5" for="node" attr.name="x" attr.type="string" />
+  <key id="d4" for="node" attr.name="y" attr.type="string" />
+  <key id="d3" for="graph" attr.name="simplified" attr.type="string" />
+  <key id="d2" for="graph" attr.name="crs" attr.type="string" />
+  <key id="d1" for="graph" attr.name="created_with" attr.type="string" />
+  <key id="d0" for="graph" attr.name="created_date" attr.type="string" />
+  <graph edgedefault="directed">
+    <node id="1371734869">
+      <data key="d4">-3.8509613</data>
+      <data key="d5">-38.5643085</data>
+      <data key="d6">3</data>
+    </node>
+    <node id="6210768059">
+      <data key="d4">-3.8553988</data>
+      <data key="d5">-38.5539673</data>
+      <data key="d6">3</data>
+    </node>
+    <node id="6212579782">
+      <data key="d4">-3.853046</data>
+      <data key="d5">-38.5594424</data>
+      <data key="d6">3</data>
+    </node>
+    <node id="6214997967">
+      <data key="d4">-3.8562937</data>
+      <data key="d5">-38.5518617</data>
+      <data key="d6">3</data>
+    </node>
+    <node id="6452137428">
+      <data key="d4">-3.8503547</data>
+      <data key="d5">-38.5657685</data>
+      <data key="d6">3</data>
+    </node>
+    <node id="6786750668">
+      <data key="d4">-3.8494816</data>
+      <data key="d5">-38.5676031</data>
+      <data key="d7">crossing</data>
+      <data key="d6">3</data>
+    </node>
+    <node id="7048040164">
+      <data key="d4">-3.852103</data>
+      <data key="d5">-38.5616203</data>
+      <data key="d6">3</data>
+    </node>
+    <node id="7048292223">
+      <data key="d4">-3.8532845</data>
+      <data key="d5">-38.5589025</data>
+      <data key="d6">3</data>
+    </node>
+    <edge source="1371734869" target="6452137428" id="0">
+      <data key="d8">535570371</data>
+      <data key="d9">trunk</data>
+      <data key="d10">2</data>
+      <data key="d11">80</data>
+      <data key="d12">Rodovia Quarto Anel Viário</data>
+      <data key="d13">True</data>
+      <data key="d14">BR-020</data>
+      <data key="d15">False</data>
+      <data key="d16">175.46920312212848</data>
+      <data key="d17">LINESTRING (-38.5643085 -3.8509613, -38.5647406 -3.8507747, -38.5648269 -3.8507407, -38.5657685 -3.8503547)</data>
+    </edge>
+    <edge source="6210768059" target="7048292223" id="0">
+      <data key="d8">535570371</data>
+      <data key="d9">trunk</data>
+      <data key="d10">2</data>
+      <data key="d11">80</data>
+      <data key="d12">Rodovia Quarto Anel Viário</data>
+      <data key="d13">True</data>
+      <data key="d14">BR-020</data>
+      <data key="d15">False</data>
+      <data key="d16">595.8777138031503</data>
+      <data key="d17">LINESTRING (-38.5539673 -3.8553988, -38.5548753 -3.8550143, -38.557063 -3.854088, -38.5589025 -3.8532845)</data>
+    </edge>
+    <edge source="6212579782" target="7048040164" id="0">
+      <data key="d8">535570371</data>
+      <data key="d9">trunk</data>
+      <data key="d10">2</data>
+      <data key="d11">80</data>
+      <data key="d12">Rodovia Quarto Anel Viário</data>
+      <data key="d13">True</data>
+      <data key="d14">BR-020</data>
+      <data key="d15">False</data>
+      <data key="d16">263.3997338265225</data>
+      <data key="d17">LINESTRING (-38.5594424 -3.853046, -38.5606494 -3.8525271, -38.5608999 -3.8524194, -38.5610468 -3.8523525, -38.5613313 -3.8522287, -38.5616203 -3.852103)</data>
+    </edge>
+    <edge source="6214997967" target="6210768059" id="0">
+      <data key="d8">535570371</data>
+      <data key="d9">trunk</data>
+      <data key="d10">2</data>
+      <data key="d11">80</data>
+      <data key="d12">Rodovia Quarto Anel Viário</data>
+      <data key="d13">True</data>
+      <data key="d14">BR-020</data>
+      <data key="d15">False</data>
+      <data key="d16">253.91553014333897</data>
+      <data key="d17">LINESTRING (-38.5518617 -3.8562937, -38.5533528 -3.8556646, -38.5539673 -3.8553988)</data>
+    </edge>
+    <edge source="6452137428" target="6786750668" id="0">
+      <data key="d8">723598800</data>
+      <data key="d9">tertiary</data>
+      <data key="d10">1</data>
+      <data key="d13">True</data>
+      <data key="d15">False</data>
+      <data key="d16">225.61769379498926</data>
+      <data key="d17">LINESTRING (-38.5657685 -3.8503547, -38.5657975 -3.850334, -38.5658146 -3.8503217, -38.5658329 -3.8503113, -38.5658992 -3.8502788, -38.566896 -3.8498088, -38.5676031 -3.8494816)</data>
+    </edge>
+    <edge source="7048040164" target="1371734869" id="0">
+      <data key="d8">535570371</data>
+      <data key="d9">trunk</data>
+      <data key="d10">2</data>
+      <data key="d11">80</data>
+      <data key="d12">Rodovia Quarto Anel Viário</data>
+      <data key="d13">True</data>
+      <data key="d14">BR-020</data>
+      <data key="d15">False</data>
+      <data key="d16">324.13662988360164</data>
+      <data key="d17">LINESTRING (-38.5616203 -3.852103, -38.5625937 -3.8516847, -38.5643085 -3.8509613)</data>
+    </edge>
+    <edge source="7048292223" target="6212579782" id="0">
+      <data key="d8">535570371</data>
+      <data key="d9">trunk</data>
+      <data key="d10">2</data>
+      <data key="d11">80</data>
+      <data key="d12">Rodovia Quarto Anel Viário</data>
+      <data key="d13">True</data>
+      <data key="d14">BR-020</data>
+      <data key="d15">False</data>
+      <data key="d16">65.50682912623111</data>
+    </edge>
+    <data key="d0">2026-04-19 10:19:36</data>
+    <data key="d1">OSMnx 2.1.0</data>
+    <data key="d2">epsg:4326</data>
+    <data key="d3">True</data>
+  </graph>
+</graphml>

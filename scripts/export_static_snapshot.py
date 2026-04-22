@@ -320,7 +320,9 @@ def _summarize_item(item: Dict[str, Any], metrics: Dict[str, Any], manager_cache
 
 def _build_explainability(risk_items: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
     explainability: Dict[str, Dict[str, Any]] = {}
-    for item in risk_items:
+    # Priorização: Gerar explicabilidade profunda apenas para o Top 100 para evitar timeout
+    # O restante usará o fallback leve já mapeado no loop principal
+    for item in risk_items[:100]:
         node_id = item.get("node_id")
         if node_id is None:
             continue
@@ -474,7 +476,7 @@ def _build_explainability_academics(risk_items: List[Dict[str, Any]]) -> Dict[st
     orchestrator_dates = getattr(report_app.orchestrator, 'dates', None)
     last_date_base = orchestrator_dates[-1] if orchestrator_dates is not None and len(orchestrator_dates) > 0 else None
 
-    for item in risk_items:
+    for item in risk_items[:100]:
         node_id = item.get('node_id')
         if node_id is None:
             continue

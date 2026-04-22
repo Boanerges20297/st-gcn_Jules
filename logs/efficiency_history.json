@@ -659,5 +659,208 @@
         "JIJOCA DE JERICOACOARA"
       ]
     }
+  },
+  {
+    "date": "2026-04-22 00:00:00",
+    "total_events": 13,
+    "brute_cvli": 13,
+    "exogenous": 0,
+    "exogenous_conflict": 0,
+    "police_qualified_actions_7d": 0,
+    "police_administrative_events_7d": 0,
+    "assigned_total_events": 13,
+    "unmapped_total_events": 0,
+    "assigned_brute_cvli": 13,
+    "assigned_exogenous": 0,
+    "unmapped_exogenous": 0,
+    "assigned_police_qualified_actions": 0,
+    "unmapped_police_qualified_actions": 0,
+    "unmapped_exogenous_sample": [],
+    "global": {
+      "total_nodes": 116,
+      "active_locations": 11,
+      "total_events": 13,
+      "ranking_top10": [
+        "MESSEJANA",
+        "CAUCAIA",
+        "BARROSO",
+        "JUAZEIRO DO NORTE",
+        "TIANGUA",
+        "MARACANAU",
+        "BARRA DO CEARA",
+        "PLANALTO AYRTON SENNA",
+        "GRANJA LISBOA",
+        "MONDUBIM"
+      ],
+      "gt_sample": [
+        "BARROSO",
+        "ANCURI",
+        "HORIZONTE",
+        "JUAZEIRO DO NORTE",
+        "URUBURETAMA",
+        "TIANGUA",
+        "JIJOCA DE JERICOACOARA",
+        "ACOPIARA",
+        "CARIRIACU",
+        "CEDRO",
+        "SANTANA DO ACARAU"
+      ],
+      "p5": 0.6,
+      "recall5": 0.2727,
+      "hits5": [
+        "BARROSO",
+        "JUAZEIRO DO NORTE",
+        "TIANGUA"
+      ],
+      "p10": 0.3,
+      "recall10": 0.2727,
+      "hits10": [
+        "BARROSO",
+        "JUAZEIRO DO NORTE",
+        "TIANGUA"
+      ],
+      "p20": 0.45,
+      "recall20": 0.8182,
+      "hits20": [
+        "BARROSO",
+        "JUAZEIRO DO NORTE",
+        "TIANGUA",
+        "CARIRIACU",
+        "HORIZONTE",
+        "JIJOCA DE JERICOACOARA",
+        "URUBURETAMA",
+        "SANTANA DO ACARAU",
+        "CEDRO"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 40,
+      "active_locations": 2,
+      "total_events": 2,
+      "ranking_top10": [
+        "MESSEJANA",
+        "BARROSO",
+        "BARRA DO CEARA",
+        "PLANALTO AYRTON SENNA",
+        "GRANJA LISBOA",
+        "MONDUBIM",
+        "ALTO ALEGRE",
+        "SIQUEIRA",
+        "CRISTO REDENTOR",
+        "CURIO"
+      ],
+      "gt_sample": [
+        "BARROSO",
+        "ANCURI"
+      ],
+      "p5": 0.2,
+      "recall5": 0.5,
+      "hits5": [
+        "BARROSO"
+      ],
+      "p10": 0.1,
+      "recall10": 0.5,
+      "hits10": [
+        "BARROSO"
+      ],
+      "p20": 0.1,
+      "recall20": 1.0,
+      "hits20": [
+        "BARROSO",
+        "ANCURI"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 19,
+      "active_locations": 1,
+      "total_events": 2,
+      "ranking_top10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "HORIZONTE",
+        "PARAIPABA",
+        "SAO LUIS DO CURU",
+        "PACAJUS",
+        "EUSEBIO",
+        "PINDORETAMA",
+        "PACATUBA",
+        "ITAITINGA"
+      ],
+      "gt_sample": [
+        "HORIZONTE"
+      ],
+      "p5": 0.2,
+      "recall5": 1.0,
+      "hits5": [
+        "HORIZONTE"
+      ],
+      "p10": 0.1,
+      "recall10": 1.0,
+      "hits10": [
+        "HORIZONTE"
+      ],
+      "p20": 0.0526,
+      "recall20": 1.0,
+      "hits20": [
+        "HORIZONTE"
+      ]
+    },
+    "interior": {
+      "total_nodes": 50,
+      "active_locations": 8,
+      "total_events": 9,
+      "ranking_top10": [
+        "JUAZEIRO DO NORTE",
+        "TIANGUA",
+        "CARIRIACU",
+        "VARZEA ALEGRE",
+        "JIJOCA DE JERICOACOARA",
+        "URUBURETAMA",
+        "SANTANA DO ACARAU",
+        "CEDRO",
+        "UMIRIM",
+        "CARIRE"
+      ],
+      "gt_sample": [
+        "JUAZEIRO DO NORTE",
+        "URUBURETAMA",
+        "TIANGUA",
+        "JIJOCA DE JERICOACOARA",
+        "ACOPIARA",
+        "CARIRIACU",
+        "CEDRO",
+        "SANTANA DO ACARAU"
+      ],
+      "p5": 0.8,
+      "recall5": 0.5,
+      "hits5": [
+        "JUAZEIRO DO NORTE",
+        "TIANGUA",
+        "CARIRIACU",
+        "JIJOCA DE JERICOACOARA"
+      ],
+      "p10": 0.7,
+      "recall10": 0.875,
+      "hits10": [
+        "JUAZEIRO DO NORTE",
+        "TIANGUA",
+        "CARIRIACU",
+        "JIJOCA DE JERICOACOARA",
+        "URUBURETAMA",
+        "SANTANA DO ACARAU",
+        "CEDRO"
+      ],
+      "p20": 0.35,
+      "recall20": 0.875,
+      "hits20": [
+        "JUAZEIRO DO NORTE",
+        "TIANGUA",
+        "CARIRIACU",
+        "JIJOCA DE JERICOACOARA",
+        "URUBURETAMA",
+        "SANTANA DO ACARAU",
+        "CEDRO"
+      ]
+    }
   }
 ]
