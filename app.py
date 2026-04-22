@@ -49,6 +49,12 @@ try:
 except ImportError:
     ChampionChallenger = None
 
+# --- API V4 (Inteligência Granular 500m) ---
+try:
+    from src.core.api_v4_routes import create_v4_api_blueprint
+except ImportError:
+    create_v4_api_blueprint = None
+
 warnings.filterwarnings('ignore')
 # Configurando logs para garantir visibilidade no terminal
 logging.basicConfig(level=logging.INFO)
@@ -248,6 +254,12 @@ try:
     )
     app.register_blueprint(admin_bp)
     print("✅ Admin Dashboard Registrado em /api/admin/health")
+
+    # Registro API V4 (Sentinela Granular)
+    if create_v4_api_blueprint:
+        v4_bp = create_v4_api_blueprint(BASE_DIR)
+        app.register_blueprint(v4_bp)
+        print("🚀 API Sentinela V4 (500m) Registrada em /api/v4")
     
     # Thread de checagem periódica de saúde (a cada 5 minutos)
     def _run_health_checks():
@@ -995,10 +1007,24 @@ def get_top20_micro_nodes():
     def _decorate_top_features(payload):
         polygon_cache = _load_micronode_polygon_cache()
         faction_cache = _load_top_micronode_faction_cache()
-        features = payload.get('features', [])[:limit]
+        features = payload.get('features', [])
+        
+        # --- FILTRO TOP 1 POR AREA (SENTINELA CLEAN MODE) ---
+        # Mantemos apenas a primeira ocorrencia de cada bairro/municipio.
         decorated = []
+        seen_areas = set()
+        
         for feature in features:
             props = dict(feature.get('properties') or {})
+            
+            # Identificar area (bairro ou municipio)
+            area_raw = props.get('bairro') or props.get('municipio') or props.get('name') or props.get('micronodo') or "DESCONHECIDO"
+            area_key = _normalize_polygon_lookup_name(str(area_raw))
+            
+            if area_key in seen_areas:
+                continue
+            seen_areas.add(area_key)
+            
             lookup_key = _normalize_polygon_lookup_name(props.get('name') or props.get('micronodo'))
             polygon_geometry = polygon_cache.get(lookup_key)
             faction = props.get('faction') or faction_cache.get(lookup_key)
@@ -1011,6 +1037,11 @@ def get_top20_micro_nodes():
                 props['faction'] = faction
             feature['properties'] = props
             decorated.append(feature)
+            
+            # Respeitar o limite apos a filtragem por area
+            if len(decorated) >= limit:
+                break
+                
         payload['features'] = decorated
         return payload
     
