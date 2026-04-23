@@ -75,10 +75,10 @@ PREDICT_HORIZON = 14
 REGION_CONFIGS = {
     'fortaleza': dict(
         window=120, lr=0.01,  epochs=120, dropout=0.3, margin=1.0,
-        k_eval=10, use_momentum=True,  grad_accum=32,
+        k_eval=10, use_momentum=True,  grad_accum=64,
         raw_cvli_context=True,
         output_name='fortaleza_model_active.pth',
-        focal_alpha=0.75, focal_gamma=1.5, ranking_weight=10.0
+        focal_alpha=0.55, focal_gamma=1.5, ranking_weight=10.0
     ),
     'rmf': dict(
         window=90,  lr=0.018, epochs=120, dropout=0.5, margin=1.5,
@@ -136,9 +136,9 @@ def autosave_training_log(region_key, config):
         with open(log_path, 'a', encoding='utf-8') as f:
             f.write(new_entry)
 
-        logging.info(f"📝 Auto-log incremental: Tentativa {next_attempt} registrada no TRAINING_LOG.md")
+        logging.info(f"[LOG] Auto-log incremental: Tentativa {next_attempt} registrada no TRAINING_LOG.md")
     except Exception as e:
-        logging.error(f"❌ Erro ao escrever log auto-incremental em TRAINING_LOG.md: {e}")
+        logging.error(f"[ERR] Erro ao escrever log auto-incremental em TRAINING_LOG.md: {e}")
 
 def normalize_adj(adj):
     adj = adj + np.eye(adj.shape[0])
@@ -317,16 +317,16 @@ class SpecialistTrainer:
         focal_gamma = cfg.get('focal_gamma', 2.0)
         ranking_w   = cfg.get('ranking_weight', 1.0)
 
-        logging.info("\n" + "═"*80)
-        logging.info(f"🚀 ESPECIALISTA: {self.region_key.upper()} (TENTATIVA 49 - REGIONALIZED AGGRESSION)")
-        logging.info(f"📊 METODOLOGIA: Split Temporal (85/15) | Blindagem de Seleção (Cutoff 2025)")
-        logging.info(f"📉 LOSS: Regional Focal Ranking (alpha={focal_alpha}, gamma={focal_gamma}, rank_w={ranking_w})")
+        logging.info("\n" + "="*80)
+        logging.info(f"[*] ESPECIALISTA: {self.region_key.upper()} (TENTATIVA 49 - REGIONALIZED AGGRESSION)")
+        logging.info(f"[i] METODOLOGIA: Split Temporal (85/15) | Blindagem de Seleção (Cutoff 2025)")
+        logging.info(f"[-] LOSS: Regional Focal Ranking (alpha={focal_alpha}, gamma={focal_gamma}, rank_w={ranking_w})")
         logging.info(
-            f"⚙️ ARQ: DeepSTGAT_64 | window={self.window} | lr={self.lr} | dropout={self.dropout} | "
+            f"[!] ARQ: DeepSTGAT_64 | window={self.window} | lr={self.lr} | dropout={self.dropout} | "
             f"K={self.k_eval} | 37ch (V37 Elite) | "
             f"target_horizon={PREDICT_HORIZON}d | grad_accum={self.grad_accum} | device={DEVICE}"
         )
-        logging.info("═"*80)
+        logging.info("="*80)
 
         # Regista automaticamente no Markdown (LOG INCREMENTAL)
         autosave_training_log(self.region_key, cfg)
@@ -341,7 +341,7 @@ class SpecialistTrainer:
         N, T, C_base = nf.shape
 
         if self.raw_cvli_context:
-            logging.info("🧱 Reconstruindo canal 24 com soma móvel 7d do CVLI bruto (sem média)...")
+            logging.info("[INFO] Reconstruindo canal 24 com soma móvel 7d do CVLI bruto (sem média)...")
             nf = rebuild_raw_cvli_context(nf)
 
         # Adjacências normalizadas
@@ -350,7 +350,7 @@ class SpecialistTrainer:
 
         # Engenharia de features (momentum opcional)
         if self.use_momentum:
-            logging.info("🔧 Calculando canais de Multi-Scale Momentum + Cold Streak (negativo)...")
+            logging.info("[INFO] Calculando canais de Multi-Scale Momentum + Cold Streak (negativo)...")
             momentum_feat = build_momentum_features(nf)
             features = nf.copy()
             if features.shape[2] >= 37:
@@ -361,15 +361,15 @@ class SpecialistTrainer:
             features = nf.copy()
 
         C_ext = features.shape[2]
-        logging.info(f"📦 Shape final: ({N}, {T}, {C_ext})")
+        logging.info(f"[DATA] Shape final: ({N}, {T}, {C_ext})")
 
         # Diagnóstico CVLI
         cvli_flat = features[:, :, 0].flatten()
         nz = (cvli_flat > 0).sum()
-        logging.info(f"📊 CVLI não-zero (Canal 0): {nz}/{len(cvli_flat)} ({nz/len(cvli_flat)*100:.2f}%)")
+        logging.info(f"[DIAG] CVLI não-zero (Canal 0): {nz}/{len(cvli_flat)} ({nz/len(cvli_flat)*100:.2f}%)")
 
         # Construção dos pares (X, Y) com SPLIT TEMPORAL (sem shuffle)
-        logging.info("🔄 Gerando janelas com Normalização Z-Score Local (per-window)...")
+        logging.info("[INFO] Gerando janelas com Normalização Z-Score Local (per-window)...")
         X_list, Y_list = [], []
         for t in range(self.window, T - PREDICT_HORIZON):
             # Janela de entrada
@@ -390,7 +390,7 @@ class SpecialistTrainer:
             X_list.append(x)
             Y_list.append(y)
 
-        logging.info(f"📐 Janelas construídas: {len(X_list)}")
+        logging.info(f"[DATA] Janelas construídas: {len(X_list)}")
 
         # ⏳ SPLIT TEMPORAL ESTRITO (Sem shuffle)
         # 85% passado para treino, 15% futuro recente para validação
@@ -399,7 +399,7 @@ class SpecialistTrainer:
         train_Y = Y_list[:split]
         val_X   = X_list[split:]
         val_Y   = Y_list[split:]
-        logging.info(f"⏳ Split Temporal: {len(train_X)} treino (Passado) | {len(val_X)} validação (Futuro)")
+        logging.info(f"[SPLIT] Split Temporal: {len(train_X)} treino (Passado) | {len(val_X)} validação (Futuro)")
 
         # Modelo e otimizador
         model     = DeepSTGAT_64(num_nodes=N, in_channels=C_ext, time_steps=self.window, dropout=self.dropout).to(DEVICE)
@@ -462,24 +462,36 @@ class SpecialistTrainer:
             # ── Validação ──────────────────────────────────────
             model.eval()
             pk_list = []
+            p20_list = []
             with torch.no_grad():
                 for vx, vy in zip(val_X, val_Y):
-                    k_eff = min(self.k_eval, (vy > 0).sum().item())
-                    if k_eff > 0:
-                        vpred = model(vx.to(DEVICE), [adj_geo, adj_conf]).squeeze()
-                        _, t_idx = torch.topk(vy, k_eff)
-                        _, p_idx = torch.topk(vpred, self.k_eval)
-                        score = len(set(t_idx.cpu().numpy()) & set(p_idx.cpu().numpy())) / k_eff
-                        pk_list.append(score)
+                    k_eff_10 = min(10, (vy > 0).sum().item())
+                    k_eff_20 = min(20, (vy > 0).sum().item())
+                    
+                    vpred = model(vx.to(DEVICE), [adj_geo, adj_conf]).squeeze()
+                    _, t_idx_real = torch.topk(vy, len(vy)) # Todos os reais positivos
+                    real_positives = set(t_idx_real[vy[t_idx_real] > 0].cpu().numpy())
+                    
+                    if len(real_positives) > 0:
+                        # P@10
+                        _, p_idx_10 = torch.topk(vpred, 10)
+                        hits_10 = len(set(p_idx_10.cpu().numpy()) & real_positives)
+                        pk_list.append(hits_10 / min(10, len(real_positives)))
+                        
+                        # P@20
+                        _, p_idx_20 = torch.topk(vpred, 20)
+                        hits_20 = len(set(p_idx_20.cpu().numpy()) & real_positives)
+                        p20_list.append(hits_20 / min(20, len(real_positives)))
 
             avg_pk   = np.mean(pk_list) if pk_list else 0.0
+            avg_p20  = np.mean(p20_list) if p20_list else 0.0
             avg_loss = epoch_loss / max(steps_per_epoch, 1)
             avg_grad = np.mean(epoch_grads) if epoch_grads else 0.0
             logging.info(
                 f"\n---> ÉPOCA {epoch+1:03d} [{self.region_key.upper()}] | "
-                f"Val P@{self.k_eval}: {avg_pk*100:.2f}% | "
+                f"Val P@10: {avg_pk*100:.2f}% | P@20: {avg_p20*100:.2f}% | "
                 f"Loss: {avg_loss:.4f} | Grad: {avg_grad:.4f} | "
-                f"Recorde: {max(self.best_pk, avg_pk)*100:.2f}% <---\n"
+                f"Recorde P@10: {max(self.best_pk, avg_pk)*100:.2f}% <---\n"
             )
 
             if avg_pk > self.best_pk:
@@ -498,7 +510,7 @@ class SpecialistTrainer:
                         'channel24_mode': 'rolling_sum_7d',
                     }
                 }, output_path)
-                logging.info(f"💎 NOVO RECORDE [{self.region_key.upper()}]: P@{self.k_eval}={self.best_pk*100:.2f}% → {self.output_name}")
+                logging.info(f"[BEST] NOVO RECORDE [{self.region_key.upper()}]: P@{self.k_eval}={self.best_pk*100:.2f}% -> {self.output_name}")
 
             if DEVICE.type == 'cuda':
                 torch.cuda.empty_cache()

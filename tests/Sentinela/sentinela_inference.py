@@ -25,7 +25,7 @@ from scipy.spatial.distance import cdist
 
 warnings.filterwarnings("ignore")
 
-BASE_PATH   = r"c:\Users\Boanerges\Desktop\Projetos\Report Preview"
+BASE_PATH   = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if BASE_PATH not in sys.path:
     sys.path.append(BASE_PATH)
 

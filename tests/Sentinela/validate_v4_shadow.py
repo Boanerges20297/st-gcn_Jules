@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 warnings.filterwarnings("ignore")
 
 # Caminhos
-BASE_PATH = r"c:\Users\Boanerges\Desktop\Projetos\Report Preview"
+BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 DATA_RAW = os.path.join(BASE_PATH, "data", "raw")
 OUT_SENTINELA = os.path.join(BASE_PATH, "tests", "Sentinela")
 

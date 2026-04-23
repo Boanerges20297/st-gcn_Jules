@@ -54,15 +54,15 @@
 ## 2. Análise de Destaques e Tendências
 
 ### 2.1. Hegemonia Territorial
-O mapeamento revisado confirma o domínio do **Comando Vermelho (CV)** em mais de 80% dos bairros de alta periculosidade. Áreas como **Barra do Ceará**, **Messejana** e **Prefeito José Walter** aparecem agora vinculadas ao CV na estrutura de pastas do KML 2026.
+O **Comando Vermelho (CV)** consolidou seu mapeamento na maioria absoluta dos bairros de alta incidência. Bairros como **Barra do Ceará**, **Barroso** e **Granja Lisboa** apresentam domínio estável conforme os registros territoriais de 2026.
 
-### 2.2. Áreas em Alerta Máximo (Início de 2026)
-- **Lagoa Redonda:** Registra a maior projeção de violência para o ano (53.1), o que sugere um conflito territorial intenso no início de 2026.
-- **Barroso:** Segue com alta incidência (projeção de 26.5), mantendo a tendência de alta observada em 2025.
-- **Cajazeiras:** Também apresenta um pico estatístico preocupante (26.5 de projeção).
+### 2.2. Áreas em Alerta Máximo (2026)
+- **Lagoa Redonda:** Apresenta a maior projeção de crescimento do ano (53.1), indicando um cenário de guerra ativa ou instabilidade aguda.
+- **Prefeito José Walter:** Mantém uma frequência alarmante, com projeção de aproximadamente 20 mortes para o período parcial atual (19.9 ajustado).
+- **Barroso:** Segue com alta periculosidade, registrando projeção de 26.5 para o fechamento deste ano.
 
 ### 2.3. Reduções Notáveis
-Bairros historicamente violentos como **Bom Jardim** e **Cristo Redentor** não registraram óbitos no recorte parcial deste ano, indicando uma possível estabilização momentânea.
+Bairros como **Cristo Redentor** e **Bom Jardim** mostram uma tendência de queda em 2026 no recorte parcial, indicando mudanças na dinâmica local.
 
 ---
 ## 3. Arquivos de Saída
@@ -70,4 +70,4 @@ Bairros historicamente violentos como **Bom Jardim** e **Cristo Redentor** não 
 - **Gráficos Analíticos:** `outputs/analises/cvli/`
 - **Dataset de Apoio:** `data/raw/analise_cvli_fortaleza_completa.csv`
 
-*Relatório consolidado para o sistema de monitoramento Report Preview em 05/03/2026.*
+*Relatório consolidado para o sistema de monitoramento Report Preview.*

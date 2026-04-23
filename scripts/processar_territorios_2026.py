@@ -25,8 +25,9 @@ def normalize_text(text):
     return n
 
 def process_faction_data_v5():
-    kml_path = r'C:\Users\Boanerges\Downloads\ORCRIMS_2026.kml'
-    dict_path = r'C:\Users\Boanerges\Desktop\Projetos\Report Preview\data\raw\bairros_centros_latlong.json'
+    BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    kml_path = os.path.join(os.environ['USERPROFILE'], 'Downloads', 'ORCRIMS_2026.kml')
+    dict_path = os.path.join(BASE_PATH, 'data', 'raw', 'bairros_centros_latlong.json')
     
     print("1. Carregando Dicionário Oficial de Localidades...")
     with open(dict_path, 'r', encoding='utf-8') as f:
@@ -126,7 +127,7 @@ def process_faction_data_v5():
     df_final = pd.DataFrame(final_rows)
 
     print("4. Salvando...")
-    output_dir = r'C:\Users\Boanerges\Desktop\Projetos\Report Preview\data\raw\inteligencia'
+    output_dir = os.path.join(BASE_PATH, 'data', 'raw', 'inteligencia')
     os.makedirs(output_dir, exist_ok=True)
     
     # Arquivo 1: Micronodos Completo
@@ -136,7 +137,7 @@ def process_faction_data_v5():
     df_final.to_csv(os.path.join(output_dir, 'bairros_faccoes_2026.csv'), index=False, encoding='utf-8')
 
     # Sincronização Principal
-    df_final.to_csv(r'C:\Users\Boanerges\Desktop\Projetos\Report Preview\data\raw\inteligencia_faccoes.csv', index=False, encoding='utf-8')
+    df_final.to_csv(os.path.join(BASE_PATH, 'data', 'raw', 'inteligencia_faccoes.csv'), index=False, encoding='utf-8')
 
     print(f"🚀 SUCESSO!")
     print(f"- Micronodos: {len(df_micro)} registros.")

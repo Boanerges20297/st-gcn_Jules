@@ -31,7 +31,7 @@ from lightgbm import LGBMRanker
 
 warnings.filterwarnings("ignore")
 
-BASE_PATH    = r"c:\Users\Boanerges\Desktop\Projetos\Report Preview"
+BASE_PATH    = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 DATA_RAW     = os.path.join(BASE_PATH, "data", "raw")
 MODEL_DIR    = os.path.join(BASE_PATH, "tests", "Sentinela")
 BASE_MODEL   = os.path.join(MODEL_DIR, "lgbm_lean_v3_freeze.pkl")

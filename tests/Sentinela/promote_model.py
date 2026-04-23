@@ -15,7 +15,7 @@ import sys, io, argparse, shutil, json, os
 from datetime import datetime
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
-BASE_PATH    = r"c:\Users\Boanerges\Desktop\Projetos\Report Preview"
+BASE_PATH    = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 TESTS_DIR    = os.path.join(BASE_PATH, "tests", "Sentinela")
 ACTIVE_DIR   = os.path.join(BASE_PATH, "models", "active")
 ARCHIVE_DIR  = os.path.join(BASE_PATH, "models", "archive")

@@ -12,7 +12,7 @@ ox.settings.use_cache = True
 ox.settings.log_console = False
 
 # Caminhos base
-BASE_PATH = r"c:\Users\Boanerges\Desktop\Projetos\Report Preview"
+BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 DATA_RAW = os.path.join(BASE_PATH, "data", "raw")
 DATA_STATIC = os.path.join(BASE_PATH, "data", "static")
 NETWORK_CACHE = os.path.join(BASE_PATH, "data", "network_cache")
@@ -108,7 +108,8 @@ def extract_and_zone_networks(active_sources):
     ox.settings.timeout = 30
     
     for i, (name, source) in enumerate(active_sources.items(), 1):
-        cache_file = os.path.join(NETWORK_CACHE, f"graph_{name}.graphml")
+        safe_name = name.replace("/", "_").replace("\\", "_").strip()
+        cache_file = os.path.join(NETWORK_CACHE, f"graph_{safe_name}.graphml")
         print(f"[{i}/{total}] Processando: {name} ({source['type']})...", flush=True)
         
         try:

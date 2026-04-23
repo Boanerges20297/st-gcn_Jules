@@ -9,8 +9,9 @@ def normalize_text(text):
     return unicodedata.normalize('NFKD', str(text)).encode('ASCII', 'ignore').decode('ASCII').upper().strip()
 
 def generate_critical_streets():
-    path_occ = r'C:\Users\Boanerges\Desktop\Projetos\Report Preview\data\raw\dados_status_ocorrencias_gerais_ENRIQUECIDO.csv'
-    output_path = r'C:\Users\Boanerges\Desktop\Projetos\Report Preview\data\raw\ruas_criticas_por_bairro.json'
+    BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    path_occ = os.path.join(BASE_PATH, 'data', 'raw', 'dados_status_ocorrencias_gerais_ENRIQUECIDO.csv')
+    output_path = os.path.join(BASE_PATH, 'data', 'raw', 'ruas_criticas_por_bairro.json')
     
     if not os.path.exists(path_occ):
         print(f"❌ Arquivo {path_occ} não encontrado.")

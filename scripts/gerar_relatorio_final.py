@@ -1,8 +1,9 @@
 import pandas as pd
 import os
 
-path_csv = r'C:\Users\Boanerges\Desktop\Projetos\Report Preview\data\raw\analise_cvli_fortaleza_completa.csv'
-report_path = r'C:\Users\Boanerges\Desktop\Projetos\Report Preview\data\raw\RELATORIO_CVLI_FORTALEZA_FINAL.md'
+BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+path_csv = os.path.join(BASE_PATH, 'data', 'raw', 'analise_cvli_fortaleza_completa.csv')
+report_path = os.path.join(BASE_PATH, 'data', 'raw', 'RELATORIO_CVLI_FORTALEZA_FINAL.md')
 
 try:
     # Carregar dados (pular as linhas de metadados iniciais)
@@ -20,7 +21,7 @@ try:
 
 | Bairro | Facção Predominante | Total CVLI | Periodicidade | Projeção 2026 |
 | :--- | :---: | :---: | :---: | :---: |
-"
+"""
     
     table_rows = ""
     for i, row in df.head(40).iterrows():
