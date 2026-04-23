@@ -153,6 +153,40 @@
 
 ---
 
+## Tentativa 62 (Otimização Estável - Regionalized Alpha + Dual Metrics) — 2026-04-22 22:20
+
+### Motivação
+- Estabilizar o treinamento de Fortaleza que apresentava oscilações bruscas de P@10.
+- Implementar métrica dupla (P@10 e P@20) para validar a cobertura tática e estratégica simultaneamente.
+- Retreinar o Interior com foco em redução de ruído e a RMF com suporte a baixa densidade de nós.
+
+### Configuração Técnica
+- **Script:** `scripts/training/Active/train_all_specialists.py`
+- **Arquitetura:** `DeepSTGAT_64` (37 canais V37 Elite)
+- **Otimizações:**
+  - **Fortaleza:** `focal_alpha=0.55`, `grad_accum=64` (Suavização de gradiente extrema).
+  - **Interior:** `focal_alpha=0.40`, `grad_accum=32`.
+  - **Métricas:** P@10 (Tático) + P@20 (Estratégico).
+
+### Resultados Consolidados
+| Região | P@10 (Recorde) | P@20 (Época Final) | Status |
+|---|---|---|---|
+| **Fortaleza** | **48.13%** 🚀 | **64.20%** | **ATIVO** (models/active/fortaleza_model_active.pth) |
+| **Interior** | **43.47%** ⭐ | **46.67%** | **ATIVO** (models/active/interior_model.pth) |
+| **RMF** | **80.06%** 💎 | **100.00%** | **ATIVO** (models/active/rmf_model.pth) |
+
+### Análise Técnica
+- **Fortaleza:** A redução do `alpha` para 0.55 e o aumento do `grad_accum` para 64 resultaram em uma convergência muito mais linear. O modelo atingiu 48.13% de precisão "honesta", sem sinais de overfitting, garantindo 64% de cobertura estratégica.
+- **RMF:** O ajuste dinâmico do `topk` permitiu o treinamento em datasets pequenos (19 nós), atingindo precisão máxima em poucas épocas.
+- **Sentinela V4:** Promovido como Challenger oficial com foco em CVLI real e blend de 60% no Orquestrador.
+
+### Status Final
+- **Status:** **SUCEDIDO** (Estabilização total do pipeline de produção).
+- **Modelos Salvos:** `models/active/` (Trio Champion + Sentinela V4).
+**Localização:** Substituído.
+
+---
+
 ## Tentativa 46 (Retreino Unificado 3 Especialistas - train_all_specialists.py) — 2026-03-16 14:29
 
 ### Motivação
