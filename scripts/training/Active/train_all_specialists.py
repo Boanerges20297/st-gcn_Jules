@@ -469,19 +469,22 @@ class SpecialistTrainer:
                     k_eff_20 = min(20, (vy > 0).sum().item())
                     
                     vpred = model(vx.to(DEVICE), [adj_geo, adj_conf]).squeeze()
+                    num_nodes = vpred.size(0)
                     _, t_idx_real = torch.topk(vy, len(vy)) # Todos os reais positivos
                     real_positives = set(t_idx_real[vy[t_idx_real] > 0].cpu().numpy())
                     
                     if len(real_positives) > 0:
                         # P@10
-                        _, p_idx_10 = torch.topk(vpred, 10)
+                        k_10 = min(10, num_nodes)
+                        _, p_idx_10 = torch.topk(vpred, k_10)
                         hits_10 = len(set(p_idx_10.cpu().numpy()) & real_positives)
-                        pk_list.append(hits_10 / min(10, len(real_positives)))
+                        pk_list.append(hits_10 / min(k_10, len(real_positives)))
                         
                         # P@20
-                        _, p_idx_20 = torch.topk(vpred, 20)
+                        k_20 = min(20, num_nodes)
+                        _, p_idx_20 = torch.topk(vpred, k_20)
                         hits_20 = len(set(p_idx_20.cpu().numpy()) & real_positives)
-                        p20_list.append(hits_20 / min(20, len(real_positives)))
+                        p20_list.append(hits_20 / min(k_20, len(real_positives)))
 
             avg_pk   = np.mean(pk_list) if pk_list else 0.0
             avg_p20  = np.mean(p20_list) if p20_list else 0.0

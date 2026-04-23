@@ -80,7 +80,7 @@ class ChampionChallenger:
 
     def __init__(self, base_dir: str):
         self.base_dir    = base_dir
-        self.model_path  = os.path.join(base_dir, "models", "active", "lgbm_lean_v3_freeze.pkl")
+        self.model_path  = os.path.join(base_dir, "models", "active", "sentinela_v4_model.pkl")
         self.cc_log      = os.path.join(base_dir, "logs", "cc_decisions.jsonl")
         self.state_path  = os.path.join(base_dir, "data", "cc_state.json")
         self.csv_enrich  = os.path.join(base_dir, "data", "raw", "dados_status_ocorrencias_gerais_ENRIQUECIDO.csv")
@@ -175,7 +175,7 @@ class ChampionChallenger:
             self._feat_names   = payload["feat_names_lgbm"]
             self._ewma_weights = payload["ewma_weights"]
             self._top_bairros  = [_norm(b) for b in payload["top_bairros"]]
-            print(f"✅ [CC] Challenger LGBM V3 carregado ({len(self._top_bairros)} bairros Fortaleza)")
+            print(f"✅ [CC] Challenger Sentinela V4 carregado ({len(self._top_bairros)} bairros Fortaleza)")
         except Exception as e:
             print(f"❌ [CC] Erro ao carregar challenger: {e}")
 

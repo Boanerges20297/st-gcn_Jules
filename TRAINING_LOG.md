@@ -1042,3 +1042,26 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 - *(A preencher após a conclusão)*
 
 ---
+
+
+## Tentativa 66 (Autolog - RMF) — 2026-04-22 22:04
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 90 dias
+- **Learning Rate**: 0.018
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Grad Accumulation**: 8
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.5
+- **Focal Gamma**: 2.0
+- **Ranking Weight**: 7.0
+- **Métrica de Avaliação**: P@5
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
