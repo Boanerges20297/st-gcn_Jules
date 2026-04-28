@@ -4,9 +4,30 @@ import numpy as np
 
 import sys
 if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
-    sys.stdout.reconfigure(encoding='utf-8')
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception: pass
 if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
-    sys.stderr.reconfigure(encoding='utf-8')
+    try:
+        sys.stderr.reconfigure(encoding='utf-8')
+    except Exception: pass
+
+# --- BLINDAGEM DE ENCODING PARA WINDOWS ---
+import builtins
+_original_print = builtins.print
+def safe_print(*args, **kwargs):
+    try:
+        _original_print(*args, **kwargs)
+    except UnicodeEncodeError:
+        # Se falhar, remove caracteres não-ascii e tenta novamente
+        new_args = []
+        for arg in args:
+            if isinstance(arg, str):
+                new_args.append(arg.encode('ascii', 'ignore').decode('ascii'))
+            else:
+                new_args.append(arg)
+        _original_print(*new_args, **kwargs)
+builtins.print = safe_print
 
 import geopandas as gpd
 import pandas as pd
@@ -973,6 +994,19 @@ def get_micronodes():
                 feat['properties']['region'] = _classify_region(feat['properties'])
         return jsonify(data)
     return jsonify({"type": "FeatureCollection", "features": []})
+
+@app.route('/api/all_streets')
+def get_all_streets():
+    """Retorna a malha completa de ruas geolocalizadas para exibição no mapa."""
+    path = os.path.join(BASE_DIR, 'data', 'geo_streets_cache.json')
+    if os.path.exists(path):
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            return jsonify(data)
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+    return jsonify([])
 
 @app.route('/api/top20_micro_nodes')
 def get_top20_micro_nodes():

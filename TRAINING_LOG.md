@@ -882,3 +882,459 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 > T58 = arquitetura de producao definitiva: ST-GAT + LGBM em blend dinamico.
 
 ---
+
+## Tentativa 59 (Autolog - FORTALEZA) — 2026-04-26 12:05
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.01
+- **Dropout**: 0.3
+- **Épocas**: 120
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 60 (Autolog - FORTALEZA) — 2026-04-26 12:07
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.01
+- **Dropout**: 0.3
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 61 (Autolog - FORTALEZA) — 2026-04-26 18:06
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.01
+- **Dropout**: 0.3
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 62 (Autolog - FORTALEZA) — 2026-04-26 19:41
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.01
+- **Dropout**: 0.3
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 63 (Autolog - FORTALEZA) — 2026-04-26 19:42
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.01
+- **Dropout**: 0.3
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 64 (Autolog - FORTALEZA) — 2026-04-26 21:32
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.01
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 65 (Autolog - RMF) — 2026-04-26 21:32
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 90 dias
+- **Learning Rate**: 0.018
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 8
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.5
+- **Focal Gamma**: 2.0
+- **Ranking Weight**: 7.0
+- **Métrica de Avaliação**: P@5
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 66 (Autolog - FORTALEZA) — 2026-04-26 21:33
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.01
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 67 (Autolog - FORTALEZA) — 2026-04-26 21:36
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.005
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 68 (Autolog - FORTALEZA) — 2026-04-26 21:36
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.005
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+---
+
+## Tentativa 69 (Paradigma Sentinela V4 - Clean Palace) — 2026-04-27 14:50
+
+### Motivação
+- Superar o fracasso da arquitetura de 80 neurônios, que apresentou overfitting viciado no canal de memória.
+- Corrigir o **Logical Leakage** identificado no script de treino, onde a validação estava retroalimentando o Vault em tempo real, inflando métricas offline mas falhando na generalização.
+- Reabilitar o **MemPalace** como um mecanismo de atenção residual, não como um atalho.
+
+### Configuração Técnica (Upgrade V4)
+- **Script:** `scripts/training/Active/train_all_specialists.py` (Versão Corrigida)
+- **Arquitetura:** `DeepSTGAT_64` (Retorno à estabilidade comprovada).
+- **Canais:** 38 (37 base + 1 MemPalace Gated).
+- **Inovações de Estabilidade:**
+    1. **Canal Dropout (50%):** O Canal 38 é zerado aleatoriamente em metade dos batches de treino para forçar a rede a aprender com as features temporais reais.
+    2. **Strict Validation:** O registro de surpresas no `TrainingVault` foi movido para fora do loop de validação. O modelo agora é validado no "futuro cego" sem dicas da memória de erro imediata.
+    3. **Vault Cold-Start:** As surpresas são limpas a cada época de treino e consolidadas apenas no fechamento da época para uso na época seguinte.
+
+### Resultados Esperados
+- Estabilização do **P@10 acima de 50%** em Fortaleza.
+- Fim da queda de performance observada entre as épocas (generalização robusta).
+- Integração do Vault no loop de inferência em tempo real para reatividade imediata a falhas de campo.
+
+### Status
+- **Status:** **PLANO APROVADO / CÓDIGO ATUALIZADO**
+- **Próximos Passos:** Iniciar retreino de Fortaleza.
+
+
+## Tentativa 70 (Autolog - FORTALEZA) — 2026-04-27 14:49
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.005
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 71 (Autolog - FORTALEZA) — 2026-04-27 14:52
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.005
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 72 (Autolog - FORTALEZA) — 2026-04-27 14:53
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.005
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 73 (Autolog - FORTALEZA) — 2026-04-27 15:11
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.005
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 74 (Autolog - FORTALEZA) — 2026-04-27 15:12
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.005
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 75 (Autolog - FORTALEZA) — 2026-04-27 15:13
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.005
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 76 (Autolog - FORTALEZA) — 2026-04-27 15:15
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.005
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 77 (Autolog - FORTALEZA) — 2026-04-27 22:00
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.005
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 10.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---

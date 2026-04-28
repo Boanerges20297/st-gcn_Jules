@@ -228,5 +228,24 @@ Com calibração dinâmica de α, β, γ baseada na performance recente de cada 
 
 ---
 
-*Última atualização: 14/04/2026 — Sprint T55→T57b concluída*  
-*Próxima revisão: ao promover modelo ou iniciar Fase 5/6*
+## 🟣 Fase 8 — Sentinela V5: Gated Memory RL (Em Desenvolvimento)
+
+> **Contexto:** Evolução da Fase 7. Substitui a injeção estática/aleatória do MemPalace por um 
+> Agente de Aprendizado por Reforço (RL) que decide a intensidade da injeção de memória por bairro.
+
+### Objetivo
+Aumentar a robustez do Top 10 através de um agente que aprende a **priorizar ou ignorar** memórias de erro baseando-se no contexto de CVP e Intel em tempo real.
+
+### Estratégia (RL Core)
+- **Agente:** Actor-Critic (PPO) ou DQN.
+- **Estado (State):** Embeddings do ST-GAT + Canal 39 (CVP Ratio) + Canal 38 (Memória Bruta).
+- **Ação (Action):** Coeficiente escalar [0, 1] de gating para o canal de memória.
+- **Recompensa (Reward):** Ganho diferencial de P@10 em janelas deslizantes (RL vs Baseline V4).
+
+### Artefatos Iniciais
+- `sentinela_v5_rl_prototype.py`: Esqueleto do ambiente e agente.
+- `TRAINING_LOG.md`: Monitoramento da Baseline V4 (Prerequisito).
+
+---
+
+*Última atualização: 27/04/2026 — Sentinela V4 Ativa | V5 em Prototype*

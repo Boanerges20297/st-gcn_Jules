@@ -69,34 +69,76 @@ from geopy.geocoders import Nominatim
 import time
 
 GEO_CACHE = {}
+# 1. Carregar cache persistente (JSON)
+cache_path = os.path.join(BASE_DIR, 'data', 'geo_streets_cache.json')
+if os.path.exists(cache_path):
+    try:
+        with open(cache_path, 'r', encoding='utf-8') as f:
+            data_c = json.load(f)
+            for item in data_c:
+                k = f"{round(float(item['lat']), 3)}_{round(float(item['lng']), 3)}"
+                GEO_CACHE[k] = item['rua']
+    except: pass
+
+# 2. MINERAR CSV OFICIAL (Enriquecimento Histórico Local)
+# Com 147k registros, temos quase todas as ruas mapeadas
+if os.path.exists(OFFICIAL_CSV):
+    try:
+        print(f"🔍 Minerando ruas de {OFFICIAL_CSV} para cache local...", flush=True)
+        # Lendo apenas colunas necessárias para economizar memória
+        df_hist = pd.read_csv(OFFICIAL_CSV, usecols=['latitude', 'longitude', 'name'], low_memory=False)
+        df_hist = df_hist.dropna(subset=['latitude', 'longitude', 'name'])
+        for _, row in df_hist.iterrows():
+            k = f"{round(float(row['latitude']), 3)}_{round(float(row['longitude']), 3)}"
+            if k not in GEO_CACHE:
+                GEO_CACHE[k] = str(row['name']).upper()
+        print(f"✅ Cache histórico reconstruído: {len(GEO_CACHE)} ruas identificadas localmente.", flush=True)
+        del df_hist # Liberar memória
+    except Exception as e:
+        print(f"⚠️ Aviso: Falha ao minerar CSV histórico: {e}", flush=True)
+
 LAST_GEO_REQUEST = [0]
 
-# Nominatim exige 1 segundo entre requisições (User-Agent obrigatório)
-geolocator = Nominatim(user_agent="report_preview_merge_v2", timeout=10)
+# --- CONFIGURAÇÃO GOOGLE MAPS API ---
+GOOGLE_API_KEY = "AIzaSyDiyGKvZeWK_6PYgbzOullUYAU_kGc8x6c"
 
 def get_street_from_coords(lat, lon):
-    """Busca rua via Nominatim com rate limiting de 1.5seg entre requisições."""
-    key = f"{round(lat, 4)}_{round(lon, 4)}"
-    if key in GEO_CACHE: 
-        return GEO_CACHE[key]
+    """Busca rua via Google Maps API com alta velocidade."""
+    # 1. Tenta cache local primeiro (3 casas decimais)
+    key_cache = f"{round(lat, 3)}_{round(lon, 3)}"
+    if key_cache in GEO_CACHE:
+        return GEO_CACHE[key_cache]
     
-    # Rate limiting obrigatório para Nominatim (1+ segundo entre requisições)
-    elapsed = time.time() - LAST_GEO_REQUEST[0]
-    if elapsed < 1.5:
-        time.sleep(1.5 - elapsed)
-    
+    # 2. Consulta Google Maps (Sem rate limit de 1.5s)
     try:
-        LAST_GEO_REQUEST[0] = time.time()
-        location = geolocator.reverse(f"{lat}, {lon}")
-        if location:
-            address = location.raw.get('address', {})
-            # Tenta encontrar a rua em ordem de preferência
-            street = address.get('road') or address.get('street') or address.get('footway') or address.get('suburb')
-            if street:
-                GEO_CACHE[key] = street
-                return street
+        import requests
+        url = f"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&key={GOOGLE_API_KEY}&language=pt-BR"
+        response = requests.get(url, timeout=10)
+        data = response.json()
+        
+        if data.get("status") == "OK":
+            results = data.get("results", [])
+            if results:
+                # Procurar pelo componente 'route' (rua)
+                for res in results:
+                    for comp in res.get("address_components", []):
+                        if "route" in comp.get("types", []):
+                            street = comp.get("long_name").upper()
+                            GEO_CACHE[key_cache] = street
+                            return street
+                
+                # Fallback: Usar o formatted_address se não achar 'route' específico
+                full_addr = results[0].get("formatted_address", "")
+                street = full_addr.split(',')[0].split('-')[0].strip().upper()
+                if street:
+                    GEO_CACHE[key_cache] = street
+                    return street
+        elif data.get("status") == "REQUEST_DENIED":
+            print(f"  ❌ Erro Google API: {data.get('error_message')}", flush=True)
+            return "ERRO_API_KEY"
     except Exception as e:
-        pass  # Silencioso, continue
+        print(f"  ⚠️ Erro na conexão com Google: {e}", flush=True)
+    
     return None
 
 def find_closest_bairro(lat, lon, nodes_coords, node_names):
@@ -198,80 +240,167 @@ def merge(new_data_path):
     # Termos de natureza para disparar geolocalizacao reversa
     invalid_street_terms = ['HOMICIDIO', 'BALA', 'FOGO', 'LESAO', 'MORTE', 'CADAVER', 'LATROCINIO', 'TIRO']
 
-    print(f"\nEnriquecendo {len(df_new)} registros (Bairro + Rua + Clima)...")
-    for idx, row in df_new.iterrows():
-        lat = pd.to_numeric(row.get('latitude'), errors='coerce')
-        lon = pd.to_numeric(row.get('longitude'), errors='coerce')
-        b_at = row.get('bairro')
-        street_at = str(row.get('name', row.get('LocalOcor', ''))).upper()
-        
-        # 1. Enriquecimento de Bairro e Rua (Geográfico)
-        if not pd.isna(lat) and not pd.isna(lon) and lat != 0 and lon != 0:
-            bairro = find_closest_bairro(lat, lon, node_coords, node_names)
-            if bairro:
-                df_new.at[idx, 'bairro'] = bairro
+    # --- FILTRAGEM PRÉVIA (Evitar reprocessar o que já existe) ---
+    print(f"🔍 Filtrando registros inéditos...")
+    if not df_official.empty and 'id' in df_official.columns:
+        existing_ids = set(df_official['id'].astype(str).unique())
+        df_new['id_str'] = df_new['id'].astype(str)
+        df_new = df_new[~df_new['id_str'].isin(existing_ids)].copy()
+        df_new = df_new.drop(columns=['id_str'])
+        print(f"✨ {len(df_new)} novos registros identificados para enriquecimento.")
+    
+    if df_new.empty:
+        print("✅ Nenhum dado novo para processar. Indo direto para convergência.")
+    else:
+        print(f"\nEnriquecendo {len(df_new)} registros inéditos (Bairro + Rua + Clima)...", flush=True)
+        for i, (idx, row) in enumerate(df_new.iterrows()):
+            if i < 5:
+                print(f"  [DEBUG] Iniciando registro {i+1}...", flush=True)
             
-            needs_reverse = (pd.isna(street_at) or len(street_at) < 4 or any(t in street_at for t in invalid_street_terms))
-            if needs_reverse:
-                street_found = get_street_from_coords(lat, lon)
-                if street_found:
+            lat = pd.to_numeric(row.get('latitude'), errors='coerce')
+            lon = pd.to_numeric(row.get('longitude'), errors='coerce')
+        
+            # 1. Enriquecimento Geográfico (Pular se já tiver bairro e rua válida)
+            b_at = row.get('bairro')
+            street_at = str(row.get('name', row.get('LocalOcor', ''))).upper()
+            
+            has_bairro = not pd.isna(b_at) and len(str(b_at)) > 2
+            has_street = not pd.isna(street_at) and len(street_at) > 5 and not any(t in street_at for t in invalid_street_terms)
+
+            # Lógica de Qualidade Total: Tenta Cache Histórico, senão vai para Google API
+            if not has_street:
+                # 1. Tenta o Mega-Cache Histórico (Instantâneo)
+                key_cache = f"{round(lat, 3)}_{round(lon, 3)}"
+                if key_cache in GEO_CACHE:
+                    street_found = GEO_CACHE[key_cache]
                     df_new.at[idx, 'name'] = street_found
-                    print(f"  ✓ {idx+1}/{len(df_new)}: {street_found}")
+                    if (i+1) % 100 == 0 or i < 10:
+                        print(f"  ⚡ {i+1}/{len(df_new)} [CACHE HISTÓRICO]: {street_found}", flush=True)
+                else:
+                    # 2. Rua Inédita: Chama Google Maps
+                    # Incrementa contador de cota
+                    merge.google_calls = getattr(merge, 'google_calls', 0) + 1
+                    
+                    print(f"  🌐 {i+1}/{len(df_new)} [GOOGLE #{merge.google_calls}] Consultando internet...", flush=True)
+                    street_found = get_street_from_coords(lat, lon)
+                    if street_found and street_found not in ["TIMEOUT_API", "FALHA"]:
+                        df_new.at[idx, 'name'] = street_found
+                        print(f"  ✅ {i+1}/{len(df_new)} [GOOGLE OK]: {street_found}", flush=True)
+                    else:
+                        print(f"  ❌ {i+1}/{len(df_new)} [GOOGLE FALHA]: Rua não encontrada.", flush=True)
+            
+            # Sempre garantimos o Bairro (Local e Instantâneo)
+            if not has_bairro:
+                bairro = find_closest_bairro(lat, lon, node_coords, node_names)
+                if bairro:
+                    df_new.at[idx, 'bairro'] = bairro
+            else:
+                if (i+1) % 100 == 0 or i < 10:
+                    print(f"  ⚪ {i+1}/{len(df_new)} [COORD INVÁLIDA] - Pulando...", flush=True)
 
-        # Normalização de Bairro
-        df_new.at[idx, 'bairro'] = normalize_text(df_new.at[idx, 'bairro'])
+            # Progresso resumido
+            if (i+1) % 500 == 0:
+                print(f"  ⏳ Progresso Geral: {i+1}/{len(df_new)} ({(i+1)/len(df_new)*100:.1f}%)")
 
-        # 2. Enriquecimento Temporal e Climático (V33)
-        dt_str = row.get('data')
-        if dt_str and not pd.isna(dt_str):
-            try:
-                dt = pd.to_datetime(dt_str)
-                df_new.at[idx, 'dia_semana'] = get_day_of_week_pt(dt)
-                df_new.at[idx, 'eh_feriado'] = is_brazil_holiday(dt)
-                df_new.at[idx, 'dia_quente_cvp'] = is_cvp_hot_day(dt)
+            # Normalização de Bairro
+            df_new.at[idx, 'bairro'] = normalize_text(df_new.at[idx, 'bairro'])
+
+            # 2. Enriquecimento Temporal e Climático (V33 - Pular se já tiver clima)
+            dt_str = row.get('data')
+            has_clima = not pd.isna(row.get('clima'))
+            
+            if dt_str and not pd.isna(dt_str):
+                try:
+                    dt = pd.to_datetime(dt_str)
+                    df_new.at[idx, 'dia_semana'] = get_day_of_week_pt(dt)
+                    df_new.at[idx, 'eh_feriado'] = is_brazil_holiday(dt)
+                    df_new.at[idx, 'dia_quente_cvp'] = is_cvp_hot_day(dt)
+                    
+                    if not has_clima:
+                        c_lat = lat if not pd.isna(lat) and lat != 0 else -3.717
+                        c_lon = lon if not pd.isna(lon) and lon != 0 else -38.543
+                        precip = get_real_weather(dt, lat=c_lat, lon=c_lon)
+                        df_new.at[idx, 'precipitacao_mm'] = float(precip) if precip is not None else 0.0
+                        df_new.at[idx, 'clima'] = get_weather_label(precip)
+                except Exception:
+                    pass 
+
+            # 3. Mapeamento de Novas Variáveis (Demográficas e Identificadores)
+            if 'tipo_evento' in row:
+                natureza_str = str(row['tipo_evento']).upper()
+                df_new.at[idx, 'nature'] = natureza_str
+                df_new.at[idx, 'tipo_evento'] = natureza_str
+                # CRÍTICO: Mapeamento para o Canal 0 do modelo (CVLI)
+                if 'CVLI' in natureza_str or 'HOMICIDIO' in natureza_str:
+                    df_new.at[idx, 'tipo'] = 'cvli'
+            
+            if 'nome_vitima' in row:
+                df_new.at[idx, 'vitima'] = normalize_text(row['nome_vitima'])
+                df_new.at[idx, 'nome_vitima'] = normalize_text(row['nome_vitima'])
                 
-                # Coordenadas para clima (fallback para Fortaleza se ausente)
-                c_lat = lat if not pd.isna(lat) and lat != 0 else -3.717
-                c_lon = lon if not pd.isna(lon) and lon != 0 else -38.543
+            if 'sexo' in row:
+                df_new.at[idx, 'sexo'] = str(row['sexo']).upper()
                 
-                precip = get_real_weather(dt, lat=c_lat, lon=c_lon)
-                df_new.at[idx, 'precipitacao_mm'] = float(precip) if precip is not None else 0.0
-                df_new.at[idx, 'clima'] = get_weather_label(precip)
-            except Exception:
-                pass 
-
-        # 3. Mapeamento de Novas Variáveis (Demográficas e Identificadores)
-        if 'tipo_evento' in row:
-            natureza_str = str(row['tipo_evento']).upper()
-            df_new.at[idx, 'nature'] = natureza_str
-            df_new.at[idx, 'tipo_evento'] = natureza_str
-            # CRÍTICO: Mapeamento para o Canal 0 do modelo (CVLI)
-            if 'CVLI' in natureza_str or 'HOMICIDIO' in natureza_str:
-                df_new.at[idx, 'tipo'] = 'cvli'
+            if 'idade' in row:
+                df_new.at[idx, 'idade'] = row['idade']
+                
+            if 'id_evento' in row:
+                df_new.at[idx, 'id_evento'] = row['id_evento']
         
-        if 'nome_vitima' in row:
-            df_new.at[idx, 'vitima'] = normalize_text(row['nome_vitima'])
-            df_new.at[idx, 'nome_vitima'] = normalize_text(row['nome_vitima'])
-            
-        if 'sexo' in row:
-            df_new.at[idx, 'sexo'] = str(row['sexo']).upper()
-            
-        if 'idade' in row:
-            df_new.at[idx, 'idade'] = row['idade']
-            
-        if 'id_evento' in row:
-            df_new.at[idx, 'id_evento'] = row['id_evento']
+        # Preservar o ID original conforme solicitado
+        if 'id' in row:
+            df_new.at[idx, 'id'] = row['id']
 
-    # Mesclagem e remoção de duplicatas
+    # Mesclagem e remoção de duplicatas (Preservando ID único)
     print("\nMesclando com base oficial...")
     df_combined = pd.concat([df_official, df_new], ignore_index=True)
+    
+    # temp_key para evitar duplicatas reais (mesmo ID, data e hora)
+    # Mas garantindo que se o ID for diferente, a linha seja mantida (múltiplas vítimas)
     df_combined['temp_key'] = df_combined['id'].astype(str) + "_" + df_combined['data'].astype(str) + "_" + df_combined['hora'].astype(str)
     df_combined = df_combined.drop_duplicates(subset=['temp_key'], keep='first').drop(columns=['temp_key'])
+
+    # --- CONVERGÊNCIA DE MÚLTIPLAS MORTES (ANOMALIAS) ---
+    print("Analisando e convergindo anomalias (múltiplas mortes por ocorrência)...")
+    # Chave de evento robusta
+    df_combined['event_key'] = (
+        df_combined['data'].astype(str) + "_" + 
+        df_combined['hora'].astype(str) + "_" + 
+        df_combined['bairro'].fillna('').astype(str).str.upper() + "_" +
+        pd.to_numeric(df_combined['latitude'], errors='coerce').fillna(0).round(3).astype(str) + "_" +
+        pd.to_numeric(df_combined['longitude'], errors='coerce').fillna(0).round(3).astype(str)
+    )
+    
+    cvli_mask = df_combined['tipo'].str.lower() == 'cvli'
+    if cvli_mask.any():
+        df_cvli = df_combined[cvli_mask].copy()
+        df_others = df_combined[~cvli_mask].copy()
+        
+        # Agregar CVLIs (Convergência)
+        agg_dict = {col: 'first' for col in df_cvli.columns if col not in ['event_key', 'qtd_mortes']}
+        if 'id' in df_cvli.columns:
+            agg_dict['id'] = lambda x: ' | '.join([str(v) for v in x if pd.notna(v)])
+            
+        # Privacidade (Remover nomes)
+        for col_priv in ['nome_vitima', 'vitima']:
+            if col_priv in agg_dict: del agg_dict[col_priv]
+            if col_priv in df_others.columns: df_others = df_others.drop(columns=[col_priv])
+            if col_priv in df_cvli.columns: df_cvli = df_cvli.drop(columns=[col_priv])
+
+        df_cvli_collapsed = df_cvli.groupby('event_key').agg(agg_dict).reset_index()
+        df_cvli_collapsed['qtd_mortes'] = df_cvli.groupby('event_key').size().values
+        
+        df_combined = pd.concat([df_others, df_cvli_collapsed], ignore_index=True)
+        print(f"  ✓ {len(df_cvli) - len(df_cvli_collapsed)} registros de vítimas extras convergidos em seus eventos de origem.")
+    else:
+        df_combined['qtd_mortes'] = 1
+
+    df_combined = df_combined.drop(columns=['event_key'])
     
     # --- AJUSTE DE ORDEM DE COLUNAS (Solicitação do Usuário) ---
     # Ordem: ... version, dia_semana, eh_feriado, dia_quente_cvp, clima, precipitacao_mm, ... restante
     cols = list(df_combined.columns)
-    new_v33_cols = ['dia_semana', 'eh_feriado', 'dia_quente_cvp', 'clima', 'precipitacao_mm']
+    new_v33_cols = ['dia_semana', 'eh_feriado', 'dia_quente_cvp', 'clima', 'precipitacao_mm', 'qtd_mortes']
     
     # Remove as novas colunas da lista atual para reinceri-las na posição certa
     for c in new_v33_cols:
@@ -280,6 +409,11 @@ def merge(new_data_path):
     if 'version' in cols:
         v_idx = cols.index('version') + 1
         # Reconstrói a lista de colunas na ordem exata
+        final_cols = cols[:v_idx] + new_v33_cols + cols[v_idx:]
+        df_combined = df_combined[final_cols]
+    elif 'id' in cols:
+        # Fallback se version não existir
+        v_idx = cols.index('id') + 1
         final_cols = cols[:v_idx] + new_v33_cols + cols[v_idx:]
         df_combined = df_combined[final_cols]
     

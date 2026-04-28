@@ -536,6 +536,12 @@
                                 </label>
                             </div>
                         </div>
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" id="toggle-all-streets">
+                            <label class="form-check-label small fw-bold text-success" for="toggle-all-streets">
+                                <i class="fas fa-road"></i> Malha de Ruas (Todo Estado)
+                            </label>
+                        </div>
                         <h6 class="mb-2 fw-bold text-dark" id="top-list-title" style="font-size: 0.9rem;">🌡️ Top 10 Territórios em Tensão</h6>
                         <div id="top-areas" class="list-group list-group-flush small" style="max-height: 200px; overflow-y: auto;"></div>
                     </div>
@@ -595,6 +601,55 @@
 
     map.createPane('micronodesPane');
     map.getPane('micronodesPane').style.zIndex = 650;
+
+    // --- CAMADA DE RUAS TOTAIS (CACHE GEO) ---
+    var allStreetsLayer = L.layerGroup();
+    var allStreetsData = null; // Cache local para busca
+    var streetsLoaded = false;
+
+    $('#toggle-all-streets').on('change', function() {
+        if ($(this).is(':checked')) {
+            if (!streetsLoaded) {
+                loadAllStreets();
+            } else {
+                map.addLayer(allStreetsLayer);
+            }
+        } else {
+            map.removeLayer(allStreetsLayer);
+        }
+    });
+
+    function loadAllStreets() {
+        showLoadingOverlay();
+        document.getElementById('loading-message').textContent = "Mapeando 28.000+ logradouros...";
+        
+        fetch('/api/all_streets').then(r => r.json()).then(data => {
+            allStreetsData = data;
+            var renderer = L.canvas({ padding: 0.5 });
+            
+            data.forEach(s => {
+                if (s.lat && s.lng) {
+                    var marker = L.circleMarker([s.lat, s.lng], {
+                        radius: 2,
+                        fillColor: '#28a745',
+                        color: '#155724',
+                        weight: 0.5,
+                        opacity: 0.6,
+                        fillOpacity: 0.4,
+                        renderer: renderer,
+                        interactive: true
+                    }).bindPopup(`<strong>${s.rua}</strong><br>${s.bairro} - ${s.cidade}<br>Histórico: ${s.ocorrencias} ocorrências`);
+                    allStreetsLayer.addLayer(marker);
+                }
+            });
+            streetsLoaded = true;
+            map.addLayer(allStreetsLayer);
+            hideLoadingOverlay();
+        }).catch(err => {
+            hideLoadingOverlay();
+            console.error("Erro ao carregar ruas:", err);
+        });
+    }
 
     // Global Map Click for Simulation (handling gaps between polygons)
     map.on('click', function(e) {
@@ -3022,6 +3077,23 @@
                 var bExact = _norm(b.label) === ql ? 0 : 1;
                 if (aExact !== bExact) return aExact - bExact;
                 return b.score - a.score;
+            });
+        }
+
+        // ── 1.2 Busca no Cache de Ruas ────────────────────────────────────────
+        if (typeof allStreetsData !== 'undefined' && allStreetsData) {
+            allStreetsData.forEach(s => {
+                var rName = _norm(s.rua);
+                if (rName.indexOf(ql) !== -1) {
+                    localResults.push({
+                        type: 'geo', 
+                        label: s.rua,
+                        sublabel: `${s.bairro} - ${s.cidade}`,
+                        lat: s.lat,
+                        lon: s.lng,
+                        geoType: 'rua'
+                    });
+                }
             });
         }
 

@@ -149,6 +149,33 @@ def process_ism_data():
             }
         logging.info(f"Inteligência carregada: {len(faccoes_dict)} territórios.")
     
+    # 1.1 Carregar Dados da Tropa (Intencionalidade e Amenização)
+    TROPA_FILE = 'data/raw/ocorrencias_tropa_limpo_fortaleza.csv'
+    df_t = pd.DataFrame()
+    if os.path.exists(TROPA_FILE):
+        try:
+            df_t = pd.read_csv(TROPA_FILE, low_memory=False, encoding="utf-8-sig")
+            # Formula de Intencionalidade conforme ChampionChallenger/Sentinela V3
+            PESO_NATUREZA = {
+                'APREENSAO DE ARMA DE FOGO': 15.0, 'PORTE ILEGAL ART 14': 12.0,
+                'TRAFICO DE DROGAS': 8.0, 'APREENSAO DE DROGAS': 6.0,
+                'APREENSAO DE ENTORPECENTES': 6.0, 'MANDADO DE PRISAO': 4.0,
+                'MANDADO EM ABERTO': 3.5, 'MANDADO DE PRISAO EM ABERTO': 3.5,
+                'VEICULO ROUBADO RECUPERADO': 2.5, 'VEICULO ROUBADO LOCALIZADO': 2.0,
+                'ABANDONO DE MATERIAL': 1.5, 'NAO INFORMADA': 0.5,
+            }
+            df_t["peso_nat"] = df_t["natureza"].map(PESO_NATUREZA).fillna(0.5)
+            df_t["score_intel"] = (
+                df_t["qtd_armas"]*15 + np.log1p(df_t["qtd_drogas"].fillna(0))*4
+                + df_t["qtd_drogas_itens"]*2 + df_t["qtd_veiculos_apreendidos"]*3
+                + df_t["peso_nat"]
+            ).astype("float32")
+            df_t["data"] = pd.to_datetime(df_t["data"], errors="coerce")
+            df_t["loc_clean"] = df_t["bairro"].apply(clean_name)
+            logging.info(f"✅ Inteligência de Tropa carregada: {len(df_t)} registros.")
+        except Exception as e:
+            logging.error(f"❌ Erro ao carregar dados da tropa: {e}")
+
     # 1. Carregar Ocorrências
     clean_records = []
     if OCORRENCIAS_FILE.endswith('.csv'):
@@ -161,7 +188,8 @@ def process_ism_data():
                 'tipo_evento': str(row.get('tipo_evento', '')).upper(),
                 'arma': str(row.get('arma', '')).upper(),
                 'latitude': row.get('latitude'),
-                'longitude': row.get('longitude')
+                'longitude': row.get('longitude'),
+                'qtd_mortes': float(row.get('qtd_mortes', 1)) # Nova coluna de anomalias
             })
     else:
         with open(OCORRENCIAS_FILE, 'r', encoding='utf-8') as f:
@@ -187,7 +215,8 @@ def process_ism_data():
                     'tipo_evento': str(extract_scalar('tipo_evento') or '').upper(),
                     'arma': str(extract_scalar('arma') or '').upper(),
                     'latitude': extract_scalar('latitude'),
-                    'longitude': extract_scalar('longitude')
+                    'longitude': extract_scalar('longitude'),
+                    'qtd_mortes': float(extract_scalar('qtd_mortes') or 1)
                 })
             except: continue
     
@@ -195,6 +224,43 @@ def process_ism_data():
     
     # --- NOVO: Atualizar Cache de Ruas Geolocalizadas ---
     update_geo_streets_cache(occ_df)
+
+    # --- FILTRAGEM DE MORTES AO ACASO (ANOMALIAS NÃO-TÁTICAS) ---
+    def is_random_death(row, fac_dict):
+        if row['tipo'] != 'cvli': return False
+        
+        # Indicadores de Ação Violenta (Tática)
+        is_firearm = 'FOGO' in str(row.get('arma', '')).upper()
+        is_multi = float(row.get('qtd_mortes', 1)) > 1
+        
+        # Indicadores de Acaso (Outliers)
+        event = str(row.get('tipo_evento', '')).upper()
+        is_domestic = any(t in event for t in ['FEMINICIDIO', 'PARENTE', 'BRIGA', 'VIZINHO', 'PASSIONAL', 'CULPOSO'])
+        is_cold_weapon = any(t in str(row.get('arma', '')).upper() for t in ['BRANCA', 'FACA', 'PAULADA', 'ESPANCAMENTO', 'PEDRADA'])
+        
+        # Inteligência de Área
+        loc = row['loc_clean']
+        faction = fac_dict.get(loc, {}).get('faction', 'NEUTRO').upper()
+        is_neutral_area = faction == 'NEUTRO'
+        
+        # Regra de Exclusão (Refinada): 
+        # O "Tribunal do Crime" usa meios brutais (pedradas/pauladas) em áreas dominadas.
+        # Só excluímos se for área NEUTRA E (Arma Branca/Doméstico/Briga) E (Apenas 1 vítima)
+        if is_neutral_area and not is_firearm and not is_multi:
+            if is_domestic or is_cold_weapon:
+                return True
+        
+        return False
+
+    initial_cvli = len(occ_df[occ_df['tipo'] == 'cvli'])
+    occ_df['acaso'] = occ_df.apply(lambda r: is_random_death(r, faccoes_dict), axis=1)
+    
+    # Excluir mortes ao acaso para limpar o sinal preditivo
+    acaso_count = len(occ_df[occ_df['acaso'] == True])
+    occ_df = occ_df[occ_df['acaso'] == False].copy()
+    
+    if acaso_count > 0:
+        logging.info(f"🛡️ Filtro de Anomalias: {acaso_count} mortes ao acaso excluídas (Sinal tático preservado).")
     
     # 2. Calcular Estatísticas de CVLI para Seleção de Nós (BLINDAGEM TEMPORAL)
     # Para evitar "Selection Leakage", o ranking de importância dos bairros
@@ -250,9 +316,9 @@ def process_ism_data():
     # Seleção Top-K por Região baseada no ranking de 2 ANOS
     final_records = []
     
-    # 1. Fortaleza: Top 40 (Dinâmico 2 anos)
-    f40 = df_pool[df_pool['regiao'] == 'fortaleza'].sort_values('recent_cvli', ascending=False).head(40)
-    final_records.extend(f40.to_dict('records'))
+    # 1. Fortaleza: Todos os bairros com CVLI >= 1 (Solicitação do Usuário)
+    f_all = df_pool[(df_pool['regiao'] == 'fortaleza') & (df_pool['recent_cvli'] >= 1)]
+    final_records.extend(f_all.to_dict('records'))
     
     # 2. RMF: Todos os 18 Oficiais (Ordenados por criticidade recente)
     rmf = df_pool[df_pool['regiao'] == 'rmf'].sort_values('recent_cvli', ascending=False)
@@ -265,11 +331,13 @@ def process_ism_data():
     nodes_df = pd.DataFrame(final_records).reset_index(drop=True)
     nodes_gdf = gpd.GeoDataFrame(nodes_df, geometry=gpd.points_from_xy(nodes_df.long, nodes_df.lat), crs="EPSG:4326")
     
-    logging.info(f"📊 Malha Final: Fortaleza({len(f40)}), RMF({len(rmf)}), Interior({len(i50)})")
+    logging.info(f"📊 Malha Final: Fortaleza({len(f_all)}), RMF({len(rmf)}), Interior({len(i50)})")
     nodes_gdf = gpd.GeoDataFrame(nodes_df, geometry=gpd.points_from_xy(nodes_df.long, nodes_df.lat), crs="EPSG:4326")
 
     # 4. Construir Tensores (Otimizado)
-    start_d, end_d = occ_df['data'].min(), occ_df['data'].max()
+    # Filtrar intervalo solicitado: JAn/2022 até 25/Abr/2026
+    start_d = pd.Timestamp('2022-02-01')
+    end_d = pd.Timestamp('2026-04-25')
     date_range = pd.date_range(start_d, end_d)
     date_map = {d: i for i, d in enumerate(date_range)}
     
@@ -296,10 +364,36 @@ def process_ism_data():
         if not reg_occ.empty:
             reg_occ['n_idx'] = reg_occ['loc_clean'].map(node_map)
         
+        # 3.1 Mapeamento de Tropa para Tensores (Canais 23 e 25)
+        if not df_t.empty:
+            df_t_reg = df_t[df_t['loc_clean'].isin(reg_nodes['name'])].copy()
+            if not df_t_reg.empty:
+                df_t_reg['n_idx'] = df_t_reg['loc_clean'].map({name: i for i, name in enumerate(reg_nodes['name'])})
+                df_t_reg['t_idx'] = df_t_reg['data'].map({d: i for i, d in enumerate(date_range)})
+                df_t_reg = df_t_reg.dropna(subset=['n_idx', 't_idx'])
+                
+                # Preenchimento Canal 25 (Intencionalidade)
+                tropa_group = df_t_reg.groupby(['n_idx', 't_idx'])['score_intel'].sum()
+                for (n, t), val in tropa_group.items():
+                    features[int(n), int(t), 25] = val
+                    # Canal 23 (Amenização fixa em 0.20 quando há ação)
+                    features[int(n), int(t), 23] = 0.20
+
         # Preenchimento de ocorrências
         if not reg_occ.empty:
-            cvli_group = reg_occ[reg_occ['tipo'] == 'cvli'].groupby(['n_idx', 't_idx']).size()
-            for (n, t), val in cvli_group.items(): features[n, t, 0] = val
+            # Canal 0: CVLI (Total de mortes, não apenas registros)
+            cvli_rows = reg_occ[reg_occ['tipo'] == 'cvli']
+            if not cvli_rows.empty:
+                cvli_group = cvli_rows.groupby(['n_idx', 't_idx'])['qtd_mortes'].sum()
+                for (n, t), val in cvli_group.items(): 
+                    features[n, t, 0] = val
+                    
+                    # --- CHOQUE REAL POR ANOMALIA (Canal 25) ---
+                    # Se houve mais de uma morte no mesmo dia/bairro, gera pulso de conflito
+                    if val > 1:
+                        # Adiciona sinal de ruptura proporcional (base 1.0 + 0.5 por vítima extra)
+                        shock_val = 1.0 + (val - 1) * 0.5
+                        features[n, t, 25] = max(features[n, t, 25], shock_val)
             
             veic_group = reg_occ[reg_occ['is_veiculo']].groupby(['n_idx', 't_idx']).size()
             for (n, t), val in veic_group.items(): features[n, t, 1] = val * 2.5

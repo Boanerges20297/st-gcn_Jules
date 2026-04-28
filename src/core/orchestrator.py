@@ -240,10 +240,8 @@ class StateOrchestrator:
                         for i, row in data['nodes_gdf'].iterrows():
                             if normalize_name(row['name']) == norm_target:
                                 if intensity > 0:
-                                    x_raw_extended[i, :, 24] = min(intensity, 3.0)
                                     sim_impact[i] = impact_value
                                 if suppression > 0:
-                                    x_raw_extended[i, :, 23] = min(suppression, 3.0)
                                     sim_relief[i] = relief_value
 
             momentum_feat = np.zeros((num_nodes, total_window, 4))

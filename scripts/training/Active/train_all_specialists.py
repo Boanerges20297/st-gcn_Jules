@@ -25,6 +25,7 @@ Estratégia ativa de retreino (2026-03-16):
 """
 import pickle
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -41,9 +42,11 @@ sys.path.append(ROOT_DIR)
 sys.path.append(os.path.join(ROOT_DIR, 'src', 'core'))
 
 try:
-    from architectures import DeepSTGAT_64
+    from architectures import DeepSTGAT_64, DeepSTGAT_80
+    from training_vault import TrainingVault
 except ImportError:
-    from src.core.architectures import DeepSTGAT_64
+    from src.core.architectures import DeepSTGAT_64, DeepSTGAT_80
+    from src.core.training_vault import TrainingVault
 
 import re
 from datetime import datetime
@@ -74,21 +77,21 @@ PREDICT_HORIZON = 14
 #         output_name  (nome do .pth salvo em models/active/)
 REGION_CONFIGS = {
     'fortaleza': dict(
-        window=120, lr=0.01,  epochs=120, dropout=0.3, margin=1.0,
+        window=120, lr=0.005,  epochs=120, patience=20, dropout=0.5, margin=1.0,
         k_eval=10, use_momentum=True,  grad_accum=32,
         raw_cvli_context=True,
         output_name='fortaleza_model_active.pth',
         focal_alpha=0.75, focal_gamma=1.5, ranking_weight=10.0
     ),
     'rmf': dict(
-        window=90,  lr=0.018, epochs=120, dropout=0.5, margin=1.5,
+        window=90,  lr=0.018, epochs=120, patience=20, dropout=0.5, margin=1.5,
         k_eval=5,  use_momentum=True, grad_accum=8,
         raw_cvli_context=True,
         output_name='rmf_model.pth',
         focal_alpha=0.50, focal_gamma=2.0, ranking_weight=7.0
     ),
     'interior': dict(
-        window=120, lr=0.005, epochs=120, dropout=0.3, margin=1.0,
+        window=120, lr=0.005, epochs=120, patience=20, dropout=0.3, margin=1.0,
         k_eval=10, use_momentum=True,  grad_accum=32,
         raw_cvli_context=True,
         output_name='interior_model.pth',
@@ -123,6 +126,7 @@ def autosave_training_log(region_key, config):
         new_entry += f"- **Learning Rate**: {config.get('lr', 'N/A')}\n"
         new_entry += f"- **Dropout**: {config.get('dropout', 'N/A')}\n"
         new_entry += f"- **Épocas**: {config.get('epochs', 'N/A')}\n"
+        new_entry += f"- **Patience**: {config.get('patience', 'N/A')}\n"
         new_entry += f"- **Grad Accumulation**: {config.get('grad_accum', 'N/A')}\n\n"
         new_entry += f"### 2. Loss & Ranking\n"
         new_entry += f"- **Focal Alpha**: {config.get('focal_alpha', 'N/A')}\n"
@@ -302,6 +306,7 @@ class SpecialistTrainer:
         self.window       = cfg['window']
         self.lr           = cfg['lr']
         self.epochs       = cfg['epochs']
+        self.patience     = cfg.get('patience', 20)
         self.dropout      = cfg['dropout']
         self.k_eval       = cfg['k_eval']
         self.use_momentum = cfg['use_momentum']
@@ -310,6 +315,8 @@ class SpecialistTrainer:
         self.output_name  = cfg['output_name']
         self.margin       = cfg['margin']
         self.best_pk      = 0.0
+        self.vault        = None
+        self.cvp_ratio_data = None  # ⭐ V4: Novo canal de pressão tática
 
     def train(self):
         cfg = REGION_CONFIGS[self.region_key]
@@ -318,12 +325,12 @@ class SpecialistTrainer:
         ranking_w   = cfg.get('ranking_weight', 1.0)
 
         logging.info("\n" + "═"*80)
-        logging.info(f"🚀 ESPECIALISTA: {self.region_key.upper()} (TENTATIVA 49 - REGIONALIZED AGGRESSION)")
+        logging.info(f"🚀 ESPECIALISTA: {self.region_key.upper()} (TENTATIVA 69 - SENTINELA V4 CLEAN PALACE)")
         logging.info(f"📊 METODOLOGIA: Split Temporal (85/15) | Blindagem de Seleção (Cutoff 2025)")
         logging.info(f"📉 LOSS: Regional Focal Ranking (alpha={focal_alpha}, gamma={focal_gamma}, rank_w={ranking_w})")
         logging.info(
             f"⚙️ ARQ: DeepSTGAT_64 | window={self.window} | lr={self.lr} | dropout={self.dropout} | "
-            f"K={self.k_eval} | 37ch (V37 Elite) | "
+            f"K={self.k_eval} | {self.vault.get_memory_vector().shape[0] if self.vault else 37}ch ({'MemPalace Gated' if self.vault else 'Elite Base'}) | "
             f"target_horizon={PREDICT_HORIZON}d | grad_accum={self.grad_accum} | device={DEVICE}"
         )
         logging.info("═"*80)
@@ -361,7 +368,62 @@ class SpecialistTrainer:
             features = nf.copy()
 
         C_ext = features.shape[2]
-        logging.info(f"📦 Shape final: ({N}, {T}, {C_ext})")
+        # Inicia o Vault de Memória para Fortaleza
+        if self.region_key == 'fortaleza':
+            self.vault = TrainingVault(N, ROOT_DIR)
+            C_ext += 2 # Adiciona slots para o Canal 38 (MemPalace) e Canal 39 (CVLI Ratio)
+            logging.info(f"🧠 MemPalace Treino Ativado: Canal 38 preparado para {N} nós.")
+            
+            # Carregar CVP para o Canal 39
+            csv_path = os.path.join(ROOT_DIR, "data", "raw", "dados_status_ocorrencias_gerais_ENRIQUECIDO.csv")
+            if os.path.exists(csv_path):
+                logging.info("📈 Calculando Canal 39 (CVP/CVLI Ratio) para Fortaleza...")
+                df_c = pd.read_csv(csv_path, low_memory=False)
+                df_c = df_c[df_c["cidade"].str.upper() == "FORTALEZA"].copy()
+                df_c["data"] = pd.to_datetime(df_c["data"], errors="coerce")
+                df_c = df_c.dropna(subset=["data", "bairro"])
+                df_c["bairro"] = df_c["bairro"].str.upper().str.strip()
+                
+                # Mapa de datas e bairros do dataset original
+                dates_dt = [pd.Timestamp("2024-02-01") + pd.Timedelta(days=i) for i in range(T)]
+                dm = {d: i for i, d in enumerate(dates_dt)}
+                # Note: node_features assume uma ordem de nós. Precisamos do mapeamento de bairros.
+                # Como não temos o mapa direto aqui, vamos inferir que nf[:, :, 0] é o CVLI base.
+                
+                # Construção do ratio dinâmico
+                cvp_df = df_c[df_c["tipo"].str.lower() == "cvp"].groupby(["data", "bairro"]).size().reset_index(name="v")
+                self.cvp_ratio_data = np.zeros((N, T), dtype=np.float32)
+                
+                # Mapeamento de Bairros (Ordem do Tensor)
+                if 'nodes_gdf' in data and 'name' in data['nodes_gdf'].columns:
+                    node_names = data['nodes_gdf']['name'].tolist()
+                elif 'nodes' in data:
+                    node_names = data['nodes']
+                else:
+                    node_names = []
+                
+                if node_names:
+                    nm = {str(b).upper().strip(): i for i, b in enumerate(node_names)}
+                    for _, r in cvp_df.iterrows():
+                        ni, ti = nm.get(str(r["bairro"]).upper().strip()), dm.get(r["data"])
+                        if ni is not None and ti is not None:
+                            # Razão CVP / (CVLI + 1)
+                            cvli_val = nf[ni, ti, 0]
+                            self.cvp_ratio_data[ni, ti] = r["v"] / (cvli_val + 1.0)
+                    
+                    logging.info(f"✅ Canal 39 preenchido para {len(node_names)} nós via nodes_gdf['name'].")
+                else:
+                    logging.warning("⚠️ 'nodes_gdf' ou 'name' não encontrado no .pkl. Usando média global.")
+                    self.cvp_ratio_data = np.full((N, T), 0.5, dtype=np.float32)
+
+            # --- VALIDAÇÃO DE SANIDADE V4 ---
+            logging.info("🔍 SANITY CHECK (Canais Elite):")
+            if self.vault:
+                v_mem = self.vault.get_memory_vector()
+                logging.info(f"   [Ch38 - MemPalace] Max: {v_mem.max():.4f} | Ativos: {(v_mem>0).sum()}/{N}")
+            if self.cvp_ratio_data is not None:
+                logging.info(f"   [Ch39 - CVLI Ratio] Max: {self.cvp_ratio_data.max():.4f} | Média: {self.cvp_ratio_data.mean():.4f}")
+            logging.info("────────────────────────────────────────────────────────────────")
 
         # Diagnóstico CVLI
         cvli_flat = features[:, :, 0].flatten()
@@ -387,6 +449,12 @@ class SpecialistTrainer:
             y = torch.tensor(
                 nf[:, t:t+PREDICT_HORIZON, 0].sum(axis=1), dtype=torch.float32
             )
+            
+            # Slot vazio para o Canal 38 (MemPalace) e 39 (CVLI Ratio)
+            if self.region_key == 'fortaleza':
+                # Adiciona dois canais extras de zeros (N, 2, window)
+                x = torch.cat([x, torch.zeros((1, 2, N, self.window))], dim=1)
+                
             X_list.append(x)
             Y_list.append(y)
 
@@ -402,7 +470,9 @@ class SpecialistTrainer:
         logging.info(f"⏳ Split Temporal: {len(train_X)} treino (Passado) | {len(val_X)} validação (Futuro)")
 
         # Modelo e otimizador
-        model     = DeepSTGAT_64(num_nodes=N, in_channels=C_ext, time_steps=self.window, dropout=self.dropout).to(DEVICE)
+        # ⭐ ATUALIZAÇÃO V4: Estabilizando em DeepSTGAT_64 (80 neurônios causaram overfitting viciado)
+        model = DeepSTGAT_64(num_nodes=N, in_channels=C_ext, time_steps=self.window, dropout=self.dropout).to(DEVICE)
+            
         optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=2e-1)
         criterion = BinaryFocalRankingLoss(alpha=focal_alpha, gamma=focal_gamma, ranking_weight=ranking_w)
 
@@ -412,13 +482,14 @@ class SpecialistTrainer:
             steps_per_epoch=steps_per_epoch,
             epochs=self.epochs, pct_start=0.2
         )
-
-
         output_path = os.path.join(ROOT_DIR, 'models', 'active', self.output_name)
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
+        no_improve_epochs = 0
         for epoch in range(self.epochs):
             model.train()
+            if self.vault:
+                self.vault.clear_epoch()
             epoch_loss = 0.0
             epoch_grads = []
             sample_idx = list(range(len(train_X)))
@@ -426,7 +497,26 @@ class SpecialistTrainer:
             optimizer.zero_grad()
 
             for step, idx in enumerate(sample_idx):
-                pred = model(train_X[idx].to(DEVICE), [adj_geo, adj_conf]).squeeze()
+                x_input = train_X[idx].to(DEVICE)
+                
+                # Injeta a memória atual do Vault no Canal 37 e Ratio no Canal 38
+                if self.vault:
+                    # ⭐ ATUALIZAÇÃO V4: Canal Dropout de 50% para evitar dependência viciada na memória
+                    if random.random() > 0.5:
+                        mem_vec = torch.tensor(self.vault.get_memory_vector(), dtype=torch.float32).to(DEVICE)
+                        # Expande mem_vec para (1, 1, N, window)
+                        x_input[:, 37, :, :] = mem_vec.view(1, N, 1).expand(-1, -1, self.window)
+                    else:
+                        # Drop: Zera o canal de memória para forçar o modelo a aprender com os outros canais
+                        x_input[:, 37, :, :] = 0.0
+                    
+                    # Injeta o Canal 39 (CVLI Ratio) dinâmico
+                    if self.cvp_ratio_data is not None:
+                        # Pega o ratio da janela correspondente
+                        ratio_win = self.cvp_ratio_data[:, idx:idx+self.window]
+                        x_input[:, 38, :, :] = torch.tensor(ratio_win, dtype=torch.float32).to(DEVICE)
+
+                pred = model(x_input, [adj_geo, adj_conf]).squeeze()
                 loss = criterion(pred, train_Y[idx].to(DEVICE)) / self.grad_accum
                 loss.backward()
 
@@ -461,32 +551,75 @@ class SpecialistTrainer:
 
             # ── Validação ──────────────────────────────────────
             model.eval()
-            pk_list = []
+            pk10_list = []
+            pk20_list = []
             with torch.no_grad():
                 for vx, vy in zip(val_X, val_Y):
-                    k_eff = min(self.k_eval, (vy > 0).sum().item())
-                    if k_eff > 0:
-                        vpred = model(vx.to(DEVICE), [adj_geo, adj_conf]).squeeze()
-                        _, t_idx = torch.topk(vy, k_eff)
-                        _, p_idx = torch.topk(vpred, self.k_eval)
-                        score = len(set(t_idx.cpu().numpy()) & set(p_idx.cpu().numpy())) / k_eff
-                        pk_list.append(score)
+                    n_real = (vy > 0).sum().item()
+                    if n_real > 0:
+                        # Injeta memória na validação também
+                        if self.vault:
+                            mem_vec = torch.tensor(self.vault.get_memory_vector(), dtype=torch.float32).to(DEVICE)
+                            vx[:, 37, :, :] = mem_vec.view(1, N, 1).expand(-1, -1, self.window)
 
-            avg_pk   = np.mean(pk_list) if pk_list else 0.0
+                        vpred = model(vx.to(DEVICE), [adj_geo, adj_conf]).squeeze()
+                        
+                        # P@10
+                        k10 = min(10, n_real)
+                        _, t_idx10 = torch.topk(vy, k10)
+                        _, p_idx10 = torch.topk(vpred, 10)
+                        pk10_list.append(len(set(t_idx10.cpu().numpy()) & set(p_idx10.cpu().numpy())) / k10)
+                        
+                        # P@20
+                        k20 = min(20, n_real)
+                        _, t_idx20 = torch.topk(vy, k20)
+                        _, p_idx20 = torch.topk(vpred, 20)
+                        score20 = len(set(t_idx20.cpu().numpy()) & set(p_idx20.cpu().numpy())) / k20
+                        pk20_list.append(score20)
+                        
+                        # ⭐ ATUALIZAÇÃO V4: Registro de surpresas movido exclusivamente para o FINAL da época
+                        # (Removido do loop de validação para evitar Logical Leak / Data Leakage)
+                        # O Vault agora só aprende com o erro real após a validação ser concluída
+                        pass
+
+            if self.vault:
+                # ⭐ ATUALIZAÇÃO V4: Gravação das surpresas consolidada no fim da época baseada no erro total
+                # Isso garante que a próxima época tenha a memória de erro, mas sem leak durante a validação atual.
+                with torch.no_grad():
+                    for vx, vy in zip(val_X, val_Y):
+                        vpred = model(vx.to(DEVICE), [adj_geo, adj_conf]).squeeze()
+                        _, t_idx20 = torch.topk(vy, min(20, (vy>0).sum().item()))
+                        _, p_idx20 = torch.topk(vpred, 20)
+                        top20_set = set(p_idx20.cpu().numpy())
+                        for node_idx in t_idx20.cpu().numpy():
+                            if node_idx not in top20_set:
+                                self.vault.record_surprise(node_idx, intensity=vy[node_idx].item())
+                
+                self.vault.save(epoch + 1)
+
+            avg_p10  = np.mean(pk10_list) if pk10_list else 0.0
+            avg_p20  = np.mean(pk20_list) if pk20_list else 0.0
             avg_loss = epoch_loss / max(steps_per_epoch, 1)
             avg_grad = np.mean(epoch_grads) if epoch_grads else 0.0
+            
+            # Alvo estratégico: P@20 para Fortaleza, P@k original para outros
+            current_metric = avg_p20 if self.region_key == 'fortaleza' else avg_p10
+            metric_label   = "P@20" if self.region_key == 'fortaleza' else f"P@{self.k_eval}"
+
             logging.info(
                 f"\n---> ÉPOCA {epoch+1:03d} [{self.region_key.upper()}] | "
-                f"Val P@{self.k_eval}: {avg_pk*100:.2f}% | "
+                f"Val P@10: {avg_p10*100:.2f}% | Val P@20: {avg_p20*100:.2f}% | "
                 f"Loss: {avg_loss:.4f} | Grad: {avg_grad:.4f} | "
-                f"Recorde: {max(self.best_pk, avg_pk)*100:.2f}% <---\n"
+                f"Recorde ({metric_label}): {max(self.best_pk, current_metric)*100:.2f}% <---\n"
             )
 
-            if avg_pk > self.best_pk:
-                self.best_pk = avg_pk
+            if current_metric > self.best_pk:
+                self.best_pk = current_metric
                 torch.save({
                     'model_state_dict': model.state_dict(),
-                    f'p{self.k_eval}': avg_pk,
+                    'p10': avg_p10,
+                    'p20': avg_p20,
+                    'best_metric': metric_label,
                     'config': {
                         'window':      self.window,
                         'nodes':       N,
@@ -498,7 +631,13 @@ class SpecialistTrainer:
                         'channel24_mode': 'rolling_sum_7d',
                     }
                 }, output_path)
-                logging.info(f"💎 NOVO RECORDE [{self.region_key.upper()}]: P@{self.k_eval}={self.best_pk*100:.2f}% → {self.output_name}")
+                logging.info(f"💎 NOVO RECORDE [{self.region_key.upper()}]: {metric_label}={self.best_pk*100:.2f}% → {self.output_name}")
+                no_improve_epochs = 0
+            else:
+                no_improve_epochs += 1
+                if no_improve_epochs >= self.patience:
+                    logging.info(f"🛑 Early stopping na época {epoch+1} para {self.region_key.upper()} (patience={self.patience})")
+                    break
 
             if DEVICE.type == 'cuda':
                 torch.cuda.empty_cache()

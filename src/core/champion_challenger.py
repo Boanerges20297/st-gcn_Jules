@@ -209,7 +209,7 @@ class ChampionChallenger:
 
     def _build_features(self):
         """Constrói a matriz de features (N×T) a partir dos CSVs."""
-        START = pd.Timestamp("2024-01-01")
+        START = pd.Timestamp("2024-02-01")
         top_bairros_raw = [b for b in self._top_bairros]  # já normalizados
 
         df = pd.read_csv(self.csv_enrich, low_memory=False)
