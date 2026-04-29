@@ -1335,6 +1335,38 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 - **Métrica de Avaliação**: P@10
 
 ### 3. Resultados
-- *(A preencher após a conclusão)*
+- **Melhor P@10**: 35.39% (Época 2)
+- **Melhor P@20**: 55.38% (Época 2)
+- **Conclusão**: Early Stopping na época 22. O modelo atingiu o pico muito cedo e degradou conforme o LR subiu para 0.005. Indica que o passo de aprendizado estava muito largo para a sensibilidade espacial de Fortaleza.
+
+---
+
+
+## Tentativa 78 (Autolog - FORTALEZA) — 2026-04-28 23:01
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.001
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 25
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 15.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(Em progresso - Época 1)*
+
+### 💡 Notas Táticas (Surprise Focus)
+- **Objetivo**: Estabilizar a memória do MemPalace e forçar o ranking fino.
+- **Mudança de Rota**: Reduzimos o LR Máximo de 0.005 para 0.001 para evitar a destruição dos pesos na fase de subida do scheduler.
+- **Canal 38**: Dropout reduzido para 0.2 (antes 0.5) para que o modelo confie mais nas surpresas acumuladas no cofre histórico.
+- **Ranking Weight**: Aumentado para 15.0 para penalizar mais severamente erros de ordenação nos hotspots.
 
 ---

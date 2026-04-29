@@ -4,10 +4,11 @@ Este documento define os passos críticos para a transição do paradigma **Sent
 
 ## 🏁 Prerequisito: Conclusão da V4 (Baseline)
 O treino atual da V4 deve atingir os seguintes checkpoints antes de dispararmos a V5:
-- [ ] Mínimo de 10 épocas concluídas para Fortaleza.
-- [ ] P@10 de validação estabilizada > 45%.
-- [ ] P@20 de validação estabilizada > 65%.
-- [ ] Registro das "Surpresas" do MemPalace no `training_vault` finalizado.
+- [x] Mínimo de 10 épocas concluídas para Fortaleza (T77 concluída com 22 épocas).
+- [ ] P@10 de validação estabilizada > 45% (Atual: 35.39% na T77).
+- [ ] P@20 de validação estabilizada > 65% (Atual: 55.38% na T77).
+- [x] Registro das "Surpresas" do MemPalace no `training_vault` finalizado (V4 Base).
+- [ ] **Refinamento T78:** Superar recordes da T77 com foco em estabilidade e Ranking Weight 15.0.
 
 ---
 

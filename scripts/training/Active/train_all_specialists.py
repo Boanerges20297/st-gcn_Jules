@@ -77,11 +77,11 @@ PREDICT_HORIZON = 14
 #         output_name  (nome do .pth salvo em models/active/)
 REGION_CONFIGS = {
     'fortaleza': dict(
-        window=120, lr=0.005,  epochs=120, patience=20, dropout=0.5, margin=1.0,
+        window=120, lr=0.001,  epochs=120, patience=25, dropout=0.5, margin=1.0,
         k_eval=10, use_momentum=True,  grad_accum=32,
         raw_cvli_context=True,
         output_name='fortaleza_model_active.pth',
-        focal_alpha=0.75, focal_gamma=1.5, ranking_weight=10.0
+        focal_alpha=0.75, focal_gamma=1.5, ranking_weight=15.0
     ),
     'rmf': dict(
         window=90,  lr=0.018, epochs=120, patience=20, dropout=0.5, margin=1.5,
@@ -325,7 +325,7 @@ class SpecialistTrainer:
         ranking_w   = cfg.get('ranking_weight', 1.0)
 
         logging.info("\n" + "═"*80)
-        logging.info(f"🚀 ESPECIALISTA: {self.region_key.upper()} (TENTATIVA 69 - SENTINELA V4 CLEAN PALACE)")
+        logging.info(f"🚀 ESPECIALISTA: {self.region_key.upper()} (TENTATIVA 78 - SENTINELA V4 SURPRISE FOCUS)")
         logging.info(f"📊 METODOLOGIA: Split Temporal (85/15) | Blindagem de Seleção (Cutoff 2025)")
         logging.info(f"📉 LOSS: Regional Focal Ranking (alpha={focal_alpha}, gamma={focal_gamma}, rank_w={ranking_w})")
         logging.info(
@@ -502,7 +502,7 @@ class SpecialistTrainer:
                 # Injeta a memória atual do Vault no Canal 37 e Ratio no Canal 38
                 if self.vault:
                     # ⭐ ATUALIZAÇÃO V4: Canal Dropout de 50% para evitar dependência viciada na memória
-                    if random.random() > 0.5:
+                    if random.random() > 0.2:
                         mem_vec = torch.tensor(self.vault.get_memory_vector(), dtype=torch.float32).to(DEVICE)
                         # Expande mem_vec para (1, 1, N, window)
                         x_input[:, 37, :, :] = mem_vec.view(1, N, 1).expand(-1, -1, self.window)
