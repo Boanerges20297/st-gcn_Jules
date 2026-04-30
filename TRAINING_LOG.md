@@ -1361,12 +1361,49 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 - **Métrica de Avaliação**: P@10
 
 ### 3. Resultados
-- *(Em progresso - Época 1)*
+### 3. Resultados
+- **Melhor P@10**: Estagnado na faixa dos 40% (Desempenho pífio na quebra do teto).
+- **Conclusão**: O aumento no `Ranking Weight` e redução de LR ajudou a estabilizar, mas a topologia baseada apenas na matriz geográfica de proximidade não é suficiente para representar as fronteiras de atrito tático.
 
 ### 💡 Notas Táticas (Surprise Focus)
 - **Objetivo**: Estabilizar a memória do MemPalace e forçar o ranking fino.
 - **Mudança de Rota**: Reduzimos o LR Máximo de 0.005 para 0.001 para evitar a destruição dos pesos na fase de subida do scheduler.
 - **Canal 38**: Dropout reduzido para 0.2 (antes 0.5) para que o modelo confie mais nas surpresas acumuladas no cofre histórico.
 - **Ranking Weight**: Aumentado para 15.0 para penalizar mais severamente erros de ordenação nos hotspots.
+
+---
+
+## Preparação para Tentativa 79 (Injeção de Inteligência Tática) — 2026-04-29
+**Arquivo de Origem:** `data_processing.py` → `processed_fortaleza.pkl`
+
+### 🧠 Paradoxo da Fragilidade (A_tactical)
+Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramente geográfica. A nova topologia (`adj_geo`) é, na verdade, uma **Matriz de Adjacência Tática**:
+- **Proximidade Rápida:** Conexão viária até 3km (Haversine).
+- **Atrito de Facções:** Fronteiras entre facções opostas têm o peso de atenção multiplicado por **2.0**.
+- **Atração por Feridas (Vulnerabilidade):** Nós que sofreram forte ação policial (armas apreendidas valem 15x, drogas pesam) se tornam focos de invasão. Arestas partindo de inimigos em direção ao nó ferido são potencializadas exponencialmente.
+
+> O próximo log gerado automaticamente pelo `train_all_specialists.py` refletirá a primeira corrida oficial desta nova matriz.
+
+
+## Tentativa 79 (Autolog - FORTALEZA) — 2026-04-29 23:50
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.001
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 25
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 15.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
 
 ---

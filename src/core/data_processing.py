@@ -7,9 +7,17 @@ import numpy as np
 import pandas as pd
 import geopandas as gpd
 from scipy.spatial.distance import cdist
+from math import radians, cos, sin, asin, sqrt
 import re
 import unicodedata
 import logging
+
+def haversine(lon1, lat1, lon2, lat2):
+    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+    dlon = lon2 - lon1 
+    dlat = lat2 - lat1 
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    return 2 * 6371 * asin(sqrt(a))
 
 # --- CONFIGURAÇÃO DE CAMINHOS ISM ---
 DATA_DIR = 'data/raw'
@@ -437,18 +445,45 @@ def process_ism_data():
             features[n, :, 2] = reg_nodes.iloc[n]['tension_index']
             features[n, :, 28] = features[:, :, 0].sum(axis=0)
 
-        # Matrizes de Adjacência
-        dist_mat = cdist(reg_nodes[['lat', 'long']].values, reg_nodes[['lat', 'long']].values, 'euclidean')
-        adj_geo = (dist_mat < 0.05).astype(float)
+        # --- Matriz de Adjacência Tática (Substituindo adj_geo geográfica pura) ---
+        frag_scores = np.zeros(N)
+        if not df_t.empty and not df_t_reg.empty:
+            frag_group = df_t_reg.groupby('n_idx')['score_intel'].sum()
+            for n, val in frag_group.items():
+                frag_scores[int(n)] = val
         
+        max_frag = frag_scores.max() if frag_scores.max() > 0 else 1.0
+        frag_norm = frag_scores / max_frag
+
+        adj_geo = np.zeros((N, N)) # Salvamos como adj_geo para compatibilidade
         adj_conflict = np.eye(N)
+        
+        DIST_THRESHOLD_KM = 3.0
+        RIVALRY_MULTIPLIER = 2.0
+        
+        lats = reg_nodes['lat'].values
+        lons = reg_nodes['long'].values
         factions = reg_nodes['faction'].values
+        
         for i in range(N):
-            if factions[i] == 'NEUTRO': continue
-            neighbors = np.where(dist_mat[i] < 0.06)[0]
-            for j in neighbors:
-                if i != j and factions[j] != 'NEUTRO' and factions[i] != factions[j]:
-                    adj_conflict[i, j] = 1.0
+            for j in range(N):
+                if i != j:
+                    dist = haversine(lons[i], lats[i], lons[j], lats[j])
+                    
+                    # Matriz Tática (adj_geo)
+                    if dist <= DIST_THRESHOLD_KM:
+                        weight = 1.0 / (dist + 0.1)
+                        is_enemy = (factions[i] != factions[j]) and (factions[i] != 'NEUTRO') and (factions[j] != 'NEUTRO')
+                        if is_enemy:
+                            weight *= RIVALRY_MULTIPLIER
+                            frag_j = frag_norm[j]
+                            if frag_j > 0.1:
+                                weight *= (1.0 + frag_j) # Ataque direcionado à ferida
+                        adj_geo[i, j] = weight
+                    
+                    # Matriz de Conflito Histórico (adj_conflict)
+                    if dist < 6.0 and factions[i] != 'NEUTRO' and factions[j] != 'NEUTRO' and factions[i] != factions[j]:
+                        adj_conflict[i, j] = 1.0
         
         os.makedirs('data/processed', exist_ok=True)
         with open(f'data/processed/processed_{reg}.pkl', 'wb') as f:
