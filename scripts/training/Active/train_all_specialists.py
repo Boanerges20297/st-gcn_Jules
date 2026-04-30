@@ -42,10 +42,10 @@ sys.path.append(ROOT_DIR)
 sys.path.append(os.path.join(ROOT_DIR, 'src', 'core'))
 
 try:
-    from architectures import DeepSTGAT_64, DeepSTGAT_80
+    from architectures import DeepSTGAT_64, DeepSTGAT_80, ShallowGAT
     from training_vault import TrainingVault
 except ImportError:
-    from src.core.architectures import DeepSTGAT_64, DeepSTGAT_80
+    from src.core.architectures import DeepSTGAT_64, DeepSTGAT_80, ShallowGAT
     from src.core.training_vault import TrainingVault
 
 import re
@@ -145,12 +145,21 @@ def autosave_training_log(region_key, config):
         logging.error(f"❌ Erro ao escrever log auto-incremental em TRAINING_LOG.md: {e}")
 
 def normalize_adj(adj):
+    """
+    V5 ROW NORMALIZATION (Random Walk):
+    Em vez de esmagar simetricamente (o que mata a tática) ou passar bruto (o que abafa a 
+    história do próprio nó com um tsunami de sinal dos vizinhos), fazemos a normalização 
+    direcional D^-1 A.
+    Isso faz com que a soma das "atenções" aos vizinhos seja 1.0, mantendo a escala equilibrada 
+    com h_self, MAS preserva a proporção exata: o vizinho frágil continua recebendo 15x mais 
+    foco que o vizinho comum!
+    """
     adj = adj + np.eye(adj.shape[0])
-    d = np.array(adj.sum(1))
-    d_inv_sqrt = np.power(d, -0.5).flatten()
-    d_inv_sqrt[np.isinf(d_inv_sqrt)] = 0.
-    d_mat_inv_sqrt = np.diag(d_inv_sqrt)
-    return adj.dot(d_mat_inv_sqrt).transpose().dot(d_mat_inv_sqrt)
+    rowsum = np.array(adj.sum(1))
+    r_inv = np.power(rowsum, -1).flatten()
+    r_inv[np.isinf(r_inv)] = 0.
+    r_mat_inv = np.diag(r_inv)
+    return r_mat_inv.dot(adj)
 
 
 def build_momentum_features(features):
@@ -470,8 +479,8 @@ class SpecialistTrainer:
         logging.info(f"⏳ Split Temporal: {len(train_X)} treino (Passado) | {len(val_X)} validação (Futuro)")
 
         # Modelo e otimizador
-        # ⭐ ATUALIZAÇÃO V4: Estabilizando em DeepSTGAT_64 (80 neurônios causaram overfitting viciado)
-        model = DeepSTGAT_64(num_nodes=N, in_channels=C_ext, time_steps=self.window, dropout=self.dropout).to(DEVICE)
+        # ⭐ ATUALIZAÇÃO V5: Substituindo DeepSTGAT por ShallowGAT para evitar overthinking na Matriz Tática
+        model = ShallowGAT(num_nodes=N, in_channels=C_ext, time_steps=self.window, dropout=self.dropout).to(DEVICE)
             
         optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=2e-1)
         criterion = BinaryFocalRankingLoss(alpha=focal_alpha, gamma=focal_gamma, ranking_weight=ranking_w)

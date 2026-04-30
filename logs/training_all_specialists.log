@@ -1,43 +1,12 @@
-2026-04-29 23:50:45,441 [INFO] 
+2026-04-30 16:18:11,471 [INFO] 
 ════════════════════════════════════════════════════════════════════════════════
-2026-04-29 23:50:45,441 [INFO] 🚀 ESPECIALISTA: FORTALEZA (TENTATIVA 78 - SENTINELA V4 SURPRISE FOCUS)
-2026-04-29 23:50:45,441 [INFO] 📊 METODOLOGIA: Split Temporal (85/15) | Blindagem de Seleção (Cutoff 2025)
-2026-04-29 23:50:45,441 [INFO] 📉 LOSS: Regional Focal Ranking (alpha=0.75, gamma=1.5, rank_w=15.0)
-2026-04-29 23:50:45,441 [INFO] ⚙️ ARQ: DeepSTGAT_64 | window=120 | lr=0.001 | dropout=0.5 | K=10 | 37ch (Elite Base) | target_horizon=14d | grad_accum=32 | device=cpu
-2026-04-29 23:50:45,441 [INFO] ════════════════════════════════════════════════════════════════════════════════
-2026-04-29 23:50:45,447 [INFO] 📝 Auto-log incremental: Tentativa 79 registrada no TRAINING_LOG.md
-2026-04-29 23:50:45,668 [INFO] 🧱 Reconstruindo canal 24 com soma móvel 7d do CVLI bruto (sem média)...
-2026-04-29 23:50:45,798 [INFO] 🔧 Calculando canais de Multi-Scale Momentum + Cold Streak (negativo)...
-2026-04-29 23:50:45,903 [INFO] 🧠 MemPalace Treino Ativado: Canal 38 preparado para 122 nós.
-2026-04-29 23:50:45,903 [INFO] 📈 Calculando Canal 39 (CVP/CVLI Ratio) para Fortaleza...
-2026-04-29 23:50:48,275 [INFO] ✅ Canal 39 preenchido para 122 nós via nodes_gdf['name'].
-2026-04-29 23:50:48,275 [INFO] 🔍 SANITY CHECK (Canais Elite):
-2026-04-29 23:50:48,275 [INFO]    [Ch38 - MemPalace] Max: 0.0000 | Ativos: 0/122
-2026-04-29 23:50:48,275 [INFO]    [Ch39 - CVLI Ratio] Max: 48.0000 | Média: 0.0553
-2026-04-29 23:50:48,275 [INFO] ────────────────────────────────────────────────────────────────
-2026-04-29 23:50:48,275 [INFO] 📊 CVLI não-zero (Canal 0): 3297/188490 (1.75%)
-2026-04-29 23:50:48,275 [INFO] 🔄 Gerando janelas com Normalização Z-Score Local (per-window)...
-2026-04-29 23:50:59,573 [INFO] 📐 Janelas construídas: 1411
-2026-04-29 23:50:59,573 [INFO] ⏳ Split Temporal: 1199 treino (Passado) | 212 validação (Futuro)
-2026-04-29 23:51:16,283 [INFO] E001 | B001 | LR: 0.00004 | Loss: 32.2323 | Grad: 190.3000 | P@10: 20.0%
-2026-04-29 23:51:29,917 [INFO] E001 | B002 | LR: 0.00004 | Loss: 47.0811 | Grad: 183.5721 | P@10: 10.0%
-2026-04-29 23:51:45,500 [INFO] E001 | B003 | LR: 0.00004 | Loss: 30.7431 | Grad: 173.1763 | P@10: 10.0%
-2026-04-29 23:52:01,565 [INFO] E001 | B004 | LR: 0.00004 | Loss: 26.8905 | Grad: 168.9630 | P@10: 10.0%
-2026-04-29 23:52:17,403 [INFO] E001 | B005 | LR: 0.00004 | Loss: 13.7973 | Grad: 150.4167 | P@10: 10.0%
-2026-04-29 23:52:33,614 [INFO] E001 | B006 | LR: 0.00004 | Loss: 13.9258 | Grad: 146.1365 | P@10: 20.0%
-2026-04-29 23:52:49,123 [INFO] E001 | B007 | LR: 0.00004 | Loss: 23.7168 | Grad: 106.4612 | P@10: 0.0%
-2026-04-29 23:53:06,264 [INFO] E001 | B008 | LR: 0.00004 | Loss: 5.9541 | Grad: 85.7361 | P@10: 0.0%
-2026-04-29 23:53:21,604 [INFO] E001 | B009 | LR: 0.00004 | Loss: 6.9888 | Grad: 62.2849 | P@10: 10.0%
-2026-04-29 23:53:36,842 [INFO] E001 | B010 | LR: 0.00004 | Loss: 6.7573 | Grad: 23.2079 | P@10: 10.0%
-2026-04-29 23:53:52,014 [INFO] E001 | B011 | LR: 0.00004 | Loss: 4.1419 | Grad: 43.2188 | P@10: 20.0%
-2026-04-29 23:54:06,797 [INFO] E001 | B012 | LR: 0.00004 | Loss: 7.3380 | Grad: 53.2412 | P@10: 10.0%
-2026-04-29 23:54:22,114 [INFO] E001 | B013 | LR: 0.00004 | Loss: 12.7850 | Grad: 75.1794 | P@10: 0.0%
-2026-04-29 23:54:37,292 [INFO] E001 | B014 | LR: 0.00004 | Loss: 6.9445 | Grad: 102.9200 | P@10: 20.0%
-2026-04-29 23:54:52,125 [INFO] E001 | B015 | LR: 0.00004 | Loss: 8.4591 | Grad: 114.6998 | P@10: 10.0%
-2026-04-29 23:55:06,661 [INFO] E001 | B016 | LR: 0.00004 | Loss: 8.7485 | Grad: 136.6133 | P@10: 10.0%
-2026-04-29 23:55:20,944 [INFO] E001 | B017 | LR: 0.00004 | Loss: 8.1399 | Grad: 128.8697 | P@10: 20.0%
-2026-04-29 23:55:35,490 [INFO] E001 | B018 | LR: 0.00004 | Loss: 11.8640 | Grad: 116.2722 | P@10: 10.0%
-2026-04-29 23:55:49,786 [INFO] E001 | B019 | LR: 0.00004 | Loss: 8.8693 | Grad: 115.7951 | P@10: 0.0%
-2026-04-29 23:56:04,100 [INFO] E001 | B020 | LR: 0.00004 | Loss: 8.7787 | Grad: 93.7284 | P@10: 0.0%
-2026-04-29 23:56:19,376 [INFO] E001 | B021 | LR: 0.00004 | Loss: 8.0235 | Grad: 106.6389 | P@10: 10.0%
-2026-04-29 23:56:34,118 [INFO] E001 | B022 | LR: 0.00004 | Loss: 5.6240 | Grad: 90.1125 | P@10: 10.0%
+2026-04-30 16:18:11,471 [INFO] 🚀 ESPECIALISTA: FORTALEZA (TENTATIVA 78 - SENTINELA V4 SURPRISE FOCUS)
+2026-04-30 16:18:11,471 [INFO] 📊 METODOLOGIA: Split Temporal (85/15) | Blindagem de Seleção (Cutoff 2025)
+2026-04-30 16:18:11,471 [INFO] 📉 LOSS: Regional Focal Ranking (alpha=0.75, gamma=1.5, rank_w=15.0)
+2026-04-30 16:18:11,471 [INFO] ⚙️ ARQ: DeepSTGAT_64 | window=120 | lr=0.001 | dropout=0.5 | K=10 | 37ch (Elite Base) | target_horizon=14d | grad_accum=32 | device=cpu
+2026-04-30 16:18:11,471 [INFO] ════════════════════════════════════════════════════════════════════════════════
+2026-04-30 16:18:11,471 [INFO] 📝 Auto-log incremental: Tentativa 84 registrada no TRAINING_LOG.md
+2026-04-30 16:18:11,598 [INFO] 🧱 Reconstruindo canal 24 com soma móvel 7d do CVLI bruto (sem média)...
+2026-04-30 16:18:11,614 [INFO] 🔧 Calculando canais de Multi-Scale Momentum + Cold Streak (negativo)...
+2026-04-30 16:18:11,689 [INFO] 🧠 MemPalace Treino Ativado: Canal 38 preparado para 122 nós.
+2026-04-30 16:18:11,689 [INFO] 📈 Calculando Canal 39 (CVP/CVLI Ratio) para Fortaleza...

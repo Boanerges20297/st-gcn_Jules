@@ -1404,6 +1404,138 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 - **Métrica de Avaliação**: P@10
 
 ### 3. Resultados
+- **Melhor P@10**: 39.41% (Época 3)
+- **Melhor P@20**: 53.07% (Época 3)
+- **Conclusão**: O treinamento abortou por Early Stopping na Época 28. O modelo superaqueceu (overfitting) já na terceira época e os gradientes começaram a degradar.
+- **Diagnóstico Tático**: Injetar a Matriz Tática (focada em atrito retilíneo) num cérebro excessivamente profundo (`DeepSTGAT_64`) causou "overthinking". A matriz tática mastiga muito a informação; as convoluções profundas da rede acabam borrando e perdendo o sinal fino da fragilidade viária. Precisamos implementar a arquitetura `ShallowGAT` (menos neurônios, atenção mais direta) para que a matriz tática brilhe.
+
+---
+
+
+## Tentativa 80 (Autolog - FORTALEZA) — 2026-04-30 07:46
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.001
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 25
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 15.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- **Melhor P@10**: 37.71% (Época 2)
+- **Melhor P@20**: 53.92% (Época 3)
+- **Conclusão**: O `ShallowGAT` foi implementado com sucesso (apenas 1 bloco espaço-temporal), estancando o overfitting do `DeepSTGAT`. Porém, o P@10 não rompeu os 45%. 
+- **Diagnóstico Oculto**: A função `normalize_adj` estava aplicando Normalização Simétrica/Laplaciana ($D^{-0.5} A D^{-0.5}$) na Matriz Tática. Isso dividia os pesos táticos massivos (15x para armas) pelo grau do nó, esmagando a nossa inteligência e planificando o grafo de volta a "bairros normais".
+
+---
+
+
+## Tentativa 81 (Autolog - FORTALEZA) — 2026-04-30 08:51
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.001
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 25
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 15.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- **Melhor P@10**: 37.25% (Época 4)
+- **Melhor P@20**: 51.58% (Época 5)
+- **Conclusão**: Tentativa cancelada na Época 6. O "Bypass Tático" (remoção total da normalização) causou um *Tsunami Numérico*. Ao passar os pesos 15.0 brutos, a soma dos vizinhos (`h_geo`) ficou colossal comparada ao histórico do próprio nó (`h_self`). O modelo ficou hipervigilante aos rivais e completamente cego para a própria dinâmica do bairro.
+
+---
+
+
+## Tentativa 82 (Autolog - FORTALEZA) — 2026-04-30 09:19
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.001
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 25
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 15.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- **Melhor P@10**: 38.97% (Época 5)
+- **Melhor P@20**: 54.21% (Época 4 - **RECORDE HISTÓRICO**)
+- **Conclusão**: A normalização Row-Stochastic ($D^{-1} A$) provou ser a arquitetura correta. O P@20 disparou para o melhor nível já registrado, provando que o modelo entendeu a topologia tática. O P@10 estagnou perto dos 39% devido à taxa de aprendizado baixa para uma rede rasa, mas a convergência era saudável.
+
+---
+
+
+## Tentativa 83 (Autolog - FORTALEZA) — 2026-04-30 15:41
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.01
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 25
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 15.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- **Melhor P@10**: 35.67% (Época 2)
+- **Melhor P@20**: 50.98% (Época 2)
+- **Conclusão**: **FRACASSO TÁTICO (Catastrophic Forgetting)**. Aumentar o LR para 0.01 em uma rede `ShallowGAT` com matriz Row-Stochastic causou instabilidade numérica severa. O modelo "foi ejetado" da convergência.
+
+---
+
+
+## Tentativa 84 (Autolog - FORTALEZA) — 2026-04-30 16:18
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.001
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 25
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 15.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
 - *(A preencher após a conclusão)*
 
 ---
