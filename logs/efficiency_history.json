@@ -469,13 +469,13 @@
       "total_events": 16,
       "ranking_top10": [
         "CAUCAIA",
-        "MESSEJANA",
         "BARROSO",
+        "MESSEJANA",
         "JUAZEIRO DO NORTE",
         "SIQUEIRA",
         "PLANALTO AYRTON SENNA",
-        "GRANJA LISBOA",
         "MARACANAU",
+        "GRANJA LISBOA",
         "ALTO ALEGRE",
         "CURIO"
       ],
@@ -516,9 +516,9 @@
         "BARROSO",
         "JUAZEIRO DO NORTE",
         "LIMOEIRO DO NORTE",
+        "ANCURI",
         "VARZEA ALEGRE",
         "CARIRE",
-        "ANCURI",
         "URUBURETAMA"
       ]
     },
@@ -527,16 +527,16 @@
       "active_locations": 2,
       "total_events": 3,
       "ranking_top10": [
-        "MESSEJANA",
         "BARROSO",
+        "MESSEJANA",
         "SIQUEIRA",
         "PLANALTO AYRTON SENNA",
         "GRANJA LISBOA",
         "ALTO ALEGRE",
         "CURIO",
         "BARRA DO CEARA",
-        "MONDUBIM",
-        "CRISTO REDENTOR"
+        "ANCURI",
+        "MONDUBIM"
       ],
       "gt_sample": [
         "BARROSO",
@@ -547,10 +547,11 @@
       "hits5": [
         "BARROSO"
       ],
-      "p10": 0.1,
-      "recall10": 0.5,
+      "p10": 0.2,
+      "recall10": 1.0,
       "hits10": [
-        "BARROSO"
+        "BARROSO",
+        "ANCURI"
       ],
       "p20": 0.1,
       "recall20": 1.0,
@@ -661,16 +662,28 @@
     }
   },
   {
+<<<<<<< HEAD
     "date": "2026-04-22 00:00:00",
     "total_events": 13,
     "brute_cvli": 13,
+=======
+    "date": "2026-04-23 00:00:00",
+    "total_events": 15,
+    "brute_cvli": 15,
+>>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
     "exogenous": 0,
     "exogenous_conflict": 0,
     "police_qualified_actions_7d": 0,
     "police_administrative_events_7d": 0,
+<<<<<<< HEAD
     "assigned_total_events": 13,
     "unmapped_total_events": 0,
     "assigned_brute_cvli": 13,
+=======
+    "assigned_total_events": 15,
+    "unmapped_total_events": 0,
+    "assigned_brute_cvli": 15,
+>>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
     "assigned_exogenous": 0,
     "unmapped_exogenous": 0,
     "assigned_police_qualified_actions": 0,
@@ -679,6 +692,7 @@
     "global": {
       "total_nodes": 116,
       "active_locations": 11,
+<<<<<<< HEAD
       "total_events": 13,
       "ranking_top10": [
         "MESSEJANA",
@@ -704,6 +718,33 @@
         "CARIRIACU",
         "CEDRO",
         "SANTANA DO ACARAU"
+=======
+      "total_events": 15,
+      "ranking_top10": [
+        "BARROSO",
+        "CAUCAIA",
+        "JUAZEIRO DO NORTE",
+        "TIANGUA",
+        "MARACANAU",
+        "CURIO",
+        "BARRA DO CEARA",
+        "PLANALTO AYRTON SENNA",
+        "PARQUE IRACEMA",
+        "GRANJA LISBOA"
+      ],
+      "gt_sample": [
+        "BARROSO",
+        "BOM JARDIM",
+        "HORIZONTE",
+        "JUAZEIRO DO NORTE",
+        "TIANGUA",
+        "URUBURETAMA",
+        "JIJOCA DE JERICOACOARA",
+        "ACOPIARA",
+        "CARIRIACU",
+        "SANTANA DO ACARAU",
+        "CEDRO"
+>>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
       ],
       "p5": 0.6,
       "recall5": 0.2727,
@@ -719,23 +760,37 @@
         "JUAZEIRO DO NORTE",
         "TIANGUA"
       ],
+<<<<<<< HEAD
       "p20": 0.45,
       "recall20": 0.8182,
+=======
+      "p20": 0.4,
+      "recall20": 0.7273,
+>>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
       "hits20": [
         "BARROSO",
         "JUAZEIRO DO NORTE",
         "TIANGUA",
+<<<<<<< HEAD
         "CARIRIACU",
         "HORIZONTE",
         "JIJOCA DE JERICOACOARA",
         "URUBURETAMA",
         "SANTANA DO ACARAU",
         "CEDRO"
+=======
+        "HORIZONTE",
+        "CARIRIACU",
+        "BOM JARDIM",
+        "JIJOCA DE JERICOACOARA",
+        "ACOPIARA"
+>>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
       ]
     },
     "fortaleza": {
       "total_nodes": 40,
       "active_locations": 2,
+<<<<<<< HEAD
       "total_events": 2,
       "ranking_top10": [
         "MESSEJANA",
@@ -752,6 +807,24 @@
       "gt_sample": [
         "BARROSO",
         "ANCURI"
+=======
+      "total_events": 3,
+      "ranking_top10": [
+        "BARROSO",
+        "CURIO",
+        "BARRA DO CEARA",
+        "PLANALTO AYRTON SENNA",
+        "PARQUE IRACEMA",
+        "GRANJA LISBOA",
+        "JOSE WALTER",
+        "MONDUBIM",
+        "BONSUCESSO",
+        "MESSEJANA"
+      ],
+      "gt_sample": [
+        "BARROSO",
+        "BOM JARDIM"
+>>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
       ],
       "p5": 0.2,
       "recall5": 0.5,
@@ -767,7 +840,11 @@
       "recall20": 1.0,
       "hits20": [
         "BARROSO",
+<<<<<<< HEAD
         "ANCURI"
+=======
+        "BOM JARDIM"
+>>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
       ]
     },
     "rmf": {
@@ -808,13 +885,18 @@
     "interior": {
       "total_nodes": 50,
       "active_locations": 8,
+<<<<<<< HEAD
       "total_events": 9,
+=======
+      "total_events": 10,
+>>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
       "ranking_top10": [
         "JUAZEIRO DO NORTE",
         "TIANGUA",
         "CARIRIACU",
         "VARZEA ALEGRE",
         "JIJOCA DE JERICOACOARA",
+<<<<<<< HEAD
         "URUBURETAMA",
         "SANTANA DO ACARAU",
         "CEDRO",
@@ -830,6 +912,23 @@
         "CARIRIACU",
         "CEDRO",
         "SANTANA DO ACARAU"
+=======
+        "ACOPIARA",
+        "CEDRO",
+        "SANTANA DO ACARAU",
+        "URUBURETAMA",
+        "IRACEMA"
+      ],
+      "gt_sample": [
+        "JUAZEIRO DO NORTE",
+        "TIANGUA",
+        "URUBURETAMA",
+        "JIJOCA DE JERICOACOARA",
+        "ACOPIARA",
+        "CARIRIACU",
+        "SANTANA DO ACARAU",
+        "CEDRO"
+>>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
       ],
       "p5": 0.8,
       "recall5": 0.5,
@@ -839,27 +938,49 @@
         "CARIRIACU",
         "JIJOCA DE JERICOACOARA"
       ],
+<<<<<<< HEAD
       "p10": 0.7,
       "recall10": 0.875,
+=======
+      "p10": 0.8,
+      "recall10": 1.0,
+>>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
       "hits10": [
         "JUAZEIRO DO NORTE",
         "TIANGUA",
         "CARIRIACU",
         "JIJOCA DE JERICOACOARA",
+<<<<<<< HEAD
         "URUBURETAMA",
         "SANTANA DO ACARAU",
         "CEDRO"
       ],
       "p20": 0.35,
       "recall20": 0.875,
+=======
+        "ACOPIARA",
+        "CEDRO",
+        "SANTANA DO ACARAU",
+        "URUBURETAMA"
+      ],
+      "p20": 0.4,
+      "recall20": 1.0,
+>>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
       "hits20": [
         "JUAZEIRO DO NORTE",
         "TIANGUA",
         "CARIRIACU",
         "JIJOCA DE JERICOACOARA",
+<<<<<<< HEAD
         "URUBURETAMA",
         "SANTANA DO ACARAU",
         "CEDRO"
+=======
+        "ACOPIARA",
+        "CEDRO",
+        "SANTANA DO ACARAU",
+        "URUBURETAMA"
+>>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
       ]
     }
   }

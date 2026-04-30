@@ -91,6 +91,57 @@ class DeepSTGAT_64(nn.Module):
         x = self.prelu_final(self.final_conv(x)).squeeze(-1).permute(0, 2, 1)
         return self.fc(x)
 
+class DeepSTGAT_80(nn.Module):
+    """ESPECIALISTA ELITE (EXPANSÃO 20%+ - 80 NEURÔNIOS + CANAL 38 MEMPALACE)."""
+    def __init__(self, num_nodes, in_channels, time_steps, dropout=0.5):
+        super().__init__()
+        # in_channels agora será 38 (37 originais + 1 Vault Memory)
+        self.layer1 = STGCNBlock(in_channels, 40, time_steps, dropout)
+        self.layer2 = STGCNBlock(40, 80, time_steps, dropout)
+        self.layer3 = STGCNBlock(80, 80, time_steps, dropout)
+        self.final_conv = nn.Conv2d(80, 80, kernel_size=(1, time_steps))
+        self.prelu_final = nn.PReLU()
+        self.fc = nn.Sequential(
+            nn.Linear(80, 40), 
+            nn.PReLU(), 
+            nn.Dropout(dropout),
+            nn.Linear(40, 1)
+        )
+
+    def forward(self, x, adj_list):
+        x = self.layer1(x, adj_list)
+        x = self.layer2(x, adj_list)
+        x = self.layer3(x, adj_list)
+        x = self.prelu_final(self.final_conv(x)).squeeze(-1).permute(0, 2, 1)
+        return self.fc(x)
+
+class ShallowGAT(nn.Module):
+    """MODELO TÁTICO (SHALLOW) - 1 única camada espaço-temporal focada na Matriz Tática."""
+    def __init__(self, num_nodes, in_channels, time_steps, dropout=0.3):
+        super().__init__()
+        # Apenas UMA camada GCN espaço-temporal para não borrar a matriz de adjacência
+        self.layer1 = STGCNBlock(in_channels, 64, time_steps, dropout)
+        
+        self.final_conv = nn.Conv2d(64, 64, kernel_size=(1, time_steps))
+        self.prelu_final = nn.PReLU()
+        
+        self.fc = nn.Sequential(
+            nn.Linear(64, 32), 
+            nn.PReLU(), 
+            nn.Dropout(dropout),
+            nn.Linear(32, 1)
+        )
+
+    def forward(self, x, adj_list):
+        # Passa pela matriz de adjacência (Tática) apenas 1x
+        x = self.layer1(x, adj_list)
+        
+        # Colapso temporal direto
+        x = self.prelu_final(self.final_conv(x)).squeeze(-1).permute(0, 2, 1)
+        
+        # Pontuação Final
+        return self.fc(x)
+
 class TemperatureExpertGAT(nn.Module):
     """MODELO ESPECIALISTA LEVE (64 NEURONIOS FC)."""
     def __init__(self, num_nodes, in_channels, time_steps, dropout=0.2):
