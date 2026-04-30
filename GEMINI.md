@@ -3,13 +3,12 @@
 ## 🌍 Contexto Geral
 O sistema é uma plataforma de predição de crimes violentos (CVLI) para o estado do Ceará. Até Abril/2026, utilizava exclusivamente redes **DeepSTGAT**. Agora, opera sob um **Paradigma Híbrido (Champion/Challenger)** combinando o ST-GAT com o novo **Sentinela V3 (LGBM Lean)**, atingindo **50% de P@10** e **70% de P@20** em validações sombra para Fortaleza.
 
-## 🚀 Status Arquitetural (Paradigma Híbrido - Fase 6 Ativa)
-O sistema roda duas frentes que se unem no `app.py`:
-1. **Champion (ST-GAT)**: Modelo oficial (120d, 37 canais). Corre por via do `src/core/orchestrator.py`.
-2. **Challenger (Sentinela V3)**: Otimização ultra-lean. Usa **10 features** altamente calibradas (LightGBM + EWMA-Multi).
-   - Resolve limitação de densidade de CVLIs priorizando ranking.
-   - Calibrado contra falsos positivos: usa `cvp_cvli_ratio × sqrt(hist_pct)`.
-   - Inclui score tático operacional: valoriza muito armas (peso=15) vs drogas miúdas.
+## 🚀 Status Arquitetural (Fase 7.5 - Intervenção Tática Ativa)
+O sistema opera em regime de upgrade do núcleo neural:
+1. **Intervenção Tática (A_tactical):** Substituição da adjacência geográfica por pesos de inteligência (Atrito de Facção e Fragilidade Viária 15x).
+2. **ShallowGAT:** Migração para arquitetura de camada única para evitar diluição de sinais táticos.
+3. **Normalização Row-Stochastic:** Controle de volume via $D^{-1} A$, preservando recordes de P@20 (54.2%).
+4. **Paradigma Híbrido (Champion/Challenger):** O `app.py` continua unindo ST-GAT com Sentinela V3.
 
 **Blend Dinâmico (ChampionChallenger):**
 O `src/core/champion_challenger.py` intercede após a inferência do ST-GAT. Avalia P@10 contra dados *reais* a cada hora e ajusta o peso via suavização exponencial (EMA), permitindo ao LGBM até 50% de peso na predição final de Fortaleza sem quebrar a API.
