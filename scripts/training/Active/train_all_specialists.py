@@ -77,11 +77,18 @@ PREDICT_HORIZON = 14
 #         output_name  (nome do .pth salvo em models/active/)
 REGION_CONFIGS = {
     'fortaleza': dict(
-        window=120, lr=0.001,  epochs=120, patience=25, dropout=0.5, margin=1.0,
-        k_eval=10, use_momentum=True,  grad_accum=32,
+        # T88: weight_decay 0.2→0.005 (causa raiz #1 do colapso pós-Época 3)
+        #      grad_accum 32→6  (ruído estocástico restaurado — fuga de mínimos rasos)
+        #      dropout 0.5→0.35 (menos regularização redundante com wd baixo)
+        #      focal_gamma 1.5→2.5 (foco mais agressivo nos hotspots difíceis)
+        #      ranking_weight 15→7 (MSE nos positivos dominava demais o loss)
+        #      pct_start 0.2→0.08 (warmup mais curto → pico de LR antes da Época 3)
+        window=120, lr=0.001, epochs=150, patience=30, dropout=0.35, margin=1.0,
+        k_eval=10, use_momentum=True, grad_accum=6,
         raw_cvli_context=True,
         output_name='fortaleza_model_active.pth',
-        focal_alpha=0.75, focal_gamma=1.5, ranking_weight=15.0
+        focal_alpha=0.70, focal_gamma=2.5, ranking_weight=7.0,
+        weight_decay=0.005, pct_start=0.08
     ),
     'rmf': dict(
         window=90,  lr=0.018, epochs=120, patience=20, dropout=0.5, margin=1.5,
@@ -482,14 +489,17 @@ class SpecialistTrainer:
         # ⭐ ATUALIZAÇÃO V5: Substituindo DeepSTGAT por ShallowGAT para evitar overthinking na Matriz Tática
         model = ShallowGAT(num_nodes=N, in_channels=C_ext, time_steps=self.window, dropout=self.dropout).to(DEVICE)
             
-        optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=2e-1)
+        # T88: weight_decay lido do config (padrão 0.005 para Fortaleza, 0.01 para outros)
+        wd = REGION_CONFIGS[self.region_key].get('weight_decay', 0.01)
+        optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=wd)
         criterion = BinaryFocalRankingLoss(alpha=focal_alpha, gamma=focal_gamma, ranking_weight=ranking_w)
 
         steps_per_epoch = (len(train_X) // self.grad_accum) + 1
+        pct_start = REGION_CONFIGS[self.region_key].get('pct_start', 0.2)
         scheduler = torch.optim.lr_scheduler.OneCycleLR(
             optimizer, max_lr=self.lr,
             steps_per_epoch=steps_per_epoch,
-            epochs=self.epochs, pct_start=0.2
+            epochs=self.epochs, pct_start=pct_start
         )
         output_path = os.path.join(ROOT_DIR, 'models', 'active', self.output_name)
         os.makedirs(os.path.dirname(output_path), exist_ok=True)

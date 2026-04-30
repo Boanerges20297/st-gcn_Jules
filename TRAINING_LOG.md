@@ -1661,3 +1661,99 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 - *(A preencher após a conclusão)*
 
 ---
+
+
+## Tentativa 85 (Autolog - FORTALEZA) — 2026-04-30 16:41
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.001
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 25
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.75
+- **Focal Gamma**: 1.5
+- **Ranking Weight**: 15.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 86 (Autolog - RMF) — 2026-04-30 17:28
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 90 dias
+- **Learning Rate**: 0.018
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 8
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.5
+- **Focal Gamma**: 2.0
+- **Ranking Weight**: 7.0
+- **Métrica de Avaliação**: P@5
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 87 (Autolog - INTERIOR) — 2026-04-30 17:28
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.005
+- **Dropout**: 0.3
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.4
+- **Focal Gamma**: 2.0
+- **Ranking Weight**: 4.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 88 (Autolog - FORTALEZA) — 2026-04-30 17:37
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.001
+- **Dropout**: 0.35
+- **Épocas**: 150
+- **Patience**: 30
+- **Grad Accumulation**: 6
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.7
+- **Focal Gamma**: 2.5
+- **Ranking Weight**: 7.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
