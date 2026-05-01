@@ -1607,11 +1607,10 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 - **Grad Accumulation:** `64` passos (suavização de variância).
 
 ### 📊 Resultados & Status
-- **Status:** Em execução (Época 004 em processamento).
-- **Métricas Parciais (Época 003):**
-    - **Val P@10:** 35.86% (Evolução constante).
-    - **Val P@20:** 48.06% (**Novo Recorde Regional** para esta fase).
-- **Análise Preliminar:** A remoção da regularização L2 e a conexão residual permitiram que o modelo quebrasse a estagnação. O P@20 de 48% indica que a cobertura estratégica está se consolidando rapidamente com a janela de 60 dias.
+- **Status:** **SUCEDIDO (Recorde Quebrado)**
+- **Melhor P@20:** **49.37%** (Época 4)
+- **Melhor P@10:** **35.80%** (Época 4)
+- **Análise Final:** A arquitetura **ResGAT** provou ser a chave para romper a estagnação. O modelo atingiu seu pico tático quase instantaneamente. Embora o LR alto tenha causado saturação posterior, o checkpoint da Época 4 é o mais potente já produzido para Fortaleza nesta fase.
 
 ---
 
@@ -1635,7 +1634,10 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 - **Métrica de Avaliação**: P@5
 
 ### 3. Resultados
-- *(A preencher após a conclusão)*
+- **Status:** **FALHA CRÍTICA** (Época 1, Batch 153).
+- **Erro:** `selected index k out of range`.
+- **Causa:** Conflito entre `P@20` fixo no loop de validação e o número real de municípios da RMF (~13-19).
+- **Ação Corretiva:** Implementada blindagem `min(k, N)` no script para a T92.
 
 ---
 
@@ -1656,6 +1658,113 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 - **Focal Alpha**: 0.4
 - **Focal Gamma**: 2.0
 - **Ranking Weight**: 4.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- **Status:** **SUCEDIDO (Convergência Instantânea)**
+- **Melhor P@10:** **41.56%**
+- **Melhor P@20:** **62.63%**
+- **Análise Final:** O Interior estabilizou em patamares de excelência logo na primeira época. A janela de 120 dias com dropout moderado capturou perfeitamente os eixos das cidades polo.
+
+---
+
+## Tentativa 92 (Paradigma: Detector de Presença 7d) — 2026-05-01 16:38
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 🎯 Motivação
+- Adaptar o modelo para **Alta Precisão de Presença** (Hit Rate).
+- Delegar a ordenação fina do ranking (posicionamento) ao modelo Challenger (LightGBM).
+- Focar em um horizonte tático ultra-reativo (7 dias).
+
+### ⚙️ Configuração Técnica (Fortaleza Solo)
+- **Target (Horizonte)**: 7 dias (Reduzido de 14d)
+- **Janela (Window)**: 30 dias (Foco no calor imediato)
+- **Learning Rate**: 0.003
+- **Dropout**: 0.2 (Redução de regularização para maior sensibilidade)
+- **Grad Accumulation**: 32
+
+### 📉 Loss & Métricas
+- **Focal Alpha**: **0.80** (Foco obsessivo em hotspots/positivos)
+- **Ranking Weight**: **1.0** (Redução de 15x; posição é tarefa do Challenger)
+- **Métrica Alvo**: P@20
+
+### 3. Resultados
+- **Status:** **SUCEDIDO (Recorde Tático)**
+- **Melhor P@20:** **53.49%** (Época 3)
+- **Análise Final:** O modelo atingiu seu pico de generalização muito rápido. Após a Época 3, houve degradação contínua da validação (overfitting), provando que o `ranking_weight=1.0` com `dropout=0.2` permitiu que a rede "decorasse" a janela de 30 dias em vez de aprender a dinâmica espacial.
+
+---
+
+## Tentativa 93 (Equilíbrio Tático: Ranking Agressivo + Blindagem) — 2026-05-01 17:01
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 🎯 Motivação
+- Quebrar o platô de 53% da T92.
+- Devolver a autoridade de ranking ao grafo para evitar gradientes rasos.
+- Forçar maior generalização em janelas curtas.
+
+### ⚙️ Configuração Técnica (Fortaleza Solo)
+- **Target (Horizonte)**: 7 dias
+- **Janela (Window)**: 30 dias
+- **Learning Rate**: 0.003
+- **Dropout**: **0.4** (Aumento de 2x para combater overfitting)
+- **Grad Accumulation**: 32
+
+### 📉 Loss & Métricas
+- **Focal Alpha**: **0.75** (Balanceamento para dar espaço ao MSE)
+- **Ranking Weight**: **10.0** (Aumento de 10x para forçar a correção de ordem)
+- **Métrica Alvo**: P@20
+
+### 3. Resultados
+- **Status:** **INSTÁVEL (Caos de Convergência)**
+- **Melhor P@20:** **51.59%** (Época 2)
+- **Análise Final:** O modelo apresentou oscilações violentas (39% a 51%). O gradiente vivo (~8.0) provou que o peso de ranking funciona, mas o LR=0.003 foi excessivo para essa nova superfície de erro, impedindo o modelo de "pousar" em um ponto estável.
+
+---
+
+## Tentativa 94 (Regime de Estabilização: Carga Controlada) — 2026-05-01 17:35
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 🎯 Motivação
+- Eliminar o "quique" de convergência observado na T93.
+- Refinar a ordem dos bairros com passos menores e mais precisos.
+- Buscar o teto de 55% de P@20.
+
+### ⚙️ Configuração Técnica (Fortaleza Solo)
+- **Target (Horizonte)**: 7 dias
+- **Janela (Window)**: 30 dias
+- **Learning Rate**: **0.0008** (Redução de 3.75x)
+- **Dropout**: **0.3** (Equilíbrio entre generalização e ruído)
+- **Grad Accumulation**: 32
+
+### 📉 Loss & Métricas
+- **Focal Alpha**: **0.70** (Foco maior no ranking)
+- **Ranking Weight**: **12.0** (Aumento da autoridade de ordem)
+- **Métrica Alvo**: P@20
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+
+## Tentativa 95 (Autolog - FORTALEZA) — 2026-05-01 17:37
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 7 dias
+- **Janela (Window)**: 30 dias
+- **Learning Rate**: 0.0008
+- **Dropout**: 0.3
+- **Épocas**: 120
+- **Patience**: 60
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.7
+- **Focal Gamma**: 2.0
+- **Ranking Weight**: 12.0
 - **Métrica de Avaliação**: P@10
 
 ### 3. Resultados

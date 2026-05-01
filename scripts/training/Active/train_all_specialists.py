@@ -66,7 +66,7 @@ logging.basicConfig(
 )
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-PREDICT_HORIZON = 14
+PREDICT_HORIZON = 7
 
 # ─────────────────────────────────────────────
 # Configuração por região
@@ -77,14 +77,14 @@ PREDICT_HORIZON = 14
 #         output_name  (nome do .pth salvo em models/active/)
 REGION_CONFIGS = {
     'fortaleza': dict(
-        window=60, lr=0.003,  epochs=120, patience=60, dropout=0.4, margin=1.0,
-        k_eval=10, use_momentum=True,  grad_accum=64,
+        window=30, lr=0.0008, epochs=120, patience=60, dropout=0.3, margin=1.0,
+        k_eval=10, use_momentum=True,  grad_accum=32,
         raw_cvli_context=True,
         output_name='fortaleza_model_active.pth',
-        focal_alpha=0.55, focal_gamma=1.5, ranking_weight=15.0
+        focal_alpha=0.70, focal_gamma=2.0, ranking_weight=12.0
     ),
     'rmf': dict(
-        window=90,  lr=0.018, epochs=120, patience=20, dropout=0.5, margin=1.5,
+        window=30,  lr=0.018, epochs=120, patience=20, dropout=0.5, margin=1.5,
         k_eval=5,  use_momentum=True, grad_accum=8,
         raw_cvli_context=True,
         output_name='rmf_model.pth',
@@ -323,9 +323,24 @@ class SpecialistTrainer:
         self.grad_accum   = cfg['grad_accum']
         self.output_name  = cfg['output_name']
         self.margin       = cfg['margin']
-        self.best_pk      = 0.0
         self.vault        = None
         self.cvp_ratio_data = None  # ⭐ V4: Novo canal de pressão tática
+        
+        # 🛡️ Blindagem de Recorde Histórico: Carrega o benchmark do disco
+        self.best_pk = 0.0
+        output_path = os.path.join(ROOT_DIR, 'models', 'active', self.output_name)
+        if os.path.exists(output_path):
+            try:
+                # Carrega metadados do modelo consolidado
+                ckpt = torch.load(output_path, map_location='cpu', weights_only=False)
+                metric_key = 'p20' if self.region_key == 'fortaleza' else 'p10'
+                self.best_pk = ckpt.get(metric_key, 0.0)
+                logging.info(f"🛡️ Benchmark consolidado carregado ({self.region_key.upper()}): {self.best_pk*100:.2f}%")
+            except Exception as e:
+                logging.warning(f"⚠️ Falha ao ler benchmark do disco para {self.region_key}: {e}")
+                self.best_pk = 0.0
+        else:
+            logging.info(f"🆕 Nenhum modelo anterior encontrado para {self.region_key}. Iniciando recorde do zero.")
 
     def train(self):
         cfg = REGION_CONFIGS[self.region_key]
@@ -574,15 +589,15 @@ class SpecialistTrainer:
                         vpred = model(vx.to(DEVICE), [adj_geo, adj_conf]).squeeze()
                         
                         # P@10
-                        k10 = min(10, n_real)
-                        _, t_idx10 = torch.topk(vy, k10)
-                        _, p_idx10 = torch.topk(vpred, 10)
+                        k10 = min(10, n_real, N)
+                        _, t_idx10 = torch.topk(vy.to(DEVICE), k10)
+                        _, p_idx10 = torch.topk(vpred, min(10, N))
                         pk10_list.append(len(set(t_idx10.cpu().numpy()) & set(p_idx10.cpu().numpy())) / k10)
                         
                         # P@20
-                        k20 = min(20, n_real)
-                        _, t_idx20 = torch.topk(vy, k20)
-                        _, p_idx20 = torch.topk(vpred, 20)
+                        k20 = min(20, n_real, N)
+                        _, t_idx20 = torch.topk(vy.to(DEVICE), k20)
+                        _, p_idx20 = torch.topk(vpred, min(20, N))
                         score20 = len(set(t_idx20.cpu().numpy()) & set(p_idx20.cpu().numpy())) / k20
                         pk20_list.append(score20)
                         
@@ -597,12 +612,14 @@ class SpecialistTrainer:
                 with torch.no_grad():
                     for vx, vy in zip(val_X, val_Y):
                         vpred = model(vx.to(DEVICE), [adj_geo, adj_conf]).squeeze()
-                        _, t_idx20 = torch.topk(vy, min(20, (vy>0).sum().item()))
-                        _, p_idx20 = torch.topk(vpred, 20)
-                        top20_set = set(p_idx20.cpu().numpy())
-                        for node_idx in t_idx20.cpu().numpy():
-                            if node_idx not in top20_set:
-                                self.vault.record_surprise(node_idx, intensity=vy[node_idx].item())
+                        k_top = min(20, (vy>0).sum().item(), N)
+                        if k_top > 0:
+                            _, t_idx20 = torch.topk(vy.to(DEVICE), k_top)
+                            _, p_idx20 = torch.topk(vpred, min(20, N))
+                            top20_set = set(p_idx20.cpu().numpy())
+                            for node_idx in t_idx20.cpu().numpy():
+                                if node_idx not in top20_set:
+                                    self.vault.record_surprise(node_idx, intensity=vy[node_idx].item())
                 
                 self.vault.save(epoch + 1)
 
