@@ -77,11 +77,11 @@ PREDICT_HORIZON = 14
 #         output_name  (nome do .pth salvo em models/active/)
 REGION_CONFIGS = {
     'fortaleza': dict(
-        window=120, lr=0.001,  epochs=120, patience=25, dropout=0.5, margin=1.0,
-        k_eval=10, use_momentum=True,  grad_accum=32,
+        window=60, lr=0.003,  epochs=120, patience=60, dropout=0.4, margin=1.0,
+        k_eval=10, use_momentum=True,  grad_accum=64,
         raw_cvli_context=True,
         output_name='fortaleza_model_active.pth',
-        focal_alpha=0.75, focal_gamma=1.5, ranking_weight=15.0
+        focal_alpha=0.55, focal_gamma=1.5, ranking_weight=15.0
     ),
     'rmf': dict(
         window=90,  lr=0.018, epochs=120, patience=20, dropout=0.5, margin=1.5,
@@ -302,7 +302,7 @@ class BinaryFocalRankingLoss(nn.Module):
         else:
             rank_loss = 0.0
 
-        return focal_loss + self.ranking_weight * rank_loss + 0.01 * torch.norm(pred, 2)
+        return focal_loss + self.ranking_weight * rank_loss
 
 
 # ─────────────────────────────────────────────

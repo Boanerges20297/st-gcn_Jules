@@ -1563,3 +1563,54 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 - *(A preencher após a conclusão)*
 
 ---
+
+## Tentativa 86 (Autolog - FORTALEZA) — 2026-04-30 22:30
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Learning Rate**: 0.001
+- **Patience**: 60 (Expansão)
+- **Ranking Weight**: 15.0
+
+### 3. Resultados
+- **Melhor P@10**: Estagnado (Valor idêntico em todas as épocas).
+- **Diagnóstico**: Identificada "Morte por Regularização". O termo `0.01 * torch.norm(pred, 2)` na Loss Function estava forçando todos os scores para próximo de zero, resultando em rankings idênticos e perda de gradiente tático.
+
+---
+
+## Tentativa 87 (Intervenção Tática — ResGAT + Foco Volátil) — 2026-05-01 08:57
+
+### 🎯 Motivação & Contexto
+- **Platô Matemático:** Romper a estagnação de P@10 observada na T86 causada pelo colapso de scores.
+- **Adaptação Tática:** Ajustar a janela temporal para capturar a dinâmica criminal recente de Fortaleza, que se mostrou altamente volátil.
+
+### 🏗️ Mudanças Arquiteturais (O "Tempero")
+- **ResGAT (Residual GAT):** Evolução do ShallowGAT de 1 camada para 2 camadas de `STGCNBlock` com conexão de salto (`skip connection`).
+    - *Objetivo:* Permitir que o sinal da primeira camada (vizinhança imediata) seja preservado enquanto a segunda camada extrai correlações de atrito de 2º grau.
+- **PReLU Activation:** Implementação de ativações paramétricas em todas as camadas para evitar o problema de gradientes mortos e permitir que a rede aprenda a escala ideal de penalização para áreas de baixa criminalidade.
+- **Topology:** Mantida a matriz `A_tactical` com normalização **Row-Stochastic** ($D^{-1} A$), garantindo que o sinal de inteligência (15x para apreensões) seja preservado sem inundar a memória histórica do nó.
+
+### 📉 Mudanças de Métricas & Loss
+- **Loss Logic:** 
+    - Remoção completa da regularização L2 de saída (`torch.norm(pred, 2)`).
+    - Foco puro no blend: **Focal Loss** (para calibração binária de hotspot) + **Ranking MSE** (para intensidade de conflito).
+- **Parâmetros de Ranking:**
+    - `Ranking Weight`: Mantido em **15.0** para garantir que a ordenação seja a prioridade absoluta do gradiente.
+    - `Focal Alpha`: Reduzido para **0.55** para suavizar a convergência em Fortaleza.
+
+### ⚙️ Hiperparâmetros de Treino
+- **Janela Temporal (Window):** Reduzida de `120` para `60` dias.
+    - *Racional:* Filtrar ruídos históricos de 2025 que não refletem mais o atrito tático atual das facções.
+- **Dropout:** Elevado para `0.4` para compensar o aumento de capacidade da rede residual e prevenir overfitting nos bairros com sinal de inteligência muito forte.
+- **Learning Rate:** Fixado em `0.003` com `OneCycleLR`.
+- **Patience:** `60` épocas (estratégia de exaustão).
+- **Grad Accumulation:** `64` passos (suavização de variância).
+
+### 📊 Resultados & Status
+- **Status:** Em execução (Época 004 em processamento).
+- **Métricas Parciais (Época 003):**
+    - **Val P@10:** 35.86% (Evolução constante).
+    - **Val P@20:** 48.06% (**Novo Recorde Regional** para esta fase).
+- **Análise Preliminar:** A remoção da regularização L2 e a conexão residual permitiram que o modelo quebrasse a estagnação. O P@20 de 48% indica que a cobertura estratégica está se consolidando rapidamente com a janela de 60 dias.
+
+---

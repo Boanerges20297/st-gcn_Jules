@@ -6,7 +6,7 @@ O sistema é uma plataforma de predição de crimes violentos (CVLI) para o esta
 ## 🚀 Status Arquitetural (Fase 7.5 - Intervenção Tática Ativa)
 O sistema opera em regime de upgrade do núcleo neural:
 1. **Intervenção Tática (A_tactical):** Substituição da adjacência geográfica por pesos de inteligência (Atrito de Facção e Fragilidade Viária 15x).
-2. **ShallowGAT:** Migração para arquitetura de camada única para evitar diluição de sinais táticos.
+2. **ResGAT (Tactical Residual GAT):** Evolução do ShallowGAT para 2 camadas com skip connections, otimizando o "tempero" tático sem perder a identidade histórica (Window 60d).
 3. **Normalização Row-Stochastic:** Controle de volume via $D^{-1} A$, preservando recordes de P@20 (54.2%).
 4. **Paradigma Híbrido (Champion/Challenger):** O `app.py` continua unindo ST-GAT com Sentinela V3.
 
@@ -22,10 +22,13 @@ O `src/core/champion_challenger.py` intercede após a inferência do ST-GAT. Ava
 
 ## Logs e Planejamento
 - Tentativas e otimizações registradas em `TRAINING_LOG.md`.
-- Próximos passos operacionais geridos via `tests/Sentinela/ROADMAP.md`.
+- Próximos passos operacionais geridos via `.planning/` e `tests/Sentinela/ROADMAP.md`.
 
 ## 🇧🇷 Idioma de Interação
 - **Mandato:** Todas as interações, explicações e respostas devem ser realizadas **obrigatoriamente em Português** e voltadas à praticidade tática.
 
+## Registro
+- **Registro de Logs:** A cada nova tentativa SEMPRE REGISTRAR EM TRAININGS_LOG.MD E ATUALIZAR OS ARQUIVOS DO .PLANING.
+
 ---
-*Última atualização: 14 de Abril de 2026*
+*Última atualização: 01 de Maio de 2026*
