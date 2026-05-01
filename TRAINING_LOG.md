@@ -1614,3 +1614,51 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 - **Análise Preliminar:** A remoção da regularização L2 e a conexão residual permitiram que o modelo quebrasse a estagnação. O P@20 de 48% indica que a cobertura estratégica está se consolidando rapidamente com a janela de 60 dias.
 
 ---
+
+
+## Tentativa 88 (Autolog - RMF) — 2026-05-01 14:12
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 90 dias
+- **Learning Rate**: 0.018
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 8
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.5
+- **Focal Gamma**: 2.0
+- **Ranking Weight**: 7.0
+- **Métrica de Avaliação**: P@5
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 89 (Autolog - INTERIOR) — 2026-05-01 14:13
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.005
+- **Dropout**: 0.3
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.4
+- **Focal Gamma**: 2.0
+- **Ranking Weight**: 4.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
