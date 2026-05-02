@@ -32,7 +32,7 @@ warnings.filterwarnings("ignore")
 #  CONFIGURAÇÕES
 # ─────────────────────────────────────────────────────────────────
 EVAL_DAYS      = 14   # janela de avaliação (dias) — 1 horizonte
-MIN_CVLI_CC    = 2    # mínimo de CVLI reais para arbitrar
+MIN_CVLI_CC    = 5    # mínimo de CVLI reais para arbitrar (Aumentado p/ estabilidade)
 MIN_ADVANTAGE  = 0.03 # vantagem mínima do challenger para ativar (3pp)
 ALPHA_EMA      = 0.3  # suavização exponencial dos pesos (low = mais lento p/ mudar)
 MAX_CC_WEIGHT  = 0.50 # peso máximo que o challenger pode atingir
@@ -58,10 +58,17 @@ def _normalize_scores(arr):
     return (arr - mn) / (mx - mn)
 
 def _pk(scores, targets, k):
-    """P@k entre dois arrays de scores."""
-    top_pred = set(np.argsort(scores)[::-1][:k])
-    top_real = set(np.argsort(targets)[::-1][:k])
-    return len(top_pred & top_real) / k
+    """
+    P@k (Precision at K) REAL.
+    Conta quantos dos top K bairros preditos realmente tiveram pelo menos 1 evento.
+    """
+    # Ordena os índices por score (predição) decrescente
+    top_pred_idx = np.argsort(scores)[::-1][:k]
+    
+    # Conta quantos desses índices no Ground Truth possuem valor > 0
+    hits = np.sum(targets[top_pred_idx] > 0)
+    
+    return float(hits / k)
 
 
 # ─────────────────────────────────────────────────────────────────
@@ -378,6 +385,9 @@ class ChampionChallenger:
         Atualiza cc_weight via EMA e persiste decisão.
         """
         try:
+            # Sincronização de Estado: Recarrega o peso persistido antes de avaliar
+            self._load_state()
+
             N  = len(self._top_bairros)
             T  = len(self._dates)
 
@@ -386,6 +396,7 @@ class ChampionChallenger:
             n_cvli = int(gt.sum())
 
             if n_cvli < MIN_CVLI_CC:
+                # Sinal insuficiente para mudar estratégia
                 self._log_decision("insufficient_signal", n_cvli, 0, 0, self._cc_weight)
                 return
 
@@ -401,19 +412,20 @@ class ChampionChallenger:
             chal_arr = np.array([chal_scores.get(b, 0.0) for b in self._top_bairros])
             p10_chal = _pk(chal_arr, gt, 10)
 
-            # Calcular novo peso via EMA
+            # Calcular novo peso via EMA (Exponential Moving Average)
             advantage = p10_chal - p10_champ
+            
             if advantage > MIN_ADVANTAGE:
-                # Challenger melhor → aumentar peso gradualmente
-                target_weight = min(MAX_CC_WEIGHT, self._cc_weight + advantage)
+                # Challenger melhor -> busca o teto (MAX_CC_WEIGHT)
+                target_weight = min(MAX_CC_WEIGHT, self._cc_weight + 0.1)
             elif advantage < -MIN_ADVANTAGE:
-                # Champion melhor → diminuir peso
-                target_weight = max(0.0, self._cc_weight + advantage)
+                # Champion melhor -> busca o piso (0.0)
+                target_weight = max(0.0, self._cc_weight - 0.1)
             else:
-                # Empate → manter
+                # Empate ou vantagem mínima -> mantém o peso atual
                 target_weight = self._cc_weight
 
-            # Suavização exponencial (evita oscilações bruscas)
+            # Aplica suavização exponencial (EMA)
             new_weight = ALPHA_EMA * target_weight + (1 - ALPHA_EMA) * self._cc_weight
             new_weight = float(np.clip(new_weight, 0.0, MAX_CC_WEIGHT))
 
@@ -424,9 +436,9 @@ class ChampionChallenger:
             decision = "challenger_wins" if advantage > MIN_ADVANTAGE else (
                         "champion_wins"   if advantage < -MIN_ADVANTAGE else "tie")
 
-            print(f"⚖️  [CC] n_cvli={n_cvli} | P@10 champion={p10_champ*100:.1f}% "
-                  f"challenger={p10_chal*100:.1f}% | "
-                  f"peso CC: {prev*100:.0f}%→{new_weight*100:.0f}% [{decision}]")
+            print(f"⚖️  [CC] n_cvli={n_cvli} | P@10 ST-GAT={p10_champ*100:.1f}% "
+                  f"LGBM={p10_chal*100:.1f}% | "
+                  f"Peso LGBM: {prev*100:.1f}% -> {new_weight*100:.1f}% [{decision}]")
 
             self._log_decision(decision, n_cvli, p10_champ, p10_chal, new_weight)
 

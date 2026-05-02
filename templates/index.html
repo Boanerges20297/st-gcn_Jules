@@ -366,8 +366,8 @@
                 <div class="card-body sidebar-card-body" style="overflow-y: auto; flex: 1; padding: 12px; font-size: 0.9rem;">
                     <div id="window-info" class="mb-1" style="font-size: 0.8rem;">
                         <small class="text-muted d-block" id="base-historica-info">Base Histórica: 19/11/2025 → 19/03/2026 (120 dias)</small>
-                        <small class="text-primary fw-bold" id="horizon-info">Horizonte de Predição: 7 dias</small>
-                        <small class="text-success d-block" id="validity-info">📅 Janela de Inteligência: Projeção 7 dias (Tempo Real)</small>
+                        <small class="text-primary fw-bold" id="horizon-info">Horizonte de Predição: 14 dias</small>
+                        <small class="text-success d-block" id="validity-info">📅 Janela de Inteligência: Projeção 14 dias (Tempo Real)</small>
                         <small class="text-secondary d-block" id="model-window-info">Modelo: ST-GAT Elite v3 (Janela: 120d)</small>
                         
                         <!-- Indicador de Áreas Estáveis -->
@@ -602,6 +602,9 @@
     map.createPane('micronodesPane');
     map.getPane('micronodesPane').style.zIndex = 650;
 
+    map.createPane('streetsPane');
+    map.getPane('streetsPane').style.zIndex = 420;
+
     // --- CAMADA DE RUAS TOTAIS (CACHE GEO) ---
     var allStreetsLayer = L.layerGroup();
     var allStreetsData = null; // Cache local para busca
@@ -625,7 +628,7 @@
         
         fetch('/api/all_streets').then(r => r.json()).then(data => {
             allStreetsData = data;
-            var renderer = L.canvas({ padding: 0.5 });
+            var renderer = L.canvas({ padding: 0.5, pane: 'streetsPane' });
             
             data.forEach(s => {
                 if (s.lat && s.lng) {
@@ -1008,6 +1011,8 @@
         $('#progress-text').hide();
         $('#loading-overlay').removeClass('d-none');
     }
+    // Aliases usados em loadAllStreets e simulateEscapeRoutes
+    var showLoadingOverlay = showLoading;
 
     function showLoadingWithProgress(msg, progress) {
         $('#loading-message').text(msg || 'Atualizando Modelos...');
@@ -1035,6 +1040,7 @@
             console.warn('invalidateSize/hide overlay failed', e);
         }
     }
+    var hideLoadingOverlay = function() { hideLoading(true); };
 
     function setExportScreenshotStatus(message, tone) {
         var el = $('#export-screenshot-status');
@@ -1153,8 +1159,8 @@
             $('#base-historica-info').text('Base Histórica: ' + dateText + ' (' + days + ' dias)');
         }
 
-        // Horizonte e Inteligência são fixos para o modelo Elite
-        $('#horizon-info').text('Horizonte de Predição: 7 dias');
+        // Horizonte fixo: 14 dias (predict_horizon_days=14, TRAINING_LOG Tentativa 47+)
+        $('#horizon-info').text('Horizonte de Predição: 14 dias');
         if (metaDataGlobal && metaDataGlobal.intelligence_label) {
             $('#validity-info').html('<i class="fas fa-brain"></i> ' + metaDataGlobal.intelligence_label);
         }

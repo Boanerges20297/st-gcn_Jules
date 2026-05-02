@@ -1749,13 +1749,79 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 
 
 
-## Tentativa 95 (Autolog - FORTALEZA) — 2026-05-01 17:37
+## Tentativa 94 (Regime de Estabilização: Carga Controlada) — 2026-05-01 17:37
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 🎯 Motivação
+- Eliminar o "quique" de convergência observado na T93.
+- Refinar a ordem dos bairros com passos menores e mais precisos.
+- Buscar o teto de 55% de P@20.
+
+### ⚙️ Configuração Técnica (Fortaleza Solo)
+- **Target (Horizonte)**: 7 dias
+- **Janela (Window)**: 30 dias
+- **Learning Rate**: 0.0008 (Scheduler OneCycleLR)
+- **Dropout**: 0.3
+- **Ranking Weight**: 12.0
+
+### 3. Resultados
+- **Status:** **COLAPSO (Aceleração Fatal)**
+- **Melhor P@20:** **49.44%** (Época 5)
+- **Análise Final:** O modelo demonstrou alta performance inicial sob LR baixo (warmup), mas colapsou totalmente na Época 14 quando o LR ultrapassou 0.00045. Na Época 18 (LR 0.00067), o gradiente explodiu (40.0) e a P@20 caiu para 25%. A aceleração do scheduler "chutou" o modelo para fora da zona de convergência íngreme do ranking agressivo.
+
+---
+
+## Tentativa 95 (Paradigma: Cold Stillness) — 2026-05-01 18:37
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 🎯 Motivação
+- Eliminar a instabilidade térmica do OneCycleLR.
+- Testar a convergência lenta e profunda com LR Estático.
+- Estabilizar o gradiente de ranking através de uma janela maior de contexto (60d).
+
+### ⚙️ Configuração Técnica (Fortaleza Solo)
+- **Target (Horizonte)**: 7 dias
+- **Janela (Window)**: **60 dias**
+- **Learning Rate**: **0.0002** (Estático - Sem Scheduler)
+- **Dropout**: 0.3
+- **Ranking Weight**: 12.0
+
+### 3. Resultados
+- **Status:** **SUCEDIDO (Prova de Conceito de Estabilidade)**
+- **Melhor P@20:** **50.93%** (Época 2)
+- **Análise Final:** O modelo provou que a inércia estática com janela de 60d elimina o risco de colapso estrutural. O gradiente permaneceu ancorado em 11.0. A performance orbitou os 50% de forma resiliente.
+
+---
+
+## Tentativa 96 (Refinamento de Cadência: Cold Stillness+) — 2026-05-01 19:26
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 🎯 Motivação
+- Aumentar levemente a velocidade de aprendizado mantendo a blindagem estática.
+- Capitalizar sobre o sucesso de estabilidade da T95.
+- Buscar convergência acelerada para o teto de 54%.
+
+### ⚙️ Configuração Técnica (Fortaleza Solo)
+- **Target (Horizonte)**: 7 dias
+- **Janela (Window)**: 60 dias
+- **Learning Rate**: **0.0003** (Estático - Sem Scheduler)
+- **Dropout**: 0.3
+- **Ranking Weight**: 12.0
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+
+## Tentativa 96 (Autolog - FORTALEZA) — 2026-05-01 18:48
 **Arquivo de Origem:** `train_all_specialists.py`
 
 ### 1. Hiperparâmetros (Carga Automática)
 - **Target (Horizonte)**: 7 dias
-- **Janela (Window)**: 30 dias
-- **Learning Rate**: 0.0008
+- **Janela (Window)**: 60 dias
+- **Learning Rate**: 0.0002
 - **Dropout**: 0.3
 - **Épocas**: 120
 - **Patience**: 60
@@ -1765,6 +1831,116 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 - **Focal Alpha**: 0.7
 - **Focal Gamma**: 2.0
 - **Ranking Weight**: 12.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 97 (Autolog - FORTALEZA) — 2026-05-01 19:25
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 7 dias
+- **Janela (Window)**: 60 dias
+- **Learning Rate**: 0.0003
+- **Dropout**: 0.3
+- **Épocas**: 120
+- **Patience**: 60
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.7
+- **Focal Gamma**: 2.0
+- **Ranking Weight**: 12.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- **Status:** **SUPERADO (Transição para Estratégia de Sprint)**
+- **Melhor P@20:** **49.67%** (Época 2)
+- **Análise Final:** A estabilidade foi total, mas a evolução pós-Época 5 mostrou-se matematicamente inviável sob regime de inércia lenta. O modelo atinge a saturação de inteligência espacial muito rápido.
+
+---
+
+## Tentativa 98 (Operação Cryogenic Sprint) — 2026-05-01 20:33
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 🎯 Motivação (Ajuste Cirúrgico Definitivo)
+- Baseada na arqueologia de 97 tentativas: o ápice de generalização ocorre entre as épocas 2 e 4.
+- Aceitar que o modelo é um **Sprinter de Elite**.
+- Objetivo: Atingir os 54.2% da T82 através de um ataque rápido e congelamento criogênico imediato para preservar o estado de glória.
+
+### 🏗️ Mecanismo de Execução
+1.  **Ataque (Épocas 1-4):** LR 0.001 fixo. Permite que o ResGAT/ShallowGAT se molde à matriz `A_tactical` instantaneamente.
+2.  **Mergulho Criogênico (Época 5+):** Drop de 100x no Learning Rate (0.00001). Congela os pesos, permitindo apenas micro-ajustes de ranking sem força para sair do vale de convergência ideal.
+3.  **Janela Tática (30 dias):** Retorno ao foco no "calor" recente que gerou os recordes de 53-54%.
+
+### ⚙️ Configuração Técnica (Fortaleza Solo)
+- **Janela (Window)**: 30 dias
+- **Learning Rate Base**: 0.001
+- **Regime**: Scheduler Lambda (1.0 até E4, 0.01 pós E4)
+- **Ranking Weight**: **15.0** (Autoridade de Elite)
+- **Dropout**: 0.3
+
+### 3. Resultados
+- **Status:** **ABORTADO (Saturação Precoce)**
+- **Melhor P@20:** 50.93%
+- **Análise Final:** O regime de Sprint provou que atingimos o topo da arquitetura rasa muito rápido. Para evoluir além disso, precisamos de profundidade e contraste ativo.
+
+---
+
+## Tentativa 99 (Paradigma Legacy Contrast - O Retorno) — 2026-05-01 21:00
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 🎯 Motivação (A Quebra do Platô & Hard Negative Mining)
+- Identificado o **Paradoxo da Saturação**: a Focal Loss isolada estabilizava o modelo, mas não forçava a diferenciação entre bairros "quase perigosos" e alvos reais.
+- Objetivo: Resgatar a profundidade da T46 (87.84% P@10) e injetar o **Contraste Tático** para forçar a evolução além da Época 5.
+
+### 🏗️ Arquitetura e Engenharia (V99 Elite)
+1.  **Motor Profundo:** Retorno à **DeepSTGAT_64** (3 camadas ST-GAT). A profundidade é essencial para que a Loss de Contraste realize filtragens sucessivas de ruído.
+2.  **Loss de Contraste Tático:** Implementação da `TacticalContrastLoss`. 
+    - Foca na margem entre a média dos hotspots reais e os **Top 10% Falsos Positivos** (Hard Negatives). 
+    - Força o gradiente a permanecer ativo mesmo quando a presença básica de crime já foi aprendida.
+3.  **Normalização V6 Pure Row:** Remoção do self-loop automático na matriz `adj_geo`. Isso isola a identidade do bairro (`h_self`) da pressão externa, permitindo que a rede aprenda o peso exato de cada influência.
+4.  **Janela Contextual:** 120 dias (Contexto macro para estabilização de pesos profundos).
+
+### ⚙️ Configuração Técnica (Fortaleza Solo)
+- **Window**: 120 dias | **Learning Rate**: 0.001 (E1-E4) -> 0.00001 (E5+)
+- **Ranking Weight**: 15.0 | **Margin**: 1.5 (Força de separação)
+- **Grad Accumulation**: 32 | **Dropout**: 0.3
+
+### 3. Resultados Finais (Status: CONCLUÍDO - EXCELÊNCIA TÁTICA)
+- **Melhor P@20:** **55.14%** (Atingido na Época 2 e sustentado por 13h30).
+- **Melhor P@10:** **37.65%** (Consolidação de elite, salto de 10% em relação ao baseline).
+- **Tempo de Voo:** 13 horas e 40 minutos de treino ininterrupto.
+- **Análise Final:** O modelo atingiu a **Saturação Assintótica** na Época 45. A inteligência profunda estabilizou o "piso" de performance em 54%, eliminando a volatilidade das tentativas anteriores. A rede provou que o foco no Top 10 (37%+) é a base ideal para o blend híbrido.
+
+### 🚀 Próximos Passos
+1.  **Promoção:** O modelo `fortaleza_model_active.pth` (V99) assume o trono como **Champion**.
+2.  **Operação Híbrida:** Integração imediata com o **Challenger (LGBM Lean)** em produção para buscar o teto de 60% de P@20 via blend dinâmico.
+3.  **Monitoramento:** Acompanhar se a estabilidade da DeepSTGAT reduz a necessidade de recalibração horária do Sentinela.
+
+---
+
+
+## Tentativa 100 (Autolog - FORTALEZA) — 2026-05-01 20:57
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 7 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.001
+- **Dropout**: 0.3
+- **Épocas**: 120
+- **Patience**: 60
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.7
+- **Focal Gamma**: 2.0
+- **Ranking Weight**: 15.0
 - **Métrica de Avaliação**: P@10
 
 ### 3. Resultados

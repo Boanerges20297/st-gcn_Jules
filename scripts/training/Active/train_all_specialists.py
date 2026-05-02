@@ -77,11 +77,11 @@ PREDICT_HORIZON = 7
 #         output_name  (nome do .pth salvo em models/active/)
 REGION_CONFIGS = {
     'fortaleza': dict(
-        window=30, lr=0.0008, epochs=120, patience=60, dropout=0.3, margin=1.0,
+        window=120, lr=0.001, epochs=120, patience=60, dropout=0.3, margin=1.5,
         k_eval=10, use_momentum=True,  grad_accum=32,
         raw_cvli_context=True,
         output_name='fortaleza_model_active.pth',
-        focal_alpha=0.70, focal_gamma=2.0, ranking_weight=12.0
+        focal_alpha=0.70, focal_gamma=2.0, ranking_weight=15.0
     ),
     'rmf': dict(
         window=30,  lr=0.018, epochs=120, patience=20, dropout=0.5, margin=1.5,
@@ -146,15 +146,11 @@ def autosave_training_log(region_key, config):
 
 def normalize_adj(adj):
     """
-    V5 ROW NORMALIZATION (Random Walk):
-    Em vez de esmagar simetricamente (o que mata a tática) ou passar bruto (o que abafa a 
-    história do próprio nó com um tsunami de sinal dos vizinhos), fazemos a normalização 
-    direcional D^-1 A.
-    Isso faz com que a soma das "atenções" aos vizinhos seja 1.0, mantendo a escala equilibrada 
-    com h_self, MAS preserva a proporção exata: o vizinho frágil continua recebendo 15x mais 
-    foco que o vizinho comum!
+    V6 PURE ROW NORMALIZATION:
+    Removido o self-loop (np.eye) para evitar o conflito de 'dupla identidade' com o W_self do GCN.
+    O sinal do bairro agora é puramente gerado pela sua própria trilha histórica (h_self),
+    enquanto adj_geo cuida apenas da pressão externa.
     """
-    adj = adj + np.eye(adj.shape[0])
     rowsum = np.array(adj.sum(1))
     r_inv = np.power(rowsum, -1).flatten()
     r_inv[np.isinf(r_inv)] = 0.
@@ -273,32 +269,44 @@ def publish_training_artifacts(trained_regions, failed_regions):
     logging.info(f"✅ Alterações do treino publicadas no repositório principal com commit: {commit_message}")
 
 
-class BinaryFocalRankingLoss(nn.Module):
+class TacticalContrastLoss(nn.Module):
     """
-    Focal Loss adaptada para Ranking. 
-    Foca nos hotspots (classe minoritária) e penaliza erros em áreas críticas.
+    V99 LEGACY CONTRAST LOSS:
+    Inspirada na ContrastiveTopKLoss da T46. 
+    Aplica Focal Loss para presença e uma Margem de Contraste entre Hotspots Reais e Hard Negatives.
     """
-    def __init__(self, alpha=0.25, gamma=2.0, ranking_weight=1.0):
+    def __init__(self, alpha=0.25, gamma=2.0, ranking_weight=1.0, margin=1.5):
         super().__init__()
         self.alpha = alpha
         self.gamma = gamma
         self.ranking_weight = ranking_weight
+        self.margin = margin
 
     def forward(self, pred, target):
-        # Target binário para Focal (houve ou não crime no horizonte)
         target_bin = (target > 0).float()
         
-        # Binary Focal Loss
+        # Focal Component (Generalização de Hotspots)
         probs = torch.sigmoid(pred)
         bce_loss = F.binary_cross_entropy_with_logits(pred, target_bin, reduction='none')
         p_t = probs * target_bin + (1 - probs) * (1 - target_bin)
-        focal_loss = self.alpha * (1 - p_t)**self.gamma * bce_loss
-        focal_loss = focal_loss.mean()
+        focal_loss = (self.alpha * (1 - p_t)**self.gamma * bce_loss).mean()
 
-        # Ranking Loss (MSE apenas nos positivos para forçar intensidade correta)
+        # Contrastive Component (Separação Tática)
         if target_bin.sum() > 0:
-            pos_mask = target_bin > 0
-            rank_loss = F.mse_loss(pred[pos_mask], target[pos_mask])
+            pos_scores = pred[target_bin > 0]
+            neg_scores = pred[target_bin == 0]
+            
+            # Hard Negative Mining: foca nos 10% dos bairros frios com maior score (Falsos Positivos)
+            num_hard = max(1, int(neg_scores.numel() * 0.10))
+            hard_negs, _ = torch.topk(neg_scores, num_hard)
+            
+            # Margem: Queremos pos_scores >> hard_negs
+            contrast_loss = F.relu(self.margin + hard_negs.mean() - pos_scores.mean())
+            
+            # MSE para manter a intensidade nos picos reais
+            mse_loss = F.mse_loss(pos_scores, target[target_bin > 0])
+            
+            rank_loss = contrast_loss + 0.5 * mse_loss
         else:
             rank_loss = 0.0
 
@@ -494,18 +502,37 @@ class SpecialistTrainer:
         logging.info(f"⏳ Split Temporal: {len(train_X)} treino (Passado) | {len(val_X)} validação (Futuro)")
 
         # Modelo e otimizador
-        # ⭐ ATUALIZAÇÃO V5: Substituindo DeepSTGAT por ShallowGAT para evitar overthinking na Matriz Tática
-        model = ShallowGAT(num_nodes=N, in_channels=C_ext, time_steps=self.window, dropout=self.dropout).to(DEVICE)
+        # ⭐ T99: Retorno à arquitetura DeepSTGAT_64 (3 camadas) para Fortaleza
+        if self.region_key == 'fortaleza':
+            logging.info("🧬 Restaurando Arquitetura DEEP-STGAT (3 Camadas) para Fortaleza...")
+            model = DeepSTGAT_64(num_nodes=N, in_channels=C_ext, time_steps=self.window, dropout=self.dropout).to(DEVICE)
+        else:
+            model = ShallowGAT(num_nodes=N, in_channels=C_ext, time_steps=self.window, dropout=self.dropout).to(DEVICE)
             
-        optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=2e-1)
-        criterion = BinaryFocalRankingLoss(alpha=focal_alpha, gamma=focal_gamma, ranking_weight=ranking_w)
+        optimizer = torch.optim.AdamW(model.parameters(), lr=self.lr, weight_decay=2e-1)
+        criterion = TacticalContrastLoss(
+            alpha=focal_alpha, gamma=focal_gamma, ranking_weight=ranking_w, margin=self.margin
+        )
 
         steps_per_epoch = (len(train_X) // self.grad_accum) + 1
-        scheduler = torch.optim.lr_scheduler.OneCycleLR(
-            optimizer, max_lr=self.lr,
-            steps_per_epoch=steps_per_epoch,
-            epochs=self.epochs, pct_start=0.2
-        )
+        
+        # ⭐ T98: Regime Cryogenic Sprint (Otimização Cirúrgica de 5 Épocas)
+        if self.region_key == 'fortaleza' and self.lr == 0.001:
+            logging.info(f"💉 REGIME CRYOGENIC SPRINT: Ataque 0.001 até E4, Congelamento 0.00001 após E5")
+            # O Lambda aqui recebe o STEP total, pois chamamos scheduler.step() a cada batch
+            scheduler = torch.optim.lr_scheduler.LambdaLR(
+                optimizer, 
+                lr_lambda=lambda step: 1.0 if step < (4 * steps_per_epoch) else 0.01
+            )
+        elif self.region_key == 'fortaleza' and self.lr <= 0.0003:
+            logging.info(f"❄️ REGIME COLD STILLNESS ATIVADO: LR Estático em {self.lr}")
+            scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda epoch: 1.0)
+        else:
+            scheduler = torch.optim.lr_scheduler.OneCycleLR(
+                optimizer, max_lr=self.lr,
+                steps_per_epoch=steps_per_epoch,
+                epochs=self.epochs, pct_start=0.2
+            )
         output_path = os.path.join(ROOT_DIR, 'models', 'active', self.output_name)
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
 

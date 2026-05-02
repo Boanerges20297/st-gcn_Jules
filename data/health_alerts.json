@@ -19,6 +19,36 @@
         "error_rate_percent": 11.11111111111111
       },
       "resolved": false
+    },
+    {
+      "timestamp": "2026-05-02T19:13:48.176972",
+      "type": "high_cpu",
+      "severity": "HIGH",
+      "message": "CPU alta: 96.9%",
+      "details": {
+        "cpu_percent": 96.9
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-02T19:36:53.791068",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 6.00%",
+      "details": {
+        "error_rate_percent": 6.0
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-02T19:45:47.259098",
+      "type": "high_cpu",
+      "severity": "HIGH",
+      "message": "CPU alta: 90.9%",
+      "details": {
+        "cpu_percent": 90.9
+      },
+      "resolved": false
     }
   ]
 }

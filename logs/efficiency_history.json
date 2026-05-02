@@ -663,205 +663,247 @@
   },
   {
     "date": "2026-04-23 00:00:00",
-    "total_events": 15,
-    "brute_cvli": 15,
+    "total_events": 81,
+    "brute_cvli": 81,
     "exogenous": 0,
     "exogenous_conflict": 0,
     "police_qualified_actions_7d": 0,
     "police_administrative_events_7d": 0,
-    "assigned_total_events": 15,
+    "assigned_total_events": 81,
     "unmapped_total_events": 0,
-    "assigned_brute_cvli": 15,
+    "assigned_brute_cvli": 81,
     "assigned_exogenous": 0,
     "unmapped_exogenous": 0,
     "assigned_police_qualified_actions": 0,
     "unmapped_police_qualified_actions": 0,
     "unmapped_exogenous_sample": [],
     "global": {
-      "total_nodes": 116,
-      "active_locations": 11,
-      "total_events": 15,
+      "total_nodes": 190,
+      "active_locations": 29,
+      "total_events": 81,
       "ranking_top10": [
-        "BARROSO",
         "CAUCAIA",
         "JUAZEIRO DO NORTE",
-        "TIANGUA",
-        "MARACANAU",
+        "PARQUE IRACEMA",
+        "BARROSO",
+        "CRATO",
+        "ANCURI",
         "CURIO",
+        "BOA VIAGEM",
+        "BARBALHA",
+        "SOBRAL"
+      ],
+      "gt_sample": [
+        "BARROSO",
+        "VARJOTA",
+        "CAUCAIA",
+        "HORIZONTE",
+        "SOBRAL",
+        "JUAZEIRO DO NORTE",
+        "ITAPIPOCA",
+        "CRATO",
+        "TIANGUA",
+        "IGUATU",
+        "ITAPAJE",
+        "QUIXADA",
+        "BOA VIAGEM",
+        "CARIRE",
+        "RUSSAS"
+      ],
+      "p5": 0.8,
+      "recall5": 0.1379,
+      "hits5": [
+        "CAUCAIA",
+        "JUAZEIRO DO NORTE",
+        "BARROSO",
+        "CRATO"
+      ],
+      "p10": 0.7,
+      "recall10": 0.2414,
+      "hits10": [
+        "CAUCAIA",
+        "JUAZEIRO DO NORTE",
+        "BARROSO",
+        "CRATO",
+        "BOA VIAGEM",
+        "BARBALHA",
+        "SOBRAL"
+      ],
+      "p20": 0.65,
+      "recall20": 0.4483,
+      "hits20": [
+        "CAUCAIA",
+        "JUAZEIRO DO NORTE",
+        "BARROSO",
+        "CRATO",
+        "BOA VIAGEM",
+        "BARBALHA",
+        "SOBRAL",
+        "VARJOTA",
+        "ITAPIPOCA",
+        "PEDRA BRANCA",
+        "ITAPAJE",
+        "LIMOEIRO DO NORTE",
+        "RUSSAS"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 118,
+      "active_locations": 2,
+      "total_events": 5,
+      "ranking_top10": [
+        "PARQUE IRACEMA",
+        "BARROSO",
+        "ANCURI",
+        "CURIO",
+        "VARJOTA",
+        "CRISTO REDENTOR",
         "BARRA DO CEARA",
         "PLANALTO AYRTON SENNA",
-        "PARQUE IRACEMA",
+        "JANGURUSSU",
         "GRANJA LISBOA"
       ],
       "gt_sample": [
         "BARROSO",
-        "BOM JARDIM",
-        "HORIZONTE",
-        "JUAZEIRO DO NORTE",
-        "TIANGUA",
-        "URUBURETAMA",
-        "JIJOCA DE JERICOACOARA",
-        "ACOPIARA",
-        "CARIRIACU",
-        "SANTANA DO ACARAU",
-        "CEDRO"
+        "VARJOTA"
       ],
-      "p5": 0.6,
-      "recall5": 0.2727,
+      "p5": 0.4,
+      "recall5": 1.0,
       "hits5": [
         "BARROSO",
-        "JUAZEIRO DO NORTE",
-        "TIANGUA"
+        "VARJOTA"
       ],
-      "p10": 0.3,
-      "recall10": 0.2727,
+      "p10": 0.2,
+      "recall10": 1.0,
       "hits10": [
         "BARROSO",
-        "JUAZEIRO DO NORTE",
-        "TIANGUA"
-      ],
-      "p20": 0.4,
-      "recall20": 0.7273,
-      "hits20": [
-        "BARROSO",
-        "JUAZEIRO DO NORTE",
-        "TIANGUA",
-        "HORIZONTE",
-        "CARIRIACU",
-        "BOM JARDIM",
-        "JIJOCA DE JERICOACOARA",
-        "ACOPIARA"
-      ]
-    },
-    "fortaleza": {
-      "total_nodes": 40,
-      "active_locations": 2,
-      "total_events": 3,
-      "ranking_top10": [
-        "BARROSO",
-        "CURIO",
-        "BARRA DO CEARA",
-        "PLANALTO AYRTON SENNA",
-        "PARQUE IRACEMA",
-        "GRANJA LISBOA",
-        "JOSE WALTER",
-        "MONDUBIM",
-        "BONSUCESSO",
-        "MESSEJANA"
-      ],
-      "gt_sample": [
-        "BARROSO",
-        "BOM JARDIM"
-      ],
-      "p5": 0.2,
-      "recall5": 0.5,
-      "hits5": [
-        "BARROSO"
-      ],
-      "p10": 0.1,
-      "recall10": 0.5,
-      "hits10": [
-        "BARROSO"
+        "VARJOTA"
       ],
       "p20": 0.1,
       "recall20": 1.0,
       "hits20": [
         "BARROSO",
-        "BOM JARDIM"
+        "VARJOTA"
       ]
     },
     "rmf": {
       "total_nodes": 19,
-      "active_locations": 1,
-      "total_events": 2,
+      "active_locations": 2,
+      "total_events": 3,
       "ranking_top10": [
         "CAUCAIA",
         "MARACANAU",
         "HORIZONTE",
-        "PARAIPABA",
-        "SAO LUIS DO CURU",
+        "TRAIRI",
+        "CASCAVEL",
+        "ITAITINGA",
         "PACAJUS",
-        "EUSEBIO",
-        "PINDORETAMA",
+        "MARANGUAPE",
         "PACATUBA",
-        "ITAITINGA"
+        "AQUIRAZ"
       ],
       "gt_sample": [
+        "CAUCAIA",
         "HORIZONTE"
       ],
-      "p5": 0.2,
+      "p5": 0.4,
       "recall5": 1.0,
       "hits5": [
+        "CAUCAIA",
         "HORIZONTE"
       ],
-      "p10": 0.1,
+      "p10": 0.2,
       "recall10": 1.0,
       "hits10": [
+        "CAUCAIA",
         "HORIZONTE"
       ],
-      "p20": 0.0526,
+      "p20": 0.1053,
       "recall20": 1.0,
       "hits20": [
+        "CAUCAIA",
         "HORIZONTE"
       ]
     },
     "interior": {
       "total_nodes": 50,
-      "active_locations": 8,
-      "total_events": 10,
+      "active_locations": 25,
+      "total_events": 73,
       "ranking_top10": [
         "JUAZEIRO DO NORTE",
-        "TIANGUA",
-        "CARIRIACU",
-        "VARZEA ALEGRE",
-        "JIJOCA DE JERICOACOARA",
-        "ACOPIARA",
-        "CEDRO",
-        "SANTANA DO ACARAU",
-        "URUBURETAMA",
-        "IRACEMA"
+        "CRATO",
+        "BOA VIAGEM",
+        "BARBALHA",
+        "SOBRAL",
+        "ITAPIPOCA",
+        "PEDRA BRANCA",
+        "ITAPAJE",
+        "LIMOEIRO DO NORTE",
+        "RUSSAS"
       ],
       "gt_sample": [
+        "SOBRAL",
         "JUAZEIRO DO NORTE",
+        "ITAPIPOCA",
+        "CRATO",
         "TIANGUA",
-        "URUBURETAMA",
-        "JIJOCA DE JERICOACOARA",
-        "ACOPIARA",
-        "CARIRIACU",
-        "SANTANA DO ACARAU",
-        "CEDRO"
+        "IGUATU",
+        "ITAPAJE",
+        "QUIXADA",
+        "BOA VIAGEM",
+        "CARIRE",
+        "RUSSAS",
+        "ARACATI",
+        "LIMOEIRO DO NORTE",
+        "BARBALHA",
+        "URUBURETAMA"
       ],
-      "p5": 0.8,
-      "recall5": 0.5,
+      "p5": 1.0,
+      "recall5": 0.2,
       "hits5": [
         "JUAZEIRO DO NORTE",
-        "TIANGUA",
-        "CARIRIACU",
-        "JIJOCA DE JERICOACOARA"
+        "CRATO",
+        "BOA VIAGEM",
+        "BARBALHA",
+        "SOBRAL"
       ],
-      "p10": 0.8,
-      "recall10": 1.0,
+      "p10": 1.0,
+      "recall10": 0.4,
       "hits10": [
         "JUAZEIRO DO NORTE",
-        "TIANGUA",
-        "CARIRIACU",
-        "JIJOCA DE JERICOACOARA",
-        "ACOPIARA",
-        "CEDRO",
-        "SANTANA DO ACARAU",
-        "URUBURETAMA"
+        "CRATO",
+        "BOA VIAGEM",
+        "BARBALHA",
+        "SOBRAL",
+        "ITAPIPOCA",
+        "PEDRA BRANCA",
+        "ITAPAJE",
+        "LIMOEIRO DO NORTE",
+        "RUSSAS"
       ],
-      "p20": 0.4,
-      "recall20": 1.0,
+      "p20": 1.0,
+      "recall20": 0.8,
       "hits20": [
         "JUAZEIRO DO NORTE",
+        "CRATO",
+        "BOA VIAGEM",
+        "BARBALHA",
+        "SOBRAL",
+        "ITAPIPOCA",
+        "PEDRA BRANCA",
+        "ITAPAJE",
+        "LIMOEIRO DO NORTE",
+        "RUSSAS",
         "TIANGUA",
-        "CARIRIACU",
         "JIJOCA DE JERICOACOARA",
+        "QUIXADA",
+        "ARACATI",
+        "IRAUCUBA",
         "ACOPIARA",
+        "URUBURETAMA",
         "CEDRO",
-        "SANTANA DO ACARAU",
-        "URUBURETAMA"
+        "MIRAIMA",
+        "IGUATU"
       ]
     }
   }

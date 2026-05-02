@@ -50,12 +50,23 @@ def normalize_text(text):
 
 def clean_name(n):
     n = normalize_text(n)
+    
+    # 1. Check if it's an official RMF city (partial match)
+    for rmf_city in RMF_OFFICIAL:
+        if rmf_city in n:
+            return rmf_city
+            
+    # 2. Merges for Fortaleza
     merges = ['CONJUNTO CEARA', 'PRAIA DO FUTURO', 'VILA MANOEL SATIRO', 'ALTO ALEGRE', 'EDSON QUEIROZ', 'JOSE WALTER']
     for m in merges:
         if m in n: return m
+        
+    # 3. Clean suffixes
+    n = re.sub(r'[\(\)].*', '', n) # Remove everything in parentheses
     n = re.sub(r'\s+[IVXLCDM]+$', '', n)
     n = re.sub(r'\s+\d+$', '', n)
     n = n.strip()
+    
     return SUBDIVISION_TO_CITY.get(n, n)
 
 def update_geo_streets_cache(df):
@@ -189,15 +200,27 @@ def process_ism_data():
     if OCORRENCIAS_FILE.endswith('.csv'):
         occ_raw = pd.read_csv(OCORRENCIAS_FILE)
         for _, row in occ_raw.iterrows():
+            # Normalização de Município e Bairro
+            mun = normalize_text(str(row.get('municipio', row.get('cidade', ''))))
+            bairro = normalize_text(str(row.get('bairro', '')))
+            
+            # --- REGRA DE OURO V4: Agregação por Cidade fora da Capital ---
+            if 'FORTALEZA' in mun:
+                loc_raw = bairro if (bairro and bairro != 'DESCONHECIDO') else 'FORTALEZA'
+            elif mun:
+                loc_raw = mun # RMF e Interior agregam SEMPRE por Município
+            else:
+                loc_raw = bairro if bairro else 'DESCONHECIDO'
+
             clean_records.append({
                 'data': pd.to_datetime(str(row.get('data')), errors='coerce'),
                 'tipo': str(row.get('tipo', '')).lower(),
-                'loc_clean': clean_name(row.get('bairro', row.get('cidade'))),
+                'loc_clean': clean_name(str(loc_raw)),
                 'tipo_evento': str(row.get('tipo_evento', '')).upper(),
                 'arma': str(row.get('arma', '')).upper(),
                 'latitude': row.get('latitude'),
                 'longitude': row.get('longitude'),
-                'qtd_mortes': float(row.get('qtd_mortes', 1)) # Nova coluna de anomalias
+                'qtd_mortes': float(row.get('qtd_mortes', 1))
             })
     else:
         with open(OCORRENCIAS_FILE, 'r', encoding='utf-8') as f:
@@ -209,9 +232,18 @@ def process_ism_data():
             def extract_scalar(key):
                 v = d_dict.get(key)
                 if isinstance(v, list) and len(v) > 0: v = v[0]
-                if isinstance(v, dict): v = v.get(key, next(iter(v.values())) if v else None)
                 return v
 
+            mun = normalize_text(extract_scalar('municipio') or extract_scalar('cidade') or '')
+            bairro = normalize_text(extract_scalar('bairro_geo') or extract_scalar('bairro') or '')
+            
+            if 'FORTALEZA' in mun:
+                loc_raw = bairro if (bairro and bairro != 'DESCONHECIDO') else 'FORTALEZA'
+            elif mun:
+                loc_raw = mun
+            else:
+                loc_raw = bairro if bairro else 'DESCONHECIDO'
+            
             dt_val = extract_scalar('data')
             if dt_val is None: continue
             
@@ -219,7 +251,7 @@ def process_ism_data():
                 clean_records.append({
                     'data': pd.to_datetime(str(dt_val), errors='coerce'),
                     'tipo': str(extract_scalar('tipo') or '').lower(),
-                    'loc_clean': clean_name(extract_scalar('bairro_geo') or extract_scalar('bairro') or extract_scalar('municipio') or extract_scalar('cidade')),
+                    'loc_clean': clean_name(str(loc_raw)),
                     'tipo_evento': str(extract_scalar('tipo_evento') or '').upper(),
                     'arma': str(extract_scalar('arma') or '').upper(),
                     'latitude': extract_scalar('latitude'),
@@ -345,7 +377,11 @@ def process_ism_data():
     # 4. Construir Tensores (Otimizado)
     # Filtrar intervalo solicitado: JAn/2022 até 25/Abr/2026
     start_d = pd.Timestamp('2022-02-01')
-    end_d = pd.Timestamp('2026-04-25')
+    end_d = occ_df['data'].max()
+    if pd.isna(end_d):
+        end_d = pd.Timestamp('2026-04-25') # Fallback de segurança
+    
+    logging.info(f"📅 Cronologia do Dataset: {start_d.date()} até {end_d.date()}")
     date_range = pd.date_range(start_d, end_d)
     date_map = {d: i for i, d in enumerate(date_range)}
     
@@ -364,7 +400,7 @@ def process_ism_data():
         if N == 0: continue
         
         logging.info(f"⏳ Processando tensores para {reg.upper()} ({N} nós)...")
-        features = np.zeros((N, len(date_range), 37)) # Expandido para 37 (V37 Elite)
+        features = np.zeros((N, len(date_range), 39)) # Expandido para 39 (V37 Elite + Momentum)
         node_map = {row['name']: i for i, row in reg_nodes.iterrows()}
         
         # Filtrar ocorrencias da regiao

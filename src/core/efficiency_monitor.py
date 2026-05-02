@@ -237,11 +237,13 @@ class EfficiencyMonitor:
                 if len(r_ground_truth) < MIN_EVENTS:
                     results[r_name] = {
                         "status": f"insufficient_events ({len(r_ground_truth)}<{MIN_EVENTS})",
-                        "p5": 0.0, "p10": 0.0, "p20": 0.0,
+                        "p5": None, "p10": None, "p20": None,
                         "active_locations": len(r_ground_truth),
                         "note": f"Menos de {MIN_EVENTS} localidades com eventos. Avaliação não confiável."
                     }
                     print(f"⚠️ [Monitor] Região {r_name.upper()}: SKIP — apenas {len(r_ground_truth)} localidades com eventos (mín={MIN_EVENTS}).")
+                    if len(r_ground_truth) == 0:
+                        print(f"ℹ️ [Monitor] DICA: Verifique se o dataset processado (.pkl) não está à frente dos dados reais do CSV.")
                     continue
                 
                 region_metrics = {

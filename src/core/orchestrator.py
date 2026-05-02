@@ -23,9 +23,9 @@ except ImportError:
 # ============================================================================
 
 try:
-    from .architectures import DeepSTGAT_64, DeepSTGAT_32
+    from .architectures import DeepSTGAT_64, DeepSTGAT_32, ShallowGAT
 except ImportError:
-    from architectures import DeepSTGAT_64, DeepSTGAT_32
+    from architectures import DeepSTGAT_64, DeepSTGAT_32, ShallowGAT
 
 def normalize_name(text):
     if not isinstance(text, str): return ""
@@ -51,7 +51,7 @@ class StateOrchestrator:
                 'model_path': os.path.join(self.root, 'models', 'active', fortaleza_model_file),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_fortaleza.pkl'),
                 'class': DeepSTGAT_64,
-                'in_channels': 37, 
+                'in_channels': 39, 
                 'window': 120 
             },
             'rmf': {
@@ -64,7 +64,7 @@ class StateOrchestrator:
             'interior': {
                 'model_path': os.path.join(self.root, 'models', 'active', interior_model_file),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_interior.pkl'),
-                'class': DeepSTGAT_64,
+                'class': ShallowGAT,
                 'in_channels': 37,
                 'window': 120
             }
