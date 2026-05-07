@@ -291,22 +291,17 @@ class TacticalContrastLoss(nn.Module):
         p_t = probs * target_bin + (1 - probs) * (1 - target_bin)
         focal_loss = (self.alpha * (1 - p_t)**self.gamma * bce_loss).mean()
 
-        # Contrastive Component (Separação Tática)
+        # Contrastive Component (Separação Tática - Puro Ranking)
         if target_bin.sum() > 0:
             pos_scores = pred[target_bin > 0]
             neg_scores = pred[target_bin == 0]
             
-            # Hard Negative Mining: foca nos 10% dos bairros frios com maior score (Falsos Positivos)
-            num_hard = max(1, int(neg_scores.numel() * 0.10))
+            # Hard Negative Mining: foca nos 15% dos bairros frios com maior score (Falsos Positivos)
+            num_hard = max(1, int(neg_scores.numel() * 0.15))
             hard_negs, _ = torch.topk(neg_scores, num_hard)
             
-            # Margem: Queremos pos_scores >> hard_negs
-            contrast_loss = F.relu(self.margin + hard_negs.mean() - pos_scores.mean())
-            
-            # MSE para manter a intensidade nos picos reais
-            mse_loss = F.mse_loss(pos_scores, target[target_bin > 0])
-            
-            rank_loss = contrast_loss + 0.5 * mse_loss
+            # Margem: Queremos pos_scores >> hard_negs (Assertividade Tática)
+            rank_loss = F.relu(self.margin + hard_negs.mean() - pos_scores.mean())
         else:
             rank_loss = 0.0
 
@@ -486,9 +481,20 @@ class SpecialistTrainer:
                     x_window[:, :, c] = (x_window[:, :, c] - m) / s
             
             x = torch.tensor(x_window, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0)
-            y = torch.tensor(
-                nf[:, t:t+target_horizon, 0].sum(axis=1), dtype=torch.float32
-            )
+            y_raw = nf[:, t:t+target_horizon, 0].sum(axis=1)
+            
+            # --- DIFUSÃO ESPACIAL (Micro/Macro Assertividade) ---
+            # O sinal de um crime difunde 20% para os vizinhos geográficos.
+            # Isso treina o modelo para reconhecer a REGIÃO crítica, não apenas o nó exato.
+            y_diffused = y_raw.copy()
+            for i in range(N):
+                if y_raw[i] > 0:
+                    neighbors = np.where(adj_geo_np[i] > 0)[0]
+                    for nb in neighbors:
+                        if nb != i:
+                            y_diffused[nb] += y_raw[i] * 0.2
+            
+            y = torch.tensor(y_diffused, dtype=torch.float32)
             
             # Slot vazio para o Canal 38 (MemPalace) e 39 (CVLI Ratio)
             if self.region_key == 'fortaleza':
