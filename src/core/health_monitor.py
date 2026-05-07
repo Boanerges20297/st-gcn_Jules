@@ -586,6 +586,11 @@ class ConfidenceTracker:
                 
                 # Mapear métricas do efficiency_monitor → formato do confidence_tracker
                 global_data = entry.get('global', {})
+                
+                # Pular registros com dados insuficientes (p10=None ou status insufficient)
+                if global_data.get('p10') is None or 'insufficient' in str(global_data.get('status', '')):
+                    continue
+                
                 global_metrics = {
                     'p10': global_data.get('p10', 0),
                     'p20': global_data.get('p20', 0),

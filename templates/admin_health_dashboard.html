@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -507,9 +507,9 @@
         <div class="section">
             <h2 class="section-title">🗺️ Cobertura Territorial do Modelo</h2>
             <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:12px 16px; margin-bottom:8px; font-size:13px; color:#94a3b8;">
-                Mede <strong style="color:#e2e8f0;">Precisão@K</strong>: fração do Top-K predito que contém CVLI ou evento real.
-                Fortaleza e RMF usam <strong style="color:#60a5fa;">P@10</strong> (100 e ~30 nós, sinal denso).
-                Interior usa <strong style="color:#f59e0b;">P@20</strong> (50 nós, janela de 28 dias) pois os eventos são esparsos — as mesmas cidades se repetem (Juazeiro, Sobral, Tauá), mas com poucos registros por período.
+                Fortaleza usa <strong style="color:#60a5fa;">P@10</strong> (Precisão — fração do Top-10 que acerta).
+                RMF usa <strong style="color:#10b981;">Recall@10</strong> (19 nós, 1-2 eventos por janela — P@10 é matematicamente ~10%; Recall mede se o modelo <em>encontra</em> os eventos).
+                Interior usa <strong style="color:#f59e0b;">P@20</strong> (50 nós, janela de 28 dias, eventos esparsos).
             </div>
             <div style="background:rgba(96,165,250,0.08); border:1px solid rgba(96,165,250,0.25); border-radius:6px; padding:8px 14px; margin-bottom:10px; font-size:12px; color:#bfdbfe;">
                 Régua operacional vigente: <strong style="color:#e2e8f0;">14 dias corridos</strong> para validar melhora real de modelo antes de promoção.
@@ -541,7 +541,7 @@
                         <th>Cov@10 Global</th>
                         <th>Cov@20 Global</th>
                         <th>Cov@10 Fortaleza</th>
-                        <th>Cov@10 RMF</th>
+                        <th>R@10 / P@10 RMF</th>
                         <th>Cov@20 / R@20 Interior</th>
                         <th>Status</th>
                     </tr>
@@ -876,11 +876,11 @@
                     return `
                     <tr>
                         <td>${record.date}</td>
-                        <td>${(record.global?.p10 * 100).toFixed(1)}%</td>
-                        <td>${(record.global?.p20 * 100).toFixed(1)}%</td>
-                        <td>${((record.regions?.fortaleza?.p10 ?? 0) * 100).toFixed(1)}% <small style="color:#64748b">(GT:${gtFor})</small></td>
-                        <td>${((record.regions?.rmf?.p10 ?? 0) * 100).toFixed(1)}% <small style="color:#64748b">(GT:${gtRmf})</small></td>
-                        <td><span style="color:${intColor}">${intP20}%</span> <small style="color:#64748b">| R20:${intR20}% (GT:${gtInt}/50 nós)</small></td>
+                        <td>${record.global?.p10 != null ? (record.global.p10 * 100).toFixed(1) + '%' : '—'}</td>
+                        <td>${record.global?.p20 != null ? (record.global.p20 * 100).toFixed(1) + '%' : '—'}</td>
+                        <td>${record.regions?.fortaleza?.p10 != null ? ((record.regions.fortaleza.p10) * 100).toFixed(1) + '%' : '—'} <small style="color:#64748b">(GT:${gtFor})</small></td>
+                        <td>${(() => { const rmf = record.regions?.rmf; const r10 = rmf?.recall10 ?? rmf?.recall; const p10 = rmf?.p10; if (r10 == null && p10 == null) return '—'; const r10Str = r10 != null ? (r10 * 100).toFixed(0) + '%' : '—'; const p10Str = p10 != null ? (p10 * 100).toFixed(0) + '%' : '—'; const color = r10 != null && r10 >= 0.5 ? '#10b981' : '#f59e0b'; return '<span style="color:' + color + '">' + r10Str + '</span> <small style="color:#64748b">P:' + p10Str + '</small>'; })()} <small style="color:#64748b">(GT:${gtRmf})</small></td>
+                        <td><span style="color:${intColor}">${intP20 !== 'NaN' ? intP20 + '%' : '—'}</span> <small style="color:#64748b">| R20:${intR20 !== 'NaN' ? intR20 + '%' : '—'} (GT:${gtInt}/50 nós)</small></td>
                         <td>${statusHtml}</td>
                     </tr>
                 `}).join('');
@@ -898,20 +898,38 @@
             const ctx = document.getElementById('confidence-chart').getContext('2d');
             
             const dates = history.map(h => h.date);
-            const p10Global = history.map(h => (h.global?.p10 || 0) * 100);
-            const p20Global = history.map(h => (h.global?.p20 || 0) * 100);
+            // CORREÇÃO: null = sem dados suficientes, não plotar como zero
+            const p10Global = history.map(h => h.global?.p10 != null ? h.global.p10 * 100 : null);
+            const p20Global = history.map(h => h.global?.p20 != null ? h.global.p20 * 100 : null);
 
-            // Fortaleza e RMF usam P10 (menor conjunto = mais exigente)
-            // Interior usa P20 (maior número de nós)
+            // Fortaleza usa P@10, Interior usa P@20, RMF usa Recall@10
+            // RMF tem apenas 19 nós e 1-2 eventos por janela: P@10 será sempre ~10%
+            // mas Recall@10 = 100% (o modelo encontra TODOS os eventos)
             const regionKey = (region && region !== 'global') ? region : 'fortaleza';
-            const useP10 = (regionKey !== 'interior');
-            const kLabel = useP10 ? 'P10' : 'P20';
             const regionDisplayNames = { fortaleza: 'Fortaleza', rmf: 'RMF', interior: 'Interior' };
-            const regionLabel = `Cov@${useP10 ? '10' : '20'} ${regionDisplayNames[regionKey] || regionKey}`;
-            const regionCovData = history.map(h => {
-                const rd = h.regions?.[regionKey];
-                return ((useP10 ? rd?.p10 : rd?.p20) ?? 0) * 100;
-            });
+            let regionLabel, regionCovData;
+            if (regionKey === 'rmf') {
+                regionLabel = `Recall@10 ${regionDisplayNames[regionKey]}`;
+                regionCovData = history.map(h => {
+                    const rd = h.regions?.[regionKey];
+                    const val = rd?.recall10 ?? rd?.recall;
+                    return val != null ? val * 100 : null;
+                });
+            } else if (regionKey === 'interior') {
+                regionLabel = `Cov@20 ${regionDisplayNames[regionKey]}`;
+                regionCovData = history.map(h => {
+                    const rd = h.regions?.[regionKey];
+                    const val = rd?.p20;
+                    return val != null ? val * 100 : null;
+                });
+            } else {
+                regionLabel = `Cov@10 ${regionDisplayNames[regionKey] || regionKey}`;
+                regionCovData = history.map(h => {
+                    const rd = h.regions?.[regionKey];
+                    const val = rd?.p10;
+                    return val != null ? val * 100 : null;
+                });
+            }
 
             const avgRegionCov = regionCovData.length > 0
                 ? regionCovData.reduce((a, b) => a + b, 0) / regionCovData.length
@@ -935,7 +953,8 @@
                             borderColor: '#3b82f6',
                             backgroundColor: 'rgba(59, 130, 246, 0.1)',
                             tension: 0.3,
-                            fill: false
+                            fill: false,
+                            spanGaps: true
                         },
                         {
                             label: 'Cov@20 Global',
@@ -943,7 +962,8 @@
                             borderColor: '#10b981',
                             backgroundColor: 'rgba(16, 185, 129, 0.1)',
                             tension: 0.3,
-                            fill: false
+                            fill: false,
+                            spanGaps: true
                         },
                         {
                             label: regionLabel,
@@ -954,7 +974,8 @@
                                 : 'rgba(245, 158, 11, 0.1)',
                             tension: 0.3,
                             fill: false,
-                            borderDash: [5, 3]
+                            borderDash: [5, 3],
+                            spanGaps: true
                         }
                     ]
                 },

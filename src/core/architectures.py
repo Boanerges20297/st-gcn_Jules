@@ -116,11 +116,11 @@ class DeepSTGAT_80(nn.Module):
         return self.fc(x)
 
 class ShallowGAT(nn.Module):
-    """MODELO TÁTICO (SHALLOW) - 1 única camada espaço-temporal focada na Matriz Tática."""
+    """MODELO TÁTICO RESIDUAL (ResGAT) - 2 camadas com skip connection para máxima extração tática."""
     def __init__(self, num_nodes, in_channels, time_steps, dropout=0.3):
         super().__init__()
-        # Apenas UMA camada GCN espaço-temporal para não borrar a matriz de adjacência
         self.layer1 = STGCNBlock(in_channels, 64, time_steps, dropout)
+        self.layer2 = STGCNBlock(64, 64, time_steps, dropout)
         
         self.final_conv = nn.Conv2d(64, 64, kernel_size=(1, time_steps))
         self.prelu_final = nn.PReLU()
@@ -133,13 +133,16 @@ class ShallowGAT(nn.Module):
         )
 
     def forward(self, x, adj_list):
-        # Passa pela matriz de adjacência (Tática) apenas 1x
-        x = self.layer1(x, adj_list)
+        # Primeira camada extrai inteligência imediata
+        out1 = self.layer1(x, adj_list)
+        # Segunda camada extrai correlações de vizinhança de 2º grau
+        out2 = self.layer2(out1, adj_list)
         
-        # Colapso temporal direto
+        # Residual: Preserva o sinal da primeira camada
+        x = out1 + out2
+        
+        # Colapso temporal e FC
         x = self.prelu_final(self.final_conv(x)).squeeze(-1).permute(0, 2, 1)
-        
-        # Pontuação Final
         return self.fc(x)
 
 class TemperatureExpertGAT(nn.Module):

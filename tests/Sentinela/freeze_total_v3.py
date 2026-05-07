@@ -79,6 +79,41 @@ def build_all(start_d=pd.Timestamp("2024-01-01")):
     print("[1/3] Carregando e processando dados completos...")
 
     df = pd.read_csv(CSV_ENRICH, low_memory=False)
+
+    # --- REPARO DE BAIRROS VIA GEOLOCALIZACAO (Recuperar 'DESCONHECIDO') ---
+    print("    Reparando bairros via geolocalização (Lat/Long)...")
+    from scipy.spatial import KDTree
+    with open(LATLON_FILE, encoding="utf-8") as f:
+        raw_ll = json.load(f)
+    fort_ll = {norm(k): v for k, v in raw_ll.items() if v.get('regiao') == 'fortaleza'}
+    names_ll = list(fort_ll.keys())
+    coords_ll = np.array([[fort_ll[n]['lat'], fort_ll[n]['long']] for n in names_ll])
+    tree = KDTree(coords_ll)
+    
+    mask_null = df['bairro'].isna() | (df['bairro'].apply(norm) == 'DESCONHECIDO')
+    mask_gps  = df['latitude'].notna() & df['longitude'].notna()
+    mask_rep  = mask_null & mask_gps
+    
+    if mask_rep.sum() > 0:
+        points = df.loc[mask_rep, ['latitude', 'longitude']].values
+        dist, idx = tree.query(points)
+        THRESHOLD = 0.045 # Aprox 5km
+        df_update = df.loc[mask_rep].copy()
+        recovered = 0
+        for i, (d, ix) in enumerate(zip(dist, idx)):
+            if d < THRESHOLD:
+                df_update.iloc[i, df_update.columns.get_loc('bairro')] = names_ll[ix]
+                df_update.iloc[i, df_update.columns.get_loc('cidade')] = 'FORTALEZA'
+                recovered += 1
+            else:
+                # Regra: se não for Fortaleza, usar a cidade como bairro
+                cid = str(df_update.iloc[i, df_update.columns.get_loc('cidade')]).upper()
+                if cid != 'FORTALEZA' and cid != 'NAN' and cid != 'DESCONHECIDO':
+                    df_update.iloc[i, df_update.columns.get_loc('bairro')] = cid
+                    recovered += 1
+        df.update(df_update)
+        print(f"    [OK] {recovered} registros recuperados via GPS.")
+
     df = df[df["cidade"].str.upper() == "FORTALEZA"].copy()
     df["bairro"]     = df["bairro"].apply(norm)
     df["data"]       = pd.to_datetime(df["data"], errors="coerce")

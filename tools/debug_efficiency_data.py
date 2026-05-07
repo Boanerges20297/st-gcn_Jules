@@ -20,27 +20,26 @@ def debug_efficiency():
         nf = data.get('node_features')
         dates = data.get('dates', [])
         
-        print(f"Total dates: {len(dates)}")
-        print(f"Last date in dataset: {dates[-1]}")
+        print(f"Total dates in .pkl: {len(dates)}")
+        print(f"Last 3 dates in dataset: {dates[-3:] if len(dates) >= 3 else dates}")
         
-        # Check CVLI channel (0) for the last 7 days
-        recent_cvli = nf[:, -7:, 0]
-        total_cvli = recent_cvli.sum()
-        print(f"Total CVLI in last 7 days of dataset: {total_cvli}")
+        # Check CVLI channel (0) for the last 14 days (Monitor standard)
+        window = 14
+        recent_cvli = nf[:, -window:, 0]
+        total_recent = recent_cvli.sum()
+        print(f"Total CVLI in last {window} days of dataset: {total_recent}")
         
-        if total_cvli > 0:
-            # Show top nodes with crimes
-            node_sums = recent_cvli.sum(axis=1)
-            top_indices = np.argsort(node_sums)[-5:][::-1]
-            print("Top nodes with crimes in last 7 days:")
-            for idx in top_indices:
-                name = data['nodes_gdf'].iloc[idx]['name']
-                print(f" - {name}: {node_sums[idx]} crimes")
-        else:
-            print("WARNING: No CVLI found in the last 7 steps of node_features.")
-            # Check more steps back
-            all_cvli = nf[:, :, 0].sum()
-            print(f"Total CVLI in whole dataset: {all_cvli}")
+        # Checking alignment with raw CSV
+        csv_path = 'data/raw/dados_status_ocorrencias_gerais_ENRIQUECIDO.csv'
+        if os.path.exists(csv_path):
+            df_raw = pd.read_csv(csv_path, usecols=['data', 'tipo'], low_memory=False)
+            df_raw['data'] = pd.to_datetime(df_raw['data'], errors='coerce')
+            last_csv_date = df_raw['data'].max()
+            print(f"Last date in Raw CSV: {last_csv_date}")
+            
+            if last_csv_date < dates[-1]:
+                print(f"🚨 ALERTA: O arquivo .pkl está à frente do CSV em {(dates[-1].date() - last_csv_date.date()).days} dias.")
+                print(f"Isto causa o SKIP no Monitor pois a janela de 14 dias termina em zeros.")
 
 if __name__ == '__main__':
     debug_efficiency()

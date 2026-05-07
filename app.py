@@ -1630,7 +1630,7 @@ def get_risk():
         except Exception:
             meta['top10'] = []
 
-            # --- CORREÇÃO: Adicionar Datas da Janela de Inteligência (Projeção 7 dias) ---
+            # --- CORREÇÃO: Adicionar Datas da Janela de Inteligência (Projeção 14 dias conforme TRAINING_LOG) ---
         try:
             if orchestrator is not None and hasattr(orchestrator, 'dates') and orchestrator.dates is not None:
                 last_db_date = orchestrator.dates[-1]
@@ -1639,9 +1639,9 @@ def get_risk():
                 else:
                     last_db_dt = last_db_date
                 
-                # Início e Fim da Projeção (7 dias à frente da base)
+                # Início e Fim da Projeção (14 dias à frente da base conforme TRAINING_LOG Tentativa 47+)
                 start_pred = last_db_dt + timedelta(days=1)
-                end_pred = last_db_dt + timedelta(days=7)
+                end_pred = last_db_dt + timedelta(days=14)
                 
                 meta['start_cvli'] = str(orchestrator.dates[0])
                 meta['last_date_base'] = last_db_dt.strftime('%d/%m/%Y')
@@ -1652,7 +1652,7 @@ def get_risk():
                 meta['model_window_cvli'] = 120 # Nova janela de 120 dias para todos
                 
             else:
-                meta['intelligence_label'] = "Janela de Inteligência: Projeção 7 dias (Tempo Real)"
+                meta['intelligence_label'] = "Janela de Inteligência: Projeção 14 dias (Tempo Real)"
                 meta['last_date_base'] = 'N/A'
                 meta['model_architecture'] = "ST-GAT Elite v3"
                 meta['model_window_cvli'] = 120
