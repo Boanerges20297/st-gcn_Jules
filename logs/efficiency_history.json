@@ -209,5 +209,380 @@
         "JIJOCA DE JERICOACOARA"
       ]
     }
+  },
+  {
+    "date": "2026-04-25 00:00:00",
+    "total_events": 10,
+    "brute_cvli": 10,
+    "exogenous": 0,
+    "exogenous_conflict": 0,
+    "police_qualified_actions_7d": 0,
+    "police_administrative_events_7d": 0,
+    "assigned_total_events": 10,
+    "unmapped_total_events": 0,
+    "assigned_brute_cvli": 10,
+    "assigned_exogenous": 0,
+    "unmapped_exogenous": 0,
+    "assigned_police_qualified_actions": 0,
+    "unmapped_police_qualified_actions": 0,
+    "unmapped_exogenous_sample": [],
+    "global": {
+      "total_nodes": 191,
+      "active_locations": 10,
+      "total_events": 10,
+      "ranking_top10": [
+        "CAUCAIA",
+        "BARROSO",
+        "ANCURI",
+        "JUAZEIRO DO NORTE",
+        "MESSEJANA",
+        "AMADEU FURTADO",
+        "SANTANA DO ACARAU",
+        "AEROLANDIA",
+        "TIANGUA",
+        "URUBURETAMA"
+      ],
+      "gt_sample": [
+        "BARROSO",
+        "CAUCAIA",
+        "JUAZEIRO DO NORTE",
+        "TIANGUA",
+        "URUBURETAMA",
+        "JIJOCA DE JERICOACOARA",
+        "ACOPIARA",
+        "MIRAIMA",
+        "SANTANA DO ACARAU",
+        "CEDRO"
+      ],
+      "p5": 0.6,
+      "recall5": 0.3,
+      "hits5": [
+        "CAUCAIA",
+        "BARROSO",
+        "JUAZEIRO DO NORTE"
+      ],
+      "p10": 0.6,
+      "recall10": 0.6,
+      "hits10": [
+        "CAUCAIA",
+        "BARROSO",
+        "JUAZEIRO DO NORTE",
+        "SANTANA DO ACARAU",
+        "TIANGUA",
+        "URUBURETAMA"
+      ],
+      "p20": 0.5,
+      "recall20": 1.0,
+      "hits20": [
+        "CAUCAIA",
+        "BARROSO",
+        "JUAZEIRO DO NORTE",
+        "SANTANA DO ACARAU",
+        "TIANGUA",
+        "URUBURETAMA",
+        "MIRAIMA",
+        "ACOPIARA",
+        "CEDRO",
+        "JIJOCA DE JERICOACOARA"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 122,
+      "active_locations": 1,
+      "total_events": 1,
+      "ranking_top10": [
+        "BARROSO",
+        "ANCURI",
+        "MESSEJANA",
+        "AMADEU FURTADO",
+        "AEROLANDIA",
+        "ALTO ALEGRE",
+        "BARRA DO CEARA",
+        "PLANALTO AYRTON SENNA",
+        "JANGURUSSU",
+        "LAGOA REDONDA"
+      ],
+      "gt_sample": [
+        "BARROSO"
+      ],
+      "p5": 0.2,
+      "recall5": 1.0,
+      "hits5": [
+        "BARROSO"
+      ],
+      "p10": 0.1,
+      "recall10": 1.0,
+      "hits10": [
+        "BARROSO"
+      ],
+      "p20": 0.05,
+      "recall20": 1.0,
+      "hits20": [
+        "BARROSO"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 19,
+      "active_locations": 1,
+      "total_events": 1,
+      "ranking_top10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "HORIZONTE",
+        "PACAJUS",
+        "EUSEBIO",
+        "SAO LUIS DO CURU",
+        "PINDORETAMA",
+        "PACATUBA",
+        "ITAITINGA",
+        "PARAIPABA"
+      ],
+      "gt_sample": [
+        "CAUCAIA"
+      ],
+      "p5": 0.2,
+      "recall5": 1.0,
+      "hits5": [
+        "CAUCAIA"
+      ],
+      "p10": 0.1,
+      "recall10": 1.0,
+      "hits10": [
+        "CAUCAIA"
+      ],
+      "p20": 0.0526,
+      "recall20": 1.0,
+      "hits20": [
+        "CAUCAIA"
+      ]
+    },
+    "interior": {
+      "total_nodes": 50,
+      "active_locations": 8,
+      "total_events": 8,
+      "ranking_top10": [
+        "JUAZEIRO DO NORTE",
+        "SANTANA DO ACARAU",
+        "TIANGUA",
+        "URUBURETAMA",
+        "MIRAIMA",
+        "ACOPIARA",
+        "CEDRO",
+        "VARZEA ALEGRE",
+        "JIJOCA DE JERICOACOARA",
+        "LIMOEIRO DO NORTE"
+      ],
+      "gt_sample": [
+        "JUAZEIRO DO NORTE",
+        "TIANGUA",
+        "URUBURETAMA",
+        "JIJOCA DE JERICOACOARA",
+        "ACOPIARA",
+        "MIRAIMA",
+        "SANTANA DO ACARAU",
+        "CEDRO"
+      ],
+      "p5": 1.0,
+      "recall5": 0.625,
+      "hits5": [
+        "JUAZEIRO DO NORTE",
+        "SANTANA DO ACARAU",
+        "TIANGUA",
+        "URUBURETAMA",
+        "MIRAIMA"
+      ],
+      "p10": 0.8,
+      "recall10": 1.0,
+      "hits10": [
+        "JUAZEIRO DO NORTE",
+        "SANTANA DO ACARAU",
+        "TIANGUA",
+        "URUBURETAMA",
+        "MIRAIMA",
+        "ACOPIARA",
+        "CEDRO",
+        "JIJOCA DE JERICOACOARA"
+      ],
+      "p20": 0.4,
+      "recall20": 1.0,
+      "hits20": [
+        "JUAZEIRO DO NORTE",
+        "SANTANA DO ACARAU",
+        "TIANGUA",
+        "URUBURETAMA",
+        "MIRAIMA",
+        "ACOPIARA",
+        "CEDRO",
+        "JIJOCA DE JERICOACOARA"
+      ]
+    }
+  },
+  {
+    "date": "2026-05-05 00:00:00",
+    "total_events": 11,
+    "brute_cvli": 11,
+    "exogenous": 0,
+    "exogenous_conflict": 0,
+    "police_qualified_actions_7d": 0,
+    "police_administrative_events_7d": 0,
+    "assigned_total_events": 11,
+    "unmapped_total_events": 0,
+    "assigned_brute_cvli": 11,
+    "assigned_exogenous": 0,
+    "unmapped_exogenous": 0,
+    "assigned_police_qualified_actions": 0,
+    "unmapped_police_qualified_actions": 0,
+    "unmapped_exogenous_sample": [],
+    "global": {
+      "total_nodes": 191,
+      "active_locations": 9,
+      "total_events": 11,
+      "ranking_top10": [
+        "CAUCAIA",
+        "BARROSO",
+        "ALTO ALEGRE",
+        "JUAZEIRO DO NORTE",
+        "PLANALTO AYRTON SENNA",
+        "CANINDEZINHO",
+        "AEROLANDIA",
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "VARZEA ALEGRE"
+      ],
+      "gt_sample": [
+        "AEROPORTO",
+        "BARROSO",
+        "BOM JARDIM",
+        "CANINDEZINHO",
+        "EDSON QUEIROZ",
+        "JUAZEIRO DO NORTE",
+        "URUBURETAMA",
+        "CARIRE",
+        "MIRAIMA"
+      ],
+      "p5": 0.4,
+      "recall5": 0.2222,
+      "hits5": [
+        "BARROSO",
+        "JUAZEIRO DO NORTE"
+      ],
+      "p10": 0.3,
+      "recall10": 0.3333,
+      "hits10": [
+        "BARROSO",
+        "JUAZEIRO DO NORTE",
+        "CANINDEZINHO"
+      ],
+      "p20": 0.3,
+      "recall20": 0.6667,
+      "hits20": [
+        "BARROSO",
+        "JUAZEIRO DO NORTE",
+        "CANINDEZINHO",
+        "BOM JARDIM",
+        "CARIRE",
+        "MIRAIMA"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 122,
+      "active_locations": 5,
+      "total_events": 5,
+      "ranking_top10": [
+        "BARROSO",
+        "ALTO ALEGRE",
+        "PLANALTO AYRTON SENNA",
+        "CANINDEZINHO",
+        "AEROLANDIA",
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "BOM JARDIM",
+        "SIQUEIRA",
+        "LAGOA REDONDA"
+      ],
+      "gt_sample": [
+        "AEROPORTO",
+        "BARROSO",
+        "BOM JARDIM",
+        "CANINDEZINHO",
+        "EDSON QUEIROZ"
+      ],
+      "p5": 0.4,
+      "recall5": 0.4,
+      "hits5": [
+        "BARROSO",
+        "CANINDEZINHO"
+      ],
+      "p10": 0.3,
+      "recall10": 0.6,
+      "hits10": [
+        "BARROSO",
+        "CANINDEZINHO",
+        "BOM JARDIM"
+      ],
+      "p20": 0.15,
+      "recall20": 0.6,
+      "hits20": [
+        "BARROSO",
+        "CANINDEZINHO",
+        "BOM JARDIM"
+      ]
+    },
+    "rmf": {
+      "status": "insufficient_events (0<1)",
+      "p5": 0.0,
+      "p10": 0.0,
+      "p20": 0.0,
+      "active_locations": 0,
+      "total_nodes": 19,
+      "total_events": 0,
+      "note": "Menos de 1 localidades com eventos. Avalia\u00e7\u00e3o n\u00e3o confi\u00e1vel."
+    },
+    "interior": {
+      "total_nodes": 50,
+      "active_locations": 4,
+      "total_events": 6,
+      "ranking_top10": [
+        "JUAZEIRO DO NORTE",
+        "VARZEA ALEGRE",
+        "CARIRE",
+        "ITAPIUNA",
+        "MIRAIMA",
+        "ARATUBA",
+        "CRATO",
+        "LIMOEIRO DO NORTE",
+        "URUBURETAMA",
+        "JAGUARUANA"
+      ],
+      "gt_sample": [
+        "JUAZEIRO DO NORTE",
+        "URUBURETAMA",
+        "CARIRE",
+        "MIRAIMA"
+      ],
+      "p5": 0.6,
+      "recall5": 0.75,
+      "hits5": [
+        "JUAZEIRO DO NORTE",
+        "CARIRE",
+        "MIRAIMA"
+      ],
+      "p10": 0.4,
+      "recall10": 1.0,
+      "hits10": [
+        "JUAZEIRO DO NORTE",
+        "CARIRE",
+        "MIRAIMA",
+        "URUBURETAMA"
+      ],
+      "p20": 0.2,
+      "recall20": 1.0,
+      "hits20": [
+        "JUAZEIRO DO NORTE",
+        "CARIRE",
+        "MIRAIMA",
+        "URUBURETAMA"
+      ]
+    }
   }
 ]

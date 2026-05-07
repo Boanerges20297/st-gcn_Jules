@@ -23,9 +23,9 @@ except ImportError:
 # ============================================================================
 
 try:
-    from .architectures import DeepSTGAT_64, DeepSTGAT_32
+    from .architectures import DeepSTGAT_64, DeepSTGAT_32, ShallowGAT
 except ImportError:
-    from architectures import DeepSTGAT_64, DeepSTGAT_32
+    from architectures import DeepSTGAT_64, DeepSTGAT_32, ShallowGAT
 
 def normalize_name(text):
     if not isinstance(text, str): return ""
@@ -50,8 +50,8 @@ class StateOrchestrator:
             'fortaleza': {
                 'model_path': os.path.join(self.root, 'models', 'active', fortaleza_model_file),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_fortaleza.pkl'),
-                'class': DeepSTGAT_64,
-                'in_channels': 37, 
+                'class': ShallowGAT,
+                'in_channels': 39, 
                 'window': 120 
             },
             'rmf': {
@@ -64,7 +64,7 @@ class StateOrchestrator:
             'interior': {
                 'model_path': os.path.join(self.root, 'models', 'active', interior_model_file),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_interior.pkl'),
-                'class': DeepSTGAT_64,
+                'class': ShallowGAT,
                 'in_channels': 37,
                 'window': 120
             }
@@ -274,6 +274,11 @@ class StateOrchestrator:
             active_window = cp.get('dynamic_window', window)
             if active_window and active_window < window:
                 x_final[:, :window - active_window, :29] = 0.0
+
+            # Pad se o modelo exigir mais canais do que o dataset possui (ex: MemPalace e CVP Ratio de Fortaleza)
+            if x_final.shape[2] < channels:
+                pad_width = channels - x_final.shape[2]
+                x_final = np.pad(x_final, ((0, 0), (0, 0), (0, pad_width)), mode='constant', constant_values=0.0)
 
             x = torch.from_numpy(x_final).float().permute(2, 0, 1).unsqueeze(0).to(self.device)
             adj = self._norm_adj(data['adj_geo'], data['adj_conflict'])

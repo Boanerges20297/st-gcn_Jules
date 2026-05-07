@@ -77,18 +77,21 @@ PREDICT_HORIZON = 14
 #         output_name  (nome do .pth salvo em models/active/)
 REGION_CONFIGS = {
     'fortaleza': dict(
-        # T88: weight_decay 0.2→0.005 (causa raiz #1 do colapso pós-Época 3)
-        #      grad_accum 32→6  (ruído estocástico restaurado — fuga de mínimos rasos)
-        #      dropout 0.5→0.35 (menos regularização redundante com wd baixo)
-        #      focal_gamma 1.5→2.5 (foco mais agressivo nos hotspots difíceis)
-        #      ranking_weight 15→7 (MSE nos positivos dominava demais o loss)
-        #      pct_start 0.2→0.08 (warmup mais curto → pico de LR antes da Época 3)
-        window=120, lr=0.001, epochs=150, patience=30, dropout=0.35, margin=1.0,
+        # T89: OneCycleLR → CosineAnnealingWarmRestarts (T0=10, Tmult=2)
+        #      O modelo sempre pica na Época 1-3 com OneCycle — o LR já passou
+        #      do ótimo antes da validação. Com Cosine+Restarts, o modelo tem
+        #      múltiplos ciclos para buscar novos mínimos sem explodir.
+        #      lr_base: 1e-4 → 3e-4 (começa mais "esperto", sem warmup lento)
+        #      grad_accum mantido em 6 (ruído estocástico)
+        #      dropout 0.35, wd 0.005 mantidos (T88 sem problema nesses)
+        window=120, lr=3e-4, epochs=200, patience=40, dropout=0.35, margin=1.0,
         k_eval=10, use_momentum=True, grad_accum=6,
         raw_cvli_context=True,
         output_name='fortaleza_model_active.pth',
         focal_alpha=0.70, focal_gamma=2.5, ranking_weight=7.0,
-        weight_decay=0.005, pct_start=0.08
+        weight_decay=0.005,
+        # Cosine scheduler params
+        scheduler='cosine_restarts', cosine_T0=10, cosine_Tmult=2, cosine_eta_min=1e-6
     ),
     'rmf': dict(
         window=90,  lr=0.018, epochs=120, patience=20, dropout=0.5, margin=1.5,
@@ -489,18 +492,33 @@ class SpecialistTrainer:
         # ⭐ ATUALIZAÇÃO V5: Substituindo DeepSTGAT por ShallowGAT para evitar overthinking na Matriz Tática
         model = ShallowGAT(num_nodes=N, in_channels=C_ext, time_steps=self.window, dropout=self.dropout).to(DEVICE)
             
-        # T88: weight_decay lido do config (padrão 0.005 para Fortaleza, 0.01 para outros)
-        wd = REGION_CONFIGS[self.region_key].get('weight_decay', 0.01)
-        optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=wd)
+        # T89: weight_decay e lr_base lidos do config por região
+        wd      = REGION_CONFIGS[self.region_key].get('weight_decay', 0.01)
+        lr_base = self.lr  # Para Fortaleza: 3e-4 (T89); outros: mantém config
+        optimizer = torch.optim.AdamW(model.parameters(), lr=lr_base, weight_decay=wd)
         criterion = BinaryFocalRankingLoss(alpha=focal_alpha, gamma=focal_gamma, ranking_weight=ranking_w)
 
         steps_per_epoch = (len(train_X) // self.grad_accum) + 1
-        pct_start = REGION_CONFIGS[self.region_key].get('pct_start', 0.2)
-        scheduler = torch.optim.lr_scheduler.OneCycleLR(
-            optimizer, max_lr=self.lr,
-            steps_per_epoch=steps_per_epoch,
-            epochs=self.epochs, pct_start=pct_start
-        )
+        sched_type = REGION_CONFIGS[self.region_key].get('scheduler', 'onecycle')
+
+        if sched_type == 'cosine_restarts':
+            # T89: CosineAnnealingWarmRestarts — múltiplos ciclos, sem pico agressivo
+            T0      = REGION_CONFIGS[self.region_key].get('cosine_T0', 10)
+            Tmult   = REGION_CONFIGS[self.region_key].get('cosine_Tmult', 2)
+            eta_min = REGION_CONFIGS[self.region_key].get('cosine_eta_min', 1e-6)
+            scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
+                optimizer, T_0=T0, T_mult=Tmult, eta_min=eta_min
+            )
+            logging.info(f"📐 Scheduler: CosineAnnealingWarmRestarts (T0={T0}, Tmult={Tmult}, eta_min={eta_min})")
+        else:
+            # Legado: OneCycleLR (RMF e Interior mantêm)
+            pct_start = REGION_CONFIGS[self.region_key].get('pct_start', 0.2)
+            scheduler = torch.optim.lr_scheduler.OneCycleLR(
+                optimizer, max_lr=self.lr,
+                steps_per_epoch=steps_per_epoch,
+                epochs=self.epochs, pct_start=pct_start
+            )
+            logging.info(f"📐 Scheduler: OneCycleLR (max_lr={self.lr}, pct_start={pct_start})")
         output_path = os.path.join(ROOT_DIR, 'models', 'active', self.output_name)
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
@@ -548,8 +566,10 @@ class SpecialistTrainer:
 
                     torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
                     optimizer.step()
-                    current_lr = scheduler.get_last_lr()[0]
-                    scheduler.step()
+                    # T89: CosineRestarts faz step por época, não por batch
+                    if sched_type != 'cosine_restarts':
+                        scheduler.step()
+                    current_lr = optimizer.param_groups[0]['lr']
                     optimizer.zero_grad()
 
                     step_loss = loss.item() * self.grad_accum
@@ -661,19 +681,29 @@ class SpecialistTrainer:
             if DEVICE.type == 'cuda':
                 torch.cuda.empty_cache()
             gc.collect()
+            # T89: CosineRestarts — step por época (não por batch)
+            if sched_type == 'cosine_restarts':
+                scheduler.step()
 
-        logging.info(f"\n✅ {self.region_key.upper()} concluído. Melhor P@{self.k_eval}: {self.best_pk*100:.2f}%")
+        logging.info(f"\n✅ {self.region_key.upper()} concluído. Melhor {metric_label}: {self.best_pk*100:.2f}% | Melhor P@10: {max(pk10_list)*100:.2f}% | Melhor P@20: {max(pk20_list)*100:.2f}%")
 
 
 # ─────────────────────────────────────────────
 # Ponto de entrada
 # ─────────────────────────────────────────────
 def main():
-    # Treina sequencialmente: fortaleza → rmf → interior
-    # Para treinar apenas uma região: comente as outras ou passe argv
-    regions = sys.argv[1:] if len(sys.argv) > 1 else list(REGION_CONFIGS.keys())
+    # Uso: py train_all_specialists.py [região1 região2 ...] [--publish]
+    # --publish : publica no git após o treino (desativado por padrão — achar o ponto ótimo antes)
+    args = sys.argv[1:]
+    do_publish = '--publish' in args
+    regions_raw = [a for a in args if not a.startswith('--')]
+    regions = regions_raw if regions_raw else list(REGION_CONFIGS.keys())
+
+    if not do_publish:
+        logging.info("🔒 Modo LOCAL: publish automático DESATIVADO. Use --publish para enviar ao git.")
+
     trained_regions = []
-    failed_regions = []
+    failed_regions  = []
     for region in regions:
         if region not in REGION_CONFIGS:
             logging.error(f"❌ Região desconhecida: {region}. Opções: {list(REGION_CONFIGS.keys())}")
@@ -688,11 +718,17 @@ def main():
             import traceback
             traceback.print_exc()
 
-    if trained_regions:
+    if trained_regions and do_publish:
         try:
             publish_training_artifacts(trained_regions, failed_regions)
         except Exception as exc:
-            logging.error(f"❌ ERRO AO PUBLICAR ALTERAÇÕES DO TREINO NO GIT PRINCIPAL: {exc}")
+            logging.error(f"❌ ERRO AO PUBLICAR: {exc}")
+    elif trained_regions and not do_publish:
+        logging.info(
+            f"✅ Treino local concluído: {trained_regions}. "
+            f"Quando satisfeito com as métricas, publique com:\n"
+            f"   py scripts/training/Active/train_all_specialists.py {' '.join(trained_regions)} --publish"
+        )
 
 if __name__ == "__main__":
     main()

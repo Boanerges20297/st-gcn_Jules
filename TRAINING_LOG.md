@@ -1757,3 +1757,81 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 - *(A preencher após a conclusão)*
 
 ---
+
+
+## Tentativa 89 (Autolog - FORTALEZA) — 2026-04-30 19:24
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.0003
+- **Dropout**: 0.35
+- **Épocas**: 200
+- **Patience**: 40
+- **Grad Accumulation**: 6
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.7
+- **Focal Gamma**: 2.5
+- **Ranking Weight**: 7.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 89 (Manual - FORTALEZA) — 2026-04-30 19:24
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate (base)**: 3e-4 (direto, sem warmup lento)
+- **Dropout**: 0.35
+- **Épocas**: 200
+- **Patience**: 40
+- **Grad Accumulation**: 6
+- **Weight Decay**: 0.005
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.70
+- **Focal Gamma**: 2.5
+- **Ranking Weight**: 7.0
+- **Métrica de Avaliação**: P@20 (alvo), P@10 (monitorado)
+
+### 3. Mudança Principal (vs T88)
+- **Scheduler**: OneCycleLR → **CosineAnnealingWarmRestarts** (T0=10, Tmult=2, eta_min=1e-6)
+- **Motivação**: Modelo sempre pica na Época 1-3 com OneCycle. Cosine+Restarts dá múltiplos ciclos para escapar do mínimo inicial.
+- **Publish automático**: DESATIVADO (modo local — buscar ponto ótimo antes de publicar)
+
+### 4. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 90 (Autolog - FORTALEZA) — 2026-04-30 19:26
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.0003
+- **Dropout**: 0.35
+- **Épocas**: 200
+- **Patience**: 40
+- **Grad Accumulation**: 6
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.7
+- **Focal Gamma**: 2.5
+- **Ranking Weight**: 7.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---

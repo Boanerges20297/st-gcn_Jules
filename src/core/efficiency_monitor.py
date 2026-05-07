@@ -80,7 +80,7 @@ class EfficiencyMonitor:
             # 2a. EFICIÊNCIA BRUTA: Coletar CVLIs Reais dos últimos N passos de tempo
             # Interior tem eventos muito esparsos: usar janela mais longa (28 passos)
             # Fortaleza/RMF usam 14 passos (sinal mais denso, janela menor é suficiente)
-            WINDOW_BY_REGION = {'fortaleza': 14, 'rmf': 14, 'interior': 28}
+            WINDOW_BY_REGION = {'fortaleza': 14, 'rmf': 28, 'interior': 28}
             
             # --- AJUSTE DE DATA DE REFERÊNCIA (ANTI-CALMARIA) ---
             # Se a base de dados estiver defasada, usamos a última data da base como 'hoje' para a avaliação.
@@ -239,6 +239,8 @@ class EfficiencyMonitor:
                         "status": f"insufficient_events ({len(r_ground_truth)}<{MIN_EVENTS})",
                         "p5": 0.0, "p10": 0.0, "p20": 0.0,
                         "active_locations": len(r_ground_truth),
+                        "total_nodes": len(r_scores),
+                        "total_events": sum(r_ground_truth.values()),
                         "note": f"Menos de {MIN_EVENTS} localidades com eventos. Avaliação não confiável."
                     }
                     print(f"⚠️ [Monitor] Região {r_name.upper()}: SKIP — apenas {len(r_ground_truth)} localidades com eventos (mín={MIN_EVENTS}).")

@@ -620,8 +620,7 @@
     });
 
     function loadAllStreets() {
-        showLoadingOverlay();
-        document.getElementById('loading-message').textContent = "Mapeando 28.000+ logradouros...";
+        showLoading("Mapeando 28.000+ logradouros...");
         
         fetch('/api/all_streets').then(r => r.json()).then(data => {
             allStreetsData = data;
@@ -644,9 +643,9 @@
             });
             streetsLoaded = true;
             map.addLayer(allStreetsLayer);
-            hideLoadingOverlay();
+            hideLoading(true);
         }).catch(err => {
-            hideLoadingOverlay();
+            hideLoading(true);
             console.error("Erro ao carregar ruas:", err);
         });
     }
