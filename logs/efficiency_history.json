@@ -439,15 +439,15 @@
       "total_events": 11,
       "ranking_top10": [
         "CAUCAIA",
-        "BARROSO",
         "ALTO ALEGRE",
-        "JUAZEIRO DO NORTE",
-        "PLANALTO AYRTON SENNA",
         "CANINDEZINHO",
+        "BARROSO",
+        "PLANALTO AYRTON SENNA",
+        "JUAZEIRO DO NORTE",
         "AEROLANDIA",
         "BARRA DO CEARA",
-        "MESSEJANA",
-        "VARZEA ALEGRE"
+        "BOM JARDIM",
+        "MESSEJANA"
       ],
       "gt_sample": [
         "AEROPORTO",
@@ -463,25 +463,27 @@
       "p5": 0.4,
       "recall5": 0.2222,
       "hits5": [
-        "BARROSO",
-        "JUAZEIRO DO NORTE"
-      ],
-      "p10": 0.3,
-      "recall10": 0.3333,
-      "hits10": [
-        "BARROSO",
-        "JUAZEIRO DO NORTE",
-        "CANINDEZINHO"
-      ],
-      "p20": 0.3,
-      "recall20": 0.6667,
-      "hits20": [
-        "BARROSO",
-        "JUAZEIRO DO NORTE",
         "CANINDEZINHO",
+        "BARROSO"
+      ],
+      "p10": 0.4,
+      "recall10": 0.4444,
+      "hits10": [
+        "CANINDEZINHO",
+        "BARROSO",
+        "JUAZEIRO DO NORTE",
+        "BOM JARDIM"
+      ],
+      "p20": 0.35,
+      "recall20": 0.7778,
+      "hits20": [
+        "CANINDEZINHO",
+        "BARROSO",
+        "JUAZEIRO DO NORTE",
         "BOM JARDIM",
         "CARIRE",
-        "MIRAIMA"
+        "MIRAIMA",
+        "URUBURETAMA"
       ]
     },
     "fortaleza": {
@@ -489,16 +491,16 @@
       "active_locations": 5,
       "total_events": 5,
       "ranking_top10": [
-        "BARROSO",
         "ALTO ALEGRE",
-        "PLANALTO AYRTON SENNA",
         "CANINDEZINHO",
+        "BARROSO",
+        "PLANALTO AYRTON SENNA",
         "AEROLANDIA",
         "BARRA DO CEARA",
-        "MESSEJANA",
         "BOM JARDIM",
-        "SIQUEIRA",
-        "LAGOA REDONDA"
+        "MESSEJANA",
+        "NOVO MONDUBIM",
+        "ANCURI"
       ],
       "gt_sample": [
         "AEROPORTO",
@@ -510,29 +512,29 @@
       "p5": 0.4,
       "recall5": 0.4,
       "hits5": [
-        "BARROSO",
-        "CANINDEZINHO"
+        "CANINDEZINHO",
+        "BARROSO"
       ],
       "p10": 0.3,
       "recall10": 0.6,
       "hits10": [
-        "BARROSO",
         "CANINDEZINHO",
+        "BARROSO",
         "BOM JARDIM"
       ],
       "p20": 0.15,
       "recall20": 0.6,
       "hits20": [
-        "BARROSO",
         "CANINDEZINHO",
+        "BARROSO",
         "BOM JARDIM"
       ]
     },
     "rmf": {
       "status": "insufficient_events (0<1)",
-      "p5": 0.0,
-      "p10": 0.0,
-      "p20": 0.0,
+      "p5": null,
+      "p10": null,
+      "p20": null,
       "active_locations": 0,
       "total_nodes": 19,
       "total_events": 0,
@@ -546,12 +548,12 @@
         "JUAZEIRO DO NORTE",
         "VARZEA ALEGRE",
         "CARIRE",
-        "ITAPIUNA",
         "MIRAIMA",
-        "ARATUBA",
+        "ITAPIUNA",
+        "URUBURETAMA",
         "CRATO",
         "LIMOEIRO DO NORTE",
-        "URUBURETAMA",
+        "ARATUBA",
         "JAGUARUANA"
       ],
       "gt_sample": [
