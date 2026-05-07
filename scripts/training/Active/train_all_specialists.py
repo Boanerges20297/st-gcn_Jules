@@ -77,22 +77,22 @@ PREDICT_HORIZON = 7
 #         output_name  (nome do .pth salvo em models/active/)
 REGION_CONFIGS = {
     'fortaleza': dict(
-        window=120, lr=0.001, epochs=120, patience=60, dropout=0.3, margin=1.5,
-        k_eval=10, use_momentum=True,  grad_accum=32,
+        window=120, lr=0.005, epochs=20, patience=10, dropout=0.3, margin=1.5,
+        k_eval=10, use_momentum=True,  grad_accum=4,
         raw_cvli_context=True,
         output_name='fortaleza_model_active.pth',
         focal_alpha=0.70, focal_gamma=2.0, ranking_weight=15.0
     ),
     'rmf': dict(
-        window=30,  lr=0.018, epochs=120, patience=20, dropout=0.5, margin=1.5,
-        k_eval=5,  use_momentum=True, grad_accum=8,
+        window=30,  lr=0.018, epochs=20, patience=10, dropout=0.5, margin=1.5,
+        k_eval=5,  use_momentum=True, grad_accum=4,
         raw_cvli_context=True,
         output_name='rmf_model.pth',
         focal_alpha=0.50, focal_gamma=2.0, ranking_weight=7.0
     ),
     'interior': dict(
-        window=120, lr=0.005, epochs=120, patience=20, dropout=0.3, margin=1.0,
-        k_eval=10, use_momentum=True,  grad_accum=32,
+        window=120, lr=0.005, epochs=20, patience=10, dropout=0.3, margin=1.0,
+        k_eval=10, use_momentum=True,  grad_accum=4,
         raw_cvli_context=True,
         output_name='interior_model.pth',
         focal_alpha=0.40, focal_gamma=2.0, ranking_weight=4.0
@@ -462,15 +462,23 @@ class SpecialistTrainer:
         nz = (cvli_flat > 0).sum()
         logging.info(f"📊 CVLI não-zero (Canal 0): {nz}/{len(cvli_flat)} ({nz/len(cvli_flat)*100:.2f}%)")
 
-        # Construção dos pares (X, Y) com SPLIT TEMPORAL (sem shuffle)
-        logging.info("🔄 Gerando janelas com Normalização Z-Score Local (per-window)...")
+        # ⏳ FOCO TEMPORAL: Últimos 60 dias de amostras
+        # Horizonte alvo de previsão (7 dias)
+        target_horizon = 7 
+        focus_days = 60
+        
+        # O range original era range(self.window, T - PREDICT_HORIZON)
+        # Agora limitamos o início para pegar apenas os últimos focus_days
+        start_t = max(self.window, T - target_horizon - focus_days)
+        end_t = T - target_horizon
+
+        logging.info(f"🔄 Gerando janelas focadas nos últimos {focus_days} dias (Range: {start_t} até {end_t})...")
         X_list, Y_list = [], []
-        for t in range(self.window, T - PREDICT_HORIZON):
+        for t in range(start_t, end_t):
             # Janela de entrada
             x_window = features[:, t-self.window:t, :].copy()
             
             # 🔄 NORMALIZAÇÃO LOCAL POR JANELA (Z-Score)
-            # Para cada canal, normaliza com base na média/std da própria janela (exceto binários/sazonais)
             for c in range(C_ext):
                 if c in [0, 1, 2, 24, 27, 28, 31, 33, 34, 35, 36]:
                     m = x_window[:, :, c].mean()
@@ -479,27 +487,26 @@ class SpecialistTrainer:
             
             x = torch.tensor(x_window, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0)
             y = torch.tensor(
-                nf[:, t:t+PREDICT_HORIZON, 0].sum(axis=1), dtype=torch.float32
+                nf[:, t:t+target_horizon, 0].sum(axis=1), dtype=torch.float32
             )
             
             # Slot vazio para o Canal 38 (MemPalace) e 39 (CVLI Ratio)
             if self.region_key == 'fortaleza':
-                # Adiciona dois canais extras de zeros (N, 2, window)
                 x = torch.cat([x, torch.zeros((1, 2, N, self.window))], dim=1)
                 
             X_list.append(x)
             Y_list.append(y)
 
-        logging.info(f"📐 Janelas construídas: {len(X_list)}")
+        logging.info(f"📐 Janelas focadas construídas: {len(X_list)}")
 
         # ⏳ SPLIT TEMPORAL ESTRITO (Sem shuffle)
-        # 85% passado para treino, 15% futuro recente para validação
-        split = int(len(X_list) * 0.85)
+        # Com foco em 60 dias, usamos 50 dias para treino e os últimos 10 para validação
+        split = max(1, len(X_list) - 10) 
         train_X = X_list[:split]
         train_Y = Y_list[:split]
         val_X   = X_list[split:]
         val_Y   = Y_list[split:]
-        logging.info(f"⏳ Split Temporal: {len(train_X)} treino (Passado) | {len(val_X)} validação (Futuro)")
+        logging.info(f"⏳ Split Focado: {len(train_X)} treino | {len(val_X)} validação (Últimos 10 dias)")
 
         # Modelo e otimizador
         # ⭐ T99: Retorno à arquitetura DeepSTGAT_64 (3 camadas) para Fortaleza

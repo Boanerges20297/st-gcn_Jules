@@ -595,6 +595,7 @@
 
     map.createPane('areaPolygonsPane');
     map.getPane('areaPolygonsPane').style.zIndex = 410;
+    map.getPane('areaPolygonsPane').style.pointerEvents = 'auto'; // Bairros ativos por padrão
 
     map.createPane('topMicronodesPane');
     map.getPane('topMicronodesPane').style.zIndex = 640;
@@ -603,7 +604,8 @@
     map.getPane('micronodesPane').style.zIndex = 650;
 
     map.createPane('streetsPane');
-    map.getPane('streetsPane').style.zIndex = 420;
+    map.getPane('streetsPane').style.zIndex = 400; // Por padrão abaixo dos bairros
+    map.getPane('streetsPane').style.pointerEvents = 'none'; // Inativo por padrão
 
     // --- CAMADA DE RUAS TOTAIS (CACHE GEO) ---
     var allStreetsLayer = L.layerGroup();
@@ -612,12 +614,18 @@
 
     $('#toggle-all-streets').on('change', function() {
         if ($(this).is(':checked')) {
+            map.getPane('streetsPane').style.zIndex = 420; // Malha por cima
+            map.getPane('streetsPane').style.pointerEvents = 'auto'; 
+            map.getPane('areaPolygonsPane').style.pointerEvents = 'none'; // Desativa bairros para clique
             if (!streetsLoaded) {
                 loadAllStreets();
             } else {
                 map.addLayer(allStreetsLayer);
             }
         } else {
+            map.getPane('streetsPane').style.zIndex = 400; // Bairros por cima
+            map.getPane('streetsPane').style.pointerEvents = 'none';
+            map.getPane('areaPolygonsPane').style.pointerEvents = 'auto'; // Bairros voltam a ser superiores
             map.removeLayer(allStreetsLayer);
         }
     });

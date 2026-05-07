@@ -76,6 +76,35 @@ def pk(scores, targets, k):
 def build_features(top_bairros, start_d=pd.Timestamp("2024-01-01")):
     """Constrói matrix de features (N×T) para todos os bairros."""
     df = pd.read_csv(CSV_ENRICH, low_memory=False)
+
+    # --- REPARO DE BAIRROS VIA GEOLOCALIZACAO (Sincronizado com v3_freeze) ---
+    from scipy.spatial import KDTree
+    with open(LATLON_FILE, encoding="utf-8") as f:
+        raw_ll = json.load(f)
+    fort_ll = {norm(k): v for k, v in raw_ll.items() if v.get('regiao') == 'fortaleza'}
+    names_ll = list(fort_ll.keys())
+    coords_ll = np.array([[fort_ll[n]['lat'], fort_ll[n]['long']] for n in names_ll])
+    tree = KDTree(coords_ll)
+    
+    mask_null = df['bairro'].isna() | (df['bairro'].apply(norm) == 'DESCONHECIDO')
+    mask_gps  = df['latitude'].notna() & df['longitude'].notna()
+    mask_rep  = mask_null & mask_gps
+    
+    if mask_rep.sum() > 0:
+        points = df.loc[mask_rep, ['latitude', 'longitude']].values
+        dist, idx = tree.query(points)
+        THRESHOLD = 0.045 # Aprox 5km
+        df_update = df.loc[mask_rep].copy()
+        for i, (d, ix) in enumerate(zip(dist, idx)):
+            if d < THRESHOLD:
+                df_update.iloc[i, df_update.columns.get_loc('bairro')] = names_ll[ix]
+                df_update.iloc[i, df_update.columns.get_loc('cidade')] = 'FORTALEZA'
+            else:
+                cid = str(df_update.iloc[i, df_update.columns.get_loc('cidade')]).upper()
+                if cid != 'FORTALEZA' and cid != 'NAN' and cid != 'DESCONHECIDO':
+                    df_update.iloc[i, df_update.columns.get_loc('bairro')] = cid
+        df.update(df_update)
+
     df = df[df["cidade"].str.upper() == "FORTALEZA"].copy()
     df["bairro"] = df["bairro"].apply(norm)
     df["data"]   = pd.to_datetime(df["data"], errors="coerce")
@@ -173,6 +202,40 @@ def build_features(top_bairros, start_d=pd.Timestamp("2024-01-01")):
         for ni in range(N):
             arr[ni] = pd.Series(cvli_raw[ni]).ewm(halflife=hl,min_periods=1).mean().values
         feats[f"cvli_ewma_{hl}d"] = arr
+
+    # --- INTEGRAÇÃO CONTEXTUAL (Sincronizado com v3_freeze) ---
+    try:
+        import sys
+        if BASE_PATH not in sys.path: sys.path.append(BASE_PATH)
+        from src.enrichment import is_brazil_holiday, is_cvp_hot_day
+        weather_cache = {}
+        weather_path = os.path.join(BASE_PATH, "data", "weather_archive_cache.json")
+        if os.path.exists(weather_path):
+            with open(weather_path, 'r') as f:
+                weather_cache = json.load(f)
+        
+        f_canal = np.zeros((N, T), np.float32)
+        h_canal = np.zeros((N, T), np.float32)
+        c_canal = np.zeros((N, T), np.float32)
+        
+        for ti, d_val in enumerate(dates):
+            is_h = 1.0 if is_brazil_holiday(d_val) else 0.0
+            is_hot = 1.0 if is_cvp_hot_day(d_val) else 0.0
+            precip = float(weather_cache.get(d_val.strftime('%Y-%m-%d'), 0.0))
+            
+            f_canal[:, ti] = is_h
+            h_canal[:, ti] = is_hot
+            c_canal[:, ti] = precip
+            
+        feats["feriado"]         = f_canal
+        feats["dia_quente_cvp"]  = h_canal
+        feats["chuva_mm"]        = c_canal
+        
+        hp_2d = feats["hist_pct"]
+        feats["inter_chuva_hist"]   = c_canal * hp_2d
+        feats["inter_feriado_hist"] = f_canal * hp_2d
+    except Exception as e:
+        print(f"    [!] Erro ao gerar contexto no fine-tuner: {e}")
 
     return feats, dates, cvli_raw
 

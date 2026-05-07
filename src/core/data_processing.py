@@ -199,6 +199,41 @@ def process_ism_data():
     clean_records = []
     if OCORRENCIAS_FILE.endswith('.csv'):
         occ_raw = pd.read_csv(OCORRENCIAS_FILE)
+
+        # --- REPARO DE BAIRROS VIA GEOLOCALIZACAO (Recuperar 'DESCONHECIDO') ---
+        logging.info("📍 Reparando bairros via geolocalização (Lat/Long)...")
+        from scipy.spatial import KDTree
+        with open(BAIRROS_FILE, encoding="utf-8") as f:
+            raw_ll = json.load(f)
+        # Mapeamento apenas de Fortaleza para o reparo
+        fort_ll = {normalize_text(k): v for k, v in raw_ll.items() if v.get('regiao') == 'fortaleza'}
+        names_ll = list(fort_ll.keys())
+        coords_ll = np.array([[fort_ll[n]['lat'], fort_ll[n]['long']] for n in names_ll])
+        tree = KDTree(coords_ll)
+        
+        mask_null = occ_raw['bairro'].isna() | (occ_raw['bairro'].apply(normalize_text) == 'DESCONHECIDO')
+        mask_gps  = occ_raw['latitude'].notna() & occ_raw['longitude'].notna()
+        mask_rep  = mask_null & mask_gps
+        
+        if mask_rep.sum() > 0:
+            points = occ_raw.loc[mask_rep, ['latitude', 'longitude']].values
+            dist, idx = tree.query(points)
+            THRESHOLD = 0.045 # Aprox 5km
+            df_update = occ_raw.loc[mask_rep].copy()
+            recovered = 0
+            for i, (d, ix) in enumerate(zip(dist, idx)):
+                if d < THRESHOLD:
+                    df_update.iloc[i, df_update.columns.get_loc('bairro')] = names_ll[ix]
+                    df_update.iloc[i, df_update.columns.get_loc('cidade')] = 'FORTALEZA'
+                    recovered += 1
+                else:
+                    cid = str(df_update.iloc[i, df_update.columns.get_loc('cidade')]).upper()
+                    if cid != 'FORTALEZA' and cid != 'NAN' and cid != 'DESCONHECIDO':
+                        df_update.iloc[i, df_update.columns.get_loc('bairro')] = cid
+                        recovered += 1
+            occ_raw.update(df_update)
+            logging.info(f"✅ {recovered} registros recuperados via GPS no ISM.")
+
         for _, row in occ_raw.iterrows():
             # Normalização de Município e Bairro
             mun = normalize_text(str(row.get('municipio', row.get('cidade', ''))))
