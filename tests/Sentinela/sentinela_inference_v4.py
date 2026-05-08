@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 warnings.filterwarnings("ignore")
 
 # Caminhos base
-BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+BASE_PATH = r"c:\Users\Boanerges\Desktop\Projetos\Report Preview"
 OUT_SENTINELA = os.path.join(BASE_PATH, "tests", "Sentinela")
 
 def run_inference_v4():
@@ -34,10 +34,10 @@ def run_inference_v4():
     probs = model.predict_proba(X)[:, 1] if hasattr(model, "predict_proba") else np.zeros(len(X))
     
     # 4. Cálculo de Score Bruto e Calibragem (0-100)
-    # Reequilibrado: 60% Modelo (ML), 25% GAPS (Vácuo), 15% Infraestrutura (Vial)
-    raw_scores = (probs * 0.6 + 
-                 (df_inf["gap_index"] / 100).clip(0, 1) * 0.25 + 
-                 (df_inf["vial_criticality"] / 10).clip(0, 1) * 0.15)
+    # Combinamos Probabilidade, GAPS (Vácuo Policial) e Infraestrutura (Vial)
+    raw_scores = (probs * 0.4 + 
+                 (df_inf["gap_index"] / 100).clip(0, 1) * 0.4 + 
+                 (df_inf["vial_criticality"] / 10).clip(0, 1) * 0.2)
     
     # Calibragem Global: Mapear o maior risco do estado para ~95%
     max_raw = raw_scores.max() if len(raw_scores) > 0 else 1

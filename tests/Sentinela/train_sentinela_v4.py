@@ -8,7 +8,7 @@ from datetime import datetime
 warnings.filterwarnings("ignore")
 
 # Caminhos base
-BASE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+BASE_PATH = r"c:\Users\Boanerges\Desktop\Projetos\Report Preview"
 DATA_RAW = os.path.join(BASE_PATH, "data", "raw")
 OUT_SENTINELA = os.path.join(BASE_PATH, "tests", "Sentinela")
 
@@ -44,28 +44,14 @@ def train_v4():
     
     X = df_intel[["cvli_total", "score_intel", "gap_index", "vial_criticality"]].copy()
     
-    # Target dinâmico (estatístico): Top 10% mais críticos em gap ou vial
-    q_gap = df_intel["gap_index"].quantile(0.90)
-    q_vial = df_intel["vial_criticality"].quantile(0.90)
-    
-    # Garantir que tenhamos pelo menos algum critério (caso o quantile seja 0)
-    q_gap = max(q_gap, 1.0)
-    q_vial = max(q_vial, 1.0)
-    
-    # Target Tático: Prioriza CVLI Real > GAP (Vácuo) > Vial (Infra)
-    y = (
-        (df_intel["cvli_total"] > 0) | 
-        (df_intel["gap_index"] >= q_gap * 1.2) | 
-        (df_intel["vial_criticality"] >= q_vial * 1.5)
-    ).astype(int)
-    
-    print(f"Dataset de Treino: {len(X)} zonas processadas.")
-    print(f"Thresholds calculados: Gap >= {q_gap:.2f}, Vial >= {q_vial:.2f}")
-    print(f"Distribuição de Classes: {y.value_counts().to_dict()}")
+    # Target sintético: Alta probabilidade onde gap_index > 50 e vial_criticality > 0
+    y = ((df_intel["gap_index"] > 50) | (df_intel["vial_criticality"] > 10)).astype(int)
     
     # Adicionar encoding de facção
     df_intel["faction_code"] = pd.factorize(df_intel["faction"])[0]
     X["faction_code"] = df_intel["faction_code"]
+    
+    print(f"Dataset de Treino: {len(X)} zonas processadas.")
     
     # 4. Treinar Modelos (LGBM Lean V4)
     model = lgb.LGBMClassifier(

@@ -30,7 +30,7 @@ warnings.filterwarnings("ignore")
 # ─────────────────────────────────────────────────────────────────
 #  CONFIGURACOES
 # ─────────────────────────────────────────────────────────────────
-BASE_PATH   = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+BASE_PATH   = r"c:\Users\Boanerges\Desktop\Projetos\Report Preview"
 DATA_RAW    = os.path.join(BASE_PATH, "data", "raw")
 OUT_PATH    = os.path.join(BASE_PATH, "tests", "Sentinela")
 

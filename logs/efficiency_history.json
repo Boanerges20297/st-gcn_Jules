@@ -439,15 +439,15 @@
       "total_events": 11,
       "ranking_top10": [
         "CAUCAIA",
+        "CARIRE",
         "ALTO ALEGRE",
-        "CANINDEZINHO",
         "BARROSO",
-        "PLANALTO AYRTON SENNA",
         "JUAZEIRO DO NORTE",
-        "AEROLANDIA",
-        "BARRA DO CEARA",
-        "BOM JARDIM",
-        "MESSEJANA"
+        "CANINDEZINHO",
+        "PARAIPABA",
+        "CURIO",
+        "MIRAIMA",
+        "PARQUE IRACEMA"
       ],
       "gt_sample": [
         "AEROPORTO",
@@ -460,28 +460,29 @@
         "CARIRE",
         "MIRAIMA"
       ],
-      "p5": 0.4,
-      "recall5": 0.2222,
+      "p5": 0.6,
+      "recall5": 0.3333,
       "hits5": [
-        "CANINDEZINHO",
-        "BARROSO"
-      ],
-      "p10": 0.4,
-      "recall10": 0.4444,
-      "hits10": [
-        "CANINDEZINHO",
-        "BARROSO",
-        "JUAZEIRO DO NORTE",
-        "BOM JARDIM"
-      ],
-      "p20": 0.35,
-      "recall20": 0.7778,
-      "hits20": [
-        "CANINDEZINHO",
-        "BARROSO",
-        "JUAZEIRO DO NORTE",
-        "BOM JARDIM",
         "CARIRE",
+        "BARROSO",
+        "JUAZEIRO DO NORTE"
+      ],
+      "p10": 0.5,
+      "recall10": 0.5556,
+      "hits10": [
+        "CARIRE",
+        "BARROSO",
+        "JUAZEIRO DO NORTE",
+        "CANINDEZINHO",
+        "MIRAIMA"
+      ],
+      "p20": 0.3,
+      "recall20": 0.6667,
+      "hits20": [
+        "CARIRE",
+        "BARROSO",
+        "JUAZEIRO DO NORTE",
+        "CANINDEZINHO",
         "MIRAIMA",
         "URUBURETAMA"
       ]
@@ -492,15 +493,15 @@
       "total_events": 5,
       "ranking_top10": [
         "ALTO ALEGRE",
-        "CANINDEZINHO",
         "BARROSO",
+        "CANINDEZINHO",
+        "CURIO",
+        "PARQUE IRACEMA",
         "PLANALTO AYRTON SENNA",
-        "AEROLANDIA",
-        "BARRA DO CEARA",
-        "BOM JARDIM",
-        "MESSEJANA",
-        "NOVO MONDUBIM",
-        "ANCURI"
+        "SIQUEIRA",
+        "GRANJA LISBOA",
+        "CRISTO REDENTOR",
+        "MONDUBIM"
       ],
       "gt_sample": [
         "AEROPORTO",
@@ -512,22 +513,23 @@
       "p5": 0.4,
       "recall5": 0.4,
       "hits5": [
-        "CANINDEZINHO",
-        "BARROSO"
+        "BARROSO",
+        "CANINDEZINHO"
       ],
-      "p10": 0.3,
-      "recall10": 0.6,
+      "p10": 0.2,
+      "recall10": 0.4,
       "hits10": [
-        "CANINDEZINHO",
         "BARROSO",
-        "BOM JARDIM"
+        "CANINDEZINHO"
       ],
-      "p20": 0.15,
-      "recall20": 0.6,
+      "p20": 0.25,
+      "recall20": 1.0,
       "hits20": [
-        "CANINDEZINHO",
         "BARROSO",
-        "BOM JARDIM"
+        "CANINDEZINHO",
+        "BOM JARDIM",
+        "EDSON QUEIROZ",
+        "AEROPORTO"
       ]
     },
     "rmf": {
@@ -545,16 +547,16 @@
       "active_locations": 4,
       "total_events": 6,
       "ranking_top10": [
-        "JUAZEIRO DO NORTE",
-        "VARZEA ALEGRE",
         "CARIRE",
+        "JUAZEIRO DO NORTE",
         "MIRAIMA",
-        "ITAPIUNA",
         "URUBURETAMA",
+        "VARZEA ALEGRE",
         "CRATO",
         "LIMOEIRO DO NORTE",
-        "ARATUBA",
-        "JAGUARUANA"
+        "OROS",
+        "ACOPIARA",
+        "CEDRO"
       ],
       "gt_sample": [
         "JUAZEIRO DO NORTE",
@@ -562,26 +564,27 @@
         "CARIRE",
         "MIRAIMA"
       ],
-      "p5": 0.6,
-      "recall5": 0.75,
+      "p5": 0.8,
+      "recall5": 1.0,
       "hits5": [
-        "JUAZEIRO DO NORTE",
         "CARIRE",
-        "MIRAIMA"
+        "JUAZEIRO DO NORTE",
+        "MIRAIMA",
+        "URUBURETAMA"
       ],
       "p10": 0.4,
       "recall10": 1.0,
       "hits10": [
-        "JUAZEIRO DO NORTE",
         "CARIRE",
+        "JUAZEIRO DO NORTE",
         "MIRAIMA",
         "URUBURETAMA"
       ],
       "p20": 0.2,
       "recall20": 1.0,
       "hits20": [
-        "JUAZEIRO DO NORTE",
         "CARIRE",
+        "JUAZEIRO DO NORTE",
         "MIRAIMA",
         "URUBURETAMA"
       ]
