@@ -192,6 +192,8 @@ def process_ism_data():
             clean_records.append({
                 'data': pd.to_datetime(str(row.get('data')), errors='coerce'),
                 'tipo': str(row.get('tipo', '')).lower(),
+                'bairro': row.get('bairro'),
+                'cidade': row.get('cidade'),
                 'loc_clean': clean_name(row.get('bairro', row.get('cidade'))),
                 'tipo_evento': str(row.get('tipo_evento', '')).upper(),
                 'arma': str(row.get('arma', '')).upper(),
@@ -219,6 +221,8 @@ def process_ism_data():
                 clean_records.append({
                     'data': pd.to_datetime(str(dt_val), errors='coerce'),
                     'tipo': str(extract_scalar('tipo') or '').lower(),
+                    'bairro': extract_scalar('bairro'),
+                    'cidade': extract_scalar('municipio') or extract_scalar('cidade'),
                     'loc_clean': clean_name(extract_scalar('bairro_geo') or extract_scalar('bairro') or extract_scalar('municipio') or extract_scalar('cidade')),
                     'tipo_evento': str(extract_scalar('tipo_evento') or '').upper(),
                     'arma': str(extract_scalar('arma') or '').upper(),
@@ -299,7 +303,13 @@ def process_ism_data():
         if c_name == 'DIF': continue
         
         reg = info.get('regiao', 'interior').lower()
-        if c_name in RMF_OFFICIAL: reg = 'rmf'
+        city_meta = normalize_text(info.get('cidade_ibge', ''))
+        
+        # Sincronização de Regionalização: Prioridade RMF para municípios oficiais
+        if city_meta in RMF_OFFICIAL: 
+            reg = 'rmf'
+        if c_name in RMF_OFFICIAL: 
+            reg = 'rmf'
         
         # Usamos o ranking recente para a decisão de seleção, mas o total para metadados
         recent_count = cvli_ranking_recent.get(c_name, 0)
@@ -343,9 +353,11 @@ def process_ism_data():
     nodes_gdf = gpd.GeoDataFrame(nodes_df, geometry=gpd.points_from_xy(nodes_df.long, nodes_df.lat), crs="EPSG:4326")
 
     # 4. Construir Tensores (Otimizado)
-    # Filtrar intervalo solicitado: 01/01/2022 até 31/12/2025
+    # Janela Dinâmica: 01/01/2022 até a última data disponível (Maio/2026+)
     start_d = pd.Timestamp('2022-01-01')
-    end_d = pd.Timestamp('2025-12-31')
+    end_d = occ_df['data'].max()
+    if pd.isna(end_d): end_d = pd.Timestamp.now().floor('D')
+    
     date_range = pd.date_range(start_d, end_d)
     date_map = {d: i for i, d in enumerate(date_range)}
     
@@ -367,10 +379,15 @@ def process_ism_data():
         features = np.zeros((N, len(date_range), 37)) # Expandido para 37 (V37 Elite)
         node_map = {row['name']: i for i, row in reg_nodes.iterrows()}
         
-        # Filtrar ocorrencias da regiao
-        reg_occ = occ_df[occ_df['loc_clean'].isin(node_map)].copy()
-        if not reg_occ.empty:
-            reg_occ['n_idx'] = reg_occ['loc_clean'].map(node_map)
+        # Filtrar ocorrências da região ou que pertençam a cidades desta região (colapsando para a sede)
+        if reg == 'rmf':
+            # Na RMF, colapsamos todos os bairros para suas respectivas cidades-sede
+            reg_occ = occ_df[occ_df['cidade'].str.upper().isin(node_map)].copy()
+            reg_occ['n_idx'] = reg_occ['cidade'].str.upper().map(node_map)
+        else:
+            reg_occ = occ_df[occ_df['loc_clean'].isin(node_map)].copy()
+            if not reg_occ.empty:
+                reg_occ['n_idx'] = reg_occ['loc_clean'].map(node_map)
         
         # 3.1 Mapeamento de Tropa para Tensores (Canais 23 e 25)
         if not df_t.empty:

@@ -349,16 +349,43 @@ def processar_granular():
 
     resumo_final.sort(key=lambda registro: (registro['data'], registro['hora']))
 
+    # --- LÓGICA DE INCREMENTO (MERGE COM DEDUPLICAÇÃO) ---
+    registros_existentes = []
+    if os.path.exists(ARQUIVO_SAIDA):
+        try:
+            with open(ARQUIVO_SAIDA, 'r', encoding='utf-8-sig') as f:
+                reader_old = csv.DictReader(f)
+                registros_existentes = list(reader_old)
+        except Exception as e:
+            print(f"Aviso: Não foi possível ler o histórico existente: {e}")
+
+    # Combinar e remover duplicatas baseadas em (data, hora, bairro)
+    # Usamos um dicionário indexado pela tupla única para garantir unicidade
+    combinados = { (r['data'], r['hora'], r.get('bairro', '')): r for r in registros_existentes }
+    
+    novos_adicionados = 0
+    for r in resumo_final:
+        chave = (r['data'], r['hora'], r['bairro'])
+        if chave not in combinados:
+            combinados[chave] = r
+            novos_adicionados += 1
+        elif r['natureza'] != 'NAO INFORMADA' and combinados[chave].get('natureza') == 'NAO INFORMADA':
+            # Atualiza registro se o novo tiver dados mais completos
+            combinados[chave] = r
+
+    lista_final = sorted(combinados.values(), key=lambda x: (x['data'], x['hora']))
+
     with open(ARQUIVO_SAIDA, 'w', encoding='utf-8-sig', newline='') as csv_file:
         writer = csv.DictWriter(
             csv_file,
             fieldnames=['data', 'hora', 'bairro', 'cidade', 'natureza', 'qtd_armas', 'qtd_drogas', 'qtd_drogas_itens', 'qtd_veiculos_apreendidos'],
         )
         writer.writeheader()
-        writer.writerows(resumo_final)
+        writer.writerows(lista_final)
 
-    print(f"Sucesso! CSV limpo gerado: {ARQUIVO_SAIDA}")
-    print(f"Ocorrências de Fortaleza: {len(resumo_final)}")
+    print(f"Sucesso! Arquivo atualizado: {ARQUIVO_SAIDA}")
+    print(f"Registros novos adicionados: {novos_adicionados}")
+    print(f"Total de registros acumulados: {len(lista_final)}")
     for registro in resumo_final[:10]:
         print(registro)
 

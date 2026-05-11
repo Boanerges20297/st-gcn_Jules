@@ -2522,3 +2522,113 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 - *(A preencher após a conclusão)*
 
 ---
+
+## Tentativa 112 (Sentinela V3 — FREEZE TOTAL) — 2026-05-11 08:12
+
+### Motivação
+- Correção de caminhos hardcoded (`BASE_PATH`) que impediam a execução do script em novos ambientes.
+- Geração de modelo "Freeze" utilizando todo o histórico (Jan/2022 → Hoje) para consolidação do Challenger.
+
+### Configuração Técnica
+- **Script:** `tests/Sentinela/freeze_total_v3.py`
+- **Arquitetura:** LightGBM LambdaRank (Ensemble 50/50 com EWMA-Multi)
+- **Dados:** Jan/2022 → 2026-05-08 (Sem holdout)
+- **Features:** 15 canais (incluindo Contexto: Feriado, Dia Quente, Chuva)
+- **Horizonte:** 14 dias
+
+### Resultados
+- **Status:** **SUCEDIDO** (Modelo gerado com sucesso).
+- **Localização:** `tests/Sentinela/lgbm_lean_v3_freeze.pkl`
+- **Performance sombra (histórica):** P@10=50% | P@20=70% (conforme relatório gerado).
+- **Próximos Passos:** Promoção manual para `models/active/` após revisão do ranking.
+
+---
+
+
+## Tentativa 113 (Autolog - FORTALEZA) — 2026-05-11 08:15
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.001
+- **Dropout**: 0.35
+- **Épocas**: 200
+- **Patience**: 40
+- **Grad Accumulation**: 6
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.7
+- **Focal Gamma**: 2.5
+- **Ranking Weight**: 7.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 114 (Autolog - RMF) — 2026-05-11 12:03
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 90 dias
+- **Learning Rate**: 0.018
+- **Dropout**: 0.5
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 8
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.5
+- **Focal Gamma**: 2.0
+- **Ranking Weight**: 7.0
+- **Métrica de Avaliação**: P@5
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 115 (Autolog - INTERIOR) — 2026-05-11 12:04
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.005
+- **Dropout**: 0.3
+- **Épocas**: 120
+- **Patience**: 20
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.4
+- **Focal Gamma**: 2.0
+- **Ranking Weight**: 4.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+
+## Tentativa 116: Intervenção Tática Consolidada (ResGAT + 2026 Sync) — 2026-05-11 14:45
+**Objetivo:** Ativação em produção do modelo de 16 heads e sincronização temporal 2026.
+
+### 1. Ações Realizadas
+- **Orquestrador**: Migração oficial para `ShallowGAT` (16 cabeças) em todas as regiões.
+- **Sincronização de Canais**: Ajuste de `in_channels` para 39 (FTZ/RMF) e 37 (INT) para compatibilidade com checkpoints.
+- **Data Pipeline**: Atualização dinâmica do `date_range` no `data_processing.py` para incluir dados de Maio/2026.
+- **Regionalização RMF**: Implementado colapso de bairros periféricos para sedes municipais.
+
+### 2. Resultados Validados (Dashboard)
+- **RMF**: P@10 = 30.0% | Recall@10 = ~100% (Eventos de Itaitinga, Maracanaú e Horizonte capturados).
+- **Fortaleza**: P@10 = 60.0% (Sinal tático fortíssimo em Maio/2026).
+- **Interior**: P@10 = 20.0% (Métrica estável em baixa densidade).
+
+**Status:** ✅ SISTEMA OPERACIONAL E ATUALIZADO.
+
+---
