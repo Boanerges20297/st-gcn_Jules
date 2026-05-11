@@ -589,5 +589,159 @@
         "URUBURETAMA"
       ]
     }
+  },
+  {
+    "date": "2026-05-08 00:00:00",
+    "total_events": 10,
+    "brute_cvli": 10,
+    "exogenous": 0,
+    "exogenous_conflict": 0,
+    "police_qualified_actions_7d": 0,
+    "police_administrative_events_7d": 0,
+    "assigned_total_events": 10,
+    "unmapped_total_events": 0,
+    "assigned_brute_cvli": 10,
+    "assigned_exogenous": 0,
+    "unmapped_exogenous": 0,
+    "assigned_police_qualified_actions": 0,
+    "unmapped_police_qualified_actions": 0,
+    "unmapped_exogenous_sample": [],
+    "global": {
+      "total_nodes": 191,
+      "active_locations": 8,
+      "total_events": 10,
+      "ranking_top10": [
+        "CAUCAIA",
+        "BARROSO",
+        "ALTO ALEGRE",
+        "CURIO",
+        "JUAZEIRO DO NORTE",
+        "PARQUE IRACEMA",
+        "LIMOEIRO DO NORTE",
+        "CRATO",
+        "VARZEA ALEGRE",
+        "PLANALTO AYRTON SENNA"
+      ],
+      "gt_sample": [
+        "AEROPORTO",
+        "ANCURI",
+        "BARROSO",
+        "BOM JARDIM",
+        "CANINDEZINHO",
+        "CONJUNTO PALMEIRAS",
+        "JUAZEIRO DO NORTE",
+        "CARIRE"
+      ],
+      "p5": 0.4,
+      "recall5": 0.25,
+      "hits5": [
+        "BARROSO",
+        "JUAZEIRO DO NORTE"
+      ],
+      "p10": 0.2,
+      "recall10": 0.25,
+      "hits10": [
+        "BARROSO",
+        "JUAZEIRO DO NORTE"
+      ],
+      "p20": 0.15,
+      "recall20": 0.375,
+      "hits20": [
+        "BARROSO",
+        "JUAZEIRO DO NORTE",
+        "CANINDEZINHO"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 122,
+      "active_locations": 6,
+      "total_events": 7,
+      "ranking_top10": [
+        "BARROSO",
+        "ALTO ALEGRE",
+        "CURIO",
+        "PARQUE IRACEMA",
+        "PLANALTO AYRTON SENNA",
+        "CANINDEZINHO",
+        "MONDUBIM",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "CRISTO REDENTOR"
+      ],
+      "gt_sample": [
+        "AEROPORTO",
+        "ANCURI",
+        "BARROSO",
+        "BOM JARDIM",
+        "CANINDEZINHO",
+        "CONJUNTO PALMEIRAS"
+      ],
+      "p5": 0.2,
+      "recall5": 0.1667,
+      "hits5": [
+        "BARROSO"
+      ],
+      "p10": 0.2,
+      "recall10": 0.3333,
+      "hits10": [
+        "BARROSO",
+        "CANINDEZINHO"
+      ],
+      "p20": 0.25,
+      "recall20": 0.8333,
+      "hits20": [
+        "BARROSO",
+        "CANINDEZINHO",
+        "BOM JARDIM",
+        "CONJUNTO PALMEIRAS",
+        "ANCURI"
+      ]
+    },
+    "rmf": {
+      "status": "insufficient_events (0<1)",
+      "p5": null,
+      "p10": null,
+      "p20": null,
+      "active_locations": 0,
+      "total_nodes": 19,
+      "total_events": 0,
+      "note": "Menos de 1 localidades com eventos. Avalia\u00e7\u00e3o n\u00e3o confi\u00e1vel."
+    },
+    "interior": {
+      "total_nodes": 50,
+      "active_locations": 2,
+      "total_events": 3,
+      "ranking_top10": [
+        "JUAZEIRO DO NORTE",
+        "LIMOEIRO DO NORTE",
+        "CRATO",
+        "VARZEA ALEGRE",
+        "OROS",
+        "ACOPIARA",
+        "CEDRO",
+        "ITAPIUNA",
+        "JIJOCA DE JERICOACOARA",
+        "FRECHEIRINHA"
+      ],
+      "gt_sample": [
+        "JUAZEIRO DO NORTE",
+        "CARIRE"
+      ],
+      "p5": 0.2,
+      "recall5": 0.5,
+      "hits5": [
+        "JUAZEIRO DO NORTE"
+      ],
+      "p10": 0.1,
+      "recall10": 0.5,
+      "hits10": [
+        "JUAZEIRO DO NORTE"
+      ],
+      "p20": 0.05,
+      "recall20": 0.5,
+      "hits20": [
+        "JUAZEIRO DO NORTE"
+      ]
+    }
   }
 ]

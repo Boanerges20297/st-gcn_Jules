@@ -2339,3 +2339,186 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 - *(A preencher após a conclusão)*
 
 ---
+
+## Tentativa 63 (Correção de Discrepância Visual de Ranking) — 2026-05-08 18:20
+
+### Motivação
+- Usuário identificou que áreas marcadas como "quentes" (vermelho escuro) no mapa apareciam como "Moderado" (azul) no ranking "Top 10".
+- Divergência técnica entre os limites de risco usados no mapa/contadores (71/51/31) e na rota `/api/risk` do backend (85/70/40).
+
+### Intervenção Realizada
+- **Backend (`app.py`):** Removida a lógica de classificação hardcoded e divergente dentro da rota `/api/risk`.
+- **Sincronização:** Implementada a chamada à função oficial `classify_risk_score(score)`, garantindo que os limites de risco sejam unificados em todo o sistema (Crítico >= 71, Alto >= 51, Moderado >= 31).
+- **Impacto Visual:** Áreas com score elevado (ex: 75) que antes eram rotuladas como "Moderado" ou "Alto" agora aparecem corretamente como "Crítico" no ranking, com a cor vermelha correspondente.
+
+### Status Final
+- **Status:** **SUCEDIDO** (Correção de interface e consistência de dados).
+
+---
+
+## Tentativa 64 (Ajuste de Janela Temporal para Rebuild ISM) — 2026-05-09 22:10
+
+### Motivação
+- Alinhamento do pipeline de processamento de dados (`src/core/data_processing.py`) com o novo intervalo solicitado pelo usuário: **01/01/2022 até 31/12/2025**.
+- Garantir estabilidade histórica nos tensores e na seleção de nós (bairros/cidades) para os modelos Champion/Challenger.
+
+### Intervenção Realizada
+- **Filtro de Tensores:** Alterado `start_d` para `2022-01-01` e `end_d` para `2025-12-31`.
+- **Sincronização:** Atualizada a lógica de `date_range` para refletir exatamente o ciclo solicitado.
+
+### Status Final
+- **Status:** **SUCEDIDO** (Intervalo temporal ajustado).
+- **Próximos Passos:** Monitorar o Rebuild ISM com os novos limites.
+
+
+
+## Tentativa 105 (Autolog - FORTALEZA) — 2026-05-09 19:14
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.0003
+- **Dropout**: 0.35
+- **Épocas**: 200
+- **Patience**: 40
+- **Grad Accumulation**: 6
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.7
+- **Focal Gamma**: 2.5
+- **Ranking Weight**: 7.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 106 (Autolog - FORTALEZA) — 2026-05-10 16:17
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.001
+- **Dropout**: 0.35
+- **Épocas**: 200
+- **Patience**: 40
+- **Grad Accumulation**: 6
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.7
+- **Focal Gamma**: 2.5
+- **Ranking Weight**: 7.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+
+## Tentativa 107 (Autolog - FORTALEZA) — 2026-05-10 19:39
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.0005
+- **Dropout**: 0.35
+- **Épocas**: 200
+- **Patience**: 40
+- **Grad Accumulation**: 6
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.7
+- **Focal Gamma**: 2.5
+- **Ranking Weight**: 7.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+### Tentativa 107 (10/05/2026) - Champion Fortaleza (Upgrade V5.1 Estabilizado)
+*   **Upgrade:** Context Sensing V5.1 (Tau=730, Peso Normalizado, 4 Anos de Dados).
+*   **Resultados:** P@20 Estagnado em 38%. Degradao para 30% na poca 5.
+*   **Concluso:** Estabilidade atingida (GradNorm ~11), mas o modelo no tem " IQ\ suficiente.
+
+### Tentativa 108 (10/05/2026) - Champion Fortaleza (High-IQ 16 Heads)
+* **Arquitetura:** ShallowGAT_64 com **16 Cabeas de Atenao**.
+* **Objetivo:** Romper o teto de 40% P@20 via extraao profunda de sinais toticos.
+* **Status:** A iniciar...
+
+
+
+## Tentativa 109 (Autolog - FORTALEZA) — 2026-05-10 20:14
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.0005
+- **Dropout**: 0.35
+- **Épocas**: 200
+- **Patience**: 40
+- **Grad Accumulation**: 6
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.7
+- **Focal Gamma**: 2.5
+- **Ranking Weight**: 7.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
+
+---
+### Tentativa 108 (10/05/2026) - Champion Fortaleza (High-IQ 16 Heads) [EM ANDAMENTO]
+*   **Upgrade:** 16 Cabeas de Atenao + Context Sensing V5.1 (Tau=730).
+*   **Resultados Intermedirios:**
+    *   Recorde: **38.84% P@20** (poca 2).
+    *   Estabilidade: GradNorm ~12.
+*   **Status:** ?? EM TREINAMENTO / SOB ANLISE.
+*   **Observao:** O modelo est processando mais informao (Gradiente 23 vs 18), mas o teto de 40% permanece um desafio totico.
+
+
+### Spike 109 (10/05/2026) - Champion Fast Spike V2 (Turbo 16 Heads)
+*   **Contexto:** Teste de foraa bruta (3 pocas, LR 0.001, Subset 400).
+*   **Resultados:** Salto de 0.7% para 5.4% P@10 em apenas 3 pocas sem features elite.
+*   **Aprendizado:** O modelo com 16 cabeas converge muito mais ropido com LR alto.
+
+### Tentativa 110 (10/05/2026) - Champion Fortaleza (Extreme Upgrade V6)
+*   **Setup:** 16 Cabeas + LR 0.001 + Context Sensing V5.1 + Full Elite Features (Momentum, Vault, CVP Ratio).
+*   **Objetivo:** Romper a barreira dos 50% P@20 combinando " IQ\ arquitetural e agressividade totica.
+* **Status:** A iniciar...
+
+
+
+## Tentativa 111 (Autolog - FORTALEZA) — 2026-05-10 22:10
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.001
+- **Dropout**: 0.35
+- **Épocas**: 200
+- **Patience**: 40
+- **Grad Accumulation**: 6
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.7
+- **Focal Gamma**: 2.5
+- **Ranking Weight**: 7.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---

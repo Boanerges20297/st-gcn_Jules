@@ -343,10 +343,9 @@ def process_ism_data():
     nodes_gdf = gpd.GeoDataFrame(nodes_df, geometry=gpd.points_from_xy(nodes_df.long, nodes_df.lat), crs="EPSG:4326")
 
     # 4. Construir Tensores (Otimizado)
-    # Filtrar intervalo solicitado: Jan/2022 até a data mais recente disponível
-    start_d = pd.Timestamp('2022-02-01')
-    max_d = occ_df['data'].max()
-    end_d = max_d if not pd.isna(max_d) else pd.Timestamp('2026-04-25')
+    # Filtrar intervalo solicitado: 01/01/2022 até 31/12/2025
+    start_d = pd.Timestamp('2022-01-01')
+    end_d = pd.Timestamp('2025-12-31')
     date_range = pd.date_range(start_d, end_d)
     date_map = {d: i for i, d in enumerate(date_range)}
     

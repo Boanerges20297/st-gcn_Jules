@@ -84,7 +84,7 @@ REGION_CONFIGS = {
         #      lr_base: 1e-4 → 3e-4 (começa mais "esperto", sem warmup lento)
         #      grad_accum mantido em 6 (ruído estocástico)
         #      dropout 0.35, wd 0.005 mantidos (T88 sem problema nesses)
-        window=120, lr=3e-4, epochs=200, patience=40, dropout=0.35, margin=1.0,
+        window=120, lr=1e-3, epochs=200, patience=40, dropout=0.35, margin=1.0,
         k_eval=10, use_momentum=True, grad_accum=6,
         raw_cvli_context=True,
         output_name='fortaleza_model_active.pth',
@@ -403,8 +403,8 @@ class SpecialistTrainer:
                 df_c = df_c.dropna(subset=["data", "bairro"])
                 df_c["bairro"] = df_c["bairro"].str.upper().str.strip()
                 
-                # Mapa de datas e bairros do dataset original
-                dates_dt = [pd.Timestamp("2024-02-01") + pd.Timedelta(days=i) for i in range(T)]
+                # Mapa de datas e bairros do dataset original (Sincronizado com Rebuild ISM 2022)
+                dates_dt = [pd.Timestamp("2022-01-01") + pd.Timedelta(days=i) for i in range(T)]
                 dm = {d: i for i, d in enumerate(dates_dt)}
                 # Note: node_features assume uma ordem de nós. Precisamos do mapeamento de bairros.
                 # Como não temos o mapa direto aqui, vamos inferir que nf[:, :, 0] é o CVLI base.
@@ -553,8 +553,19 @@ class SpecialistTrainer:
                         ratio_win = self.cvp_ratio_data[:, idx:idx+self.window]
                         x_input[:, 38, :, :] = torch.tensor(ratio_win, dtype=torch.float32).to(DEVICE)
 
+                # ⭐ ATUALIZAÇÃO V5.1: Context Sensing Estabilizado
+                # Tau aumentado para 730 (suavização) e normalização de peso para manter escala de gradiente
+                tau = 730
+                w_raw = np.exp(idx / tau)
+                # Normalização: Garante que o gradiente médio não mude, apenas a distribuição de importância
+                # Média teórica dos pesos para normalização (baseada no range de treino)
+                w_norm = w_raw / np.mean([np.exp(i/tau) for i in range(len(train_X))])
+
                 pred = model(x_input, [adj_geo, adj_conf]).squeeze()
-                loss = criterion(pred, train_Y[idx].to(DEVICE)) / self.grad_accum
+                
+                # Aplicação do peso normalizado no gradiente
+                raw_loss = criterion(pred, train_Y[idx].to(DEVICE))
+                loss = (raw_loss * w_norm) / self.grad_accum
                 loss.backward()
 
                 if (step + 1) % self.grad_accum == 0:

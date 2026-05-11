@@ -41,7 +41,7 @@ class FastRelationalGCN(nn.Module):
         return self.dropout(self.prelu(out))
 
 class GlobalSpatialAttention(nn.Module):
-    def __init__(self, channels, heads=4):
+    def __init__(self, channels, heads=8):
         super().__init__()
         self.mha = nn.MultiheadAttention(embed_dim=channels, num_heads=heads, batch_first=True)
         self.norm = nn.LayerNorm(channels)
@@ -51,11 +51,11 @@ class GlobalSpatialAttention(nn.Module):
         return self.norm(x + attn_out)
 
 class STGCNBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, time_steps, dropout=0.4):
+    def __init__(self, in_channels, out_channels, time_steps, dropout=0.4, heads=8):
         super().__init__()
         self.time_conv = nn.Conv2d(in_channels, out_channels, (1, 3), padding=(0, 1))
         self.prelu = nn.PReLU()
-        self.spatial_transformer = GlobalSpatialAttention(out_channels)
+        self.spatial_transformer = GlobalSpatialAttention(out_channels, heads=heads)
         self.gcn = FastRelationalGCN(out_channels, out_channels, dropout)
         self.temp_attn = MultiHeadTemporalAttention(out_channels)
         self.residual = nn.Conv2d(in_channels, out_channels, 1) if in_channels != out_channels else nn.Identity()
@@ -117,10 +117,10 @@ class DeepSTGAT_80(nn.Module):
 
 class ShallowGAT(nn.Module):
     """MODELO TÁTICO RESIDUAL (ResGAT) - 2 camadas com skip connection para máxima extração tática."""
-    def __init__(self, num_nodes, in_channels, time_steps, dropout=0.3):
+    def __init__(self, num_nodes, in_channels, time_steps, dropout=0.3, heads=16):
         super().__init__()
-        self.layer1 = STGCNBlock(in_channels, 64, time_steps, dropout)
-        self.layer2 = STGCNBlock(64, 64, time_steps, dropout)
+        self.layer1 = STGCNBlock(in_channels, 64, time_steps, dropout, heads=heads)
+        self.layer2 = STGCNBlock(64, 64, time_steps, dropout, heads=heads)
         
         self.final_conv = nn.Conv2d(64, 64, kernel_size=(1, time_steps))
         self.prelu_final = nn.PReLU()

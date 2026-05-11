@@ -75,7 +75,7 @@ def normalize_scores(scores):
 # ─────────────────────────────────────────────────────────────────
 #  1. CONSTRUIR FEATURES (idêntico ao train_validate_v3.py)
 # ─────────────────────────────────────────────────────────────────
-def build_all(start_d=pd.Timestamp("2024-01-01")):
+def build_all(start_d=pd.Timestamp("2022-01-01")):
     print("[1/3] Carregando e processando dados completos...")
 
     df = pd.read_csv(CSV_ENRICH, low_memory=False)
@@ -98,21 +98,25 @@ def build_all(start_d=pd.Timestamp("2024-01-01")):
         points = df.loc[mask_rep, ['latitude', 'longitude']].values
         dist, idx = tree.query(points)
         THRESHOLD = 0.045 # Aprox 5km
+        
+        bairros_rec = np.array(names_ll)[idx]
+        mask_valid  = dist < THRESHOLD
+        
         df_update = df.loc[mask_rep].copy()
-        recovered = 0
-        for i, (d, ix) in enumerate(zip(dist, idx)):
-            if d < THRESHOLD:
-                df_update.iloc[i, df_update.columns.get_loc('bairro')] = names_ll[ix]
-                df_update.iloc[i, df_update.columns.get_loc('cidade')] = 'FORTALEZA'
-                recovered += 1
-            else:
-                # Regra: se não for Fortaleza, usar a cidade como bairro
-                cid = str(df_update.iloc[i, df_update.columns.get_loc('cidade')]).upper()
-                if cid != 'FORTALEZA' and cid != 'NAN' and cid != 'DESCONHECIDO':
-                    df_update.iloc[i, df_update.columns.get_loc('bairro')] = cid
-                    recovered += 1
-        df.update(df_update)
-        print(f"    [OK] {recovered} registros recuperados via GPS.")
+        
+        # Caso 1: Dentro do Threshold -> Fortaleza + Bairro
+        df_update.loc[mask_valid, 'bairro'] = bairros_rec[mask_valid]
+        df_update.loc[mask_valid, 'cidade'] = 'FORTALEZA'
+        
+        # Caso 2: Fora do Threshold mas tem cidade válida -> Bairro = Cidade
+        mask_invalid = ~mask_valid
+        cidades = df_update['cidade'].astype(str).str.upper()
+        mask_cid = mask_invalid & (~cidades.isin(['FORTALEZA', 'NAN', 'DESCONHECIDO']))
+        df_update.loc[mask_cid, 'bairro'] = df_update.loc[mask_cid, 'cidade']
+        
+        recovered = mask_valid.sum() + mask_cid.sum()
+        df.loc[mask_rep, ['bairro', 'cidade']] = df_update[['bairro', 'cidade']]
+        print(f"    [OK] {recovered} registros recuperados via vetorização GPS.")
 
     df = df[df["cidade"].str.upper() == "FORTALEZA"].copy()
     df["bairro"]     = df["bairro"].apply(norm)
@@ -302,17 +306,30 @@ def train_freeze(feats, feat_names_lgbm, dates, cvli_raw):
             rows.append(row)
 
     df_tr     = pd.DataFrame(rows).sort_values("ti")
+    
+    # --- PESOS DINAMICOS POR RECENCIA (Context Sensing) ---
+    # Amostras recentes (2026) tem peso 1.0. Amostras de 2022 tem peso reduzido.
+    # tau = 365 dias para decaimento suave ao longo de 4 anos.
+    max_ti = df_tr["ti"].max()
+    df_tr["sample_weight"] = np.exp(-(max_ti - df_tr["ti"]) / 450.0)
+    
     groups_tr = df_tr.groupby("ti").size().values
     print(f"    {len(df_tr):,} amostras | {len(feat_names_lgbm)} features", flush=True)
 
     ranker = LGBMRanker(
-        objective="lambdarank", metric="ndcg", ndcg_eval_at=[5, 10],
-        n_estimators=300, num_leaves=31, learning_rate=0.05,
-        min_child_samples=10, subsample=0.7, colsample_bytree=0.7,
-        reg_alpha=0.3, reg_lambda=2.0, random_state=42, n_jobs=-1, verbose=-1,
+        objective="lambdarank", metric="ndcg", ndcg_eval_at=[3, 5, 10],
+        n_estimators=1500, num_leaves=127, learning_rate=0.008,
+        min_child_samples=3, subsample=0.7, colsample_bytree=0.7,
+        reg_alpha=2.0, reg_lambda=5.0, random_state=42, n_jobs=-1, verbose=-1,
+        extra_trees=True
     )
     t0 = time.time()
-    ranker.fit(df_tr[feat_names_lgbm], df_tr["label"].astype("int32"), group=groups_tr)
+    ranker.fit(
+        df_tr[feat_names_lgbm], 
+        df_tr["label"].astype("int32"), 
+        group=groups_tr,
+        sample_weight=df_tr["sample_weight"]
+    )
     print(f"    Treino concluido em {time.time()-t0:.1f}s")
     return ranker
 
@@ -415,8 +432,8 @@ def save_freeze(ranker, feats, feat_names_lgbm, df_rank, top_bairros, dates):
         "dados_ate":      str(dates[-1].date()),
         "horizonte_dias": HORIZON,
         "versao":         "v3_freeze",
-        "descricao":      "LightGBM LambdaRank Lean (10 features) treinado em Jan/2024→Hoje. "
-                          "Ensemble 50% EWMA-Multi + 50% LGBM. P@10=50% P@20=70% (sombra Abr/2026).",
+        "descricao":      "LightGBM LambdaRank High-Capacity (10 features) treinado em Jan/2022→Hoje. "
+                          "Ensemble 50% EWMA-Multi + 50% LGBM. Pesos dinamicos por recencia (tau=450).",
     }
     with open(freeze_pkl, "wb") as f:
         pickle.dump(payload, f)
@@ -461,7 +478,7 @@ def save_freeze(ranker, feats, feat_names_lgbm, df_rank, top_bairros, dates):
 def run():
     section("SENTINELA V3 — FREEZE TOTAL (Candidato a Produção)")
     print(f"\n  Inicio: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
-    print(f"  Treino: Jan/2024 → Hoje (sem holdout)")
+    print(f"  Treino: Jan/2022 → Hoje (sem holdout)")
     print(f"  Horizonte de previsão: {HORIZON} dias")
 
     feats, feat_names_lgbm, dates, cvli_raw, top_bairros = build_all()

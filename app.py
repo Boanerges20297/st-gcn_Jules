@@ -1402,15 +1402,7 @@ def get_risk():
                 
                 if reg not in region_buckets: region_buckets[reg] = []
 
-                # DEFINIÇÃO ÚNICA DE STATUS (BACKEND)
-                if score >= 85: 
-                    level, status, css, color = 'crítico', 'Crítico', 'risk-critico', '#8B0000' # Vermelho Escuro
-                elif score >= 70: 
-                    level, status, css, color = 'alto', 'Alto', 'risk-alto', '#FFB3B3' # Vermelho Bem Claro
-                elif score >= 40: 
-                    level, status, css, color = 'moderado', 'Moderado', 'risk-moderado', '#FFA500' # Laranja
-                else: 
-                    level, status, css, color = 'baixo', 'Baixo', 'risk-baixo', '#444444'
+                level, status, css, color, score = classify_risk_score(score)
 
                 if reg in region_stats:
                     region_stats[reg][level] += 1
