@@ -1,20 +1,17 @@
-# 🗺️ ROADMAP — Milestone: Retreino Tático do Challenger
+# 🗺️ ROADMAP — Milestone: Exportação de Top 30 Micronodos
 
-## ✅ Fase 1: Sincronização e Auditoria de Dados (CONCLUÍDO)
-- [x] Validar integridade dos CSVs.
-- [x] Sincronização de limites de risco.
+## ✅ Fase 1-4: Retreino e Fine-tuning (CONCLUÍDO)
+- Ver histórico no log de commits ou STATE.md anterior.
 
-## ✅ Fase 2: Retreino do Modelo Challenger (CONCLUÍDO)
-- [x] Executar `freeze_total_v3.py`.
-- [x] Promoção para `models/active/`.
+## 🔵 Fase 5: Extração de Inteligência Tática
+- [ ] Modificar `tests/Sentinela/sentinela_inference.py` para calcular top 30.
+- [ ] Implementar mapeamento de micronodo para bairro/regional.
+- [ ] Validar saída do CSV/JSON.
 
-## 🔵 Fase 3: Upgrade Neural do Champion (ST-GAT)
-- [ ] Implementar Recency Bias no `train_all_specialists.py`.
-- [ ] Expandir dados para 4 anos (2022).
-- [ ] Executar treino e atingir P@20 >= 50%.
-
-## 🔵 Fase 4: Fine-Tuning de 30 Dias (Sentinela)
-- [ ] Executar `finetune_realtime_v1.py`.
+## 🔵 Fase 6: Integração com Pipeline de Exportação
+- [ ] Identificar local de salvamento do pacote de screenshots.
+- [ ] Automatizar a cópia/inclusão do `top_30_micronodes.csv` no pacote.
+- [ ] Teste de ponta a ponta: Inferência -> Exportação -> Verificação.
 
 ---
-*Próximo passo: /gsd-plan-phase 1*
+*Próximo passo: /gsd-plan-phase 5*

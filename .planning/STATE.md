@@ -1,17 +1,20 @@
-# Estado Atual do Milestone: Retreino Tático do Challenger
+# 🏁 Estado do Milestone 8 - Exportação de Inteligência Tática
 
-## 📌 Progresso Geral
-- **Fase 1:** Concluído ✅
-- **Fase 2:** Concluído ✅
-- **Fase 3:** Concluído ✅
-- **Fase 4:** Planejado ⏳
+## 📊 Progresso: 100% (CONCLUÍDO E CORRIGIDO)
 
-## 🛠️ Notas de Contexto
-- **Correção Crítica:** Corrigido `FileNotFoundError` no script `freeze_total_v3.py` causado por `BASE_PATH` fixo (hardcoded) para outro usuário. Agora o caminho é dinâmico.
-- O modelo `lgbm_lean_v3_freeze.pkl` foi gerado e promovido para `models/active/`.
-- A janela de foco para o modelo é de 14 dias (horizonte) e 60 dias (window).
-- A promoção foi realizada manualmente após validação técnica da execução.
+### 🟢 Fase 5: Implementação da Extração Top-30 Elite P10
+- **Status:** CONCLUÍDO
+- **Entregáveis:** Script `scripts/nodes/extract_top30_elite_v4.py`.
+- **Resultado:** Identificados os 30 locais com maior risco de CVLI baseados no motor **Sentinela V4 (raio de 500m)**.
 
-## 🚨 Bloqueios / Riscos
-- Monitorar a performance do novo modelo em tempo real para detectar possível drift.
-- Ambiente virtual (.venv) apresentou erro de launcher no `pip`, mas a execução via script está funcional.
+### 🟢 Fase 6: Integração e Snapshot
+- **Status:** CONCLUÍDO
+- **Entregáveis:** Pacote de exportação em `static_export/data_tactical/`.
+- **Resultado:** Arquivo `top30_elite_p10.geojson` gerado com sucesso, contendo a localização exata da inteligência tática granular vista no dashboard.
+
+### 📝 Notas de Versão
+- A inteligência foi redirecionada para a "Elite P10", que utiliza zonas circulares de 500m de raio, conforme solicitado.
+- O snapshot principal foi executado para garantir a sincronia de todos os rankings regionais.
+
+---
+*Atualizado em: 12 de Maio de 2026 (Correção Tática)*

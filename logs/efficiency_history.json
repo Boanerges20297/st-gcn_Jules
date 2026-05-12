@@ -1109,14 +1109,14 @@
       "ranking_top10": [
         "JUAZEIRO DO NORTE",
         "CAUCAIA",
-        "ARATUBA",
         "PARQUE IRACEMA",
+        "AEROLANDIA",
         "CURIO",
-        "VICOSA DO CEARA",
-        "BATURITE",
-        "ITAPIUNA",
-        "CARIRE",
-        "VARZEA ALEGRE"
+        "ANCURI",
+        "BARROSO",
+        "BOM JARDIM",
+        "CONJUNTO PALMEIRAS",
+        "TIANGUA"
       ],
       "gt_sample": [
         "AEROLANDIA",
@@ -1132,28 +1132,35 @@
         "CARIRE",
         "ALTO SANTO"
       ],
-      "p5": 0.4,
-      "recall5": 0.1667,
+      "p5": 0.6,
+      "recall5": 0.25,
       "hits5": [
         "JUAZEIRO DO NORTE",
-        "CAUCAIA"
+        "CAUCAIA",
+        "AEROLANDIA"
       ],
-      "p10": 0.3,
-      "recall10": 0.25,
+      "p10": 0.7,
+      "recall10": 0.5833,
       "hits10": [
         "JUAZEIRO DO NORTE",
         "CAUCAIA",
-        "CARIRE"
+        "AEROLANDIA",
+        "ANCURI",
+        "BARROSO",
+        "BOM JARDIM",
+        "CONJUNTO PALMEIRAS"
       ],
-      "p20": 0.3,
-      "recall20": 0.5,
+      "p20": 0.4,
+      "recall20": 0.6667,
       "hits20": [
         "JUAZEIRO DO NORTE",
         "CAUCAIA",
-        "CARIRE",
         "AEROLANDIA",
-        "ALTO SANTO",
-        "BOM JARDIM"
+        "ANCURI",
+        "BARROSO",
+        "BOM JARDIM",
+        "CONJUNTO PALMEIRAS",
+        "CARIRE"
       ]
     },
     "fortaleza": {
@@ -1162,15 +1169,15 @@
       "total_events": 5,
       "ranking_top10": [
         "PARQUE IRACEMA",
-        "CURIO",
         "AEROLANDIA",
-        "CANINDEZINHO",
+        "CURIO",
+        "ANCURI",
+        "BARROSO",
         "BOM JARDIM",
         "CONJUNTO PALMEIRAS",
-        "ANCURI",
-        "MONDUBIM",
-        "ALTO ALEGRE",
-        "BARROSO"
+        "CANINDEZINHO",
+        "LAGOA REDONDA",
+        "MONDUBIM"
       ],
       "gt_sample": [
         "AEROLANDIA",
@@ -1179,29 +1186,30 @@
         "BOM JARDIM",
         "CONJUNTO PALMEIRAS"
       ],
-      "p5": 0.4,
-      "recall5": 0.4,
+      "p5": 0.6,
+      "recall5": 0.6,
       "hits5": [
         "AEROLANDIA",
-        "BOM JARDIM"
+        "ANCURI",
+        "BARROSO"
       ],
       "p10": 0.5,
       "recall10": 1.0,
       "hits10": [
         "AEROLANDIA",
-        "BOM JARDIM",
-        "CONJUNTO PALMEIRAS",
         "ANCURI",
-        "BARROSO"
+        "BARROSO",
+        "BOM JARDIM",
+        "CONJUNTO PALMEIRAS"
       ],
       "p20": 0.25,
       "recall20": 1.0,
       "hits20": [
         "AEROLANDIA",
-        "BOM JARDIM",
-        "CONJUNTO PALMEIRAS",
         "ANCURI",
-        "BARROSO"
+        "BARROSO",
+        "BOM JARDIM",
+        "CONJUNTO PALMEIRAS"
       ]
     },
     "rmf": {
@@ -1256,13 +1264,13 @@
       "total_events": 4,
       "ranking_top10": [
         "JUAZEIRO DO NORTE",
-        "ARATUBA",
-        "VICOSA DO CEARA",
-        "BATURITE",
-        "ITAPIUNA",
-        "CARIRE",
-        "VARZEA ALEGRE",
         "TIANGUA",
+        "ARATUBA",
+        "CARIRE",
+        "GROAIRAS",
+        "VICOSA DO CEARA",
+        "IGUATU",
+        "BATURITE",
         "ITAPAJE",
         "LIMOEIRO DO NORTE"
       ],
@@ -1271,10 +1279,11 @@
         "CARIRE",
         "ALTO SANTO"
       ],
-      "p5": 0.2,
-      "recall5": 0.3333,
+      "p5": 0.4,
+      "recall5": 0.6667,
       "hits5": [
-        "JUAZEIRO DO NORTE"
+        "JUAZEIRO DO NORTE",
+        "CARIRE"
       ],
       "p10": 0.2,
       "recall10": 0.6667,

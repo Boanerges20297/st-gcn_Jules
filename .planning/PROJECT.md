@@ -6,14 +6,15 @@ Plataforma de predição de crimes violentos (CVLI) operando em paradigma híbri
 ## 🚀 Milestones Concluídos
 - **Milestone 1–7:** Desenvolvimento do ST-GAT (Champion) e Sentinela V1-V2.
 - **Milestone 7.5:** Implementação do Sentinela V3 (LGBM Lean) e Paradigm Híbrido.
+- **Milestone 8:** Exportação de Inteligência Tática (Top 30 Micronodos).
 
-## 🏁 Milestone Atual: Retreino Tático do Challenger (Maio/2026)
-- **Motivação:** Atualização de dados em Maio/2026 e necessidade de ajuste à volatilidade recente.
-- **Foco:** Janela de 30 dias para fine-tuning.
+## 🏁 Milestone Atual: Exportação de Top 30 Micronodos (Maio/2026)
+- **Motivação:** Necessidade de visualizar os pontos críticos identificados pelo Sentinela em relatórios e screenshots.
+- **Foco:** Extração, formatação e empacotamento de dados de predição.
 - **Metas:**
-  - P@10 ≥ 50% (Fortaleza)
-  - P@20 ≥ 70% (Fortaleza)
-  - Sincronização total com `data/raw/` atualizado.
+  - Exportar CSV/JSON com os 30 micronodos de maior risco.
+  - Incluir metadados (Bairro, Regional, Score).
+  - Integrar no pacote de exportação da aplicação.
 
 ## 📑 Documentos de Referência
 - [GEMINI.md](file:///c:/Users/Boanerges/Desktop/Projetos/Report%20Preview/GEMINI.md)

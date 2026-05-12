@@ -1,21 +1,21 @@
-# REQUIREMENTS — Retreino Tático do Challenger
+# Requisitos: Exportação de Top 30 Micronodos
 
-## 1. Escopo Técnico
-- **Input:** `data/raw/dados_status_ocorrencias_gerais_ENRIQUECIDO.csv` (atualizado).
-- **Processamento:**
-  - Retreino total do LGBM Lean (Base).
-  - Fine-tuning incremental (30 dias).
-- **Output:**
-  - `models/active/lgbm_lean_v3_freeze.pkl`
-  - `tests/Sentinela/lgbm_finetune_current.pkl`
-  - `tests/Sentinela/ranking_realtime.csv`
+## 📋 Escopo
+Implementar a funcionalidade de extração dos 30 micronodos com maior probabilidade de ocorrência (risco) predita pelo modelo Sentinela, formatando-os para inclusão no pacote de screenshots/relatórios.
 
-## 2. Critérios de Aceite (UAT)
-- [ ] **Cobertura:** Ranking deve cobrir o Top 40 bairros de Fortaleza.
-- [ ] **Performance:** P@10 ≥ 50% na validação sombra (últimos 14 dias).
-- [ ] **Integridade:** O arquivo `.pkl` deve ser compatível com o `app.py` atual.
-- [ ] **Explicabilidade:** O relatório de importância de features deve destacar `cvp_cvli_ratio` como principal preditor.
+## ✅ Requisitos Funcionais
+1. **Identificação de Top Risco:** Filtrar a inferência do Sentinela para obter os 30 maiores scores.
+2. **Enriquecimento Geográfico:** Associar o ID do micronodo ao Bairro e Regional correspondente.
+3. **Formatação de Saída:** Gerar arquivo `top_30_micronodes.csv` ou JSON no diretório de exportação.
+4. **Integração com Package:** Garantir que o script de screenshot/exportação capture este novo arquivo.
+5. **Automação:** O script `sentinela_inference.py` deve gerar este arquivo automaticamente após a inferência.
 
-## 3. Restrições
-- Não alterar a arquitetura de 10 features do Sentinela V3.
-- Manter o idioma de interação e logs em Português.
+## 🛠️ Critérios de Aceite
+- [ ] O arquivo exportado deve conter exatamente 30 entradas (ou menos, se o total for inferior).
+- [ ] Colunas obrigatórias: `micronode_id`, `score`, `bairro`, `regional`.
+- [ ] O arquivo deve estar presente na pasta `exports/` ou similar definida para screenshots.
+- [ ] A ordenação deve ser decrescente pelo `score`.
+
+## 📌 Restrições
+- Não deve impactar o tempo de inferência em mais de 2 segundos.
+- Deve utilizar os pesos ativos em `models/active/`.
