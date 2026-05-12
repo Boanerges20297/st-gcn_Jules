@@ -2632,3 +2632,27 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 **Status:** ✅ SISTEMA OPERACIONAL E ATUALIZADO.
 
 ---
+
+
+## Tentativa 117 (Autolog - FORTALEZA) — 2026-05-11 19:28
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 120 dias
+- **Learning Rate**: 0.001
+- **Dropout**: 0.35
+- **Épocas**: 200
+- **Patience**: 40
+- **Grad Accumulation**: 6
+
+### 2. Loss & Ranking
+- **Focal Alpha**: 0.7
+- **Focal Gamma**: 2.5
+- **Ranking Weight**: 7.0
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+---
