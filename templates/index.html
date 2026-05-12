@@ -697,8 +697,8 @@
         
         // Opacidade dinâmica para dar destaque ao Top do Ranking
         var fillOpacity = isPoint ? 1.0 : 
-                          (score >= 71 ? 0.60 : 
-                          (score >= 51 ? 0.45 : 
+                          (score >= 71 ? 0.45 : 
+                          (score >= 51 ? 0.38 : 
                           (score >= 31 ? 0.28 : 0.12)));
 
         return {
@@ -870,7 +870,8 @@
                             layer.on('popupopen', function() {
                                 var streetsDiv = document.getElementById('streets-' + rank);
                                 if (streetsDiv && streetsDiv.textContent === 'Carregando...') {
-                                    fetch('/api/territory?name=' + encodeURIComponent(cleanName))
+                                    var regionParam = f.properties.region || '';
+                                    fetch('/api/territory?name=' + encodeURIComponent(cleanName) + '&region=' + encodeURIComponent(regionParam))
                                         .then(r => r.json())
                                         .then(data => {
                                             if (data && data.metrics && data.metrics.critical_streets) {
@@ -1257,52 +1258,42 @@
         // Recalculate Stats based on current region filter
         var regionFilter = $('#region-filter').val() || 'all';
 
-        // Preferir contagens/estatísticas vindas do backend por região quando disponíveis.
+        // Contagem SEMPRE a partir dos polígonos visíveis no mapa (garante que card = mapa)
         try {
-            if (metaDataGlobal && metaDataGlobal.counts_by_region && metaDataGlobal.counts_by_region[regionFilter]) {
-                var rc = metaDataGlobal.counts_by_region[regionFilter];
-                $('#high-risk-count').text(rc['crítico'] || rc['critico'] || 0);
-                $('#medium-risk-count').text(rc['alto'] || 0);
-                $('#low-risk-count').text(rc['moderado'] || 0);
-                $('#stable-areas-count').text(rc['baixo'] || 0);
-            } else if (regionFilter === 'all' && metaDataGlobal && metaDataGlobal.counts) {
-                // fallback to global counts when 'all' selected
-                var counts = metaDataGlobal.counts;
-                $('#high-risk-count').text(counts['crítico'] || counts['critico'] || 0);
-                $('#medium-risk-count').text(counts['alto'] || 0);
-                $('#low-risk-count').text(counts['moderado'] || 0);
-                $('#stable-areas-count').text(counts['baixo'] || 0);
-            } else {
-                // Fallback: contar direto das camadas visíveis (apenas features com score numérico)
-                var criticalRisk = 0, highRisk = 0, mediumRisk = 0, stableAreas = 0;
-                if (geojsonLayer) {
-                    // Função para normalizar regions  
-                    function normalizeRegion(region) {
-                        if (!region) return 'unknown';
-                        var r = String(region).toLowerCase();
-                        if (r === 'capital' || r === 'fortaleza') return 'fortaleza';
-                        return r;
-                    }                    var normalizedFilter = normalizeRegion(regionFilter);
-                    
-                    geojsonLayer.eachLayer(function(layer) {
-                        var props = layer.feature.properties;
-                        var regionValue = props.region || props.region_type || 'unknown';
-                        var normalizedRegion = normalizeRegion(regionValue);
-                        var score = (typeof props.risk_score === 'number') ? props.risk_score : (typeof props.risk_score_cvli === 'number' ? props.risk_score_cvli : null);
-                        if (normalizedFilter === 'all' || normalizedFilter === normalizedRegion) {
-                            if (score === null) return;
-                            if (score >= 90) criticalRisk++;
-                            else if (score >= 80) highRisk++;
-                            else if (score >= 50) mediumRisk++;
-                            else stableAreas++;
-                        }
-                    });
+            var criticalRisk = 0, highRisk = 0, mediumRisk = 0, stableAreas = 0;
+            if (geojsonLayer) {
+                function normalizeRegion(region) {
+                    if (!region) return 'unknown';
+                    var r = String(region).toLowerCase();
+                    if (r === 'capital' || r === 'fortaleza') return 'fortaleza';
+                    return r;
                 }
-                $('#high-risk-count').text(criticalRisk);
-                $('#medium-risk-count').text(highRisk);
-                $('#low-risk-count').text(mediumRisk);
-                $('#stable-areas-count').text(stableAreas);
+                var normalizedFilter = normalizeRegion(regionFilter);
+                var countedNames = {};  // Deduplicação por nome+região
+                
+                geojsonLayer.eachLayer(function(layer) {
+                    var props = layer.feature.properties;
+                    var regionValue = props.region || props.region_type || 'unknown';
+                    var normalizedRegion = normalizeRegion(regionValue);
+                    var score = (typeof props.risk_score === 'number') ? props.risk_score : (typeof props.risk_score_cvli === 'number' ? props.risk_score_cvli : null);
+                    if (normalizedFilter === 'all' || normalizedFilter === normalizedRegion) {
+                        if (score === null) return;
+                        // Deduplicar por nome normalizado para não contar polígonos sobrepostos
+                        var dedupKey = (props.clean_name || normalizeName(props.Name || props.name || '')) + '|' + normalizedRegion;
+                        if (countedNames[dedupKey]) return;
+                        countedNames[dedupKey] = true;
+                        
+                        if (score >= 71) criticalRisk++;
+                        else if (score >= 51) highRisk++;
+                        else if (score >= 31) mediumRisk++;
+                        else stableAreas++;
+                    }
+                });
             }
+            $('#high-risk-count').text(criticalRisk);
+            $('#medium-risk-count').text(highRisk);
+            $('#low-risk-count').text(mediumRisk);
+            $('#stable-areas-count').text(stableAreas);
         } catch (e) {
             console.warn('Erro ao atualizar contagens por região:', e);
         }
@@ -1404,12 +1395,12 @@
 
     function normalizeName(text) {
         if (!text) return "";
-        return text.toString()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/\s*-\s*AIS.*$/gi, "") // Remove " - AIS 12, 26", " - AIS CAPITAL", etc
-            .toUpperCase()
-            .trim();
+        let t = text.toString()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .toUpperCase().trim();
+        // Remove sufixos como " - AIS 12", "(AIS 10)", " - AIS CAPITAL"
+        t = t.replace(/\s*[-–(]?\s*AIS.*$/gi, "").trim();
+        return t;
     }
 
     function reloadMapLayer() {
@@ -1448,10 +1439,36 @@
 
                 geojson.features.forEach(function(feature) {
                     var rawName = feature.properties.Name || feature.properties.name || feature.properties.NOME || "";
-                    var normName = normalizeName(rawName);
+                    // Preferir clean_name vindo do backend (já normalizado pelo Python)
+                    var normName = feature.properties.clean_name || normalizeName(rawName);
                     var regionType = (feature.properties.region_type || '').toString().toLowerCase() || 'unknown';
                     var compositeKey = normName + '|' + regionType;
-                    var r = riskByName[compositeKey] || riskByName[normName] || {};
+                    
+                    // Match em 3 camadas: composto > simples > fuzzy
+                    var r = riskByName[compositeKey] || riskByName[normName];
+                    
+                    // Fallback fuzzy: procurar por substring (ex: PREFEITO JOSE WALTER <-> JOSE WALTER)
+                    if (!r && normName) {
+                        var riskKeys = Object.keys(riskByName);
+                        // Normalizar espaços em barras (BOA VISTA / CASTELAO -> BOA VISTA/CASTELAO)
+                        var normNameCompact = normName.replace(/\s*\/\s*/g, '/');
+                        // Remover sufixos romanos (I, II)
+                        var normNameBase = normNameCompact.replace(/\s+[IV]+$/g, '');
+                        
+                        for (var ki = 0; ki < riskKeys.length; ki++) {
+                            var rk = riskKeys[ki];
+                            if (rk.indexOf('|') !== -1) continue; // pular compostas
+                            var rkCompact = rk.replace(/\s*\/\s*/g, '/');
+                            if (rkCompact === normNameCompact || rkCompact === normNameBase ||
+                                normNameCompact.indexOf(rkCompact) !== -1 || rkCompact.indexOf(normNameCompact) !== -1 ||
+                                normNameBase === rkCompact) {
+                                r = riskByName[rk];
+                                break;
+                            }
+                        }
+                    }
+                    
+                    r = r || {};
                     
                     // Use apenas o `risk_score` fornecido pelo backend quando disponível.
                     // NÃO criar/fabricar valores locais (remover suavização/fallback no front).
@@ -2142,7 +2159,8 @@
             
             // BUSCAR RUAS CRÍTICAS GEOLOCALIZADAS VIA API
             var bairroParam = feature.properties.name || '';
-            var cidadeParam = region || '';
+            var regionParam = feature.properties.region_type || ''; 
+            var cidadeParam = feature.properties.CIDADE || feature.properties.city || regionParam || 'RMF/Interior';
             var streetsContainerId = 'streets-list-' + feature.properties.node_id;
     
             // Calcular latLng base do polígono/ponto para o Ponto de Fuga ST-GCN

@@ -917,11 +917,11 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 
 ---
 
-<<<<<<< HEAD
+
 ## Tentativa 59 (Autolog - FORTALEZA) — 2026-04-22 15:48
-=======
+
 ## Tentativa 59 (Autolog - FORTALEZA) — 2026-04-26 12:05
->>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
+
 **Arquivo de Origem:** `train_all_specialists.py`
 
 ### 1. Hiperparâmetros (Carga Automática)
@@ -944,11 +944,11 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 ---
 
 
-<<<<<<< HEAD
+
 ## Tentativa 60 (Autolog - FORTALEZA) — 2026-04-22 16:56
-=======
+
 ## Tentativa 60 (Autolog - FORTALEZA) — 2026-04-26 12:07
->>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
+
 **Arquivo de Origem:** `train_all_specialists.py`
 
 ### 1. Hiperparâmetros (Carga Automática)
@@ -957,18 +957,18 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 - **Learning Rate**: 0.01
 - **Dropout**: 0.3
 - **Épocas**: 120
-<<<<<<< HEAD
+
 - **Grad Accumulation**: 64
 
 ### 2. Loss & Ranking
 - **Focal Alpha**: 0.55
-=======
+
 - **Patience**: 20
 - **Grad Accumulation**: 32
 
 ### 2. Loss & Ranking
 - **Focal Alpha**: 0.75
->>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
+
 - **Focal Gamma**: 1.5
 - **Ranking Weight**: 10.0
 - **Métrica de Avaliação**: P@10
@@ -979,11 +979,11 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 ---
 
 
-<<<<<<< HEAD
+
 ## Tentativa 61 (Autolog - FORTALEZA) — 2026-04-22 16:57
-=======
+
 ## Tentativa 61 (Autolog - FORTALEZA) — 2026-04-26 18:06
->>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
+
 **Arquivo de Origem:** `train_all_specialists.py`
 
 ### 1. Hiperparâmetros (Carga Automática)
@@ -992,18 +992,18 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 - **Learning Rate**: 0.01
 - **Dropout**: 0.3
 - **Épocas**: 120
-<<<<<<< HEAD
+
 - **Grad Accumulation**: 64
 
 ### 2. Loss & Ranking
 - **Focal Alpha**: 0.55
-=======
+
 - **Patience**: 20
 - **Grad Accumulation**: 32
 
 ### 2. Loss & Ranking
 - **Focal Alpha**: 0.75
->>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
+
 - **Focal Gamma**: 1.5
 - **Ranking Weight**: 10.0
 - **Métrica de Avaliação**: P@10
@@ -1014,11 +1014,11 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 ---
 
 
-<<<<<<< HEAD
+
 ## Tentativa 62 (Autolog - FORTALEZA) — 2026-04-22 16:57
-=======
+
 ## Tentativa 62 (Autolog - FORTALEZA) — 2026-04-26 19:41
->>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
+
 **Arquivo de Origem:** `train_all_specialists.py`
 
 ### 1. Hiperparâmetros (Carga Automática)
@@ -1027,18 +1027,18 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 - **Learning Rate**: 0.01
 - **Dropout**: 0.3
 - **Épocas**: 120
-<<<<<<< HEAD
+
 - **Grad Accumulation**: 64
 
 ### 2. Loss & Ranking
 - **Focal Alpha**: 0.55
-=======
+
 - **Patience**: 20
 - **Grad Accumulation**: 32
 
 ### 2. Loss & Ranking
 - **Focal Alpha**: 0.75
->>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
+
 - **Focal Gamma**: 1.5
 - **Ranking Weight**: 10.0
 - **Métrica de Avaliação**: P@10
@@ -1049,11 +1049,11 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 ---
 
 
-<<<<<<< HEAD
+
 ## Tentativa 63 (Autolog - FORTALEZA) — 2026-04-22 17:01
-=======
+
 ## Tentativa 63 (Autolog - FORTALEZA) — 2026-04-26 19:42
->>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
+
 **Arquivo de Origem:** `train_all_specialists.py`
 
 ### 1. Hiperparâmetros (Carga Automática)
@@ -1062,18 +1062,18 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 - **Learning Rate**: 0.01
 - **Dropout**: 0.3
 - **Épocas**: 120
-<<<<<<< HEAD
+
 - **Grad Accumulation**: 64
 
 ### 2. Loss & Ranking
 - **Focal Alpha**: 0.55
-=======
+
 - **Patience**: 20
 - **Grad Accumulation**: 32
 
 ### 2. Loss & Ranking
 - **Focal Alpha**: 0.75
->>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
+
 - **Focal Gamma**: 1.5
 - **Ranking Weight**: 10.0
 - **Métrica de Avaliação**: P@10
@@ -1084,9 +1084,9 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 ---
 
 
-<<<<<<< HEAD
+
 ## Tentativa 64 (Autolog - RMF) — 2026-04-22 19:03
-=======
+
 ## Tentativa 64 (Autolog - FORTALEZA) — 2026-04-26 21:32
 **Arquivo de Origem:** `train_all_specialists.py`
 
@@ -1112,7 +1112,7 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 
 
 ## Tentativa 65 (Autolog - RMF) — 2026-04-26 21:32
->>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
+
 **Arquivo de Origem:** `train_all_specialists.py`
 
 ### 1. Hiperparâmetros (Carga Automática)
@@ -1121,10 +1121,10 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 - **Learning Rate**: 0.018
 - **Dropout**: 0.5
 - **Épocas**: 120
-<<<<<<< HEAD
-=======
+
+
 - **Patience**: 20
->>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
+
 - **Grad Accumulation**: 8
 
 ### 2. Loss & Ranking
@@ -1139,9 +1139,9 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 ---
 
 
-<<<<<<< HEAD
+
 ## Tentativa 65 (Autolog - INTERIOR) — 2026-04-22 19:04
-=======
+
 ## Tentativa 66 (Autolog - FORTALEZA) — 2026-04-26 21:33
 **Arquivo de Origem:** `train_all_specialists.py`
 
@@ -1167,14 +1167,14 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 
 
 ## Tentativa 67 (Autolog - FORTALEZA) — 2026-04-26 21:36
->>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
+
 **Arquivo de Origem:** `train_all_specialists.py`
 
 ### 1. Hiperparâmetros (Carga Automática)
 - **Target (Horizonte)**: 14 dias
 - **Janela (Window)**: 120 dias
 - **Learning Rate**: 0.005
-<<<<<<< HEAD
+
 - **Dropout**: 0.3
 - **Épocas**: 120
 - **Grad Accumulation**: 32
@@ -1183,7 +1183,7 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 - **Focal Alpha**: 0.4
 - **Focal Gamma**: 2.0
 - **Ranking Weight**: 4.0
-=======
+
 - **Dropout**: 0.5
 - **Épocas**: 120
 - **Patience**: 20
@@ -1193,7 +1193,7 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 - **Focal Alpha**: 0.75
 - **Focal Gamma**: 1.5
 - **Ranking Weight**: 10.0
->>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
+
 - **Métrica de Avaliação**: P@10
 
 ### 3. Resultados
@@ -1202,16 +1202,16 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 ---
 
 
-<<<<<<< HEAD
+
 ## Tentativa 66 (Autolog - RMF) — 2026-04-22 22:04
-=======
+
 ## Tentativa 68 (Autolog - FORTALEZA) — 2026-04-26 21:36
->>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
+
 **Arquivo de Origem:** `train_all_specialists.py`
 
 ### 1. Hiperparâmetros (Carga Automática)
 - **Target (Horizonte)**: 14 dias
-<<<<<<< HEAD
+
 - **Janela (Window)**: 90 dias
 - **Learning Rate**: 0.018
 - **Dropout**: 0.5
@@ -1223,7 +1223,7 @@ O EWMA é intrinsecamente estável porque usa apenas o histórico recente de CVL
 - **Focal Gamma**: 2.0
 - **Ranking Weight**: 7.0
 - **Métrica de Avaliação**: P@5
-=======
+
 - **Janela (Window)**: 120 dias
 - **Learning Rate**: 0.005
 - **Dropout**: 0.5
@@ -1655,7 +1655,7 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 - **Focal Gamma**: 1.5
 - **Ranking Weight**: 15.0
 - **Métrica de Avaliação**: P@10
->>>>>>> f0c5e832fdb68777a137ddf4ac9d9c9f82fa9032
+
 
 ### 3. Resultados
 - *(A preencher após a conclusão)*
@@ -2617,20 +2617,22 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 | Config C (rank_xendcg) | 20.0% | 27.5% | ⭐ VENCEDOR |
 | Config D (Robust Regularization) | 15.0% | 10.0% | — |
 
-<<<<<<< HEAD
+
  - - - 
  
  # #   P R O M O � � O   D E F I N I T I V A :   L i g h t G B M   S o l o   C h a l l e n g e r   ( 3 0 d   - >   7 d )      2 0 2 6 - 0 5 - 1 1   0 8 : 3 5 
  
  # # #   C o n f i g u r a � � o   E l e i t a 
  -   * * R e g i m e * * :   3 0   d i a s   d e   l o o k b a c k   p a r a   7   d i a s   d e   h o r i z o n t e . 
- -   * * C o n f i g u r a � � o * * :   C o n f i g   E   ( o b j e c t i v e = \  
+ -   * * C o n f i g u r a � � o * * :   C o n f i g   E   ( o b j e c t i v e = \ 
+ 
  r a n k _ x e n d c g \ ,   l e a r n i n g _ r a t e = 0 . 1 ,   n _ e s t i m a t o r s = 2 0 0 ,   n u m _ l e a v e s = 1 5 ) . 
  -   * * M � t r i c a   R e c o r d e * * :   4 6 . 2 %   P @ 2 0   ( M � d i a   4   F o l d s ) . 
  
  # # #   S t a t u s 
  -   A T I V O :   m o d e l s / a c t i v e / l g b m _ s o l o _ c h a l l e n g e r . p k l 
-  
+ 
+ 
  
  - - - 
  
@@ -2645,9 +2647,10 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
  -   * * P @ 1 0 * * :   S a l t o   d e   3 0 %   p a r a   * * 5 0 % * *   ( A u m e n t o   d e   6 6 %   n a   p r e c i s � o   t � t i c a ) . 
  -   * * M o d e l o * * :   L G B M R a n k e r   ( C o n f i g   E   -   U l t r a - F a s t ) . 
  -   * * E s t r a t � g i a * * :   O   s i s t e m a   a g o r a   �   u m   A t i r a d o r   d e   E l i t e   n o   T o p   1 0 ,   m a n t e n d o   o   P @ 2 0   e s t r a t � g i c o   v i a   E n s e m b l e   E W M A . 
-  
  
-=======
+ 
+ 
+
 
 
 ## Tentativa 111 (Autolog - FORTALEZA) — 2026-05-10 22:10
@@ -2806,4 +2809,29 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 - *(A preencher após a conclusão)*
 
 ---
->>>>>>> 41fcd935e06823a796486d1b66951a425d481f90
+
+
+## Corre��o Cr�tica (Merge Fix) - 2026-05-12 10:33
+
+### Interven��o
+- Resolvido conflito de mesclagem no src/core/orchestrator.py que causava SyntaxError.
+- Selecionada arquitetura **ShallowGAT (ResGAT)** para Fortaleza conforme diretriz de upgrade do n�cleo neural.
+- Limpeza de marcadores de conflito em arquivos de dados e logs.
+- Sistema restabelecido e operando com Sentinela V3 + ResGAT.
+
+
+## Corre��o de Discrep�ncia de Ranking (Deduplica��o) - 2026-05-12 10:48
+
+### Problema
+- Cards do dashboard mostravam contagens infladas (ex: 42 �reas moderadas) devido a n�s duplicados na malha territorial.
+- Pol�gonos de risco moderado no mapa estavam pouco vis�veis (opacidade 0.28).
+
+### Interven��o
+- **Deduplica��o no Orquestrador:** Adicionada l�gica de deduplica��o por territ�rio no endpoint /api/risk para garantir que as estat�sticas reflitam bairros �nicos.
+- **Visibilidade UI:** Aumentada opacidade dos pol�gonos (Moderado 0.28 -> 0.55) e alinhados os thresholds de fallback (31/51/71) no frontend.
+- **Consist�ncia:** Garantido que o contador do card agora bate exatamente com o n�mero de bairros �nicos coloridos no mapa.
+
+
+## Correcao de Mapeamento GeoJSON - 2026-05-12 11:28
+- Ajustada normalizacao de nomes para suportar espacos e sufixos variados no GeoJSON.
+- Garantido que os 42 bairros moderados aparecam coloridos no mapa.

@@ -1,7 +1,7 @@
 [
   {
     "date": "2026-04-22 00:00:00",
-    "timestamp": "2026-04-30T16:37:23.323810",
+    "timestamp": "2026-05-12T07:30:08.733201",
     "global": {
       "p10": 0.7,
       "p20": 0.45,
@@ -27,7 +27,7 @@
         "active_locations": 2,
         "total_nodes": 40,
         "total_events": 2,
-        "f1_score": 0.0
+        "f1_score": 0.3333
       },
       "rmf": {
         "p10": 0.1,
@@ -39,7 +39,7 @@
         "active_locations": 1,
         "total_nodes": 19,
         "total_events": 2,
-        "f1_score": 0.0
+        "f1_score": 0.1818
       },
       "interior": {
         "p10": 0.7,
@@ -51,13 +51,13 @@
         "active_locations": 8,
         "total_nodes": 50,
         "total_events": 9,
-        "f1_score": 0.0
+        "f1_score": 0.7778
       }
     }
   },
   {
     "date": "2026-04-25 00:00:00",
-    "timestamp": "2026-05-07T15:57:05.483656",
+    "timestamp": "2026-05-12T07:30:08.734730",
     "global": {
       "p10": 0.6,
       "p20": 0.5,
@@ -83,7 +83,7 @@
         "active_locations": 1,
         "total_nodes": 122,
         "total_events": 1,
-        "f1_score": 0.0
+        "f1_score": 0.1818
       },
       "rmf": {
         "p10": 0.1,
@@ -95,7 +95,7 @@
         "active_locations": 1,
         "total_nodes": 19,
         "total_events": 1,
-        "f1_score": 0.0
+        "f1_score": 0.1818
       },
       "interior": {
         "p10": 0.8,
@@ -107,13 +107,13 @@
         "active_locations": 8,
         "total_nodes": 50,
         "total_events": 8,
-        "f1_score": 0.0
+        "f1_score": 0.8889
       }
     }
   },
   {
     "date": "2026-05-05 00:00:00",
-    "timestamp": "2026-05-08T15:48:41.358580",
+    "timestamp": "2026-05-12T07:30:08.736270",
     "global": {
       "p10": 0.5,
       "p20": 0.3,
@@ -139,19 +139,7 @@
         "active_locations": 5,
         "total_nodes": 122,
         "total_events": 5,
-        "f1_score": 0.0
-      },
-      "rmf": {
-        "p10": 0,
-        "p20": 0,
-        "precision": 0,
-        "recall": 0,
-        "recall10": 0,
-        "recall20": 0,
-        "active_locations": 0,
-        "total_nodes": 19,
-        "total_events": 0,
-        "f1_score": 0.0
+        "f1_score": 0.3333
       },
       "interior": {
         "p10": 0.4,
@@ -163,13 +151,13 @@
         "active_locations": 4,
         "total_nodes": 50,
         "total_events": 6,
-        "f1_score": 0.0
+        "f1_score": 0.5714
       }
     }
   },
   {
     "date": "2025-12-31 00:00:00",
-    "timestamp": "2026-05-11T14:35:40.491149",
+    "timestamp": "2026-05-12T07:30:08.737104",
     "global": {
       "p10": 1.0,
       "p20": 0.95,
@@ -195,7 +183,7 @@
         "active_locations": 22,
         "total_nodes": 122,
         "total_events": 31,
-        "f1_score": 0.0
+        "f1_score": 0.8108
       },
       "rmf": {
         "p10": 0.4,
@@ -207,7 +195,7 @@
         "active_locations": 5,
         "total_nodes": 19,
         "total_events": 33,
-        "f1_score": 0.0
+        "f1_score": 0.5714
       },
       "interior": {
         "p10": 0.9,
@@ -219,13 +207,13 @@
         "active_locations": 10,
         "total_nodes": 50,
         "total_events": 19,
-        "f1_score": 0.0
+        "f1_score": 0.9474
       }
     }
   },
   {
     "date": "2026-05-08 00:00:00",
-    "timestamp": "2026-05-11T14:45:59.413173",
+    "timestamp": "2026-05-12T07:30:08.738633",
     "global": {
       "p10": 0.5,
       "p20": 0.45,
@@ -251,7 +239,7 @@
         "active_locations": 6,
         "total_nodes": 122,
         "total_events": 7,
-        "f1_score": 0.0
+        "f1_score": 0.75
       },
       "rmf": {
         "p10": 0.3,
@@ -263,7 +251,7 @@
         "active_locations": 3,
         "total_nodes": 19,
         "total_events": 3,
-        "f1_score": 0.0
+        "f1_score": 0.4615
       },
       "interior": {
         "p10": 0.2,
@@ -275,55 +263,26 @@
         "active_locations": 2,
         "total_nodes": 50,
         "total_events": 3,
-        "f1_score": 0.0
+        "f1_score": 0.3333
       }
     }
   },
   {
-<<<<<<< HEAD
-    "date": "2025-12-31 00:00:00",
-    "timestamp": "2026-05-12T07:21:11.168768",
-    "global": {
-      "p10": 1.0,
-      "p20": 1.0,
-      "precision": 1.0,
-      "recall": 0.5405,
-      "recall10": 0.2703,
-      "recall20": 0.5405,
-      "active_locations": 37,
-      "total_nodes": 191,
-      "total_events": 83,
-      "assigned_total_events": 83,
-      "unmapped_total_events": 0,
-      "f1_score": 0.7017
-    },
-    "regions": {
-      "fortaleza": {
-        "p10": 1.0,
-        "p20": 0.8,
-        "precision": 1.0,
-        "recall": 0.7273,
-        "recall10": 0.4545,
-        "recall20": 0.7273,
-        "active_locations": 22,
-        "total_nodes": 122,
-        "total_events": 31,
-=======
     "date": "2026-05-11 00:00:00",
-    "timestamp": "2026-05-11T14:56:25.870050",
+    "timestamp": "2026-05-12T09:39:09.794234",
     "global": {
-      "p10": 0.3,
-      "p20": 0.3,
-      "precision": 0.3,
-      "recall": 0.5,
-      "recall10": 0.25,
-      "recall20": 0.5,
+      "p10": 0.5,
+      "p20": 0.4,
+      "precision": 0.5,
+      "recall": 0.6667,
+      "recall10": 0.4167,
+      "recall20": 0.6667,
       "active_locations": 12,
       "total_nodes": 191,
       "total_events": 13,
       "assigned_total_events": 13,
       "unmapped_total_events": 0,
-      "f1_score": 0.375
+      "f1_score": 0.5714
     },
     "regions": {
       "fortaleza": {
@@ -336,33 +295,10 @@
         "active_locations": 5,
         "total_nodes": 122,
         "total_events": 5,
->>>>>>> 41fcd935e06823a796486d1b66951a425d481f90
         "f1_score": 0.0
       },
       "rmf": {
         "p10": 0.4,
-<<<<<<< HEAD
-        "p20": 0.2632,
-        "precision": 0.4,
-        "recall": 1.0,
-        "recall10": 0.8,
-        "recall20": 1.0,
-        "active_locations": 5,
-        "total_nodes": 19,
-        "total_events": 33,
-        "f1_score": 0.0
-      },
-      "interior": {
-        "p10": 0.9,
-        "p20": 0.45,
-        "precision": 0.9,
-        "recall": 0.9,
-        "recall10": 0.9,
-        "recall20": 0.9,
-        "active_locations": 10,
-        "total_nodes": 50,
-        "total_events": 19,
-=======
         "p20": 0.2105,
         "precision": 0.4,
         "recall": 1.0,
@@ -383,7 +319,6 @@
         "active_locations": 3,
         "total_nodes": 50,
         "total_events": 4,
->>>>>>> 41fcd935e06823a796486d1b66951a425d481f90
         "f1_score": 0.0
       }
     }

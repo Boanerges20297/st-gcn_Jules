@@ -15,7 +15,9 @@ O `src/core/champion_challenger.py` intercede após a inferência do ST-GAT. Ava
 
 ## 🛠️ Diretrizes de Laboratório (tests/Sentinela/)
 - **Retreino:** `tests/Sentinela/freeze_total_v3.py` (Sem holdout, retreina V3 no dataset inteiro).
-- **Validação Sombra:** `tests/Sentinela/train_validate_v3.py`.
+- **Validação Sombra:** `tests/Sentinela/train_validate_v3.py` e auto-validação em `scripts/automated_validation.py`.
+- **Rastreamento de Facções:** `scripts/faction_migration_tracker.py` (Gera `data/faction_migration_history.json`).
+- **Logs de Desempenho:** Centralizados em `VALIDATION_LOG.md`.
 - **Inferência/Explicação:** `tests/Sentinela/sentinela_inference.py`.
 - **Tempo Real:** `tests/Sentinela/finetune_realtime_v1.py` (Janela deslizante de 30 dias para pegar padrões voláteis).
 - **Promoção:** `.venv/Scripts/python.exe tests/Sentinela/promote_model.py` empurra seguro para `models/active/`.

@@ -61,8 +61,8 @@ except ImportError:
     def normalize_name(text):
         if not isinstance(text, str): return ""
         text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('ASCII').upper().strip()
-        import re
-        return re.sub(r'\s*-\s*AIS.*$', '', text).strip()
+        # Remove sufixos como " - AIS 12", "(AIS 10)", etc
+        return re.sub(r'\s*[-–(]?\s*AIS.*$', '', text).strip()
 
 # --- Champion/Challenger LGBM Lean (Sentinela V3) ---
 try:
@@ -1387,6 +1387,7 @@ def get_risk():
         except Exception as _exo_err:
             print(f"⚠️ Erro ao carregar localidades por município: {_exo_err}")
 
+        seen_territories_stats = set()
         for i, row in nodes_gdf.iterrows():
             try:
                 name = str(row['name'])
@@ -1404,9 +1405,13 @@ def get_risk():
 
                 level, status, css, color, score = classify_risk_score(score)
 
-                if reg in region_stats:
-                    region_stats[reg][level] += 1
-                meta['counts'][level] += 1
+                # Deduplicação para contagem de estatísticas (evita inflar cards se houver nós duplicados)
+                territory_key = f"{name_norm}|{reg}"
+                if territory_key not in seen_territories_stats:
+                    seen_territories_stats.add(territory_key)
+                    if reg in region_stats:
+                        region_stats[reg][level] += 1
+                    meta['counts'][level] += 1
 
                 # Inteligência de Ruas Críticas
                 critical_streets_info = streets_cache.get(name_norm, None)
@@ -1581,25 +1586,26 @@ def get_risk():
             meta['counts_by_region'] = {}
             meta['top10_by_region'] = {}
             for region_key, items in region_buckets.items():
-                c = {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0}
+                # Deduplicar por clean_name para evitar inflar contagens com nós repetidos
+                seen_region_names = set()
+                deduped_items = []
                 for it in items:
+                    cn = normalize_name(it.get('name', ''))
+                    if cn not in seen_region_names:
+                        seen_region_names.add(cn)
+                        deduped_items.append(it)
+
+                c = {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0}
+                for it in deduped_items:
                     level, _, _, _, _ = classify_risk_score(it.get('risk_score', 0))
                     c[level] += 1
                 meta['counts_by_region'][region_key] = c
 
-                sorted_region = sorted(items, key=lambda x: x.get('risk_score', 0), reverse=True)
-                
-                deduped_region = []
-                seen_names = set()
-                for r in sorted_region:
-                    if r.get('name') not in seen_names:
-                        seen_names.add(r.get('name'))
-                        deduped_region.append(r)
-                
+                sorted_region = sorted(deduped_items, key=lambda x: x.get('risk_score', 0), reverse=True)
                 meta['top10_by_region'][region_key] = [{
                     'name': r.get('name'), 'node_id': r.get('node_id'), 'risk_score': r.get('risk_score'),
                     'status_label': r.get('status_label'), 'region_type': r.get('region_type')
-                } for r in deduped_region[:10]]
+                } for r in sorted_region[:10]]
         except Exception:
             meta['counts_by_region'] = {}
             meta['top10_by_region'] = {}
@@ -1685,6 +1691,9 @@ def get_territory():
         # Normalizar o nome
         name_norm = normalize_name(name_param)
         
+        # Obter região (opcional, mas recomendado para evitar colisões)
+        region_param = request.args.get('region', '').strip().lower()
+        
         # Obter as respostas da API /api/risk para usar os dados já processados
         risk_response = get_risk()
         if risk_response.status_code != 200:
@@ -1693,10 +1702,15 @@ def get_territory():
         risk_data = risk_response.get_json()
         results = risk_data.get('data', [])
         
-        # Procurar pelo nó específico
+        # Procurar pelo nó específico com match de região se fornecido
         node_result = None
         for item in results:
-            if normalize_name(item.get('name', '')) == name_norm:
+            item_name_norm = normalize_name(item.get('name', ''))
+            item_region = str(item.get('region_type') or '').lower()
+            
+            if item_name_norm == name_norm:
+                if region_param and item_region and region_param != item_region:
+                    continue # Nome bate mas região não
                 node_result = item
                 break
         
@@ -1868,6 +1882,9 @@ def get_polygons():
                     data = json.load(f)
                     for feat in data.get('features', []):
                         feat['properties']['region_type'] = reg
+                        # Injetar clean_name normalizado para match robusto com /api/risk
+                        raw_name = feat['properties'].get('Name') or feat['properties'].get('name') or ''
+                        feat['properties']['clean_name'] = normalize_name(raw_name)
                         features.append(feat)
             except: pass
     return jsonify({"type": "FeatureCollection", "features": features})

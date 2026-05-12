@@ -430,6 +430,24 @@ def merge(new_data_path):
         print("Executando data_processing.py...")
         subprocess.run([sys.executable, dp_path], check=False)
 
+    # 8. Validação e Rastreamento (NOVO)
+    print("\n🔍 Iniciando Protocolos de Validação e Rastreamento...")
+    try:
+        from scripts.automated_validation import run_validation
+        from scripts.faction_migration_tracker import track_faction_migration
+        
+        # Validar desempenho contra os novos dados (Gabarito)
+        if not df_new.empty:
+            run_validation(df_new)
+        
+        # Rastrear movimentos de facções
+        geo_path = os.path.join(BASE_DIR, 'data', 'raw', 'inteligencia', 'micronodos_faccoes_2026.geojson')
+        hist_path = os.path.join(BASE_DIR, 'data', 'faction_migration_history.json')
+        track_faction_migration(geo_path, hist_path)
+        
+    except Exception as e:
+        print(f"⚠️ Erro nos protocolos de validação/rastreamento: {e}")
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Uso: python scripts/merge_new_data.py novo_arquivo.json")
