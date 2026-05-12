@@ -1109,14 +1109,14 @@
       "ranking_top10": [
         "JUAZEIRO DO NORTE",
         "CAUCAIA",
-        "PARQUE IRACEMA",
         "AEROLANDIA",
         "CURIO",
         "ANCURI",
         "BARROSO",
         "BOM JARDIM",
         "CONJUNTO PALMEIRAS",
-        "TIANGUA"
+        "TIANGUA",
+        "PARQUE IRACEMA"
       ],
       "gt_sample": [
         "AEROLANDIA",
@@ -1132,12 +1132,13 @@
         "CARIRE",
         "ALTO SANTO"
       ],
-      "p5": 0.6,
-      "recall5": 0.25,
+      "p5": 0.8,
+      "recall5": 0.3333,
       "hits5": [
         "JUAZEIRO DO NORTE",
         "CAUCAIA",
-        "AEROLANDIA"
+        "AEROLANDIA",
+        "ANCURI"
       ],
       "p10": 0.7,
       "recall10": 0.5833,
@@ -1168,15 +1169,15 @@
       "active_locations": 5,
       "total_events": 5,
       "ranking_top10": [
-        "PARQUE IRACEMA",
         "AEROLANDIA",
         "CURIO",
         "ANCURI",
         "BARROSO",
         "BOM JARDIM",
         "CONJUNTO PALMEIRAS",
-        "CANINDEZINHO",
-        "LAGOA REDONDA",
+        "PARQUE IRACEMA",
+        "ALTO ALEGRE",
+        "PLANALTO AYRTON SENNA",
         "MONDUBIM"
       ],
       "gt_sample": [
@@ -1186,12 +1187,13 @@
         "BOM JARDIM",
         "CONJUNTO PALMEIRAS"
       ],
-      "p5": 0.6,
-      "recall5": 0.6,
+      "p5": 0.8,
+      "recall5": 0.8,
       "hits5": [
         "AEROLANDIA",
         "ANCURI",
-        "BARROSO"
+        "BARROSO",
+        "BOM JARDIM"
       ],
       "p10": 0.5,
       "recall10": 1.0,
@@ -1265,14 +1267,14 @@
       "ranking_top10": [
         "JUAZEIRO DO NORTE",
         "TIANGUA",
-        "ARATUBA",
         "CARIRE",
-        "GROAIRAS",
-        "VICOSA DO CEARA",
         "IGUATU",
         "BATURITE",
+        "GROAIRAS",
+        "ARATUBA",
+        "ALTO SANTO",
         "ITAPAJE",
-        "LIMOEIRO DO NORTE"
+        "SOBRAL"
       ],
       "gt_sample": [
         "JUAZEIRO DO NORTE",
@@ -1285,11 +1287,12 @@
         "JUAZEIRO DO NORTE",
         "CARIRE"
       ],
-      "p10": 0.2,
-      "recall10": 0.6667,
+      "p10": 0.3,
+      "recall10": 1.0,
       "hits10": [
         "JUAZEIRO DO NORTE",
-        "CARIRE"
+        "CARIRE",
+        "ALTO SANTO"
       ],
       "p20": 0.15,
       "recall20": 1.0,

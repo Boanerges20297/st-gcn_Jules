@@ -57,6 +57,10 @@ def _normalize_scores(arr):
     if mx - mn < 1e-9: return np.zeros_like(arr)
     return (arr - mn) / (mx - mn)
 
+def _is_context_only_feature(name: str) -> bool:
+    feat = str(name or "").strip().lower()
+    return feat == "cvp_cvli_ratio" or feat == "dia_quente_cvp" or feat.startswith("cvp_")
+
 def _pk(scores, targets, k):
     """
     P@k (Precision at K) REAL.
@@ -362,7 +366,7 @@ class ChampionChallenger:
             ti = T - 1
 
             xi = pd.DataFrame(
-                [[float(self._feats[f][ni, ti]) for f in self._feat_names]
+                [[0.0 if _is_context_only_feature(f) else float(self._feats[f][ni, ti]) for f in self._feat_names]
                  for ni in range(N)],
                 columns=self._feat_names
             )
@@ -370,6 +374,8 @@ class ChampionChallenger:
 
             sc_ewma = np.zeros(N, np.float32)
             for fn, w in self._ewma_weights.items():
+                if _is_context_only_feature(fn):
+                    continue
                 if fn in self._feats:
                     sc_ewma += w * self._feats[fn][:, ti]
 

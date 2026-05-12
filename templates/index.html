@@ -816,10 +816,10 @@
                         var color = colorByRankSimple(rank);
                         return {
                             color: color,
-                            weight: rank <= 3 ? 2.4 : 1.8,
-                            opacity: 0.95,
+                            weight: rank <= 3 ? 3 : 2.2,
+                            opacity: 1,
                             fillColor: color,
-                            fillOpacity: rank <= 3 ? 0.30 : 0.18
+                            fillOpacity: rank <= 3 ? 0.45 : 0.32
                         };
                     },
                     pointToLayer: function(feature, latlng) {
@@ -843,7 +843,7 @@
                             };
                             var faccao = faccaoMap[f.properties.source] || (f.properties.faction || 'Não identificado');
                             var scoreRaw = f.properties.score;
-                            var scoreText = scoreRaw !== undefined && scoreRaw !== null ? Math.round(scoreRaw * 100) + '%' : 'N/A';
+                            var scoreText = scoreRaw !== undefined && scoreRaw !== null ? Math.round(scoreRaw) + '%' : 'N/A';
                             var popupContent = '<div id="popup-' + rank + '" style="width:300px; padding:8px;">' +
                                               '<div style="text-align:center; margin-bottom:8px;"><strong>' + rank + '. ' + displayName + '</strong></div>' +
                                               '<div style="font-size:0.85rem;"><b>Facção:</b> ' + faccao + '</div>' +

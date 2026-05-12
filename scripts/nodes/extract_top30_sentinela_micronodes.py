@@ -117,19 +117,29 @@ def export_regional_files(processed_nodes):
         'interior': []
     }
     
-    # Separar por região
+    # Construir conjuntos de bairros por região a partir do orquestrador (source of truth)
+    region_node_sets = {}
+    for reg_key, spec in app.orchestrator.specialists.items():
+        reg_mapped = 'capital' if reg_key == 'fortaleza' else reg_key
+        region_node_sets[reg_mapped] = set()
+        for _, r in spec['data']['nodes_gdf'].iterrows():
+            region_node_sets[reg_mapped].add(normalize_name(str(r.get('name', ''))))
+
+    # Separar por região usando o mapeamento real
     for node in sorted_nodes:
-        # Tenta identificar região pelo bairro no app
-        # No app, temos _RMF_NODES para distinguir.
         name_norm = normalize_name(node['bairro'])
-        if name_norm in app._RMF_NODES:
-            reg = 'rmf'
-        elif node['risk_score'] > 0: # Se tem score no ranking de Fortaleza
-             # Nota: O orquestrador carrega rankings separados. 
-             # Para simplificar, se estiver no risk_scores obtido, classificamos conforme a origem.
-             reg = 'capital' # Default para este script focado em Fortaleza
-        else:
-            reg = 'interior'
+        reg = 'interior'  # Default seguro
+        for reg_key, node_set in region_node_sets.items():
+            if name_norm in node_set:
+                reg = reg_key
+                break
+            # Match parcial para nomes complexos
+            for known_name in node_set:
+                if known_name in name_norm or name_norm in known_name:
+                    reg = reg_key
+                    break
+            if reg != 'interior':
+                break
         
         regions[reg].append(node)
 

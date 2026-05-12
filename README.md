@@ -1,7 +1,7 @@
 # 🛡️ Report Preview — Sistema de Predição de Risco Criminal
 
 > **Inteligência Criminal Preditiva para o Estado do Ceará**
-> Paradigma Híbrido: ST-GAT (Deep Learning) + Sentinela V3 (LGBM Lean) + Champion/Challenger Dinâmico
+> Paradigma Híbrido: ST-GAT (champion) + Sentinela V3 (challenger controlado) + guardrails operacionais para evitar falsos positivos territoriais
 
 ---
 
@@ -14,12 +14,14 @@ O **Report Preview** é uma plataforma operacional de previsão de crimes violen
 | Modelo | P@10 | P@20 | Janela | Status |
 |--------|------|------|--------|--------|
 | ST-GAT (fortaleza_model_active) | ~42% | — | 120d | ✅ Oficial (champion) |
-| **Sentinela V3 — EWMA-Multi** | **50%** | 65% | 14d | ✅ Challenger ativo |
-| **Sentinela V3 — LGBM Lean** | 30% | **70%** | 14d | ✅ Challenger ativo |
-| **Sentinela V3 — Ensemble** | 30% | **70%** | 14d | ✅ Produção |
+| **Sentinela V3 — EWMA-Multi** | **50%** | 65% | 14d | Shadow / laboratório |
+| **Sentinela V3 — LGBM Lean** | 30% | **70%** | 14d | Shadow / laboratório |
+| **Sentinela V3 — Ensemble** | 30% | **70%** | 14d | Challenger carregado; blend pode permanecer em `0%` |
 | Baseline aleatório | 25% | 50% | — | Referência |
 
 > **P@K** = Precisão no Top-K: proporção dos K bairros previstos que de fato registraram CVLI no horizonte de 14 dias.
+>
+> **Guardrail operacional atual:** o score final prioriza `CVLI` recente/histórico e vizinhança. `CVP` permanece apenas como contexto interno do modelo; ele não deve promover diretamente um bairro para risco moderado/alto. Pressão territorial por facção também só entra quando existe suporte `CVLI` recente real ou lastro histórico relevante.
 
 ---
 
@@ -51,19 +53,25 @@ O sistema opera em duas camadas paralelas que convergem num blend dinâmico:
 └──────────────────────────┬──────────────────────────────────┘
                            │
 ┌──────────────────────────▼──────────────────────────────────┐
-│                     CAMADA 2: SENTINELA V3                  │
+│                 CAMADA 2: SENTINELA V3 / CC                 │
 │                                                             │
-│  10 Features Lean (calibradas):                             │
-│    cvp_cvli_ratio × sqrt(hist_pct)  ← anti-falso-positivo  │
-│    target_enc, intel_ewma, nbr_cvli, hist_pct, ...          │
+│  Ranking challenger usado apenas sob arbitragem segura      │
+│  Features contextuais: target_enc, intel_ewma, nbr_cvli,    │
+│  hist_pct, sinais de contexto e validação por P@10          │
 │      ↓                                                      │
 │  LightGBM LambdaRank (300 árvores, reg forte)               │
 │      +                                                      │
 │  EWMA-Multi (7d×0.4 + 14d×0.35 + 30d×0.15 + 90d×0.1)      │
 │      ↓                                                      │
-│  Ensemble 50/50 → ranking Fortaleza                         │
+│  Blend dinâmico → somente se o challenger provar vantagem   │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+### Guardrails do Score Final
+
+1. O alvo primário é `CVLI`; `CVP` é canal auxiliar de contexto e não driver direto do risco final.
+2. Facção/tensão territorial não sobe bairro frio sozinha: o reforço territorial exige `CVLI` recente no tensor do modelo ou lastro histórico relevante.
+3. O challenger pode ser carregado sem influenciar a API: o peso efetivo vem de `data/cc_state.json` e pode ficar em `0%`.
 
 ### Componentes Principais
 
@@ -91,22 +99,24 @@ O **Sentinela V3** adota uma filosofia diferente:
 1. **Menos é mais**: 10 features de alta importância > 42 features ruidosas
 2. **Ranking explícito**: LightGBM LambdaRank otimiza diretamente para NDCG@10, não MSE
 3. **Momentum EWMA**: captura tendências de curto prazo que o GAT (janela 120d) perde
-4. **Calibração de falsos positivos**: `cvp_ratio × sqrt(hist_pct)` elimina bairros comerciais com CVP alto mas sem histórico de CVLI
+4. **Guardrails de produção**: sinais contextuais só entram no score externo quando encontram suporte em `CVLI` recente/histórico relevante
 
-### As 10 Features do Modelo (por importância)
+### Features históricas do Challenger (treino original)
+
+As importâncias abaixo descrevem o treinamento do challenger em laboratório. No caminho externo atual servido pela API, features derivadas de `CVP` são neutralizadas para que não empurrem diretamente o score final.
 
 | # | Feature | Peso% | O que captura |
 |---|---------|-------|---------------|
-| 1 | `cvp_cvli_ratio` (calibrado) | 18.8% | Escalada de crime patrimonial → homicídio |
+| 1 | `cvp_cvli_ratio` (calibrado) | 18.8% | Feature histórica do challenger; neutralizada no score externo |
 | 2 | `target_enc` | 15.7% | Média histórica expanding de CVLI por bairro |
 | 3 | `intel_ewma_14d` | 10.8% | Pressão de operações policiais (armas/drogas/veículos) |
-| 4 | `cvp_ewma_30d` | 10.5% | Tendência de longo prazo de crimes patrimoniais |
+| 4 | `cvp_ewma_30d` | 10.5% | Feature histórica de contexto; neutralizada no score externo |
 | 5 | `intel_ewma_7d` | 8.8% | Intel de tropa de curto prazo |
 | 6 | `inter_intel_cvli` | 8.5% | Interação simultânea: Intel alta + CVLI recente |
 | 7 | `nbr_cvli_30d` | 8.3% | CVLI em bairros geograficamente vizinhos (retaliação) |
 | 8 | `hist_pct` | 6.9% | Percentil histórico do bairro no ranking de CVLI |
-| 9 | `cvp_ewma_14d` | 6.5% | Tendência de CVP médio prazo |
-| 10 | `cvp_ewma_7d` | 5.2% | Tendência de CVP curto prazo |
+| 9 | `cvp_ewma_14d` | 6.5% | Feature histórica de contexto; neutralizada no score externo |
+| 10 | `cvp_ewma_7d` | 5.2% | Feature histórica de contexto; neutralizada no score externo |
 
 ### Motor de Inteligência de Tropa (score_intel)
 
@@ -190,7 +200,7 @@ Report Preview/
 [A cada requisição /api/risk]
     ↓
 1. ST-GAT gera scores_map {bairro: score} para todas as regiões
-2. CC.apply(scores_map) blenda apenas os bairros de Fortaleza
+2. CC.apply(scores_map) só blenda Fortaleza quando `w_cc > 0`
 3. Pesos CC ajustados automaticamente 1x/hora via EMA
 4. JSON retornado ao frontend (mesmo formato de sempre)
 ```
@@ -224,7 +234,7 @@ Report Preview/
 
 ## 🏆 Champion/Challenger — Como Funciona
 
-O CC é a peça central do novo paradigma. Ele resolve o problema de **qual modelo confiar** sem depender de uma decisão humana a cada ciclo:
+O CC arbitra qual modelo pode influenciar o score final sem depender de uma decisão humana a cada ciclo:
 
 ```
 Novo período (1x/hora):
@@ -238,23 +248,24 @@ Novo período (1x/hora):
 ```
 
 **Garantias de segurança:**
-- Começa em `w=0%` (100% ST-GAT) — transição gradual
+- Começa em `w=0%` (100% ST-GAT) — transição gradual e pode permanecer em `0%`
 - Máximo de `w=50%` — ST-GAT nunca é eliminado
 - Se LGBM falhar: fallback imediato para 100% ST-GAT
+- Features derivadas de `CVP` não entram diretamente no score externo do challenger
 - Sem alteração na interface da API — transparente para o frontend
 
 ---
 
 ## 🔍 Explicabilidade por Bairro
 
-O `sentinela_inference.py` expõe uma razão principal por bairro, calculada via z-score ponderado por importância:
+O `sentinela_inference.py` expõe uma razão principal por bairro, mas a leitura operacional deve respeitar o guardrail do score final:
 
 ```
-ANCURI       → Tendência de CVP longa       (ratio acima da média × sqrt(hist_pct))
-BARROSO      → Pressão Intel + CVLI         (intel recente + CVLI simultâneos)
-JANGURUSSU   → Histórico de CVLI elevado    (target_enc alto)
-CURIO        → Intel de tropa recente       (intel_ewma_14d = 0.92, >1σ)
-MONDUBIM     → Intel de tropa recente 🚨    (intel_ewma_14d = 3.02, ALTO)
+ANCURI       → CVLI recente + pressão territorial válida
+BARROSO      → Pressão Intel + CVLI simultâneos
+JANGURUSSU   → Histórico de CVLI elevado
+CURIO        → Intel de tropa recente com suporte espacial
+CENTRO       → Mantido em baixo quando não há CVLI recente relevante
 ```
 
 ---

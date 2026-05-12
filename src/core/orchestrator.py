@@ -291,6 +291,25 @@ class StateOrchestrator:
             norm_tension = (tension_vec - tension_vec.min()) / (tension_vec.max() - tension_vec.min() + 1e-6)
 
             inclusion_horizon = 28 if region == 'interior' else 14
+            current_cvli_recent = x_raw_extended[:, -inclusion_horizon:, 0].sum(axis=1)
+            current_cvli_30d = x_raw_extended[:, -30:, 0].sum(axis=1)
+
+            historical_col = 'total_cvli' if 'total_cvli' in data['nodes_gdf'].columns else 'recent_cvli'
+            historical_cvli = data['nodes_gdf'][historical_col].fillna(0).values.astype(float)
+
+            # Tensão territorial não deve sozinha promover bairros frios.
+            # Exigimos atividade CVLI recente real ou lastro histórico relevante.
+            historical_support = np.clip((historical_cvli - 20.0) / 40.0, 0, 1)
+            live_support = np.maximum(
+                np.clip(current_cvli_recent / 1.0, 0, 1),
+                np.clip(current_cvli_30d / 2.0, 0, 1)
+            )
+            territorial_support = np.maximum(
+                historical_support,
+                live_support
+            )
+            norm_tension = norm_tension * territorial_support
+
             recent_crime_signal = np.clip(x_raw_extended[:, -inclusion_horizon:, 0].sum(axis=1), 0, 2) / 2.0
             neighbor_signal = np.clip((data['adj_geo'].dot((sim_impact > 0).astype(float))) * (cp.get('tag_bias_neighbor', 0.6)/0.6), 0, 1)
             inclusion_signal = np.clip(np.maximum.reduce([recent_crime_signal, neighbor_signal]), 0, 1)

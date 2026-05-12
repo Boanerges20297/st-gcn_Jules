@@ -16,9 +16,12 @@ def extract_elite_v4():
     ZONES_PATH = os.path.join(base_dir, 'tests', 'Sentinela', 'sentinela_v4_zones.geojson')
     RANKING_PATH = os.path.join(base_dir, 'tests', 'Sentinela', 'ranking_sentinela_v4.json')
     
-    # Caminho de saída (compatibilidade com o dashboard de screenshot)
+    # Caminhos de saída (compatibilidade com o dashboard de screenshot)
     OUTPUT_PATH = os.path.join(base_dir, 'outputs', 'top30_elite_p10.geojson')
-    STATIC_EXPORT_PATH = os.path.join(base_dir, 'static_export', 'data_tactical', 'top30_elite_p10.geojson')
+    # Package oficial para envio
+    STATIC_EXPORT_PATH = os.path.join(base_dir, 'static_export', 'data', 'top30_elite_p10.geojson')
+    # Backup tático
+    STATIC_EXPORT_TACTICAL_PATH = os.path.join(base_dir, 'static_export', 'data_tactical', 'top30_elite_p10.geojson')
 
     if not os.path.exists(ZONES_PATH) or not os.path.exists(RANKING_PATH):
         logger.error("Arquivos do Sentinela V4 não encontrados.")
@@ -81,17 +84,15 @@ def extract_elite_v4():
     }
 
     # 4. Salvar
-    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
-    with open(OUTPUT_PATH, 'w', encoding='utf-8') as f:
-        json.dump(output_geojson, f, indent=2, ensure_ascii=False)
-    
-    # Salvar também na pasta de exportação estática
-    os.makedirs(os.path.dirname(STATIC_EXPORT_PATH), exist_ok=True)
-    with open(STATIC_EXPORT_PATH, 'w', encoding='utf-8') as f:
-        json.dump(output_geojson, f, indent=2, ensure_ascii=False)
+    def save_json(path, data):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        logger.info(f"✅ Salvo em: {path}")
 
-    logger.info(f"✅ Exportado Top {len(output_features)} Micronodos Elite P10 para {OUTPUT_PATH}")
-    logger.info(f"✅ Cópia para snapshot criada em {STATIC_EXPORT_PATH}")
+    save_json(OUTPUT_PATH, output_geojson)
+    save_json(STATIC_EXPORT_PATH, output_geojson)
+    save_json(STATIC_EXPORT_TACTICAL_PATH, output_geojson)
 
 if __name__ == "__main__":
     extract_elite_v4()

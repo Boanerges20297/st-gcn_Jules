@@ -1045,17 +1045,18 @@ def get_top20_micro_nodes():
         faction_cache = _load_top_micronode_faction_cache()
         features = payload.get('features', [])
         
-        # --- FILTRO TOP 1 POR AREA (SENTINELA CLEAN MODE) ---
-        # Mantemos apenas a primeira ocorrencia de cada bairro/municipio.
+        # --- FILTRO DE DEDUP POR MICRONODO (SENTINELA CLEAN MODE) ---
+        # Cada micronodo tem rank unico - nao eliminar pontos taticos distintos.
         decorated = []
         seen_areas = set()
         
         for feature in features:
             props = dict(feature.get('properties') or {})
             
-            # Identificar area (bairro ou municipio)
-            area_raw = props.get('bairro') or props.get('municipio') or props.get('name') or props.get('micronodo') or "DESCONHECIDO"
-            area_key = _normalize_polygon_lookup_name(str(area_raw))
+            # Usar rank + nome como chave unica (micronodos distintos podem compartilhar nome)
+            rank = props.get('rank', '')
+            area_raw = props.get('name') or props.get('micronodo') or props.get('bairro') or "DESCONHECIDO"
+            area_key = f"{rank}:{_normalize_polygon_lookup_name(str(area_raw))}"
             
             if area_key in seen_areas:
                 continue
