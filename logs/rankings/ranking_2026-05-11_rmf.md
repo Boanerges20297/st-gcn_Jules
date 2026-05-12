@@ -1,5 +1,9 @@
 # 🛡️ Relatório de Risco Diário - REGIÃO METROPOLITANA
+<<<<<<< HEAD
 **Data de Geração:** 11/05/2026 09:20:05
+=======
+**Data de Geração:** 11/05/2026 14:07:47
+>>>>>>> 41fcd935e06823a796486d1b66951a425d481f90
 **Estado da Base Histórica:** 2025-12-31 00:00:00
 
 | Pos | Localidade | Risco (%) | Facção Predominante |

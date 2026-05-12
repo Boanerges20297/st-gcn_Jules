@@ -1,4 +1,4 @@
-"""
+r"""
 ====================================================================
 SENTINELA V3 — TREINO FREEZE TOTAL (CANDIDATO A PRODUÇÃO)
 ====================================================================
@@ -23,6 +23,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
 from scipy.spatial.distance import cdist
+# pyrefly: ignore [missing-import]
 from lightgbm import LGBMRanker
 
 warnings.filterwarnings("ignore")
@@ -30,7 +31,7 @@ warnings.filterwarnings("ignore")
 # ─────────────────────────────────────────────────────────────────
 #  CONFIGURACOES
 # ─────────────────────────────────────────────────────────────────
-BASE_PATH   = r"c:\Users\Boanerges\Desktop\Projetos\Report Preview"
+BASE_PATH   = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 DATA_RAW    = os.path.join(BASE_PATH, "data", "raw")
 OUT_PATH    = os.path.join(BASE_PATH, "tests", "Sentinela")
 
