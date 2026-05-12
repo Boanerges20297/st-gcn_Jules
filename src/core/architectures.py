@@ -77,8 +77,8 @@ class DeepSTGAT_64(nn.Module):
     """ESPECIALISTA FORTALEZA (Versao Original Estavel - 63.2%)."""
     def __init__(self, num_nodes, in_channels, time_steps, dropout=0.4):
         super().__init__()
-        self.layer1 = STGCNBlock(in_channels, 32, time_steps, dropout)
-        self.layer2 = STGCNBlock(32, 64, time_steps, dropout)
+        self.layer1 = STGCNBlock(in_channels, 64, time_steps, dropout)
+        self.layer2 = STGCNBlock(64, 64, time_steps, dropout)
         self.layer3 = STGCNBlock(64, 64, time_steps, dropout)
         self.final_conv = nn.Conv2d(64, 64, kernel_size=(1, time_steps))
         self.prelu_final = nn.PReLU()

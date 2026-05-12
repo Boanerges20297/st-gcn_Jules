@@ -51,7 +51,7 @@ class StateOrchestrator:
                 'model_path': os.path.join(self.root, 'models', 'active', fortaleza_model_file),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_fortaleza.pkl'),
                 'class': DeepSTGAT_64,
-                'in_channels': 41, 
+                'in_channels': 39, 
                 'window': 120 
             },
             'rmf': {

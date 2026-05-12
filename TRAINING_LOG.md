@@ -2522,3 +2522,127 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
 - *(A preencher após a conclusão)*
 
 ---
+
+
+---
+
+## Tentativa SOLO-LGBM-01 (Vôo Solo LightGBM) — 2026-05-11 08:18
+
+### Motivação
+- Avaliar performance pura do LightGBM sem interferência de EWMA ou GAT.
+### Configuração Técnica
+- **Modelo**: `LGBMRanker` (Solo Flight)
+- **Features**: 12 (Lean V3 + Sazonalidade)
+- **Parâmetros**: {
+  "objective": "lambdarank",
+  "metric": "ndcg",
+  "ndcg_eval_at": [
+    5,
+    10
+  ],
+  "n_estimators": 600,
+  "num_leaves": 63,
+  "learning_rate": 0.03,
+  "min_child_samples": 15,
+  "subsample": 0.8,
+  "colsample_bytree": 0.8,
+  "reg_alpha": 0.5,
+  "reg_lambda": 3.0,
+  "random_state": 42,
+  "n_jobs": -1,
+  "verbose": -1
+}
+### Resultados (Validação Shadow 14d)
+| Região | P@10 | P@20 | Status |
+|---|---|---|---|
+| **Fortaleza** | **40.0%** | **35.0%** | BASELINE |
+
+### Análise
+- O LightGBM solo demonstrou força competitiva em P@10, sugerindo que a engenharia de features é o driver principal.
+
+
+---
+
+## Tentativa SOLO-LGBM-02 (Torneio de Hiperparâmetros) — 2026-05-11 08:26
+
+- **Vencedor**: Config A (Baseline)
+- **TOP_N**: 60 (Aumentado para maior cobertura)
+- **Parâmetros**: {
+  "objective": "lambdarank",
+  "metric": "ndcg",
+  "n_estimators": 600,
+  "num_leaves": 63,
+  "learning_rate": 0.03,
+  "random_state": 42,
+  "n_jobs": -1,
+  "verbose": -1
+}
+### Performance Consolidada
+| Config | P@10 | P@20 | Status |
+|---|---|---|---|
+| Config A (Baseline) | 40.0% | 20.0% | ⭐ VENCEDOR |
+| Config B (Complex - 127 Leaves) | 40.0% | 20.0% | — |
+| Config C (rank_xendcg) | 40.0% | 20.0% | — |
+| Config D (Robust Regularization) | 40.0% | 20.0% | — |
+
+
+---
+
+## Tentativa SOLO-LGBM-03 (Torneio Walk-Forward 4 Folds) — 2026-05-11 08:27
+
+- **Vencedor**: Config D (Robust Regularization)
+- **Nova Feature**: `days_since_last_cvli` (Adicionada)
+- **TOP_N**: 60
+### Performance Média (4 Folds x 14 Dias)
+| Config | P@10 Mean | P@20 Mean | Status |
+|---|---|---|---|
+| Config A (Baseline) | 25.0% | 22.5% | — |
+| Config B (Complex - 127 Leaves) | 25.0% | 16.2% | — |
+| Config C (rank_xendcg) | 22.5% | 25.0% | — |
+| Config D (Robust Regularization) | 27.5% | 22.5% | ⭐ VENCEDOR |
+
+
+---
+
+## Tentativa SOLO-LGBM-03 (Torneio Walk-Forward 4 Folds) — 2026-05-11 08:29
+
+- **Vencedor**: Config C (rank_xendcg)
+- **Nova Feature**: `days_since_last_cvli` (Adicionada)
+- **TOP_N**: 60
+### Performance Média (4 Folds x 14 Dias)
+| Config | P@10 Mean | P@20 Mean | Status |
+|---|---|---|---|
+| Config A (Baseline) | 15.0% | 20.0% | — |
+| Config B (Complex - 127 Leaves) | 15.0% | 23.8% | — |
+| Config C (rank_xendcg) | 20.0% | 27.5% | ⭐ VENCEDOR |
+| Config D (Robust Regularization) | 15.0% | 10.0% | — |
+
+ - - - 
+ 
+ # #   P R O M O � � O   D E F I N I T I V A :   L i g h t G B M   S o l o   C h a l l e n g e r   ( 3 0 d   - >   7 d )      2 0 2 6 - 0 5 - 1 1   0 8 : 3 5 
+ 
+ # # #   C o n f i g u r a � � o   E l e i t a 
+ -   * * R e g i m e * * :   3 0   d i a s   d e   l o o k b a c k   p a r a   7   d i a s   d e   h o r i z o n t e . 
+ -   * * C o n f i g u r a � � o * * :   C o n f i g   E   ( o b j e c t i v e = \  
+ r a n k _ x e n d c g \ ,   l e a r n i n g _ r a t e = 0 . 1 ,   n _ e s t i m a t o r s = 2 0 0 ,   n u m _ l e a v e s = 1 5 ) . 
+ -   * * M � t r i c a   R e c o r d e * * :   4 6 . 2 %   P @ 2 0   ( M � d i a   4   F o l d s ) . 
+ 
+ # # #   S t a t u s 
+ -   A T I V O :   m o d e l s / a c t i v e / l g b m _ s o l o _ c h a l l e n g e r . p k l 
+  
+ 
+ - - - 
+ 
+ # #   S U B S T I T U I � � O   D E   N � C L E O :   S o l o   C h a l l e n g e r   8 0 0 d   a s s u m e   m o t o r   L G B M      2 0 2 6 - 0 5 - 1 1   0 9 : 0 0 
+ 
+ # # #   M u d a n � a s   E s t r u t u r a i s 
+ -   * * D e s p r o m o v i d o * * :   l g b m _ l e a n _ v 3 _ f r e e z e . p k l   ( e n v i a d o   p a r a   t e s t s / S e n t i n e l a / d e p r e c a t e d / ) 
+ -   * * P r o m o v i d o * * :   l g b m _ s o l o _ c h a l l e n g e r _ 8 0 0 d . p k l   ( m o t o r   o f i c i a l   e m   m o d e l s / a c t i v e / ) 
+ -   * * I n f r a e s t r u t u r a * * :   A t u a l i z a d o   s r c / c o r e / c h a m p i o n _ c h a l l e n g e r . p y   p a r a   p r o c e s s a r   a s   n o v a s   f e a t u r e s   d e   u l t r a - r e a t i v i d a d e   ( r e c e n c y ,   e w m a _ 3 d ,   e t c ) . 
+ 
+ # # #   G a n h o s   d e   P e r f o r m a n c e   ( S i m e t r i a   T o t a l ) 
+ -   * * P @ 1 0 * * :   S a l t o   d e   3 0 %   p a r a   * * 5 0 % * *   ( A u m e n t o   d e   6 6 %   n a   p r e c i s � o   t � t i c a ) . 
+ -   * * M o d e l o * * :   L G B M R a n k e r   ( C o n f i g   E   -   U l t r a - F a s t ) . 
+ -   * * E s t r a t � g i a * * :   O   s i s t e m a   a g o r a   �   u m   A t i r a d o r   d e   E l i t e   n o   T o p   1 0 ,   m a n t e n d o   o   P @ 2 0   e s t r a t � g i c o   v i a   E n s e m b l e   E W M A . 
+  
+ 
