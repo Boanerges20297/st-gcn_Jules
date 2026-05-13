@@ -115,6 +115,10 @@
             padding: 12px;
             border-radius: 4px;
         }
+
+        #explainability-export-status {
+            min-height: 1rem;
+        }
         
         #explanation-content {
             margin-top: 8px;
@@ -234,6 +238,7 @@
         }
 
         /* Garante que mapa e sidebar tenham mesma altura em colunas lado a lado */
+        html, body { overflow-x: hidden; }
         .rp-main-row {
             align-items: stretch;
             --bs-gutter-x: 0.75rem;
@@ -250,14 +255,17 @@
             .rp-main-row {
                 display: flex;
                 flex-wrap: nowrap;
+                width: 100%;
             }
             .rp-map-col {
-                flex: 1 1 auto;
+                flex: 1 1 0;
+                min-width: 0;
                 max-width: none;
             }
             .rp-sidebar-col {
                 flex: 0 0 clamp(290px, 20vw, 360px);
                 max-width: clamp(290px, 20vw, 360px);
+                min-width: 0;
             }
         }
     </style>
@@ -433,9 +441,15 @@
                     
                     <!-- Explicabilidade e Métricas Técnicas (Collapsible) -->
                     <div id="explanation-section" style="display:none; margin-top: 6px; margin-bottom: 8px; border-top: 1px solid #ddd; padding-top: 8px;">
-                        <button class="btn btn-sm btn-link p-0 text-primary fw-bold" data-bs-toggle="collapse" data-bs-target="#explanation-collapse" aria-expanded="true">
-                            <i class="fas fa-chart-bar"></i> Explicabilidade do Risco
-                        </button>
+                        <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+                            <button class="btn btn-sm btn-link p-0 text-primary fw-bold" data-bs-toggle="collapse" data-bs-target="#explanation-collapse" aria-expanded="true">
+                                <i class="fas fa-chart-bar"></i> Explicabilidade do Risco
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" id="btn-export-area-explainability" onclick="exportSelectedExplainabilityReport()" disabled title="Exporta a explicabilidade da área em destaque para uso gerencial">
+                                <i class="fas fa-file-export"></i> Exportar análise
+                            </button>
+                        </div>
+                        <div id="explainability-export-status" class="small text-muted mt-2" style="display:none;"></div>
                         <div id="explanation-collapse" class="collapse show">
                             <div id="explanation-content" class="small text-muted mt-2">
                                 Carregando métricas...
@@ -766,6 +780,12 @@
     var selectedLayer = null;  // território em destaque (borda dourada)
     var riskDataGlobal = null;
     var metaDataGlobal = null;
+    var selectedExplainabilityState = {
+        feature: null,
+        explanation: null,
+        capturedAt: null
+    };
+    var explainabilityRequestToken = 0;
     var _effMetricsPrintedDate = null; // guard: print termômetro apenas 1x por data de avaliação
 
     // Top30 micro-nodes layer
@@ -844,11 +864,15 @@
                             var faccao = faccaoMap[f.properties.source] || (f.properties.faction || 'Não identificado');
                             var scoreRaw = f.properties.score;
                             var scoreText = scoreRaw !== undefined && scoreRaw !== null ? Math.round(scoreRaw) + '%' : 'N/A';
+                            var peakHrs = f.properties.peak_hours || '';
+                            var peakHtml = peakHrs ? '<div style="font-size:0.82rem; color:#ffd166; margin-bottom:6px; background:rgba(255,209,102,0.08); padding:4px 6px; border-radius:4px; border-left:3px solid #ffd166;"><b>⏱ Horário de Risco:</b> ' + peakHrs + '</div>' : '';
                             var popupContent = '<div id="popup-' + rank + '" style="width:300px; padding:8px;">' +
                                               '<div style="text-align:center; margin-bottom:8px;"><strong>' + rank + '. ' + displayName + '</strong></div>' +
+                                              '<div style="font-size:0.85rem;"><b>Bairro:</b> ' + (f.properties.bairro || 'N/A') + '</div>' +
                                               '<div style="font-size:0.85rem;"><b>Facção:</b> ' + faccao + '</div>' +
                                               '<div style="font-size:0.85rem;"><b>Município:</b> ' + (f.properties.municipality || 'N/A') + '</div>' +
                                               '<div style="font-size:0.85rem; margin-bottom:8px;"><b>Tensão:</b> ' + scoreText + '</div>' +
+                                              peakHtml +
                                               '<div id="streets-' + rank + '" style="font-size:0.8rem; color:#888;">Carregando...</div>' +
                                               '</div>';
                             layer.bindPopup(popupContent);
@@ -1060,6 +1084,264 @@
         else if (tone === 'error') el.addClass('text-danger');
         else el.addClass('text-muted');
         el.text(message).show();
+    }
+
+    function setExplainabilityExportStatus(message, tone) {
+        var el = $('#explainability-export-status');
+        if (!message) {
+            el.hide().removeClass('text-success text-danger text-muted').text('');
+            return;
+        }
+        el.removeClass('text-success text-danger text-muted');
+        if (tone === 'success') el.addClass('text-success');
+        else if (tone === 'error') el.addClass('text-danger');
+        else el.addClass('text-muted');
+        el.text(message).show();
+    }
+
+    function updateExplainabilityExportButton(enabled) {
+        $('#btn-export-area-explainability').prop('disabled', !enabled);
+    }
+
+    function cloneSerializable(value) {
+        try {
+            return JSON.parse(JSON.stringify(value));
+        } catch (error) {
+            return value;
+        }
+    }
+
+    function primeExplainabilityExport(featureProps) {
+        selectedExplainabilityState = {
+            feature: cloneSerializable(featureProps || {}),
+            explanation: null,
+            capturedAt: new Date().toISOString()
+        };
+        updateExplainabilityExportButton(false);
+        setExplainabilityExportStatus('Preparando relatório exportável da área selecionada...', 'muted');
+    }
+
+    function registerExplainabilityExportData(data) {
+        selectedExplainabilityState.explanation = cloneSerializable(data || {});
+        selectedExplainabilityState.capturedAt = new Date().toISOString();
+        updateExplainabilityExportButton(true);
+        setExplainabilityExportStatus('Análise pronta para exportação.', 'success');
+    }
+
+    function escapeHtml(value) {
+        return String(value == null ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function formatReportText(value) {
+        return escapeHtml(value).replace(/\n/g, '<br>');
+    }
+
+    function formatTimestampForReport(value) {
+        try {
+            var date = value ? new Date(value) : new Date();
+            if (isNaN(date.getTime())) date = new Date();
+            return date.toLocaleString('pt-BR');
+        } catch (error) {
+            return new Date().toLocaleString('pt-BR');
+        }
+    }
+
+    function buildExplainabilityList(items, itemFormatter, ordered) {
+        if (!Array.isArray(items) || items.length === 0) return '';
+        var tag = ordered ? 'ol' : 'ul';
+        var rows = items
+            .map(function(item) {
+                var rendered = itemFormatter(item);
+                return rendered ? '<li>' + rendered + '</li>' : '';
+            })
+            .filter(Boolean)
+            .join('');
+        if (!rows) return '';
+        return '<' + tag + '>' + rows + '</' + tag + '>';
+    }
+
+    function buildExplainabilitySection(title, content) {
+        if (!content) return '';
+        return '<section class="report-section">'
+            + '<h2>' + escapeHtml(title) + '</h2>'
+            + content
+            + '</section>';
+    }
+
+    function slugifyReportName(value) {
+        return String(value || 'area')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '_')
+            .replace(/^_+|_+$/g, '')
+            .slice(0, 60) || 'area';
+    }
+
+    function buildExplainabilityReportHtml() {
+        var state = selectedExplainabilityState || {};
+        var feature = state.feature || {};
+        var data = state.explanation || {};
+        var structured = data.structured_result || {};
+        var territoryName = feature.name || data.name || 'Área selecionada';
+        var region = feature.region_type || feature.region || 'N/D';
+        var faction = feature.faction || data.faction || 'N/D';
+        var statusLabel = feature.status_label || data.status_label || 'N/D';
+        var riskScore = (typeof data.risk_score_pct === 'number')
+            ? data.risk_score_pct.toFixed(1) + '%'
+            : (typeof feature.risk_score === 'number' ? feature.risk_score.toFixed(1) + '%' : 'N/D');
+        var confidencePct = (typeof data.confidence_pct === 'number')
+            ? data.confidence_pct.toFixed(1) + '%'
+            : (typeof data.confidence === 'number' ? (data.confidence * 100).toFixed(1) + '%' : 'N/D');
+        var reportMoment = formatTimestampForReport(state.capturedAt);
+        var argumentBullets = [];
+
+        if (structured.manager_guidance) argumentBullets.push(structured.manager_guidance);
+        if (data.summary) argumentBullets.push(data.summary);
+        if (data.interpretation) argumentBullets.push(data.interpretation);
+        (data.factors || []).forEach(function(factor) {
+            if (factor && factor.explanation) argumentBullets.push(factor.explanation);
+        });
+        (data.confidence_components || []).forEach(function(component) {
+            if (!component || !component.name || !component.text) return;
+            argumentBullets.push(component.name + ': ' + component.text);
+        });
+
+        var executiveSection = '';
+        if (data.summary) {
+            executiveSection += '<p>' + formatReportText(data.summary) + '</p>';
+        }
+        executiveSection += buildExplainabilityList([
+            structured.executive_summary,
+            structured.technical_basis,
+            structured.confidence_basis,
+            structured.manager_guidance
+        ].filter(Boolean), function(item) { return formatReportText(item); }, false);
+
+        var argumentsSection = buildExplainabilityList(argumentBullets, function(item) {
+            return formatReportText(item);
+        }, true);
+
+        var factorsSection = buildExplainabilityList(data.factors || [], function(factor) {
+            if (!factor || !factor.explanation) return '';
+            var importance = factor.importance ? ' <strong>(' + escapeHtml(factor.importance) + ')</strong>' : '';
+            return formatReportText(factor.explanation) + importance;
+        }, false);
+
+        var confidenceSection = '';
+        confidenceSection += '<p><strong>Confiança estimada:</strong> ' + escapeHtml(confidencePct);
+        if (data.confidence_label) {
+            confidenceSection += ' <span style="color:#3454d1;">(' + escapeHtml(data.confidence_label) + ')</span>';
+        }
+        confidenceSection += '</p>';
+        if (data.confidence_explanation) {
+            confidenceSection += '<p>' + formatReportText(data.confidence_explanation) + '</p>';
+        }
+        confidenceSection += buildExplainabilityList(data.confidence_components || [], function(component) {
+            if (!component || !component.name || !component.text) return '';
+            var scoreText = (typeof component.score_pct === 'number') ? ' (' + component.score_pct.toFixed(1) + '%)' : '';
+            return '<strong>' + escapeHtml(component.name) + scoreText + ':</strong> ' + formatReportText(component.text);
+        }, false);
+        confidenceSection += buildExplainabilityList(data.confidence_caveats || [], function(item) {
+            return formatReportText(item);
+        }, false);
+
+        var methodologySection = '';
+        if (structured.methodology_note) {
+            methodologySection += '<p>' + formatReportText(structured.methodology_note) + '</p>';
+        }
+        if (feature.cvli_prediction_text) {
+            methodologySection += '<p><strong>Previsão operacional:</strong> ' + formatReportText(feature.cvli_prediction_text) + '</p>';
+        }
+
+        return '<!DOCTYPE html>'
+            + '<html lang="pt-BR">'
+            + '<head>'
+            + '<meta charset="utf-8">'
+            + '<meta name="viewport" content="width=device-width, initial-scale=1">'
+            + '<title>Explicabilidade - ' + escapeHtml(territoryName) + '</title>'
+            + '<style>'
+            + 'body{font-family:Segoe UI,Tahoma,sans-serif;margin:0;background:#f4f6fb;color:#172033;line-height:1.55;}'
+            + '.report{max-width:960px;margin:0 auto;padding:32px 24px 56px;}'
+            + '.hero{background:linear-gradient(135deg,#163b72 0%,#0d6efd 100%);color:#fff;padding:28px;border-radius:18px;box-shadow:0 18px 40px rgba(13,110,253,.18);}'
+            + '.hero h1{margin:0 0 8px;font-size:2rem;line-height:1.15;}'
+            + '.hero p{margin:0;color:rgba(255,255,255,.88);}'
+            + '.meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:18px;}'
+            + '.meta-card{background:#fff;border:1px solid #dfe7f5;border-radius:14px;padding:14px 16px;box-shadow:0 8px 18px rgba(23,32,51,.06);}'
+            + '.meta-card .label{display:block;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;color:#6b778c;margin-bottom:6px;}'
+            + '.meta-card .value{display:block;font-size:1.05rem;font-weight:700;color:#172033;}'
+            + '.report-section{background:#fff;border:1px solid #e3e8f2;border-radius:16px;padding:20px 22px;margin-top:18px;box-shadow:0 10px 24px rgba(23,32,51,.05);}'
+            + '.report-section h2{margin:0 0 12px;font-size:1.08rem;color:#163b72;}'
+            + '.report-section p{margin:0 0 12px;}'
+            + '.report-section ul,.report-section ol{margin:0;padding-left:20px;}'
+            + '.report-section li{margin:0 0 8px;}'
+            + '.footer-note{margin-top:18px;font-size:.85rem;color:#5b6577;}'
+            + '@media print{body{background:#fff;}.report{max-width:none;padding:0;}.hero,.meta-card,.report-section{box-shadow:none;}}'
+            + '</style>'
+            + '</head>'
+            + '<body>'
+            + '<main class="report">'
+            + '<section class="hero">'
+            + '<h1>Explicabilidade territorial para suporte gerencial</h1>'
+            + '<p>Relatório exportado a partir da área em destaque no mapa, consolidando síntese executiva, justificativa técnica e argumentos de sustentação.</p>'
+            + '</section>'
+            + '<section class="meta-grid">'
+            + '<div class="meta-card"><span class="label">Área</span><span class="value">' + escapeHtml(territoryName) + '</span></div>'
+            + '<div class="meta-card"><span class="label">Região</span><span class="value">' + escapeHtml(region) + '</span></div>'
+            + '<div class="meta-card"><span class="label">Facção predominante</span><span class="value">' + escapeHtml(faction) + '</span></div>'
+            + '<div class="meta-card"><span class="label">Status</span><span class="value">' + escapeHtml(statusLabel) + '</span></div>'
+            + '<div class="meta-card"><span class="label">Risco estimado</span><span class="value">' + escapeHtml(riskScore) + '</span></div>'
+            + '<div class="meta-card"><span class="label">Confiança</span><span class="value">' + escapeHtml(confidencePct) + '</span></div>'
+            + '<div class="meta-card"><span class="label">Extraído em</span><span class="value">' + escapeHtml(reportMoment) + '</span></div>'
+            + '</section>'
+            + buildExplainabilitySection('Síntese executiva', executiveSection)
+            + buildExplainabilitySection('Subsídios argumentativos para o gestor', argumentsSection)
+            + buildExplainabilitySection('Fatores prioritários para decisão', factorsSection)
+            + buildExplainabilitySection('Leitura de confiança e ressalvas', confidenceSection)
+            + buildExplainabilitySection('Nota metodológica', methodologySection)
+            + '<p class="footer-note">Documento gerado automaticamente pelo Report Preview com base na área clicada e nos dados atuais de explicabilidade.</p>'
+            + '</main>'
+            + '</body>'
+            + '</html>';
+    }
+
+    function exportSelectedExplainabilityReport() {
+        var state = selectedExplainabilityState || {};
+        if (!state.feature || !state.explanation) {
+            setExplainabilityExportStatus('Selecione uma área e aguarde a carga da explicabilidade antes de exportar.', 'error');
+            return;
+        }
+
+        try {
+            var territoryName = state.feature.name || state.explanation.name || 'area';
+            var date = new Date();
+            var stamp = date.getFullYear()
+                + String(date.getMonth() + 1).padStart(2, '0')
+                + String(date.getDate()).padStart(2, '0')
+                + '_'
+                + String(date.getHours()).padStart(2, '0')
+                + String(date.getMinutes()).padStart(2, '0');
+            var filename = 'explicabilidade_' + slugifyReportName(territoryName) + '_' + stamp + '.html';
+            var html = buildExplainabilityReportHtml();
+            var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+            var url = URL.createObjectURL(blob);
+            var link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            setExplainabilityExportStatus('Relatório exportado com sucesso para uso gerencial.', 'success');
+        } catch (error) {
+            console.error('Erro ao exportar explicabilidade:', error);
+            setExplainabilityExportStatus('Falha ao exportar a explicabilidade da área selecionada.', 'error');
+        }
     }
 
     function syncSheetsEvents() {
@@ -1462,8 +1744,9 @@
                     feature.properties.risk_score_cvli = (typeof r.risk_score_cvli === 'number') ? r.risk_score_cvli : null;
                     feature.properties.faction = r.faction || feature.properties.faction || "Não Identificado";
                     feature.properties.name = r.name || rawName;
-                    feature.properties.node_id = r.node_id || "0";
+                    feature.properties.node_id = (r.node_id !== undefined && r.node_id !== null) ? r.node_id : null;
                     feature.properties.metrics = r.metrics || {};
+                        feature.properties.peak_hours = (r.peak_hours || ((r.metrics || {}).peak_hours) || feature.properties.peak_hours || '');
                     // Copy server-provided labels (status, textual risk) so front apenas apresenta o que vem do back
                     if (r.status_label) feature.properties.status_label = r.status_label;
                     if (r.risk_text) feature.properties.risk_text = r.risk_text;
@@ -1515,6 +1798,16 @@
                     layer.on('click', function(e) {
                         if (!simulationMode) {
                             L.DomEvent.stopPropagation(e);
+                            // Carrega explicabilidade imediatamente ao clicar (sem aguardar animação do mapa)
+                            var clickedNodeId = (feature.properties.node_id !== undefined && feature.properties.node_id !== null) ? feature.properties.node_id : feature.properties.id;
+                            primeExplainabilityExport(feature.properties);
+                            if (clickedNodeId !== undefined && clickedNodeId !== null) {
+                                loadExplanation(clickedNodeId);
+                            } else {
+                                $('#explanation-section').show();
+                                $('#explanation-content').html('<p class="text-muted small">Esta área não possui identificador para explicabilidade.</p>');
+                                updateExplainabilityExportButton(false);
+                            }
                             focusLayerAndShowDetails(e.target, 1.0);
                         }
                     });
@@ -1574,6 +1867,7 @@
                 if (r.status_label) feature.properties.status_label = r.status_label;
                 if (r.risk_text) feature.properties.risk_text = r.risk_text;
                 if (r.metrics) feature.properties.metrics = r.metrics;
+                    feature.properties.peak_hours = (r.peak_hours || ((r.metrics || {}).peak_hours) || feature.properties.peak_hours || '');
                 if (r.faction) feature.properties.faction = r.faction;
                 
                 // Aplicar novo estilo visual imediatamente
@@ -1641,7 +1935,9 @@
             if (r.risk_text) feature.properties.risk_text = r.risk_text;
             feature.properties.faction = r.faction || feature.properties.faction || null;
             feature.properties.name = r.name || rawName;
-            feature.properties.node_id = r.node_id;
+            feature.properties.node_id = (r.node_id !== undefined && r.node_id !== null) ? r.node_id : null;
+            feature.properties.metrics = r.metrics || {};
+            feature.properties.peak_hours = (r.peak_hours || ((r.metrics || {}).peak_hours) || feature.properties.peak_hours || '');
             if (!feature.properties.region_type) {
                 feature.properties.region_type = 'unknown';
             }
@@ -1682,6 +1978,16 @@
                         addSimulationPoint(e.latlng);
                     } else {
                         L.DomEvent.stopPropagation(e);
+                        // Carrega explicabilidade imediatamente ao clicar (sem aguardar animação do mapa)
+                        var clickedNodeId = (feature.properties.node_id !== undefined && feature.properties.node_id !== null) ? feature.properties.node_id : feature.properties.id;
+                        primeExplainabilityExport(feature.properties);
+                        if (clickedNodeId !== undefined && clickedNodeId !== null) {
+                            loadExplanation(clickedNodeId);
+                        } else {
+                            $('#explanation-section').show();
+                            $('#explanation-content').html('<p class="text-muted small">Esta área não possui identificador para explicabilidade.</p>');
+                            updateExplainabilityExportButton(false);
+                        }
                         // Use smart focus to account for sidebar and headers
                         focusLayerAndShowDetails(layer, 1.0);
                     }
@@ -2024,56 +2330,26 @@
                 if (bounds) {
                     var center = bounds.getCenter();
 
-                    // Zoom de cidade: centraliza no polígono mas mantém visão ampla (+20%)
-                    // zoom 12.3 ≈ 20% mais fechado que 12 (escala logarítmica base-2)
+                    // Mostra os detalhes imediatamente — não espera a animação do mapa
+                    if (!initialMapLoad) {
+                        showFeatureDetails(layer, center);
+                    }
+
+                    // Animação do mapa acontece em paralelo (apenas cosmética)
                     var cityZoom = Math.min(12.3, Math.max(map.getZoom(), 11.3));
                     map.setView(center, cityZoom, {
                         animate: true,
                         duration: duration
                     });
-
-                    if (!initialMapLoad) {
-                        map.once('moveend', function() {
-                            // Centraliza o polígono na tela (sem offset para popup)
-                            var containerPt = map.latLngToContainerPoint(center);
-                            var mapSize    = map.getSize();
-                            var targetY    = mapSize.y * 0.50;
-                            var deltaY     = containerPt.y - targetY;
-                            var targetX    = mapSize.x * 0.50;
-                            var deltaX     = containerPt.x - targetX;
-
-                            if (Math.abs(deltaY) > 15 || Math.abs(deltaX) > 15) {
-                                map.panBy([deltaX, deltaY], { animate: true, duration: 0.35 });
-                                map.once('moveend', function() {
-                                    showFeatureDetails(layer, center);
-                                });
-                            } else {
-                                showFeatureDetails(layer, center);
-                            }
-                        });
-                    }
                 } else {
                     // Fallback para CircleMarkers (ponto único)
                     var latlng = (layer.getLatLng && layer.getLatLng()) || null;
                     if (latlng) {
+                        if (!initialMapLoad) {
+                            showFeatureDetails(layer, latlng);
+                        }
                         var cityZoom = Math.min(12.3, Math.max(map.getZoom(), 11.3));
                         map.setView(latlng, cityZoom, { animate: true, duration: duration });
-                        if (!initialMapLoad) {
-                            map.once('moveend', function() {
-                                var containerPt = map.latLngToContainerPoint(latlng);
-                                var mapSize     = map.getSize();
-                                var deltaY = containerPt.y - mapSize.y * 0.50;
-                                var deltaX = containerPt.x - mapSize.x * 0.50;
-                                if (Math.abs(deltaY) > 15 || Math.abs(deltaX) > 15) {
-                                    map.panBy([deltaX, deltaY], { animate: true, duration: 0.35 });
-                                    map.once('moveend', function() {
-                                        showFeatureDetails(layer, latlng);
-                                    });
-                                } else {
-                                    showFeatureDetails(layer, latlng);
-                                }
-                            });
-                        }
                     }
                 }
             } catch (e) {
@@ -2129,6 +2405,7 @@
             // Prefer final backend `risk_score` (post-ranking). Fallback to CVLI raw percentiles.
             var score = typeof feature.properties.risk_score !== 'undefined' && feature.properties.risk_score !== null ? feature.properties.risk_score : (feature.properties.risk_score_cvli || 0);
             var predVal = feature.properties.cvli_pred;
+            var peakHoursText = feature.properties.peak_hours || ((feature.properties.metrics || {}).peak_hours) || '';
             var typeLabel = 'Inteligência';
             var status = getStatus(score, typeLabel);
             // Prefer server-provided normalized region if present, else CIDADE
@@ -2195,6 +2472,7 @@
                                         <strong>Previsão:</strong> ${predText}
                                     </div>
                                 </div>
+                                ${peakHoursText ? '<div style="margin-top:8px; font-size:0.8rem; background:rgba(255,209,102,0.08); padding:8px 10px; border-radius:6px; border-left:4px solid #ffd166;"><span style="color:#ffd166; font-weight:700;">⏱ Horário de Risco Padrão:</span> <span style="color:#fff;">' + peakHoursText + '</span><div style="font-size:0.68rem; color:#6c757d; margin-top:2px;">Janela com maior concentração histórica de CVLI (padrão relativo)</div></div>' : ''}
 
                                 <div style="margin-top: 10px; font-size: 0.8rem; background: rgba(255, 193, 7, 0.05); padding: 8px; border-radius: 4px; border: 1px solid rgba(255, 193, 7, 0.2);">
                                     <strong style="color: #ffc107; display: block; margin-bottom: 4px;"><i class="fas fa-map-marker-alt"></i> Logradouros Críticos:</strong>
@@ -2279,16 +2557,13 @@
         reasonsHtml += '</ul>';
         $('#selected-info').html(reasonsHtml);
         
-        // WEEK 4: Load explanation and anomaly data asynchronously
-        var nodeId = feature.properties.node_id || feature.properties.id;
-        if (nodeId !== undefined && nodeId !== null) {
-            loadExplanation(nodeId);
-            loadAnomalyStatus();
-        }
+        // WEEK 4: Anomaly status; explanation is loaded directly on click/list handlers
+        loadAnomalyStatus();
     }
     
     // WEEK 4: Load explanation from API
     function loadExplanation(nodeId) {
+        var requestToken = ++explainabilityRequestToken;
         $('#explanation-section').show();
         $('#explanation-collapse').collapse('show');
         $('#explanation-content').html('<div class="small text-muted"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Analisando dados táticos...</div>');
@@ -2306,6 +2581,7 @@
                 return response.json();
             })
             .then(data => {
+                if (requestToken !== explainabilityRequestToken) return;
                 var html = '';
                 
                 // 1. Resumo Principal
@@ -2394,10 +2670,14 @@
                 }
 
                 $('#explanation-content').html(html || '<p class="text-muted">Dados insuficientes para gerar explicação tática.</p>');
+                registerExplainabilityExportData(data);
             })
             .catch(error => {
+                if (requestToken !== explainabilityRequestToken) return;
                 console.warn('Erro ao carregar explicação:', error);
                 $('#explanation-content').html('<p class="text-muted">Erro na conexão com o motor de inteligência.</p>');
+                updateExplainabilityExportButton(false);
+                setExplainabilityExportStatus('Não foi possível preparar a exportação desta área.', 'error');
             });
     }
     
@@ -2512,9 +2792,13 @@
                 else if (label.toUpperCase().indexOf('ALERT') !== -1 || label.toUpperCase().indexOf('ALTO') !== -1) cls = 'text-warning';
                 else if (label.toUpperCase().indexOf('MODER') !== -1) cls = 'text-info';
 
+                var peakHtml = item.peak_hours
+                    ? `<small class="d-block" style="font-size:0.65rem; color:#aaa; line-height:1.1;">⏱ ${item.peak_hours}</small>`
+                    : '';
+
                 htmlSrv += `<a href="#" class="list-group-item list-group-item-action py-2 ps-2 pe-1" data-nodeid="${item.node_id}" data-name="${item.name}">
                         <div class="d-flex w-100 justify-content-between align-items-center">
-                            <span class="mb-1">${displayIdx}. ${item.name}</span>
+                            <span class="mb-1" style="line-height:1.2;">${displayIdx}. ${item.name}${peakHtml ? '<br>' + peakHtml : ''}</span>
                             <div class="text-end ms-2" style="min-width: 70px;">
                                 <small class="d-block text-muted" style="font-size: 0.7rem; line-height: 1;">Tensão</small>
                                 <span class="${cls} fw-bold" style="font-size: 0.85rem;">${item.status_label || ''}</span>
@@ -2543,7 +2827,14 @@
                         }
                     } catch(e){}
                 });
-                if (found) focusLayerAndShowDetails(found, 1.5);
+                if (found) {
+                    var foundNodeId = found.feature && (found.feature.properties.node_id || found.feature.properties.id);
+                    primeExplainabilityExport(found.feature ? found.feature.properties : {});
+                    if (foundNodeId !== undefined && foundNodeId !== null) {
+                        loadExplanation(foundNodeId);
+                    }
+                    focusLayerAndShowDetails(found, 1.5);
+                }
             });
             // Mark that initial load has been handled
             initialMapLoad = false;
@@ -2610,11 +2901,17 @@
                 regionSuffix = ' - <small class="text-muted">' + item.cidade + '</small>';
             }
 
+            // Peak hours from layer properties
+            var peakHoursVal = (item.layer && item.layer.feature && item.layer.feature.properties.peak_hours) || '';
+            var peakHoursHtml = peakHoursVal
+                ? `<small style="font-size:0.65rem; color:#aaa; line-height:1.1; display:block;">⏱ ${peakHoursVal}</small>`
+                : '';
+
             // Create a clickable item
             html += `<a href="#" class="list-group-item list-group-item-action py-2 ps-2 pe-1" data-idx="${idx}">
                         <div class="d-flex w-100 justify-content-between align-items-center">
-                            <span class="mb-1">
-                                ${idx+1}. ${item.name}${regionSuffix}
+                            <span class="mb-1" style="line-height:1.2;">
+                                ${idx+1}. ${item.name}${regionSuffix}${peakHoursHtml}
                             </span>
                             <div class="text-end ms-2" style="min-width: 70px;">
                                 <small class="d-block text-muted" style="font-size: 0.7rem; line-height: 1;">Tensão</small>
@@ -2635,6 +2932,11 @@
             var idx = $(this).data('idx');
             var item = top10[idx];
             if (item && item.layer) {
+                var listNodeId = item.layer.feature && (item.layer.feature.properties.node_id || item.layer.feature.properties.id);
+                primeExplainabilityExport(item.layer.feature ? item.layer.feature.properties : {});
+                if (listNodeId !== undefined && listNodeId !== null) {
+                    loadExplanation(listNodeId);
+                }
                 // Center with smart padding and show details
                 focusLayerAndShowDetails(item.layer, 1.5);
             }
@@ -3297,7 +3599,8 @@
         
         // Exibir overlay de carregamento
         showLoadingOverlay();
-        document.getElementById('loading-overlay-text').textContent = "Processando malha viária criminal e construindo vetores (ST-GCN)...";
+        var _loadingEl = document.getElementById('loading-message') || document.getElementById('loading-overlay-text');
+        if (_loadingEl) _loadingEl.textContent = "Processando malha viária criminal e construindo vetores (ST-GCN)...";
         
         // Remove old routes
         if (escapeRoutesLayer) {

@@ -116,6 +116,29 @@ def _normalize_polygon_lookup_name(value: Any) -> str:
     return report_app.normalize_name(text.split("- AIS")[0].strip())
 
 
+def _extract_peak_hours(item: Dict[str, Any], metrics: Dict[str, Any] | None = None) -> str:
+    source_metrics = dict(metrics or item.get("metrics") or {})
+    peak_hours = item.get("peak_hours")
+    if peak_hours in (None, ""):
+        peak_hours = source_metrics.get("peak_hours")
+    return str(peak_hours or "").strip()
+
+
+def _lookup_peak_hours_from_props(props: Dict[str, Any], peak_hours_cache: Dict[str, str]) -> str:
+    lookup_name = (
+        props.get("bairro")
+        or props.get("name")
+        or props.get("Name")
+        or props.get("NOME")
+        or props.get("micronodo")
+        or ""
+    )
+    lookup_key = _normalize_polygon_lookup_name(lookup_name)
+    if not lookup_key:
+        return ""
+    return str(peak_hours_cache.get(lookup_key) or "").strip()
+
+
 def _municipality_for_item(item: Dict[str, Any]) -> str:
     region = _normalize_region(str(item.get("region_type") or item.get("region") or "fortaleza"))
     if region == "fortaleza":
@@ -155,6 +178,12 @@ def _dedupe_risk_items(risk_items: List[Dict[str, Any]]) -> List[Dict[str, Any]]
         normalized_item = dict(item)
         normalized_item["region_type"] = region
         normalized_item["clean_name"] = clean_name
+        normalized_metrics = dict(normalized_item.get("metrics") or {})
+        normalized_peak_hours = _extract_peak_hours(normalized_item, normalized_metrics)
+        if normalized_peak_hours:
+            normalized_item["peak_hours"] = normalized_peak_hours
+            normalized_metrics["peak_hours"] = normalized_peak_hours
+        normalized_item["metrics"] = normalized_metrics
 
         existing = deduped.get(item_id)
         if existing is None:
@@ -166,12 +195,15 @@ def _dedupe_risk_items(risk_items: List[Dict[str, Any]]) -> List[Dict[str, Any]]
         merged["faction"] = existing.get("faction") or normalized_item.get("faction")
         merged["municipality"] = existing.get("municipality") or normalized_item.get("municipality")
         merged["node_id"] = existing.get("node_id") or normalized_item.get("node_id")
+        merged["peak_hours"] = _extract_peak_hours(existing) or _extract_peak_hours(normalized_item)
 
         existing_metrics = dict(existing.get("metrics") or {})
         candidate_metrics = dict(normalized_item.get("metrics") or {})
         for key, value in candidate_metrics.items():
             if key not in existing_metrics or existing_metrics.get(key) in (None, "", [], {}):
                 existing_metrics[key] = value
+        if merged["peak_hours"] and not existing_metrics.get("peak_hours"):
+            existing_metrics["peak_hours"] = merged["peak_hours"]
         merged["metrics"] = existing_metrics
         deduped[item_id] = merged
 
@@ -668,7 +700,7 @@ def _build_explainability_academics(risk_items: List[Dict[str, Any]]) -> Dict[st
     return explainability_academics
 
 
-def _copy_top_layer(region: str, target_path: Path) -> Dict[str, Any]:
+def _copy_top_layer(region: str, target_path: Path, peak_hours_cache: Dict[str, str]) -> Dict[str, Any]:
     payload = _request_json(
         f"/api/top20_micro_nodes?region={region}&limit=30",
         report_app.get_top20_micro_nodes,
@@ -680,10 +712,32 @@ def _copy_top_layer(region: str, target_path: Path) -> Dict[str, Any]:
         props["region"] = _normalize_region(str(props.get("region") or region))
         props.setdefault("score", _safe_float(props.get("score") or props.get("risk_score")))
         props.setdefault("municipality", props.get("municipality") or _region_display_name(props["region"]))
+        peak_hours = str(props.get("peak_hours") or "").strip() or _lookup_peak_hours_from_props(props, peak_hours_cache)
+        if peak_hours:
+            props["peak_hours"] = peak_hours
         feature["properties"] = props
     payload["features"] = features
     _write_json(target_path, payload)
     return payload
+
+
+def _enrich_micronodes_with_peak_hours(
+    micronodes_payload: Dict[str, Any],
+    peak_hours_cache: Dict[str, str],
+) -> Dict[str, Any]:
+    features = []
+    for feature in list(micronodes_payload.get("features") or []):
+        enriched = dict(feature)
+        props = dict(enriched.get("properties") or {})
+        props["region"] = _normalize_region(str(props.get("region") or "fortaleza"))
+        peak_hours = str(props.get("peak_hours") or "").strip() or _lookup_peak_hours_from_props(props, peak_hours_cache)
+        if peak_hours:
+            props["peak_hours"] = peak_hours
+        enriched["properties"] = props
+        features.append(enriched)
+    enriched_payload = dict(micronodes_payload)
+    enriched_payload["features"] = features
+    return enriched_payload
 
 
 def _build_dashboard_summary(risk_items: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -719,7 +773,11 @@ def _build_dashboard_summary(risk_items: List[Dict[str, Any]]) -> Dict[str, Any]
     return summary
 
 
-def _enrich_polygons_with_risk(polygons_payload: Dict[str, Any], risk_items: List[Dict[str, Any]]) -> Dict[str, Any]:
+def _enrich_polygons_with_risk(
+    polygons_payload: Dict[str, Any],
+    risk_items: List[Dict[str, Any]],
+    peak_hours_cache: Dict[str, str],
+) -> Dict[str, Any]:
     risk_by_key: Dict[Tuple[str, str], Dict[str, Any]] = {}
     for item in risk_items:
         region = _normalize_region(str(item.get("region_type") or item.get("region") or "fortaleza"))
@@ -744,6 +802,10 @@ def _enrich_polygons_with_risk(polygons_payload: Dict[str, Any], risk_items: Lis
         props["status_label"] = matched.get("status_label") if matched else None
         props["trend"] = matched.get("trend") if matched else None
         props["metrics"] = dict(matched.get("metrics") or {}) if matched else dict(props.get("metrics") or {})
+        peak_hours = _extract_peak_hours(matched or {}, props.get("metrics") or {}) or _lookup_peak_hours_from_props(props, peak_hours_cache)
+        if peak_hours:
+            props["peak_hours"] = peak_hours
+            props["metrics"]["peak_hours"] = peak_hours
 
         enriched = dict(feature)
         enriched["properties"] = props
@@ -798,6 +860,7 @@ def export_snapshot(output_dir: Path) -> Path:
     risk_payload = _request_json("/api/risk", report_app.get_risk)
     polygons_payload = _request_json("/api/polygons", report_app.get_polygons)
     micronodes_payload = _request_json("/api/micronodes", report_app.get_micronodes)
+    peak_hours_cache = report_app._compute_peak_hours_cache() or {}
 
     risk_items = _dedupe_risk_items(list(risk_payload.get("data", [])))
     risk_items.sort(key=lambda item: _safe_float(item.get("risk_score")), reverse=True)
@@ -818,6 +881,7 @@ def export_snapshot(output_dir: Path) -> Path:
         region_rank_counters[region] += 1
         momentum = momentum_index.get(item_id, {})
         metrics = dict(item.get("metrics") or {})
+        peak_hours = _extract_peak_hours(item, metrics)
         recent_cvli = _safe_int(momentum.get("recent_cvli", metrics.get("cvli_7d")))
         recent_exogenous = _safe_int(exogenous_index.get(item_id, 0))
 
@@ -832,6 +896,7 @@ def export_snapshot(output_dir: Path) -> Path:
             "momentum_7d": _safe_float(momentum.get("momentum_7d")),
             "momentum_14d": _safe_float(momentum.get("momentum_14d")),
             "tension_index": _safe_float(item.get("tension_score", item.get("risk_score"))),
+            "peak_hours": peak_hours,
         }
 
         summary = _summarize_item(item, combined_metrics, manager_cache)
@@ -857,6 +922,7 @@ def export_snapshot(output_dir: Path) -> Path:
             "momentum_7d": combined_metrics["momentum_7d"],
             "momentum_14d": combined_metrics["momentum_14d"],
             "critical_streets": combined_metrics["critical_streets"],
+            "peak_hours": peak_hours,
             "summary": summary,
             "risk_score": _safe_float(item.get("risk_score")),
             "status": item.get("status_label"),
@@ -877,6 +943,7 @@ def export_snapshot(output_dir: Path) -> Path:
                 "momentum_14d": combined_metrics["momentum_14d"],
                 "recent_cvli": recent_cvli,
                 "recent_exogenous": recent_exogenous,
+                "peak_hours": peak_hours,
                 "faction": item.get("faction"),
                 "tension_index": combined_metrics["tension_index"],
                 "status": item.get("status_label"),
@@ -888,7 +955,7 @@ def export_snapshot(output_dir: Path) -> Path:
 
     top_layers = {}
     for region, filename in REGION_EXPORTS:
-        layer_payload = _copy_top_layer(region, output_dir / filename)
+        layer_payload = _copy_top_layer(region, output_dir / filename, peak_hours_cache)
         top_layers[region] = layer_payload
 
     _write_json(output_dir / "manifest.json", _build_manifest(snapshot_id, generated_at))
@@ -903,8 +970,8 @@ def export_snapshot(output_dir: Path) -> Path:
     _write_json(output_dir / "territory_details.json", territory_details)
     _write_json(output_dir / "explainability.json", explainability_index)
     _write_json(output_dir / "explainability_academics.json", _build_explainability_academics(risk_items))
-    _write_json(output_dir / "polygons.geojson", _enrich_polygons_with_risk(polygons_payload, risk_items))
-    _write_json(output_dir / "micronodes.geojson", micronodes_payload)
+    _write_json(output_dir / "polygons.geojson", _enrich_polygons_with_risk(polygons_payload, risk_items, peak_hours_cache))
+    _write_json(output_dir / "micronodes.geojson", _enrich_micronodes_with_peak_hours(micronodes_payload, peak_hours_cache))
 
     return output_dir
 

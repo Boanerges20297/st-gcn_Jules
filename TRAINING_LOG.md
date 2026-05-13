@@ -2745,3 +2745,18 @@ Para quebrar o platô de P@10 = 40%, abandonamos a matriz de adjacência puramen
  -   * * S t a t u s : * *   * * A T I V O   E   C O R R I G I D O * * 
   
  
+---
+
+## Intervenção: Validação Automática de Gabarito (merge_new_data.py) - 2026-05-12
+
+### Motivação
+- Implementar validação em tempo real de novos dados inseridos na base oficial.
+- Garantir que a cada merge de novos registros, a performance do modelo Champion/Challenger seja confrontada com a realidade (gabarito).
+
+### Mudanças
+- **Script:** scripts/merge_new_data.py
+- **Funcionalidade:** Adicionada função perform_validation_log que calcula P@10 e P@20 para novos CVLIs em Fortaleza.
+- **Log:** Criação do arquivo VALIDATION_LOG.md para registro histórico de acurácia operacional.
+
+### Status
+- **Status:** **OPERACIONAL** (Aguardando próximo merge para primeiro registro real).

@@ -255,6 +255,7 @@ confidence_tracker = None
 
 _MICRONODE_POLYGON_CACHE = None
 _TOP_MICRONODE_FACTION_CACHE = None
+_PEAK_HOURS_CACHE = None  # {bairro_norm: "Entre XHs e YHs"}
 
 # === REGISTRAR HEALTH MONITOR BLUEPRINT (antes de load_data_and_models) ===
 model_calibrator = None
@@ -775,11 +776,31 @@ def load_data_and_models():
             continue
         if os.path.exists(path):
             try:
-                # Carregamento limpo e direto
-                data = pd.read_pickle(path)
-                reg_gdf = data.get("nodes_gdf")
-                if reg_gdf is not None:
-                    dfs.append(reg_gdf)
+                # Carregamento robusto para evitar falhas de StringDtype (NotImplementedError)
+                def _robust_pickle_load(p):
+                    import pickle
+                    try: return pd.read_pickle(p)
+                    except:
+                        class RobustUnpickler(pickle.Unpickler):
+                            def find_class(self, module, name):
+                                if 'pandas' in module and 'StringDtype' in name:
+                                    try:
+                                        from pandas import StringDtype
+                                        return StringDtype
+                                    except: return object
+                                return super().find_class(module, name)
+                        try:
+                            with open(p, 'rb') as f: return RobustUnpickler(f).load()
+                        except: return None
+
+                data = _robust_pickle_load(path)
+                if data is not None:
+                    reg_gdf = data.get("nodes_gdf")
+                    if reg_gdf is not None:
+                        dfs.append(reg_gdf)
+                else:
+                    print(f"❌ Falha crítica ao carregar {path}.")
+                    continue
             except Exception as e:
                 print(f"❌ Erro crítico ao carregar {path}: {e}")
         else:
@@ -843,6 +864,9 @@ def load_data_and_models():
         # Iniciar Monitor de Eficiência e Relatórios
         efficiency_monitor = EfficiencyMonitor(BASE_DIR, orchestrator, nodes_gdf)
         generate_daily_ranking_report()
+
+        # Calcular cache de horários de pico em background (não bloqueia startup)
+        threading.Thread(target=_compute_peak_hours_cache, daemon=True).start()
         
         # Disparar Monitor em Segundo Plano (Thread Paralela)
         # Guard: não iniciar no processo filho do Flask reloader
@@ -997,6 +1021,74 @@ def _load_top_micronode_faction_cache():
 
     return _TOP_MICRONODE_FACTION_CACHE
 
+def _compute_peak_hours_cache():
+    """
+    Calcula a janela horária de maior risco por bairro usando CVLI dos últimos 365 dias.
+    Pattern-based: normaliza por total de eventos do bairro para refletir padrão
+    criminal relativo, não volume global histórico.
+    Retorna dict {bairro_norm: "Entre XHs e YHs"}.
+    """
+    global _PEAK_HOURS_CACHE
+    if _PEAK_HOURS_CACHE is not None:
+        return _PEAK_HOURS_CACHE
+
+    csv_path = os.path.join(BASE_DIR, 'data', 'raw', 'dados_status_ocorrencias_gerais_ENRIQUECIDO.csv')
+    if not os.path.exists(csv_path):
+        _PEAK_HOURS_CACHE = {}
+        return _PEAK_HOURS_CACHE
+
+    try:
+        df = pd.read_csv(csv_path, usecols=['bairro', 'hora', 'tipo'], low_memory=False)
+        df = df[df['tipo'].str.lower() == 'cvli'].copy()
+        df = df.dropna(subset=['hora', 'bairro'])
+
+        def _extract_hour(h):
+            try:
+                return int(str(h).split(':')[0])
+            except Exception:
+                return None
+
+        df['hour'] = df['hora'].apply(_extract_hour)
+        df = df.dropna(subset=['hour'])
+        df['hour'] = df['hour'].astype(int)
+        df['bairro_norm'] = df['bairro'].apply(normalize_name)
+
+        result = {}
+        WINDOW = 5   # janela de 5 horas consecutivas
+        MIN_EVENTS = 3
+
+        for bairro, grp in df.groupby('bairro_norm'):
+            if len(grp) < MIN_EVENTS:
+                continue
+            # Histograma 24h normalizado (padrão relativo, não volume bruto)
+            counts = [0] * 24
+            for h in grp['hour']:
+                counts[int(h) % 24] += 1
+            total = sum(counts)
+            if total == 0:
+                continue
+            props = [c / total for c in counts]
+
+            # Janela deslizante circular — encontra o bloco de WINDOW horas mais denso
+            best_sum = -1.0
+            best_start = 0
+            for start in range(24):
+                w_sum = sum(props[(start + i) % 24] for i in range(WINDOW))
+                if w_sum > best_sum:
+                    best_sum = w_sum
+                    best_start = start
+
+            end_hour = (best_start + WINDOW) % 24
+            result[bairro] = f"Entre {best_start:02d}hs e {end_hour:02d}hs"
+
+        _PEAK_HOURS_CACHE = result
+        print(f"✅ Cache de horários de pico calculado: {len(result)} bairros.")
+    except Exception as e:
+        print(f"⚠️ Erro ao calcular horários de pico: {e}")
+        _PEAK_HOURS_CACHE = {}
+
+    return _PEAK_HOURS_CACHE
+
 @app.route('/api/micronodes')
 def get_micronodes():
     path = os.path.join(app.root_path, 'data', 'raw', 'inteligencia', 'micronodos_faccoes_2026.geojson')
@@ -1072,6 +1164,11 @@ def get_top20_micro_nodes():
                 props['is_centroid'] = False
             if faction:
                 props['faction'] = faction
+            # Inject peak hours pattern
+            peak_cache = _compute_peak_hours_cache() or {}
+            bairro_lookup = _normalize_polygon_lookup_name(props.get('bairro') or props.get('name') or props.get('micronodo') or '')
+            if bairro_lookup and bairro_lookup in peak_cache:
+                props['peak_hours'] = peak_cache[bairro_lookup]
             feature['properties'] = props
             decorated.append(feature)
             
@@ -1433,13 +1530,18 @@ def get_risk():
                 ev_count = events_info.get('events_count', 0)
                 ev_types = list(events_info.get('event_types', set()))
 
+                # Horário de pico padrão-baseado para este bairro
+                peak_hours_cache = _compute_peak_hours_cache() or {}
+                peak_hours = peak_hours_cache.get(name_norm, '')
+
                 node_metrics = {
                     'cvli_7d': 0,
                     'tension': round(float(np.nan_to_num(row.get('tension_index', 0))), 2),
                     'events_count': ev_count,
                     'event_types': ev_types[:3],
                     'critical_streets': critical_streets_info,
-                    'spatial_influence': score >= 80
+                    'spatial_influence': score >= 80,
+                    'peak_hours': peak_hours,
                 }
                 
                 # Crimes Reais
@@ -1599,7 +1701,8 @@ def get_risk():
                 
                 meta['top10_by_region'][region_key] = [{
                     'name': r.get('name'), 'node_id': r.get('node_id'), 'risk_score': r.get('risk_score'),
-                    'status_label': r.get('status_label'), 'region_type': r.get('region_type')
+                    'status_label': r.get('status_label'), 'region_type': r.get('region_type'),
+                    'peak_hours': (r.get('metrics') or {}).get('peak_hours', '')
                 } for r in deduped_region[:10]]
         except Exception:
             meta['counts_by_region'] = {}
@@ -1618,7 +1721,8 @@ def get_risk():
                         'node_id': r.get('node_id'),
                         'risk_score': r.get('risk_score'),
                         'status_label': r.get('status_label'),
-                        'region_type': r.get('region_type')
+                        'region_type': r.get('region_type'),
+                        'peak_hours': (r.get('metrics') or {}).get('peak_hours', '')
                     })
                     if len(meta['top10']) >= 10:
                         break
@@ -1671,6 +1775,7 @@ def get_risk():
         return jsonify({'meta': meta, 'data': results})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @app.route('/api/territory')
 def get_territory():

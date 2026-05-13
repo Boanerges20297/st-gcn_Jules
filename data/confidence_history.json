@@ -280,8 +280,27 @@
     }
   },
   {
+    "date": "2026-05-12",
+    "timestamp": "2026-05-12T18:53:33.061755",
+    "global": {
+      "p10": 0,
+      "p20": 0,
+      "precision": 0,
+      "recall": 0,
+      "recall10": 0,
+      "recall20": 0,
+      "active_locations": 0,
+      "total_nodes": 0,
+      "total_events": 0,
+      "assigned_total_events": 0,
+      "unmapped_total_events": 0,
+      "f1_score": 0.0
+    },
+    "regions": {}
+  },
+  {
     "date": "2026-05-11 00:00:00",
-    "timestamp": "2026-05-12T16:38:34.106009",
+    "timestamp": "2026-05-13T07:32:52.678697",
     "global": {
       "p10": 0.7,
       "p20": 0.4,
@@ -331,6 +350,62 @@
         "active_locations": 3,
         "total_nodes": 50,
         "total_events": 4,
+        "f1_score": 0.0
+      }
+    }
+  },
+  {
+    "date": "2026-05-12 00:00:00",
+    "timestamp": "2026-05-13T09:29:57.449101",
+    "global": {
+      "p10": 0.8,
+      "p20": 0.5,
+      "precision": 0.8,
+      "recall": 0.7143,
+      "recall10": 0.5714,
+      "recall20": 0.7143,
+      "active_locations": 14,
+      "total_nodes": 191,
+      "total_events": 17,
+      "assigned_total_events": 17,
+      "unmapped_total_events": 0,
+      "f1_score": 0.7547
+    },
+    "regions": {
+      "fortaleza": {
+        "p10": 0.5,
+        "p20": 0.25,
+        "precision": 0.5,
+        "recall": 1.0,
+        "recall10": 1.0,
+        "recall20": 1.0,
+        "active_locations": 5,
+        "total_nodes": 122,
+        "total_events": 6,
+        "f1_score": 0.0
+      },
+      "rmf": {
+        "p10": 0.3,
+        "p20": 0.2105,
+        "precision": 0.3,
+        "recall": 1.0,
+        "recall10": 0.75,
+        "recall20": 1.0,
+        "active_locations": 4,
+        "total_nodes": 19,
+        "total_events": 5,
+        "f1_score": 0.0
+      },
+      "interior": {
+        "p10": 0.5,
+        "p20": 0.25,
+        "precision": 0.5,
+        "recall": 1.0,
+        "recall10": 1.0,
+        "recall20": 1.0,
+        "active_locations": 5,
+        "total_nodes": 50,
+        "total_events": 6,
         "f1_score": 0.0
       }
     }

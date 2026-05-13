@@ -1087,6 +1087,29 @@
     }
   },
   {
+    "date": "2026-05-12",
+    "total_events": 0,
+    "brute_cvli": 0,
+    "exogenous": 0,
+    "exogenous_conflict": 0,
+    "police_qualified_actions_7d": 0,
+    "police_administrative_events_7d": 0,
+    "assigned_total_events": 0,
+    "unmapped_total_events": 0,
+    "assigned_brute_cvli": 0,
+    "assigned_exogenous": 0,
+    "unmapped_exogenous": 0,
+    "assigned_police_qualified_actions": 0,
+    "unmapped_police_qualified_actions": 0,
+    "unmapped_exogenous_sample": [],
+    "global": {
+      "status": "no_scores",
+      "p5": 0.0,
+      "p10": 0.0,
+      "p20": 0.0
+    }
+  },
+  {
     "date": "2026-05-11 00:00:00",
     "total_events": 13,
     "brute_cvli": 13,
@@ -1112,9 +1135,9 @@
         "AEROLANDIA",
         "CURIO",
         "ANCURI",
-        "BARROSO",
         "BOM JARDIM",
         "CONJUNTO PALMEIRAS",
+        "BARROSO",
         "TIANGUA",
         "PARQUE IRACEMA"
       ],
@@ -1147,9 +1170,9 @@
         "CAUCAIA",
         "AEROLANDIA",
         "ANCURI",
-        "BARROSO",
         "BOM JARDIM",
-        "CONJUNTO PALMEIRAS"
+        "CONJUNTO PALMEIRAS",
+        "BARROSO"
       ],
       "p20": 0.4,
       "recall20": 0.6667,
@@ -1158,9 +1181,9 @@
         "CAUCAIA",
         "AEROLANDIA",
         "ANCURI",
-        "BARROSO",
         "BOM JARDIM",
         "CONJUNTO PALMEIRAS",
+        "BARROSO",
         "CARIRE"
       ]
     },
@@ -1172,13 +1195,13 @@
         "AEROLANDIA",
         "CURIO",
         "ANCURI",
-        "BARROSO",
         "BOM JARDIM",
         "CONJUNTO PALMEIRAS",
+        "BARROSO",
         "PARQUE IRACEMA",
         "ALTO ALEGRE",
         "PLANALTO AYRTON SENNA",
-        "MONDUBIM"
+        "SIQUEIRA"
       ],
       "gt_sample": [
         "AEROLANDIA",
@@ -1192,26 +1215,26 @@
       "hits5": [
         "AEROLANDIA",
         "ANCURI",
-        "BARROSO",
-        "BOM JARDIM"
+        "BOM JARDIM",
+        "CONJUNTO PALMEIRAS"
       ],
       "p10": 0.5,
       "recall10": 1.0,
       "hits10": [
         "AEROLANDIA",
         "ANCURI",
-        "BARROSO",
         "BOM JARDIM",
-        "CONJUNTO PALMEIRAS"
+        "CONJUNTO PALMEIRAS",
+        "BARROSO"
       ],
       "p20": 0.25,
       "recall20": 1.0,
       "hits20": [
         "AEROLANDIA",
         "ANCURI",
-        "BARROSO",
         "BOM JARDIM",
-        "CONJUNTO PALMEIRAS"
+        "CONJUNTO PALMEIRAS",
+        "BARROSO"
       ]
     },
     "rmf": {
@@ -1298,6 +1321,235 @@
       "recall20": 1.0,
       "hits20": [
         "JUAZEIRO DO NORTE",
+        "CARIRE",
+        "ALTO SANTO"
+      ]
+    }
+  },
+  {
+    "date": "2026-05-12 00:00:00",
+    "total_events": 17,
+    "brute_cvli": 17,
+    "exogenous": 0,
+    "exogenous_conflict": 0,
+    "police_qualified_actions_7d": 0,
+    "police_administrative_events_7d": 0,
+    "assigned_total_events": 17,
+    "unmapped_total_events": 0,
+    "assigned_brute_cvli": 17,
+    "assigned_exogenous": 0,
+    "unmapped_exogenous": 0,
+    "assigned_police_qualified_actions": 0,
+    "unmapped_police_qualified_actions": 0,
+    "unmapped_exogenous_sample": [],
+    "global": {
+      "total_nodes": 191,
+      "active_locations": 14,
+      "total_events": 17,
+      "ranking_top10": [
+        "JUAZEIRO DO NORTE",
+        "AEROLANDIA",
+        "CAUCAIA",
+        "BARROSO",
+        "CURIO",
+        "TIANGUA",
+        "ITAPAJE",
+        "VARZEA ALEGRE",
+        "BOM JARDIM",
+        "CARIRE"
+      ],
+      "gt_sample": [
+        "AEROLANDIA",
+        "ANCURI",
+        "BARROSO",
+        "BOM JARDIM",
+        "CONJUNTO PALMEIRAS",
+        "CAUCAIA",
+        "HORIZONTE",
+        "ITAITINGA",
+        "TRAIRI",
+        "JUAZEIRO DO NORTE",
+        "ITAPAJE",
+        "CARIRE",
+        "VARZEA ALEGRE",
+        "ALTO SANTO"
+      ],
+      "p5": 0.8,
+      "recall5": 0.2857,
+      "hits5": [
+        "JUAZEIRO DO NORTE",
+        "AEROLANDIA",
+        "CAUCAIA",
+        "BARROSO"
+      ],
+      "p10": 0.8,
+      "recall10": 0.5714,
+      "hits10": [
+        "JUAZEIRO DO NORTE",
+        "AEROLANDIA",
+        "CAUCAIA",
+        "BARROSO",
+        "ITAPAJE",
+        "VARZEA ALEGRE",
+        "BOM JARDIM",
+        "CARIRE"
+      ],
+      "p20": 0.5,
+      "recall20": 0.7143,
+      "hits20": [
+        "JUAZEIRO DO NORTE",
+        "AEROLANDIA",
+        "CAUCAIA",
+        "BARROSO",
+        "ITAPAJE",
+        "VARZEA ALEGRE",
+        "BOM JARDIM",
+        "CARIRE",
+        "CONJUNTO PALMEIRAS",
+        "ANCURI"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 122,
+      "active_locations": 5,
+      "total_events": 6,
+      "ranking_top10": [
+        "AEROLANDIA",
+        "BARROSO",
+        "CURIO",
+        "BOM JARDIM",
+        "CONJUNTO PALMEIRAS",
+        "PARQUE IRACEMA",
+        "ANCURI",
+        "ALTO ALEGRE",
+        "PLANALTO AYRTON SENNA",
+        "SIQUEIRA"
+      ],
+      "gt_sample": [
+        "AEROLANDIA",
+        "ANCURI",
+        "BARROSO",
+        "BOM JARDIM",
+        "CONJUNTO PALMEIRAS"
+      ],
+      "p5": 0.8,
+      "recall5": 0.8,
+      "hits5": [
+        "AEROLANDIA",
+        "BARROSO",
+        "BOM JARDIM",
+        "CONJUNTO PALMEIRAS"
+      ],
+      "p10": 0.5,
+      "recall10": 1.0,
+      "hits10": [
+        "AEROLANDIA",
+        "BARROSO",
+        "BOM JARDIM",
+        "CONJUNTO PALMEIRAS",
+        "ANCURI"
+      ],
+      "p20": 0.25,
+      "recall20": 1.0,
+      "hits20": [
+        "AEROLANDIA",
+        "BARROSO",
+        "BOM JARDIM",
+        "CONJUNTO PALMEIRAS",
+        "ANCURI"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 19,
+      "active_locations": 4,
+      "total_events": 5,
+      "ranking_top10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "ITAITINGA",
+        "TRAIRI",
+        "PARAIPABA",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "SAO LUIS DO CURU"
+      ],
+      "gt_sample": [
+        "CAUCAIA",
+        "HORIZONTE",
+        "ITAITINGA",
+        "TRAIRI"
+      ],
+      "p5": 0.6,
+      "recall5": 0.75,
+      "hits5": [
+        "CAUCAIA",
+        "ITAITINGA",
+        "TRAIRI"
+      ],
+      "p10": 0.3,
+      "recall10": 0.75,
+      "hits10": [
+        "CAUCAIA",
+        "ITAITINGA",
+        "TRAIRI"
+      ],
+      "p20": 0.2105,
+      "recall20": 1.0,
+      "hits20": [
+        "CAUCAIA",
+        "ITAITINGA",
+        "TRAIRI",
+        "HORIZONTE"
+      ]
+    },
+    "interior": {
+      "total_nodes": 50,
+      "active_locations": 5,
+      "total_events": 6,
+      "ranking_top10": [
+        "JUAZEIRO DO NORTE",
+        "TIANGUA",
+        "ITAPAJE",
+        "VARZEA ALEGRE",
+        "CARIRE",
+        "IGUATU",
+        "BATURITE",
+        "GROAIRAS",
+        "ARATUBA",
+        "ALTO SANTO"
+      ],
+      "gt_sample": [
+        "JUAZEIRO DO NORTE",
+        "ITAPAJE",
+        "CARIRE",
+        "VARZEA ALEGRE",
+        "ALTO SANTO"
+      ],
+      "p5": 0.8,
+      "recall5": 0.8,
+      "hits5": [
+        "JUAZEIRO DO NORTE",
+        "ITAPAJE",
+        "VARZEA ALEGRE",
+        "CARIRE"
+      ],
+      "p10": 0.5,
+      "recall10": 1.0,
+      "hits10": [
+        "JUAZEIRO DO NORTE",
+        "ITAPAJE",
+        "VARZEA ALEGRE",
+        "CARIRE",
+        "ALTO SANTO"
+      ],
+      "p20": 0.25,
+      "recall20": 1.0,
+      "hits20": [
+        "JUAZEIRO DO NORTE",
+        "ITAPAJE",
+        "VARZEA ALEGRE",
         "CARIRE",
         "ALTO SANTO"
       ]

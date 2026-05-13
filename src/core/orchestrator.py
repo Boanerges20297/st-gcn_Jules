@@ -211,8 +211,50 @@ class StateOrchestrator:
         self._node_owners = {normalize_name(str(r['name'])): reg for reg, spec in self.specialists.items() for _, r in spec['data']['nodes_gdf'].iterrows()}
 
     def _load_pickle_safe(self, path):
-        try: return pd.read_pickle(path)
-        except: return None
+        """Carregamento robusto para evitar falhas de StringDtype (NotImplementedError)."""
+        import pickle
+        import pandas as pd
+        
+        # 1. Tenta o caminho padrão (mais rápido)
+        try:
+            return pd.read_pickle(path)
+        except Exception:
+            pass
+            
+        # 2. Fallback: Unpickler customizado para interceptar StringDtype problemáticos
+        class RobustUnpickler(pickle.Unpickler):
+            def find_class(self, module, name):
+                # Se for StringDtype do pandas (python ou arrow), redirecionamos para algo seguro
+                if 'pandas' in module and 'StringDtype' in name:
+                    try:
+                        from pandas import StringDtype
+                        return StringDtype
+                    except ImportError:
+                        return object
+                return super().find_class(module, name)
+
+        try:
+            with open(path, 'rb') as f:
+                return RobustUnpickler(f).load()
+        except Exception as e:
+            # 3. Último recurso: Carregar via pickle puro e converter se necessário
+            try:
+                with open(path, 'rb') as f:
+                    data = pickle.load(f)
+                if isinstance(data, dict) and 'nodes_gdf' in data:
+                    # Tenta converter o GDF para algo legível forçando dtypes
+                    gdf = data['nodes_gdf']
+                    if hasattr(gdf, 'astype'):
+                        for col in gdf.columns:
+                            try:
+                                if gdf[col].dtype == 'string':
+                                    gdf[col] = gdf[col].astype(object)
+                            except: pass
+                    data['nodes_gdf'] = gdf
+                return data
+            except Exception as final_e:
+                print(f"❌ Falha total ao carregar {path}: {final_e}")
+                return None
 
     def get_combined_risk(self, exogenous_shocks=None, return_trends=False):
         combined_scores = {}
