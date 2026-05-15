@@ -256,6 +256,8 @@ confidence_tracker = None
 _MICRONODE_POLYGON_CACHE = None
 _TOP_MICRONODE_FACTION_CACHE = None
 _PEAK_HOURS_CACHE = None  # {bairro_norm: "Entre XHs e YHs"}
+_MICRONODE_EXPORT_BUILT_AT = None
+_MICRONODE_EXPORT_LOCK = threading.Lock()
 
 # === REGISTRAR HEALTH MONITOR BLUEPRINT (antes de load_data_and_models) ===
 model_calibrator = None
@@ -867,6 +869,9 @@ def load_data_and_models():
 
         # Calcular cache de horários de pico em background (não bloqueia startup)
         threading.Thread(target=_compute_peak_hours_cache, daemon=True).start()
+
+        # Regenerar micronodos dinâmicos no startup para alinhar a camada ao mapa.
+        rebuild_dynamic_micronode_exports(force=True)
         
         # Disparar Monitor em Segundo Plano (Thread Paralela)
         # Guard: não iniciar no processo filho do Flask reloader
@@ -1089,6 +1094,174 @@ def _compute_peak_hours_cache():
 
     return _PEAK_HOURS_CACHE
 
+
+def build_current_exogenous_shocks():
+    """Builds the live exogenous shock map used by risk and micronode overlays."""
+    exogenous_shocks = {}
+    try:
+        exo_files = ['exogenous_events.json']
+        all_raw_events = []
+        for f_name in exo_files:
+            f_path = os.path.join(BASE_DIR, 'data', f_name)
+            if os.path.exists(f_path):
+                try:
+                    with open(f_path, 'r', encoding='utf-8') as xf:
+                        all_raw_events.extend(json.load(xf) or [])
+                except Exception:
+                    pass
+
+        cutoff = datetime.now().date() - timedelta(days=EXOGENOUS_WINDOW_DAYS)
+        last_date_base = None
+        if orchestrator is not None and hasattr(orchestrator, 'dates') and orchestrator.dates is not None:
+            last_date_base = orchestrator.dates[-1]
+
+        critical_types = [
+            'leader_transfer', 'faction_conflict', 'territory_dispute',
+            'confronto', 'execucao', 'chacina', 'tortura', 'homicidio_com_sinais_de_faccao'
+        ]
+
+        for ev in all_raw_events:
+            try:
+                ev_date_str = ev.get('date') or ev.get('event_date')
+                if not verify_date_consistency(ev_date_str, last_date_base):
+                    continue
+
+                event_dt = parse_event_datetime(ev)
+                if event_dt and event_dt.date() < cutoff:
+                    continue
+
+                bairro_raw = (ev.get('bairro') or '').strip()
+                municipio_raw = (ev.get('municipio') or '').strip()
+                targets = []
+
+                if bairro_raw:
+                    targets = [normalize_name(str(bairro_raw))]
+                elif municipio_raw:
+                    mun_norm = normalize_name(municipio_raw)
+                    if 'FORTALEZA' in municipio_raw.upper():
+                        region_key = 'fortaleza'
+                    elif mun_norm in _RMF_NODES or any(n in mun_norm for n in _RMF_NODES):
+                        region_key = 'rmf'
+                    else:
+                        region_key = 'interior'
+
+                    try:
+                        for _, row in nodes_gdf.iterrows():
+                            if str(row.get('regiao', '')).lower() == region_key:
+                                targets.append(normalize_name(row['name']))
+                    except Exception:
+                        targets = [mun_norm]
+                else:
+                    continue
+
+                ev_type = str(ev.get('type') or ev.get('natureza') or '').lower()
+                description = ' '.join([
+                    str(ev.get('description') or ''),
+                    str(ev.get('descricao') or ''),
+                    str(ev.get('resumo') or ''),
+                    str(ev.get('raw_text') or ''),
+                ]).lower()
+                conflict_severity = str(ev.get('conflict_severity', '')).upper()
+                classification = classify_exogenous_event(ev)
+
+                is_supp = classification['is_qualified_suppression']
+                is_conflict = classification['is_conflict']
+                if classification['signal_class'] == 'administrative_police':
+                    continue
+
+                if is_supp:
+                    if any(w in description for w in ['fuzil', 'metralhadora', 'fuzi', '7.62', '5.56']):
+                        intensity = 1.0
+                    elif any(w in description for w in ['lider', 'chefe', 'frente', 'comando']):
+                        intensity = 0.9
+                    elif any(w in description for w in ['pistola', 'revolver', 'arma de fogo']):
+                        intensity = 0.7
+                    elif any(w in description for w in ['quilos', 'kg', 'grande quantidade', 'deposito']):
+                        intensity = 0.6
+                    elif any(w in description for w in ['veiculo', 'carro', 'moto', 'recuperad']):
+                        intensity = 0.4
+                    else:
+                        intensity = float(ev.get('intensity', 0.3))
+                    intensity *= suppression_decay_factor(event_dt)
+                else:
+                    if conflict_severity == 'HIGH':
+                        intensity = 0.9
+                    elif conflict_severity == 'MEDIUM':
+                        intensity = 0.6
+                    elif conflict_severity == 'LOW':
+                        intensity = 0.3
+                    else:
+                        intensity = float(ev.get('intensity', 0.5))
+
+                is_city_wide = not bairro_raw and bool(municipio_raw)
+                if is_city_wide and len(targets) > 1:
+                    intensity = intensity / min(len(targets), 10.0)
+
+                is_critical = (
+                    ev_type in critical_types or
+                    (is_conflict and intensity > 0.7) or
+                    ('execuc' in description) or
+                    ('facç' in description) or
+                    ('morte' in description and 'facç' in description)
+                )
+
+                for loc_norm in targets:
+                    if loc_norm not in exogenous_shocks:
+                        exogenous_shocks[loc_norm] = {
+                            'conflict_intensity': 0.0,
+                            'suppression_intensity': 0.0,
+                            'is_critical': False,
+                            'events_count': 0,
+                            'event_types': set()
+                        }
+
+                    exogenous_shocks[loc_norm]['events_count'] += 1
+                    if ev_type:
+                        exogenous_shocks[loc_norm]['event_types'].add(ev_type)
+
+                    if is_supp:
+                        exogenous_shocks[loc_norm]['suppression_intensity'] += intensity
+                    elif is_conflict:
+                        exogenous_shocks[loc_norm]['conflict_intensity'] += intensity
+                        if is_critical:
+                            exogenous_shocks[loc_norm]['is_critical'] = True
+            except Exception:
+                continue
+    except Exception as e:
+        print(f"Erro ao processar shocks no app.py: {e}")
+        return None, {}
+
+    return (exogenous_shocks or None), exogenous_shocks
+
+
+def rebuild_dynamic_micronode_exports(force=False):
+    """Ensures micronode overlay files match the current model state."""
+    global _MICRONODE_EXPORT_BUILT_AT
+    output_files = [
+        os.path.join(BASE_DIR, 'outputs', 'visible_micronodes_capital.geojson'),
+        os.path.join(BASE_DIR, 'outputs', 'visible_micronodes_rmf.geojson'),
+        os.path.join(BASE_DIR, 'outputs', 'visible_micronodes_interior.geojson'),
+        os.path.join(BASE_DIR, 'outputs', 'visible_micronodes.geojson'),
+    ]
+
+    if not force and _MICRONODE_EXPORT_BUILT_AT is not None and all(os.path.exists(path) for path in output_files):
+        return True
+
+    with _MICRONODE_EXPORT_LOCK:
+        if not force and _MICRONODE_EXPORT_BUILT_AT is not None and all(os.path.exists(path) for path in output_files):
+            return True
+
+        try:
+            from scripts.nodes.extract_top30_sentinela_micronodes import build_all_micronode_exports
+
+            build_all_micronode_exports(ensure_runtime=False)
+            _MICRONODE_EXPORT_BUILT_AT = datetime.now()
+            print("✅ Micronodos dinâmicos regenerados.")
+            return True
+        except Exception as error:
+            print(f"⚠️ [Micronodes] Falha ao regenerar overlay dinâmico: {error}")
+            return False
+
 @app.route('/api/micronodes')
 def get_micronodes():
     path = os.path.join(app.root_path, 'data', 'raw', 'inteligencia', 'micronodos_faccoes_2026.geojson')
@@ -1114,23 +1287,37 @@ def get_all_streets():
             return jsonify({"error": str(e)}), 500
     return jsonify([])
 
+@app.route('/api/visible_micronodes')
 @app.route('/api/top20_micro_nodes')
-def get_top20_micro_nodes():
+def get_visible_micronodes():
     region = request.args.get('region', 'fortaleza').lower()
-    try:
-        limit = max(1, min(int(request.args.get('limit', 30)), 100))
-    except Exception:
-        limit = 30
+    limit_raw = request.args.get('limit')
+    limit = None
+    if limit_raw not in (None, ''):
+        try:
+            limit = max(1, min(int(limit_raw), 2000))
+        except Exception:
+            limit = None
+    force_refresh = request.args.get('refresh', '0').lower() in ('1', 'true', 'yes')
     # Mapear regiao para o arquivo correspondente na pasta outputs
     filename_map = {
+        'fortaleza': 'visible_micronodes_capital.geojson',
+        'rmf': 'visible_micronodes_rmf.geojson',
+        'interior': 'visible_micronodes_interior.geojson',
+        'all': 'visible_micronodes.geojson'
+    }
+    legacy_filename_map = {
         'fortaleza': 'top20_micro_nodes_capital.geojson',
         'rmf': 'top20_micro_nodes_rmf.geojson',
         'interior': 'top20_micro_nodes_interior.geojson',
         'all': 'top20_micro_nodes.geojson'
     }
     
-    filename = filename_map.get(region, 'top20_micro_nodes_capital.geojson')
+    filename = filename_map.get(region, 'visible_micronodes_capital.geojson')
     path = os.path.join(app.root_path, 'outputs', filename)
+    legacy_path = os.path.join(app.root_path, 'outputs', legacy_filename_map.get(region, 'top20_micro_nodes_capital.geojson'))
+
+    rebuild_dynamic_micronode_exports(force=force_refresh)
 
     def _decorate_top_features(payload):
         polygon_cache = _load_micronode_polygon_cache()
@@ -1145,10 +1332,11 @@ def get_top20_micro_nodes():
         for feature in features:
             props = dict(feature.get('properties') or {})
             
-            # Usar rank + nome como chave unica (micronodos distintos podem compartilhar nome)
+            # Usar regiao + rank + nome como chave unica (micronodos distintos podem compartilhar nome)
             rank = props.get('rank', '')
+            region_key = props.get('region', '')
             area_raw = props.get('name') or props.get('micronodo') or props.get('bairro') or "DESCONHECIDO"
-            area_key = f"{rank}:{_normalize_polygon_lookup_name(str(area_raw))}"
+            area_key = f"{region_key}:{rank}:{_normalize_polygon_lookup_name(str(area_raw))}"
             
             if area_key in seen_areas:
                 continue
@@ -1173,7 +1361,7 @@ def get_top20_micro_nodes():
             decorated.append(feature)
             
             # Respeitar o limite apos a filtragem por area
-            if len(decorated) >= limit:
+            if limit is not None and len(decorated) >= limit:
                 break
                 
         payload['features'] = decorated
@@ -1185,11 +1373,24 @@ def get_top20_micro_nodes():
             if isinstance(data, dict) and 'features' in data:
                 data = _decorate_top_features(data)
             return jsonify(data)
+    if os.path.exists(legacy_path):
+        with open(legacy_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            if isinstance(data, dict) and 'features' in data:
+                data = _decorate_top_features(data)
+            return jsonify(data)
     
     # Fallback se o regional nao existir
-    fallback_path = os.path.join(app.root_path, 'outputs', 'top20_micro_nodes.geojson')
+    fallback_path = os.path.join(app.root_path, 'outputs', 'visible_micronodes.geojson')
     if os.path.exists(fallback_path):
         with open(fallback_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            if isinstance(data, dict) and 'features' in data:
+                data = _decorate_top_features(data)
+            return jsonify(data)
+    legacy_fallback_path = os.path.join(app.root_path, 'outputs', 'top20_micro_nodes.geojson')
+    if os.path.exists(legacy_fallback_path):
+        with open(legacy_fallback_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
             if isinstance(data, dict) and 'features' in data:
                 data = _decorate_top_features(data)
@@ -1197,171 +1398,16 @@ def get_top20_micro_nodes():
             
     return jsonify({"type": "FeatureCollection", "features": []})
 
+
+# Backward-compatible module attribute used by snapshot/export scripts.
+get_top20_micro_nodes = get_visible_micronodes
+
 @app.route('/api/risk')
 def get_risk():
     if nodes_gdf is None or orchestrator is None:
         return jsonify({'error': 'Inicializando...'}), 503
     try:
-        # --- Build exogenous_shocks from recent exogenous events ---
-        exogenous_shocks = {}
-        try:
-            # Carregar de ambos os arquivos potenciais para garantir cobertura
-            # Use only the canonical exogenous events file. Previously the
-            # geocoded variant was written as a duplicate which created
-            # multiple files and confusion. Keep a single source of truth.
-            exo_files = ['exogenous_events.json']
-            all_raw_events = []
-            for f_name in exo_files:
-                f_path = os.path.join(BASE_DIR, 'data', f_name)
-                if os.path.exists(f_path):
-                    try:
-                        with open(f_path, 'r', encoding='utf-8') as xf:
-                            all_raw_events.extend(json.load(xf) or [])
-                    except: pass
-
-            # Considerar apenas a janela exógena operacional vigente do arquivo canônico (7 dias)
-            cutoff = datetime.now().date() - timedelta(days=EXOGENOUS_WINDOW_DAYS)
-            
-            # Limite superior baseado nos dados do orquestrador (evita inconsistência teórica)
-            last_date_base = None
-            if orchestrator is not None and hasattr(orchestrator, 'dates') and orchestrator.dates is not None:
-                last_date_base = orchestrator.dates[-1]
-
-            # Tipos que sempre são CRÍTICOS (Canal 25) - Incluindo sinais de violência extrema
-            CRITICAL_TYPES = [
-                'leader_transfer', 'faction_conflict', 'territory_dispute', 
-                'confronto', 'execucao', 'chacina', 'tortura', 'homicidio_com_sinais_de_faccao'
-            ]
-            
-            # Tipos que são de SUPRESSÃO (Canal 23) - Ação Policial Positiva
-            SUPPRESSION_TYPES = [
-                'apreensao', 'prisao', 'recuperacao_veiculo', 'cumprimento_mandado',
-                'abordagem_positiva', 'desarticulacao_grupo'
-            ]
-
-            # Small helper: RMF cities derived from orchestrator index
-            for ev in all_raw_events:
-                try:
-                    # --- Verificação de Consistência Teórica (Não ver o futuro) ---
-                    ev_date_str = ev.get('date') or ev.get('event_date')
-                    if not verify_date_consistency(ev_date_str, last_date_base):
-                        continue # Pula evento futuro em relação ao estado do modelo
-                    event_dt = parse_event_datetime(ev)
-                    if event_dt and event_dt.date() < cutoff:
-                        continue
-
-                    # Extração e Normalização da Localidade
-                    bairro_raw = (ev.get('bairro') or '').strip()
-                    municipio_raw = (ev.get('municipio') or '').strip()
-                    # If a bairro is present, target that specific node; otherwise expand by municipio->region
-                    targets = []  # list of normalized node names to apply this shock to
-                    if bairro_raw:
-                        targets = [normalize_name(str(bairro_raw))]
-                    elif municipio_raw:
-                        mun_up = municipio_raw.upper()
-                        # Determine high-level region from municipality name
-                        if 'FORTALEZA' in mun_up:
-                            region_key = 'fortaleza'
-                        elif normalize_name(municipio_raw) in _RMF_NODES or any(n in normalize_name(municipio_raw) for n in _RMF_NODES):
-                            region_key = 'rmf'
-                        else:
-                            region_key = 'interior'
-
-                        # Expand to all node names that belong to that region
-                        try:
-                            for i, row in nodes_gdf.iterrows():
-                                if str(row.get('regiao', '')).lower() == region_key:
-                                    targets.append(normalize_name(row['name']))
-                        except Exception:
-                            # Fallback: use municipality string as single target
-                            targets = [normalize_name(municipio_raw)]
-                    else:
-                        continue
-
-                    # Intensidade e Criticidade
-                    ev_type = str(ev.get('type') or ev.get('natureza') or '').lower()
-                    description = ' '.join([
-                        str(ev.get('description') or ''),
-                        str(ev.get('descricao') or ''),
-                        str(ev.get('resumo') or ''),
-                        str(ev.get('raw_text') or ''),
-                    ]).lower()
-                    conflict_severity = str(ev.get('conflict_severity', '')).upper()
-                    classification = classify_exogenous_event(ev)
-
-                    # Classificação exógena: conflito real, supressão qualificada ou ação policial administrativa.
-                    is_supp = classification['is_qualified_suppression']
-                    is_conflict = classification['is_conflict']
-                    if classification['signal_class'] == 'administrative_police':
-                        continue
-
-                    # Se for supressão, calibramos a intensidade pelo impacto
-                    if is_supp:
-                        if any(w in description for w in ['fuzil', 'metralhadora', 'fuzi', '7.62', '5.56']):
-                            intensity = 1.0
-                        elif any(w in description for w in ['lider', 'chefe', 'frente', 'comando']):
-                            intensity = 0.9
-                        elif any(w in description for w in ['pistola', 'revolver', 'arma de fogo']):
-                            intensity = 0.7
-                        elif any(w in description for w in ['quilos', 'kg', 'grande quantidade', 'deposito']):
-                            intensity = 0.6
-                        elif any(w in description for w in ['veiculo', 'carro', 'moto', 'recuperad']):
-                            intensity = 0.4
-                        else:
-                            intensity = float(ev.get('intensity', 0.3))
-                        intensity *= suppression_decay_factor(event_dt)
-                    else:
-                        # Mapeia o conflict_severity fornecido pelo LLM para intensity
-                        if conflict_severity == 'HIGH':
-                            intensity = 0.9
-                        elif conflict_severity == 'MEDIUM':
-                            intensity = 0.6
-                        elif conflict_severity == 'LOW':
-                            intensity = 0.3
-                        else:
-                            intensity = float(ev.get('intensity', 0.5))
-
-                    # Se a localidade for genérica (município inteiro), reduzimos drasticamente o impacto por nó
-                    # para não zerar ou estourar a cidade inteira.
-                    is_city_wide = not bairro_raw and bool(municipio_raw)
-                    if is_city_wide and len(targets) > 1:
-                        intensity = intensity / min(len(targets), 10.0) # Fator de amortecimento para impacto difuso                    
-                    # Decisão de Canal: Canal 25 se tipo for crítico, intensidade > 0.7 
-                    # OU se a descrição contiver palavras-chave de alerta máximo
-                    is_critical = (ev_type in CRITICAL_TYPES) or (is_conflict and intensity > 0.7) or \
-                                  ('execuc' in description) or ('facç' in description) or \
-                                  ('morte' in description and 'facç' in description)
-                    
-                    # Apply/update shock for all resolved targets (single bairro or expanded region nodes)
-                    for loc_norm in targets:
-                        if loc_norm not in exogenous_shocks:
-                            exogenous_shocks[loc_norm] = {
-                                'conflict_intensity': 0.0,
-                                'suppression_intensity': 0.0,
-                                'is_critical': False,
-                                'events_count': 0,
-                                'event_types': set()
-                            }
-                        
-                        exogenous_shocks[loc_norm]['events_count'] += 1
-                        if ev_type:
-                            exogenous_shocks[loc_norm]['event_types'].add(ev_type)
-                        
-                        # Acumula as intensidades de forma independente
-                        if is_supp:
-                            exogenous_shocks[loc_norm]['suppression_intensity'] += intensity
-                        elif is_conflict:
-                            exogenous_shocks[loc_norm]['conflict_intensity'] += intensity
-                            if is_critical:
-                                exogenous_shocks[loc_norm]['is_critical'] = True
-                except: continue
-
-            exogenous_shocks_map = exogenous_shocks
-            if not exogenous_shocks:
-                exogenous_shocks = None
-        except Exception as e:
-            print(f"Erro ao processar shocks no app.py: {e}")
-            exogenous_shocks = None
+        exogenous_shocks, exogenous_shocks_map = build_current_exogenous_shocks()
 
         scores_map, trends_map = orchestrator.get_combined_risk(exogenous_shocks, return_trends=True)
         

@@ -538,9 +538,9 @@
                                 <option value="interior">Interior do Estado</option>
                             </select>
                             <div class="form-check mt-2">
-                                <input class="form-check-input" type="checkbox" id="toggle-top20">
-                                <label class="form-check-label small fw-bold text-danger" for="toggle-top20">
-                                    <i class="fas fa-thumbtack"></i> Top 30 Micronodos (Elite P10)
+                                <input class="form-check-input" type="checkbox" id="toggle-visible-micronodes">
+                                <label class="form-check-label small fw-bold text-danger" for="toggle-visible-micronodes">
+                                    <i class="fas fa-thumbtack"></i> Micronodos das Áreas Plotadas
                                 </label>
                             </div>
                             <div class="form-check mt-1">
@@ -788,12 +788,16 @@
     var explainabilityRequestToken = 0;
     var _effMetricsPrintedDate = null; // guard: print termômetro apenas 1x por data de avaliação
 
-    // Top30 micro-nodes layer
-    var top20Layer = L.layerGroup();
-    var top20LoadedRegion = null; // track which region is loaded into top20Layer
-    var top20LoadingRequestId = 0; // track async requests to avoid race conditions
+    // Dynamic micronodes layer for plotted moderate/high/critical areas
+    var visibleMicronodesLayer = L.layerGroup();
+    var visibleMicronodesLoadedRegion = null; // track which region is loaded into visibleMicronodesLayer
+    var visibleMicronodesLoadingRequestId = 0; // track async requests to avoid race conditions
 
-    function colorByRankSimple(r){ return r<=3 ? '#8B0000' : r<=10 ? '#FF6B6B' : '#FFA500'; }
+    function colorByMicronodeRiskSimple(score){
+        if (score >= 71) return '#8B0000';
+        if (score >= 51) return '#FF6B6B';
+        return '#FFA500';
+    }
     function makePinSimple(color){
         var html = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;">'
                 + '<div style="width:14px;height:14px;background:'+color+';border-radius:7px;border:2px solid #fff;box-shadow:0 1px 2px rgba(0,0,0,0.4);"></div>'
@@ -802,49 +806,49 @@
         return L.divIcon({html: html, className: '', iconSize: [18,22], iconAnchor: [9,20]});
     }
 
-    function loadTop20(region, cb){
+    function loadVisibleMicronodes(region, cb, options){
         // region optional: capital|rmf|interior
-        var url = '/api/top20_micro_nodes';
+        var url = '/api/visible_micronodes';
         var query = [];
         if (region) query.push('region=' + encodeURIComponent(region));
-        query.push('limit=30');
+        if (options && options.refresh) query.push('refresh=1');
         if (query.length) url += '?' + query.join('&');
-        console.log('[Top20] Loading', url);
+        console.log('[Micronodes] Loading', url);
         
         // Increment request ID to handle race conditions
-        top20LoadingRequestId++;
-        var currentRequestId = top20LoadingRequestId;
+        visibleMicronodesLoadingRequestId++;
+        var currentRequestId = visibleMicronodesLoadingRequestId;
         
         fetch(url).then(function(resp){
-            if (!resp.ok) throw new Error('Não foi possível carregar Top30: ' + resp.status);
+            if (!resp.ok) throw new Error('Não foi possível carregar micronodos dinâmicos: ' + resp.status);
             return resp.json();
         }).then(function(data){
             try{
                 // Ignore this response if a newer request was made
-                if (currentRequestId !== top20LoadingRequestId) {
-                    console.log('[Top20] Ignoring stale response for', url);
+                if (currentRequestId !== visibleMicronodesLoadingRequestId) {
+                    console.log('[Micronodes] Ignoring stale response for', url);
                     return;
                 }
                 
-                top20Layer.clearLayers();
+                visibleMicronodesLayer.clearLayers();
                 var features = data.features || data;
-                console.log('[Top20] Received features:', (features && features.length) || 0);
+                console.log('[Micronodes] Received features:', (features && features.length) || 0);
                 var builtLayer = L.geoJson({ type: 'FeatureCollection', features: features }, {
                     pane: 'topMicronodesPane',
                     style: function(feature) {
-                        var rank = (feature.properties && feature.properties.rank) || 0;
-                        var color = colorByRankSimple(rank);
+                        var score = (feature.properties && (feature.properties.score || feature.properties.risk_score)) || 0;
+                        var color = colorByMicronodeRiskSimple(score);
                         return {
                             color: color,
-                            weight: rank <= 3 ? 3 : 2.2,
+                            weight: score >= 71 ? 3 : 2.2,
                             opacity: 1,
                             fillColor: color,
-                            fillOpacity: rank <= 3 ? 0.45 : 0.32
+                            fillOpacity: score >= 71 ? 0.45 : 0.32
                         };
                     },
                     pointToLayer: function(feature, latlng) {
-                        var rank = (feature.properties && feature.properties.rank) || 0;
-                        var color = colorByRankSimple(rank);
+                        var score = (feature.properties && (feature.properties.score || feature.properties.risk_score)) || 0;
+                        var color = colorByMicronodeRiskSimple(score);
                         return L.marker(latlng, {icon: makePinSimple(color)});
                     },
                     onEachFeature: function(f, layer) {
@@ -929,70 +933,70 @@
                                 }
                             });
                         } catch (e) {
-                            console.warn('[Top20] feature error', e, f);
+                            console.warn('[Micronodes] feature error', e, f);
                         }
                     }
                 });
 
                 builtLayer.eachLayer(function(layer) {
-                    top20Layer.addLayer(layer);
+                    visibleMicronodesLayer.addLayer(layer);
                 });
 
-                console.log('[Top20] Built layers:', top20Layer.getLayers().length);
-                top20LoadedRegion = region || 'all';
+                console.log('[Micronodes] Built layers:', visibleMicronodesLayer.getLayers().length);
+                visibleMicronodesLoadedRegion = region || 'all';
                 
                 // Ensure layer is added to map if checkbox is checked
-                if ($('#toggle-top20').prop('checked')) {
-                    if (!map.hasLayer(top20Layer)) {
-                        map.addLayer(top20Layer);
-                        console.log('[Top20] Layer added to map');
+                if ($('#toggle-visible-micronodes').prop('checked')) {
+                    if (!map.hasLayer(visibleMicronodesLayer)) {
+                        map.addLayer(visibleMicronodesLayer);
+                        console.log('[Micronodes] Layer added to map');
                     } else {
-                        console.log('[Top20] Layer already on map');
+                        console.log('[Micronodes] Layer already on map');
                     }
                 } else {
-                    console.log('[Top20] Checkbox unchecked, not adding layer');
+                    console.log('[Micronodes] Checkbox unchecked, not adding layer');
                 }
                 
                 if (cb) cb(null);
-            }catch(err){ console.warn('[Top20] build error', err); if (cb) cb(err); }
-        }).catch(function(err){ console.warn('[Top20] fetch error', err); if (cb) cb(err); });
+            }catch(err){ console.warn('[Micronodes] build error', err); if (cb) cb(err); }
+        }).catch(function(err){ console.warn('[Micronodes] fetch error', err); if (cb) cb(err); });
     }
 
-    function updateTop20ForRegion(region){
-        console.log('[Top20] updateTop20ForRegion: region=' + region + ', checking=' + $('#toggle-top20').prop('checked') + ', topLoadedRegion=' + top20LoadedRegion);
+    function updateVisibleMicronodesForRegion(region){
+        console.log('[Micronodes] updateVisibleMicronodesForRegion: region=' + region + ', checking=' + $('#toggle-visible-micronodes').prop('checked') + ', loadedRegion=' + visibleMicronodesLoadedRegion);
         
         // If checkbox is unchecked, remove layer
-        if (!$('#toggle-top20').prop('checked')) {
-            console.log('[Top20] updateTop20ForRegion: Checkbox unchecked, clearing layer');
-            try{ top20Layer.clearLayers(); }catch(e){}
-            if (map.hasLayer(top20Layer)) map.removeLayer(top20Layer);
-            top20LoadedRegion = null; // Reset cache
+        if (!$('#toggle-visible-micronodes').prop('checked')) {
+            console.log('[Micronodes] updateVisibleMicronodesForRegion: Checkbox unchecked, clearing layer');
+            try{ visibleMicronodesLayer.clearLayers(); }catch(e){}
+            if (map.hasLayer(visibleMicronodesLayer)) map.removeLayer(visibleMicronodesLayer);
+            visibleMicronodesLoadedRegion = null; // Reset cache
             return;
         }
         
         // If already loaded for this region, just ensure layer is visible
-        if (top20LoadedRegion === region){
-            var markerCount = top20Layer.getLayers().length;
-            console.log('[Top20] Already loaded for region, markers in layer:', markerCount);
+        if (visibleMicronodesLoadedRegion === region){
+            var markerCount = visibleMicronodesLayer.getLayers().length;
+            console.log('[Micronodes] Already loaded for region, markers in layer:', markerCount);
             if (markerCount === 0) {
-                console.log('[Top20] Layer is empty! Force reloading...');
-                top20LoadedRegion = null; // Reset to force reload
+                console.log('[Micronodes] Layer is empty! Force reloading...');
+                visibleMicronodesLoadedRegion = null; // Reset to force reload
             } else {
-                if (!map.hasLayer(top20Layer)) {
-                    map.addLayer(top20Layer);
-                    console.log('[Top20] Layer re-added to map, markers:', markerCount);
+                if (!map.hasLayer(visibleMicronodesLayer)) {
+                    map.addLayer(visibleMicronodesLayer);
+                    console.log('[Micronodes] Layer re-added to map, markers:', markerCount);
                 } else {
-                    console.log('[Top20] Layer already on map, markers:', markerCount);
+                    console.log('[Micronodes] Layer already on map, markers:', markerCount);
                 }
                 return;
             }
         }
         
-        console.log('[Top20] Loading region:', region);
+        console.log('[Micronodes] Loading region:', region);
         // Load the data
-        loadTop20(region, function(err){
-            if (err){ console.warn('[Top20] load error', err); return; }
-            console.log('[Top20] Callback: region=' + region + ', checkbox=' + $('#toggle-top20').prop('checked'));
+        loadVisibleMicronodes(region, function(err){
+            if (err){ console.warn('[Micronodes] load error', err); return; }
+            console.log('[Micronodes] Callback: region=' + region + ', checkbox=' + $('#toggle-visible-micronodes').prop('checked'));
         });
     }
 
@@ -2191,8 +2195,8 @@
                                         $('#region-filter').val('fortaleza').trigger('change');
                                         applyRegionFilter('fortaleza');
                                         map.closePopup();
-                                        // Refresh top20 layer if visible
-                                        refreshTop20();
+                                        // Refresh visible micronodes layer if visible
+                                        refreshVisibleMicronodes();
                                         // Update dashboard again to ensure counts reflect saved events
                                         updateDashboard('CVLI');
                                     } catch (e) { console.warn('Error restoring initial view after exogenous save', e); }
@@ -2947,14 +2951,13 @@
     $('#region-filter').on('change', function() {
         var val = $(this).val();
         
-        // Padronizado para Top 30 para todas as regiões conforme solicitação
-        var labelText = 'Top 30 Micronodos (Elite P10)';
-        $('label[for="toggle-top20"]').html('<i class="fas fa-thumbtack"></i> ' + labelText);
+        var labelText = 'Micronodos das Áreas Plotadas';
+        $('label[for="toggle-visible-micronodes"]').html('<i class="fas fa-thumbtack"></i> ' + labelText);
         
         applyRegionFilter(val);
         updateTopCriticalAreas();
-        // update top20 layer for selected region if visible
-        updateTop20ForRegion(val);
+        // update visible micronodes layer for selected region if visible
+        updateVisibleMicronodesForRegion(val);
         // Atualiza também os cards que mostram contagens por região
         try { updateDashboard('CVLI'); } catch(e) { console.warn('updateDashboard failed on region change', e); }
     });
@@ -3068,25 +3071,25 @@
         }
     });
 
-    // Toggle Top30 micro-nodes
-    $('#toggle-top20').on('change', function(){
+    // Toggle dynamic micronodes
+    $('#toggle-visible-micronodes').on('change', function(){
         var checked = $(this).prop('checked');
         var region = $('#region-filter').val();
-        console.log('[Top20] Checkbox change event: checked=' + checked + ', region=' + region);
+        console.log('[Micronodes] Checkbox change event: checked=' + checked + ', region=' + region);
         if (checked){
-            updateTop20ForRegion(region);
+            updateVisibleMicronodesForRegion(region);
         } else {
-            try{ top20Layer.clearLayers(); }catch(e){}
-            if (map.hasLayer(top20Layer)) map.removeLayer(top20Layer);
-            console.log('[Top20] Checkbox unchecked - layer removed');
+            try{ visibleMicronodesLayer.clearLayers(); }catch(e){}
+            if (map.hasLayer(visibleMicronodesLayer)) map.removeLayer(visibleMicronodesLayer);
+            console.log('[Micronodes] Checkbox unchecked - layer removed');
         }
     });
 
-    // Expose function to refresh Top30 (useful after model updates)
-    function refreshTop20(){
+    // Expose function to refresh dynamic micronodes (useful after model updates)
+    function refreshVisibleMicronodes(){
         var region = $('#region-filter').val();
-        if ($('#toggle-top20').prop('checked')){
-            loadTop20(region, function(err){ if (err) console.warn('refreshTop20 failed', err); });
+        if ($('#toggle-visible-micronodes').prop('checked')){
+            loadVisibleMicronodes(region, function(err){ if (err) console.warn('refreshVisibleMicronodes failed', err); }, {refresh:true});
         }
     }
 
@@ -3142,10 +3145,10 @@
             });
         }
         
-        // Carrega os Top30 micronodes para a região selecionada
+        // Carrega os micronodos dinâmicos para a região selecionada
         // Isso garante que os micronodes sejam pré-carregados ao trocar de região,
         // mesmo se o checkbox não estiver marcado no momento
-        updateTop20ForRegion(regionFilter);
+        updateVisibleMicronodesForRegion(regionFilter);
     }
 
     // ===== Monitor de Atualização de Modelos =====
@@ -3628,6 +3631,24 @@
                 // Exibir na tela (Render Layer)
                 escapeRoutesLayer = L.geoJSON(data, {
                     style: function(feature) {
+                        if (feature.properties.is_mesh) {
+                            return {
+                                color: '#ffffff', // Branco puro para contraste extremo contra layers escuras
+                                weight: 2.5,
+                                opacity: 0.9,
+                                dashArray: '2, 4' // Pontilhado suave para não poluir tanto, mas super visível
+                            };
+                        }
+                        if (feature.properties.is_polygon) {
+                            return {
+                                color: '#ffcc00', // Amarelo/Laranja para cerco
+                                weight: 2,
+                                opacity: 0.8,
+                                fillColor: '#ffcc00',
+                                fillOpacity: 0.15,
+                                dashArray: '8, 4'
+                            };
+                        }
                         return {
                             color: '#ff2d55', // Neon red/pink alert
                             weight: feature.properties.rank === 1 ? 5 : (feature.properties.rank === 2 ? 4 : 2),
@@ -3636,6 +3657,24 @@
                         };
                     },
                     onEachFeature: function(f, layer) {
+                        if (f.properties.is_mesh) {
+                            layer.bindPopup(
+                                '<div style="background:#fff; color:#000; padding:8px; border-radius:4px; font-size:14px;">' +
+                                '<b>Malha Viária de Contenção</b><br/>' +
+                                '<b>Raio:</b> Ruas dentro da área de alcance (Cerco)' +
+                                '</div>'
+                            );
+                            return;
+                        }
+                        if (f.properties.is_polygon) {
+                            layer.bindPopup(
+                                '<div style="background:#fff; color:#000; padding:8px; border-radius:4px; font-size:14px;">' +
+                                '<b>Perímetro de Cerco Tático</b><br/>' +
+                                '<b>Tempo Est:</b> ' + f.properties.time_estimate + 
+                                '</div>'
+                            );
+                            return;
+                        }
                         layer.bindPopup(
                             '<div style="background:#fff; color:#000; padding:8px; border-radius:4px; font-size:14px;">' +
                             '<b>Fuga Preditiva (ST-GCN)</b><br/>' +

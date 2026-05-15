@@ -702,8 +702,8 @@ def _build_explainability_academics(risk_items: List[Dict[str, Any]]) -> Dict[st
 
 def _copy_top_layer(region: str, target_path: Path, peak_hours_cache: Dict[str, str]) -> Dict[str, Any]:
     payload = _request_json(
-        f"/api/top20_micro_nodes?region={region}&limit=30",
-        report_app.get_top20_micro_nodes,
+        f"/api/visible_micronodes?region={region}",
+        report_app.get_visible_micronodes,
     )
     features = payload.get("features", [])
     for index, feature in enumerate(features, start=1):
