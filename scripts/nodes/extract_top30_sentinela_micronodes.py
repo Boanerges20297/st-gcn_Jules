@@ -2,6 +2,7 @@
 """Build dynamic micronode overlays for every plotted moderate/high/critical area."""
 import json
 import math
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -93,8 +94,10 @@ def _haversine_meters(lon1, lat1, lon2, lat2):
 
 def _extract_city_from_props(props):
     micronodo = str(props.get('micronodo') or '').strip()
-    if ' - ' in micronodo:
-        city_raw = micronodo.split(' - ')[-1].split('/')[0].strip()
+    # Divide pelo hifen com espacos opcionais (ex: "Caninde- CE", "Caninde - CE", "Caninde-CE")
+    parts = re.split(r'\s*-\s*', micronodo)
+    if len(parts) > 1:
+        city_raw = parts[-1].split('/')[0].strip()
         if city_raw:
             return city_raw
 
@@ -140,34 +143,30 @@ def _resolve_parent_area(area_raw, micronodo_raw, risk_scores):
 
     for candidate in ordered:
         for known_name, score in risk_scores.items():
-            if candidate in known_name or known_name in candidate:
+            # Usa correspondencia exata de palavras completas (limites de palavra \b) para evitar correspondencias falsas como CANINDE -> CANINDEZINHO
+            if re.search(r'\b' + re.escape(candidate) + r'\b', known_name) or re.search(r'\b' + re.escape(known_name) + r'\b', candidate):
                 return known_name, score
 
     return (ordered[0] if ordered else normalize_name(area_raw)), 0.0
 
 
-def _build_region_node_sets():
-    region_node_sets = {}
-    for reg_key, spec in app.orchestrator.specialists.items():
-        reg_mapped = 'capital' if reg_key == 'fortaleza' else reg_key
-        region_node_sets[reg_mapped] = {
-            normalize_name(str(row.get('name') or ''))
-            for _, row in spec['data']['nodes_gdf'].iterrows()
-        }
-    return region_node_sets
+def _classify_region(city_norm, lon, lat):
+    # Mesma lógica-base do app: capital por bbox, depois município explícito,
+    # depois RMF por bbox. Evita vazamento por homônimos como BARROSO/CANINDEZINHO.
+    if -3.86 <= lat <= -3.69 and -38.64 <= lon <= -38.40:
+        return 'capital'
 
+    if city_norm:
+        if city_norm == 'FORTALEZA':
+            return 'capital'
 
-def _classify_region(parent_norm, city_norm, region_node_sets):
-    for reg_name, node_set in region_node_sets.items():
-        if parent_norm in node_set or city_norm in node_set:
-            return reg_name
+        rmf_norm = {normalize_name(city) for city in getattr(app, '_RMF_CITIES', set())}
+        if city_norm in rmf_norm:
+            return 'rmf'
+        return 'interior'
 
-    for reg_name, node_set in region_node_sets.items():
-        for known_name in node_set:
-            if parent_norm and (parent_norm in known_name or known_name in parent_norm):
-                return reg_name
-            if city_norm and (city_norm in known_name or known_name in city_norm):
-                return reg_name
+    if -4.20 <= lat <= -3.60 and -38.90 <= lon <= -38.20:
+        return 'rmf'
     return 'interior'
 
 
@@ -261,7 +260,6 @@ def process_micronodes(risk_scores):
         data = json.load(f)
 
     display_name_map = _build_display_name_map()
-    region_node_sets = _build_region_node_sets()
     street_points = load_geo_street_points()
     processed = []
 
@@ -277,7 +275,13 @@ def process_micronodes(risk_scores):
         parent_norm, parent_risk = _resolve_parent_area(area_raw, micronodo_name, risk_scores)
         city_raw = _extract_city_from_props(props)
         city_norm = normalize_name(city_raw)
-        region = _classify_region(parent_norm, city_norm, region_node_sets)
+        # Se o que foi extraído como 'cidade' é na verdade um bairro/nome local,
+        # descartar para evitar classificar por homônimo fora da capital.
+        if city_norm and city_norm not in {'FORTALEZA'} and city_norm not in {normalize_name(city) for city in getattr(app, '_RMF_CITIES', set())}:
+            if city_norm == normalize_name(area_raw) or city_norm == normalize_name(micronodo_name):
+                city_raw = ''
+                city_norm = ''
+        region = _classify_region(city_norm, lon, lat)
         if not city_raw:
             city_raw = 'Fortaleza' if region == 'capital' else display_name_map.get(parent_norm, area_raw)
             city_norm = normalize_name(city_raw)
@@ -295,7 +299,7 @@ def process_micronodes(risk_scores):
 
         processed.append({
             'name': micronodo_name,
-            'bairro': display_name_map.get(parent_norm, area_raw),
+            'bairro': area_raw,  # area_oficial do dado-fonte; não remapear pelo nó do modelo
             'parent_norm': parent_norm,
             'parent_risk_score': parent_risk,
             'parent_risk_level': level,

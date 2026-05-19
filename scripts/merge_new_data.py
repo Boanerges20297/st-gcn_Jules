@@ -331,7 +331,7 @@ def merge(new_data_path):
                 df_new.at[idx, 'nature'] = natureza_str
                 df_new.at[idx, 'tipo_evento'] = natureza_str
                 # CRÍTICO: Mapeamento para o Canal 0 do modelo (CVLI)
-                if 'CVLI' in natureza_str or 'HOMICIDIO' in natureza_str:
+                if any(term in natureza_str for term in ['CVLI', 'HOMICIDIO', 'LATROCINIO', 'FEMINICIDIO', 'LESAO CORPORAL SEGUIDA DE MORTE']):
                     df_new.at[idx, 'tipo'] = 'cvli'
             
             if 'nome_vitima' in row:
@@ -433,16 +433,17 @@ def merge(new_data_path):
     # 8. Validação Automática com Gabarito (Novo)
     if not df_new.empty:
         try:
-            perform_validation_log(df_new)
+            perform_validation_log(df_combined, window_days=14)
         except Exception as e:
             print(f"⚠️ Erro na validação automática: {e}")
 
-def perform_validation_log(df_new):
+def perform_validation_log(df_eval, window_days=14):
     """
-    Avalia a performance das predições contra os dados que acabaram de ser mesclados.
+    Avalia a performance das predições contra os dados reais.
+    Filtra para os últimos `window_days` dias para obter um gabarito tático real.
     Registra o resultado regional detalhado em VALIDATION_LOG.md.
     """
-    print("\n📊 Iniciando Validação Regional Detalhada (Gabarito)...")
+    print(f"\n📊 Iniciando Validação Regional Detalhada (Gabarito - Últimos {window_days} dias)...")
     
     # 1. Carregar Orquestrador para obter as predições e mapeamento regional
     try:
@@ -463,11 +464,21 @@ def perform_validation_log(df_new):
             node_to_region[normalize_name(str(row['name']))] = reg
 
     # 3. Preparar Ground Truth por Região
-    df_new['data'] = pd.to_datetime(df_new['data'], errors='coerce')
-    cvlis = df_new[df_new['tipo'].str.lower() == 'cvli'].copy()
+    df_eval['data'] = pd.to_datetime(df_eval['data'], errors='coerce')
+    
+    max_date = df_eval['data'].max()
+    if pd.isna(max_date):
+        print("  - Erro: Nenhuma data válida encontrada na base.")
+        return
+        
+    cutoff_date = max_date - pd.Timedelta(days=window_days)
+    mask_time = df_eval['data'] >= cutoff_date
+    mask_cvli = df_eval['tipo'].str.lower() == 'cvli'
+    
+    cvlis = df_eval[mask_time & mask_cvli].copy()
     
     if cvlis.empty:
-        print("  - Nenhum CVLI nos novos dados para validar.")
+        print(f"  - Nenhum CVLI nos últimos {window_days} dias para validar.")
         return
 
     cvlis['node_norm'] = cvlis['bairro'].apply(normalize_name)

@@ -46,6 +46,9 @@ RMF_CITIES = {
 # pelo polígono do município. Forçar município e região corretos.
 AREA_MUNICIPALITY_OVERRIDE = {
     'MARECHAL RONDON': ('Caucaia', 'rmf'),
+    # Canindezinho: bairro de Fortaleza (AIS21/32ºDP) próximo à fronteira com Caucaia.
+    # O centroide de alguns polígonos cai dentro do município de Caucaia.
+    'CANINDEZINHO': ('Fortaleza', 'capital'),
 }
 
 def haversine(lon1, lat1, lon2, lat2):

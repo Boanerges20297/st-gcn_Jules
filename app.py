@@ -254,6 +254,7 @@ health_monitor = None
 confidence_tracker = None
 
 _MICRONODE_POLYGON_CACHE = None
+_MICRONODE_REFERENCE_CACHE = None
 _TOP_MICRONODE_FACTION_CACHE = None
 _PEAK_HOURS_CACHE = None  # {bairro_norm: "Entre XHs e YHs"}
 _MICRONODE_EXPORT_BUILT_AT = None
@@ -931,8 +932,9 @@ def _classify_region(props: dict) -> str:
     if -3.86 <= lat <= -3.69 and -38.64 <= lng <= -38.40:
         return 'fortaleza'
     # Extrair município do campo micronodo: formato 'LOC - CIDADE / CE'
-    if ' - ' in mn:
-        cidade_raw = mn.split(' - ')[-1].split('/')[0].strip()
+    parts = re.split(r'\s*-\s*', mn)
+    if len(parts) > 1:
+        cidade_raw = parts[-1].split('/')[0].strip()
         cidade_norm = normalize_name(cidade_raw)
         if cidade_norm in ('FORTALEZA',):
             return 'fortaleza'
@@ -948,6 +950,91 @@ def _classify_region(props: dict) -> str:
 
 def _normalize_polygon_lookup_name(text: str) -> str:
     return re.sub(r'\s+', ' ', normalize_name(text or '')).strip()
+
+
+def _build_micronode_polygon_lookup_keys(micronodo=None, bairro=None, name=None):
+    micronodo_key = _normalize_polygon_lookup_name(micronodo)
+    bairro_key = _normalize_polygon_lookup_name(bairro)
+    name_key = _normalize_polygon_lookup_name(name)
+
+    keys = []
+    for key in (
+        f'{micronodo_key}||{bairro_key}' if micronodo_key and bairro_key else '',
+        f'{name_key}||{bairro_key}' if name_key and bairro_key else '',
+        micronodo_key,
+        name_key,
+        bairro_key,
+    ):
+        if key and key not in keys:
+            keys.append(key)
+    return keys
+
+
+def _load_micronode_reference_centroids():
+    global _MICRONODE_REFERENCE_CACHE
+    if _MICRONODE_REFERENCE_CACHE is not None:
+        return _MICRONODE_REFERENCE_CACHE
+
+    cache_path = os.path.join(BASE_DIR, 'data', 'geo_streets_cache.json')
+    if not os.path.exists(cache_path):
+        _MICRONODE_REFERENCE_CACHE = {}
+        return _MICRONODE_REFERENCE_CACHE
+
+    grouped = {}
+    try:
+        with open(cache_path, 'r', encoding='utf-8') as file_obj:
+            data = json.load(file_obj) or []
+
+        for item in data:
+            bairro_key = _normalize_polygon_lookup_name(item.get('bairro'))
+            lat = item.get('lat')
+            lng = item.get('lng')
+            if not bairro_key or lat is None or lng is None:
+                continue
+            try:
+                grouped.setdefault(bairro_key, []).append((float(lng), float(lat)))
+            except Exception:
+                continue
+
+        _MICRONODE_REFERENCE_CACHE = {
+            bairro_key: (
+                sum(point[0] for point in points) / len(points),
+                sum(point[1] for point in points) / len(points),
+            )
+            for bairro_key, points in grouped.items()
+            if points
+        }
+    except Exception as error:
+        print(f"⚠️ [Top Micronodes] Falha ao carregar centroides de referência: {error}")
+        _MICRONODE_REFERENCE_CACHE = {}
+
+    return _MICRONODE_REFERENCE_CACHE
+
+
+def _select_micronode_polygon_geometry(polygon_cache, lookup_keys, bairro=None):
+    bairro_key = _normalize_polygon_lookup_name(bairro)
+    ref_centroid = _load_micronode_reference_centroids().get(bairro_key)
+    max_distance_sq = 0.08 ** 2
+
+    for key in lookup_keys:
+        entry = polygon_cache.get(key)
+        if not entry:
+            continue
+
+        candidates = entry.get('candidates') or []
+        if ref_centroid and candidates:
+            best = min(
+                candidates,
+                key=lambda candidate: ((candidate['centroid'][0] - ref_centroid[0]) ** 2) + ((candidate['centroid'][1] - ref_centroid[1]) ** 2),
+            )
+            best_distance_sq = ((best['centroid'][0] - ref_centroid[0]) ** 2) + ((best['centroid'][1] - ref_centroid[1]) ** 2)
+            if best_distance_sq <= max_distance_sq:
+                return best.get('geometry')
+            continue
+
+        return entry.get('merged')
+
+    return None
 
 
 def _load_micronode_polygon_cache():
@@ -971,12 +1058,11 @@ def _load_micronode_polygon_cache():
                 continue
 
             properties = feature.get('properties') or {}
-            keys = {
-                _normalize_polygon_lookup_name(properties.get('area_oficial')),
-                _normalize_polygon_lookup_name(properties.get('micronodo')),
-                _normalize_polygon_lookup_name(properties.get('name')),
-            }
-            keys = {key for key in keys if key}
+            keys = _build_micronode_polygon_lookup_keys(
+                micronodo=properties.get('micronodo'),
+                bairro=properties.get('area_oficial'),
+                name=properties.get('name'),
+            )
             if not keys:
                 continue
 
@@ -991,7 +1077,17 @@ def _load_micronode_polygon_cache():
         for key, geometries in polygon_groups.items():
             merged = unary_union(geometries)
             if not merged.is_empty:
-                cache[key] = mapping(merged)
+                candidates = []
+                for geometry_obj in geometries:
+                    centroid = geometry_obj.centroid
+                    candidates.append({
+                        'geometry': mapping(geometry_obj),
+                        'centroid': (centroid.x, centroid.y),
+                    })
+                cache[key] = {
+                    'merged': mapping(merged),
+                    'candidates': candidates,
+                }
         _MICRONODE_POLYGON_CACHE = cache
     except Exception as error:
         print(f"⚠️ [Top Micronodes] Falha ao carregar cache de polígonos ORCRIMS: {error}")
@@ -1341,10 +1437,18 @@ def get_visible_micronodes():
             if area_key in seen_areas:
                 continue
             seen_areas.add(area_key)
-            
-            lookup_key = _normalize_polygon_lookup_name(props.get('name') or props.get('micronodo'))
-            polygon_geometry = polygon_cache.get(lookup_key)
-            faction = props.get('faction') or faction_cache.get(lookup_key)
+
+            lookup_keys = _build_micronode_polygon_lookup_keys(
+                micronodo=props.get('micronodo') or props.get('name'),
+                bairro=props.get('bairro') or props.get('parent_area'),
+                name=props.get('name'),
+            )
+            polygon_geometry = _select_micronode_polygon_geometry(
+                polygon_cache,
+                lookup_keys,
+                bairro=props.get('bairro') or props.get('parent_area'),
+            )
+            faction = props.get('faction') or next((faction_cache.get(key) for key in lookup_keys if faction_cache.get(key)), None)
             if polygon_geometry:
                 feature['geometry'] = polygon_geometry
                 props['geometry_type'] = polygon_geometry.get('type', 'Polygon')

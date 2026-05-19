@@ -354,7 +354,9 @@ class StateOrchestrator:
 
             recent_crime_signal = np.clip(x_raw_extended[:, -inclusion_horizon:, 0].sum(axis=1), 0, 2) / 2.0
             neighbor_signal = np.clip((data['adj_geo'].dot((sim_impact > 0).astype(float))) * (cp.get('tag_bias_neighbor', 0.6)/0.6), 0, 1)
-            inclusion_signal = np.clip(np.maximum.reduce([recent_crime_signal, neighbor_signal]), 0, 1)
+            # Nó com evento direto também recebe inclusão máxima (não apenas seus vizinhos)
+            own_event_signal = (sim_impact > 0).astype(float)
+            inclusion_signal = np.clip(np.maximum.reduce([recent_crime_signal, neighbor_signal, own_event_signal]), 0, 1)
             calm_signal = np.clip(-momentum_feat[:, -1, 3], 0, 30) / 30.0
 
             if cp.get('use_historical_fallback') and cp.get('historical_top10'):

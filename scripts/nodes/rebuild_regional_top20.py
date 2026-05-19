@@ -31,54 +31,33 @@ RMF_NORM = {
 }
 
 # ------------------------------------------------------------
-# Pure-Python PIP (ray casting)
+# Load municipality boundaries using Shapely for fast PIP
 # ------------------------------------------------------------
-def _pip_ring(px, py, ring):
-    """Ray-cast point-in-polygon for a single exterior ring."""
-    inside = False
-    n = len(ring)
-    j = n - 1
-    for i in range(n):
-        xi, yi = ring[i][0], ring[i][1]
-        xj, yj = ring[j][0], ring[j][1]
-        if ((yi > py) != (yj > py)) and (px < (xj - xi) * (py - yi) / (yj - yi) + xi):
-            inside = not inside
-        j = i
-    return inside
+from shapely.geometry import shape, Point
+from shapely.prepared import prep
 
-
-def point_in_polygon(lon, lat, geom):
-    """Returns True if (lon, lat) is inside the GeoJSON geometry (Polygon or MultiPolygon)."""
-    gt = geom['type']
-    if gt == 'Polygon':
-        outer = geom['coordinates'][0]
-        return _pip_ring(lon, lat, outer)
-    elif gt == 'MultiPolygon':
-        for poly in geom['coordinates']:
-            if _pip_ring(lon, lat, poly[0]):
-                return True
-    return False
-
-
-# ------------------------------------------------------------
-# Load municipality boundaries
-# ------------------------------------------------------------
 print('Loading municipality boundaries...')
 with open(STATIC, 'r', encoding='utf-8') as f:
     mun_fc = json.load(f)
 
-municipalities = []  # list of (name_norm, geom)
+# Pre-build prepared shapely geometries for fast PIP
+municipalities = []  # list of (name_norm, name_raw, prepared_geom)
 for feat in mun_fc['features']:
     name = feat['properties'].get('name') or feat['properties'].get('nome') or ''
-    municipalities.append((_norm(name), name, feat['geometry']))
+    try:
+        geom = prep(shape(feat['geometry']))
+        municipalities.append((_norm(name), name, geom))
+    except Exception:
+        pass  # skip invalid geometries
 
 print(f'  {len(municipalities)} municipalities loaded.')
 
 
 def classify(lon, lat):
     """Returns (municipality_name, region) for a given point."""
-    for name_norm, name_raw, geom in municipalities:
-        if point_in_polygon(lon, lat, geom):
+    pt = Point(lon, lat)
+    for name_norm, name_raw, prepared_geom in municipalities:
+        if prepared_geom.contains(pt):
             if 'FORTALEZA' in name_norm:
                 return name_raw, 'capital'
             if name_norm in RMF_NORM:
@@ -87,8 +66,8 @@ def classify(lon, lat):
     # Fallback – distance from Fortaleza centre
     FORT = (-38.5267, -3.7172)
     def hav(lo1, la1, lo2, la2):
-        lo1,la1,lo2,la2 = map(radians,[lo1,la1,lo2,la2])
-        return 6371000*2*asin(sqrt(sin((la2-la1)/2)**2+cos(la1)*cos(la2)*sin((lo2-lo1)/2)**2))
+        lo1, la1, lo2, la2 = map(radians, [lo1, la1, lo2, la2])
+        return 6371000 * 2 * asin(sqrt(sin((la2-la1)/2)**2 + cos(la1)*cos(la2)*sin((lo2-lo1)/2)**2))
     d = hav(lon, lat, FORT[0], FORT[1])
     if d < 20000:
         return 'Fortaleza (approx)', 'capital'
@@ -102,6 +81,16 @@ def classify(lon, lat):
 # ------------------------------------------------------------
 OCCURRENCES_FILE = BASE_DIR / 'data' / 'raw' / 'dados_status_ocorrencias_gerais.json'
 INT_FILE = INT_DIR / 'micronodos_faccoes_2026.geojson'
+
+# ------------------------------------------------------------
+# Name-based overrides for border neighborhoods whose centroid
+# falls inside the wrong municipality polygon.
+# Key: _norm(area_oficial), Value: (municipality_name, region)
+# ------------------------------------------------------------
+BOUNDARY_NAME_OVERRIDE = {
+    'CANINDEZINHO': ('Fortaleza', 'capital'),  # AIS21/32ºDP – bairro de Fortaleza
+    'MARECHAL RONDON': ('Caucaia', 'rmf'),
+}
 
 # ------------------------------------------------------------
 # Haversine distance (metres)
@@ -136,9 +125,12 @@ for i, feat in enumerate(raw['features']):
     if lon == 0 and lat == 0:
         continue
 
-    mun_name, region = classify(lon, lat)
-
     name = (props.get('area_oficial') or props.get('micronodo') or '').strip()
+    name_key = _norm(name) if name else ''
+    if name_key in BOUNDARY_NAME_OVERRIDE:
+        mun_name, region = BOUNDARY_NAME_OVERRIDE[name_key]
+    else:
+        mun_name, region = classify(lon, lat)
     if not name:
         name = f'Área {i+1}'
 
