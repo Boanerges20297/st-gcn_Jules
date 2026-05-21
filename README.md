@@ -23,6 +23,11 @@ O **Report Preview** é uma plataforma operacional de previsão de crimes violen
 >
 > **Guardrail operacional atual:** o score final prioriza `CVLI` recente/histórico e vizinhança. `CVP` permanece apenas como contexto interno do modelo; ele não deve promover diretamente um bairro para risco moderado/alto. Pressão territorial por facção também só entra quando existe suporte `CVLI` recente real ou lastro histórico relevante.
 
+### Documentacao Operacional
+
+- Deploy completo em VPS/Hostinger: [IMPLEMENTACAO_NUVEM_HOSTINGER.md](IMPLEMENTACAO_NUVEM_HOSTINGER.md)
+- Checklist rapido de implantacao: [CHECKLIST_DEPLOY_HOSTINGER.md](CHECKLIST_DEPLOY_HOSTINGER.md)
+
 ---
 
 ## 🏗️ Arquitetura do Sistema
