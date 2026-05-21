@@ -143,7 +143,7 @@ class TelegramGeminiGateway:
                 return path
         return None
 
-    def _build_wrapper_command(self, query: str, scope: str) -> list[str]:
+    def _build_wrapper_command(self, query: str, scope: str, chat_id: int | None = None) -> list[str]:
         wrapper_suffix = self.wrapper_path.suffix.lower()
         common_args = [
             "--scope",
@@ -179,13 +179,21 @@ class TelegramGeminiGateway:
             ]
             if self.hermes_workspace:
                 command.extend(["-HermesWorkspace", str(self.hermes_workspace)])
+            if chat_id is not None:
+                command.extend(["-ChatId", str(chat_id)])
             return command
 
         if wrapper_suffix == ".py":
-            return [sys.executable, str(self.wrapper_path), *common_args]
+            args = [sys.executable, str(self.wrapper_path), *common_args]
+            if chat_id is not None:
+                args.extend(["--chat-id", str(chat_id)])
+            return args
 
         if wrapper_suffix == ".sh":
-            return ["bash", str(self.wrapper_path), *common_args]
+            args = ["bash", str(self.wrapper_path), *common_args]
+            if chat_id is not None:
+                args.extend(["--chat-id", str(chat_id)])
+            return args
 
         raise RuntimeError(f"Wrapper nao suportado: {self.wrapper_path}")
 
@@ -502,7 +510,7 @@ class TelegramGeminiGateway:
         worker = threading.Thread(target=keep_typing, daemon=True)
         worker.start()
         try:
-            return self._run_query(query, scope)
+            return self._run_query(query, scope, chat_id)
         finally:
             stop_event.set()
             worker.join(timeout=1)
@@ -530,8 +538,15 @@ class TelegramGeminiGateway:
         except Exception:
             logging.exception("Falha ao enviar typing para chat %s", chat_id)
 
-    def _extract_answer_body(self, scope: str) -> str:
-        latest_path = self.chat_dir / f"gemini_chat_{scope}_latest.md"
+    def _extract_answer_body(self, scope: str, chat_id: int | None = None) -> str:
+        # Prefer per-chat latest file if available, fall back to scope-global latest
+        latest_path = None
+        if chat_id is not None:
+            candidate = self.chat_dir / f"gemini_chat_{scope}_{chat_id}_latest.md"
+            if candidate.exists():
+                latest_path = candidate
+        if latest_path is None:
+            latest_path = self.chat_dir / f"gemini_chat_{scope}_latest.md"
         text = read_text(latest_path)
         if not text:
             return "Nao foi possivel localizar a resposta gerada."
@@ -540,8 +555,8 @@ class TelegramGeminiGateway:
             return parts[2].strip()
         return text.strip()
 
-    def _run_query(self, query: str, scope: str) -> str:
-        command = self._build_wrapper_command(query, scope)
+    def _run_query(self, query: str, scope: str, chat_id: int | None = None) -> str:
+        command = self._build_wrapper_command(query, scope, chat_id)
         completed = subprocess.run(
             command,
             cwd=self.project_root,
@@ -553,8 +568,8 @@ class TelegramGeminiGateway:
         if completed.returncode != 0:
             logging.error("Falha ao processar pergunta. stdout=%s stderr=%s", completed.stdout, completed.stderr)
             return "Falha ao gerar a resposta analitica no momento. Verifique o gateway Gemini local."
-        logging.info("Pergunta processada com scope=%s", scope)
-        return self._extract_answer_body(scope)
+        logging.info("Pergunta processada com scope=%s chat=%s", scope, chat_id)
+        return self._extract_answer_body(scope, chat_id)
 
     def handle_update(self, update: dict) -> None:
         message = update.get("message") or update.get("edited_message")

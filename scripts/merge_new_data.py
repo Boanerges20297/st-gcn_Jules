@@ -8,6 +8,11 @@ import subprocess
 import sys
 from datetime import datetime
 
+try:
+    from src.hostinger_sync import HostingerSyncManager
+except ImportError:
+    HostingerSyncManager = None
+
 # Importação de Enriquecimento (V33)
 sys.path.append(os.getcwd())
 try:
@@ -213,6 +218,77 @@ def build_streets_cache(df_combined):
     print(f"✅ Cache de ruas críticas criado: {len(streets_list)} ruas em {cache_path}")
 
 
+def incremental_update_streets_cache(df_new_rows):
+    """Atualiza incrementalmente data/geo_streets_cache.json com as novas linhas enriquecidas."""
+    cache_path = os.path.join(BASE_DIR, 'data', 'geo_streets_cache.json')
+    # Carrega lista existente
+    existing = []
+    try:
+        if os.path.exists(cache_path):
+            with open(cache_path, 'r', encoding='utf-8') as f:
+                existing = json.load(f)
+    except Exception:
+        existing = []
+
+    # Indexar por (rua, bairro) para atualizacao rapida
+    index = {}
+    for item in existing:
+        key = (item.get('rua'), item.get('bairro'))
+        index[key] = item
+
+    updated = False
+    for _, row in df_new_rows.iterrows():
+        try:
+            rua = str(row.get('name', '')).upper().strip()
+            bairro = str(row.get('bairro', '')).upper().strip()
+            if not rua or not bairro:
+                continue
+            lat = None
+            lon = None
+            try:
+                lat = float(row.get('latitude')) if not pd.isna(row.get('latitude')) else None
+                lon = float(row.get('longitude')) if not pd.isna(row.get('longitude')) else None
+            except Exception:
+                lat = None; lon = None
+
+            key = (rua, bairro)
+            if key in index:
+                item = index[key]
+                # atualizar ocorrencias e media de coordenadas quando disponivel
+                item['ocorrencias'] = int(item.get('ocorrencias', 1)) + 1
+                if lat is not None and lon is not None:
+                    # recalcula media aproximada
+                    prev_lat = float(item.get('latitude')) if item.get('latitude') is not None else lat
+                    prev_lon = float(item.get('longitude')) if item.get('longitude') is not None else lon
+                    item['latitude'] = (prev_lat + lat) / 2
+                    item['longitude'] = (prev_lon + lon) / 2
+                index[key] = item
+                updated = True
+            else:
+                new_item = {
+                    'rua': rua,
+                    'bairro': bairro,
+                    'cidade': 'FORTALEZA',
+                    'ocorrencias': 1,
+                    'latitude': lat,
+                    'longitude': lon,
+                    'source': 'incremental'
+                }
+                existing.append(new_item)
+                index[key] = new_item
+                updated = True
+        except Exception:
+            continue
+
+    if updated:
+        try:
+            with open(cache_path, 'w', encoding='utf-8') as f:
+                json.dump(existing, f, ensure_ascii=False, indent=2)
+            print(f"✅ Cache de ruas incrementado: {len(existing)} entradas em {cache_path}")
+        except Exception as e:
+            print(f"⚠️ Falha ao salvar cache incremental: {e}")
+
+
 def merge(new_data_path):
     print(f"--- INICIANDO MESCLAGEM EM CSV: {new_data_path} ---")
     
@@ -351,14 +427,49 @@ def merge(new_data_path):
         if 'id' in row:
             df_new.at[idx, 'id'] = row['id']
 
-    # Mesclagem e remoção de duplicatas (Preservando ID único)
-    print("\nMesclando com base oficial...")
-    df_combined = pd.concat([df_official, df_new], ignore_index=True)
-    
-    # temp_key para evitar duplicatas reais (mesmo ID, data e hora)
-    # Mas garantindo que se o ID for diferente, a linha seja mantida (múltiplas vítimas)
-    df_combined['temp_key'] = df_combined['id'].astype(str) + "_" + df_combined['data'].astype(str) + "_" + df_combined['hora'].astype(str)
-    df_combined = df_combined.drop_duplicates(subset=['temp_key'], keep='first').drop(columns=['temp_key'])
+    # Mesclagem incremental: apenas anexar registros inéditos ao CSV oficial
+    print("\nMesclando incrementalmente com base oficial (append apenas registros novos)...")
+    # construir temp_key no novo lote
+    if 'id' in df_new.columns and 'data' in df_new.columns and 'hora' in df_new.columns:
+        df_new['temp_key'] = df_new['id'].astype(str) + "_" + df_new['data'].astype(str) + "_" + df_new['hora'].astype(str)
+    else:
+        df_new['temp_key'] = df_new.index.astype(str)
+
+    existing_temp_keys = set()
+    if not df_official.empty and 'id' in df_official.columns and 'data' in df_official.columns and 'hora' in df_official.columns:
+        df_official['temp_key'] = df_official['id'].astype(str) + "_" + df_official['data'].astype(str) + "_" + df_official['hora'].astype(str)
+        existing_temp_keys = set(df_official['temp_key'].astype(str).unique())
+
+    to_append = df_new[~df_new['temp_key'].astype(str).isin(existing_temp_keys)].copy()
+    if to_append.empty:
+        print("✅ Nenhum registro novo para anexar ao CSV oficial.")
+        did_append = False
+    else:
+        print(f"✨ Preparando {len(to_append)} registros inéditos para anexar ao CSV oficial.")
+        # Ajustar colunas para manter compatibilidade com CSV oficial
+        if not df_official.empty:
+            # Reindexar para colunas da oficial, adicionando colunas faltantes se houver
+            to_append = to_append.reindex(columns=df_official.columns, fill_value="")
+
+        # Se o CSV oficial existir, anexar; caso contrario, salvar novo arquivo completo
+        if os.path.exists(OFFICIAL_CSV):
+            to_append.to_csv(OFFICIAL_CSV, mode='a', header=False, index=False, encoding='utf-8')
+            print(f"✅ {len(to_append)} registros anexados a {OFFICIAL_CSV} (modo append).")
+            did_append = True
+        else:
+            # sem arquivo oficial previo: salvar cabeçalho completo
+            to_append.to_csv(OFFICIAL_CSV, index=False, encoding='utf-8')
+            print(f"✅ Arquivo oficial criado em {OFFICIAL_CSV} com {len(to_append)} registros.")
+            did_append = False
+
+    # Construir dataframe combinado em memoria para cache e validacao
+    if os.path.exists(OFFICIAL_CSV):
+        try:
+            df_combined = pd.read_csv(OFFICIAL_CSV, low_memory=False)
+        except Exception:
+            df_combined = pd.concat([df_official, to_append], ignore_index=True)
+    else:
+        df_combined = pd.concat([df_official, to_append], ignore_index=True)
 
     # --- CONVERGÊNCIA DE MÚLTIPLAS MORTES (ANOMALIAS) ---
     print("Analisando e convergindo anomalias (múltiplas mortes por ocorrência)...")
@@ -417,12 +528,20 @@ def merge(new_data_path):
         final_cols = cols[:v_idx] + new_v33_cols + cols[v_idx:]
         df_combined = df_combined[final_cols]
     
-    df_combined.to_csv(OFFICIAL_CSV, index=False, encoding='utf-8')
-    print(f"✅ SUCESSO! Base atualizada em {OFFICIAL_CSV} com colunas ordenadas.")
-
-    # Construir cache de ruas críticas geolocalizadas
-    print("\n📍 Construindo cache de ruas críticas...")
-    build_streets_cache(df_combined)
+    if not did_append:
+        df_combined.to_csv(OFFICIAL_CSV, index=False, encoding='utf-8')
+        print(f"✅ SUCESSO! Base atualizada em {OFFICIAL_CSV} com colunas ordenadas.")
+        # Construir cache de ruas críticas geolocalizadas (reconstrução completa)
+        print("\n📍 Construindo cache de ruas críticas (reconstrucao completa)...")
+        build_streets_cache(df_combined)
+    else:
+        print("✅ CSV oficial atualizado por append; evitando reescrita completa.")
+        # Atualizacao incremental do cache de ruas apenas com os novos registros
+        if 'to_append' in globals() and not to_append.empty:
+            print("\n📍 Atualizando cache de ruas criticamente de forma incremental...")
+            incremental_update_streets_cache(to_append)
+        else:
+            print("\n📍 Nenhum registro novo para atualizar o cache incremental.")
     
     # 7. Disparar processamento subsequente
     dp_path = os.path.join('src', 'core', 'data_processing.py')
@@ -436,6 +555,14 @@ def merge(new_data_path):
             perform_validation_log(df_combined, window_days=14)
         except Exception as e:
             print(f"⚠️ Erro na validação automática: {e}")
+
+    if HostingerSyncManager is not None:
+        try:
+            sync_result = HostingerSyncManager(BASE_DIR).sync_data_merge_artifacts()
+            if sync_result.get('status') == 'synced':
+                print(f"✅ Sync Hostinger (data merge): {len(sync_result.get('uploaded_files', []))} arquivo(s) enviados")
+        except Exception as e:
+            print(f"⚠️ Sync Hostinger falhou após merge: {e}")
 
 def perform_validation_log(df_eval, window_days=14):
     """

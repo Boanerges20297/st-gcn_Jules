@@ -213,6 +213,7 @@ def main() -> int:
     parser.add_argument("--project-root", default=str(Path.cwd()))
     parser.add_argument("--context-root", default="")
     parser.add_argument("--chat-dir", default="")
+    parser.add_argument("--chat-id", default="", help="Optional chat identifier to isolate latest answer files")
     parser.add_argument("--gemini-model", default="gemini-2.5-flash")
     args = parser.parse_args()
 
@@ -306,6 +307,9 @@ PERGUNTA DO USUARIO:
     result = invoke_gemini_text(prompt, project_root, args.gemini_model)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     latest_answer_path = chat_dir / f"gemini_chat_{args.scope}_latest.md"
+    # If chat-id provided, create per-chat latest file to avoid cross-chat leakage
+    if args.chat_id:
+        latest_answer_path = chat_dir / f"gemini_chat_{args.scope}_{args.chat_id}_latest.md"
     history_answer_path = history_dir / f"gemini_chat_{args.scope}_{timestamp}.md"
     history_prompt_path = history_dir / f"gemini_chat_prompt_{args.scope}_{timestamp}.txt"
 

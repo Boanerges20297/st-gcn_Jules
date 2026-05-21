@@ -11,6 +11,7 @@ param(
     [string]$HermesWorkspace = 'E:\Hermes_Workspace',
 
     [string]$GeminiModel = 'gemini-2.5-flash'
+    ,[string]$ChatId = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -428,6 +429,9 @@ $Query
 
 $timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'
 $latestAnswerPath = Join-Path $chatDir ('gemini_chat_{0}_latest.md' -f $Scope)
+if (-not [string]::IsNullOrWhiteSpace($ChatId)) {
+    $latestAnswerPath = Join-Path $chatDir ('gemini_chat_{0}_{1}_latest.md' -f $Scope, $ChatId)
+}
 $historyAnswerPath = Join-Path $historyDir ('gemini_chat_{0}_{1}.md' -f $Scope, $timestamp)
 $historyPromptPath = Join-Path $historyDir ('gemini_chat_prompt_{0}_{1}.txt' -f $Scope, $timestamp)
 
