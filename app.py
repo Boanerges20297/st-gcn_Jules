@@ -260,6 +260,20 @@ _PEAK_HOURS_CACHE = None  # {bairro_norm: "Entre XHs e YHs"}
 _MICRONODE_EXPORT_BUILT_AT = None
 _MICRONODE_EXPORT_LOCK = threading.Lock()
 
+# Cache global para explicabilidade para evitar redundância de I/O em loops
+_EXOGENOUS_EVENTS_CACHE = None
+_RUAS_CRITICAS_FORTALEZA_CACHE = None
+_STREETS_BY_MUNICIPIO_CACHE = None
+
+# Status da exportação de snapshot assíncrona
+_SNAPSHOT_EXPORT_STATUS = {
+    'status': 'idle',
+    'error': None,
+    'last_run': None,
+    'copied_count': 0
+}
+_SNAPSHOT_EXPORT_LOCK = threading.Lock()
+
 # === REGISTRAR HEALTH MONITOR BLUEPRINT (antes de load_data_and_models) ===
 model_calibrator = None
 try:
@@ -669,8 +683,6 @@ def generate_daily_ranking_report():
 
     # Calculamos o risco atual (sem shocks para servir de baseline estável ou com os atuais)
     scores_map = orchestrator.get_combined_risk()
-    if champion_challenger is not None:
-        scores_map = champion_challenger.apply(scores_map)
     
     regions = {reg: REGION_LABELS.get(reg, reg.upper()) for reg in (orchestrator.specialists.keys() if orchestrator else _ALL_REGIONS)}
 
@@ -726,7 +738,13 @@ def generate_daily_ranking_report():
 
 def load_data_and_models():
     global nodes_gdf, orchestrator, efficiency_monitor, health_monitor, confidence_tracker
+    global _EXOGENOUS_EVENTS_CACHE, _RUAS_CRITICAS_FORTALEZA_CACHE, _STREETS_BY_MUNICIPIO_CACHE
     
+    # Invalida caches de explicabilidade para garantir recarga de novos dados
+    _EXOGENOUS_EVENTS_CACHE = None
+    _RUAS_CRITICAS_FORTALEZA_CACHE = None
+    _STREETS_BY_MUNICIPIO_CACHE = None
+
     # Limpeza de eventos exógenos antigos
     archive_old_exogenous_events()
 
@@ -1514,10 +1532,6 @@ def get_risk():
         exogenous_shocks, exogenous_shocks_map = build_current_exogenous_shocks()
 
         scores_map, trends_map = orchestrator.get_combined_risk(exogenous_shocks, return_trends=True)
-        
-        # --- BLEND CHAMPION/CHALLENGER ---
-        if champion_challenger is not None:
-            scores_map = champion_challenger.apply(scores_map)
             
         results = []
         meta = {'counts': {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0}}
@@ -2258,35 +2272,69 @@ def _publish_screenshot_repo(repo_dir: str, data_subdir: str = 'public/data') ->
     }
 
 
+def _bg_export_thread(target_data_dir, publish_repo):
+    global _SNAPSHOT_EXPORT_STATUS
+    with _SNAPSHOT_EXPORT_LOCK:
+        _SNAPSHOT_EXPORT_STATUS['status'] = 'running'
+        _SNAPSHOT_EXPORT_STATUS['error'] = None
+        try:
+            sync_info = _sync_static_snapshot_to_screenshot_app(target_data_dir)
+            publish_info = None
+            if publish_repo:
+                publish_info = _publish_screenshot_repo(sync_info['target_repo_dir'])
+            
+            _SNAPSHOT_EXPORT_STATUS['status'] = 'success'
+            _SNAPSHOT_EXPORT_STATUS['copied_count'] = len(sync_info.get('copied_files', []))
+            _SNAPSHOT_EXPORT_STATUS['last_run'] = datetime.now().isoformat()
+            logging.info('[SCREENSHOT EXPORT] Exportação assíncrona concluída com sucesso')
+        except Exception as e:
+            _SNAPSHOT_EXPORT_STATUS['status'] = 'error'
+            _SNAPSHOT_EXPORT_STATUS['error'] = str(e)
+            _SNAPSHOT_EXPORT_STATUS['last_run'] = datetime.now().isoformat()
+            logging.error(f'[SCREENSHOT EXPORT] Erro na exportação assíncrona: {e}')
+
+
 @app.route('/api/export_static_snapshot', methods=['POST'])
 def export_static_snapshot_to_screenshot_app():
+    global _SNAPSHOT_EXPORT_STATUS
+    if _SNAPSHOT_EXPORT_LOCK.locked() or _SNAPSHOT_EXPORT_STATUS['status'] == 'running':
+        return jsonify({
+            'ok': False,
+            'message': 'Uma exportação já está em andamento. Por favor, aguarde.'
+        }), 409
+
     try:
         payload = request.get_json(silent=True) or {}
         target_repo_dir = payload.get('target_repo_dir') or STATIC_SCREENSHOT_REPO_DIR
         target_data_dir = payload.get('target_data_dir') or os.path.join(target_repo_dir, 'public', 'data')
         publish_repo = bool(payload.get('publish_repo', False))
 
-        sync_info = _sync_static_snapshot_to_screenshot_app(target_data_dir)
-        publish_info = None
-        if publish_repo:
-            publish_info = _publish_screenshot_repo(sync_info['target_repo_dir'])
+        # Dispara thread em background
+        threading.Thread(
+            target=_bg_export_thread,
+            args=(target_data_dir, publish_repo),
+            daemon=True
+        ).start()
 
         return jsonify({
             'ok': True,
-            'message': (
-                'Snapshot exportado, sincronizado e publicado no repositório screenshot.'
-                if publish_repo else
-                'Snapshot exportado e sincronizado com a aplicação screenshot.'
-            ),
-            **sync_info,
-            'publish_info': publish_info,
+            'status': 'processing',
+            'message': 'Exportação iniciada em segundo plano. Os arquivos serão gerados e sincronizados.'
         })
-    except FileNotFoundError as exc:
-        return jsonify({'ok': False, 'error': str(exc)}), 404
-    except subprocess.TimeoutExpired:
-        return jsonify({'ok': False, 'error': 'Timeout ao exportar snapshot estático.'}), 504
-    except Exception as exc:
-        return jsonify({'ok': False, 'error': str(exc)}), 500
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)}), 500
+
+
+@app.route('/api/export_static_snapshot/status', methods=['GET'])
+def export_static_snapshot_status():
+    global _SNAPSHOT_EXPORT_STATUS
+    return jsonify({
+        'ok': True,
+        'status': _SNAPSHOT_EXPORT_STATUS['status'],
+        'error': _SNAPSHOT_EXPORT_STATUS['error'],
+        'last_run': _SNAPSHOT_EXPORT_STATUS['last_run'],
+        'copied_count': _SNAPSHOT_EXPORT_STATUS['copied_count']
+    })
 
 @app.route('/api/geocode')
 def geocode_search():
@@ -2582,27 +2630,34 @@ def explain_node(node_id):
             nearby = peers[:3]
         except: nearby = []
 
+        global _EXOGENOUS_EVENTS_CACHE
         events = []
         events_path = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
         last_date_base = orchestrator.dates[-1] if (orchestrator and hasattr(orchestrator, 'dates')) else None
         try:
-            if os.path.exists(events_path):
-                with open(events_path, 'r', encoding='utf-8') as ef:
-                    evts = json.load(ef)
-                    for e in evts:
-                        e_date_str = e.get('date') or e.get('event_date')
-                        if not verify_date_consistency(e_date_str, last_date_base): continue
+            if _EXOGENOUS_EVENTS_CACHE is None:
+                if os.path.exists(events_path):
+                    with open(events_path, 'r', encoding='utf-8') as ef:
+                        _EXOGENOUS_EVENTS_CACHE = json.load(ef) or []
+                else:
+                    _EXOGENOUS_EVENTS_CACHE = []
+            
+            for e in _EXOGENOUS_EVENTS_CACHE:
+                e_date_str = e.get('date') or e.get('event_date')
+                if not verify_date_consistency(e_date_str, last_date_base): continue
 
-                        # Match robusto por bairro ou município
-                        evt_bairro = normalize_name(str(e.get('bairro', '')))
-                        evt_mun = normalize_name(str(e.get('municipio', '')))
-                        evt_title = normalize_name(str(e.get('title', '')))
-                        evt_loc = normalize_name(str(e.get('location', '')))
+                # Match robusto por bairro ou município
+                evt_bairro = normalize_name(str(e.get('bairro', '')))
+                evt_mun = normalize_name(str(e.get('municipio', '')))
+                evt_title = normalize_name(str(e.get('title', '')))
+                evt_loc = normalize_name(str(e.get('location', '')))
 
-                        if (name_norm and (name_norm == evt_bairro or name_norm in evt_title or name_norm in evt_loc)) or \
-                           (not evt_bairro and evt_mun and (evt_mun == name_norm or name_norm in evt_mun)):
-                            events.append(e)
-        except: events = []
+                if (name_norm and (name_norm == evt_bairro or name_norm in evt_title or name_norm in evt_loc)) or \
+                   (not evt_bairro and evt_mun and (evt_mun == name_norm or name_norm in evt_mun)):
+                    events.append(e)
+        except Exception as e_evt:
+            logging.warning(f"Erro ao filtrar eventos exógenos: {e_evt}")
+            events = []
 
         region_type = str(row.get('region_type') or row.get('regiao') or '').lower()
         faction = str(row.get('faction') or 'NEUTRO').upper()
@@ -2634,27 +2689,35 @@ def explain_node(node_id):
             if event_type and event_type not in event_types:
                 event_types.append(event_type)
 
+        global _RUAS_CRITICAS_FORTALEZA_CACHE, _STREETS_BY_MUNICIPIO_CACHE
         critical_streets = 'Sem logradouros críticos recentes'
         critical_streets_count = 0
         try:
             if region_type == 'fortaleza':
-                streets_path = os.path.join(BASE_DIR, 'data', 'raw', 'ruas_criticas_por_bairro.json')
-                if os.path.exists(streets_path):
-                    with open(streets_path, 'r', encoding='utf-8') as sf:
-                        streets_cache = json.load(sf) or {}
-                    normalized_cache = {normalize_name(k): v for k, v in streets_cache.items() if k}
-                    critical_streets = normalized_cache.get(name_norm)
-                    if critical_streets is None:
-                        for cache_key, cache_value in normalized_cache.items():
-                            if name_norm in cache_key or cache_key in name_norm:
-                                critical_streets = cache_value
-                                break
+                if _RUAS_CRITICAS_FORTALEZA_CACHE is None:
+                    streets_path = os.path.join(BASE_DIR, 'data', 'raw', 'ruas_criticas_por_bairro.json')
+                    if os.path.exists(streets_path):
+                        with open(streets_path, 'r', encoding='utf-8') as sf:
+                            streets_cache = json.load(sf) or {}
+                        _RUAS_CRITICAS_FORTALEZA_CACHE = {normalize_name(k): v for k, v in streets_cache.items() if k}
+                    else:
+                        _RUAS_CRITICAS_FORTALEZA_CACHE = {}
+                
+                critical_streets = _RUAS_CRITICAS_FORTALEZA_CACHE.get(name_norm)
+                if critical_streets is None:
+                    for cache_key, cache_value in _RUAS_CRITICAS_FORTALEZA_CACHE.items():
+                        if name_norm in cache_key or cache_key in name_norm:
+                            critical_streets = cache_value
+                            break
             else:
-                streets_path = os.path.join(BASE_DIR, 'data', 'streets_by_municipio.json')
-                if os.path.exists(streets_path):
-                    with open(streets_path, 'r', encoding='utf-8') as sf:
-                        streets_by_city = json.load(sf) or {}
-                    critical_streets = streets_by_city.get(name_norm)
+                if _STREETS_BY_MUNICIPIO_CACHE is None:
+                    streets_path = os.path.join(BASE_DIR, 'data', 'streets_by_municipio.json')
+                    if os.path.exists(streets_path):
+                        with open(streets_path, 'r', encoding='utf-8') as sf:
+                            _STREETS_BY_MUNICIPIO_CACHE = json.load(sf) or {}
+                    else:
+                        _STREETS_BY_MUNICIPIO_CACHE = {}
+                critical_streets = _STREETS_BY_MUNICIPIO_CACHE.get(name_norm)
         except Exception as e:
             logging.warning(f"Erro ao carregar ruas críticas para explicação de {name}: {e}")
             critical_streets = 'Sem logradouros críticos recentes'
@@ -3198,4 +3261,4 @@ if __name__ == "__main__":
     print("ACESSE: http://localhost:5050")
     print("="*50 + "\n")
     # Usando 0.0.0.0 para maior compatibilidade, mas o link impresso é localhost
-    app.run(host='0.0.0.0', port=5050, debug=True, use_reloader=True)
+    app.run(host='0.0.0.0', port=5050, debug=True, use_reloader=False)

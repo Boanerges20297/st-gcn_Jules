@@ -125,6 +125,22 @@
 
 ---
 
+### 8. **HERMES_REPORT_PREVIEW_TRANSFORMATION.md**
+   **Hermes Operational Transformation in Report Preview**
+
+   Contains:
+   - como o Hermes foi acoplado ao pipeline do Report Preview
+   - artefatos oficiais em `outputs/hermes/`
+   - uso do Gemini CLI com memoria Hermes
+   - gateway proprio de Telegram com autenticacao SQLite
+   - contrato de fallback tatico 14d
+   - obrigacao de resposta como previsao operacional para 7 dias
+
+   **Time to read**: 8-12 minutes
+   **For**: Maintainers, operators, analysts, AI/tooling integrators
+
+---
+
 ## 🎯 Navigation by Role
 
 ### 👨‍💼 Project Manager
@@ -190,6 +206,7 @@ Documentation Depth:
 |-------------|----------|
 | **Get started quickly** | [QUICK_START.md](QUICK_START.md) |
 | **Understand everything** | [README.md](README.md) |
+| **Understand the Hermes transformation** | [HERMES_REPORT_PREVIEW_TRANSFORMATION.md](HERMES_REPORT_PREVIEW_TRANSFORMATION.md) |
 | **Learn architecture** | [TECHNICAL_SUMMARY.md](TECHNICAL_SUMMARY.md) |
 | **Navigate codebase** | [STRUCTURE.md](STRUCTURE.md) |
 | **Find specific info** | [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md) |

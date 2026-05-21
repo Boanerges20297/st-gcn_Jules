@@ -25,7 +25,7 @@
           "RUA PIO NORÕES"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -59,7 +59,7 @@
           "RUA JOAQUIM DE FIGUEIREDO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -77,7 +77,7 @@
         "name": "Mutirão ll ou Frei Damião",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
+        "faction": "PCC",
         "risk_score": 68.454,
         "score": 68.454,
         "region": "interior",
@@ -93,7 +93,7 @@
           "RUA ESTUDANTE JOSÉ DOS SANTOS LOPES"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -112,22 +112,22 @@
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
         "faction": "CV",
-        "risk_score": 68.234,
-        "score": 68.234,
+        "risk_score": 68.442,
+        "score": 68.442,
         "region": "interior",
         "parent_area": "JUAZEIRO DO NORTE",
         "parent_risk_score": 78.0,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
-        "local_street_pressure": 7.775,
-        "nearby_streets_count": 24,
+        "local_street_pressure": 7.959,
+        "nearby_streets_count": 25,
         "nearby_streets": [
           "ROMEIRÃO",
           "AVENIDA PRESIDENTE CASTELO BRANCO",
           "RUA JOAQUIM DA ROCHA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -146,22 +146,22 @@
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
         "faction": "CV",
-        "risk_score": 67.615,
-        "score": 67.615,
+        "risk_score": 67.818,
+        "score": 67.818,
         "region": "interior",
         "parent_area": "JUAZEIRO DO NORTE",
         "parent_risk_score": 78.0,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
-        "local_street_pressure": 7.243,
-        "nearby_streets_count": 22,
+        "local_street_pressure": 7.424,
+        "nearby_streets_count": 23,
         "nearby_streets": [
           "FAIXA DE GAZA",
           "RUA JOSÉ MARROCOS",
           "RUA FISCAL JOSÉ SOARES"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -195,7 +195,7 @@
           "RUA CECÍLIA MEIRELES"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -210,6 +210,40 @@
       "properties": {
         "node_id": 7,
         "rank": 7,
+        "name": "Franciscano",
+        "bairro": "JUAZEIRO DO NORTE",
+        "municipality": "JUAZEIRO DO NORTE",
+        "faction": "CV",
+        "risk_score": 66.112,
+        "score": 66.112,
+        "region": "interior",
+        "parent_area": "JUAZEIRO DO NORTE",
+        "parent_risk_score": 78.0,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 5.907,
+        "nearby_streets_count": 20,
+        "nearby_streets": [
+          "FRANCISCANO",
+          "RUA DO SEMINÁRIO",
+          "PIO 12"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-20T21:59:42.429634"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.31343644444445,
+          -7.213875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 8,
+        "rank": 8,
         "name": "Santo Antônio- Juazeiro do Norte",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
@@ -229,47 +263,13 @@
           "RUA MONSENHOR LIMA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -39.32932818181819,
           -7.215488045454546
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 8,
-        "rank": 8,
-        "name": "Franciscano",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 65.862,
-        "score": 65.862,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 78.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 5.684,
-        "nearby_streets_count": 19,
-        "nearby_streets": [
-          "FRANCISCANO",
-          "RUA DO SEMINÁRIO",
-          "RUA LEÃO XIII"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.31343644444445,
-          -7.213875
         ]
       }
     },
@@ -297,7 +297,7 @@
           "RUA ANA MARIA DUARTE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -312,40 +312,6 @@
       "properties": {
         "node_id": 10,
         "rank": 10,
-        "name": "Pio 12",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "PCC",
-        "risk_score": 65.14,
-        "score": 65.14,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 78.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 5.017,
-        "nearby_streets_count": 14,
-        "nearby_streets": [
-          "PIO 12",
-          "RUA SETE DE SETEMBRO",
-          "AREA SEM NOME"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.30689006666667,
-          -7.210879066666668
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 11,
-        "rank": 11,
         "name": "Salesianos",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
@@ -365,7 +331,7 @@
           "RUA FISCAL JOSÉ SOARES"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -378,8 +344,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 12,
-        "rank": 12,
+        "node_id": 11,
+        "rank": 11,
         "name": "Catuana",
         "bairro": "CAUCAIA",
         "municipality": "CAUCAIA",
@@ -399,7 +365,7 @@
           "RUA J"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -412,8 +378,76 @@
     {
       "type": "Feature",
       "properties": {
+        "node_id": 12,
+        "rank": 12,
+        "name": "Pio 12",
+        "bairro": "JUAZEIRO DO NORTE",
+        "municipality": "JUAZEIRO DO NORTE",
+        "faction": "CV",
+        "risk_score": 64.902,
+        "score": 64.902,
+        "region": "interior",
+        "parent_area": "JUAZEIRO DO NORTE",
+        "parent_risk_score": 78.0,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 4.794,
+        "nearby_streets_count": 15,
+        "nearby_streets": [
+          "PIO 12",
+          "RUA SETE DE SETEMBRO",
+          "AREA SEM NOME"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-20T21:59:42.429634"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.306744153333334,
+          -7.211463766666668
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "node_id": 13,
         "rank": 13,
+        "name": "Timbaúba",
+        "bairro": "JUAZEIRO DO NORTE",
+        "municipality": "JUAZEIRO DO NORTE",
+        "faction": "PCC",
+        "risk_score": 64.546,
+        "score": 64.546,
+        "region": "interior",
+        "parent_area": "JUAZEIRO DO NORTE",
+        "parent_risk_score": 78.0,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 4.498,
+        "nearby_streets_count": 13,
+        "nearby_streets": [
+          "TIMBAÚBA",
+          "RUA ASSIS DIAS SOBREIRA",
+          "AREA SEM NOME"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-20T21:59:42.429634"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.301542184210525,
+          -7.2154447631578975
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 14,
+        "rank": 14,
         "name": "Caucaia",
         "bairro": "CAUCAIA",
         "municipality": "CAUCAIA",
@@ -433,7 +467,7 @@
           "POÇO IMPERIAL"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -446,12 +480,12 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 14,
-        "rank": 14,
+        "node_id": 15,
+        "rank": 15,
         "name": "Mutirão",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
+        "faction": "PCC",
         "risk_score": 64.279,
         "score": 64.279,
         "region": "interior",
@@ -467,7 +501,7 @@
           "RUA JOSÉ ROMEIRO FEIJOEIRO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -480,42 +514,42 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 15,
-        "rank": 15,
-        "name": "Timbaúba",
+        "node_id": 16,
+        "rank": 16,
+        "name": "Alto",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
         "faction": "CV",
-        "risk_score": 64.065,
-        "score": 64.065,
+        "risk_score": 64.161,
+        "score": 64.161,
         "region": "interior",
         "parent_area": "JUAZEIRO DO NORTE",
         "parent_risk_score": 78.0,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
-        "local_street_pressure": 4.071,
-        "nearby_streets_count": 11,
+        "local_street_pressure": 4.167,
+        "nearby_streets_count": 14,
         "nearby_streets": [
-          "TIMBAÚBA",
-          "RUA ASSIS DIAS SOBREIRA",
-          "AREA SEM NOME"
+          "ALTO",
+          "RUA DO SEMINÁRIO",
+          "RUA SETE DE SETEMBRO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -39.30158315,
-          -7.215591400000003
+          -39.312726875,
+          -7.205163812500001
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 16,
-        "rank": 16,
+        "node_id": 17,
+        "rank": 17,
         "name": "Baixa da Raposa",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
@@ -535,7 +569,7 @@
           "RUA RENAN CARVALHO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -548,8 +582,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 17,
-        "rank": 17,
+        "node_id": 18,
+        "rank": 18,
         "name": "Distrito de Matuões",
         "bairro": "CAUCAIA",
         "municipality": "CAUCAIA",
@@ -569,47 +603,13 @@
           "DISTRITO DE MATUÕES"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -38.82523231428571,
           -3.588355628571428
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 18,
-        "rank": 18,
-        "name": "Alto",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 63.986,
-        "score": 63.986,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 78.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 4.011,
-        "nearby_streets_count": 13,
-        "nearby_streets": [
-          "ALTO",
-          "RUA DO SEMINÁRIO",
-          "RUA SETE DE SETEMBRO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.312726875,
-          -7.205163812500001
         ]
       }
     },
@@ -637,7 +637,7 @@
           "RUA MANOEL LOURENÇO DE VASCONCELOS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -671,7 +671,7 @@
           "AVENIDA CICERO GONÇALVES"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -705,7 +705,7 @@
           "RUA 05 ERNANDO RIBEIRO DA CRUZ"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -739,7 +739,7 @@
           "RUA 13 DE JUNHO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -754,18 +754,52 @@
       "properties": {
         "node_id": 23,
         "rank": 23,
-        "name": "Bairro Limoeiro",
+        "name": "VILA FATIMA",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 62.829,
-        "score": 62.829,
+        "faction": "PCC",
+        "risk_score": 62.973,
+        "score": 62.973,
         "region": "interior",
         "parent_area": "JUAZEIRO DO NORTE",
         "parent_risk_score": 78.0,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
-        "local_street_pressure": 2.979,
+        "local_street_pressure": 3.086,
+        "nearby_streets_count": 10,
+        "nearby_streets": [
+          "VILA FATIMA",
+          "AREA SEM NOME",
+          "RUA ASSIS DIAS SOBREIRA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-20T21:59:42.429634"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.29991402222222,
+          -7.207199266666667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 24,
+        "rank": 24,
+        "name": "Bairro Limoeiro",
+        "bairro": "JUAZEIRO DO NORTE",
+        "municipality": "JUAZEIRO DO NORTE",
+        "faction": "CV",
+        "risk_score": 62.85,
+        "score": 62.85,
+        "region": "interior",
+        "parent_area": "JUAZEIRO DO NORTE",
+        "parent_risk_score": 78.0,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 2.998,
         "nearby_streets_count": 10,
         "nearby_streets": [
           "BAIRRO LIMOEIRO",
@@ -773,7 +807,7 @@
           "RUA ASSIS DIAS SOBREIRA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -786,8 +820,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 24,
-        "rank": 24,
+        "node_id": 25,
+        "rank": 25,
         "name": "Socorro",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
@@ -807,7 +841,7 @@
           "AVENIDA PADRE CÍCERO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -820,8 +854,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 25,
-        "rank": 25,
+        "node_id": 26,
+        "rank": 26,
         "name": "Cruzeiro",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -841,7 +875,7 @@
           "RUA DOCTOR EDIVALDO COELHO MOITA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -854,8 +888,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 26,
-        "rank": 26,
+        "node_id": 27,
+        "rank": 27,
         "name": "ÁREA DE INFLUÊNCIA DO PCC",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
@@ -875,7 +909,7 @@
           "RUA SÃO PAULO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -888,8 +922,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 27,
-        "rank": 27,
+        "node_id": 28,
+        "rank": 28,
         "name": "Campo do Laurao",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -909,7 +943,7 @@
           "BAIRRO DO GINASIO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -922,8 +956,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 28,
-        "rank": 28,
+        "node_id": 29,
+        "rank": 29,
         "name": "Campo Alegre",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
@@ -943,7 +977,7 @@
           "RUA FRANCISCO MEDEIROS DA SILVA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -956,8 +990,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 29,
-        "rank": 29,
+        "node_id": 30,
+        "rank": 30,
         "name": "SÃO JOSÉ X COM JN",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
@@ -977,7 +1011,7 @@
           "RUA MARIA AMÉLIA ESMERALDO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -990,8 +1024,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 30,
-        "rank": 30,
+        "node_id": 31,
+        "rank": 31,
         "name": "Residencial São Sebastião",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
@@ -1011,7 +1045,7 @@
           "RESIDENCIAL NOSSA SENHORA DAS DORES - JUAZEIRO DO NORTE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -1024,8 +1058,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 31,
-        "rank": 31,
+        "node_id": 32,
+        "rank": 32,
         "name": "Lagoa Seca- Juazeiro do Norte",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
@@ -1045,7 +1079,7 @@
           "RUA JÚLIA JORGE COUTO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -1058,8 +1092,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 32,
-        "rank": 32,
+        "node_id": 33,
+        "rank": 33,
         "name": "Bairro da Malvinas - Barbalha",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "Barbalha",
@@ -1079,7 +1113,7 @@
           "RUA P-18"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -1092,8 +1126,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 33,
-        "rank": 33,
+        "node_id": 34,
+        "rank": 34,
         "name": "Bulandeira - Barbalha",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "Barbalha",
@@ -1113,7 +1147,7 @@
           "RUA PROJETADA | M"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -1126,8 +1160,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 34,
-        "rank": 34,
+        "node_id": 35,
+        "rank": 35,
         "name": "Praça",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -1147,7 +1181,7 @@
           "RUA ODILON ÁGUIAR"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -1160,8 +1194,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 35,
-        "rank": 35,
+        "node_id": 36,
+        "rank": 36,
         "name": "Bairro José Geraldo da Cruz",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
@@ -1181,7 +1215,7 @@
           "JOÃO CABRAL"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -1194,8 +1228,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 36,
-        "rank": 36,
+        "node_id": 37,
+        "rank": 37,
         "name": "Bertolândia",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
@@ -1215,7 +1249,7 @@
           "RESIDENCIAL SÃO SEBASTIÃO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.429634"
       },
       "geometry": {
         "type": "Point",
@@ -1228,8 +1262,42 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 37,
-        "rank": 37,
+        "node_id": 38,
+        "rank": 38,
+        "name": "Condomínios Tenente Coelho",
+        "bairro": "JUAZEIRO DO NORTE",
+        "municipality": "JUAZEIRO DO NORTE",
+        "faction": "PCC",
+        "risk_score": 61.283,
+        "score": 61.283,
+        "region": "interior",
+        "parent_area": "JUAZEIRO DO NORTE",
+        "parent_risk_score": 78.0,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 1.615,
+        "nearby_streets_count": 5,
+        "nearby_streets": [
+          "CONDOMÍNIOS TENENTE COELHO",
+          "PEDRINHAS",
+          "VILA FATIMA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-20T21:59:42.429634"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.2853975875,
+          -7.2109234375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 39,
+        "rank": 39,
         "name": "Residencial Nossa Senhora das Dores - Juazeiro do norte",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
@@ -1249,7 +1317,7 @@
           "RESIDENCIAL SÃO SEBASTIÃO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1262,8 +1330,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 38,
-        "rank": 38,
+        "node_id": 40,
+        "rank": 40,
         "name": "Sítio Estrela - Barbalha",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "Barbalha",
@@ -1282,7 +1350,7 @@
           "PRAÇA MARIA FELICIO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1295,46 +1363,12 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 39,
-        "rank": 39,
-        "name": "Condomínios Tenente Coelho",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "PCC",
-        "risk_score": 61.079,
-        "score": 61.079,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 78.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 1.434,
-        "nearby_streets_count": 4,
-        "nearby_streets": [
-          "CONDOMÍNIOS TENENTE COELHO",
-          "PEDRINHAS",
-          "RUA JOAQUIM LEANDRO DE SOUZA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.2853975875,
-          -7.2109234375
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 40,
-        "rank": 40,
+        "node_id": 41,
+        "rank": 41,
         "name": "Pedrinhas",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
+        "faction": "PCC",
         "risk_score": 61.033,
         "score": 61.033,
         "region": "interior",
@@ -1350,7 +1384,7 @@
           "RUA JOAQUIM LEANDRO DE SOUZA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1363,12 +1397,12 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 41,
-        "rank": 41,
+        "node_id": 42,
+        "rank": 42,
         "name": "Vila Nova",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
+        "faction": "PCC",
         "risk_score": 60.952,
         "score": 60.952,
         "region": "interior",
@@ -1384,7 +1418,7 @@
           "RUA JOAQUIM LEANDRO DE SOUZA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1397,8 +1431,41 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 42,
-        "rank": 42,
+        "node_id": 43,
+        "rank": 43,
+        "name": "VILA 3 MARIAS",
+        "bairro": "JUAZEIRO DO NORTE",
+        "municipality": "JUAZEIRO DO NORTE",
+        "faction": "CV",
+        "risk_score": 60.927,
+        "score": 60.927,
+        "region": "interior",
+        "parent_area": "JUAZEIRO DO NORTE",
+        "parent_risk_score": 78.0,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 1.288,
+        "nearby_streets_count": 2,
+        "nearby_streets": [
+          "VILA 3 MARIAS",
+          "CONDOMINIO LEANDRO BEZERRA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-20T21:59:42.430512"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.310322449999994,
+          -7.176342278571428
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 44,
+        "rank": 44,
         "name": "Bairro do Ginasio",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -1418,7 +1485,7 @@
           "RUA DOZE DE AGOSTO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1431,8 +1498,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 43,
-        "rank": 43,
+        "node_id": 45,
+        "rank": 45,
         "name": "Lagoa - Barbalha",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "Barbalha",
@@ -1450,7 +1517,7 @@
           "LAGOA - BARBALHA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1463,8 +1530,41 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 44,
-        "rank": 44,
+        "node_id": 46,
+        "rank": 46,
+        "name": "CONDOMINIO LEANDRO BEZERRA",
+        "bairro": "JUAZEIRO DO NORTE",
+        "municipality": "JUAZEIRO DO NORTE",
+        "faction": "CV",
+        "risk_score": 60.821,
+        "score": 60.821,
+        "region": "interior",
+        "parent_area": "JUAZEIRO DO NORTE",
+        "parent_risk_score": 78.0,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 1.196,
+        "nearby_streets_count": 2,
+        "nearby_streets": [
+          "CONDOMINIO LEANDRO BEZERRA",
+          "VILA 3 MARIAS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-20T21:59:42.430512"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.30089946,
+          -7.171924680000001
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 47,
+        "rank": 47,
         "name": "MATA DOS LIMAS",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
@@ -1482,7 +1582,7 @@
           "MATA DOS LIMAS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1495,8 +1595,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 45,
-        "rank": 45,
+        "node_id": 48,
+        "rank": 48,
         "name": "Bela vista - Crato",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "Crato",
@@ -1514,7 +1614,7 @@
           "BELA VISTA - CRATO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1527,8 +1627,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 46,
-        "rank": 46,
+        "node_id": 49,
+        "rank": 49,
         "name": "Por do Sol",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -1548,7 +1648,7 @@
           "RUA MESSÍAS ÁGUIAR"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1561,8 +1661,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 47,
-        "rank": 47,
+        "node_id": 50,
+        "rank": 50,
         "name": "Horto- Juazeiro do Norte",
         "bairro": "JUAZEIRO DO NORTE",
         "municipality": "JUAZEIRO DO NORTE",
@@ -1580,7 +1680,7 @@
           "HORTO- JUAZEIRO DO NORTE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1593,8 +1693,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 48,
-        "rank": 48,
+        "node_id": 51,
+        "rank": 51,
         "name": "Comunidade da Peroba",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -1614,7 +1714,7 @@
           "RUA JOAQUINA TELES DE MENESES"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1627,8 +1727,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 49,
-        "rank": 49,
+        "node_id": 52,
+        "rank": 52,
         "name": "Ceasa",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -1648,7 +1748,7 @@
           "RUA MANOEL LOURENÇO DE VASCONCELOS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1661,8 +1761,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 50,
-        "rank": 50,
+        "node_id": 53,
+        "rank": 53,
         "name": "Bairro do Estádio",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -1682,7 +1782,7 @@
           "RUA PRINCIPAL"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1695,8 +1795,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 51,
-        "rank": 51,
+        "node_id": 54,
+        "rank": 54,
         "name": "Rua do Arame",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -1716,7 +1816,7 @@
           "RUA PRINCIPAL"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1729,8 +1829,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 52,
-        "rank": 52,
+        "node_id": 55,
+        "rank": 55,
         "name": "Rua das Palmeiras",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -1750,7 +1850,7 @@
           "VILA PASCOAL"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1763,8 +1863,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 53,
-        "rank": 53,
+        "node_id": 56,
+        "rank": 56,
         "name": "Alto do Bode",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -1784,7 +1884,7 @@
           "TABAJARA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1797,8 +1897,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 54,
-        "rank": 54,
+        "node_id": 57,
+        "rank": 57,
         "name": "Dom Expedito",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -1818,7 +1918,7 @@
           "RUA SANTO ANTÔNIO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1831,8 +1931,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 55,
-        "rank": 55,
+        "node_id": 58,
+        "rank": 58,
         "name": "Governador Ferraz",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -1852,7 +1952,7 @@
           "AVENIDA ENF. JOSÉ EVANGELISTA DE VASCONCELOS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1865,8 +1965,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 56,
-        "rank": 56,
+        "node_id": 59,
+        "rank": 59,
         "name": "Tabajara",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -1886,7 +1986,7 @@
           "ALTO DO BODE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1899,8 +1999,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 57,
-        "rank": 57,
+        "node_id": 60,
+        "rank": 60,
         "name": "Tianguazinho",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -1920,7 +2020,7 @@
           "AVENIDA NEZITO TEXEIRA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1933,8 +2033,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 58,
-        "rank": 58,
+        "node_id": 61,
+        "rank": 61,
         "name": "Pedra Fina",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -1954,7 +2054,7 @@
           "BAIRRO DO ESTÁDIO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -1967,8 +2067,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 59,
-        "rank": 59,
+        "node_id": 62,
+        "rank": 62,
         "name": "Bairro Rodoviária",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -1988,7 +2088,7 @@
           "RUA FRANCISCO GENTIL DE FARIAS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2001,8 +2101,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 60,
-        "rank": 60,
+        "node_id": 63,
+        "rank": 63,
         "name": "Cariré",
         "bairro": "CARIRE",
         "municipality": "CARIRE",
@@ -2022,7 +2122,7 @@
           "RUA SANTO ANTÔNIO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2035,8 +2135,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 61,
-        "rank": 61,
+        "node_id": 64,
+        "rank": 64,
         "name": "Terra Prometida",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -2056,7 +2156,7 @@
           "RUA DO ARAME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2069,8 +2169,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 62,
-        "rank": 62,
+        "node_id": 65,
+        "rank": 65,
         "name": "Vila Pascoal",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -2090,7 +2190,7 @@
           "SÃO VICENTE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2103,8 +2203,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 63,
-        "rank": 63,
+        "node_id": 66,
+        "rank": 66,
         "name": "São Vicente",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -2124,7 +2224,7 @@
           "RUA DAS PALMEIRAS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2137,8 +2237,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 64,
-        "rank": 64,
+        "node_id": 67,
+        "rank": 67,
         "name": "Alto do Bernardo",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
@@ -2158,7 +2258,7 @@
           "RUA JESUINO P. DE MESQUITA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2171,8 +2271,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 65,
-        "rank": 65,
+        "node_id": 68,
+        "rank": 68,
         "name": "Jaibaras",
         "bairro": "CARIRE",
         "municipality": "CARIRE",
@@ -2192,7 +2292,7 @@
           "ESTRADA DO SETOR"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2205,8 +2305,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 66,
-        "rank": 66,
+        "node_id": 69,
+        "rank": 69,
         "name": "Flecheiras",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -2226,7 +2326,7 @@
           "RUA FRANCISCO AILTON SILVA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2239,8 +2339,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 67,
-        "rank": 67,
+        "node_id": 70,
+        "rank": 70,
         "name": "São José Do Torto",
         "bairro": "CARIRE",
         "municipality": "CARIRE",
@@ -2259,7 +2359,7 @@
           "RUA RAIMUNDO RIBEIRO DA SILVA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2272,8 +2372,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 68,
-        "rank": 68,
+        "node_id": 71,
+        "rank": 71,
         "name": "Dom Timóteo",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -2293,7 +2393,7 @@
           "RUA FRANCISCA ALBUQUERQUE ALVES"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2306,8 +2406,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 69,
-        "rank": 69,
+        "node_id": 72,
+        "rank": 72,
         "name": "JAIBARAS CV",
         "bairro": "CARIRE",
         "municipality": "CARIRE",
@@ -2327,7 +2427,7 @@
           "ESTRADA JAÍBARAS SOBRAL"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2340,8 +2440,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 70,
-        "rank": 70,
+        "node_id": 73,
+        "rank": 73,
         "name": "Carnaúba - Itapajé",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
@@ -2361,7 +2461,7 @@
           "RUA OTÁVIO PINTO DE MESQUITA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2374,8 +2474,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 71,
-        "rank": 71,
+        "node_id": 74,
+        "rank": 74,
         "name": "Comunidade São Francisco - Itapajé",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
@@ -2395,7 +2495,7 @@
           "TRAVESSA ASSIS BASTOS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2408,8 +2508,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 72,
-        "rank": 72,
+        "node_id": 75,
+        "rank": 75,
         "name": "Bairro do Aeroporto",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -2429,7 +2529,7 @@
           "DOM EXPEDITO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2442,8 +2542,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 73,
-        "rank": 73,
+        "node_id": 76,
+        "rank": 76,
         "name": "Padre Lima",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
@@ -2463,7 +2563,7 @@
           "RUA TEREZA MAGALHÃES"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2476,8 +2576,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 74,
-        "rank": 74,
+        "node_id": 77,
+        "rank": 77,
         "name": "Bela Vista- Itapajé",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
@@ -2497,7 +2597,7 @@
           "RUA OLÁVO CAVALCANTE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2510,8 +2610,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 75,
-        "rank": 75,
+        "node_id": 78,
+        "rank": 78,
         "name": "Bairro Subestação",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -2531,7 +2631,7 @@
           "AP DE CATATAU"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2544,8 +2644,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 76,
-        "rank": 76,
+        "node_id": 79,
+        "rank": 79,
         "name": "BARROSO",
         "bairro": "BARROSO",
         "municipality": "BARROSO",
@@ -2561,7 +2661,7 @@
         "nearby_streets_count": 0,
         "nearby_streets": [],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2574,8 +2674,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 77,
-        "rank": 77,
+        "node_id": 80,
+        "rank": 80,
         "name": "Sítios Cacimbas",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -2595,7 +2695,7 @@
           "BAIRRO SUBESTAÇÃO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2608,8 +2708,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 78,
-        "rank": 78,
+        "node_id": 81,
+        "rank": 81,
         "name": "Rua da Paz",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -2629,7 +2729,7 @@
           "RUA TRINTA E UM DE MAIO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2642,8 +2742,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 79,
-        "rank": 79,
+        "node_id": 82,
+        "rank": 82,
         "name": "AP De Catatau",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -2663,7 +2763,7 @@
           "BAIRRO SUBESTAÇÃO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2676,8 +2776,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 80,
-        "rank": 80,
+        "node_id": 83,
+        "rank": 83,
         "name": "Bairro do Cruzeiro",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
@@ -2697,7 +2797,7 @@
           "COMUNIDADE SÃO FRANCISCO - ITAPAJÉ"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2710,8 +2810,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 81,
-        "rank": 81,
+        "node_id": 84,
+        "rank": 84,
         "name": "Comunidade do Catatau",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -2731,7 +2831,7 @@
           "SÍTIOS CACIMBAS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2744,8 +2844,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 82,
-        "rank": 82,
+        "node_id": 85,
+        "rank": 85,
         "name": "VÁRZEA ALEGRE - RUSSAS - PCC",
         "bairro": "QUIXERE",
         "municipality": "PCC",
@@ -2765,7 +2865,7 @@
           "RUA VASCO DA GAMA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2778,8 +2878,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 83,
-        "rank": 83,
+        "node_id": 86,
+        "rank": 86,
         "name": "Pau Ferrado",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
@@ -2799,7 +2899,7 @@
           "RUA PEDRO FIRMO DE MESQUITA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2812,8 +2912,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 84,
-        "rank": 84,
+        "node_id": 87,
+        "rank": 87,
         "name": "Corrego",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -2833,7 +2933,7 @@
           "RUA DA PAZ"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2846,8 +2946,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 85,
-        "rank": 85,
+        "node_id": 88,
+        "rank": 88,
         "name": "Zezinho da costa - Várzea alegre",
         "bairro": "VÁRZEA ALEGRE",
         "municipality": "VARZEA ALEGRE",
@@ -2867,7 +2967,7 @@
           "VILA CACILDA - VÁRZEA ALEGRE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2880,8 +2980,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 86,
-        "rank": 86,
+        "node_id": 89,
+        "rank": 89,
         "name": "Santo Antonio -  Varzea alegre",
         "bairro": "VÁRZEA ALEGRE",
         "municipality": "VARZEA ALEGRE",
@@ -2901,7 +3001,7 @@
           "AREA SEM NOME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2914,8 +3014,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 87,
-        "rank": 87,
+        "node_id": 90,
+        "rank": 90,
         "name": "Piçarra",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
@@ -2935,7 +3035,7 @@
           "BAIRRO DO CRUZEIRO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2948,8 +3048,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 88,
-        "rank": 88,
+        "node_id": 91,
+        "rank": 91,
         "name": "Patos - Várzea alegre",
         "bairro": "VÁRZEA ALEGRE",
         "municipality": "VARZEA ALEGRE",
@@ -2969,7 +3069,7 @@
           "VILA CACILDA - VÁRZEA ALEGRE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -2982,8 +3082,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 89,
-        "rank": 89,
+        "node_id": 92,
+        "rank": 92,
         "name": "Vila Cacilda - Várzea alegre",
         "bairro": "VÁRZEA ALEGRE",
         "municipality": "VARZEA ALEGRE",
@@ -3003,7 +3103,7 @@
           "PATOS - VÁRZEA ALEGRE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3016,8 +3116,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 90,
-        "rank": 90,
+        "node_id": 93,
+        "rank": 93,
         "name": "Varjota - Várzea alegre",
         "bairro": "VÁRZEA ALEGRE",
         "municipality": "VARZEA ALEGRE",
@@ -3037,7 +3137,7 @@
           "ZEZINHO DA COSTA - VÁRZEA ALEGRE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3050,8 +3150,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 91,
-        "rank": 91,
+        "node_id": 94,
+        "rank": 94,
         "name": "Riachinho - Várzea alegre",
         "bairro": "VÁRZEA ALEGRE",
         "municipality": "VARZEA ALEGRE",
@@ -3071,7 +3171,7 @@
           "RUA POETA PERGENTINO BRITO DE LIMA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3084,8 +3184,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 92,
-        "rank": 92,
+        "node_id": 95,
+        "rank": 95,
         "name": "Várzea",
         "bairro": "MORADA NOVA",
         "municipality": "VARZEA ALEGRE",
@@ -3105,7 +3205,7 @@
           "RUA RAIMUNDO BELMIRO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3118,8 +3218,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 93,
-        "rank": 93,
+        "node_id": 96,
+        "rank": 96,
         "name": "Juremal - Varzea alegre",
         "bairro": "VÁRZEA ALEGRE",
         "municipality": "VARZEA ALEGRE",
@@ -3139,7 +3239,7 @@
           "AREA SEM NOME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3152,8 +3252,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 94,
-        "rank": 94,
+        "node_id": 97,
+        "rank": 97,
         "name": "Vila Peri - Várzea alegre",
         "bairro": "VÁRZEA ALEGRE",
         "municipality": "VARZEA ALEGRE",
@@ -3173,7 +3273,7 @@
           "JUREMAL - VARZEA ALEGRE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3186,8 +3286,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 95,
-        "rank": 95,
+        "node_id": 98,
+        "rank": 98,
         "name": "Pitanga",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -3207,7 +3307,7 @@
           "AREA SEM NOME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3220,8 +3320,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 96,
-        "rank": 96,
+        "node_id": 99,
+        "rank": 99,
         "name": "Quatigaba",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
@@ -3240,7 +3340,7 @@
           "CE-240"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3253,8 +3353,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 97,
-        "rank": 97,
+        "node_id": 100,
+        "rank": 100,
         "name": "Pindoguaba",
         "bairro": "TIANGUÁ",
         "municipality": "TIANGUA",
@@ -3272,7 +3372,7 @@
           "PINDOGUABA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3285,8 +3385,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 98,
-        "rank": 98,
+        "node_id": 101,
+        "rank": 101,
         "name": "Padre Manoel Lima e Silva",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
@@ -3306,7 +3406,7 @@
           "FERROS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3319,8 +3419,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 99,
-        "rank": 99,
+        "node_id": 102,
+        "rank": 102,
         "name": "Grossos - Várzea Alegre",
         "bairro": "VÁRZEA ALEGRE",
         "municipality": "VARZEA ALEGRE",
@@ -3340,7 +3440,7 @@
           "VILA CACILDA - VÁRZEA ALEGRE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3353,8 +3453,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 100,
-        "rank": 100,
+        "node_id": 103,
+        "rank": 103,
         "name": "Ferros",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
@@ -3374,7 +3474,7 @@
           "AREA SEM NOME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3387,8 +3487,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 101,
-        "rank": 101,
+        "node_id": 104,
+        "rank": 104,
         "name": "Cidade De Jardim",
         "bairro": "JARDIM",
         "municipality": "BOM JARDIM",
@@ -3407,7 +3507,7 @@
           "AREA SEM NOME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3420,8 +3520,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 102,
-        "rank": 102,
+        "node_id": 105,
+        "rank": 105,
         "name": "Barateiro",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
@@ -3441,7 +3541,7 @@
           "PIÇARRA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3454,8 +3554,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 103,
-        "rank": 103,
+        "node_id": 106,
+        "rank": 106,
         "name": "Padre Lima",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
@@ -3474,7 +3574,7 @@
           "DISTRITO DE IRATINGA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3487,8 +3587,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 104,
-        "rank": 104,
+        "node_id": 107,
+        "rank": 107,
         "name": "Distrito de Iratinga",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
@@ -3507,7 +3607,7 @@
           "PADRE LIMA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3520,8 +3620,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 105,
-        "rank": 105,
+        "node_id": 108,
+        "rank": 108,
         "name": "Armador",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
@@ -3539,7 +3639,7 @@
           "ARMADOR"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3552,8 +3652,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 106,
-        "rank": 106,
+        "node_id": 109,
+        "rank": 109,
         "name": "Alto Alegre",
         "bairro": "SALITRE",
         "municipality": "ALTO ALEGRE",
@@ -3573,7 +3673,7 @@
           "RUA DA POUSADA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3586,8 +3686,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 107,
-        "rank": 107,
+        "node_id": 110,
+        "rank": 110,
         "name": "Juremal",
         "bairro": "ALTO SANTO",
         "municipality": "ALTO SANTO",
@@ -3605,7 +3705,7 @@
           "JUREMAL"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3618,8 +3718,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 108,
-        "rank": 108,
+        "node_id": 111,
+        "rank": 111,
         "name": "Planalto",
         "bairro": "PENTECOSTE",
         "municipality": "PLANALTO AYRTON SENNA",
@@ -3639,7 +3739,7 @@
           "RUA AGAPITO CORDEIRO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3652,8 +3752,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 109,
-        "rank": 109,
+        "node_id": 112,
+        "rank": 112,
         "name": "Estação - Boa Vista",
         "bairro": "MARACANAÚ",
         "municipality": "Boa Vista",
@@ -3673,7 +3773,7 @@
           "PASSARELA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3686,8 +3786,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 110,
-        "rank": 110,
+        "node_id": 113,
+        "rank": 113,
         "name": "BECO DO BURACO - VILA SÃO JOSÉ - ALTO DO CAJUEIRO",
         "bairro": "MARACANAÚ",
         "municipality": "ALTO DO CAJUEIRO",
@@ -3707,7 +3807,7 @@
           "GUABIRABA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3720,8 +3820,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 111,
-        "rank": 111,
+        "node_id": 114,
+        "rank": 114,
         "name": "Novo Parque Iracema - Alto do João Grande",
         "bairro": "MARACANAÚ",
         "municipality": "Alto do João Grande",
@@ -3741,7 +3841,7 @@
           "RUA MANOEL DUARTE MESQUITA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3754,8 +3854,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 112,
-        "rank": 112,
+        "node_id": 115,
+        "rank": 115,
         "name": "Cidade de Deus - Área Seca",
         "bairro": "MARACANAÚ",
         "municipality": "Área Seca",
@@ -3775,7 +3875,7 @@
           "ÁREA SECA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3788,8 +3888,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 113,
-        "rank": 113,
+        "node_id": 116,
+        "rank": 116,
         "name": "Cidade de Alto Santo",
         "bairro": "ALTO SANTO",
         "municipality": "ALTO SANTO",
@@ -3809,7 +3909,7 @@
           "AVENIDA DO TIBOLO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3822,8 +3922,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 114,
-        "rank": 114,
+        "node_id": 117,
+        "rank": 117,
         "name": "Jardim Novo - Alto santo",
         "bairro": "ALTO SANTO",
         "municipality": "ALTO SANTO",
@@ -3843,7 +3943,7 @@
           "ESTRADA SEM NOME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3856,8 +3956,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 115,
-        "rank": 115,
+        "node_id": 118,
+        "rank": 118,
         "name": "Castanhão",
         "bairro": "ALTO SANTO",
         "municipality": "ALTO SANTO",
@@ -3875,7 +3975,7 @@
           "CASTANHÃO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.430512"
       },
       "geometry": {
         "type": "Point",
@@ -3888,8 +3988,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 116,
-        "rank": 116,
+        "node_id": 119,
+        "rank": 119,
         "name": "Colônia - (Em Disputa)",
         "bairro": "MARACANAÚ",
         "municipality": "(Em Disputa)",
@@ -3909,7 +4009,7 @@
           "RUA LUIS GIRÃO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.431030"
       },
       "geometry": {
         "type": "Point",
@@ -3922,8 +4022,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 117,
-        "rank": 117,
+        "node_id": 120,
+        "rank": 120,
         "name": "Área Verde - Novo Maranguape I",
         "bairro": "MARACANAÚ",
         "municipality": "Novo Maranguape I",
@@ -3943,7 +4043,7 @@
           "RUA RAIMUNDO PACHÊCO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.431030"
       },
       "geometry": {
         "type": "Point",
@@ -3956,8 +4056,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 118,
-        "rank": 118,
+        "node_id": 121,
+        "rank": 121,
         "name": "Papoco - Mucunã",
         "bairro": "MARACANAÚ",
         "municipality": "Mucunã",
@@ -3977,7 +4077,7 @@
           "LUZARDO VIANA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.431030"
       },
       "geometry": {
         "type": "Point",
@@ -3990,8 +4090,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 119,
-        "rank": 119,
+        "node_id": 122,
+        "rank": 122,
         "name": "Gruta - Colônia",
         "bairro": "MARACANAÚ",
         "municipality": "Colônia",
@@ -4011,7 +4111,7 @@
           "RUA ANA PAULA DE MORAIS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.431030"
       },
       "geometry": {
         "type": "Point",
@@ -4024,8 +4124,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 120,
-        "rank": 120,
+        "node_id": 123,
+        "rank": 123,
         "name": "Canindezinho",
         "bairro": "CANINDEZINHO",
         "municipality": "CANINDEZINHO",
@@ -4045,7 +4145,7 @@
           "RUA JOSÉ FARIAS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.431030"
       },
       "geometry": {
         "type": "Point",
@@ -4058,8 +4158,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 121,
-        "rank": 121,
+        "node_id": 124,
+        "rank": 124,
         "name": "Favela do Magalhães - Jaçanaú",
         "bairro": "MARACANAÚ",
         "municipality": "Jaçanaú",
@@ -4079,7 +4179,7 @@
           "PAPOCO - MUCUNÃ"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.431030"
       },
       "geometry": {
         "type": "Point",
@@ -4092,8 +4192,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 122,
-        "rank": 122,
+        "node_id": 125,
+        "rank": 125,
         "name": "Comunidade da Central  - Jaçanaú",
         "bairro": "MARACANAÚ",
         "municipality": "Jaçanaú",
@@ -4113,7 +4213,7 @@
           "MUCUNÃ - MARACANAÚ"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.431030"
       },
       "geometry": {
         "type": "Point",
@@ -4126,8 +4226,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 123,
-        "rank": 123,
+        "node_id": 126,
+        "rank": 126,
         "name": "Alto da alvorada - Mucunã",
         "bairro": "MARACANAÚ",
         "municipality": "Mucunã",
@@ -4147,7 +4247,7 @@
           "MUCUNÃ - MARACANAÚ"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.431030"
       },
       "geometry": {
         "type": "Point",
@@ -4160,8 +4260,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 124,
-        "rank": 124,
+        "node_id": 127,
+        "rank": 127,
         "name": "Timonha",
         "bairro": "GRANJA",
         "municipality": "GRANJA LISBOA",
@@ -4181,7 +4281,7 @@
           "RUA DA ALEGRIA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.431030"
       },
       "geometry": {
         "type": "Point",
@@ -4194,8 +4294,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 125,
-        "rank": 125,
+        "node_id": 128,
+        "rank": 128,
         "name": "São José",
         "bairro": "IPAPORANGA",
         "municipality": "PARQUE SAO JOSE",
@@ -4215,7 +4315,7 @@
           "BAIRRO DO CEMITÉRIO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.431030"
       },
       "geometry": {
         "type": "Point",
@@ -4228,8 +4328,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 126,
-        "rank": 126,
+        "node_id": 129,
+        "rank": 129,
         "name": "Santa Terezinha",
         "bairro": "GRANJA",
         "municipality": "GRANJA LISBOA",
@@ -4247,7 +4347,7 @@
           "SANTA TEREZINHA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-19T00:00:13.033569"
+        "generated_at": "2026-05-20T21:59:42.431030"
       },
       "geometry": {
         "type": "Point",
@@ -4259,10 +4359,10 @@
     }
   ],
   "metadata": {
-    "total": 126,
+    "total": 129,
     "source": "Sentinela Micronodes Dynamic Overlay",
     "threshold_min_score": 31.0,
-    "generated_at": "2026-05-19T00:00:13.033569",
+    "generated_at": "2026-05-20T21:59:42.431030",
     "region": "interior"
   }
 }

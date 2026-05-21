@@ -177,10 +177,14 @@ Report Preview/
 ├── logs/
 │   ├── cc_decisions.jsonl          # 🆕 Auditoria de cada decisão CC
 │   ├── predict_p10.jsonl           # Top-10 predito por região (histórico)
-│   └── rankings/                   # Relatórios diários por região
+│   ├── rankings/                   # Relatórios diários por região
+│   └── manual/                     # Logs operacionais manuais e capturas avulsas
 │
-├── TRAINING_LOG.md                 # Histórico completo de experimentos (T1→T57b)
-└── GEMINI.md                       # Contexto do projeto para IA-assistente
+└── docs/
+  └── ai/GEMINI.md               # Contexto do projeto para IA-assistente
+
+├── TRAINING_LOG.md              # Histórico completo de experimentos (T1→T57b)
+└── VALIDATION_LOG.md            # Histórico de validação e checkpoints
 ```
 
 ---

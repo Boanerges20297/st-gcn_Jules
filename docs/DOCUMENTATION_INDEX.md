@@ -109,6 +109,21 @@
 
 ---
 
+### 4. **HERMES_REPORT_PREVIEW_TRANSFORMATION.md** - HERMES OPERACIONAL
+
+   **Target**: Operacao, mantenedores, integradores de IA, suporte tecnico
+   **Tempo**: 8-12 minutos
+
+   **Conteúdo**:
+   - transformacao do Hermes em camada operacional do Report Preview
+   - artefatos `outputs/hermes/` e historico de execucoes
+   - wrapper PowerShell do Gemini com memoria Hermes
+   - gateway Telegram proprio com autenticacao SQLite
+   - admin de usuarios, auditoria e bloqueio global
+   - contrato atual de resposta com previsao para os proximos 7 dias
+
+---
+
 ## 📊 Cobertura de Tópicos
 
 ```

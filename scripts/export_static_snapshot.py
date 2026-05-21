@@ -28,6 +28,9 @@ REGION_EXPORTS = (
 MOMENTUM_WINDOW_DAYS = 14
 RECENT_EXOGENOUS_WINDOW_DAYS = 14
 
+_CRITICAL_STREETS_FORTALEZA_CACHE = None
+_STREETS_BY_MUNICIPIO_CACHE = None
+
 
 def _safe_feature_name(index: int) -> str:
     return f"channel_{index:02d}"
@@ -429,23 +432,30 @@ def _extract_feature_channel_windows(features, spec_idx: int, gen) -> Dict[str, 
 
 
 def _load_critical_streets_for_academics(region_type: str, name_norm: str):
+    global _CRITICAL_STREETS_FORTALEZA_CACHE, _STREETS_BY_MUNICIPIO_CACHE
     critical_streets = 'Sem logradouros críticos recentes'
     if region_type == 'fortaleza':
-        streets_path = ROOT_DIR / 'data' / 'raw' / 'ruas_criticas_por_bairro.json'
-        if streets_path.exists():
-            streets_cache = json.loads(streets_path.read_text(encoding='utf-8')) or {}
-            normalized_cache = {report_app.normalize_name(k): v for k, v in streets_cache.items() if k}
-            critical_streets = normalized_cache.get(name_norm)
-            if critical_streets is None:
-                for cache_key, cache_value in normalized_cache.items():
-                    if name_norm in cache_key or cache_key in name_norm:
-                        critical_streets = cache_value
-                        break
+        if _CRITICAL_STREETS_FORTALEZA_CACHE is None:
+            streets_path = ROOT_DIR / 'data' / 'raw' / 'ruas_criticas_por_bairro.json'
+            if streets_path.exists():
+                streets_cache = json.loads(streets_path.read_text(encoding='utf-8')) or {}
+                _CRITICAL_STREETS_FORTALEZA_CACHE = {report_app.normalize_name(k): v for k, v in streets_cache.items() if k}
+            else:
+                _CRITICAL_STREETS_FORTALEZA_CACHE = {}
+        critical_streets = _CRITICAL_STREETS_FORTALEZA_CACHE.get(name_norm)
+        if critical_streets is None:
+            for cache_key, cache_value in _CRITICAL_STREETS_FORTALEZA_CACHE.items():
+                if name_norm in cache_key or cache_key in name_norm:
+                    critical_streets = cache_value
+                    break
     else:
-        streets_path = ROOT_DIR / 'data' / 'streets_by_municipio.json'
-        if streets_path.exists():
-            streets_by_city = json.loads(streets_path.read_text(encoding='utf-8')) or {}
-            critical_streets = streets_by_city.get(name_norm)
+        if _STREETS_BY_MUNICIPIO_CACHE is None:
+            streets_path = ROOT_DIR / 'data' / 'streets_by_municipio.json'
+            if streets_path.exists():
+                _STREETS_BY_MUNICIPIO_CACHE = json.loads(streets_path.read_text(encoding='utf-8')) or {}
+            else:
+                _STREETS_BY_MUNICIPIO_CACHE = {}
+        critical_streets = _STREETS_BY_MUNICIPIO_CACHE.get(name_norm)
 
     if critical_streets is None:
         critical_streets = 'Sem logradouros críticos recentes'

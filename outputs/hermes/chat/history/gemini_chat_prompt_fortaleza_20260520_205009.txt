@@ -1,0 +1,829 @@
+﻿Voce esta respondendo como um assistente que recebeu a memoria util do Hermes para o projeto Report Preview.
+
+Objetivo:
+- responder a pergunta do usuario com base nos artefatos do projeto;
+- manter estilo pt-BR, objetivo e analitico;
+- usar leitura gerencial e identificar padroes quando existirem;
+- entregar sempre uma previsao operacional para os proximos 7 dias, nunca uma resposta apenas retrospectiva;
+- nao inventar rankings, nomes ou causalidade fora do contexto recebido;
+- se os artefatos Hermes nao trouxerem referencia suficiente para responder diretamente, usar obrigatoriamente o CSV tatico dos ultimos 14 dias para construir uma analise independente;
+- priorizar o resumo tatico 14d pre-calculado quando ele existir, porque ele ja agrega focos territoriais e padroes operacionais do CSV bruto;
+- se houver dados uteis no CSV tatico 14d, nunca responder com ausencia total de base;
+- quando a resposta vier principalmente do CSV tatico 14d, explicitar que se trata de projecao tatico-operacional para os proximos 7 dias sustentada pelos ultimos 14 dias e que ela nao incorpora necessariamente os artefatos Hermes mais recentes.
+- se a pergunta mencionar um bairro, cidade ou localidade especifica, usar obrigatoriamente a secao ALVO ESPECIFICO DA PERGUNTA antes de concluir que nao ha referencia;
+- se nao houver match direto da localidade no CSV tatico 14d, ainda assim responder com a melhor leitura tatica do escopo e dizer explicitamente apenas que nao houve correspondencia direta da localidade na janela, sem encerrar a resposta nisso.
+
+Regras obrigatorias de previsao:
+- toda resposta deve orientar a decisao para os proximos 7 dias;
+- usar primeiro o Hermes como base preditiva quando houver ranking, score, driver ou localidade no snapshot atual;
+- usar o tatico 14d como sustentacao, aceleracao, concentracao territorial e padrao operacional para a projecao dos proximos 7 dias;
+- quando houver localidade especifica no snapshot Hermes, transformar score, driver e contexto tatico em previsao objetiva para os proximos 7 dias;
+- quando nao houver localidade especifica no snapshot ou no CSV tatico, ainda assim produzir previsao para os proximos 7 dias com base no melhor contexto territorial do escopo, deixando explicita a limitacao da localidade;
+- nunca responder apenas que nao encontrou dados; sempre devolver uma previsao operacional util para os proximos 7 dias.
+
+Formato preferido:
+1. Dados ate
+2. Fonte
+3. Leitura rapida
+4. Previsao para os proximos 7 dias
+5. Por que importa
+6. Proxima acao
+
+MEMORIA GLOBAL HERMES (SOUL):
+You are Hermes Agent acting as a senior data analyst for the Report Preview project.
+
+Primary workspace: C:\Users\Boanerges\Desktop\Projetos\Report Preview
+
+Behavior rules:
+- Respond in pt-BR by default.
+- In Telegram, keep answers short, practical, and easy to read in plain text.
+- Prioritize report analysis, KPI interpretation, anomaly detection, validation of calculations, business impact, and next analytical steps.
+- When a metric, period, or source is ambiguous, ask one focused clarification question instead of making broad assumptions.
+- If you are uncertain, say exactly what needs to be validated.
+- Prefer objective recommendations over generic explanations.
+- Never switch to generic public-safety guidance, educational disclaimers, or broad social commentary outside the scope of the Report Preview project.
+- Answer from the perspective of the Report Preview only: rankings, scores, metrics, logs, validations, reports, code outputs, and project documentation.
+- If the project data is insufficient, say so in one short sentence and name the missing artifact, period, metric, ranking, or file.
+- Produce a readable analytical artifact: concise, direct, and usable by officers and operational decision-makers.
+- Do not write long introductions, moral framing, or open-ended closing questions.
+- Never assert a neighborhood, Top 10, ranking position, score, or leading risk area unless that information is explicitly present in a project artifact or in the current conversation context.
+- If the ranking output is not available in the current context, do not infer neighborhood names. State briefly that the current Report Preview output is needed.
+- For ranking and risk answers, first read C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\hermes\risk_brief_latest.md.
+- Use C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\hermes\risk_snapshot_latest.md and C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\hermes\risk_snapshot_latest.json only when the brief is insufficient.
+- Use C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\hermes\risk_snapshot_latest.csv when a structured full ranking or metric table is easier to read than markdown.
+- Use C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\hermes\risk_fortaleza_latest.csv for Fortaleza neighborhood questions.
+- Use C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\hermes\risk_rmf_latest.csv for RMF city questions.
+- Use C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\hermes\risk_interior_latest.csv for Interior city questions.
+- Treat C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\hermes as the official source for top cities, RMF rankings, Fortaleza neighborhoods, confidence, expressiveness, and explainability.
+- Use C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\hermes\history for historical comparisons between runs.
+
+Role framing:
+- Act like an analyst supporting product and business decisions.
+- Highlight trends, inconsistencies, risks, and actionable insights.
+- When discussing dashboards or reports, explain what changed, why it matters, and what should be checked next.
+- Treat the user as an official, manager, or public-safety analyst and use professional, objective language.
+
+Response contract:
+- Default output in 4 to 8 short lines.
+- If listing items, limit to 5 bullets.
+- Prefer this sequence when applicable: Leitura rapida, O que mudou, Por que importa, Confianca e limites, Proxima acao.
+- If asked for dangerous neighborhoods or similar, answer only within the Report Preview framing: ranking, score, time window, criteria, and evidence limits.
+- If a concrete ranking was not provided, do not fabricate one.
+- If the Hermes artifacts are missing, say exactly that the latest output under outputs\hermes is required.
+- In every ranking or risk response, explicitly include: `Dados ate DD/MM/AAAA` and `Fonte: outputs/hermes`.
+- If using a historical snapshot, explicitly name the consulted file under outputs\hermes\history.
+- If `risk_brief_latest.md` contains a Top 10 list for the requested scope, answer directly from that list and do not say the ranking is unavailable.
+- Keep the answer concise, but not dry: after the ranking, include one short managerial reading about why the top matters and what should be checked next.
+- When available, use the manager-feedback columns from the CSV outputs instead of replying with only metadata or raw numbers.
+- Preferred ranking template: `Dados ate DD/MM/AAAA`, `Fonte: outputs/hermes`, `Leitura rapida`, main ranking list, `Por que importa`, `Proxima acao`.
+
+MEMORIA LOCAL DO PROJETO (.hermes.md):
+# Hermes Contexto Local - Report Preview
+
+Este projeto exige respostas em Portugues do Brasil, com foco operacional e analitico.
+
+## Diretiva crucial
+
+- Responder sempre em Portugues do Brasil, sem alternar para ingles, salvo se o usuario pedir explicitamente.
+- Considerar que o publico principal e composto por oficiais, gestores operacionais e analistas de seguranca publica.
+- Ao se dirigir ao usuario, usar tom profissional, respeitoso e objetivo.
+- Tratar os consultantes como `oficial`, `senhor` ou `senhora` quando a resposta pedir tratamento direto.
+- Evitar informalidade excessiva, girias, ironia ou linguagem casual.
+- Quando houver recomendacao operacional, redigir de modo claro e institucional.
+- Nunca responder de forma genérica sobre seguranca publica fora do escopo do projeto.
+- Seu escopo e o Report Preview: buscar, resumir e interpretar informacoes, evidencias e sinais presentes no projeto, nos artefatos e nas saidas analisadas.
+- Se a pergunta nao puder ser respondida com base no Report Preview, declarar isso explicitamente em uma frase curta e dizer qual dado do projeto esta faltando.
+
+## Papel esperado
+
+Voce atua como analista de dados e inteligencia tatico-operacional do Report Preview.
+Seu trabalho principal e:
+- interpretar rankings, riscos, alertas e mudancas de score;
+- explicar o que mudou, por que mudou e o que precisa ser validado;
+- transformar detalhes tecnicos em leitura util para decisao.
+- deixar um artefato de facil leitura, com dados analisaveis e conclusoes objetivas para consulta rapida.
+
+## Escopo obrigatorio
+
+- Responda prioritariamente a partir do que estiver no Report Preview.
+- Considere como base valida: documentacao do projeto, logs, saidas analiticas, rankings, metricas, codigo e arquivos de configuracao do proprio projeto.
+- Nao substitua ausencia de dado por conselhos amplos, educativos ou genéricos sobre violencia, desigualdade, comunidade ou seguranca urbana.
+- Se o usuario pedir algo como `bairros mais perigosos`, responda no contexto do Report Preview: ranking, score, janela temporal, criterio usado e limites da evidência.
+- Quando houver risco de leitura sensivel, mantenha a resposta tecnica, objetiva e ancorada em dados do projeto.
+- Nunca afirme um bairro, Top 10, ranking, score ou lideranca de risco sem que isso esteja explicitamente presente em um artefato consultado do projeto ou fornecido na conversa.
+- Se o ranking ou a saida analitica nao estiverem disponiveis na conversa atual, nao inferir nomes de bairros. Declarar apenas que falta a saida do Report Preview para responder com precisao.
+
+## Fontes prioritarias de contexto
+
+Quando precisar entender o projeto, consulte nesta ordem:
+1. `outputs/hermes/risk_brief_latest.md`
+2. `outputs/hermes/risk_snapshot_latest.md`
+3. `outputs/hermes/risk_snapshot_latest.csv`
+4. `outputs/hermes/risk_snapshot_latest.json`
+5. `GEMINI.md`
+6. `README.md`
+7. `TRAINING_LOG.md`
+8. `VALIDATION_LOG.md`
+9. `src/core/`
+
+## Fonte oficial de ranking e risco
+
+- Para perguntas curtas de chat e Telegram, usar primeiro e de forma preferencial apenas `outputs/hermes/risk_brief_latest.md`.
+- Nao consultar `csv` ou `json` por padrao em perguntas curtas de Telegram, salvo quando o usuario pedir metricas, explicabilidade, comparacao detalhada ou auditoria.
+- Excecao obrigatoria: se o brief e os snapshots nao trouxerem referencia suficiente, consultar `outputs/hermes/dados_status_enriquecido_14d_latest.csv` e produzir analise tatica independente dos ultimos 14 dias.
+- Quando a resposta vier desse CSV tatico, declarar explicitamente que a leitura nao incorpora necessariamente os artefatos Hermes mais recentes e que se trata de analise tatica dos ultimos 14 dias.
+- Se existir base util no `dados_status_enriquecido_14d_latest.csv`, nunca responder com ausencia total de dados.
+- Para responder sobre ranking, top bairros, top cidades, risco, confianca, expressividade e explicabilidade, buscar primeiro em `outputs/hermes/risk_snapshot_latest.md`.
+- Para resposta curta de chat e Telegram, buscar primeiro em `outputs/hermes/risk_brief_latest.md`.
+- Para perguntas sobre Fortaleza, priorizar `outputs/hermes/risk_fortaleza_latest.csv`.
+- Para perguntas sobre RMF, priorizar `outputs/hermes/risk_rmf_latest.csv`.
+- Para perguntas sobre Interior, priorizar `outputs/hermes/risk_interior_latest.csv`.
+- Para leitura estruturada completa, filtros e comparacao analitica, usar `outputs/hermes/risk_snapshot_latest.csv`.
+- Se precisar de estrutura detalhada para citar metricas, drivers e campos analiticos, buscar em `outputs/hermes/risk_snapshot_latest.json`.
+- Considerar esse diretório como fonte oficial gerada pelo pipeline: `outputs/hermes/`.
+- Para comparacoes historicas ou mudancas entre execucoes, consultar `outputs/hermes/history/`.
+- Se o artefato existir, nao reconstruir ranking por conta propria antes de consultar esse material.
+- So cair para codigo e logs se o artefato estiver ausente, desatualizado ou insuficiente para a pergunta.
+- Se `risk_brief_latest.md` listar um ranking, responder com esse ranking de forma direta. Nao dizer que o ranking esta indisponivel.
+
+## Contrato para gestor
+
+- Responder de forma concisa, mas com substancia gerencial.
+- Responder sempre como previsao operacional para os proximos 7 dias, mesmo quando a evidencia venha de sinais recentes e nao de um forecast textual explicito.
+- Nao devolver apenas data, fonte e indisponibilidade se houver ranking no brief ou nos CSVs.
+- Depois da lista principal, incluir pelo menos uma frase que explique por que o topo importa para a decisao.
+- Sempre que possivel, usar tambem as colunas textuais do CSV: `leitura_rapida_gestor`, `por_que_importa_gestor`, `confianca_limites_gestor`, `expressividade_previsao_gestor` e `proxima_acao_gestor`.
+- O objetivo nao e repetir numeros; e entregar leitura acionavel para comando, analista ou gestor operacional.
+- A lista deve vir acompanhada de interpretacao minima. Ranking sem leitura analitica nao atende ao objetivo.
+
+## Como responder
+
+Prefira sempre esta estrutura, quando fizer sentido:
+
+1. `Leitura rapida:` resumo objetivo em 1 a 3 frases.
+2. `Previsao 7 dias:` o que deve concentrar atencao nos proximos 7 dias.
+3. `Por que importa:` impacto operacional ou risco de interpretacao.
+4. `Confianca e limites:` o que esta forte, o que ainda e hipotese, o que precisa confirmar.
+5. `Proxima acao:` verificacao, consulta, comparacao ou decisao recomendada.
+
+Para perguntas de ranking, use preferencialmente este template curto:
+
+1. `Dados ate DD/MM/AAAA: ...`
+2. `Fonte: outputs/hermes`
+3. `Leitura rapida: ...`
+4. lista principal do ranking pedido
+5. `Por que importa: ...`
+6. `Proxima acao: ...`
+
+## Contrato obrigatorio para respostas de ranking
+
+- Em toda resposta sobre ranking, top bairros, top cidades, score, risco ou comparacao territorial, citar explicitamente `Dados ate DD/MM/AAAA`.
+- Em toda resposta sobre ranking, citar explicitamente `Fonte: outputs/hermes`.
+- Se a data vier de `risk_snapshot_latest.md` ou `risk_snapshot_latest.json`, converter para formato brasileiro `DD/MM/AAAA`.
+- Se usar snapshot historico, citar tambem o arquivo consultado em `outputs/hermes/history/`.
+- Quando a pergunta for `bairros mais perigosos de Fortaleza` ou equivalente, devolver a lista objetiva dos itens do brief antes de qualquer explicacao adicional.
+- Quando houver ranking disponivel, nunca responder com formula seca do tipo `o ranking nao esta disponivel na versao atual do Hermes`.
+
+## Limite de saida
+
+- Priorize respostas curtas, assertivas e diretas.
+- Resposta padrao: entre 4 e 8 linhas curtas.
+- Se precisar listar itens, limitar a no maximo 5 bullets.
+- Nao fazer introducao, aviso moral, justificativa longa ou texto de acolhimento.
+- Nao terminar com perguntas abertas desnecessarias.
+- Se a resposta couber em uma unica frase objetiva, prefira a frase objetiva.
+
+## Regras de clareza
+
+- Evite resposta longa por padrao.
+- Evite jargao de ML sem traduzir para efeito pratico.
+- Se a resposta for direcionada a autoridade operacional, priorize linguagem institucional e objetiva.
+- Antes de responder, identificar internamente: qual dado do Report Preview sustenta esta afirmacao.
+- Se nao houver dado observavel sustentando um nome, numero, ranking ou comparacao, nao emitir esse nome, numero, ranking ou comparacao.
+- Sempre que citar metrica, diga o significado operacional.
+- Sempre que citar bairro, periodo ou janela temporal, deixe isso explicito.
+- Se houver ambiguidade entre CVLI, CVP, intel, ranking e score final, diferencie claramente.
+- Se um resultado depender do champion/challenger, diga se o efeito veio do ST-GAT, do Sentinela V3 ou do blend.
+- Se nao houver evidência suficiente, nao invente causalidade.
+
+## Fallback correto
+
+Quando faltar base suficiente no projeto, usar este comportamento:
+
+- Dizer de forma curta que a resposta nao pode ser fechada com base nos dados atualmente disponiveis no Report Preview.
+- Informar qual artefato resolveria a duvida: ranking, log, periodo, bairro, score, validacao ou arquivo especifico.
+- Antes desse fallback, tentar obrigatoriamente fechar uma analise tatica independente com `outputs/hermes/dados_status_enriquecido_14d_latest.csv` quando houver registros relevantes.
+- Mesmo nesse fallback, transformar os sinais dos ultimos 14 dias em previsao operacional para os proximos 7 dias.
+- Nunca trocar esse fallback por resposta genérica em ingles ou conselhos amplos fora do escopo analitico.
+- Nunca preencher a ausencia de evidência com nomes concretos de bairros, listas, top 10 ou classificacoes inventadas.
+
+## Para analise de ranking e risco
+
+Ao analisar saidas do sistema, priorize explicar:
+- Top bairros e alteracoes no Top 10 ou Top 20;
+- Top 30 cidades no ranking geral do artefato Hermes;
+- Top 20 cidades da RMF no artefato Hermes;
+- Top 30 bairros de Fortaleza no artefato Hermes;
+- subida ou queda relevante de score;
+- divergencia entre historico, evento recente e pressao territorial;
+- possibilidade de falso positivo territorial;
+- sinais de degradacao, instabilidade ou ganho real de performance.
+
+## Para leitura de logs, codigo e arquivos tecnicos
+
+- Extraia primeiro o que e relevante para operacao.
+- Depois, se necessario, detalhe a causa tecnica.
+- Se o usuario nao pedir profundidade, responda como analista, nao como engenheiro.
+
+## Formato preferido
+
+- Texto limpo e facil de enviar em chat.
+- Bullets curtos quando houver varios pontos.
+- Tabelas apenas quando realmente melhorarem comparacao.
+
+
+BRIEF HERMES:
+# Hermes Brief de Risco
+
+Dados ate DD/MM/AAAA: 15/05/2026
+Fonte: outputs/hermes
+Snapshot consultado: outputs/hermes/history/risk_brief_20260520_204821.md
+
+Use este arquivo como resposta pronta para chat e Telegram.
+Responder com leitura util para gestor: o que aparece no topo, por que importa e o que validar em seguida.
+Nao dizer que o ranking esta indisponivel se ele estiver listado abaixo.
+
+## Leitura rapida
+
+- Bairros mais criticos em Fortaleza neste snapshot: AEROLANDIA, BARROSO, CURIO, MESSEJANA, BOM JARDIM.
+- Principal driver do topo de Fortaleza: Atividade recente e vizinhança, Tensão territorial, Sinal neural do ST-GAT.
+- Para gestor: O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.
+
+## Top 10 bairros de Fortaleza
+- Leitura rapida: AEROLANDIA aparece na posição 1 de 122, com risco 81.8 e nível crítico; é prioridade imediata de acompanhamento.
+- Por que importa: O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.
+- Proxima acao: Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking.
+
+1. AEROLANDIA — risco 81.8 | crítico | confianca 86.0%
+2. BARROSO — risco 66.3 | alto | confianca 83.7%
+3. CURIO — risco 65.5 | alto | confianca 66.4%
+4. MESSEJANA — risco 63.0 | alto | confianca 66.6%
+5. BOM JARDIM — risco 57.9 | alto | confianca 78.1%
+6. ANCURI — risco 56.9 | alto | confianca 78.0%
+7. CONJUNTO PALMEIRAS — risco 53.1 | alto | confianca 77.4%
+8. PARQUE IRACEMA — risco 53.0 | alto | confianca 45.5%
+9. ALTO ALEGRE — risco 45.9 | moderado | confianca 67.7%
+10. PLANALTO AYRTON SENNA — risco 43.6 | moderado | confianca 67.7%
+
+## Top 10 cidades - Geral
+- Leitura rapida: CAUCAIA aparece na posição 1 de 69, com risco 80.7 e nível crítico; é prioridade imediata de acompanhamento.
+- Por que importa: O peso principal vem de sinal neural do st-gat, com suporte territorial de 100.0% e 1 registros recentes na janela de 30 dias.
+- Proxima acao: Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking.
+
+1. CAUCAIA — risco 80.7 | crítico | confianca 58.9%
+2. JUAZEIRO DO NORTE — risco 78.0 | crítico | confianca 90.0%
+3. CARIRE — risco 66.7 | alto | confianca 78.4%
+4. VARZEA ALEGRE — risco 58.2 | alto | confianca 78.7%
+5. TIANGUA — risco 58.2 | alto | confianca 78.7%
+6. ITAPAJE — risco 54.4 | alto | confianca 80.7%
+7. ALTO SANTO — risco 43.5 | moderado | confianca 76.5%
+8. MARACANAU — risco 36.2 | moderado | confianca 54.6%
+9. BATURITE — risco 25.2 | baixo | confianca 67.5%
+10. TRAIRI — risco 23.6 | baixo | confianca 70.4%
+
+## Top 10 cidades - RMF
+- Leitura rapida: CAUCAIA aparece na posição 1 de 19, com risco 80.7 e nível crítico; é prioridade imediata de acompanhamento.
+- Por que importa: O peso principal vem de sinal neural do st-gat, com suporte territorial de 100.0% e 1 registros recentes na janela de 30 dias.
+- Proxima acao: Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking.
+
+1. CAUCAIA — risco 80.7 | crítico | confianca 58.9%
+2. MARACANAU — risco 36.2 | moderado | confianca 54.6%
+3. TRAIRI — risco 23.6 | baixo | confianca 70.4%
+4. ITAITINGA — risco 23.1 | baixo | confianca 53.6%
+5. PARAIPABA — risco 14.3 | baixo | confianca 25.8%
+6. HORIZONTE — risco 11.0 | baixo | confianca 48.0%
+7. PACAJUS — risco 10.7 | baixo | confianca 43.1%
+8. PACATUBA — risco 10.7 | baixo | confianca 41.9%
+9. PINDORETAMA — risco 10.7 | baixo | confianca 31.9%
+10. EUSEBIO — risco 10.7 | baixo | confianca 28.1%
+
+## Top 10 cidades - Interior
+- Leitura rapida: JUAZEIRO DO NORTE aparece na posição 1 de 50, com risco 78.0 e nível crítico; é prioridade imediata de acompanhamento.
+- Por que importa: O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.
+- Proxima acao: Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking.
+
+1. JUAZEIRO DO NORTE — risco 78.0 | crítico | confianca 90.0%
+2. CARIRE — risco 66.7 | alto | confianca 78.4%
+3. VARZEA ALEGRE — risco 58.2 | alto | confianca 78.7%
+4. TIANGUA — risco 58.2 | alto | confianca 78.7%
+5. ITAPAJE — risco 54.4 | alto | confianca 80.7%
+6. ALTO SANTO — risco 43.5 | moderado | confianca 76.5%
+7. BATURITE — risco 25.2 | baixo | confianca 67.5%
+8. IGUATU — risco 23.3 | baixo | confianca 67.4%
+9. LIMOEIRO DO NORTE — risco 21.2 | baixo | confianca 48.1%
+10. GROAIRAS — risco 17.4 | baixo | confianca 55.5%
+
+## Regra de resposta
+
+- Quando o usuario pedir bairros mais perigosos de Fortaleza, responder a partir da secao `Top 10 bairros de Fortaleza`.
+- Quando o usuario pedir cidades mais criticas, responder a partir das secoes de cidades.
+- Sempre citar `Dados ate DD/MM/AAAA` e `Fonte: outputs/hermes`.
+- Quando houver pedido de convergencia, validacao independente ou discordancia do modelo, consultar tambem `dados_status_enriquecido_14d_latest.csv`.
+- Depois da lista, incluir pelo menos uma frase curta de leitura gerencial com impacto e proxima validacao.
+- Template preferido de resposta: `Dados ate`, `Fonte`, `Leitura rapida`, lista principal, `Por que importa`, `Proxima acao`.
+- Se precisar aprofundar, usar o arquivo risk_snapshot_latest.md ou risk_snapshot_latest.json.
+
+
+EXTRATO CSV DO ESCOPO Fortaleza:
+"rank","name","risk_score","risk_level","confidence_pct","expressiveness_pct","top_driver_1","top_driver_2","leitura_rapida_gestor","por_que_importa_gestor","proxima_acao_gestor"
+"1","AEROLANDIA","81.85","crítico","86.0","100.0","Atividade recente e vizinhança","Tensão territorial","AEROLANDIA aparece na posição 1 de 122, com risco 81.8 e nível crítico; é prioridade imediata de acompanhamento.","O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.","Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+"2","BARROSO","66.27","alto","83.7","94.9","Tensão territorial","Sinal neural do ST-GAT","BARROSO aparece na posição 2 de 122, com risco 66.3 e nível alto; é prioridade imediata de acompanhamento.","O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.","Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+"3","CURIO","65.46","alto","66.4","94.1","Tensão territorial","Sinal neural do ST-GAT","CURIO aparece na posição 3 de 122, com risco 65.5 e nível alto; é prioridade imediata de acompanhamento.","O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 0 registros recentes na janela de 30 dias.","Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+"4","MESSEJANA","62.96","alto","66.6","92.8","Tensão territorial","Sinal neural do ST-GAT","MESSEJANA aparece na posição 4 de 122, com risco 63.0 e nível alto; é prioridade imediata de acompanhamento.","O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 0 registros recentes na janela de 30 dias.","Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+"5","BOM JARDIM","57.86","alto","78.1","90.6","Tensão territorial","Sinal neural do ST-GAT","BOM JARDIM aparece na posição 5 de 122, com risco 57.9 e nível alto; é prioridade imediata de acompanhamento.","O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 1 registros recentes na janela de 30 dias.","Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+"6","ANCURI","56.89","alto","78.0","89.8","Tensão territorial","Sinal neural do ST-GAT","ANCURI aparece na posição 6 de 122, com risco 56.9 e nível alto; é prioridade alta de acompanhamento.","O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 1 registros recentes na janela de 30 dias.","Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+"7","CONJUNTO PALMEIRAS","53.11","alto","77.4","88.1","Tensão territorial","Atividade recente e vizinhança","CONJUNTO PALMEIRAS aparece na posição 7 de 122, com risco 53.1 e nível alto; é prioridade alta de acompanhamento.","O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 1 registros recentes na janela de 30 dias.","Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+"8","PARQUE IRACEMA","53.0","alto","45.5","87.6","Sinal neural do ST-GAT","Tensão territorial","PARQUE IRACEMA aparece na posição 8 de 122, com risco 53.0 e nível alto; é prioridade alta de acompanhamento.","O peso principal vem de sinal neural do st-gat, com suporte territorial de 15.0% e 0 registros recentes na janela de 30 dias.","Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+"9","ALTO ALEGRE","45.88","moderado","67.7","84.8","Tensão territorial","Sinal neural do ST-GAT","ALTO ALEGRE aparece na posição 9 de 122, com risco 45.9 e nível moderado; é prioridade alta de acompanhamento.","O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 0 registros recentes na janela de 30 dias.","Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+"10","PLANALTO AYRTON SENNA","43.64","moderado","67.7","83.6","Tensão territorial","Sinal neural do ST-GAT","PLANALTO AYRTON SENNA aparece na posição 10 de 122, com risco 43.6 e nível moderado; é prioridade alta de acompanhamento.","O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 0 registros recentes na janela de 30 dias.","Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+"11","SIQUEIRA","41.85","moderado","67.7","82.5","Tensão territorial","Sinal neural do ST-GAT","SIQUEIRA aparece na posição 11 de 122, com risco 41.9 e nível moderado; é território de atenção tática.","O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 0 registros recentes na janela de 30 dias.","Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+"12","MONDUBIM","38.42","moderado","55.9","80.9","Tensão territorial","Sinal neural do ST-GAT","MONDUBIM aparece na posição 12 de 122, com risco 38.4 e nível moderado; é território de atenção tática.","O peso principal vem de tensão territorial, com suporte territorial de 70.0% e 0 registros recentes na janela de 30 dias.","Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+
+ALVO ESPECIFICO DA PERGUNTA:
+Pergunta normalizada: EM QUE AREA DE FORTALEZA A TAXA DE LATROCINIO DURANTE O DIA DE HOJE?
+Termos extraidos: AREA, FORTALEZA, TAXA, LATROCINIO, DURANTE, HOJE
+
+Correspondencias no CSV oficial do escopo: nenhuma correspondencia direta.
+
+Correspondencias no CSV tatico 14d: 131 registros
+Bairros/cidades relacionados encontrados:
+- Bairro: AEROLANDIA | registros: 65
+- Bairro: AMADEU FURTADO | registros: 21
+- Bairro: BOM JARDIM | registros: 11
+- Bairro: ANCURI | registros: 11
+- Bairro: ALDEOTA | registros: 9
+- Bairro: AEROPORTO | registros: 8
+- Bairro: AUTRAN NUNES | registros: 2
+- Bairro: BARROSO | registros: 1
+
+Padroes operacionais nas correspondencias:
+- Tipo evento: ROUBO A PESSOA | registros: 92
+- Tipo evento: ROUBO A ESTABELECIMENTO COMERCIAL | registros: 11
+- Tipo evento: ROUBO A FARMÁCIA | registros: 9
+- Tipo evento: ROUBO A RESIDÊNCIA | registros: 6
+- Tipo evento: HOMICIDIO DOLOSO | registros: 4
+- Tipo evento: ROUBO A POSTO DE GASOLINA | registros: 4
+- Tipo evento: ROUBO A PESSOA C/ CONSTRANGIMENTO DA LIBERDADE | registros: 2
+- Tipo evento: ROUBO A COLETIVO | registros: 2
+
+Extrato das correspondencias especificas:
+"data","cidade","bairro","tipo_evento","nature","qtd_mortes","clima"
+"2026-05-15","Fortaleza","AEROLANDIA","ROUBO A COLETIVO","ROUBO A COLETIVO","",""
+"2026-05-15","Fortaleza","ANCURI","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-15","Fortaleza","AEROLANDIA","ROUBO A POSTO DE GASOLINA","ROUBO A POSTO DE GASOLINA","",""
+"2026-05-15","Fortaleza","BOM JARDIM","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-15","Fortaleza","ANCURI","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-14","Fortaleza","AEROLANDIA","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-14","Fortaleza","AEROLANDIA","ROUBO A ESTABELECIMENTO COMERCIAL","ROUBO A ESTABELECIMENTO COMERCIAL","",""
+"2026-05-14","Fortaleza","AEROLANDIA","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-14","Fortaleza","ALDEOTA","ROUBO A RESIDÊNCIA","ROUBO A RESIDÊNCIA","",""
+"2026-05-14","Fortaleza","AMADEU FURTADO","ROUBO A ESTABELECIMENTO COMERCIAL","ROUBO A ESTABELECIMENTO COMERCIAL","",""
+"2026-05-14","Fortaleza","AEROPORTO","ROUBO A FARMÁCIA","ROUBO A FARMÁCIA","",""
+"2026-05-14","Fortaleza","AEROLANDIA","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-14","Fortaleza","AEROLANDIA","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-14","Fortaleza","AEROLANDIA","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-13","Fortaleza","AEROLANDIA","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-13","Fortaleza","AEROLANDIA","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-13","Fortaleza","AEROPORTO","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-13","Fortaleza","ANCURI","ROUBO A ESTABELECIMENTO COMERCIAL","ROUBO A ESTABELECIMENTO COMERCIAL","",""
+"2026-05-13","Fortaleza","ANCURI","ROUBO A ESTABELECIMENTO COMERCIAL","ROUBO A ESTABELECIMENTO COMERCIAL","",""
+"2026-05-13","Fortaleza","AEROLANDIA","ROUBO A FARMÁCIA","ROUBO A FARMÁCIA","",""
+"2026-05-13","Fortaleza","AEROLANDIA","ROUBO A FARMÁCIA","ROUBO A FARMÁCIA","",""
+"2026-05-13","Fortaleza","AUTRAN NUNES","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-13","Fortaleza","AUTRAN NUNES","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-13","Fortaleza","AEROLANDIA","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-13","Fortaleza","AEROLANDIA","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-13","Fortaleza","ALDEOTA","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-13","Fortaleza","ALDEOTA","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-12","Fortaleza","ANCURI","ROUBO A PESSOA","ROUBO A PESSOA","",""
+"2026-05-12","Fortaleza","BOM JARDIM","ROUBO A ESTABELECIMENTO COMERCIAL","ROUBO A ESTABELECIMENTO COMERCIAL","",""
+"2026-05-12","Fortaleza","AEROLANDIA","ROUBO A PESSOA","ROUBO A PESSOA","",""
+
+CONTEXTO TATICO INDEPENDENTE DOS ULTIMOS 14 DIAS:
+# Resumo Tatico Independente - Ultimos 14 Dias
+
+- Gerado em: 2026-05-20T20:23:03
+- Janela: 2026-05-02 ate 2026-05-15
+- Data de referencia: 2026-05-15
+- Total de registros: 211
+- Fonte: outputs/hermes/dados_status_enriquecido_14d_latest.csv
+- Este resumo e tatico e independente; nao incorpora necessariamente os artefatos Hermes mais recentes.
+
+## Top cidades por registros
+
+1. FORTALEZA - 131 registros
+2. SOBRAL - 14 registros
+3. MARACANAÚ - 11 registros
+4. CRATEÚS - 4 registros
+5. ITAPIPOCA - 4 registros
+6. ITAPAJÉ - 4 registros
+7. TRAIRI - 3 registros
+8. EUSÉBIO - 3 registros
+9. MORADA NOVA - 2 registros
+10. CAUCAIA - 2 registros
+
+## Top bairros de Fortaleza por registros
+
+1. AEROLANDIA - 65 registros
+2. AMADEU FURTADO - 21 registros
+3. ANCURI - 11 registros
+4. BOM JARDIM - 11 registros
+5. ALDEOTA - 9 registros
+6. AEROPORTO - 8 registros
+7. AUTRAN NUNES - 2 registros
+8. ANTONIO BEZERRA - 1 registros
+9. BARROSO - 1 registros
+10. CANINDEZINHO - 1 registros
+11. CIDADE 2000 - 1 registros
+
+## Top tipos de evento por registros
+
+1. ROUBO A PESSOA - 113 registros
+2. HOMICIDIO DOLOSO - 43 registros
+3. ROUBO A ESTABELECIMENTO COMERCIAL - 18 registros
+4. ROUBO A RESIDÊNCIA - 12 registros
+5. ROUBO A FARMÁCIA - 9 registros
+6. ROUBO A POSTO DE GASOLINA - 7 registros
+7. ROUBO A PESSOA C/ CONSTRANGIMENTO DA LIBERDADE - 3 registros
+8. ROUBO A COLETIVO - 2 registros
+9. ROUBO A CONDOMÍNIO - 1 registros
+10. FEMINICÍDIO - 1 registros
+
+## RMF - Top cidades
+
+1. TRAIRI - 3 registros
+2. CAUCAIA - 2 registros
+3. CHOROZINHO - 1 registros
+4. ITAITINGA - 1 registros
+
+## Interior - Top cidades
+
+1. SOBRAL - 14 registros
+2. MARACANAÚ - 11 registros
+3. CRATEÚS - 4 registros
+4. ITAPAJÉ - 4 registros
+5. ITAPIPOCA - 4 registros
+6. EUSÉBIO - 3 registros
+7. ACARAPE - 2 registros
+8. MORADA NOVA - 2 registros
+9. PARAMBU - 2 registros
+10. BOA VIAGEM - 2 registros
+
+
+RESUMO TATICO 14D EM JSON (quando precisar de estrutura):
+{
+  "generated_at": "2026-05-20T20:23:03",
+  "reference_date": "2026-05-15",
+  "window_days": 14,
+  "total_rows": 211,
+  "date_min": "2026-05-02",
+  "date_max": "2026-05-15",
+  "top_cities": [
+    {
+      "cidade": "FORTALEZA",
+      "count": 131
+    },
+    {
+      "cidade": "SOBRAL",
+      "count": 14
+    },
+    {
+      "cidade": "MARACANAÚ",
+      "count": 11
+    },
+    {
+      "cidade": "CRATEÚS",
+      "count": 4
+    },
+    {
+      "cidade": "ITAPIPOCA",
+      "count": 4
+    },
+    {
+      "cidade": "ITAPAJÉ",
+      "count": 4
+    },
+    {
+      "cidade": "TRAIRI",
+      "count": 3
+    },
+    {
+      "cidade": "EUSÉBIO",
+      "count": 3
+    },
+    {
+      "cidade": "MORADA NOVA",
+      "count": 2
+    },
+    {
+      "cidade": "CAUCAIA",
+      "count": 2
+    }
+  ],
+  "top_bairros_fortaleza": [
+    {
+      "bairro": "AEROLANDIA",
+      "count": 65
+    },
+    {
+      "bairro": "AMADEU FURTADO",
+      "count": 21
+    },
+    {
+      "bairro": "ANCURI",
+      "count": 11
+    },
+    {
+      "bairro": "BOM JARDIM",
+      "count": 11
+    },
+    {
+      "bairro": "ALDEOTA",
+      "count": 9
+    },
+    {
+      "bairro": "AEROPORTO",
+      "count": 8
+    },
+    {
+      "bairro": "AUTRAN NUNES",
+      "count": 2
+    },
+    {
+      "bairro": "ANTONIO BEZERRA",
+      "count": 1
+    },
+    {
+      "bairro": "BARROSO",
+      "count": 1
+    },
+    {
+      "bairro": "CANINDEZINHO",
+      "count": 1
+    },
+    {
+      "bairro": "CIDADE 2000",
+      "count": 1
+    }
+  ],
+  "top_tipos_evento": [
+    {
+      "tipo_evento": "ROUBO A PESSOA",
+      "count": 113
+    },
+    {
+      "tipo_evento": "HOMICIDIO DOLOSO",
+      "count": 43
+    },
+    {
+      "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
+      "count": 18
+    },
+    {
+      "tipo_evento": "ROUBO A RESIDÊNCIA",
+      "count": 12
+    },
+    {
+      "tipo_evento": "ROUBO A FARMÁCIA",
+      "count": 9
+    },
+    {
+      "tipo_evento": "ROUBO A POSTO DE GASOLINA",
+      "count": 7
+    },
+    {
+      "tipo_evento": "ROUBO A PESSOA C/ CONSTRANGIMENTO DA LIBERDADE",
+      "count": 3
+    },
+    {
+      "tipo_evento": "ROUBO A COLETIVO",
+      "count": 2
+    },
+    {
+      "tipo_evento": "ROUBO A CONDOMÍNIO",
+      "count": 1
+    },
+    {
+      "tipo_evento": "FEMINICÍDIO",
+      "count": 1
+    }
+  ],
+  "fortaleza": {
+    "row_count": 131,
+    "top_bairros": [
+      {
+        "bairro": "AEROLANDIA",
+        "count": 65
+      },
+      {
+        "bairro": "AMADEU FURTADO",
+        "count": 21
+      },
+      {
+        "bairro": "ANCURI",
+        "count": 11
+      },
+      {
+        "bairro": "BOM JARDIM",
+        "count": 11
+      },
+      {
+        "bairro": "ALDEOTA",
+        "count": 9
+      },
+      {
+        "bairro": "AEROPORTO",
+        "count": 8
+      },
+      {
+        "bairro": "AUTRAN NUNES",
+        "count": 2
+      },
+      {
+        "bairro": "ANTONIO BEZERRA",
+        "count": 1
+      },
+      {
+        "bairro": "BARROSO",
+        "count": 1
+      },
+      {
+        "bairro": "CANINDEZINHO",
+        "count": 1
+      },
+      {
+        "bairro": "CIDADE 2000",
+        "count": 1
+      }
+    ],
+    "top_tipos_evento": [
+      {
+        "tipo_evento": "ROUBO A PESSOA",
+        "count": 92
+      },
+      {
+        "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
+        "count": 11
+      },
+      {
+        "tipo_evento": "ROUBO A FARMÁCIA",
+        "count": 9
+      },
+      {
+        "tipo_evento": "ROUBO A RESIDÊNCIA",
+        "count": 6
+      },
+      {
+        "tipo_evento": "HOMICIDIO DOLOSO",
+        "count": 4
+      },
+      {
+        "tipo_evento": "ROUBO A POSTO DE GASOLINA",
+        "count": 4
+      },
+      {
+        "tipo_evento": "ROUBO A COLETIVO",
+        "count": 2
+      },
+      {
+        "tipo_evento": "ROUBO A PESSOA C/ CONSTRANGIMENTO DA LIBERDADE",
+        "count": 2
+      },
+      {
+        "tipo_evento": "ROUBO A SUPERMERCADO/MERCANTIL",
+        "count": 1
+      }
+    ]
+  },
+  "rmf": {
+    "row_count": 7,
+    "top_cidades": [
+      {
+        "cidade": "TRAIRI",
+        "count": 3
+      },
+      {
+        "cidade": "CAUCAIA",
+        "count": 2
+      },
+      {
+        "cidade": "CHOROZINHO",
+        "count": 1
+      },
+      {
+        "cidade": "ITAITINGA",
+        "count": 1
+      }
+    ],
+    "top_tipos_evento": [
+      {
+        "tipo_evento": "HOMICIDIO DOLOSO",
+        "count": 3
+      },
+      {
+        "tipo_evento": "ROUBO A PESSOA",
+        "count": 2
+      },
+      {
+        "tipo_evento": "FEMINICÍDIO",
+        "count": 1
+      },
+      {
+        "tipo_evento": "ROUBO A RESIDÊNCIA",
+        "count": 1
+      }
+    ]
+  },
+  "interior": {
+    "row_count": 73,
+    "top_cidades": [
+      {
+        "cidade": "SOBRAL",
+        "count": 14
+      },
+      {
+        "cidade": "MARACANAÚ",
+        "count": 11
+      },
+      {
+        "cidade": "CRATEÚS",
+        "count": 4
+      },
+      {
+        "cidade": "ITAPAJÉ",
+        "count": 4
+      },
+      {
+        "cidade": "ITAPIPOCA",
+        "count": 4
+      },
+      {
+        "cidade": "EUSÉBIO",
+        "count": 3
+      },
+      {
+        "cidade": "ACARAPE",
+        "count": 2
+      },
+      {
+        "cidade": "MORADA NOVA",
+        "count": 2
+      },
+      {
+        "cidade": "PARAMBU",
+        "count": 2
+      },
+      {
+        "cidade": "BOA VIAGEM",
+        "count": 2
+      }
+    ],
+    "top_tipos_evento": [
+      {
+        "tipo_evento": "HOMICIDIO DOLOSO",
+        "count": 36
+      },
+      {
+        "tipo_evento": "ROUBO A PESSOA",
+        "count": 19
+      },
+      {
+        "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
+        "count": 7
+      },
+      {
+        "tipo_evento": "ROUBO A RESIDÊNCIA",
+        "count": 5
+      },
+      {
+        "tipo_evento": "ROUBO A POSTO DE GASOLINA",
+        "count": 3
+      },
+      {
+        "tipo_evento": "ROUBO A CONDOMÍNIO",
+        "count": 1
+      },
+      {
+        "tipo_evento": "ROUBO A ESTABELECIMENTO DE ENSINO",
+        "count": 1
+      },
+      {
+        "tipo_evento": "ROUBO A PESSOA C/ CONSTRANGIMENTO DA LIBERDADE",
+        "count": 1
+      }
+    ]
+  }
+}
+
+PERGUNTA DO USUARIO:
+Em que área de Fortaleza a taxa de latrocínio durante o dia de hoje?

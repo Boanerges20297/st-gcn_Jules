@@ -256,9 +256,663 @@ class StateOrchestrator:
                 print(f"❌ Falha total ao carregar {path}: {final_e}")
                 return None
 
+    def _risk_level(self, score):
+        score = max(0.0, min(100.0, float(score)))
+        if score >= 71.0:
+            return 'crítico'
+        if score >= 51.0:
+            return 'alto'
+        if score >= 31.0:
+            return 'moderado'
+        return 'baixo'
+
+    def _label_band(self, value, bands):
+        for threshold, label in bands:
+            if value >= threshold:
+                return label
+        return bands[-1][1]
+
+    def _score_percentile(self, rank, total_items):
+        if total_items <= 1:
+            return 100.0
+        return round(100.0 * (1.0 - ((rank - 1) / (total_items - 1))), 1)
+
+    def _compute_confidence_pct(self, item):
+        neural = float(item.get('neural_score', 0.0)) / 100.0
+        tension = float(item.get('tension_score', 0.0)) / 100.0
+        inclusion = float(item.get('inclusion_score', 0.0)) / 100.0
+        support = float(item.get('territorial_support_pct', 0.0)) / 100.0
+        recent_30d = min(float(item.get('recent_cvli_30d', 0.0)) / 4.0, 1.0)
+        coherence = 1.0 - min(float(np.std([neural, tension, inclusion])), 1.0)
+        base = (0.30 * coherence) + (0.25 * max(neural, tension, inclusion)) + (0.25 * support) + (0.20 * recent_30d)
+        if item.get('historical_fallback'):
+            base -= 0.12
+        return round(max(5.0, min(99.0, base * 100.0)), 1)
+
+    def _build_driver_list(self, item):
+        drivers = [
+            ('sinal_neural', float(item.get('neural_score', 0.0)), 'Sinal neural do ST-GAT'),
+            ('tensao_territorial', float(item.get('tension_score', 0.0)), 'Tensão territorial'),
+            ('inclusao_recente', float(item.get('inclusion_score', 0.0)), 'Atividade recente e vizinhança'),
+        ]
+
+        if float(item.get('recent_cvli_30d', 0.0)) > 0:
+            drivers.append(('cvli_recente', min(float(item.get('recent_cvli_30d', 0.0)) * 20.0, 100.0), 'CVLI recente na janela de 30 dias'))
+        if item.get('historical_fallback'):
+            drivers.append(('fallback_historico', 55.0, 'Fallback histórico ativado'))
+
+        ordered = sorted(drivers, key=lambda entry: entry[1], reverse=True)
+        return [
+            {
+                'key': key,
+                'label': label,
+                'strength_pct': round(strength, 1),
+            }
+            for key, strength, label in ordered[:3]
+        ]
+
+    def _build_manager_feedback(self, item, rank, total_items, score, confidence_pct, expressiveness_pct, drivers):
+        primary_driver = drivers[0]['label'] if drivers else 'Sinal combinado do modelo'
+        recent_cvli = int(item.get('recent_cvli_30d', 0))
+        support_pct = float(item.get('territorial_support_pct', 0.0))
+        risk_level = self._risk_level(score)
+
+        if rank <= 5:
+            priority_text = 'prioridade imediata de acompanhamento'
+        elif rank <= 10:
+            priority_text = 'prioridade alta de acompanhamento'
+        elif risk_level in ('crítico', 'alto'):
+            priority_text = 'território relevante para monitoramento'
+        else:
+            priority_text = 'território de atenção tática'
+
+        leitura_rapida = (
+            f"{item['name']} aparece na posição {rank} de {total_items}, com risco {score:.1f} e nível {risk_level}; "
+            f"é {priority_text}."
+        )
+        por_que_importa = (
+            f"O peso principal vem de {primary_driver.lower()}, com suporte territorial de {support_pct:.1f}%"
+            f" e {recent_cvli} registros recentes na janela de 30 dias."
+        )
+
+        if confidence_pct >= 85:
+            confidence_note = 'Leitura com boa sustentação dos sinais atuais.'
+        elif confidence_pct >= 70:
+            confidence_note = 'Leitura consistente, mas ainda pede validação operacional pontual.'
+        elif item.get('historical_fallback'):
+            confidence_note = 'Leitura mais fraca; parte do peso vem de fallback histórico e deve ser confirmada em campo.'
+        else:
+            confidence_note = 'Leitura sensível a ruído; requer conferência adicional antes de decisão forte.'
+
+        if expressiveness_pct >= 85:
+            expressiveness_note = 'O território está bem destacado no ranking frente aos pares.'
+        elif expressiveness_pct >= 70:
+            expressiveness_note = 'O território se diferencia do bloco intermediário, mas sem isolamento absoluto.'
+        else:
+            expressiveness_note = 'O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.'
+
+        proxima_acao = (
+            f"Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+        )
+
+        return {
+            'leitura_rapida': leitura_rapida,
+            'por_que_importa': por_que_importa,
+            'confianca_limites': confidence_note,
+            'expressividade_previsao': expressiveness_note,
+            'proxima_acao': proxima_acao,
+        }
+
+    def _build_ranking_entry(self, item, rank, peer_scores, cc_status, data_limit):
+        score = round(float(item.get('score_final', item.get('score_raw', 0.0))), 2)
+        total_items = max(1, len(peer_scores))
+        mean_score = float(np.mean(peer_scores)) if peer_scores else score
+        std_score = float(np.std(peer_scores)) if len(peer_scores) > 1 else 0.0
+        z_score = (score - mean_score) / std_score if std_score > 1e-6 else 0.0
+        percentile = self._score_percentile(rank, total_items)
+        separation_pct = max(0.0, min(100.0, 50.0 + (12.0 * z_score)))
+        expressiveness_pct = round((0.6 * percentile) + (0.4 * separation_pct), 1)
+        confidence_pct = self._compute_confidence_pct(item)
+        drivers = self._build_driver_list(item)
+        manager_feedback = self._build_manager_feedback(item, rank, total_items, score, confidence_pct, expressiveness_pct, drivers)
+
+        entry = {
+            'rank': rank,
+            'name': item['name'],
+            'name_normalized': item['name_normalized'],
+            'region': item['region'],
+            'territorial_level': item['territorial_level'],
+            'risk_score': score,
+            'risk_level': self._risk_level(score),
+            'confidence_pct': confidence_pct,
+            'confidence_label': self._label_band(confidence_pct, [(85, 'alta'), (70, 'moderada'), (55, 'baixa'), (0, 'muito baixa')]),
+            'expressiveness_pct': expressiveness_pct,
+            'expressiveness_label': self._label_band(expressiveness_pct, [(85, 'muito alta'), (70, 'alta'), (50, 'moderada'), (0, 'baixa')]),
+            'data_limit': data_limit,
+            'metrics': {
+                'recent_cvli_14d': int(item.get('recent_cvli_14d', 0)),
+                'recent_cvli_30d': int(item.get('recent_cvli_30d', 0)),
+                'historical_cvli': round(float(item.get('historical_cvli', 0.0)), 1),
+                'neural_score': round(float(item.get('neural_score', 0.0)), 1),
+                'tension_score': round(float(item.get('tension_score', 0.0)), 1),
+                'inclusion_score': round(float(item.get('inclusion_score', 0.0)), 1),
+                'calm_penalty': round(float(item.get('calm_penalty', 0.0)), 1),
+                'territorial_support_pct': round(float(item.get('territorial_support_pct', 0.0)), 1),
+                'historical_support_pct': round(float(item.get('historical_support_pct', 0.0)), 1),
+                'live_support_pct': round(float(item.get('live_support_pct', 0.0)), 1),
+                'score_z': round(z_score, 2),
+                'peer_percentile': percentile,
+                'dynamic_window_days': int(item.get('dynamic_window', 0) or 0),
+                'base_window_days': int(item.get('base_window', 0) or 0),
+            },
+            'explainability': {
+                'top_drivers': drivers,
+                'summary': ' | '.join(f"{driver['label']}: {driver['strength_pct']:.1f}%" for driver in drivers),
+            },
+            'manager_feedback': manager_feedback,
+            'prediction_details': {
+                'historical_fallback': bool(item.get('historical_fallback', False)),
+                'trend': item.get('trend', 'stable'),
+            },
+        }
+
+        if item['region'] == 'fortaleza' and cc_status:
+            entry['prediction_details']['champion_challenger'] = {
+                'champion_pct': float(cc_status.get('champion_pct', 100.0)),
+                'challenger_pct': float(cc_status.get('challenger_pct', 0.0)),
+                'cc_weight': float(cc_status.get('cc_weight', 0.0)),
+                'last_eval': cc_status.get('last_eval'),
+            }
+
+        return entry
+
+    def _build_hermes_rankings(self, scores_map, component_details):
+        cc_status = self.champion_challenger.status() if self.champion_challenger is not None else None
+        data_limit = None
+        if self.dates is not None and len(self.dates) > 0:
+            try:
+                data_limit = pd.Timestamp(self.dates[-1]).strftime('%Y-%m-%d')
+            except Exception:
+                data_limit = str(self.dates[-1])
+
+        rows = []
+        for name_key, score in scores_map.items():
+            meta = component_details.get(name_key)
+            if not meta:
+                continue
+            row = dict(meta)
+            row['score_final'] = float(score)
+            rows.append(row)
+
+        rows.sort(key=lambda item: item['score_final'], reverse=True)
+
+        general_cities = [item for item in rows if item['territorial_level'] == 'cidade']
+        rmf_cities = [item for item in general_cities if item['region'] == 'rmf']
+        interior_cities = [item for item in general_cities if item['region'] == 'interior']
+        fortaleza_bairros = [item for item in rows if item['region'] == 'fortaleza']
+
+        def build_slice(items, limit):
+            peer_scores = [float(item['score_final']) for item in items]
+            return [
+                self._build_ranking_entry(item, idx + 1, peer_scores, cc_status, data_limit)
+                for idx, item in enumerate(items[:limit])
+            ]
+
+        return {
+            'generated_at': datetime.now().isoformat(timespec='seconds'),
+            'data_limit': data_limit,
+            'source': 'src/core/orchestrator.py:get_combined_risk',
+            'model': {
+                'type': 'ST-GAT + Sentinela V3',
+                'challenger': cc_status,
+            },
+            'rankings': {
+                'general_cities_top30': build_slice(general_cities, 30),
+                'rmf_cities_top20': build_slice(rmf_cities, 20),
+                'interior_cities_top30': build_slice(interior_cities, 30),
+                'fortaleza_bairros_top30': build_slice(fortaleza_bairros, 30),
+            },
+        }
+
+    def _export_recent_enriched_status(self, output_dir, history_dir, timestamp_slug, data_limit):
+        source_path = os.path.join(self.root, 'data', 'raw', 'dados_status_ocorrencias_gerais_ENRIQUECIDO.csv')
+        latest_path = os.path.join(output_dir, 'dados_status_enriquecido_14d_latest.csv')
+        history_path = os.path.join(history_dir, f'dados_status_enriquecido_14d_{timestamp_slug}.csv')
+
+        if not os.path.exists(source_path):
+            raise FileNotFoundError(f'Fonte enriquecida nao encontrada: {source_path}')
+
+        status_df = pd.read_csv(source_path, encoding='utf-8', low_memory=False)
+        if 'data' not in status_df.columns:
+            raise KeyError("Coluna 'data' nao encontrada em dados_status_ocorrencias_gerais_ENRIQUECIDO.csv")
+
+        status_df['data'] = pd.to_datetime(status_df['data'], errors='coerce')
+        status_df = status_df.dropna(subset=['data']).copy()
+
+        if status_df.empty:
+            filtered_df = status_df
+            reference_date = pd.Timestamp(data_limit) if data_limit else pd.Timestamp.today().normalize()
+        else:
+            csv_max_date = status_df['data'].max().normalize()
+            if data_limit:
+                reference_date = min(pd.Timestamp(data_limit).normalize(), csv_max_date)
+            else:
+                reference_date = csv_max_date
+            window_start = reference_date - pd.Timedelta(days=13)
+            filtered_df = status_df[(status_df['data'] >= window_start) & (status_df['data'] <= reference_date)].copy()
+
+        filtered_df['data'] = filtered_df['data'].dt.strftime('%Y-%m-%d')
+        filtered_df = filtered_df.sort_values(['data', 'hora', 'cidade', 'bairro'], ascending=[False, False, True, True], na_position='last')
+
+        for path in (latest_path, history_path):
+            filtered_df.to_csv(path, index=False, encoding='utf-8-sig')
+
+        tactical_summary = self._build_tactical_14d_summary(filtered_df, reference_date)
+        tactical_latest_json_path = os.path.join(output_dir, 'dados_status_enriquecido_14d_summary_latest.json')
+        tactical_history_json_path = os.path.join(history_dir, f'dados_status_enriquecido_14d_summary_{timestamp_slug}.json')
+        tactical_latest_md_path = os.path.join(output_dir, 'dados_status_enriquecido_14d_summary_latest.md')
+        tactical_history_md_path = os.path.join(history_dir, f'dados_status_enriquecido_14d_summary_{timestamp_slug}.md')
+
+        for path in (tactical_latest_json_path, tactical_history_json_path):
+            with open(path, 'w', encoding='utf-8') as f:
+                json.dump(tactical_summary, f, indent=2, ensure_ascii=False)
+
+        tactical_md = self._render_tactical_14d_summary_markdown(tactical_summary)
+        for path in (tactical_latest_md_path, tactical_history_md_path):
+            with open(path, 'w', encoding='utf-8') as f:
+                f.write(tactical_md)
+
+        return {
+            'source': 'data/raw/dados_status_ocorrencias_gerais_ENRIQUECIDO.csv',
+            'latest_csv': 'outputs/hermes/dados_status_enriquecido_14d_latest.csv',
+            'history_csv': f'outputs/hermes/history/dados_status_enriquecido_14d_{timestamp_slug}.csv',
+            'latest_summary_json': 'outputs/hermes/dados_status_enriquecido_14d_summary_latest.json',
+            'history_summary_json': f'outputs/hermes/history/dados_status_enriquecido_14d_summary_{timestamp_slug}.json',
+            'latest_summary_md': 'outputs/hermes/dados_status_enriquecido_14d_summary_latest.md',
+            'history_summary_md': f'outputs/hermes/history/dados_status_enriquecido_14d_summary_{timestamp_slug}.md',
+            'reference_date': reference_date.strftime('%Y-%m-%d'),
+            'window_days': 14,
+            'row_count': int(len(filtered_df)),
+        }
+
+    def _build_tactical_14d_summary(self, status_df, reference_date):
+        summary = {
+            'generated_at': datetime.now().isoformat(timespec='seconds'),
+            'reference_date': reference_date.strftime('%Y-%m-%d'),
+            'window_days': 14,
+            'total_rows': int(len(status_df)),
+            'date_min': None,
+            'date_max': None,
+            'top_cities': [],
+            'top_bairros_fortaleza': [],
+            'top_tipos_evento': [],
+            'fortaleza': {
+                'row_count': 0,
+                'top_bairros': [],
+                'top_tipos_evento': [],
+            },
+            'rmf': {
+                'row_count': 0,
+                'top_cidades': [],
+                'top_tipos_evento': [],
+            },
+            'interior': {
+                'row_count': 0,
+                'top_cidades': [],
+                'top_tipos_evento': [],
+            },
+        }
+
+        if status_df.empty:
+            return summary
+
+        working_df = status_df.copy()
+        working_df['data'] = pd.to_datetime(working_df['data'], errors='coerce')
+        working_df['cidade_norm'] = working_df['cidade'].fillna('').astype(str).str.strip().str.upper()
+        working_df['bairro_norm'] = working_df['bairro'].fillna('').astype(str).str.strip().str.upper()
+        working_df['tipo_evento_norm'] = working_df['tipo_evento'].fillna('').astype(str).str.strip().str.upper()
+
+        summary['date_min'] = working_df['data'].min().strftime('%Y-%m-%d') if working_df['data'].notna().any() else None
+        summary['date_max'] = working_df['data'].max().strftime('%Y-%m-%d') if working_df['data'].notna().any() else None
+
+        def _group_counts(df, column, limit, field_name):
+            if column not in df.columns:
+                return []
+            grouped = (
+                df[df[column].fillna('').astype(str).str.strip() != '']
+                .groupby(column)
+                .size()
+                .sort_values(ascending=False)
+                .head(limit)
+            )
+            return [
+                {field_name: str(index), 'count': int(value)}
+                for index, value in grouped.items()
+            ]
+
+        summary['top_cities'] = _group_counts(working_df, 'cidade_norm', 10, 'cidade')
+        summary['top_bairros_fortaleza'] = _group_counts(working_df[working_df['cidade_norm'] == 'FORTALEZA'], 'bairro_norm', 15, 'bairro')
+        summary['top_tipos_evento'] = _group_counts(working_df, 'tipo_evento_norm', 10, 'tipo_evento')
+
+        fortaleza_df = working_df[working_df['cidade_norm'] == 'FORTALEZA'].copy()
+        summary['fortaleza'] = {
+            'row_count': int(len(fortaleza_df)),
+            'top_bairros': _group_counts(fortaleza_df, 'bairro_norm', 15, 'bairro'),
+            'top_tipos_evento': _group_counts(fortaleza_df, 'tipo_evento_norm', 10, 'tipo_evento'),
+        }
+
+        rmf_names = {
+            'CAUCAIA', 'MARACANAU', 'MARANGUAPE', 'PACATUBA', 'HORIZONTE', 'EUSEBIO', 'AQUIRAZ', 'PARACURU',
+            'PARAIPABA', 'ITAITINGA', 'GUAIUBA', 'SAO GONCALO DO AMARANTE', 'CASCAVEL', 'PACAJUS', 'CHOROZINHO',
+            'PINDORETAMA', 'BEBERIBE', 'TRAIRI', 'SAO LUIS DO CURU'
+        }
+        rmf_df = working_df[working_df['cidade_norm'].isin(rmf_names)].copy()
+        interior_df = working_df[(working_df['cidade_norm'] != 'FORTALEZA') & (~working_df['cidade_norm'].isin(rmf_names))].copy()
+
+        summary['rmf'] = {
+            'row_count': int(len(rmf_df)),
+            'top_cidades': _group_counts(rmf_df, 'cidade_norm', 10, 'cidade'),
+            'top_tipos_evento': _group_counts(rmf_df, 'tipo_evento_norm', 10, 'tipo_evento'),
+        }
+        summary['interior'] = {
+            'row_count': int(len(interior_df)),
+            'top_cidades': _group_counts(interior_df, 'cidade_norm', 10, 'cidade'),
+            'top_tipos_evento': _group_counts(interior_df, 'tipo_evento_norm', 10, 'tipo_evento'),
+        }
+
+        return summary
+
+    def _render_tactical_14d_summary_markdown(self, summary):
+        def _render_list(title, items, key_name):
+            lines = [f'## {title}', '']
+            if not items:
+                lines.append('- Sem registros relevantes nesta janela.')
+                lines.append('')
+                return lines
+            for idx, item in enumerate(items, start=1):
+                lines.append(f"{idx}. {item[key_name]} - {item['count']} registros")
+            lines.append('')
+            return lines
+
+        lines = [
+            '# Resumo Tatico Independente - Ultimos 14 Dias',
+            '',
+            f"- Gerado em: {summary['generated_at']}",
+            f"- Janela: {summary.get('date_min') or '-'} ate {summary.get('date_max') or '-'}",
+            f"- Data de referencia: {summary['reference_date']}",
+            f"- Total de registros: {summary['total_rows']}",
+            '- Fonte: outputs/hermes/dados_status_enriquecido_14d_latest.csv',
+            '- Este resumo e tatico e independente; nao incorpora necessariamente os artefatos Hermes mais recentes.',
+            '',
+        ]
+        lines.extend(_render_list('Top cidades por registros', summary.get('top_cities', []), 'cidade'))
+        lines.extend(_render_list('Top bairros de Fortaleza por registros', summary.get('top_bairros_fortaleza', []), 'bairro'))
+        lines.extend(_render_list('Top tipos de evento por registros', summary.get('top_tipos_evento', []), 'tipo_evento'))
+        lines.extend(_render_list('RMF - Top cidades', summary.get('rmf', {}).get('top_cidades', []), 'cidade'))
+        lines.extend(_render_list('Interior - Top cidades', summary.get('interior', {}).get('top_cidades', []), 'cidade'))
+        return '\n'.join(lines).strip() + '\n'
+
+    def _write_hermes_outputs(self, scores_map, component_details):
+        try:
+            artifact = self._build_hermes_rankings(scores_map, component_details)
+            output_dir = os.path.join(self.root, 'outputs', 'hermes')
+            history_dir = os.path.join(output_dir, 'history')
+            os.makedirs(output_dir, exist_ok=True)
+            os.makedirs(history_dir, exist_ok=True)
+
+            json_path = os.path.join(output_dir, 'risk_snapshot_latest.json')
+            md_path = os.path.join(output_dir, 'risk_snapshot_latest.md')
+            brief_path = os.path.join(output_dir, 'risk_brief_latest.md')
+            csv_path = os.path.join(output_dir, 'risk_snapshot_latest.csv')
+            timestamp_slug = datetime.fromisoformat(artifact['generated_at']).strftime('%Y%m%d_%H%M%S')
+            history_json_path = os.path.join(history_dir, f'risk_snapshot_{timestamp_slug}.json')
+            history_md_path = os.path.join(history_dir, f'risk_snapshot_{timestamp_slug}.md')
+            history_brief_path = os.path.join(history_dir, f'risk_brief_{timestamp_slug}.md')
+            history_csv_path = os.path.join(history_dir, f'risk_snapshot_{timestamp_slug}.csv')
+
+            artifact['artifacts'] = {
+                'latest_json': 'outputs/hermes/risk_snapshot_latest.json',
+                'latest_md': 'outputs/hermes/risk_snapshot_latest.md',
+                'latest_brief': 'outputs/hermes/risk_brief_latest.md',
+                'latest_csv': 'outputs/hermes/risk_snapshot_latest.csv',
+                'history_json': f"outputs/hermes/history/risk_snapshot_{timestamp_slug}.json",
+                'history_md': f"outputs/hermes/history/risk_snapshot_{timestamp_slug}.md",
+                'history_brief': f"outputs/hermes/history/risk_brief_{timestamp_slug}.md",
+                'history_csv': f"outputs/hermes/history/risk_snapshot_{timestamp_slug}.csv",
+            }
+
+            recent_status_artifact = self._export_recent_enriched_status(
+                output_dir=output_dir,
+                history_dir=history_dir,
+                timestamp_slug=timestamp_slug,
+                data_limit=artifact.get('data_limit'),
+            )
+            artifact['artifacts']['latest_status_enriquecido_14d_csv'] = recent_status_artifact['latest_csv']
+            artifact['artifacts']['history_status_enriquecido_14d_csv'] = recent_status_artifact['history_csv']
+            artifact['artifacts']['status_enriquecido_14d_source'] = recent_status_artifact['source']
+            artifact['status_enriquecido_14d'] = {
+                'source': recent_status_artifact['source'],
+                'reference_date': recent_status_artifact['reference_date'],
+                'window_days': recent_status_artifact['window_days'],
+                'row_count': recent_status_artifact['row_count'],
+            }
+
+            for path in (json_path, history_json_path):
+                with open(path, 'w', encoding='utf-8') as f:
+                    json.dump(artifact, f, indent=2, ensure_ascii=False)
+
+            title_map = {
+                'general_cities_top30': 'Ranking das cidades - Top 30 (Geral)',
+                'rmf_cities_top20': 'Ranking das cidades - Top 20 (RMF)',
+                'interior_cities_top30': 'Ranking das cidades - Top 30 (Interior)',
+                'fortaleza_bairros_top30': 'Ranking dos bairros - Top 30 (Fortaleza)',
+            }
+
+            lines = [
+                '# Artefato Hermes de Risco',
+                '',
+                f"- Gerado em: {artifact['generated_at']}",
+                f"- Base de dados ate: {artifact['data_limit'] or 'indisponivel'}",
+                f"- Base de dados formatada: {pd.Timestamp(artifact['data_limit']).strftime('%d/%m/%Y') if artifact['data_limit'] else 'indisponivel'}",
+                f"- Origem: {artifact['source']}",
+                '- Fonte oficial para o Hermes: outputs/hermes/',
+                f"- Snapshot historico JSON: outputs/hermes/history/risk_snapshot_{timestamp_slug}.json",
+                f"- Snapshot historico Markdown: outputs/hermes/history/risk_snapshot_{timestamp_slug}.md",
+                f"- CSV enriquecido (ultimos 14 dias): outputs/hermes/dados_status_enriquecido_14d_latest.csv",
+                f"- Snapshot historico do CSV enriquecido: outputs/hermes/history/dados_status_enriquecido_14d_{timestamp_slug}.csv",
+                '',
+                '## Leitura operacional',
+                '',
+                '- Este artefato deve ser a fonte primaria do Hermes para rankings e leitura de risco.',
+                '- As metricas de confianca e expressividade sao heuristicas operacionais calculadas a partir do score, separacao no ranking e coerencia dos sinais.',
+                f"- O CSV enriquecido complementar cobre {artifact['status_enriquecido_14d']['row_count']} registros ate {artifact['status_enriquecido_14d']['reference_date']} para analise independente de convergencia.",
+                '',
+            ]
+
+            for key, title in title_map.items():
+                lines.append(f'## {title}')
+                lines.append('')
+                lines.append('| Rank | Localidade | Risco | Nivel | Confianca | Expressividade | Drivers | Base ate |')
+                lines.append('| --- | --- | --- | --- | --- | --- | --- | --- |')
+                for entry in artifact['rankings'][key]:
+                    drivers = '; '.join(driver['label'] for driver in entry['explainability']['top_drivers'])
+                    lines.append(
+                        f"| {entry['rank']} | {entry['name']} | {entry['risk_score']:.1f} | {entry['risk_level']} | "
+                        f"{entry['confidence_pct']:.1f}% ({entry['confidence_label']}) | "
+                        f"{entry['expressiveness_pct']:.1f}% ({entry['expressiveness_label']}) | {drivers} | {entry['data_limit'] or '-'} |"
+                    )
+                lines.append('')
+
+            markdown_payload = '\n'.join(lines).strip() + '\n'
+            for path in (md_path, history_md_path):
+                with open(path, 'w', encoding='utf-8') as f:
+                    f.write(markdown_payload)
+
+            data_limit_br = pd.Timestamp(artifact['data_limit']).strftime('%d/%m/%Y') if artifact['data_limit'] else 'indisponivel'
+
+            def _brief_block(title, entries):
+                brief_lines = [f'## {title}']
+                if not entries:
+                    brief_lines.append('- Ranking indisponivel neste snapshot.')
+                    brief_lines.append('')
+                    return brief_lines
+
+                lead = entries[0]
+                brief_lines.append(f"- Leitura rapida: {lead['manager_feedback']['leitura_rapida']}")
+                brief_lines.append(f"- Por que importa: {lead['manager_feedback']['por_que_importa']}")
+                brief_lines.append(f"- Proxima acao: {lead['manager_feedback']['proxima_acao']}")
+                brief_lines.append('')
+
+                for entry in entries:
+                    brief_lines.append(
+                        f"{entry['rank']}. {entry['name']} — risco {entry['risk_score']:.1f} | {entry['risk_level']} | confianca {entry['confidence_pct']:.1f}%"
+                    )
+                brief_lines.append('')
+                return brief_lines
+
+            fortaleza_top10 = artifact['rankings']['fortaleza_bairros_top30'][:10]
+            rmf_top10 = artifact['rankings']['rmf_cities_top20'][:10]
+            geral_top10 = artifact['rankings']['general_cities_top30'][:10]
+            drivers_fortaleza = ', '.join(driver['label'] for driver in fortaleza_top10[0]['explainability']['top_drivers']) if fortaleza_top10 else 'indisponivel'
+
+            brief_lines = [
+                '# Hermes Brief de Risco',
+                '',
+                f'Dados ate DD/MM/AAAA: {data_limit_br}',
+                'Fonte: outputs/hermes',
+                f'Snapshot consultado: outputs/hermes/history/risk_brief_{timestamp_slug}.md',
+                '',
+                'Use este arquivo como resposta pronta para chat e Telegram.',
+                'Responder com leitura util para gestor: o que aparece no topo, por que importa e o que validar em seguida.',
+                'Nao dizer que o ranking esta indisponivel se ele estiver listado abaixo.',
+                '',
+                '## Leitura rapida',
+                '',
+                f"- Bairros mais criticos em Fortaleza neste snapshot: {', '.join(entry['name'] for entry in fortaleza_top10[:5])}." if fortaleza_top10 else '- Bairros mais criticos em Fortaleza indisponiveis neste snapshot.',
+                f"- Principal driver do topo de Fortaleza: {drivers_fortaleza}." if fortaleza_top10 else '- Principal driver indisponivel.',
+                f"- Para gestor: {fortaleza_top10[0]['manager_feedback']['por_que_importa']}" if fortaleza_top10 else '- Leitura gerencial indisponivel.',
+                '',
+            ]
+            brief_lines.extend(_brief_block('Top 10 bairros de Fortaleza', fortaleza_top10))
+            brief_lines.extend(_brief_block('Top 10 cidades - Geral', geral_top10))
+            brief_lines.extend(_brief_block('Top 10 cidades - RMF', rmf_top10))
+            brief_lines.extend(_brief_block('Top 10 cidades - Interior', artifact['rankings']['interior_cities_top30'][:10]))
+            brief_lines.extend([
+                '## Regra de resposta',
+                '',
+                '- Quando o usuario pedir bairros mais perigosos de Fortaleza, responder a partir da secao `Top 10 bairros de Fortaleza`.',
+                '- Quando o usuario pedir cidades mais criticas, responder a partir das secoes de cidades.',
+                '- Sempre citar `Dados ate DD/MM/AAAA` e `Fonte: outputs/hermes`.',
+                '- Quando houver pedido de convergencia, validacao independente ou discordancia do modelo, consultar tambem `dados_status_enriquecido_14d_latest.csv`.',
+                '- Depois da lista, incluir pelo menos uma frase curta de leitura gerencial com impacto e proxima validacao.',
+                '- Template preferido de resposta: `Dados ate`, `Fonte`, `Leitura rapida`, lista principal, `Por que importa`, `Proxima acao`.',
+                '- Se precisar aprofundar, usar o arquivo risk_snapshot_latest.md ou risk_snapshot_latest.json.',
+                '',
+            ])
+
+            brief_payload = '\n'.join(brief_lines).strip() + '\n'
+            for path in (brief_path, history_brief_path):
+                with open(path, 'w', encoding='utf-8') as f:
+                    f.write(brief_payload)
+
+            csv_rows = []
+            scope_titles = {
+                'general_cities_top30': 'cities_general_top30',
+                'rmf_cities_top20': 'cities_rmf_top20',
+                'interior_cities_top30': 'cities_interior_top30',
+                'fortaleza_bairros_top30': 'fortaleza_bairros_top30',
+            }
+            for scope_key, scope_name in scope_titles.items():
+                for entry in artifact['rankings'][scope_key]:
+                    top_drivers = entry['explainability']['top_drivers']
+                    csv_rows.append({
+                        'snapshot_generated_at': artifact['generated_at'],
+                        'data_limit': artifact['data_limit'],
+                        'source': artifact['source'],
+                        'scope': scope_name,
+                        'rank': entry['rank'],
+                        'name': entry['name'],
+                        'name_normalized': entry['name_normalized'],
+                        'region': entry['region'],
+                        'territorial_level': entry['territorial_level'],
+                        'risk_score': entry['risk_score'],
+                        'risk_level': entry['risk_level'],
+                        'confidence_pct': entry['confidence_pct'],
+                        'confidence_label': entry['confidence_label'],
+                        'expressiveness_pct': entry['expressiveness_pct'],
+                        'expressiveness_label': entry['expressiveness_label'],
+                        'recent_cvli_14d': entry['metrics']['recent_cvli_14d'],
+                        'recent_cvli_30d': entry['metrics']['recent_cvli_30d'],
+                        'historical_cvli': entry['metrics']['historical_cvli'],
+                        'neural_score': entry['metrics']['neural_score'],
+                        'tension_score': entry['metrics']['tension_score'],
+                        'inclusion_score': entry['metrics']['inclusion_score'],
+                        'calm_penalty': entry['metrics']['calm_penalty'],
+                        'territorial_support_pct': entry['metrics']['territorial_support_pct'],
+                        'historical_support_pct': entry['metrics']['historical_support_pct'],
+                        'live_support_pct': entry['metrics']['live_support_pct'],
+                        'score_z': entry['metrics']['score_z'],
+                        'peer_percentile': entry['metrics']['peer_percentile'],
+                        'dynamic_window_days': entry['metrics']['dynamic_window_days'],
+                        'base_window_days': entry['metrics']['base_window_days'],
+                        'historical_fallback': entry['prediction_details']['historical_fallback'],
+                        'trend': entry['prediction_details']['trend'],
+                        'top_driver_1': top_drivers[0]['label'] if len(top_drivers) > 0 else '',
+                        'top_driver_1_strength_pct': top_drivers[0]['strength_pct'] if len(top_drivers) > 0 else '',
+                        'top_driver_2': top_drivers[1]['label'] if len(top_drivers) > 1 else '',
+                        'top_driver_2_strength_pct': top_drivers[1]['strength_pct'] if len(top_drivers) > 1 else '',
+                        'top_driver_3': top_drivers[2]['label'] if len(top_drivers) > 2 else '',
+                        'top_driver_3_strength_pct': top_drivers[2]['strength_pct'] if len(top_drivers) > 2 else '',
+                        'explainability_summary': entry['explainability']['summary'],
+                        'leitura_rapida_gestor': entry['manager_feedback']['leitura_rapida'],
+                        'por_que_importa_gestor': entry['manager_feedback']['por_que_importa'],
+                        'confianca_limites_gestor': entry['manager_feedback']['confianca_limites'],
+                        'expressividade_previsao_gestor': entry['manager_feedback']['expressividade_previsao'],
+                        'proxima_acao_gestor': entry['manager_feedback']['proxima_acao'],
+                    })
+
+            csv_df = pd.DataFrame(csv_rows)
+            for path in (csv_path, history_csv_path):
+                csv_df.to_csv(path, index=False, encoding='utf-8-sig')
+
+            separate_csv_specs = {
+                'fortaleza_bairros_top30': (
+                    os.path.join(output_dir, 'risk_fortaleza_latest.csv'),
+                    os.path.join(history_dir, f'risk_fortaleza_{timestamp_slug}.csv'),
+                ),
+                'rmf_cities_top20': (
+                    os.path.join(output_dir, 'risk_rmf_latest.csv'),
+                    os.path.join(history_dir, f'risk_rmf_{timestamp_slug}.csv'),
+                ),
+                'interior_cities_top30': (
+                    os.path.join(output_dir, 'risk_interior_latest.csv'),
+                    os.path.join(history_dir, f'risk_interior_{timestamp_slug}.csv'),
+                ),
+            }
+
+            artifact['artifacts']['latest_csv_fortaleza'] = 'outputs/hermes/risk_fortaleza_latest.csv'
+            artifact['artifacts']['latest_csv_rmf'] = 'outputs/hermes/risk_rmf_latest.csv'
+            artifact['artifacts']['latest_csv_interior'] = 'outputs/hermes/risk_interior_latest.csv'
+            artifact['artifacts']['history_csv_fortaleza'] = f'outputs/hermes/history/risk_fortaleza_{timestamp_slug}.csv'
+            artifact['artifacts']['history_csv_rmf'] = f'outputs/hermes/history/risk_rmf_{timestamp_slug}.csv'
+            artifact['artifacts']['history_csv_interior'] = f'outputs/hermes/history/risk_interior_{timestamp_slug}.csv'
+
+            for scope_key, paths in separate_csv_specs.items():
+                scope_name = scope_titles[scope_key]
+                scope_df = csv_df[csv_df['scope'] == scope_name].copy()
+                for path in paths:
+                    scope_df.to_csv(path, index=False, encoding='utf-8-sig')
+
+            for path in (json_path, history_json_path):
+                with open(path, 'w', encoding='utf-8') as f:
+                    json.dump(artifact, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            print(f"⚠️ [Hermes Output] Erro ao gerar artefato: {e}")
+
     def get_combined_risk(self, exogenous_shocks=None, return_trends=False):
         combined_scores = {}
         trends = {}
+        component_details = {}
         
         for region, spec in self.specialists.items():
             model, data, window = spec['model'], spec['data'], spec['window']
@@ -373,8 +1027,31 @@ class StateOrchestrator:
             for i, row in data['nodes_gdf'].iterrows():
                 name_key = normalize_name(str(row['name']))
                 if self._node_owners.get(name_key, region) == region:
-                    combined_scores[name_key] = float(out_norm[i])
-                    if return_trends: trends[name_key] = 'stable'
+                    score_value = float(out_norm[i])
+                    combined_scores[name_key] = score_value
+                    if return_trends:
+                        trends[name_key] = 'stable'
+                    component_details[name_key] = {
+                        'name': str(row['name']),
+                        'name_normalized': name_key,
+                        'region': region,
+                        'territorial_level': 'bairro' if region == 'fortaleza' else 'cidade',
+                        'score_raw': score_value,
+                        'neural_score': float(norm_neural[i] * 100.0),
+                        'tension_score': float(norm_tension[i] * 100.0),
+                        'inclusion_score': float(inclusion_signal[i] * 100.0),
+                        'calm_penalty': float(calm_signal[i] * 100.0),
+                        'recent_cvli_14d': int(current_cvli_recent[i]),
+                        'recent_cvli_30d': int(current_cvli_30d[i]),
+                        'historical_cvli': float(historical_cvli[i]),
+                        'territorial_support_pct': float(territorial_support[i] * 100.0),
+                        'historical_support_pct': float(historical_support[i] * 100.0),
+                        'live_support_pct': float(live_support[i] * 100.0),
+                        'dynamic_window': active_window if active_window else window,
+                        'base_window': window,
+                        'historical_fallback': bool(cp.get('use_historical_fallback')),
+                        'trend': 'stable',
+                    }
         
         # --- REFINAMENTO SENTINELA V3 (LGBM) ---
         if self.champion_challenger is not None:
@@ -384,6 +1061,7 @@ class StateOrchestrator:
                 print(f"⚠️ [Sentinela V3] Falha ao aplicar refinamento: {e}")
         # ---------------------------------------
 
+        self._write_hermes_outputs(combined_scores, component_details)
         self._log_predict_p10(combined_scores)
         return (combined_scores, trends) if return_trends else combined_scores
 

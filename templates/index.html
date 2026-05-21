@@ -1389,15 +1389,13 @@
         otherBtn.prop('disabled', true);
         setExportScreenshotStatus(
             isPublish
-                ? 'Exportando snapshot, sincronizando arquivos e publicando no repositório screenshot...'
-                : 'Exportando snapshot e sincronizando aplicação screenshot local...',
+                ? 'Iniciando exportação, sincronização de arquivos e publicação no repositório...'
+                : 'Iniciando exportação estática e sincronização de arquivos locais...',
             'muted'
         );
         showLoading(
-            isPublish ? 'Atualizando e publicando aplicação screenshot...' : 'Atualizando aplicação screenshot...',
-            isPublish
-                ? 'Gerando snapshot estático, copiando os artefatos e executando git add/commit/push.'
-                : 'Gerando snapshot estático e copiando os artefatos para a Vite app.'
+            isPublish ? 'Iniciando exportação e publicação...' : 'Iniciando exportação estática...',
+            'Gerando snapshot estático em segundo plano. Por favor, aguarde.'
         );
 
         fetch('/api/export_static_snapshot', {
@@ -1416,23 +1414,47 @@
                 throw new Error(errorMessage);
             }
 
-            var copied = result.data.copied_files || [];
-            var message = isPublish ? 'Snapshot sincronizado e publicado com sucesso' : 'Snapshot sincronizado com sucesso';
-            if (copied.length) {
-                message += ' (' + copied.length + ' arquivos).';
-            } else {
-                message += '.';
-            }
-            if (isPublish && result.data.publish_info && result.data.publish_info.commit_message) {
-                message += ' ' + result.data.publish_info.commit_message;
-            }
-            setExportScreenshotStatus(message, 'success');
+            // Inicia polling de status a cada 2.5 segundos
+            var pollInterval = setInterval(function() {
+                fetch('/api/export_static_snapshot/status')
+                .then(function(r) { return r.json(); })
+                .then(function(statusData) {
+                    if (!statusData || !statusData.ok) {
+                        return;
+                    }
+                    if (statusData.status === 'running') {
+                        showLoading(
+                            isPublish ? 'Publicando aplicação screenshot...' : 'Atualizando aplicação screenshot...',
+                            'O motor está computando e sincronizando as 100 análises territoriais críticas em segundo plano...'
+                        );
+                    } else if (statusData.status === 'success') {
+                        clearInterval(pollInterval);
+                        var message = isPublish ? 'Snapshot sincronizado e publicado com sucesso' : 'Snapshot sincronizado com sucesso';
+                        if (statusData.copied_count) {
+                            message += ' (' + statusData.copied_count + ' arquivos sincronizados).';
+                        } else {
+                            message += '.';
+                        }
+                        setExportScreenshotStatus(message, 'success');
+                        btn.prop('disabled', false);
+                        otherBtn.prop('disabled', false);
+                        hideLoading(true);
+                    } else if (statusData.status === 'error') {
+                        clearInterval(pollInterval);
+                        setExportScreenshotStatus('Falha ao atualizar a aplicação screenshot: ' + statusData.error, 'error');
+                        btn.prop('disabled', false);
+                        otherBtn.prop('disabled', false);
+                        hideLoading(true);
+                    }
+                })
+                .catch(function(pollErr) {
+                    console.warn('Erro ao consultar status da exportação:', pollErr);
+                });
+            }, 2500);
         })
         .catch(function(error) {
             console.error('Erro ao exportar snapshot para screenshot app:', error);
             setExportScreenshotStatus('Falha ao atualizar a aplicação screenshot: ' + error.message, 'error');
-        })
-        .finally(function() {
             btn.prop('disabled', false);
             otherBtn.prop('disabled', false);
             hideLoading(true);

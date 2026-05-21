@@ -269,6 +269,46 @@
         "cpu_percent": 96.6
       },
       "resolved": false
+    },
+    {
+      "timestamp": "2026-05-20T15:39:12.516219",
+      "type": "high_cpu",
+      "severity": "HIGH",
+      "message": "CPU alta: 85.5%",
+      "details": {
+        "cpu_percent": 85.5
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-20T15:49:22.456448",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 5.26%",
+      "details": {
+        "error_rate_percent": 5.263157894736842
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-20T16:12:05.438959",
+      "type": "high_cpu",
+      "severity": "HIGH",
+      "message": "CPU alta: 100.0%",
+      "details": {
+        "cpu_percent": 100.0
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-20T17:22:19.993025",
+      "type": "high_cpu",
+      "severity": "HIGH",
+      "message": "CPU alta: 88.0%",
+      "details": {
+        "cpu_percent": 88.0
+      },
+      "resolved": false
     }
   ]
 }
