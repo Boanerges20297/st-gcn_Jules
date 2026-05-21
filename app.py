@@ -83,10 +83,14 @@ logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_SCREENSHOT_REPO_DIR = os.path.normpath(os.path.join(BASE_DIR, '..', 'screenshot-report_preview'))
-STATIC_SCREENSHOT_PUBLIC_DATA_DIR = os.path.join(STATIC_SCREENSHOT_REPO_DIR, 'public', 'data')
 STATIC_EXPORT_SCRIPT = os.path.join(BASE_DIR, 'scripts', 'export_static_snapshot.py')
-STATIC_EXPORT_OUTPUT_DIR = os.path.join(BASE_DIR, 'static_export', 'data')
+STATIC_EXPORT_OUTPUT_DIR = os.path.normpath(
+    os.environ.get('STATIC_EXPORT_OUTPUT_DIR', os.path.join(BASE_DIR, 'static_export', 'data'))
+)
+STATIC_SCREENSHOT_REPO_DIR = os.path.normpath(
+    os.environ.get('STATIC_SCREENSHOT_REPO_DIR', os.path.join(BASE_DIR, '..', 'screenshot-report_preview'))
+)
+STATIC_SCREENSHOT_PUBLIC_DATA_DIR = os.path.join(STATIC_SCREENSHOT_REPO_DIR, 'public', 'data')
 
 # Cache file for manager-harmonized explanations
 CACHE_FILE = os.path.join(BASE_DIR, 'data', 'manager_explanations_cache.json')
@@ -3258,7 +3262,9 @@ if __name__ == "__main__":
     load_data_and_models()
     print("\n" + "="*50)
     print("DASHBOARD CPRAIO PRONTO")
-    print("ACESSE: http://localhost:5050")
+    app_port = int(os.environ.get('APP_PORT', os.environ.get('PORT', '5050')))
+    debug_mode = os.environ.get('FLASK_DEBUG', '').strip().lower() in ('1', 'true', 'yes', 'on')
+    print(f"ACESSE: http://localhost:{app_port}")
     print("="*50 + "\n")
     # Usando 0.0.0.0 para maior compatibilidade, mas o link impresso é localhost
-    app.run(host='0.0.0.0', port=5050, debug=True, use_reloader=False)
+    app.run(host='0.0.0.0', port=app_port, debug=debug_mode, use_reloader=False)

@@ -86,12 +86,20 @@ Minimo esperado no `.env`:
 ```env
 FLASK_APP=app.py
 FLASK_ENV=production
+FLASK_DEBUG=0
 LOG_LEVEL=INFO
 APP_PORT=5050
 SECRET_KEY=troque-por-um-segredo-forte
+STATIC_EXPORT_OUTPUT_DIR=./static_export/data
+STATIC_SCREENSHOT_REPO_DIR=./../screenshot-report_preview
 GOOGLE_API_KEY=sua-chave-se-aplicavel
 GEMINI_API_KEYS=sua-chave-se-aplicavel
 ```
+
+Notas:
+
+- mantenha `FLASK_DEBUG=0` em producao
+- os paths `STATIC_EXPORT_OUTPUT_DIR` e `STATIC_SCREENSHOT_REPO_DIR` servem para alinhar export estatico e integracao futura com a app de screenshot
 
 ### 6. Validar arquivos obrigatorios
 
@@ -232,6 +240,25 @@ Valide:
 which gemini
 gemini --help
 echo "Responda somente ok" | gemini -p "Leia stdin e responda somente ok"
+```
+
+### 13. Se for usar Docker futuramente
+
+Validar estes pontos antes do go-live:
+
+- `Dockerfile` e `docker-compose.yml` alinhados com porta interna `5050`
+- `static_export/` montado como volume persistente
+- `SCREENSHOT_APP_PATH` apontando para o repo externo real, se houver sincronizacao de snapshot
+- `FLASK_DEBUG=0` no runtime do container
+
+Exemplo de variaveis para Compose:
+
+```env
+APP_PORT=5000
+FLASK_DEBUG=0
+STATIC_EXPORT_OUTPUT_DIR=/app/static_export/data
+STATIC_SCREENSHOT_REPO_DIR=/opt/screenshot-report_preview
+SCREENSHOT_APP_PATH=/opt/apps/screenshot-report_preview
 ```
 
 ## Comandos de operacao

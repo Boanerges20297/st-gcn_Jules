@@ -12,18 +12,26 @@ services:
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=${FLASK_ENV:-production}
+      - FLASK_DEBUG=${FLASK_DEBUG:-0}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - APP_PORT=5050
       # Pass API keys for LLM features
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - GEMINI_API_KEYS=${GEMINI_API_KEYS}
+      - STATIC_EXPORT_OUTPUT_DIR=/app/static_export/data
+      - STATIC_SCREENSHOT_REPO_DIR=${STATIC_SCREENSHOT_REPO_DIR:-/opt/screenshot-report_preview}
     volumes:
       # Mount data and logs as read-write (removed :ro)
       # The app needs to write to exogenous_events.json and log files
       - ./data:/app/data
       - ./logs:/app/logs
       - ./outputs:/app/outputs
+      - ./static_export:/app/static_export
       # Models can be read-only if the app doesn't retrain/save them
       - ./models:/app/models:ro
+      # Optional: mount the external screenshot app repo here when you need snapshot sync.
+      # Replace the host path with the actual repository location in your deployment environment.
+      - ${SCREENSHOT_APP_PATH:-./.docker/screenshot-report_preview}:/opt/screenshot-report_preview
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5050/api/model-update-status"]
       interval: 30s

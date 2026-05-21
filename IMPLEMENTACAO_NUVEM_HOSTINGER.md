@@ -225,10 +225,14 @@ Configuracoes minimas recomendadas:
 ```env
 FLASK_APP=app.py
 FLASK_ENV=production
+FLASK_DEBUG=0
 LOG_LEVEL=INFO
 
 APP_PORT=5050
 SECRET_KEY=troque-por-um-segredo-forte
+
+STATIC_EXPORT_OUTPUT_DIR=./static_export/data
+STATIC_SCREENSHOT_REPO_DIR=./../screenshot-report_preview
 
 GOOGLE_API_KEY=sua-chave-se-usar-integracoes-google
 GEMINI_API_KEYS=sua-chave-ou-lista-se-usar-rotinas-gemini
@@ -242,6 +246,8 @@ Observacoes:
 
 - o `docker-compose.yml` usa `APP_PORT`, `GOOGLE_API_KEY` e `GEMINI_API_KEYS`
 - o app sobe internamente em `5050` no [app.py](c:/Users/Boanerges/Desktop/Projetos/Report%20Preview/app.py)
+- `FLASK_DEBUG=0` deve permanecer desligado em producao
+- `STATIC_EXPORT_OUTPUT_DIR` e `STATIC_SCREENSHOT_REPO_DIR` agora podem ser sobrescritos por ambiente
 - em deploy sem Docker, mantenha `APP_PORT=5050` por consistencia operacional
 
 ## Teste local na VPS
@@ -395,8 +401,31 @@ Observacoes importantes:
 
 - o `docker-compose.yml` publica `${APP_PORT:-5000}:5050`
 - dentro do container o app continua ouvindo em `5050`
+- o compose injeta `APP_PORT=5050` e `FLASK_DEBUG=0` para alinhar o runtime com producao
 - o compose monta `data`, `logs`, `outputs` e `models`
+- o compose agora tambem monta `static_export/` para persistir snapshots e exports
+- o path do repositorio externo de screenshot e configurado por `SCREENSHOT_APP_PATH`
 - se o projeto depender de arquivos externos nao versionados, eles precisam existir no host
+
+### Variaveis importantes no Docker
+
+Se voce for usar Docker em producao, estas variaveis merecem atencao:
+
+```env
+APP_PORT=5000
+FLASK_ENV=production
+FLASK_DEBUG=0
+STATIC_EXPORT_OUTPUT_DIR=/app/static_export/data
+STATIC_SCREENSHOT_REPO_DIR=/opt/screenshot-report_preview
+SCREENSHOT_APP_PATH=/caminho/no/host/screenshot-report_preview
+```
+
+Notas:
+
+- `APP_PORT` no host pode continuar `5000`, porque o container recebe `5000:5050`
+- `STATIC_EXPORT_OUTPUT_DIR` dentro do container deve continuar apontando para `/app/static_export/data`
+- `STATIC_SCREENSHOT_REPO_DIR` dentro do container deve apontar para o mount do repositorio externo
+- `SCREENSHOT_APP_PATH` e resolvido no host pelo Compose, nao dentro do container
 
 ### Quando preferir Docker
 
@@ -488,6 +517,8 @@ Hoje, para producao web principal, o mais limpo e separar:
 
 - VPS Linux: API Flask principal
 - maquina Windows operacional: gateway Hermes/Telegram/Gemini, se ainda dependente dos scripts atuais
+
+Se no futuro voce decidir containerizar tambem o fluxo de export para a app de screenshot, garanta que o repositorio externo esteja montado no host e ligado ao container via `SCREENSHOT_APP_PATH`.
 
 ## Implantacao do gateway Telegram/Gemini
 
