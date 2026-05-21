@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: report-preview-app
+    env_file:
+      - .env
+    environment:
+      FLASK_APP: app.py
+      FLASK_ENV: ${FLASK_ENV:-production}
+      FLASK_DEBUG: ${FLASK_DEBUG:-0}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      APP_PORT: 5050
+      STATIC_EXPORT_OUTPUT_DIR: /app/static_export/data
+      STATIC_SCREENSHOT_REPO_DIR: ${STATIC_SCREENSHOT_REPO_DIR:-/opt/screenshot-report_preview}
+    expose:
+      - "5050"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./outputs:/app/outputs
+      - ./static_export:/app/static_export
+      - ./models:/app/models:ro
+      - ${SCREENSHOT_APP_PATH:-./.docker/screenshot-report_preview}:/opt/screenshot-report_preview
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5050/api/model-update-status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.report-preview.rule: "Host(`${TRAEFIK_HOST}`)"
+      traefik.http.routers.report-preview.entrypoints: websecure
+      traefik.http.routers.report-preview.tls: "true"
+      traefik.http.routers.report-preview.tls.certresolver: letsencrypt
+      traefik.http.services.report-preview.loadbalancer.server.port: "5050"
+    networks:
+      - report-preview
+
+  telegram-gateway:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.telegram-gateway
+    container_name: report-preview-telegram-gateway
+    env_file:
+      - .env
+    environment:
+      PYTHONUNBUFFERED: 1
+      REPORTPREVIEW_RUNTIME_DIR: /app/outputs/mempalace/chat
+      MEMPALACE_CONTEXT_PATH: /app/.mempalace.md
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./outputs:/app/outputs
+    restart: unless-stopped
+    labels:
+      traefik.enable: "false"
+    depends_on:
+      app:
+        condition: service_started
+    networks:
+      - report-preview
+
+networks:
+  report-preview:
+    driver: bridge

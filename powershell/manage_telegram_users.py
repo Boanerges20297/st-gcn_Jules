@@ -9,7 +9,7 @@ from pathlib import Path
 from secrets import token_bytes
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 USERS_DIR = PROJECT_ROOT / "data" / "users"
 DB_PATH = USERS_DIR / "telegram_auth.sqlite3"
 
@@ -148,6 +148,24 @@ def set_active(username: str, active: bool) -> None:
         raise ValueError(f"Usuario '{normalized}' nao encontrado.")
     state = "ativado" if active else "desativado"
     print(f"Usuario '{normalized}' {state}")
+
+
+def delete_user(username: str) -> None:
+    normalized = normalize_username(username)
+    if not normalized:
+        raise ValueError("Usuario invalido.")
+
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.execute(
+            "DELETE FROM users WHERE username = ?",
+            (normalized,),
+        )
+        conn.commit()
+
+    if cursor.rowcount == 0:
+        raise ValueError(f"Usuario '{normalized}' nao encontrado.")
+
+    print(f"Usuario '{normalized}' removido")
 
 
 def list_users(show_inactive: bool) -> None:
@@ -295,6 +313,9 @@ def build_parser() -> argparse.ArgumentParser:
     deactivate_parser = subparsers.add_parser("deactivate", help="Desativa um usuario")
     deactivate_parser.add_argument("username")
 
+    delete_parser = subparsers.add_parser("delete", help="Remove um usuario do banco")
+    delete_parser.add_argument("username")
+
     list_parser = subparsers.add_parser("list", help="Lista usuarios cadastrados")
     list_parser.add_argument("--all", action="store_true", help="Inclui usuarios inativos")
 
@@ -315,6 +336,8 @@ def main() -> int:
             set_active(args.username, True)
         elif args.command == "deactivate":
             set_active(args.username, False)
+        elif args.command == "delete":
+            delete_user(args.username)
         elif args.command == "list":
             list_users(args.all)
         else:

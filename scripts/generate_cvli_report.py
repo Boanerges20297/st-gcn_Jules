@@ -94,8 +94,7 @@ def generate_report():
         
         f.write("## 1. Totais por Dia da Semana\n")
         f.write("| Dia da Semana | Total CVLI | Média Diária |\n")
-        f.write("|---|---|---|
-")
+        f.write("|---|---|---|\n")
         for day in day_order:
             total = dow_stats.get(day, 0)
             pt_day = week_map[day]
@@ -106,8 +105,7 @@ def generate_report():
         
         f.write("## 2. Sazonalidade Mensal (Acumulado)\n")
         f.write("| Mês | Total Acumulado |\n")
-        f.write("|---|---|
-")
+        f.write("|---|---|\n")
         for month_num in range(1, 13):
             total = month_stats.get(month_num, 0)
             pt_month = month_map[month_num]
@@ -116,8 +114,7 @@ def generate_report():
         
         f.write("## 3. Totais por Ano\n")
         f.write("| Ano | Total CVLI | Variação |\n")
-        f.write("|---|---|---|
-")
+        f.write("|---|---|---|\n")
         prev = None
         for year, total in year_stats.items():
             delta = ""
@@ -132,8 +129,7 @@ def generate_report():
         f.write("## 4. Evolução Mês a Mês (Recente)\n")
         f.write("*(Últimos 12 meses do dataset)*\n\n")
         f.write("| Mês/Ano | Total CVLI |\n")
-        f.write("|---|---|
-")
+        f.write("|---|---|\n")
         # Ensure we have data
         if not moy_stats.empty:
             for period in moy_stats.index[-12:]:
@@ -146,8 +142,7 @@ def generate_report():
         
         f.write("### Distribuição por Quadrante\n")
         f.write("| Quadrante | Posição Relativa | Total CVLI | % do Total |\n")
-        f.write("|---|---|---|---|
-")
+        f.write("|---|---|---|---|\n")
         grand_total = quadrant_stats.sum()
         for quad, total in quadrant_stats.items():
             pct = (total / grand_total) * 100

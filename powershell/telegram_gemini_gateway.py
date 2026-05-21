@@ -3,6 +3,7 @@ import hashlib
 import hmac
 import json
 import logging
+import os
 import sqlite3
 import subprocess
 import sys
@@ -23,9 +24,9 @@ def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8") if path.exists() else ""
 
 
-def load_dotenv(path: Path) -> dict[str, str]:
+def load_dotenv(path: Path | None) -> dict[str, str]:
     data: dict[str, str] = {}
-    if not path.exists():
+    if path is None or not path.exists():
         return data
     for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
@@ -59,29 +60,39 @@ def infer_scope(message: str) -> str:
 
 
 class TelegramGeminiGateway:
-    def __init__(self, project_root: Path, hermes_workspace: Path, gemini_model: str) -> None:
+    def __init__(
+        self,
+        project_root: Path,
+        hermes_workspace: Path | None,
+        gemini_model: str,
+        wrapper_path: Path | None = None,
+        chat_runtime_dir: Path | None = None,
+    ) -> None:
         self.project_root = project_root
         self.hermes_workspace = hermes_workspace
         self.gemini_model = gemini_model
-        self.chat_dir = self.project_root / "outputs" / "hermes" / "chat"
+        self.wrapper_path = wrapper_path or self._default_wrapper_path()
+        self.chat_dir = chat_runtime_dir or self._default_chat_dir()
         self.chat_dir.mkdir(parents=True, exist_ok=True)
         self.state_path = self.chat_dir / "telegram_gateway_state.json"
         self.log_path = self.chat_dir / "telegram_gemini_gateway.log"
-        self.wrapper_path = self.project_root / "ask_gemini_with_hermes_memory.ps1"
         self.users_dir = self.project_root / "data" / "users"
         self.auth_db_path = self.users_dir / "telegram_auth.sqlite3"
         self.project_dotenv_path = self.project_root / ".env"
-        self.dotenv_path = self.hermes_workspace / ".hermes" / ".env"
+        self.context_dotenv_path = self._detect_context_dotenv()
         self.users_dir.mkdir(parents=True, exist_ok=True)
         self.project_env_data = load_dotenv(self.project_dotenv_path)
-        self.env_data = {**self.project_env_data, **load_dotenv(self.dotenv_path)}
+        self.env_data = {**self.project_env_data, **load_dotenv(self.context_dotenv_path)}
         self.session_ttl_seconds = parse_int_env(self.project_env_data, "TELEGRAM_AUTH_SESSION_TTL_SECONDS", DEFAULT_SESSION_TTL_SECONDS)
         self.max_failed_attempts = parse_int_env(self.project_env_data, "TELEGRAM_AUTH_MAX_FAILED_ATTEMPTS", DEFAULT_MAX_FAILED_ATTEMPTS)
         self.lockout_seconds = parse_int_env(self.project_env_data, "TELEGRAM_AUTH_LOCKOUT_SECONDS", DEFAULT_LOCKOUT_SECONDS)
         self._ensure_auth_db()
         self.token = self.env_data.get("TELEGRAM_BOT_TOKEN", "")
         if not self.token:
-            raise RuntimeError(f"TELEGRAM_BOT_TOKEN ausente em {self.dotenv_path}")
+            searched = [str(self.project_dotenv_path)]
+            if self.context_dotenv_path:
+                searched.append(str(self.context_dotenv_path))
+            raise RuntimeError(f"TELEGRAM_BOT_TOKEN ausente nos envs pesquisados: {', '.join(searched)}")
         self.state = self._load_state()
         self.offset = int(self.state.get("offset", 0))
         self.chat_sessions = self.state.get("chat_sessions", {})
@@ -93,12 +104,90 @@ class TelegramGeminiGateway:
             encoding="utf-8",
         )
         logging.info(
-            "Gateway iniciado com auth_db=%s, session_ttl=%s, max_failed_attempts=%s, lockout_seconds=%s",
+            "Gateway iniciado com auth_db=%s, wrapper=%s, chat_dir=%s, session_ttl=%s, max_failed_attempts=%s, lockout_seconds=%s",
             self.auth_db_path,
+            self.wrapper_path,
+            self.chat_dir,
             self.session_ttl_seconds,
             self.max_failed_attempts,
             self.lockout_seconds,
         )
+
+    def _default_wrapper_path(self) -> Path:
+        if os.name == "nt":
+            return self.project_root / "powershell" / "ask_gemini_with_hermes_memory.ps1"
+        return self.project_root / "scripts" / "linux" / "ask_gemini_with_mempalace.py"
+
+    def _default_chat_dir(self) -> Path:
+        if os.name == "nt":
+            return self.project_root / "outputs" / "hermes" / "chat"
+        return self.project_root / "outputs" / "mempalace" / "chat"
+
+    def _detect_context_dotenv(self) -> Path | None:
+        candidates: list[Path] = []
+        if self.hermes_workspace:
+            candidates.extend(
+                [
+                    self.hermes_workspace / ".mempalace" / ".env",
+                    self.hermes_workspace / ".hermes" / ".env",
+                ]
+            )
+        candidates.extend(
+            [
+                self.project_root / ".mempalace" / ".env",
+                self.project_root / ".hermes" / ".env",
+            ]
+        )
+        for path in candidates:
+            if path.exists():
+                return path
+        return None
+
+    def _build_wrapper_command(self, query: str, scope: str) -> list[str]:
+        wrapper_suffix = self.wrapper_path.suffix.lower()
+        common_args = [
+            "--scope",
+            scope,
+            "--query",
+            query,
+            "--gemini-model",
+            self.gemini_model,
+            "--project-root",
+            str(self.project_root),
+            "--chat-dir",
+            str(self.chat_dir),
+        ]
+
+        if self.hermes_workspace:
+            common_args.extend(["--context-root", str(self.hermes_workspace)])
+
+        if wrapper_suffix == ".ps1":
+            command = [
+                "powershell",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(self.wrapper_path),
+                "-Scope",
+                scope,
+                "-Query",
+                query,
+                "-GeminiModel",
+                self.gemini_model,
+                "-ProjectRoot",
+                str(self.project_root),
+            ]
+            if self.hermes_workspace:
+                command.extend(["-HermesWorkspace", str(self.hermes_workspace)])
+            return command
+
+        if wrapper_suffix == ".py":
+            return [sys.executable, str(self.wrapper_path), *common_args]
+
+        if wrapper_suffix == ".sh":
+            return ["bash", str(self.wrapper_path), *common_args]
+
+        raise RuntimeError(f"Wrapper nao suportado: {self.wrapper_path}")
 
     def _ensure_auth_db(self) -> None:
         with sqlite3.connect(self.auth_db_path) as conn:
@@ -452,19 +541,7 @@ class TelegramGeminiGateway:
         return text.strip()
 
     def _run_query(self, query: str, scope: str) -> str:
-        command = [
-            "powershell",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-File",
-            str(self.wrapper_path),
-            "-Scope",
-            scope,
-            "-Query",
-            query,
-            "-GeminiModel",
-            self.gemini_model,
-        ]
+        command = self._build_wrapper_command(query, scope)
         completed = subprocess.run(
             command,
             cwd=self.project_root,
@@ -559,16 +636,20 @@ class TelegramGeminiGateway:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Gateway Telegram -> Gemini com memoria Hermes")
-    parser.add_argument("--project-root", default=r"C:\Users\Boanerges\Desktop\Projetos\Report Preview")
-    parser.add_argument("--hermes-workspace", default=r"E:\Hermes_Workspace")
+    parser = argparse.ArgumentParser(description="Gateway Telegram -> Gemini com memoria operacional do projeto")
+    parser.add_argument("--project-root", default=r"C:\Users\Boanerges\Desktop\Projetos\Report Preview" if os.name == "nt" else str(Path.cwd()))
+    parser.add_argument("--hermes-workspace", default=r"E:\Hermes_Workspace" if os.name == "nt" else "")
     parser.add_argument("--gemini-model", default="gemini-2.5-flash")
+    parser.add_argument("--wrapper-path", default="")
+    parser.add_argument("--chat-runtime-dir", default="")
     args = parser.parse_args()
 
     gateway = TelegramGeminiGateway(
         project_root=Path(args.project_root),
-        hermes_workspace=Path(args.hermes_workspace),
+        hermes_workspace=Path(args.hermes_workspace) if args.hermes_workspace else None,
         gemini_model=args.gemini_model,
+        wrapper_path=Path(args.wrapper_path) if args.wrapper_path else None,
+        chat_runtime_dir=Path(args.chat_runtime_dir) if args.chat_runtime_dir else None,
     )
     gateway.run()
     return 0

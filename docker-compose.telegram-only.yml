@@ -1,0 +1,21 @@
+services:
+  telegram-gateway:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.telegram-gateway
+    container_name: report-preview-telegram-gateway
+    env_file:
+      - .env
+    environment:
+      PYTHONUNBUFFERED: 1
+      REPORTPREVIEW_RUNTIME_DIR: /app/outputs/mempalace/chat
+      MEMPALACE_CONTEXT_PATH: /app/.mempalace.md
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./outputs:/app/outputs
+      - ./.mempalace.md:/app/.mempalace.md:ro
+      - ./.hermes.md:/app/.hermes.md:ro
+      - ./powershell:/app/powershell:ro
+      - ./scripts:/app/scripts:ro
+    restart: unless-stopped
