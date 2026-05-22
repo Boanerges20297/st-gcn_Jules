@@ -52,21 +52,21 @@ class StateOrchestrator:
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_fortaleza.pkl'),
                 'class': ShallowGAT,
                 'in_channels': 39, 
-                'window': 120 
+                'window': 14 
             },
             'rmf': {
                 'model_path': os.path.join(self.root, 'models', 'active', 'rmf_model.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_rmf.pkl'),
                 'class': ShallowGAT,
                 'in_channels': 39,
-                'window': 30
+                'window': 14
             },
             'interior': {
                 'model_path': os.path.join(self.root, 'models', 'active', interior_model_file),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_interior.pkl'),
                 'class': ShallowGAT,
                 'in_channels': 37,
-                'window': 120
+                'window': 14
             }
         }
         
@@ -971,7 +971,7 @@ class StateOrchestrator:
             if active_window and active_window < window:
                 x_final[:, :window - active_window, :29] = 0.0
 
-            # Pad se o modelo exigir mais canais do que o dataset possui (ex: MemPalace e CVP Ratio de Fortaleza)
+            # Pad se o modelo exigir mais canais do que o dataset possui (ex: MemPalace e CVLI Ratio de Fortaleza)
             if x_final.shape[2] < channels:
                 pad_width = channels - x_final.shape[2]
                 x_final = np.pad(x_final, ((0, 0), (0, 0), (0, pad_width)), mode='constant', constant_values=0.0)
@@ -1018,10 +1018,21 @@ class StateOrchestrator:
                 hist_signal = np.array([1.0 if normalize_name(str(row['name'])) in hist_norms else 0.0 for _, row in data['nodes_gdf'].iterrows()])
                 final_logic = (0.50 * norm_neural) + (0.20 * norm_tension) + (0.10 * inclusion_signal) + (0.20 * hist_signal) - (0.10 * calm_signal)
             else:
-                # ⭐ Peso neural aumentado para 0.60 (mais confiança no novo modelo honesto)
-                n_w = 0.60 if region != 'interior' else 0.45
-                t_w, i_w = 0.20, 0.20
-                final_logic = (n_w * norm_neural) + (t_w * norm_tension) + (i_w * inclusion_signal) - (0.10 * calm_signal)
+                # Foco Total em CVLI (Atualização Produção 2026-05-21)
+                neural_weight = 0.50 if region != 'interior' else 0.35
+                tension_weight = 0.10
+                inclusion_weight = 0.40 # O Gatilho de Conflito agora manda!
+                
+                # Fator Anti-Amnésia: 
+                # Se a área está em calmaria severa, a rede neural perde a "certeza absoluta" baseada no passado.
+                # calm_signal vai de 0.0 (violência) a 1.0 (calma de 30 dias).
+                decay_factor = 1.0 - (calm_signal * 0.5) 
+                
+                final_logic = (
+                    (neural_weight * norm_neural * decay_factor)
+                    + (tension_weight * norm_tension)
+                    + (inclusion_weight * inclusion_signal)
+                )
             
             out_norm = np.clip(final_logic, 0, 1) * 100.0
             for i, row in data['nodes_gdf'].iterrows():

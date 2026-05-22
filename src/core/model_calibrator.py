@@ -27,34 +27,33 @@ logger = logging.getLogger(__name__)
 
 # Limites absolutos para não degradar a inferência
 _PARAM_LIMITS = {
-    'tension_factor':       (0.80, 3.00),  # base mais alta, máximo mais agressivo
+    'tension_factor':       (0.10, 3.00),  # Permite redução drástica se houver ruído
     'min_risk':             (15.0, 30.0),
-    'tag_bias_direct':      (2.00, 5.00),  # base e teto maiores para INTEL mais forte
-    'tag_bias_neighbor':    (0.60, 1.50),
-    'norm_neural_weight':   (0.20, 0.50),  # quanto o modelo neural contribui no blend
+    'tag_bias_direct':      (1.00, 5.00),  
+    'tag_bias_neighbor':    (0.30, 1.50),
+    'norm_neural_weight':   (0.20, 0.90),  # Permite que a rede neural domine quase totalmente
 }
 
-# Passos calibrados para ter impacto real no ranking
-# Passo 1-2: ajuste suave. Passo 3-4: agressivo. Passo 5: máximo.
+# Passos calibrados: agora priorizamos o peso neural em cenários de incerteza
 _STEPS = {
     'p20': {
-        'tension_factor':       +0.30,
-        'tag_bias_direct':      +0.50,
-        'tag_bias_neighbor':    +0.15,
+        'tension_factor':       -0.10,  # Reduz peso estático se a precisão cair
+        'tag_bias_direct':      +0.20,
+        'tag_bias_neighbor':    +0.10,
         'min_risk':              0.0,
-        'norm_neural_weight':   +0.05,
+        'norm_neural_weight':   +0.15,  # Aumenta peso da rede neural
     },
     'p10': {
-        'tension_factor':       +0.45,
-        'tag_bias_direct':      +0.75,
-        'tag_bias_neighbor':    +0.20,
+        'tension_factor':       -0.15,
+        'tag_bias_direct':      +0.30,
+        'tag_bias_neighbor':    +0.15,
         'min_risk':              0.0,
-        'norm_neural_weight':   +0.08,
+        'norm_neural_weight':   +0.20,
     },
     'faction_coverage': {
-        'tension_factor':       +0.50,
-        'tag_bias_direct':      +0.80,
-        'tag_bias_neighbor':    +0.20,
+        'tension_factor':       +0.20,
+        'tag_bias_direct':      +0.50,
+        'tag_bias_neighbor':    +0.10,
         'min_risk':              0.0,
         'norm_neural_weight':   +0.05,
     },
