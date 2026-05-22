@@ -51,21 +51,21 @@ class StateOrchestrator:
                 'model_path': os.path.join(self.root, 'models', 'active', fortaleza_model_file),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_fortaleza.pkl'),
                 'class': ShallowGAT,
-                'in_channels': 39, 
+                'in_channels': 41, 
                 'window': 14 
             },
             'rmf': {
                 'model_path': os.path.join(self.root, 'models', 'active', 'rmf_model.pth'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_rmf.pkl'),
                 'class': ShallowGAT,
-                'in_channels': 39,
+                'in_channels': 41,
                 'window': 14
             },
             'interior': {
                 'model_path': os.path.join(self.root, 'models', 'active', interior_model_file),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_interior.pkl'),
                 'class': ShallowGAT,
-                'in_channels': 37,
+                'in_channels': 41,
                 'window': 14
             }
         }
