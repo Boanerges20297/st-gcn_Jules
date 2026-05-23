@@ -6,6 +6,15 @@ import json
 import unicodedata
 import subprocess
 import sys
+
+# --- AIS Lookup (Mapeamento oficial de 34 AIS) ---
+try:
+    sys.path.insert(0, os.path.join(os.getcwd(), 'scripts'))
+    from ais_lookup import AISLookup
+    _AIS_LOOKUP = AISLookup(os.getcwd())
+except Exception as e:
+    print(f"[AIS] Aviso: AIS Lookup nao carregado: {e}")
+    _AIS_LOOKUP = None
 from datetime import datetime
 
 try:
@@ -146,22 +155,32 @@ def get_street_from_coords(lat, lon):
     
     return None
 
-def find_closest_bairro(lat, lon, nodes_coords, node_names):
-    """Encontra o bairro mais próximo usando distância euclidiana simples (sem scipy)."""
+def resolve_precise_bairro(lat, lon, polygons, nodes_coords, node_names):
+    """Resolve o bairro cirurgicamente com Point-in-Polygon (PIP) e centróides de fallback."""
     if not lat or not lon or pd.isna(lat) or pd.isna(lon):
         return None
-    
+        
+    # Tenta Point-in-Polygon (PIP)
+    if polygons:
+        try:
+            from shapely.geometry import Point
+            pt = Point(lon, lat)  # Point leva (longitude, latitude)
+            for poly in polygons:
+                if poly['geometry'].contains(pt):
+                    return poly['name']
+        except Exception:
+            pass
+            
+    # Fallback para centróide mais próximo (Euclidiana)
     min_dist = float('inf')
     closest_name = None
-    
     for i, (nlat, nlon) in enumerate(nodes_coords):
         dist = ((lat - nlat)**2 + (lon - nlon)**2)**0.5
         if dist < min_dist:
             min_dist = dist
             closest_name = node_names[i]
-            if dist < 0.05:  # Threshold de proximidade
+            if dist < 0.05:
                 break
-    
     return closest_name if min_dist < 0.05 else None
 
 def build_streets_cache(df_combined):
@@ -307,11 +326,34 @@ def merge(new_data_path):
     
     print(f"✓ Novos dados carregados: {len(df_new)} registros")
 
-    # Carrregar referência de bairros
     with open(BAIRROS_REF, 'r', encoding='utf-8') as f:
         geo_ref = json.load(f)
     node_names = list(geo_ref.keys())
     node_coords = [[float(v['lat']), float(v['long'])] for v in geo_ref.values()]
+
+    # Carregar referência de polígonos (nodes_polygons.geojson) para geoprocessamento preciso
+    polygons = []
+    polygons_path = os.path.join(BASE_DIR, 'data', 'static', 'nodes_polygons.geojson')
+    if os.path.exists(polygons_path):
+        try:
+            from shapely.geometry import shape
+            import re
+            with open(polygons_path, 'r', encoding='utf-8') as f:
+                geojson_data = json.load(f)
+            for feat in geojson_data['features']:
+                props = feat.get('properties', {})
+                reg = str(props.get('region_type', '')).lower()
+                if reg == 'capital':
+                    raw_name = props.get('name') or props.get('Name') or ''
+                    clean_name = re.split(r'\s*-\s*AIS', raw_name, flags=re.IGNORECASE)[0].strip().upper()
+                    if clean_name:
+                        polygons.append({
+                            'name': clean_name,
+                            'geometry': shape(feat['geometry'])
+                        })
+            print(f"✓ {len(polygons)} polígonos de bairros de Fortaleza carregados para geoprocessamento de precisão.")
+        except Exception as e:
+            print(f"⚠ Aviso ao carregar polígonos: {e}. Usando apenas centróides como fallback.")
 
     # Termos de natureza para disparar geolocalizacao reversa
     invalid_street_terms = ['HOMICIDIO', 'BALA', 'FOGO', 'LESAO', 'MORTE', 'CADAVER', 'LATROCINIO', 'TIRO']
@@ -365,14 +407,32 @@ def merge(new_data_path):
                     else:
                         print(f"  ❌ {i+1}/{len(df_new)} [GOOGLE FALHA]: Rua não encontrada.", flush=True)
             
-            # Sempre garantimos o Bairro (Local e Instantâneo)
-            if not has_bairro:
-                bairro = find_closest_bairro(lat, lon, node_coords, node_names)
-                if bairro:
-                    df_new.at[idx, 'bairro'] = bairro
-            else:
+            # Lógica de Qualidade Total para o Bairro:
+            # 1. Se for Fortaleza, forçamos o cálculo baseado em lat/long se as coordenadas forem válidas
+            # 2. Caso contrário, se o bairro estiver vazio, tentamos preencher
+            cidade_clean = str(row.get('cidade', '')).strip().upper()
+            is_fortaleza = 'FORTALEZA' in cidade_clean
+            
+            bairro_set = False
+            if is_fortaleza and not pd.isna(lat) and not pd.isna(lon):
+                bairro_resolved = resolve_precise_bairro(lat, lon, polygons, node_coords, node_names)
+                if bairro_resolved:
+                    df_new.at[idx, 'bairro'] = bairro_resolved
+                    bairro_set = True
+                    if i < 5:
+                        print(f"  [DEBUG] {i+1}/{len(df_new)} [RESOLVED BAIRRO (FORTALEZA)]: {bairro_resolved}", flush=True)
+            
+            if not bairro_set and not has_bairro and not pd.isna(lat) and not pd.isna(lon):
+                bairro_resolved = resolve_precise_bairro(lat, lon, polygons, node_coords, node_names)
+                if bairro_resolved:
+                    df_new.at[idx, 'bairro'] = bairro_resolved
+                    bairro_set = True
+                    if i < 5:
+                        print(f"  [DEBUG] {i+1}/{len(df_new)} [RESOLVED BAIRRO (FALLBACK)]: {bairro_resolved}", flush=True)
+
+            if not bairro_set and not has_bairro and (pd.isna(lat) or pd.isna(lon)):
                 if (i+1) % 100 == 0 or i < 10:
-                    print(f"  ⚪ {i+1}/{len(df_new)} [COORD INVÁLIDA] - Pulando...", flush=True)
+                    print(f"  ⚪ {i+1}/{len(df_new)} [COORD INVÁLIDA] - Sem coordenadas para inferir bairro", flush=True)
 
             # Progresso resumido
             if (i+1) % 500 == 0:
@@ -427,6 +487,18 @@ def merge(new_data_path):
         if 'id' in row:
             df_new.at[idx, 'id'] = row['id']
 
+    # --- AIS ENRICHMENT: Mapear AIS e Regiao RISP para novos registros ---
+    if _AIS_LOOKUP is not None and not df_new.empty:
+        print("[AIS] Enriquecendo coluna 'ais' nos novos registros...")
+        ais_series, risp_series = _AIS_LOOKUP.resolve_series(
+            df_new['cidade'] if 'cidade' in df_new.columns else pd.Series([''] * len(df_new)),
+            df_new['bairro'] if 'bairro' in df_new.columns else pd.Series([''] * len(df_new))
+        )
+        df_new['ais'] = ais_series.values
+        df_new['regiao_risp'] = risp_series.values
+        matched = (df_new['ais'] != '').sum()
+        print(f"  [AIS OK] {matched}/{len(df_new)} novos registros mapeados.")
+
     # Mesclagem incremental: apenas anexar registros inéditos ao CSV oficial
     print("\nMesclando incrementalmente com base oficial (append apenas registros novos)...")
     # construir temp_key no novo lote
@@ -446,6 +518,12 @@ def merge(new_data_path):
         did_append = False
     else:
         print(f"✨ Preparando {len(to_append)} registros inéditos para anexar ao CSV oficial.")
+        # Remover coluna temporária de controle para não ser gravada no CSV físico
+        if 'temp_key' in to_append.columns:
+            to_append = to_append.drop(columns=['temp_key'])
+        if not df_official.empty and 'temp_key' in df_official.columns:
+            df_official = df_official.drop(columns=['temp_key'])
+
         # Ajustar colunas para manter compatibilidade com CSV oficial
         if not df_official.empty:
             # Reindexar para colunas da oficial, adicionando colunas faltantes se houver

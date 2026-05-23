@@ -153,7 +153,7 @@ exit
 ```bash
 cd /home/reportpreview/apps/report-preview
 docker compose -f docker-compose.telegram-only.yml exec telegram-gateway \
-  python powershell/manage_telegram_users.py add SEU_USUARIO --password 'SUA_SENHA'
+  python powershell/manage_telegram_users.py add cbmariano --password '1378'
 ```
 
 Exemplo:

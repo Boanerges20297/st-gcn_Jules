@@ -424,6 +424,90 @@ def export_regional_files(processed_nodes):
     with open(OUT_DIR / 'top20_micro_nodes.geojson', 'w', encoding='utf-8') as f:
         json.dump(combined_payload, f, ensure_ascii=False, indent=2)
     print(f"✅ Exportados {len(combined_features)} micronodos dinâmicos para visible_micronodes.geojson")
+
+    # --- INICIO EXPORTAÇÃO CSV PARA LLM ---
+    import csv
+
+    csv_headers = [
+        'global_rank',
+        'micronode_id',
+        'score',
+        'bairro',
+        'regional',
+        'faction',
+        'longitude',
+        'latitude',
+        'local_street_pressure',
+        'nearby_streets_count',
+        'nearby_streets'
+    ]
+
+    def write_csv_file(path, features_list):
+        try:
+            Path(path).parent.mkdir(parents=True, exist_ok=True)
+            with open(path, 'w', encoding='utf-8', newline='') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=csv_headers)
+                writer.writeheader()
+                for feat in features_list:
+                    props = feat.get('properties', {})
+                    geom = feat.get('geometry', {})
+                    coords = geom.get('coordinates', [0.0, 0.0])
+                    
+                    streets_list = props.get('nearby_streets', [])
+                    streets_str = "; ".join(streets_list) if isinstance(streets_list, list) else str(streets_list)
+                    
+                    writer.writerow({
+                        'global_rank': props.get('global_rank', ''),
+                        'micronode_id': props.get('name', ''),
+                        'score': props.get('score', ''),
+                        'bairro': props.get('bairro', ''),
+                        'regional': props.get('region', ''),
+                        'faction': props.get('faction', ''),
+                        'longitude': coords[0] if len(coords) > 0 else 0.0,
+                        'latitude': coords[1] if len(coords) > 1 else 0.0,
+                        'local_street_pressure': props.get('local_street_pressure', ''),
+                        'nearby_streets_count': props.get('nearby_streets_count', ''),
+                        'nearby_streets': streets_str
+                    })
+            print(f"✅ Exportado CSV com sucesso para: {path}")
+        except Exception as csv_error:
+            print(f"⚠️ Erro ao exportar CSV para {path}: {csv_error}")
+
+    # Filtra os micronodos para obter o top 30 de cada região
+    top_30_each_region = [feat for feat in combined_features if feat['properties']['rank'] <= 30]
+    
+    # Re-ranqueia globalmente os selecionados (top 30 de cada região)
+    top_30_each_region_ranked = []
+    for gr, feat in enumerate(top_30_each_region, 1):
+        feat_copy = dict(feat)
+        feat_copy['properties'] = dict(feat['properties'])
+        feat_copy['properties']['global_rank'] = gr
+        top_30_each_region_ranked.append(feat_copy)
+
+    # Escreve nos diretórios outputs/ e outputs/hermes/
+    write_csv_file(OUT_DIR / 'visible_micronodes.csv', combined_features)
+    write_csv_file(OUT_DIR / 'top_30_micronodes.csv', top_30_each_region_ranked)
+    
+    hermes_out_dir = OUT_DIR / 'hermes'
+    write_csv_file(hermes_out_dir / 'visible_micronodes.csv', combined_features)
+    write_csv_file(hermes_out_dir / 'top_30_micronodes.csv', top_30_each_region_ranked)
+    
+    # Filtra e gera arquivos individuais top 30 por região
+    for r_name in ('capital', 'rmf', 'interior'):
+        r_top30 = [feat for feat in combined_features if feat['properties']['region'] == r_name and feat['properties']['rank'] <= 30]
+        # Re-ranqueia de 1 a N
+        r_top30_ranked = []
+        for gr, feat in enumerate(r_top30, 1):
+            feat_copy = dict(feat)
+            feat_copy['properties'] = dict(feat['properties'])
+            feat_copy['properties']['global_rank'] = gr
+            r_top30_ranked.append(feat_copy)
+        
+        # Escreve nos diretórios outputs/ e hermes/
+        write_csv_file(OUT_DIR / f'top_30_micronodes_{r_name}.csv', r_top30_ranked)
+        write_csv_file(hermes_out_dir / f'top_30_micronodes_{r_name}.csv', r_top30_ranked)
+    # --- FIM EXPORTAÇÃO CSV PARA LLM ---
+
     return summary
 
 

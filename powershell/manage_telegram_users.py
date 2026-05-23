@@ -29,11 +29,23 @@ def ensure_db() -> None:
                 password_salt TEXT NOT NULL,
                 password_hash TEXT NOT NULL,
                 is_active INTEGER NOT NULL DEFAULT 1,
+                acesso TEXT NOT NULL DEFAULT 'user',
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL
             )
             """
         )
+        # Migração: adicionar a coluna acesso se ela não existir
+        cursor = conn.execute("PRAGMA table_info(users)")
+        columns = [row[1] for row in cursor.fetchall()]
+        if "acesso" not in columns:
+            conn.execute("ALTER TABLE users ADD COLUMN acesso TEXT NOT NULL DEFAULT 'user'")
+            conn.commit()
+
+        # Forçar boanerges como admin e todos os outros como user
+        conn.execute("UPDATE users SET acesso = 'admin' WHERE lower(username) = 'boanerges'")
+        conn.execute("UPDATE users SET acesso = 'user' WHERE lower(username) != 'boanerges'")
+        
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS auth_audit (
@@ -89,17 +101,19 @@ def add_user(username: str, password: str | None) -> None:
     password_hash = hash_password(password_value, salt_hex)
     now = datetime.now().isoformat(timespec="seconds")
 
+    acesso = "admin" if normalized.strip().lower() == "boanerges" else "user"
+
     with sqlite3.connect(DB_PATH) as conn:
         conn.execute(
             """
-            INSERT INTO users (username, password_salt, password_hash, is_active, created_at, updated_at)
-            VALUES (?, ?, ?, 1, ?, ?)
+            INSERT INTO users (username, password_salt, password_hash, is_active, acesso, created_at, updated_at)
+            VALUES (?, ?, ?, 1, ?, ?, ?)
             """,
-            (normalized, salt_hex, password_hash, now, now),
+            (normalized, salt_hex, password_hash, acesso, now, now),
         )
         conn.commit()
 
-    print(f"Usuario '{normalized}' cadastrado em {DB_PATH}")
+    print(f"Usuario '{normalized}' ({acesso}) cadastrado em {DB_PATH}")
 
 
 def set_password(username: str, password: str | None) -> None:
@@ -169,7 +183,7 @@ def delete_user(username: str) -> None:
 
 
 def list_users(show_inactive: bool) -> None:
-    query = "SELECT username, is_active, created_at, updated_at FROM users"
+    query = "SELECT username, is_active, acesso, created_at, updated_at FROM users"
     params: tuple = ()
     if not show_inactive:
         query += " WHERE is_active = 1"
@@ -182,9 +196,9 @@ def list_users(show_inactive: bool) -> None:
         print("Nenhum usuario cadastrado.")
         return
 
-    for username, is_active, created_at, updated_at in rows:
+    for username, is_active, acesso, created_at, updated_at in rows:
         status = "ativo" if int(is_active) == 1 else "inativo"
-        print(f"{username}\t{status}\tcriado={created_at}\tatualizado={updated_at}")
+        print(f"{username}\t{status}\tacesso={acesso}\tcriado={created_at}\tatualizado={updated_at}")
 
 
 def user_exists(username: str) -> bool:

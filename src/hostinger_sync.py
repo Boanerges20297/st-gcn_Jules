@@ -76,6 +76,11 @@ class HostingerSyncManager:
             'outputs/hermes/risk_rmf_latest.csv',
             'outputs/hermes/risk_interior_latest.csv',
             'outputs/hermes/dados_status_enriquecido_14d_latest.csv',
+            'outputs/hermes/visible_micronodes.csv',
+            'outputs/hermes/top_30_micronodes.csv',
+            'outputs/hermes/top_30_micronodes_capital.csv',
+            'outputs/hermes/top_30_micronodes_rmf.csv',
+            'outputs/hermes/top_30_micronodes_interior.csv',
         ]
         return self._sync_event('risk_outputs', fingerprint, relative_paths)
 

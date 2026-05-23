@@ -15,7 +15,9 @@ services:
       - ./logs:/app/logs
       - ./outputs:/app/outputs
       - ./.mempalace.md:/app/.mempalace.md:ro
+      - ./.mempalace:/app/.mempalace:ro
       - ./.hermes.md:/app/.hermes.md:ro
+      - ./.gemini:/app/.gemini:ro
       - ./powershell:/app/powershell:ro
       - ./scripts:/app/scripts:ro
     restart: unless-stopped
