@@ -653,6 +653,7 @@ class StateOrchestrator:
         return '\n'.join(lines).strip() + '\n'
 
     def _write_hermes_outputs(self, scores_map, component_details):
+        print("🔄 [Hermes] Iniciando exportação de artefatos analíticos para o Telegram Bot...")
         try:
             artifact = self._build_hermes_rankings(scores_map, component_details)
             output_dir = os.path.join(self.root, 'outputs', 'hermes')
@@ -906,8 +907,31 @@ class StateOrchestrator:
             for path in (json_path, history_json_path):
                 with open(path, 'w', encoding='utf-8') as f:
                     json.dump(artifact, f, indent=2, ensure_ascii=False)
+            
+            print(f"✅ [Hermes] Artefatos analíticos exportados com sucesso para o Telegram Bot ({len(csv_rows)} registros).")
+            
+            # --- PUBLICAÇÃO DIRETA PARA A VPS HOSTINGER (Telegram Bot) ---
+            try:
+                from src.hostinger_sync import HostingerSyncManager
+                print("🔄 [Hostinger] Iniciando publicação automática dos novos artefatos para a VPS...")
+                sync_manager = HostingerSyncManager(self.root)
+                sync_result = sync_manager.sync_risk_artifacts(artifact)
+                
+                if sync_result.get('status') == 'synced':
+                    uploaded = sync_result.get('uploaded_files', [])
+                    print(f"✅ [Hostinger] Publicação concluída com sucesso! {len(uploaded)} arquivo(s) atualizados na VPS:")
+                    for f in uploaded:
+                        print(f"  - {f}")
+                elif sync_result.get('status') == 'skipped':
+                    print("ℹ️ [Hostinger] Publicação ignorada (nenhum dado novo ou alterado no snapshot).")
+                elif sync_result.get('status') == 'disabled':
+                    print("ℹ️ [Hostinger] Publicação automática inativa (HOSTINGER_SYNC_ENABLED=false).")
+                else:
+                    print(f"ℹ️ [Hostinger] Sincronização: {sync_result.get('status')} - {sync_result.get('reason', '')}")
+            except Exception as sync_err:
+                print(f"⚠️ [Hostinger] Falha na publicação automática para a VPS: {sync_err}")
         except Exception as e:
-            print(f"⚠️ [Hermes Output] Erro ao gerar artefato: {e}")
+            print(f"❌ [Hermes] Erro ao exportar artefatos para o Telegram Bot: {e}")
 
     def get_combined_risk(self, exogenous_shocks=None, return_trends=False):
         combined_scores = {}
