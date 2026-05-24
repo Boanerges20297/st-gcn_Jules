@@ -347,6 +347,10 @@ class TelegramGeminiGateway:
         return int(time.time())
 
     def _set_session(self, chat_id: int, session: dict) -> None:
+        old_session = self.chat_sessions.get(str(chat_id))
+        if isinstance(old_session, dict) and "message_ids" in old_session:
+            if "message_ids" not in session:
+                session["message_ids"] = old_session["message_ids"]
         self.chat_sessions[str(chat_id)] = session
         self._save_state()
 
@@ -566,6 +570,7 @@ class TelegramGeminiGateway:
                 self._delete_message(chat_id, int(username_msg_id))
 
             if verified_username:
+                self._clear_chat_history(chat_id)
                 self._set_authenticated_session(chat_id, verified_username)
                 self._audit_auth_event("login_success", chat_id, user_id=user_id, username=verified_username)
                 self._send_main_menu(chat_id, message=f"🔓 Acesso liberado para *{verified_username}*.\n\nSelecione um módulo tático abaixo para iniciar:")
@@ -674,11 +679,10 @@ class TelegramGeminiGateway:
                     if chat_id and msg_id:
                         try:
                             session = self._get_session(int(chat_id))
-                            if session and session.get("authenticated"):
-                                msg_ids = session.setdefault("message_ids", [])
-                                if msg_id not in msg_ids:
-                                    msg_ids.append(msg_id)
-                                    self._set_session(int(chat_id), session)
+                            msg_ids = session.setdefault("message_ids", [])
+                            if msg_id not in msg_ids:
+                                msg_ids.append(msg_id)
+                                self._set_session(int(chat_id), session)
                         except Exception as e:
                             logging.warning("Erro ao rastrear message_id na sessao: %s", e)
             return res_data
@@ -1820,12 +1824,14 @@ class TelegramGeminiGateway:
                         dist_f = dist
                         
                     try:
-                        ais_val = float(ais)
+                        clean_ais = str(ais).upper().replace("AIS", "").strip()
+                        ais_val = float(clean_ais)
                         ais_str = f"{ais_val:.0f}"
                     except ValueError:
                         ais_str = ais
                         
-                    text += f"*{idx}. 🛣️ AIS {ais_str} ({cidade})* — _{dt}_\n"
+                    display_ais = f"AIS {ais_str}" if not str(ais_str).upper().startswith("AIS") else ais_str
+                    text += f"*{idx}. 🛣️ {display_ais} ({cidade})* — _{dt}_\n"
                     text += f"   Origem: {bairro} (Rua: {rua})\n"
                     text += f"   Destino: *{prox_b}* (Rua: {prox_r})\n"
                     text += f"   ⏱️ {dias_f} dias depois | 🗺️ Deslocamento: {dist_f} km\n\n"
@@ -2229,9 +2235,9 @@ class TelegramGeminiGateway:
         user_id = int(message.get("from", {}).get("id", chat_id))
         logging.info("Mensagem recebida chat=%s user=%s texto=%s", chat_id, user_id, text)
 
-        # Rastrear message_id do usuario se a sessao ja estiver autenticada
+        # Rastrear message_id do usuario para limpeza posterior no logout/timeout
         msg_id = int(message.get("message_id") or 0)
-        if msg_id and self._is_authenticated(chat_id):
+        if msg_id:
             session = self._get_session(chat_id)
             msg_ids = session.setdefault("message_ids", [])
             if msg_id not in msg_ids:
@@ -2733,8 +2739,10 @@ class TelegramGeminiGateway:
                     
                     nodes = []
                     for idx, r in enumerate(latest_transitions, 1):
+                        ais_raw = r.get('ais') or ''
+                        display_ais = f"AIS {ais_raw}" if not str(ais_raw).upper().startswith("AIS") else ais_raw
                         nodes.append(
-                            f"{idx}. AIS {r.get('ais')} ({r.get('cidade')}) em {r.get('datetime')}: "
+                            f"{idx}. {display_ais} ({r.get('cidade')}) em {r.get('datetime')}: "
                             f"Origem {r.get('bairro')} (Rua {r.get('rua')}) -> Destino {r.get('prox_bairro')} (Rua {r.get('prox_rua')}) | "
                             f"Deslocamento: {r.get('distancia_para_prox_km')} km em {r.get('dias_para_prox')} dias"
                         )
