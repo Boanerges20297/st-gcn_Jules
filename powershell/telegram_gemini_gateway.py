@@ -33,7 +33,10 @@ def load_dotenv(path: Path | None) -> dict[str, str]:
         if not line or line.startswith("#") or "=" not in line:
             continue
         key, value = line.split("=", 1)
-        data[key.strip()] = value.strip().strip('"').strip("'")
+        k = key.strip()
+        v = value.strip().strip('"').strip("'")
+        data[k] = v
+        os.environ[k] = v
     return data
 
 
@@ -153,7 +156,7 @@ class TelegramGeminiGateway:
 
     def _detect_context_dotenv(self) -> Path | None:
         candidates: list[Path] = []
-        if self.hermes_workspace:
+        if self.hermes_workspace and self.hermes_workspace.exists():
             candidates.extend(
                 [
                     self.hermes_workspace / ".mempalace" / ".env",
@@ -758,17 +761,33 @@ class TelegramGeminiGateway:
             try:
                 self._api("editMessageText", payload)
             except Exception as e:
-                logging.warning("Falha ao editar mensagem chat_id=%s msg_id=%s: %s. Enviando nova.", chat_id, edit_message_id, e)
-                payload.pop("message_id", None)
+                logging.warning("Falha ao editar mensagem com Markdown chat_id=%s msg_id=%s: %s. Tentando sem Markdown ou enviando nova.", chat_id, edit_message_id, e)
                 try:
-                    self._api("sendMessage", payload)
-                except Exception as e2:
-                    logging.error("Falha ao enviar mensagem fallback chat_id=%s: %s", chat_id, e2)
+                    payload_no_md = payload.copy()
+                    payload_no_md.pop("parse_mode", None)
+                    self._api("editMessageText", payload_no_md)
+                except Exception as e_edit_no_md:
+                    logging.warning("Falha ao editar sem Markdown chat_id=%s msg_id=%s: %s. Enviando nova mensagem.", chat_id, edit_message_id, e_edit_no_md)
+                    payload.pop("message_id", None)
+                    try:
+                        self._api("sendMessage", payload)
+                    except Exception as e2:
+                        logging.warning("Falha ao enviar nova mensagem com Markdown chat_id=%s: %s. Tentando sem Markdown.", chat_id, e2)
+                        payload.pop("parse_mode", None)
+                        try:
+                            self._api("sendMessage", payload)
+                        except Exception as e3:
+                            logging.error("Falha definitiva ao enviar mensagem fallback chat_id=%s: %s", chat_id, e3)
         else:
             try:
                 self._api("sendMessage", payload)
             except Exception as e:
-                logging.error("Falha ao enviar mensagem chat_id=%s: %s", chat_id, e)
+                logging.warning("Falha ao enviar mensagem com Markdown chat_id=%s: %s. Tentando sem Markdown.", chat_id, e)
+                payload.pop("parse_mode", None)
+                try:
+                    self._api("sendMessage", payload)
+                except Exception as e2:
+                    logging.error("Falha definitiva ao enviar mensagem chat_id=%s: %s", chat_id, e2)
 
     def _is_admin_session(self, chat_id: int) -> bool:
         session = self._get_session(chat_id)
@@ -3132,7 +3151,7 @@ class TelegramGeminiGateway:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Gateway Telegram -> Gemini com memoria operacional do projeto")
     parser.add_argument("--project-root", default=r"C:\Users\Boanerges\Desktop\Projetos\Report Preview" if os.name == "nt" else str(Path.cwd()))
-    parser.add_argument("--hermes-workspace", default=r"E:\Hermes_Workspace" if os.name == "nt" else "")
+    parser.add_argument("--hermes-workspace", default="")
     parser.add_argument("--gemini-model", default="gemini-2.5-flash")
     parser.add_argument("--wrapper-path", default="")
     parser.add_argument("--chat-runtime-dir", default="")
