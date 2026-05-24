@@ -110,10 +110,7 @@ def main():
             upload_file(sftp, local_path, remote_path)
             
         # Directories to upload
-        changed_dirs = [
-            (".mempalace", ".mempalace"),
-            (".gemini", ".gemini")
-        ]
+        changed_dirs = []
         
         print("\nUploading directories...")
         for local_rel, remote_rel in changed_dirs:
