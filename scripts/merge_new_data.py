@@ -33,7 +33,7 @@ try:
         get_weather_label
     )
 except ImportError:
-    print("⚠️ Aviso: src.enrichment não encontrado. Algumas variáveis de clima/calendário serão ignoradas.")
+    print("️ Aviso: src.enrichment não encontrado. Algumas variáveis de clima/calendário serão ignoradas.")
     get_day_of_week_pt = lambda x: ""
     is_brazil_holiday = lambda x: False
     is_cvp_hot_day = lambda x: False
@@ -126,7 +126,7 @@ if os.path.exists(cache_path):
 # Com 147k registros, temos quase todas as ruas mapeadas
 if os.path.exists(OFFICIAL_CSV):
     try:
-        print(f"🔍 Minerando ruas de {OFFICIAL_CSV} para cache local...", flush=True)
+        print(f" Minerando ruas de {OFFICIAL_CSV} para cache local...", flush=True)
         # Lendo apenas colunas necessárias para economizar memória
         df_hist = pd.read_csv(OFFICIAL_CSV, usecols=['latitude', 'longitude', 'name'], low_memory=False)
         df_hist = df_hist.dropna(subset=['latitude', 'longitude', 'name'])
@@ -134,14 +134,14 @@ if os.path.exists(OFFICIAL_CSV):
             k = f"{round(float(row['latitude']), 3)}_{round(float(row['longitude']), 3)}"
             if k not in GEO_CACHE:
                 GEO_CACHE[k] = str(row['name']).upper()
-        print(f"✅ Cache histórico reconstruído: {len(GEO_CACHE)} ruas identificadas localmente.", flush=True)
+        print(f" Cache histórico reconstruído: {len(GEO_CACHE)} ruas identificadas localmente.", flush=True)
         del df_hist # Liberar memória
     except Exception as e:
-        print(f"⚠️ Aviso: Falha ao minerar CSV histórico: {e}", flush=True)
+        print(f"️ Aviso: Falha ao minerar CSV histórico: {e}", flush=True)
 
 LAST_GEO_REQUEST = [0]
 
-# --- CONFIGURAÇÃO GOOGLE MAPS API ---
+# --- CONFIGURAO GOOGLE MAPS API ---
 GOOGLE_API_KEY = "AIzaSyDiyGKvZeWK_6PYgbzOullUYAU_kGc8x6c"
 
 def get_street_from_coords(lat, lon):
@@ -176,10 +176,10 @@ def get_street_from_coords(lat, lon):
                     GEO_CACHE[key_cache] = street
                     return street
         elif data.get("status") == "REQUEST_DENIED":
-            print(f"  ❌ Erro Google API: {data.get('error_message')}", flush=True)
+            print(f"   Erro Google API: {data.get('error_message')}", flush=True)
             return "ERRO_API_KEY"
     except Exception as e:
-        print(f"  ⚠️ Erro na conexão com Google: {e}", flush=True)
+        print(f"  ️ Erro na conexão com Google: {e}", flush=True)
     
     return None
 
@@ -226,7 +226,7 @@ def build_streets_cache(df_combined):
     ].copy()
     
     if df_valid.empty:
-        print("⚠ Nenhum registro com rua/bairro/coordenadas válidas")
+        print(" Nenhum registro com rua/bairro/coordenadas válidas")
         return
     
     # Normalizar campos para agrupamento
@@ -262,7 +262,7 @@ def build_streets_cache(df_combined):
     with open(cache_path, 'w', encoding='utf-8') as f:
         json.dump(streets_list, f, ensure_ascii=False, indent=2)
     
-    print(f"✅ Cache de ruas críticas criado: {len(streets_list)} ruas em {cache_path}")
+    print(f" Cache de ruas críticas criado: {len(streets_list)} ruas em {cache_path}")
 
 
 def incremental_update_streets_cache(df_new_rows):
@@ -277,7 +277,7 @@ def incremental_update_streets_cache(df_new_rows):
     except Exception:
         existing = []
 
-    # Indexar por (rua, bairro) para atualizacao rapida
+    # Indexar por (rua, bairro) para atualiza??o rapida
     index = {}
     for item in existing:
         key = (item.get('rua'), item.get('bairro'))
@@ -331,9 +331,9 @@ def incremental_update_streets_cache(df_new_rows):
         try:
             with open(cache_path, 'w', encoding='utf-8') as f:
                 json.dump(existing, f, ensure_ascii=False, indent=2)
-            print(f"✅ Cache de ruas incrementado: {len(existing)} entradas em {cache_path}")
+            print(f" Cache de ruas incrementado: {len(existing)} entradas em {cache_path}")
         except Exception as e:
-            print(f"⚠️ Falha ao salvar cache incremental: {e}")
+            print(f"️ Falha ao salvar cache incremental: {e}")
 
 
 def merge(new_data_path):
@@ -341,10 +341,10 @@ def merge(new_data_path):
     
     if os.path.exists(OFFICIAL_CSV):
         df_official = pd.read_csv(OFFICIAL_CSV, low_memory=False)
-        print(f"✓ Base oficial carregada: {len(df_official)} registros")
+        print(f" Base oficial carregada: {len(df_official)} registros")
     else:
         df_official = pd.DataFrame()
-        print("⚠ Base oficial não existe, será criada nova")
+        print(" Base oficial não existe, será criada nova")
 
     # Carregar APENAS os novos dados (dados_status.json)
     df_new = robust_load_any(new_data_path)
@@ -353,7 +353,7 @@ def merge(new_data_path):
         print("Erro: Arquivo de entrada vazio!")
         return
     
-    print(f"✓ Novos dados carregados: {len(df_new)} registros")
+    print(f" Novos dados carregados: {len(df_new)} registros")
 
     with open(BAIRROS_REF, 'r', encoding='utf-8') as f:
         geo_ref = json.load(f)
@@ -380,24 +380,24 @@ def merge(new_data_path):
                             'name': clean_name,
                             'geometry': shape(feat['geometry'])
                         })
-            print(f"✓ {len(polygons)} polígonos de bairros de Fortaleza carregados para geoprocessamento de precisão.")
+            print(f" {len(polygons)} polígonos de bairros de Fortaleza carregados para geoprocessamento de precisão.")
         except Exception as e:
-            print(f"⚠ Aviso ao carregar polígonos: {e}. Usando apenas centróides como fallback.")
+            print(f" Aviso ao carregar polígonos: {e}. Usando apenas centróides como fallback.")
 
     # Termos de natureza para disparar geolocalizacao reversa
     invalid_street_terms = ['HOMICIDIO', 'BALA', 'FOGO', 'LESAO', 'MORTE', 'CADAVER', 'LATROCINIO', 'TIRO']
 
-    # --- FILTRAGEM PRÉVIA (Evitar reprocessar o que já existe) ---
-    print(f"🔍 Filtrando registros inéditos...")
+    # --- FILTRAGEM PRVIA (Evitar reprocessar o que já existe) ---
+    print(f" Filtrando registros inéditos...")
     if not df_official.empty and 'id' in df_official.columns:
         existing_ids = set(df_official['id'].astype(str).unique())
         df_new['id_str'] = df_new['id'].astype(str)
         df_new = df_new[~df_new['id_str'].isin(existing_ids)].copy()
         df_new = df_new.drop(columns=['id_str'])
-        print(f"✨ {len(df_new)} novos registros identificados para enriquecimento.")
+        print(f" {len(df_new)} novos registros identificados para enriquecimento.")
     
     if df_new.empty:
-        print("✅ Nenhum dado novo para processar. Indo direto para convergência.")
+        print(" Nenhum dado novo para processar. Indo direto para convergência.")
     else:
         print(f"\nEnriquecendo {len(df_new)} registros inéditos (Bairro + Rua + Clima)...", flush=True)
         for i, (idx, row) in enumerate(df_new.iterrows()):
@@ -422,19 +422,19 @@ def merge(new_data_path):
                     street_found = GEO_CACHE[key_cache]
                     df_new.at[idx, 'name'] = street_found
                     if (i+1) % 100 == 0 or i < 10:
-                        print(f"  ⚡ {i+1}/{len(df_new)} [CACHE HISTÓRICO]: {street_found}", flush=True)
+                        print(f"   {i+1}/{len(df_new)} [CACHE HISTRICO]: {street_found}", flush=True)
                 else:
                     # 2. Rua Inédita: Chama Google Maps
                     # Incrementa contador de cota
                     merge.google_calls = getattr(merge, 'google_calls', 0) + 1
                     
-                    print(f"  🌐 {i+1}/{len(df_new)} [GOOGLE #{merge.google_calls}] Consultando internet...", flush=True)
+                    print(f"   {i+1}/{len(df_new)} [GOOGLE #{merge.google_calls}] Consultando internet...", flush=True)
                     street_found = get_street_from_coords(lat, lon)
                     if street_found and street_found not in ["TIMEOUT_API", "FALHA"]:
                         df_new.at[idx, 'name'] = street_found
-                        print(f"  ✅ {i+1}/{len(df_new)} [GOOGLE OK]: {street_found}", flush=True)
+                        print(f"   {i+1}/{len(df_new)} [GOOGLE OK]: {street_found}", flush=True)
                     else:
-                        print(f"  ❌ {i+1}/{len(df_new)} [GOOGLE FALHA]: Rua não encontrada.", flush=True)
+                        print(f"   {i+1}/{len(df_new)} [GOOGLE FALHA]: Rua não encontrada.", flush=True)
             
             # Lógica de Qualidade Total para o Bairro:
             # 1. Se for Fortaleza, forçamos o cálculo baseado em lat/long se as coordenadas forem válidas
@@ -461,7 +461,7 @@ def merge(new_data_path):
 
             if not bairro_set and not has_bairro and (pd.isna(lat) or pd.isna(lon)):
                 if (i+1) % 100 == 0 or i < 10:
-                    print(f"  ⚪ {i+1}/{len(df_new)} [COORD INVÁLIDA] - Sem coordenadas para inferir bairro", flush=True)
+                    print(f"   {i+1}/{len(df_new)} [COORD INVÁLIDA] - Sem coordenadas para inferir bairro", flush=True)
 
             # Progresso resumido
             if (i+1) % 500 == 0:
@@ -543,10 +543,10 @@ def merge(new_data_path):
 
     to_append = df_new[~df_new['temp_key'].astype(str).isin(existing_temp_keys)].copy()
     if to_append.empty:
-        print("✅ Nenhum registro novo para anexar ao CSV oficial.")
+        print(" Nenhum registro novo para anexar ao CSV oficial.")
         did_append = False
     else:
-        print(f"✨ Preparando {len(to_append)} registros inéditos para anexar ao CSV oficial.")
+        print(f" Preparando {len(to_append)} registros inéditos para anexar ao CSV oficial.")
         # Remover coluna temporária de controle para não ser gravada no CSV físico
         if 'temp_key' in to_append.columns:
             to_append = to_append.drop(columns=['temp_key'])
@@ -573,12 +573,12 @@ def merge(new_data_path):
         # Se o CSV oficial existir, anexar; caso contrario, salvar novo arquivo completo
         if os.path.exists(OFFICIAL_CSV):
             to_append.to_csv(OFFICIAL_CSV, mode='a', header=False, index=False, encoding='utf-8')
-            print(f"✅ {len(to_append)} registros anexados a {OFFICIAL_CSV} (modo append).")
+            print(f" {len(to_append)} registros anexados a {OFFICIAL_CSV} (modo append).")
             did_append = True
         else:
             # sem arquivo oficial previo: salvar cabeçalho completo
             to_append.to_csv(OFFICIAL_CSV, index=False, encoding='utf-8')
-            print(f"✅ Arquivo oficial criado em {OFFICIAL_CSV} com {len(to_append)} registros.")
+            print(f" Arquivo oficial criado em {OFFICIAL_CSV} com {len(to_append)} registros.")
             did_append = False
 
     # Construir dataframe combinado em memoria para cache e validacao
@@ -590,16 +590,23 @@ def merge(new_data_path):
     else:
         df_combined = pd.concat([df_official, to_append], ignore_index=True)
 
-    # --- CONVERGÊNCIA DE MÚLTIPLAS MORTES (ANOMALIAS) ---
+    # --- CONVERGNCIA DE MLTIPLAS MORTES (ANOMALIAS) ---
     print("Analisando e convergindo anomalias (múltiplas mortes por ocorrência)...")
     # Chave de evento robusta
-    df_combined['event_key'] = (
-        df_combined['data'].astype(str) + "_" + 
-        df_combined['hora'].astype(str) + "_" + 
+    # Prioriza id_evento quando disponivel (melhor chave de ocorrencia);
+    # fallback para composicao temporal/espacial para legados sem id_evento.
+    fallback_key = (
+        df_combined['data'].astype(str) + "_" +
+        df_combined['hora'].astype(str) + "_" +
         df_combined['bairro'].fillna('').astype(str).str.upper() + "_" +
         pd.to_numeric(df_combined['latitude'], errors='coerce').fillna(0).round(3).astype(str) + "_" +
         pd.to_numeric(df_combined['longitude'], errors='coerce').fillna(0).round(3).astype(str)
     )
+    if 'id_evento' in df_combined.columns:
+        id_evento_norm = df_combined['id_evento'].fillna('').astype(str).str.strip()
+        df_combined['event_key'] = np.where(id_evento_norm != '', 'EV_' + id_evento_norm, fallback_key)
+    else:
+        df_combined['event_key'] = fallback_key
     
     cvli_mask = df_combined['tipo'].str.lower() == 'cvli'
     if cvli_mask.any():
@@ -621,7 +628,7 @@ def merge(new_data_path):
         df_cvli_collapsed['qtd_mortes'] = df_cvli.groupby('event_key').size().values
         
         df_combined = pd.concat([df_others, df_cvli_collapsed], ignore_index=True)
-        print(f"  ✓ {len(df_cvli) - len(df_cvli_collapsed)} registros de vítimas extras convergidos em seus eventos de origem.")
+        print(f"   {len(df_cvli) - len(df_cvli_collapsed)} registros de vítimas extras convergidos em seus eventos de origem.")
     else:
         df_combined['qtd_mortes'] = 1
 
@@ -647,20 +654,12 @@ def merge(new_data_path):
         final_cols = cols[:v_idx] + new_v33_cols + cols[v_idx:]
         df_combined = df_combined[final_cols]
     
-    if not did_append:
-        df_combined.to_csv(OFFICIAL_CSV, index=False, encoding='utf-8')
-        print(f"✅ SUCESSO! Base atualizada em {OFFICIAL_CSV} com colunas ordenadas.")
-        # Construir cache de ruas críticas geolocalizadas (reconstrução completa)
-        print("\n📍 Construindo cache de ruas críticas (reconstrucao completa)...")
-        build_streets_cache(df_combined)
-    else:
-        print("✅ CSV oficial atualizado por append; evitando reescrita completa.")
-        # Atualizacao incremental do cache de ruas apenas com os novos registros
-        if 'to_append' in globals() and not to_append.empty:
-            print("\n📍 Atualizando cache de ruas criticamente de forma incremental...")
-            incremental_update_streets_cache(to_append)
-        else:
-            print("\n📍 Nenhum registro novo para atualizar o cache incremental.")
+    # Persistir sempre a base convergida (qtd_mortes/event_key), inclusive no fluxo append.
+    df_combined.to_csv(OFFICIAL_CSV, index=False, encoding='utf-8')
+    print(f" SUCESSO! Base convergida atualizada em {OFFICIAL_CSV} com colunas ordenadas.")
+    # Regerar cache para refletir o estado consolidado final.
+    print("\n Construindo cache de ruas críticas (reconstrucao completa)...")
+    build_streets_cache(df_combined)
     
     # 7. Disparar processamento subsequente
     dp_path = os.path.join('src', 'core', 'data_processing.py')
@@ -673,15 +672,15 @@ def merge(new_data_path):
         try:
             perform_validation_log(df_combined, window_days=14)
         except Exception as e:
-            print(f"⚠️ Erro na validação automática: {e}")
+            print(f"️ Erro na validação automática: {e}")
 
     if HostingerSyncManager is not None:
         try:
             sync_result = HostingerSyncManager(BASE_DIR).sync_data_merge_artifacts()
             if sync_result.get('status') == 'synced':
-                print(f"✅ Sync Hostinger (data merge): {len(sync_result.get('uploaded_files', []))} arquivo(s) enviados")
+                print(f" Sync Hostinger (data merge): {len(sync_result.get('uploaded_files', []))} arquivo(s) enviados")
         except Exception as e:
-            print(f"⚠️ Sync Hostinger falhou após merge: {e}")
+            print(f"️ Sync Hostinger falhou após merge: {e}")
 
 def perform_validation_log(df_eval, window_days=14):
     """
@@ -689,7 +688,7 @@ def perform_validation_log(df_eval, window_days=14):
     Filtra para os últimos `window_days` dias para obter um gabarito tático real.
     Registra o resultado regional detalhado em VALIDATION_LOG.md.
     """
-    print(f"\n📊 Iniciando Validação Regional Detalhada (Gabarito - Últimos {window_days} dias)...")
+    print(f"\n Iniciando Validação Regional Detalhada (Gabarito - ltimos {window_days} dias)...")
     
     # 1. Carregar Orquestrador para obter as predições e mapeamento regional
     try:
@@ -763,7 +762,7 @@ def perform_validation_log(df_eval, window_days=14):
             'p20': f"{p20*100:.1f}%",
             'r10': f"{r10*100:.1f}%",
             'r20': f"{r20*100:.1f}%",
-            'status': "✅" if p10 >= 0.4 else ("⚠️" if p10 >= 0.2 else "🚨")
+            'status': "" if p10 >= 0.4 else ("️" if p10 >= 0.2 else "")
         })
 
     # 4. Registrar no VALIDATION_LOG.md
@@ -773,7 +772,7 @@ def perform_validation_log(df_eval, window_days=14):
     end_d = cvlis['data'].max().strftime('%Y-%m-%d')
     
     with open(log_path, 'a', encoding='utf-8') as f:
-        f.write(f"\n### 🔄 Sessão de Validação: {now_str}\n")
+        f.write(f"\n###  Sessão de Validação: {now_str}\n")
         f.write(f"**Período Gabarito:** {start_d} a {end_d}\n\n")
         f.write("| Região    | N_CVLI Bruto | Hits Bruto | P@10  |  P@20 |  R@10  |  R@20  | Status |\n")
         f.write("|:----------|:------------:|:----------:|:-----:|:-----:|:------:|:------:|:------:|\n")
@@ -782,7 +781,7 @@ def perform_validation_log(df_eval, window_days=14):
             f.write(f"| {region_padded} | {res['total']:^12} | {res['hits']:^10} | {res['p10']:^5} | {res['p20']:^5} | {res['r10']:^6} | {res['r20']:^6} | {res['status']:^6} |\n")
         f.write("\n---\n")
         
-    print(f"  ✅ Validação regional concluída e registrada em {log_path}")
+    print(f"   Validação regional concluída e registrada em {log_path}")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

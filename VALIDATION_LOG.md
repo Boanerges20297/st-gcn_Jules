@@ -92,3 +92,14 @@ Este arquivo registra a performance das predições do sistema (Champion + Chall
 | INTERIOR  |      6       |     3      | 30.0% | 20.0% | 50.0%  | 66.7%  |   ⚠️   |
 
 ---
+
+### ðŸ”„ SessÃ£o de ValidaÃ§Ã£o: 2026-05-25 15:17
+**PerÃ­odo Gabarito:** 2026-05-11 a 2026-05-24
+
+| RegiÃ£o    | N_CVLI Bruto | Hits Bruto | P@10  |  P@20 |  R@10  |  R@20  | Status |
+|:----------|:------------:|:----------:|:-----:|:-----:|:------:|:------:|:------:|
+| FORTALEZA |      6       |     5      | 50.0% | 30.0% | 83.3%  | 100.0% |  âœ…   |
+| RMF       |      2       |     2      | 20.0% | 10.0% | 100.0% | 100.0% | âš ï¸ |
+| INTERIOR  |      7       |     5      | 50.0% | 25.0% | 71.4%  | 71.4%  |  âœ…   |
+
+---

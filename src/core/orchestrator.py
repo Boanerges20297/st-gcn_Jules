@@ -1,4 +1,4 @@
-import sys
+﻿import sys
 import json
 import numpy as np
 import torch
@@ -7,7 +7,10 @@ import os
 import pandas as pd
 import unicodedata
 import re
+import threading
+import time
 from datetime import datetime
+from pathlib import Path
 
 # --- Champion/Challenger LGBM Lean (Sentinela V3) ---
 try:
@@ -37,8 +40,14 @@ class StateOrchestrator:
     def __init__(self, project_root):
         self.root = project_root
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self._hostinger_sync_manager = None
+        self._hostinger_sync_lock = threading.Lock()
+        self._hostinger_sync_worker_started = False
+        self._hostinger_sync_pending_risk_artifact = None
+        self._hostinger_sync_pending_startup_merge = False
+        self._hostinger_sync_retry_interval_seconds = 60
         
-        # ⭐ ATUALIZAÇÃO (2026-03-18): Modelo oficial de Fortaleza agora é retreinado com Blindagem Temporal
+        # â­ ATUALIZAÃ‡ÃƒO (2026-03-18): Modelo oficial de Fortaleza agora Ã© retreinado com Blindagem Temporal
         # Paradigma Tentativa 49: Gradiente Agressivo + Z-Score Local.
         fortaleza_model_file = 'fortaleza_model_active.pth'
         has_momentum_fortaleza = True
@@ -91,9 +100,131 @@ class StateOrchestrator:
         if ChampionChallenger is not None:
             try:
                 self.champion_challenger = ChampionChallenger(self.root)
-                print("✅ [Sentinela V3] Refinamento LGBM integrado ao Orquestrador.")
+                print("âœ… [Sentinela V3] Refinamento LGBM integrado ao Orquestrador.")
             except Exception as cc_err:
-                print(f"⚠️ [Sentinela V3] Falha ao integrar: {cc_err}")
+                print(f"âš ï¸ [Sentinela V3] Falha ao integrar: {cc_err}")
+
+    def _ensure_hostinger_sync_worker(self):
+        with self._hostinger_sync_lock:
+            if self._hostinger_sync_worker_started:
+                return
+            self._hostinger_sync_worker_started = True
+        worker = threading.Thread(target=self._hostinger_sync_worker_loop, daemon=True)
+        worker.start()
+        print("[Hostinger Sync] worker iniciado (assincrono, retry a cada 60s).")
+
+    def _hostinger_sync_worker_loop(self):
+        while True:
+            pending_risk = None
+            pending_merge = False
+            with self._hostinger_sync_lock:
+                pending_risk = self._hostinger_sync_pending_risk_artifact
+                pending_merge = self._hostinger_sync_pending_startup_merge
+
+            if pending_merge:
+                ok = self._try_sync_startup_data_merge_once()
+                if ok:
+                    with self._hostinger_sync_lock:
+                        self._hostinger_sync_pending_startup_merge = False
+
+            if pending_risk is not None:
+                ok = self._try_sync_risk_artifacts_once(pending_risk, 'risk_update')
+                if ok:
+                    with self._hostinger_sync_lock:
+                        self._hostinger_sync_pending_risk_artifact = None
+
+            time.sleep(self._hostinger_sync_retry_interval_seconds)
+
+    def _get_hostinger_sync_manager(self):
+        if self._hostinger_sync_manager is not None:
+            return self._hostinger_sync_manager
+        try:
+            from src.hostinger_sync import HostingerSyncManager
+            self._hostinger_sync_manager = HostingerSyncManager(self.root)
+            return self._hostinger_sync_manager
+        except Exception as e:
+            print(f"[Hostinger Sync] falha ao inicializar manager: {e}")
+            return None
+
+    @staticmethod
+    def _log_hostinger_sync_result(context, result):
+        if not isinstance(result, dict):
+            print(f"[Hostinger Sync] {context}: resultado invalido ({result}).")
+            return
+        status = str(result.get('status', 'unknown')).strip().lower()
+        reason = result.get('reason')
+        fingerprint = result.get('fingerprint')
+        uploaded = result.get('uploaded_files') or []
+        if status == 'synced':
+            print(f"[Hostinger Sync] {context}: synced | arquivos={len(uploaded)} | fingerprint={fingerprint or '-'}")
+            return
+        if status == 'skipped':
+            print(f"[Hostinger Sync] {context}: skipped | motivo={reason or 'unchanged'} | fingerprint={fingerprint or '-'}")
+            return
+        if status == 'disabled':
+            print(f"[Hostinger Sync] {context}: disabled | motivo={reason or 'not configured'}")
+            return
+        print(f"[Hostinger Sync] {context}: status={status or 'unknown'} | motivo={reason or '-'} | fingerprint={fingerprint or '-'}")
+
+    def _log_hostinger_sync_config_snapshot(self, context):
+        manager = self._get_hostinger_sync_manager()
+        if manager is None:
+            return
+        cfg = manager.config
+        masked_user = f"{cfg.user[:2]}***" if cfg.user else "-"
+        print(f"[Hostinger Sync] {context}: config enabled={cfg.enabled} host={cfg.host or '-'} port={cfg.port} user={masked_user} timeout={cfg.timeout_seconds}s configured={cfg.is_configured}")
+
+    def _try_sync_risk_artifacts_once(self, artifact, context):
+        manager = self._get_hostinger_sync_manager()
+        if manager is None:
+            return False
+        self._log_hostinger_sync_config_snapshot(context)
+        try:
+            result = manager.sync_risk_artifacts(artifact)
+            self._log_hostinger_sync_result(context, result)
+            status = str((result or {}).get('status', '')).lower()
+            return status in {'synced', 'skipped', 'disabled'}
+        except Exception as e:
+            print(f"[Hostinger Sync] {context}: erro ao sincronizar risk artifacts: {e}")
+            return False
+
+    def _try_sync_startup_data_merge_once(self):
+        manager = self._get_hostinger_sync_manager()
+        if manager is None:
+            return False
+        self._log_hostinger_sync_config_snapshot('startup:data_merge')
+        try:
+            merge_result = manager.sync_data_merge_artifacts()
+            self._log_hostinger_sync_result('startup:data_merge', merge_result)
+            status = str((merge_result or {}).get('status', '')).lower()
+            return status in {'synced', 'skipped', 'disabled'}
+        except Exception as e:
+            print(f"[Hostinger Sync] startup:data_merge: erro ao sincronizar data merge: {e}")
+            return False
+
+    def _enqueue_hostinger_risk_sync(self, artifact):
+        self._ensure_hostinger_sync_worker()
+        with self._hostinger_sync_lock:
+            self._hostinger_sync_pending_risk_artifact = artifact
+        print("[Hostinger Sync] risk_update: sync enfileirado (assincrono).")
+
+    def sync_hostinger_on_startup(self):
+        self._ensure_hostinger_sync_worker()
+        with self._hostinger_sync_lock:
+            self._hostinger_sync_pending_startup_merge = True
+        print("[Hostinger Sync] startup:data_merge: sync enfileirado (assincrono).")
+
+        latest_json_path = Path(self.root) / 'outputs' / 'hermes' / 'risk_snapshot_latest.json'
+        if not latest_json_path.exists():
+            print("[Hostinger Sync] startup:risk_outputs: arquivo latest inexistente; aguardando proxima atualizacao de risco.")
+            return
+        try:
+            artifact = json.loads(latest_json_path.read_text(encoding='utf-8'))
+            with self._hostinger_sync_lock:
+                self._hostinger_sync_pending_risk_artifact = artifact
+            print("[Hostinger Sync] startup:risk_outputs: sync enfileirado (assincrono).")
+        except Exception as e:
+            print(f"[Hostinger Sync] startup:risk_outputs: erro ao processar snapshot latest: {e}")
 
     def _restore_window_state(self):
         try:
@@ -110,7 +241,7 @@ class StateOrchestrator:
                         if hf:
                             self._load_historical_fallback(region)
         except Exception as e:
-            print(f"⚠️ [Window State] Erro ao restaurar: {e}")
+            print(f"âš ï¸ [Window State] Erro ao restaurar: {e}")
 
     def _save_window_state(self):
         try:
@@ -127,7 +258,7 @@ class StateOrchestrator:
             with open(self._window_state_path, 'w', encoding='utf-8') as f:
                 json.dump(state, f, indent=2, ensure_ascii=False)
         except Exception as e:
-            print(f"⚠️ [Window State] Erro ao salvar: {e}")
+            print(f"âš ï¸ [Window State] Erro ao salvar: {e}")
 
     _WINDOW_LADDER = [120, 90, 60, 30]
 
@@ -152,13 +283,13 @@ class StateOrchestrator:
             if current_rung > ladder[-1]:
                 next_rung = ladder[current_idx + 1] if current_idx + 1 < len(ladder) else ladder[-1]
                 if next_rung != current_window:
-                    print(f"📉 [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. Reduzindo janela {current_window}d → {next_rung}d.")
+                    print(f"ðŸ“‰ [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. Reduzindo janela {current_window}d â†’ {next_rung}d.")
                     cp['dynamic_window'] = next_rung
                     cp['use_historical_fallback'] = False
                     self._save_window_state()
             else:
                 if not cp.get('use_historical_fallback', False):
-                    print(f"📉 [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. ATIVANDO fallback histórico.")
+                    print(f"ðŸ“‰ [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. ATIVANDO fallback histÃ³rico.")
                     cp['use_historical_fallback'] = True
                     self._load_historical_fallback(region)
                     self._save_window_state()
@@ -171,11 +302,11 @@ class StateOrchestrator:
 
             if current_rung < base_window:
                 next_rung = ladder[current_idx - 1] if current_idx > 0 else base_window
-                print(f"📈 [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. Expandindo janela {current_window}d → {next_rung}d.")
+                print(f"ðŸ“ˆ [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. Expandindo janela {current_window}d â†’ {next_rung}d.")
                 cp['dynamic_window'] = next_rung
             else:
                 cp['dynamic_window'] = None
-                print(f"✅ [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. Janela base restaurada.")
+                print(f"âœ… [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. Janela base restaurada.")
 
             if cp.get('use_historical_fallback'):
                 cp['use_historical_fallback'] = False
@@ -205,9 +336,9 @@ class StateOrchestrator:
                     self.specialists[region] = {'model': model, 'data': data, 'window': cfg['window'], 'channels': cfg['in_channels']}
                     if self.dates is None:
                         self.dates = data.get('dates')
-                    print(f"✅ Orquestrador: Especialista {region.upper()} carregado ({cfg['in_channels']} Canais).")
+                    print(f"âœ… Orquestrador: Especialista {region.upper()} carregado ({cfg['in_channels']} Canais).")
                 except Exception as e:
-                    print(f"❌ Erro ao carregar {region}: {e}")
+                    print(f"âŒ Erro ao carregar {region}: {e}")
         self._node_owners = {normalize_name(str(r['name'])): reg for reg, spec in self.specialists.items() for _, r in spec['data']['nodes_gdf'].iterrows()}
 
     def _load_pickle_safe(self, path):
@@ -215,13 +346,13 @@ class StateOrchestrator:
         import pickle
         import pandas as pd
         
-        # 1. Tenta o caminho padrão (mais rápido)
+        # 1. Tenta o caminho padrÃ£o (mais rÃ¡pido)
         try:
             return pd.read_pickle(path)
         except Exception:
             pass
             
-        # 2. Fallback: Unpickler customizado para interceptar StringDtype problemáticos
+        # 2. Fallback: Unpickler customizado para interceptar StringDtype problemÃ¡ticos
         class RobustUnpickler(pickle.Unpickler):
             def find_class(self, module, name):
                 # Se for StringDtype do pandas (python ou arrow), redirecionamos para algo seguro
@@ -237,12 +368,12 @@ class StateOrchestrator:
             with open(path, 'rb') as f:
                 return RobustUnpickler(f).load()
         except Exception as e:
-            # 3. Último recurso: Carregar via pickle puro e converter se necessário
+            # 3. Ãšltimo recurso: Carregar via pickle puro e converter se necessÃ¡rio
             try:
                 with open(path, 'rb') as f:
                     data = pickle.load(f)
                 if isinstance(data, dict) and 'nodes_gdf' in data:
-                    # Tenta converter o GDF para algo legível forçando dtypes
+                    # Tenta converter o GDF para algo legÃ­vel forÃ§ando dtypes
                     gdf = data['nodes_gdf']
                     if hasattr(gdf, 'astype'):
                         for col in gdf.columns:
@@ -253,13 +384,13 @@ class StateOrchestrator:
                     data['nodes_gdf'] = gdf
                 return data
             except Exception as final_e:
-                print(f"❌ Falha total ao carregar {path}: {final_e}")
+                print(f"âŒ Falha total ao carregar {path}: {final_e}")
                 return None
 
     def _risk_level(self, score):
         score = max(0.0, min(100.0, float(score)))
         if score >= 71.0:
-            return 'crítico'
+            return 'crÃ­tico'
         if score >= 51.0:
             return 'alto'
         if score >= 31.0:
@@ -292,14 +423,14 @@ class StateOrchestrator:
     def _build_driver_list(self, item):
         drivers = [
             ('sinal_neural', float(item.get('neural_score', 0.0)), 'Sinal neural do ST-GAT'),
-            ('tensao_territorial', float(item.get('tension_score', 0.0)), 'Tensão territorial'),
-            ('inclusao_recente', float(item.get('inclusion_score', 0.0)), 'Atividade recente e vizinhança'),
+            ('tensao_territorial', float(item.get('tension_score', 0.0)), 'TensÃ£o territorial'),
+            ('inclusao_recente', float(item.get('inclusion_score', 0.0)), 'Atividade recente e vizinhanÃ§a'),
         ]
 
         if float(item.get('recent_cvli_30d', 0.0)) > 0:
             drivers.append(('cvli_recente', min(float(item.get('recent_cvli_30d', 0.0)) * 20.0, 100.0), 'CVLI recente na janela de 30 dias'))
         if item.get('historical_fallback'):
-            drivers.append(('fallback_historico', 55.0, 'Fallback histórico ativado'))
+            drivers.append(('fallback_historico', 55.0, 'Fallback histÃ³rico ativado'))
 
         ordered = sorted(drivers, key=lambda entry: entry[1], reverse=True)
         return [
@@ -321,14 +452,14 @@ class StateOrchestrator:
             priority_text = 'prioridade imediata de acompanhamento'
         elif rank <= 10:
             priority_text = 'prioridade alta de acompanhamento'
-        elif risk_level in ('crítico', 'alto'):
-            priority_text = 'território relevante para monitoramento'
+        elif risk_level in ('crÃ­tico', 'alto'):
+            priority_text = 'territÃ³rio relevante para monitoramento'
         else:
-            priority_text = 'território de atenção tática'
+            priority_text = 'territÃ³rio de atenÃ§Ã£o tÃ¡tica'
 
         leitura_rapida = (
-            f"{item['name']} aparece na posição {rank} de {total_items}, com risco {score:.1f} e nível {risk_level}; "
-            f"é {priority_text}."
+            f"{item['name']} aparece na posiÃ§Ã£o {rank} de {total_items}, com risco {score:.1f} e nÃ­vel {risk_level}; "
+            f"Ã© {priority_text}."
         )
         por_que_importa = (
             f"O peso principal vem de {primary_driver.lower()}, com suporte territorial de {support_pct:.1f}%"
@@ -336,23 +467,23 @@ class StateOrchestrator:
         )
 
         if confidence_pct >= 85:
-            confidence_note = 'Leitura com boa sustentação dos sinais atuais.'
+            confidence_note = 'Leitura com boa sustentaÃ§Ã£o dos sinais atuais.'
         elif confidence_pct >= 70:
-            confidence_note = 'Leitura consistente, mas ainda pede validação operacional pontual.'
+            confidence_note = 'Leitura consistente, mas ainda pede validaÃ§Ã£o operacional pontual.'
         elif item.get('historical_fallback'):
-            confidence_note = 'Leitura mais fraca; parte do peso vem de fallback histórico e deve ser confirmada em campo.'
+            confidence_note = 'Leitura mais fraca; parte do peso vem de fallback histÃ³rico e deve ser confirmada em campo.'
         else:
-            confidence_note = 'Leitura sensível a ruído; requer conferência adicional antes de decisão forte.'
+            confidence_note = 'Leitura sensÃ­vel a ruÃ­do; requer conferÃªncia adicional antes de decisÃ£o forte.'
 
         if expressiveness_pct >= 85:
-            expressiveness_note = 'O território está bem destacado no ranking frente aos pares.'
+            expressiveness_note = 'O territÃ³rio estÃ¡ bem destacado no ranking frente aos pares.'
         elif expressiveness_pct >= 70:
-            expressiveness_note = 'O território se diferencia do bloco intermediário, mas sem isolamento absoluto.'
+            expressiveness_note = 'O territÃ³rio se diferencia do bloco intermediÃ¡rio, mas sem isolamento absoluto.'
         else:
-            expressiveness_note = 'O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.'
+            expressiveness_note = 'O territÃ³rio estÃ¡ prÃ³ximo de pares vizinhos e pode oscilar no prÃ³ximo ciclo.'
 
         proxima_acao = (
-            f"Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+            f"Verificar eventos recentes, pressÃ£o territorial e coerÃªncia com inteligÃªncia local antes da prÃ³xima atualizaÃ§Ã£o do ranking."
         )
 
         return {
@@ -765,7 +896,7 @@ class StateOrchestrator:
 
                 for entry in entries:
                     brief_lines.append(
-                        f"{entry['rank']}. {entry['name']} — risco {entry['risk_score']:.1f} | {entry['risk_level']} | confianca {entry['confidence_pct']:.1f}%"
+                        f"{entry['rank']}. {entry['name']} â€” risco {entry['risk_score']:.1f} | {entry['risk_level']} | confianca {entry['confidence_pct']:.1f}%"
                     )
                 brief_lines.append('')
                 return brief_lines
@@ -906,8 +1037,9 @@ class StateOrchestrator:
             for path in (json_path, history_json_path):
                 with open(path, 'w', encoding='utf-8') as f:
                     json.dump(artifact, f, indent=2, ensure_ascii=False)
+            self._enqueue_hostinger_risk_sync(artifact)
         except Exception as e:
-            print(f"⚠️ [Hermes Output] Erro ao gerar artefato: {e}")
+            print(f"âš ï¸ [Hermes Output] Erro ao gerar artefato: {e}")
 
     def get_combined_risk(self, exogenous_shocks=None, return_trends=False):
         combined_scores = {}
@@ -951,17 +1083,17 @@ class StateOrchestrator:
                 cold_streak = np.where(x_raw_extended[:, t, 0] > 0, 0, cold_streak + 1)
                 momentum_feat[:, t, 3] = -np.clip(cold_streak, 0, 30)
             
-            # --- INJEÇÃO DE MOMENTUM (V37 Elite) ---
+            # --- INJEÃ‡ÃƒO DE MOMENTUM (V37 Elite) ---
             if channels >= 37:
                 # Preenche os canais 33-36 (Momentum calculado on-the-fly)
                 x_raw_extended[:, :, 33:37] = momentum_feat[:, :, :4]
 
             x_final = x_raw_extended[:, -window:, :channels].copy()
             
-            # ⭐ NORMALIZAÇÃO Z-SCORE (V37 Elite)
+            # â­ NORMALIZAÃ‡ÃƒO Z-SCORE (V37 Elite)
             for c in range(channels):
-                # Evitamos normalizar canais binários/sazonais fixos (3-22, 29, 30, 32)
-                # Normalizamos apenas: Crime(0), Veículos(1), Tensão(2), Intel(27), Global(28), Chuva(31), Momentum(33-36)
+                # Evitamos normalizar canais binÃ¡rios/sazonais fixos (3-22, 29, 30, 32)
+                # Normalizamos apenas: Crime(0), VeÃ­culos(1), TensÃ£o(2), Intel(27), Global(28), Chuva(31), Momentum(33-36)
                 if c in [0, 1, 2, 24, 27, 28, 31, 33, 34, 35, 36]:
                     m_c = x_final[:, :, c].mean()
                     s_c = x_final[:, :, c].std() + 1e-6
@@ -993,8 +1125,8 @@ class StateOrchestrator:
             historical_col = 'total_cvli' if 'total_cvli' in data['nodes_gdf'].columns else 'recent_cvli'
             historical_cvli = data['nodes_gdf'][historical_col].fillna(0).values.astype(float)
 
-            # Tensão territorial não deve sozinha promover bairros frios.
-            # Exigimos atividade CVLI recente real ou lastro histórico relevante.
+            # TensÃ£o territorial nÃ£o deve sozinha promover bairros frios.
+            # Exigimos atividade CVLI recente real ou lastro histÃ³rico relevante.
             historical_support = np.clip((historical_cvli - 20.0) / 40.0, 0, 1)
             live_support = np.maximum(
                 np.clip(current_cvli_recent / 1.0, 0, 1),
@@ -1008,7 +1140,7 @@ class StateOrchestrator:
 
             recent_crime_signal = np.clip(x_raw_extended[:, -inclusion_horizon:, 0].sum(axis=1), 0, 2) / 2.0
             neighbor_signal = np.clip((data['adj_geo'].dot((sim_impact > 0).astype(float))) * (cp.get('tag_bias_neighbor', 0.6)/0.6), 0, 1)
-            # Nó com evento direto também recebe inclusão máxima (não apenas seus vizinhos)
+            # NÃ³ com evento direto tambÃ©m recebe inclusÃ£o mÃ¡xima (nÃ£o apenas seus vizinhos)
             own_event_signal = (sim_impact > 0).astype(float)
             inclusion_signal = np.clip(np.maximum.reduce([recent_crime_signal, neighbor_signal, own_event_signal]), 0, 1)
             calm_signal = np.clip(-momentum_feat[:, -1, 3], 0, 30) / 30.0
@@ -1018,14 +1150,14 @@ class StateOrchestrator:
                 hist_signal = np.array([1.0 if normalize_name(str(row['name'])) in hist_norms else 0.0 for _, row in data['nodes_gdf'].iterrows()])
                 final_logic = (0.50 * norm_neural) + (0.20 * norm_tension) + (0.10 * inclusion_signal) + (0.20 * hist_signal) - (0.10 * calm_signal)
             else:
-                # Foco Total em CVLI (Atualização Produção 2026-05-21)
+                # Foco Total em CVLI (AtualizaÃ§Ã£o ProduÃ§Ã£o 2026-05-21)
                 neural_weight = 0.50 if region != 'interior' else 0.35
                 tension_weight = 0.10
                 inclusion_weight = 0.40 # O Gatilho de Conflito agora manda!
                 
-                # Fator Anti-Amnésia: 
-                # Se a área está em calmaria severa, a rede neural perde a "certeza absoluta" baseada no passado.
-                # calm_signal vai de 0.0 (violência) a 1.0 (calma de 30 dias).
+                # Fator Anti-AmnÃ©sia: 
+                # Se a Ã¡rea estÃ¡ em calmaria severa, a rede neural perde a "certeza absoluta" baseada no passado.
+                # calm_signal vai de 0.0 (violÃªncia) a 1.0 (calma de 30 dias).
                 decay_factor = 1.0 - (calm_signal * 0.5) 
                 
                 final_logic = (
@@ -1069,7 +1201,7 @@ class StateOrchestrator:
             try:
                 combined_scores = self.champion_challenger.apply(combined_scores)
             except Exception as e:
-                print(f"⚠️ [Sentinela V3] Falha ao aplicar refinamento: {e}")
+                print(f"âš ï¸ [Sentinela V3] Falha ao aplicar refinamento: {e}")
         # ---------------------------------------
 
         self._write_hermes_outputs(combined_scores, component_details)
@@ -1077,7 +1209,7 @@ class StateOrchestrator:
         return (combined_scores, trends) if return_trends else combined_scores
 
     def _log_predict_p10(self, scores_map):
-        """Registra o top-10 predito por região a cada cálculo de risco para análise e validação."""
+        """Registra o top-10 predito por regiÃ£o a cada cÃ¡lculo de risco para anÃ¡lise e validaÃ§Ã£o."""
         try:
             log_path = os.path.join(self.root, 'logs', 'predict_p10.jsonl')
             os.makedirs(os.path.dirname(log_path), exist_ok=True)
@@ -1099,7 +1231,7 @@ class StateOrchestrator:
             with open(log_path, 'a', encoding='utf-8') as f:
                 f.write(json.dumps(record, ensure_ascii=False) + '\n')
         except Exception as e:
-            print(f"⚠️ [P10 Log] Erro ao registrar predição: {e}")
+            print(f"âš ï¸ [P10 Log] Erro ao registrar prediÃ§Ã£o: {e}")
 
     def _norm_adj(self, geo, conf):
         def n(a):
