@@ -25,12 +25,12 @@
           "PASSARELA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755241"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.625701086956525,
+          -38.62570108695652,
           -3.8873841304347825
         ]
       }
@@ -59,13 +59,13 @@
           "GUABIRABA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755257"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -38.69226130882353,
-          -3.8953126470588226
+          -3.8953126470588235
         ]
       }
     },
@@ -74,40 +74,6 @@
       "properties": {
         "node_id": 3,
         "rank": 3,
-        "name": "Alto do Bernardo",
-        "bairro": "ITAPAJÉ",
-        "municipality": "ITAPAJE",
-        "faction": "CV",
-        "risk_score": 71.563,
-        "score": 71.563,
-        "region": "interior",
-        "parent_area": "ITAPAJÉ",
-        "parent_risk_score": 78.6,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 10.365,
-        "nearby_streets_count": 26,
-        "nearby_streets": [
-          "ALTO DO BERNARDO",
-          "RUA ALBERTO COELHO",
-          "RUA JESUINO P. DE MESQUITA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.5904940967742,
-          -3.681352677419355
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 4,
-        "rank": 4,
         "name": "Novo Parque Iracema - Alto do João Grande",
         "bairro": "MARACANAÚ",
         "municipality": "Alto do João Grande",
@@ -127,21 +93,21 @@
           "RUA MANOEL DUARTE MESQUITA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755263"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.68869488461538,
-          -3.914271307692306
+          -38.68869488461539,
+          -3.914271307692308
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 5,
-        "rank": 5,
+        "node_id": 4,
+        "rank": 4,
         "name": "Cidade de Deus - Área Seca",
         "bairro": "MARACANAÚ",
         "municipality": "Área Seca",
@@ -161,123 +127,21 @@
           "ÁREA SECA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755268"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.66095119999999,
-          -3.8752303999999995
+          -38.6609512,
+          -3.8752304000000004
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 6,
-        "rank": 6,
-        "name": "Carnaúba - Itapajé",
-        "bairro": "ITAPAJÉ",
-        "municipality": "ITAPAJE",
-        "faction": "CV",
-        "risk_score": 70.417,
-        "score": 70.417,
-        "region": "interior",
-        "parent_area": "ITAPAJÉ",
-        "parent_risk_score": 78.6,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 9.334,
-        "nearby_streets_count": 26,
-        "nearby_streets": [
-          "CARNAÚBA - ITAPAJÉ",
-          "RUA JOÃO DA SILVA MOTA",
-          "RUA OTÁVIO PINTO DE MESQUITA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.58377711666666,
-          -3.6790391666666666
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 7,
-        "rank": 7,
-        "name": "Comunidade São Francisco - Itapajé",
-        "bairro": "ITAPAJÉ",
-        "municipality": "ITAPAJE",
-        "faction": "CV",
-        "risk_score": 70.335,
-        "score": 70.335,
-        "region": "interior",
-        "parent_area": "ITAPAJÉ",
-        "parent_risk_score": 78.6,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 9.276,
-        "nearby_streets_count": 22,
-        "nearby_streets": [
-          "COMUNIDADE SÃO FRANCISCO - ITAPAJÉ",
-          "RUA TARCILA CARNEIRO SARAIVA",
-          "TRAVESSA ASSIS BASTOS"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.58936146428571,
-          -3.684116642857144
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 8,
-        "rank": 8,
-        "name": "Padre Lima",
-        "bairro": "ITAPAJÉ",
-        "municipality": "ITAPAJE",
-        "faction": "CV",
-        "risk_score": 69.731,
-        "score": 69.731,
-        "region": "interior",
-        "parent_area": "ITAPAJÉ",
-        "parent_risk_score": 78.6,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 8.738,
-        "nearby_streets_count": 26,
-        "nearby_streets": [
-          "RUA SALES NETO",
-          "ALTO DO BERNARDO",
-          "RUA TEREZA MAGALHÃES"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.590193500000005,
-          -3.6778966250000007
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 9,
-        "rank": 9,
+        "node_id": 5,
+        "rank": 5,
         "name": "Colônia - (Em Disputa)",
         "bairro": "MARACANAÚ",
         "municipality": "(Em Disputa)",
@@ -297,21 +161,21 @@
           "RUA LUIS GIRÃO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755274"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -38.635009172413795,
-          -3.884029758620689
+          -3.8840297586206898
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 10,
-        "rank": 10,
+        "node_id": 6,
+        "rank": 6,
         "name": "Área Verde - Novo Maranguape I",
         "bairro": "MARACANAÚ",
         "municipality": "Novo Maranguape I",
@@ -331,55 +195,21 @@
           "RUA RAIMUNDO PACHÊCO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755279"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.67124333333333,
-          -3.871072666666667
+          -38.67124333333334,
+          -3.8710726666666666
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 11,
-        "rank": 11,
-        "name": "Bela Vista- Itapajé",
-        "bairro": "ITAPAJÉ",
-        "municipality": "ITAPAJE",
-        "faction": "CV",
-        "risk_score": 68.93,
-        "score": 68.93,
-        "region": "interior",
-        "parent_area": "ITAPAJÉ",
-        "parent_risk_score": 78.6,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 8.02,
-        "nearby_streets_count": 22,
-        "nearby_streets": [
-          "BELA VISTA- ITAPAJÉ",
-          "RUA MARIA APARECIDA LIMA BARBOSA",
-          "RUA OLÁVO CAVALCANTE"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.580755450980384,
-          -3.681636921568627
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 12,
-        "rank": 12,
+        "node_id": 7,
+        "rank": 7,
         "name": "Papoco - Mucunã",
         "bairro": "MARACANAÚ",
         "municipality": "Mucunã",
@@ -399,21 +229,21 @@
           "LUZARDO VIANA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755284"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -38.651285586206896,
-          -3.8522155862068974
+          -3.8522155862068965
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 13,
-        "rank": 13,
+        "node_id": 8,
+        "rank": 8,
         "name": "Gruta - Colônia",
         "bairro": "MARACANAÚ",
         "municipality": "Colônia",
@@ -433,55 +263,21 @@
           "RUA ANA PAULA DE MORAIS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755289"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.641463422222216,
-          -3.8852641999999986
+          -38.64146342222222,
+          -3.8852641999999995
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 14,
-        "rank": 14,
-        "name": "Bairro do Cruzeiro",
-        "bairro": "ITAPAJÉ",
-        "municipality": "ITAPAJE",
-        "faction": "PCC",
-        "risk_score": 67.863,
-        "score": 67.863,
-        "region": "interior",
-        "parent_area": "ITAPAJÉ",
-        "parent_risk_score": 78.6,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 7.08,
-        "nearby_streets_count": 18,
-        "nearby_streets": [
-          "BAIRRO DO CRUZEIRO",
-          "RUA JANDIRA BASTOS MAGALHÃES",
-          "COMUNIDADE SÃO FRANCISCO - ITAPAJÉ"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.588095,
-          -3.6878160769230766
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 15,
-        "rank": 15,
+        "node_id": 9,
+        "rank": 9,
         "name": "Favela do Magalhães - Jaçanaú",
         "bairro": "MARACANAÚ",
         "municipality": "Jaçanaú",
@@ -501,30 +297,64 @@
           "PAPOCO - MUCUNÃ"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755293"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -38.64580655555556,
-          -3.846872222222222
+          -3.8468722222222222
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 16,
-        "rank": 16,
+        "node_id": 10,
+        "rank": 10,
+        "name": "Alto do Bernardo",
+        "bairro": "ITAPAJÉ",
+        "municipality": "ITAPAJE",
+        "faction": "CV",
+        "risk_score": 67.171,
+        "score": 67.171,
+        "region": "interior",
+        "parent_area": "ITAPAJÉ",
+        "parent_risk_score": 72.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 10.365,
+        "nearby_streets_count": 26,
+        "nearby_streets": [
+          "ALTO DO BERNARDO",
+          "RUA ALBERTO COELHO",
+          "RUA JESUINO P. DE MESQUITA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755298"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.590494096774194,
+          -3.681352677419355
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 11,
+        "rank": 11,
         "name": "Catuana",
         "bairro": "CAUCAIA",
         "municipality": "CAUCAIA",
         "faction": "CV",
-        "risk_score": 67.146,
-        "score": 67.146,
+        "risk_score": 66.93,
+        "score": 66.93,
         "region": "interior",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 83.6,
+        "parent_risk_score": 83.3,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 3.209,
@@ -535,12 +365,12 @@
           "RUA J"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755303"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.91335163636364,
+          -38.913351636363636,
           -3.6866190606060605
         ]
       }
@@ -548,76 +378,8 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 17,
-        "rank": 17,
-        "name": "Pau Ferrado",
-        "bairro": "ITAPAJÉ",
-        "municipality": "ITAPAJE",
-        "faction": "CV",
-        "risk_score": 67.054,
-        "score": 67.054,
-        "region": "interior",
-        "parent_area": "ITAPAJÉ",
-        "parent_risk_score": 78.6,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 6.362,
-        "nearby_streets_count": 16,
-        "nearby_streets": [
-          "PAU FERRADO",
-          "RUA GEORGINA GONÇALVES DAS CHAGAS",
-          "RUA PEDRO FIRMO DE MESQUITA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.59621002941177,
-          -3.6772114411764716
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 18,
-        "rank": 18,
-        "name": "Caucaia",
-        "bairro": "CAUCAIA",
-        "municipality": "CAUCAIA",
-        "faction": "CV",
-        "risk_score": 66.43,
-        "score": 66.43,
-        "region": "interior",
-        "parent_area": "CAUCAIA",
-        "parent_risk_score": 83.6,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 2.598,
-        "nearby_streets_count": 5,
-        "nearby_streets": [
-          "CAUCAIA",
-          "RUA FRANCISCO BENTO",
-          "POÇO IMPERIAL"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -41.13028516129034,
-          -3.0140951935483873
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 19,
-        "rank": 19,
+        "node_id": 12,
+        "rank": 12,
         "name": "Comunidade da Central  - Jaçanaú",
         "bairro": "MARACANAÚ",
         "municipality": "Jaçanaú",
@@ -637,55 +399,55 @@
           "MUCUNÃ - MARACANAÚ"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755307"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -38.642674875,
-          -3.8401806250000003
+          -3.840180625
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 20,
-        "rank": 20,
-        "name": "Distrito de Matuões",
+        "node_id": 13,
+        "rank": 13,
+        "name": "Caucaia",
         "bairro": "CAUCAIA",
         "municipality": "CAUCAIA",
         "faction": "CV",
-        "risk_score": 66.101,
-        "score": 66.101,
+        "risk_score": 66.214,
+        "score": 66.214,
         "region": "interior",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 83.6,
+        "parent_risk_score": 83.3,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
-        "local_street_pressure": 2.151,
+        "local_street_pressure": 2.598,
         "nearby_streets_count": 5,
         "nearby_streets": [
-          "RUA ANTONIO BRASILEIRO",
-          "RUA JOSÉ PAULINO ALVES",
-          "DISTRITO DE MATUÕES"
+          "CAUCAIA",
+          "RUA FRANCISCO BENTO",
+          "POÇO IMPERIAL"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755311"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.82523231428571,
-          -3.588355628571428
+          -41.130285161290324,
+          -3.0140951935483873
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 21,
-        "rank": 21,
+        "node_id": 14,
+        "rank": 14,
         "name": "Alto da alvorada - Mucunã",
         "bairro": "MARACANAÚ",
         "municipality": "Mucunã",
@@ -705,13 +467,251 @@
           "MUCUNÃ - MARACANAÚ"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755316"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -38.664738660714285,
-          -3.8423726071428583
+          -3.842372607142857
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 15,
+        "rank": 15,
+        "name": "Carnaúba - Itapajé",
+        "bairro": "ITAPAJÉ",
+        "municipality": "ITAPAJE",
+        "faction": "CV",
+        "risk_score": 66.025,
+        "score": 66.025,
+        "region": "interior",
+        "parent_area": "ITAPAJÉ",
+        "parent_risk_score": 72.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 9.334,
+        "nearby_streets_count": 26,
+        "nearby_streets": [
+          "CARNAÚBA - ITAPAJÉ",
+          "RUA JOÃO DA SILVA MOTA",
+          "RUA OTÁVIO PINTO DE MESQUITA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755320"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.58377711666667,
+          -3.6790391666666666
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 16,
+        "rank": 16,
+        "name": "Comunidade São Francisco - Itapajé",
+        "bairro": "ITAPAJÉ",
+        "municipality": "ITAPAJE",
+        "faction": "CV",
+        "risk_score": 65.943,
+        "score": 65.943,
+        "region": "interior",
+        "parent_area": "ITAPAJÉ",
+        "parent_risk_score": 72.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 9.276,
+        "nearby_streets_count": 22,
+        "nearby_streets": [
+          "COMUNIDADE SÃO FRANCISCO - ITAPAJÉ",
+          "RUA TARCILA CARNEIRO SARAIVA",
+          "TRAVESSA ASSIS BASTOS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755325"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.589361464285716,
+          -3.6841166428571426
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 17,
+        "rank": 17,
+        "name": "Distrito de Matuões",
+        "bairro": "CAUCAIA",
+        "municipality": "CAUCAIA",
+        "faction": "CV",
+        "risk_score": 65.885,
+        "score": 65.885,
+        "region": "interior",
+        "parent_area": "CAUCAIA",
+        "parent_risk_score": 83.3,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 2.151,
+        "nearby_streets_count": 5,
+        "nearby_streets": [
+          "RUA ANTONIO BRASILEIRO",
+          "RUA JOSÉ PAULINO ALVES",
+          "DISTRITO DE MATUÕES"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755329"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.825232314285714,
+          -3.5883556285714286
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 18,
+        "rank": 18,
+        "name": "Padre Lima",
+        "bairro": "ITAPAJÉ",
+        "municipality": "ITAPAJE",
+        "faction": "CV",
+        "risk_score": 65.339,
+        "score": 65.339,
+        "region": "interior",
+        "parent_area": "ITAPAJÉ",
+        "parent_risk_score": 72.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 8.738,
+        "nearby_streets_count": 26,
+        "nearby_streets": [
+          "RUA SALES NETO",
+          "ALTO DO BERNARDO",
+          "RUA TEREZA MAGALHÃES"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755334"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.5901935,
+          -3.677896625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 19,
+        "rank": 19,
+        "name": "Bela Vista- Itapajé",
+        "bairro": "ITAPAJÉ",
+        "municipality": "ITAPAJE",
+        "faction": "CV",
+        "risk_score": 64.538,
+        "score": 64.538,
+        "region": "interior",
+        "parent_area": "ITAPAJÉ",
+        "parent_risk_score": 72.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 8.02,
+        "nearby_streets_count": 22,
+        "nearby_streets": [
+          "BELA VISTA- ITAPAJÉ",
+          "RUA MARIA APARECIDA LIMA BARBOSA",
+          "RUA OLÁVO CAVALCANTE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755339"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.58075545098039,
+          -3.6816369215686278
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 20,
+        "rank": 20,
+        "name": "Bairro do Cruzeiro",
+        "bairro": "ITAPAJÉ",
+        "municipality": "ITAPAJE",
+        "faction": "PCC",
+        "risk_score": 63.471,
+        "score": 63.471,
+        "region": "interior",
+        "parent_area": "ITAPAJÉ",
+        "parent_risk_score": 72.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 7.08,
+        "nearby_streets_count": 18,
+        "nearby_streets": [
+          "BAIRRO DO CRUZEIRO",
+          "RUA JANDIRA BASTOS MAGALHÃES",
+          "COMUNIDADE SÃO FRANCISCO - ITAPAJÉ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755343"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.588094999999996,
+          -3.687816076923077
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 21,
+        "rank": 21,
+        "name": "Pau Ferrado",
+        "bairro": "ITAPAJÉ",
+        "municipality": "ITAPAJE",
+        "faction": "CV",
+        "risk_score": 62.662,
+        "score": 62.662,
+        "region": "interior",
+        "parent_area": "ITAPAJÉ",
+        "parent_risk_score": 72.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 6.362,
+        "nearby_streets_count": 16,
+        "nearby_streets": [
+          "PAU FERRADO",
+          "RUA GEORGINA GONÇALVES DAS CHAGAS",
+          "RUA PEDRO FIRMO DE MESQUITA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755348"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.596210029411765,
+          -3.6772114411764707
         ]
       }
     },
@@ -724,11 +724,11 @@
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
         "faction": "CV",
-        "risk_score": 65.897,
-        "score": 65.897,
+        "risk_score": 61.505,
+        "score": 61.505,
         "region": "interior",
         "parent_area": "ITAPAJÉ",
-        "parent_risk_score": 78.6,
+        "parent_risk_score": 72.5,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 5.329,
@@ -739,12 +739,12 @@
           "BAIRRO DO CRUZEIRO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755352"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -39.58877145714287,
+          -39.58877145714286,
           -3.6902896857142853
         ]
       }
@@ -754,83 +754,15 @@
       "properties": {
         "node_id": 23,
         "rank": 23,
-        "name": "Padre Manoel Lima e Silva",
-        "bairro": "ITAPAJÉ",
-        "municipality": "ITAPAJE",
-        "faction": "CV",
-        "risk_score": 63.698,
-        "score": 63.698,
-        "region": "interior",
-        "parent_area": "ITAPAJÉ",
-        "parent_risk_score": 78.6,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 3.381,
-        "nearby_streets_count": 10,
-        "nearby_streets": [
-          "PADRE MANOEL LIMA E SILVA",
-          "AREA SEM NOME",
-          "FERROS"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.57977238461539,
-          -3.6967618461538456
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 24,
-        "rank": 24,
-        "name": "Ferros",
-        "bairro": "ITAPAJÉ",
-        "municipality": "ITAPAJE",
-        "faction": "CV",
-        "risk_score": 62.708,
-        "score": 62.708,
-        "region": "interior",
-        "parent_area": "ITAPAJÉ",
-        "parent_risk_score": 78.6,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 2.495,
-        "nearby_streets_count": 4,
-        "nearby_streets": [
-          "FERROS",
-          "RUA ANTÔNIO RODRIGUES DA SILVA",
-          "AREA SEM NOME"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.57251205882352,
-          -3.7032485882352946
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 25,
-        "rank": 25,
         "name": "Bairro do Csu",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 62.642,
-        "score": 62.642,
+        "risk_score": 60.482,
+        "score": 60.482,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 16.0,
@@ -841,30 +773,30 @@
           "RUA MANOEL LOURENÇO DE VASCONCELOS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755356"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -40.99388361538461,
-          -3.721718307692308
+          -3.7217183076923073
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 26,
-        "rank": 26,
+        "node_id": 24,
+        "rank": 24,
         "name": "Bairro Santo Anônio",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 62.469,
-        "score": 62.469,
+        "risk_score": 60.309,
+        "score": 60.309,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 15.839,
@@ -875,7 +807,7 @@
           "RUA 13 DE JUNHO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755361"
       },
       "geometry": {
         "type": "Point",
@@ -888,17 +820,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 27,
-        "rank": 27,
+        "node_id": 25,
+        "rank": 25,
         "name": "Cruzeiro",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 62.091,
-        "score": 62.091,
+        "risk_score": 59.931,
+        "score": 59.931,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 15.511,
@@ -909,12 +841,12 @@
           "RUA DOCTOR EDIVALDO COELHO MOITA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755365"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -40.998068266666664,
+          -40.99806826666667,
           -3.7301130000000002
         ]
       }
@@ -922,17 +854,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 28,
-        "rank": 28,
+        "node_id": 26,
+        "rank": 26,
         "name": "Campo do Laurao",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "CV",
-        "risk_score": 62.019,
-        "score": 62.019,
+        "risk_score": 59.859,
+        "score": 59.859,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 15.453,
@@ -943,7 +875,7 @@
           "BAIRRO DO GINASIO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755369"
       },
       "geometry": {
         "type": "Point",
@@ -956,17 +888,153 @@
     {
       "type": "Feature",
       "properties": {
+        "node_id": 27,
+        "rank": 27,
+        "name": "Padre Manoel Lima e Silva",
+        "bairro": "ITAPAJÉ",
+        "municipality": "ITAPAJE",
+        "faction": "CV",
+        "risk_score": 59.306,
+        "score": 59.306,
+        "region": "interior",
+        "parent_area": "ITAPAJÉ",
+        "parent_risk_score": 72.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 3.381,
+        "nearby_streets_count": 10,
+        "nearby_streets": [
+          "PADRE MANOEL LIMA E SILVA",
+          "AREA SEM NOME",
+          "FERROS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755374"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.57977238461539,
+          -3.696761846153846
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 28,
+        "rank": 28,
+        "name": "Praça",
+        "bairro": "TIANGUA",
+        "municipality": "TIANGUA",
+        "faction": "CV",
+        "risk_score": 58.714,
+        "score": 58.714,
+        "region": "interior",
+        "parent_area": "TIANGUA",
+        "parent_risk_score": 54.4,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 14.436,
+        "nearby_streets_count": 45,
+        "nearby_streets": [
+          "PRAÇA",
+          "ALTO DO BODE",
+          "RUA ODILON ÁGUIAR"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755378"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.98847428571429,
+          -3.730285
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "node_id": 29,
         "rank": 29,
+        "name": "Ferros",
+        "bairro": "ITAPAJÉ",
+        "municipality": "ITAPAJE",
+        "faction": "CV",
+        "risk_score": 58.316,
+        "score": 58.316,
+        "region": "interior",
+        "parent_area": "ITAPAJÉ",
+        "parent_risk_score": 72.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 2.495,
+        "nearby_streets_count": 4,
+        "nearby_streets": [
+          "FERROS",
+          "RUA ANTÔNIO RODRIGUES DA SILVA",
+          "AREA SEM NOME"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755383"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.57251205882353,
+          -3.7032485882352937
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 30,
+        "rank": 30,
+        "name": "Bairro do Ginasio",
+        "bairro": "TIANGUA",
+        "municipality": "TIANGUA",
+        "faction": "CV",
+        "risk_score": 58.116,
+        "score": 58.116,
+        "region": "interior",
+        "parent_area": "TIANGUA",
+        "parent_risk_score": 54.4,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 13.898,
+        "nearby_streets_count": 42,
+        "nearby_streets": [
+          "BAIRRO DO GINASIO",
+          "CAMPO DO LAURAO",
+          "RUA DOZE DE AGOSTO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755387"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.986187,
+          -3.725994
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 31,
+        "rank": 31,
         "name": "Barateiro",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
         "faction": "CV",
-        "risk_score": 61.969,
-        "score": 61.969,
+        "risk_score": 57.577,
+        "score": 57.577,
         "region": "interior",
         "parent_area": "ITAPAJÉ",
-        "parent_risk_score": 78.6,
+        "parent_risk_score": 72.5,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 1.833,
@@ -977,7 +1045,7 @@
           "PIÇARRA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755392"
       },
       "geometry": {
         "type": "Point",
@@ -990,17 +1058,51 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 30,
-        "rank": 30,
+        "node_id": 32,
+        "rank": 32,
+        "name": "Por do Sol",
+        "bairro": "TIANGUA",
+        "municipality": "TIANGUA",
+        "faction": "PCC",
+        "risk_score": 57.471,
+        "score": 57.471,
+        "region": "interior",
+        "parent_area": "TIANGUA",
+        "parent_risk_score": 54.4,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 13.323,
+        "nearby_streets_count": 44,
+        "nearby_streets": [
+          "POR DO SOL",
+          "RUA PISTA DE POUSO",
+          "RUA MESSÍAS ÁGUIAR"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755398"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -41.00366355,
+          -3.72093485
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 33,
+        "rank": 33,
         "name": "Padre Lima",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
         "faction": "CV",
-        "risk_score": 61.835,
-        "score": 61.835,
+        "risk_score": 57.443,
+        "score": 57.443,
         "region": "interior",
         "parent_area": "ITAPAJÉ",
-        "parent_risk_score": 78.6,
+        "parent_risk_score": 72.5,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 1.72,
@@ -1010,7 +1112,7 @@
           "DISTRITO DE IRATINGA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755402"
       },
       "geometry": {
         "type": "Point",
@@ -1023,17 +1125,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 31,
-        "rank": 31,
+        "node_id": 34,
+        "rank": 34,
         "name": "Distrito de Iratinga",
         "bairro": "ITAPAJÉ",
         "municipality": "ITAPAJE",
         "faction": "CV",
-        "risk_score": 61.528,
-        "score": 61.528,
+        "risk_score": 57.136,
+        "score": 57.136,
         "region": "interior",
         "parent_area": "ITAPAJÉ",
-        "parent_risk_score": 78.6,
+        "parent_risk_score": 72.5,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 1.437,
@@ -1043,113 +1145,13 @@
           "PADRE LIMA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755407"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -39.54967314999999,
-          -3.7367336499999992
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 32,
-        "rank": 32,
-        "name": "Praça",
-        "bairro": "TIANGUA",
-        "municipality": "TIANGUA",
-        "faction": "CV",
-        "risk_score": 60.874,
-        "score": 60.874,
-        "region": "interior",
-        "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 14.436,
-        "nearby_streets_count": 45,
-        "nearby_streets": [
-          "PRAÇA",
-          "ALTO DO BODE",
-          "RUA ODILON ÁGUIAR"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -40.98847428571428,
-          -3.7302850000000007
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 33,
-        "rank": 33,
-        "name": "Armador",
-        "bairro": "ITAPAJÉ",
-        "municipality": "ITAPAJE",
-        "faction": "CV",
-        "risk_score": 60.74,
-        "score": 60.74,
-        "region": "interior",
-        "parent_area": "ITAPAJÉ",
-        "parent_risk_score": 78.6,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 0.747,
-        "nearby_streets_count": 1,
-        "nearby_streets": [
-          "ARMADOR"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.64633494594593,
-          -3.7277178378378384
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 34,
-        "rank": 34,
-        "name": "Bairro do Ginasio",
-        "bairro": "TIANGUA",
-        "municipality": "TIANGUA",
-        "faction": "CV",
-        "risk_score": 60.276,
-        "score": 60.276,
-        "region": "interior",
-        "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 13.898,
-        "nearby_streets_count": 42,
-        "nearby_streets": [
-          "BAIRRO DO GINASIO",
-          "CAMPO DO LAURAO",
-          "RUA DOZE DE AGOSTO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -40.98618700000001,
-          -3.725994
+          -39.549673150000004,
+          -3.73673365
         ]
       }
     },
@@ -1158,49 +1160,15 @@
       "properties": {
         "node_id": 35,
         "rank": 35,
-        "name": "Por do Sol",
-        "bairro": "TIANGUA",
-        "municipality": "TIANGUA",
-        "faction": "PCC",
-        "risk_score": 59.631,
-        "score": 59.631,
-        "region": "interior",
-        "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 13.323,
-        "nearby_streets_count": 44,
-        "nearby_streets": [
-          "POR DO SOL",
-          "RUA PISTA DE POUSO",
-          "RUA MESSÍAS ÁGUIAR"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -41.003663550000006,
-          -3.7209348500000003
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 36,
-        "rank": 36,
         "name": "Comunidade da Peroba",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "CV",
-        "risk_score": 58.829,
-        "score": 58.829,
+        "risk_score": 56.669,
+        "score": 56.669,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 12.616,
@@ -1211,30 +1179,30 @@
           "RUA JOAQUINA TELES DE MENESES"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755411"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -40.994798625,
-          -3.716521875
+          -3.7165218749999998
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 37,
-        "rank": 37,
+        "node_id": 36,
+        "rank": 36,
         "name": "Ceasa",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "TCP/GDE",
-        "risk_score": 58.772,
-        "score": 58.772,
+        "risk_score": 56.612,
+        "score": 56.612,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 13.893,
@@ -1245,13 +1213,45 @@
           "RUA MANOEL LOURENÇO DE VASCONCELOS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755415"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -40.997840185185176,
+          -40.99784018518518,
           -3.7180927407407407
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 37,
+        "rank": 37,
+        "name": "Armador",
+        "bairro": "ITAPAJÉ",
+        "municipality": "ITAPAJE",
+        "faction": "CV",
+        "risk_score": 56.348,
+        "score": 56.348,
+        "region": "interior",
+        "parent_area": "ITAPAJÉ",
+        "parent_risk_score": 72.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 0.747,
+        "nearby_streets_count": 1,
+        "nearby_streets": [
+          "ARMADOR"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755420"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.646334945945945,
+          -3.7277178378378375
         ]
       }
     },
@@ -1264,11 +1264,11 @@
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 58.501,
-        "score": 58.501,
+        "risk_score": 56.341,
+        "score": 56.341,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 12.323,
@@ -1279,7 +1279,7 @@
           "RUA PRINCIPAL"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755424"
       },
       "geometry": {
         "type": "Point",
@@ -1298,11 +1298,11 @@
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 58.206,
-        "score": 58.206,
+        "risk_score": 56.046,
+        "score": 56.046,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 12.066,
@@ -1313,12 +1313,12 @@
           "RUA PRINCIPAL"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755428"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -41.00618758333335,
+          -41.006187583333336,
           -3.73141775
         ]
       }
@@ -1332,11 +1332,11 @@
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "CV",
-        "risk_score": 57.636,
-        "score": 57.636,
+        "risk_score": 55.476,
+        "score": 55.476,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 11.561,
@@ -1347,12 +1347,12 @@
           "VILA PASCOAL"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755433"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -40.99283471428572,
+          -40.99283471428571,
           -3.714698380952381
         ]
       }
@@ -1366,11 +1366,11 @@
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "CV",
-        "risk_score": 56.701,
-        "score": 56.701,
+        "risk_score": 54.541,
+        "score": 54.541,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 10.731,
@@ -1381,12 +1381,12 @@
           "TABAJARA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755437"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -40.98661918181817,
+          -40.986619181818185,
           -3.731951272727273
         ]
       }
@@ -1400,11 +1400,11 @@
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 56.547,
-        "score": 56.547,
+        "risk_score": 54.387,
+        "score": 54.387,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 10.57,
@@ -1415,7 +1415,7 @@
           "RUA SANTO ANTÔNIO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755441"
       },
       "geometry": {
         "type": "Point",
@@ -1434,11 +1434,11 @@
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 56.446,
-        "score": 56.446,
+        "risk_score": 54.286,
+        "score": 54.286,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 10.486,
@@ -1449,7 +1449,7 @@
           "AVENIDA ENF. JOSÉ EVANGELISTA DE VASCONCELOS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755445"
       },
       "geometry": {
         "type": "Point",
@@ -1468,11 +1468,11 @@
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "CV",
-        "risk_score": 56.137,
-        "score": 56.137,
+        "risk_score": 53.977,
+        "score": 53.977,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 10.225,
@@ -1483,13 +1483,13 @@
           "ALTO DO BODE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -40.984056571428575,
-          -3.7297785000000006
+          -3.7297784999999997
         ]
       }
     },
@@ -1502,11 +1502,11 @@
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "CV",
-        "risk_score": 56.092,
-        "score": 56.092,
+        "risk_score": 53.932,
+        "score": 53.932,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 10.169,
@@ -1517,13 +1517,13 @@
           "AVENIDA NEZITO TEXEIRA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755454"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -40.981644640000006,
-          -3.723113399999999
+          -3.7231134
         ]
       }
     },
@@ -1536,11 +1536,11 @@
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 55.517,
-        "score": 55.517,
+        "risk_score": 53.357,
+        "score": 53.357,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 9.675,
@@ -1551,7 +1551,7 @@
           "BAIRRO DO ESTÁDIO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755458"
       },
       "geometry": {
         "type": "Point",
@@ -1570,11 +1570,11 @@
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "CV",
-        "risk_score": 55.279,
-        "score": 55.279,
+        "risk_score": 53.119,
+        "score": 53.119,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 9.437,
@@ -1585,12 +1585,12 @@
           "RUA FRANCISCO GENTIL DE FARIAS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755462"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -40.98410617647059,
+          -40.98410617647058,
           -3.7151502352941175
         ]
       }
@@ -1604,11 +1604,11 @@
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 54.283,
-        "score": 54.283,
+        "risk_score": 52.123,
+        "score": 52.123,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 8.577,
@@ -1619,7 +1619,7 @@
           "RUA DO ARAME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755466"
       },
       "geometry": {
         "type": "Point",
@@ -1638,11 +1638,11 @@
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "CV",
-        "risk_score": 53.825,
-        "score": 53.825,
+        "risk_score": 51.665,
+        "score": 51.665,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 8.171,
@@ -1653,12 +1653,12 @@
           "SÃO VICENTE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755470"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -40.99404755172413,
+          -40.99404755172414,
           -3.7116389655172415
         ]
       }
@@ -1672,11 +1672,11 @@
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "CV",
-        "risk_score": 53.606,
-        "score": 53.606,
+        "risk_score": 51.446,
+        "score": 51.446,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 7.975,
@@ -1687,12 +1687,12 @@
           "RUA DAS PALMEIRAS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755474"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -40.98904905882354,
+          -40.98904905882353,
           -3.712083882352941
         ]
       }
@@ -1706,11 +1706,11 @@
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 53.215,
-        "score": 53.215,
+        "risk_score": 51.055,
+        "score": 51.055,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 7.614,
@@ -1721,13 +1721,13 @@
           "RUA FRANCISCO AILTON SILVA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.302910"
+        "generated_at": "2026-05-25T14:14:47.755478"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -40.99319851612902,
-          -3.7419451612903227
+          -40.993198516129034,
+          -3.7419451612903223
         ]
       }
     },
@@ -1740,11 +1740,11 @@
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 52.894,
-        "score": 52.894,
+        "risk_score": 50.734,
+        "score": 50.734,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 7.334,
@@ -1755,13 +1755,13 @@
           "RUA FRANCISCA ALBUQUERQUE ALVES"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755482"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -40.98859176,
-          -3.740343840000001
+          -3.74034384
         ]
       }
     },
@@ -1774,11 +1774,11 @@
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 52.115,
-        "score": 52.115,
+        "risk_score": 49.955,
+        "score": 49.955,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 6.651,
@@ -1789,13 +1789,13 @@
           "DOM EXPEDITO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755486"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -41.0121253125,
-          -3.7227314999999996
+          -3.7227315
         ]
       }
     },
@@ -1804,83 +1804,15 @@
       "properties": {
         "node_id": 54,
         "rank": 54,
-        "name": "VÁRZEA ALEGRE - RUSSAS - PCC",
-        "bairro": "QUIXERE",
-        "municipality": "PCC",
-        "faction": "PCC",
-        "risk_score": 51.236,
-        "score": 51.236,
-        "region": "interior",
-        "parent_area": "QUIXERE",
-        "parent_risk_score": 59.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 4.333,
-        "nearby_streets_count": 10,
-        "nearby_streets": [
-          "VÁRZEA ALEGRE - RUSSAS - PCC",
-          "RUA OCION LOPES DA SILVEIRA",
-          "RUA VASCO DA GAMA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -37.96794058333333,
-          -4.92764573809524
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 55,
-        "rank": 55,
-        "name": "João Cabral",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 50.809,
-        "score": 50.809,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 10.184,
-        "nearby_streets_count": 26,
-        "nearby_streets": [
-          "JOÃO CABRAL",
-          "RUA OZANA PEREIRA",
-          "RUA PIO NORÕES"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.31815930434783,
-          -7.233151869565215
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 56,
-        "rank": 56,
         "name": "Bairro Subestação",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 50.801,
-        "score": 50.801,
+        "risk_score": 48.641,
+        "score": 48.641,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 5.483,
@@ -1891,30 +1823,30 @@
           "AP DE CATATAU"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755490"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -41.00555935897435,
-          -3.743852384615384
+          -41.00555935897436,
+          -3.743852384615385
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 57,
-        "rank": 57,
+        "node_id": 55,
+        "rank": 55,
         "name": "Sítios Cacimbas",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 50.415,
-        "score": 50.415,
+        "risk_score": 48.255,
+        "score": 48.255,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 5.139,
@@ -1925,30 +1857,30 @@
           "BAIRRO SUBESTAÇÃO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755494"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -41.00927825000001,
-          -3.7421494499999994
+          -41.00927825,
+          -3.7421494500000003
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 58,
-        "rank": 58,
+        "node_id": 56,
+        "rank": 56,
         "name": "Rua da Paz",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "CV",
-        "risk_score": 50.16,
-        "score": 50.16,
+        "risk_score": 48.0,
+        "score": 48.0,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 4.916,
@@ -1959,7 +1891,7 @@
           "RUA TRINTA E UM DE MAIO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755498"
       },
       "geometry": {
         "type": "Point",
@@ -1972,17 +1904,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 59,
-        "rank": 59,
+        "node_id": 57,
+        "rank": 57,
         "name": "AP De Catatau",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 50.001,
-        "score": 50.001,
+        "risk_score": 47.841,
+        "score": 47.841,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 4.775,
@@ -1993,7 +1925,7 @@
           "BAIRRO SUBESTAÇÃO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755502"
       },
       "geometry": {
         "type": "Point",
@@ -2006,119 +1938,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 60,
-        "rank": 60,
-        "name": "Zezinho da costa - Várzea alegre",
-        "bairro": "VÁRZEA ALEGRE",
-        "municipality": "VARZEA ALEGRE",
-        "faction": "TCP/GDE",
-        "risk_score": 49.822,
-        "score": 49.822,
-        "region": "interior",
-        "parent_area": "VÁRZEA ALEGRE",
-        "parent_risk_score": 59.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 4.465,
-        "nearby_streets_count": 12,
-        "nearby_streets": [
-          "ZEZINHO DA COSTA - VÁRZEA ALEGRE",
-          "AREA SEM NOME",
-          "VILA CACILDA - VÁRZEA ALEGRE"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.29625700000001,
-          -6.792312090909092
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 61,
-        "rank": 61,
-        "name": "Bairro do Triângulo",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 49.658,
-        "score": 49.658,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 9.168,
-        "nearby_streets_count": 28,
-        "nearby_streets": [
-          "BAIRRO DO TRIÂNGULO",
-          "RUA LETÍCIA VASCONCELOS",
-          "RUA JOAQUIM DE FIGUEIREDO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.32688142857143,
-          -7.231872107142855
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 62,
-        "rank": 62,
-        "name": "Santo Antonio -  Varzea alegre",
-        "bairro": "VÁRZEA ALEGRE",
-        "municipality": "VARZEA ALEGRE",
-        "faction": "TCP/GDE",
-        "risk_score": 49.636,
-        "score": 49.636,
-        "region": "interior",
-        "parent_area": "VÁRZEA ALEGRE",
-        "parent_risk_score": 59.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 4.309,
-        "nearby_streets_count": 13,
-        "nearby_streets": [
-          "SANTO ANTONIO -  VARZEA ALEGRE",
-          "VILA CACILDA - VÁRZEA ALEGRE",
-          "AREA SEM NOME"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.2975898,
-          -6.785686800000001
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 63,
-        "rank": 63,
+        "node_id": 58,
+        "rank": 58,
         "name": "Comunidade do Catatau",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 49.625,
-        "score": 49.625,
+        "risk_score": 47.465,
+        "score": 47.465,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 4.44,
@@ -2129,7 +1959,7 @@
           "SÍTIOS CACIMBAS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755507"
       },
       "geometry": {
         "type": "Point",
@@ -2142,119 +1972,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 64,
-        "rank": 64,
-        "name": "Patos - Várzea alegre",
-        "bairro": "VÁRZEA ALEGRE",
-        "municipality": "VARZEA ALEGRE",
-        "faction": "TCP/GDE",
-        "risk_score": 49.257,
-        "score": 49.257,
-        "region": "interior",
-        "parent_area": "VÁRZEA ALEGRE",
-        "parent_risk_score": 59.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 3.966,
-        "nearby_streets_count": 11,
-        "nearby_streets": [
-          "PATOS - VÁRZEA ALEGRE",
-          "RUA POETA PERGENTINO BRITO DE LIMA",
-          "VILA CACILDA - VÁRZEA ALEGRE"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.289570000000005,
-          -6.7905152000000015
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 65,
-        "rank": 65,
-        "name": "Vila Cacilda - Várzea alegre",
-        "bairro": "VÁRZEA ALEGRE",
-        "municipality": "VARZEA ALEGRE",
-        "faction": "TCP/GDE",
-        "risk_score": 49.231,
-        "score": 49.231,
-        "region": "interior",
-        "parent_area": "VÁRZEA ALEGRE",
-        "parent_risk_score": 59.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 3.941,
-        "nearby_streets_count": 13,
-        "nearby_streets": [
-          "VILA CACILDA - VÁRZEA ALEGRE",
-          "SANTO ANTONIO -  VARZEA ALEGRE",
-          "PATOS - VÁRZEA ALEGRE"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.293321652173915,
-          -6.786630913043477
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 66,
-        "rank": 66,
-        "name": "Varjota - Várzea alegre",
-        "bairro": "VÁRZEA ALEGRE",
-        "municipality": "VARZEA ALEGRE",
-        "faction": "TCP/GDE",
-        "risk_score": 49.167,
-        "score": 49.167,
-        "region": "interior",
-        "parent_area": "VÁRZEA ALEGRE",
-        "parent_risk_score": 59.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 3.877,
-        "nearby_streets_count": 12,
-        "nearby_streets": [
-          "VARJOTA - VÁRZEA ALEGRE",
-          "AREA SEM NOME",
-          "ZEZINHO DA COSTA - VÁRZEA ALEGRE"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.301873642857146,
-          -6.797692952380949
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 67,
-        "rank": 67,
+        "node_id": 59,
+        "rank": 59,
         "name": "Corrego",
         "bairro": "TIANGUA",
         "municipality": "TIANGUA",
         "faction": "PCC",
-        "risk_score": 48.889,
-        "score": 48.889,
+        "risk_score": 46.729,
+        "score": 46.729,
         "region": "interior",
         "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
+        "parent_risk_score": 54.4,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 3.776,
@@ -2265,13 +1993,280 @@
           "RUA DA PAZ"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755511"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -40.9753755625,
-          -3.7087780625000004
+          -3.7087780625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 60,
+        "rank": 60,
+        "name": "Pitanga",
+        "bairro": "TIANGUA",
+        "municipality": "TIANGUA",
+        "faction": "PCC",
+        "risk_score": 44.262,
+        "score": 44.262,
+        "region": "interior",
+        "parent_area": "TIANGUA",
+        "parent_risk_score": 54.4,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 1.589,
+        "nearby_streets_count": 3,
+        "nearby_streets": [
+          "PITANGA",
+          "ESTRADA PARÁ ITAGUARUNA",
+          "AREA SEM NOME"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755515"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.981263469387756,
+          -3.7591266530612244
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 61,
+        "rank": 61,
+        "name": "Quatigaba",
+        "bairro": "TIANGUA",
+        "municipality": "TIANGUA",
+        "faction": "CV",
+        "risk_score": 44.15,
+        "score": 44.15,
+        "region": "interior",
+        "parent_area": "TIANGUA",
+        "parent_risk_score": 54.4,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 1.486,
+        "nearby_streets_count": 2,
+        "nearby_streets": [
+          "QUATIGABA",
+          "CE-240"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755519"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -41.06694808108108,
+          -3.674352189189189
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 62,
+        "rank": 62,
+        "name": "Pindoguaba",
+        "bairro": "TIANGUÁ",
+        "municipality": "TIANGUA",
+        "faction": "PCC",
+        "risk_score": 43.576,
+        "score": 43.576,
+        "region": "interior",
+        "parent_area": "TIANGUÁ",
+        "parent_risk_score": 54.4,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 0.975,
+        "nearby_streets_count": 1,
+        "nearby_streets": [
+          "PINDOGUABA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755523"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -41.13899385714286,
+          -3.750933642857143
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 63,
+        "rank": 63,
+        "name": "VÁRZEA ALEGRE - RUSSAS - PCC",
+        "bairro": "QUIXERE",
+        "municipality": "PCC",
+        "faction": "PCC",
+        "risk_score": 42.452,
+        "score": 42.452,
+        "region": "interior",
+        "parent_area": "QUIXERE",
+        "parent_risk_score": 47.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 4.333,
+        "nearby_streets_count": 10,
+        "nearby_streets": [
+          "VÁRZEA ALEGRE - RUSSAS - PCC",
+          "RUA OCION LOPES DA SILVEIRA",
+          "RUA VASCO DA GAMA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755527"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -37.96794058333334,
+          -4.927645738095238
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 64,
+        "rank": 64,
+        "name": "Groaíras",
+        "bairro": "GROAIRAS",
+        "municipality": "GROAIRAS",
+        "faction": "PCC",
+        "risk_score": 41.972,
+        "score": 41.972,
+        "region": "interior",
+        "parent_area": "GROAIRAS",
+        "parent_risk_score": 50.9,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.706,
+        "nearby_streets_count": 3,
+        "nearby_streets": [
+          "GROAÍRAS",
+          "RUA MANOEL VICENTE DE MELO",
+          "AREA SEM NOME"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755532"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.38747925,
+          -3.9163854999999996
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 65,
+        "rank": 65,
+        "name": "Bonfim",
+        "bairro": "GROAIRAS",
+        "municipality": "GROAIRAS",
+        "faction": "PCC",
+        "risk_score": 41.349,
+        "score": 41.349,
+        "region": "interior",
+        "parent_area": "GROAIRAS",
+        "parent_risk_score": 50.9,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.243,
+        "nearby_streets_count": 1,
+        "nearby_streets": [
+          "BONFIM"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755536"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.39853833333333,
+          -3.7731925714285715
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 66,
+        "rank": 66,
+        "name": "Zezinho da costa - Várzea alegre",
+        "bairro": "VÁRZEA ALEGRE",
+        "municipality": "VARZEA ALEGRE",
+        "faction": "TCP/GDE",
+        "risk_score": 41.038,
+        "score": 41.038,
+        "region": "interior",
+        "parent_area": "VÁRZEA ALEGRE",
+        "parent_risk_score": 47.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 4.465,
+        "nearby_streets_count": 12,
+        "nearby_streets": [
+          "ZEZINHO DA COSTA - VÁRZEA ALEGRE",
+          "AREA SEM NOME",
+          "VILA CACILDA - VÁRZEA ALEGRE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755541"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.296257,
+          -6.792312090909092
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 67,
+        "rank": 67,
+        "name": "Santo Antonio -  Varzea alegre",
+        "bairro": "VÁRZEA ALEGRE",
+        "municipality": "VARZEA ALEGRE",
+        "faction": "TCP/GDE",
+        "risk_score": 40.852,
+        "score": 40.852,
+        "region": "interior",
+        "parent_area": "VÁRZEA ALEGRE",
+        "parent_risk_score": 47.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 4.309,
+        "nearby_streets_count": 13,
+        "nearby_streets": [
+          "SANTO ANTONIO -  VARZEA ALEGRE",
+          "VILA CACILDA - VÁRZEA ALEGRE",
+          "AREA SEM NOME"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755545"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.2975898,
+          -6.785686800000001
         ]
       }
     },
@@ -2280,32 +2275,30 @@
       "properties": {
         "node_id": 68,
         "rank": 68,
-        "name": "Riachinho - Várzea alegre",
-        "bairro": "VÁRZEA ALEGRE",
-        "municipality": "VARZEA ALEGRE",
-        "faction": "TCP/GDE",
-        "risk_score": 48.875,
-        "score": 48.875,
+        "name": "BONFIM",
+        "bairro": "GROAIRAS",
+        "municipality": "GROAIRAS",
+        "faction": "PCC",
+        "risk_score": 40.716,
+        "score": 40.716,
         "region": "interior",
-        "parent_area": "VÁRZEA ALEGRE",
-        "parent_risk_score": 59.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 3.619,
-        "nearby_streets_count": 9,
+        "parent_area": "GROAIRAS",
+        "parent_risk_score": 50.9,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 0.561,
+        "nearby_streets_count": 1,
         "nearby_streets": [
-          "RIACHINHO - VÁRZEA ALEGRE",
-          "RUA PERGENTINO BRITO DE LIMA",
-          "RUA POETA PERGENTINO BRITO DE LIMA"
+          "FAZENDA VICENTE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755549"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -39.28763779310345,
-          -6.796705482758622
+          -40.45630451481481,
+          -3.7753280555555557
         ]
       }
     },
@@ -2314,17 +2307,153 @@
       "properties": {
         "node_id": 69,
         "rank": 69,
+        "name": "Patos - Várzea alegre",
+        "bairro": "VÁRZEA ALEGRE",
+        "municipality": "VARZEA ALEGRE",
+        "faction": "TCP/GDE",
+        "risk_score": 40.473,
+        "score": 40.473,
+        "region": "interior",
+        "parent_area": "VÁRZEA ALEGRE",
+        "parent_risk_score": 47.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 3.966,
+        "nearby_streets_count": 11,
+        "nearby_streets": [
+          "PATOS - VÁRZEA ALEGRE",
+          "RUA POETA PERGENTINO BRITO DE LIMA",
+          "VILA CACILDA - VÁRZEA ALEGRE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755554"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.289570000000005,
+          -6.7905152
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 70,
+        "rank": 70,
+        "name": "Vila Cacilda - Várzea alegre",
+        "bairro": "VÁRZEA ALEGRE",
+        "municipality": "VARZEA ALEGRE",
+        "faction": "TCP/GDE",
+        "risk_score": 40.447,
+        "score": 40.447,
+        "region": "interior",
+        "parent_area": "VÁRZEA ALEGRE",
+        "parent_risk_score": 47.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 3.941,
+        "nearby_streets_count": 13,
+        "nearby_streets": [
+          "VILA CACILDA - VÁRZEA ALEGRE",
+          "SANTO ANTONIO -  VARZEA ALEGRE",
+          "PATOS - VÁRZEA ALEGRE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755558"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.293321652173915,
+          -6.786630913043479
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 71,
+        "rank": 71,
+        "name": "Varjota - Várzea alegre",
+        "bairro": "VÁRZEA ALEGRE",
+        "municipality": "VARZEA ALEGRE",
+        "faction": "TCP/GDE",
+        "risk_score": 40.383,
+        "score": 40.383,
+        "region": "interior",
+        "parent_area": "VÁRZEA ALEGRE",
+        "parent_risk_score": 47.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 3.877,
+        "nearby_streets_count": 12,
+        "nearby_streets": [
+          "VARJOTA - VÁRZEA ALEGRE",
+          "AREA SEM NOME",
+          "ZEZINHO DA COSTA - VÁRZEA ALEGRE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755562"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.301873642857146,
+          -6.797692952380952
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 72,
+        "rank": 72,
+        "name": "Riachinho - Várzea alegre",
+        "bairro": "VÁRZEA ALEGRE",
+        "municipality": "VARZEA ALEGRE",
+        "faction": "TCP/GDE",
+        "risk_score": 40.091,
+        "score": 40.091,
+        "region": "interior",
+        "parent_area": "VÁRZEA ALEGRE",
+        "parent_risk_score": 47.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 3.619,
+        "nearby_streets_count": 9,
+        "nearby_streets": [
+          "RIACHINHO - VÁRZEA ALEGRE",
+          "RUA PERGENTINO BRITO DE LIMA",
+          "RUA POETA PERGENTINO BRITO DE LIMA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755566"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -39.28763779310345,
+          -6.79670548275862
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 73,
+        "rank": 73,
         "name": "Várzea",
         "bairro": "MORADA NOVA",
         "municipality": "VARZEA ALEGRE",
         "faction": "TCP/GDE",
-        "risk_score": 48.874,
-        "score": 48.874,
+        "risk_score": 40.09,
+        "score": 40.09,
         "region": "interior",
         "parent_area": "MORADA NOVA",
-        "parent_risk_score": 59.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 47.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
         "local_street_pressure": 3.628,
         "nearby_streets_count": 9,
         "nearby_streets": [
@@ -2333,7 +2462,7 @@
           "RUA RAIMUNDO BELMIRO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755570"
       },
       "geometry": {
         "type": "Point",
@@ -2346,170 +2475,34 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 70,
-        "rank": 70,
-        "name": "Juremal - Varzea alegre",
-        "bairro": "VÁRZEA ALEGRE",
-        "municipality": "VARZEA ALEGRE",
-        "faction": "TCP/GDE",
-        "risk_score": 48.644,
-        "score": 48.644,
-        "region": "interior",
-        "parent_area": "VÁRZEA ALEGRE",
-        "parent_risk_score": 59.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 3.417,
-        "nearby_streets_count": 9,
-        "nearby_streets": [
-          "JUREMAL - VARZEA ALEGRE",
-          "AVENIDA VICENTE ALVES COSTA",
-          "AREA SEM NOME"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.30504227777778,
-          -6.788122333333332
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 71,
-        "rank": 71,
-        "name": "Vila Peri - Várzea alegre",
-        "bairro": "VÁRZEA ALEGRE",
-        "municipality": "VARZEA ALEGRE",
-        "faction": "TCP/GDE",
-        "risk_score": 48.595,
-        "score": 48.595,
-        "region": "interior",
-        "parent_area": "VÁRZEA ALEGRE",
-        "parent_risk_score": 59.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 3.38,
-        "nearby_streets_count": 8,
-        "nearby_streets": [
-          "VILA PERI - VÁRZEA ALEGRE",
-          "AVENIDA VICENTE ALVES COSTA",
-          "JUREMAL - VARZEA ALEGRE"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.30741655555555,
-          -6.794361722222222
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 72,
-        "rank": 72,
-        "name": "Mutirão ll ou Frei Damião",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "PCC",
-        "risk_score": 48.294,
-        "score": 48.294,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 7.977,
-        "nearby_streets_count": 20,
-        "nearby_streets": [
-          "MUTIRÃO LL OU FREI DAMIÃO",
-          "RUA JOSÉ MAGALHÃES LANDIM",
-          "RUA ESTUDANTE JOSÉ DOS SANTOS LOPES"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.33870954545454,
-          -7.244146545454544
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 73,
-        "rank": 73,
-        "name": "Romeirão",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 48.282,
-        "score": 48.282,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 7.959,
-        "nearby_streets_count": 25,
-        "nearby_streets": [
-          "ROMEIRÃO",
-          "AVENIDA PRESIDENTE CASTELO BRANCO",
-          "RUA JOAQUIM DA ROCHA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.31531508333334,
-          -7.2254932499999995
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "node_id": 74,
         "rank": 74,
-        "name": "Faixa de Gaza",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
+        "name": "Comunidade do gato morto - Sobral",
+        "bairro": "MERUOCA",
+        "municipality": "Sobral",
         "faction": "CV",
-        "risk_score": 47.658,
-        "score": 47.658,
+        "risk_score": 40.088,
+        "score": 40.088,
         "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
+        "parent_area": "MERUOCA",
+        "parent_risk_score": 35.5,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 7.424,
+        "local_street_pressure": 9.974,
         "nearby_streets_count": 23,
         "nearby_streets": [
-          "FAIXA DE GAZA",
-          "RUA JOSÉ MARROCOS",
-          "RUA FISCAL JOSÉ SOARES"
+          "COMUNIDADE DO GATO MORTO - SOBRAL",
+          "RUA RAIMUNDO MENDES ÁGUIAR",
+          "TRAVESSA RAIMUNDO NONATO DOS SANTOS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755574"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -39.321389874999994,
-          -7.219006375
+          -40.375543,
+          -3.674484233333333
         ]
       }
     },
@@ -2518,32 +2511,32 @@
       "properties": {
         "node_id": 75,
         "rank": 75,
-        "name": "Bairro Antonio Vieira",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 46.649,
-        "score": 46.649,
+        "name": "Juremal - Varzea alegre",
+        "bairro": "VÁRZEA ALEGRE",
+        "municipality": "VARZEA ALEGRE",
+        "faction": "TCP/GDE",
+        "risk_score": 39.86,
+        "score": 39.86,
         "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
+        "parent_area": "VÁRZEA ALEGRE",
+        "parent_risk_score": 47.5,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 6.509,
-        "nearby_streets_count": 17,
+        "local_street_pressure": 3.417,
+        "nearby_streets_count": 9,
         "nearby_streets": [
-          "BAIRRO ANTONIO VIEIRA",
-          "RUA LADISLAU DE ARRUDA CAMPOS",
-          "RUA CECÍLIA MEIRELES"
+          "JUREMAL - VARZEA ALEGRE",
+          "AVENIDA VICENTE ALVES COSTA",
+          "AREA SEM NOME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755579"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -39.333412599999996,
-          -7.2221098
+          -39.30504227777778,
+          -6.788122333333333
         ]
       }
     },
@@ -2552,32 +2545,32 @@
       "properties": {
         "node_id": 76,
         "rank": 76,
-        "name": "Grossos - Várzea Alegre",
+        "name": "Vila Peri - Várzea alegre",
         "bairro": "VÁRZEA ALEGRE",
         "municipality": "VARZEA ALEGRE",
         "faction": "TCP/GDE",
-        "risk_score": 46.543,
-        "score": 46.543,
+        "risk_score": 39.811,
+        "score": 39.811,
         "region": "interior",
         "parent_area": "VÁRZEA ALEGRE",
-        "parent_risk_score": 59.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 1.553,
-        "nearby_streets_count": 4,
+        "parent_risk_score": 47.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 3.38,
+        "nearby_streets_count": 8,
         "nearby_streets": [
-          "GROSSOS - VÁRZEA ALEGRE",
-          "SANTO ANTONIO -  VARZEA ALEGRE",
-          "VILA CACILDA - VÁRZEA ALEGRE"
+          "VILA PERI - VÁRZEA ALEGRE",
+          "AVENIDA VICENTE ALVES COSTA",
+          "JUREMAL - VARZEA ALEGRE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755583"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -39.291900285714306,
-          -6.776406171428572
+          -39.307416555555555,
+          -6.794361722222223
         ]
       }
     },
@@ -2586,32 +2579,32 @@
       "properties": {
         "node_id": 77,
         "rank": 77,
-        "name": "Pitanga",
-        "bairro": "TIANGUA",
-        "municipality": "TIANGUA",
-        "faction": "PCC",
-        "risk_score": 46.422,
-        "score": 46.422,
+        "name": "Planalto",
+        "bairro": "PENTECOSTE",
+        "municipality": "PLANALTO AYRTON SENNA",
+        "faction": "CV",
+        "risk_score": 37.883,
+        "score": 37.883,
         "region": "interior",
-        "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 1.589,
-        "nearby_streets_count": 3,
+        "parent_area": "PENTECOSTE",
+        "parent_risk_score": 44.4,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.317,
+        "nearby_streets_count": 6,
         "nearby_streets": [
-          "PITANGA",
-          "ESTRADA PARÁ ITAGUARUNA",
-          "AREA SEM NOME"
+          "PLANALTO",
+          "RUA JOSÉ SALU",
+          "RUA AGAPITO CORDEIRO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755587"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -40.98126346938777,
-          -3.7591266530612257
+          -39.27512254545454,
+          -3.7948220000000004
         ]
       }
     },
@@ -2620,31 +2613,32 @@
       "properties": {
         "node_id": 78,
         "rank": 78,
-        "name": "Quatigaba",
-        "bairro": "TIANGUA",
-        "municipality": "TIANGUA",
-        "faction": "CV",
-        "risk_score": 46.31,
-        "score": 46.31,
+        "name": "Grossos - Várzea Alegre",
+        "bairro": "VÁRZEA ALEGRE",
+        "municipality": "VARZEA ALEGRE",
+        "faction": "TCP/GDE",
+        "risk_score": 37.759,
+        "score": 37.759,
         "region": "interior",
-        "parent_area": "TIANGUA",
-        "parent_risk_score": 57.4,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 1.486,
-        "nearby_streets_count": 2,
+        "parent_area": "VÁRZEA ALEGRE",
+        "parent_risk_score": 47.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.553,
+        "nearby_streets_count": 4,
         "nearby_streets": [
-          "QUATIGABA",
-          "CE-240"
+          "GROSSOS - VÁRZEA ALEGRE",
+          "SANTO ANTONIO -  VARZEA ALEGRE",
+          "VILA CACILDA - VÁRZEA ALEGRE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755592"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -41.06694808108109,
-          -3.674352189189189
+          -39.291900285714284,
+          -6.7764061714285715
         ]
       }
     },
@@ -2653,32 +2647,30 @@
       "properties": {
         "node_id": 79,
         "rank": 79,
-        "name": "Franciscano",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 45.952,
-        "score": 45.952,
+        "name": "Juremal",
+        "bairro": "ALTO SANTO",
+        "municipality": "ALTO SANTO",
+        "faction": "TCP/GDE",
+        "risk_score": 36.664,
+        "score": 36.664,
         "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
+        "parent_area": "ALTO SANTO",
+        "parent_risk_score": 42.6,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 5.907,
-        "nearby_streets_count": 20,
+        "local_street_pressure": 0.17,
+        "nearby_streets_count": 1,
         "nearby_streets": [
-          "FRANCISCANO",
-          "RUA DO SEMINÁRIO",
-          "PIO 12"
+          "JUREMAL"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755596"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -39.31343644444445,
-          -7.213875
+          -38.25519188235294,
+          -5.44134344117647
         ]
       }
     },
@@ -2687,32 +2679,32 @@
       "properties": {
         "node_id": 80,
         "rank": 80,
-        "name": "Santo Antônio- Juazeiro do Norte",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
+        "name": "1° de Maio",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
         "faction": "CV",
-        "risk_score": 45.926,
-        "score": 45.926,
+        "risk_score": 36.625,
+        "score": 36.625,
         "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 5.872,
-        "nearby_streets_count": 15,
+        "local_street_pressure": 6.895,
+        "nearby_streets_count": 14,
         "nearby_streets": [
-          "SANTO ANTÔNIO- JUAZEIRO DO NORTE",
-          "RUA APOLO Ⅺ",
-          "RUA MONSENHOR LIMA"
+          "1° DE MAIO",
+          "CIDADE DE DEUS- FORQUILHA",
+          "AREA SEM NOME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755602"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -39.32932818181819,
-          -7.215488045454546
+          -40.266874333333334,
+          -3.804587833333333
         ]
       }
     },
@@ -2721,30 +2713,32 @@
       "properties": {
         "node_id": 81,
         "rank": 81,
-        "name": "Pindoguaba",
-        "bairro": "TIANGUÁ",
-        "municipality": "TIANGUA",
-        "faction": "PCC",
-        "risk_score": 45.736,
-        "score": 45.736,
+        "name": "Cohab",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
+        "faction": "CV",
+        "risk_score": 36.598,
+        "score": 36.598,
         "region": "interior",
-        "parent_area": "TIANGUÁ",
-        "parent_risk_score": 57.4,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 0.975,
-        "nearby_streets_count": 1,
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 6.876,
+        "nearby_streets_count": 13,
         "nearby_streets": [
-          "PINDOGUABA"
+          "COHAB",
+          "SALSA",
+          "AREA SEM NOME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755606"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -41.13899385714285,
-          -3.750933642857142
+          -40.263533125,
+          -3.8013503749999997
         ]
       }
     },
@@ -2753,32 +2747,32 @@
       "properties": {
         "node_id": 82,
         "rank": 82,
-        "name": "Frei Damião",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "PCC",
-        "risk_score": 45.089,
-        "score": 45.089,
+        "name": "Jubina",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
+        "faction": "CV",
+        "risk_score": 36.591,
+        "score": 36.591,
         "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 5.112,
-        "nearby_streets_count": 14,
+        "local_street_pressure": 6.869,
+        "nearby_streets_count": 13,
         "nearby_streets": [
-          "FREI DAMIÃO",
-          "RUA MARIA TAVARES NOCA",
-          "RUA ANA MARIA DUARTE"
+          "JUBINA",
+          "COHAB",
+          "SALSA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755610"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -39.33711433333334,
-          -7.254219714285715
+          -40.2658641,
+          -3.8006214999999997
         ]
       }
     },
@@ -2787,226 +2781,22 @@
       "properties": {
         "node_id": 83,
         "rank": 83,
-        "name": "Salesianos",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 44.947,
-        "score": 44.947,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 5.001,
-        "nearby_streets_count": 15,
-        "nearby_streets": [
-          "SALESIANOS",
-          "AVENIDA PADRE CÍCERO",
-          "RUA FISCAL JOSÉ SOARES"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.32501874468086,
-          -7.209594425531915
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 84,
-        "rank": 84,
-        "name": "Pio 12",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 44.742,
-        "score": 44.742,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 4.794,
-        "nearby_streets_count": 15,
-        "nearby_streets": [
-          "PIO 12",
-          "RUA SETE DE SETEMBRO",
-          "AREA SEM NOME"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.306744153333334,
-          -7.211463766666668
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 85,
-        "rank": 85,
-        "name": "Timbaúba",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "PCC",
-        "risk_score": 44.386,
-        "score": 44.386,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 4.498,
-        "nearby_streets_count": 13,
-        "nearby_streets": [
-          "TIMBAÚBA",
-          "RUA ASSIS DIAS SOBREIRA",
-          "AREA SEM NOME"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.301542184210525,
-          -7.2154447631578975
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 86,
-        "rank": 86,
-        "name": "Mutirão",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "PCC",
-        "risk_score": 44.119,
-        "score": 44.119,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 4.263,
-        "nearby_streets_count": 12,
-        "nearby_streets": [
-          "MUTIRÃO",
-          "RUA Mᵃ. GENEROSA DE ALMEIDA",
-          "RUA JOSÉ ROMEIRO FEIJOEIRO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.34112122222222,
-          -7.235104000000001
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 87,
-        "rank": 87,
-        "name": "Alto",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 44.001,
-        "score": 44.001,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 4.167,
-        "nearby_streets_count": 14,
-        "nearby_streets": [
-          "ALTO",
-          "RUA DO SEMINÁRIO",
-          "RUA SETE DE SETEMBRO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.312726875,
-          -7.205163812500001
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 88,
-        "rank": 88,
-        "name": "Baixa da Raposa",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "PCC",
-        "risk_score": 43.891,
-        "score": 43.891,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 4.075,
-        "nearby_streets_count": 8,
-        "nearby_streets": [
-          "BAIXA DA RAPOSA",
-          "RUA ANTÔNIO CORTÊZ DE ALENCAR",
-          "RUA RENAN CARVALHO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.33474714285715,
-          -7.260922428571429
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 89,
-        "rank": 89,
         "name": "BARROSO",
         "bairro": "BARROSO",
         "municipality": "BARROSO",
         "faction": "CV",
-        "risk_score": 43.851,
-        "score": 43.851,
+        "risk_score": 36.219,
+        "score": 36.219,
         "region": "interior",
         "parent_area": "BARROSO",
-        "parent_risk_score": 56.2,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 45.6,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
         "local_street_pressure": 0.0,
         "nearby_streets_count": 0,
         "nearby_streets": [],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755615"
       },
       "geometry": {
         "type": "Point",
@@ -3019,32 +2809,238 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 90,
-        "rank": 90,
-        "name": "Juremal",
-        "bairro": "ALTO SANTO",
-        "municipality": "ALTO SANTO",
-        "faction": "TCP/GDE",
-        "risk_score": 43.576,
-        "score": 43.576,
+        "node_id": 84,
+        "rank": 84,
+        "name": "Alto Alegre",
+        "bairro": "SALITRE",
+        "municipality": "ALTO ALEGRE",
+        "faction": "CV",
+        "risk_score": 36.029,
+        "score": 36.029,
         "region": "interior",
-        "parent_area": "ALTO SANTO",
-        "parent_risk_score": 52.2,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 0.17,
-        "nearby_streets_count": 1,
+        "parent_area": "SALITRE",
+        "parent_risk_score": 42.6,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.817,
+        "nearby_streets_count": 5,
         "nearby_streets": [
-          "JUREMAL"
+          "ALTO ALEGRE",
+          "PATRIARCA",
+          "RUA DA POUSADA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755619"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.255191882352925,
-          -5.441343441176469
+          -40.3716652,
+          -7.065903133333333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 85,
+        "rank": 85,
+        "name": "Salsa",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
+        "faction": "CV",
+        "risk_score": 35.926,
+        "score": 35.926,
+        "region": "interior",
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 6.278,
+        "nearby_streets_count": 12,
+        "nearby_streets": [
+          "SALSA",
+          "COHAB",
+          "JUBINA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755623"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.2635782,
+          -3.800054133333333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 86,
+        "rank": 86,
+        "name": "Rua dos Cocos",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
+        "faction": "CV",
+        "risk_score": 35.556,
+        "score": 35.556,
+        "region": "interior",
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 5.95,
+        "nearby_streets_count": 13,
+        "nearby_streets": [
+          "RUA DOS COCOS",
+          "ALTO ALEGRE",
+          "AREA SEM NOME"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755627"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.263022666666664,
+          -3.8057770833333335
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 87,
+        "rank": 87,
+        "name": "Cidade de Deus- Forquilha",
+        "bairro": "SOBRAL",
+        "municipality": "Forquilha",
+        "faction": "CV",
+        "risk_score": 35.367,
+        "score": 35.367,
+        "region": "interior",
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 5.78,
+        "nearby_streets_count": 13,
+        "nearby_streets": [
+          "CIDADE DE DEUS- FORQUILHA",
+          "RUA ANTÔNIO DE LOURDES",
+          "1° DE MAIO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755631"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.26966604651163,
+          -3.8061409534883723
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 88,
+        "rank": 88,
+        "name": "Sinhá Saboia",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
+        "faction": "CV",
+        "risk_score": 35.365,
+        "score": 35.365,
+        "region": "interior",
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 5.759,
+        "nearby_streets_count": 13,
+        "nearby_streets": [
+          "SINHÁ SABOIA",
+          "RUA MARIINHA PAIVA",
+          "RUA SINHÁ SABÓIA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755635"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.33474492307692,
+          -3.7058815384615382
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 89,
+        "rank": 89,
+        "name": "Várzea Grande",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
+        "faction": "TCP/GDE",
+        "risk_score": 35.158,
+        "score": 35.158,
+        "region": "interior",
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 6.928,
+        "nearby_streets_count": 17,
+        "nearby_streets": [
+          "VÁRZEA GRANDE",
+          "TRAVESSA ITÁLIA",
+          "RUA VEREADOR FRANCISCO FELIX PORTO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755640"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.34141395348838,
+          -3.696258906976744
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 90,
+        "rank": 90,
+        "name": "Cidade dos Anjos",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
+        "faction": "CV",
+        "risk_score": 35.051,
+        "score": 35.051,
+        "region": "interior",
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 5.502,
+        "nearby_streets_count": 13,
+        "nearby_streets": [
+          "CIDADE DOS ANJOS",
+          "CIDADE DE DEUS- FORQUILHA",
+          "1° DE MAIO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755644"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.27067613333334,
+          -3.8022530666666667
         ]
       }
     },
@@ -3053,32 +3049,32 @@
       "properties": {
         "node_id": 91,
         "rank": 91,
-        "name": "São José",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
+        "name": "Pico da Esperança",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
         "faction": "CV",
-        "risk_score": 42.981,
-        "score": 42.981,
+        "risk_score": 34.705,
+        "score": 34.705,
         "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 3.245,
-        "nearby_streets_count": 9,
+        "local_street_pressure": 5.194,
+        "nearby_streets_count": 12,
         "nearby_streets": [
-          "SÃO JOSÉ",
-          "TRAVESSA SÃO JOSÉ",
-          "AVENIDA CICERO GONÇALVES"
+          "PICO DA ESPERANÇA",
+          "RUA MANOEL LIBERATO ARAGÃO",
+          "CIDADE DE DEUS- FORQUILHA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755648"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -39.34910941666667,
-          -7.229535208333334
+          -40.2675967037037,
+          -3.8090762962962965
         ]
       }
     },
@@ -3087,32 +3083,32 @@
       "properties": {
         "node_id": 92,
         "rank": 92,
-        "name": "Conj. Barro Branco 1",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "PCC",
-        "risk_score": 42.965,
-        "score": 42.965,
+        "name": "Alto Alegre",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
+        "faction": "CV",
+        "risk_score": 34.586,
+        "score": 34.586,
         "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 3.251,
-        "nearby_streets_count": 7,
+        "local_street_pressure": 5.085,
+        "nearby_streets_count": 11,
         "nearby_streets": [
-          "CONJ. BARRO BRANCO 1",
-          "RUA PEDRO AGOSTINHO DE SOUSA",
-          "RUA 05 ERNANDO RIBEIRO DA CRUZ"
+          "ALTO ALEGRE",
+          "RUA DOS COCOS",
+          "AREA SEM NOME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
+        "generated_at": "2026-05-25T14:14:47.755652"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -39.378038200000006,
-          -7.2435856
+          -40.260892269230766,
+          -3.803626576923077
         ]
       }
     },
@@ -3121,323 +3117,17 @@
       "properties": {
         "node_id": 93,
         "rank": 93,
-        "name": "VILA FATIMA",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "PCC",
-        "risk_score": 42.813,
-        "score": 42.813,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 3.086,
-        "nearby_streets_count": 10,
-        "nearby_streets": [
-          "VILA FATIMA",
-          "AREA SEM NOME",
-          "RUA ASSIS DIAS SOBREIRA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.29991402222222,
-          -7.207199266666667
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 94,
-        "rank": 94,
-        "name": "Bairro Limoeiro",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 42.69,
-        "score": 42.69,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 2.998,
-        "nearby_streets_count": 10,
-        "nearby_streets": [
-          "BAIRRO LIMOEIRO",
-          "TIMBAÚBA",
-          "RUA ASSIS DIAS SOBREIRA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.30056788235294,
-          -7.224925588235293
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 95,
-        "rank": 95,
-        "name": "Socorro",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 42.65,
-        "score": 42.65,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 2.967,
-        "nearby_streets_count": 10,
-        "nearby_streets": [
-          "SOCORRO",
-          "SALESIANOS",
-          "AVENIDA PADRE CÍCERO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.32336263888889,
-          -7.202973916666666
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 96,
-        "rank": 96,
-        "name": "ÁREA DE INFLUÊNCIA DO PCC",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "PCC",
-        "risk_score": 42.494,
-        "score": 42.494,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 2.77,
-        "nearby_streets_count": 6,
-        "nearby_streets": [
-          "ÁREA DE INFLUÊNCIA DO PCC",
-          "RUA DOUTOR FRANCISCO ESMERALDO DE MELO",
-          "RUA SÃO PAULO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.374815468181815,
-          -7.225181972727273
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 97,
-        "rank": 97,
-        "name": "Campo Alegre",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 42.396,
-        "score": 42.396,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 2.724,
-        "nearby_streets_count": 7,
-        "nearby_streets": [
-          "CAMPO ALEGRE",
-          "RUA JOÃO PEREIRA DE CARVALHO",
-          "RUA FRANCISCO MEDEIROS DA SILVA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.303451"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.287976138888894,
-          -7.2508061111111095
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 98,
-        "rank": 98,
-        "name": "SÃO JOSÉ X COM JN",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 41.843,
-        "score": 41.843,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 2.235,
-        "nearby_streets_count": 5,
-        "nearby_streets": [
-          "SÃO JOSÉ X COM JN",
-          "RUA PADRE FREDERICO",
-          "RUA MARIA AMÉLIA ESMERALDO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.363320996296295,
-          -7.234312781481482
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 99,
-        "rank": 99,
-        "name": "Residencial São Sebastião",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 41.786,
-        "score": 41.786,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 2.199,
-        "nearby_streets_count": 4,
-        "nearby_streets": [
-          "RESIDENCIAL SÃO SEBASTIÃO",
-          "AREA SEM NOME",
-          "RESIDENCIAL NOSSA SENHORA DAS DORES - JUAZEIRO DO NORTE"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.271257142857145,
-          -7.230486142857143
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 100,
-        "rank": 100,
-        "name": "Lagoa Seca- Juazeiro do Norte",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 41.78,
-        "score": 41.78,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 2.191,
-        "nearby_streets_count": 7,
-        "nearby_streets": [
-          "LAGOA SECA- JUAZEIRO DO NORTE",
-          "AVENIDA LEÃO SAMPAIO",
-          "RUA JÚLIA JORGE COUTO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.32613322222223,
-          -7.247637000000002
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 101,
-        "rank": 101,
-        "name": "Bairro da Malvinas - Barbalha",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "Barbalha",
-        "faction": "CV",
-        "risk_score": 41.503,
-        "score": 41.503,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 1.874,
-        "nearby_streets_count": 5,
-        "nearby_streets": [
-          "BAIRRO DA MALVINAS - BARBALHA",
-          "AV. LUIZ GONZAGA",
-          "RUA P-18"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.28155913636363,
-          -7.303047386363636
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 102,
-        "rank": 102,
         "name": "Cidade de Alto Santo",
         "bairro": "ALTO SANTO",
         "municipality": "ALTO SANTO",
         "faction": "TCP/GDE",
-        "risk_score": 41.428,
-        "score": 41.428,
+        "risk_score": 34.516,
+        "score": 34.516,
         "region": "interior",
         "parent_area": "ALTO SANTO",
-        "parent_risk_score": 52.2,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 42.6,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
         "local_street_pressure": 1.758,
         "nearby_streets_count": 3,
         "nearby_streets": [
@@ -3446,32 +3136,66 @@
           "AVENIDA DO TIBOLO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
+        "generated_at": "2026-05-25T14:14:47.755656"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -38.26764759649123,
-          -5.521316333333336
+          -5.521316333333334
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 103,
-        "rank": 103,
+        "node_id": 94,
+        "rank": 94,
+        "name": "Santo Antônio",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
+        "faction": "CV",
+        "risk_score": 34.482,
+        "score": 34.482,
+        "region": "interior",
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 4.987,
+        "nearby_streets_count": 14,
+        "nearby_streets": [
+          "SANTO ANTÔNIO",
+          "RUA SANTA CLARA",
+          "RUA SAO JOAQUIM"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755661"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.341419,
+          -3.7056791666666666
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 95,
+        "rank": 95,
         "name": "Jardim Novo - Alto santo",
         "bairro": "ALTO SANTO",
         "municipality": "ALTO SANTO",
         "faction": "TCP/GDE",
-        "risk_score": 41.322,
-        "score": 41.322,
+        "risk_score": 34.41,
+        "score": 34.41,
         "region": "interior",
         "parent_area": "ALTO SANTO",
-        "parent_risk_score": 52.2,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 42.6,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
         "local_street_pressure": 1.717,
         "nearby_streets_count": 3,
         "nearby_streets": [
@@ -3480,7 +3204,7 @@
           "ESTRADA SEM NOME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
+        "generated_at": "2026-05-25T14:14:47.755665"
       },
       "geometry": {
         "type": "Point",
@@ -3493,51 +3217,253 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 104,
-        "rank": 104,
-        "name": "Bulandeira - Barbalha",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "Barbalha",
+        "node_id": 96,
+        "rank": 96,
+        "name": "Jatobá",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
         "faction": "CV",
-        "risk_score": 41.315,
-        "score": 41.315,
+        "risk_score": 34.302,
+        "score": 34.302,
         "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 1.712,
-        "nearby_streets_count": 4,
+        "local_street_pressure": 4.835,
+        "nearby_streets_count": 12,
         "nearby_streets": [
-          "BULANDEIRA - BARBALHA",
-          "AVENIDA PAULO MARQUÊS",
-          "RUA PROJETADA | M"
+          "JATOBÁ",
+          "COHAB I",
+          "COHAB II"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
+        "generated_at": "2026-05-25T14:14:47.755669"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -39.31173175,
-          -7.293588833333332
+          -40.328697999999996,
+          -3.705087666666667
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 105,
-        "rank": 105,
+        "node_id": 97,
+        "rank": 97,
+        "name": "COHAB I",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
+        "faction": "CV",
+        "risk_score": 33.691,
+        "score": 33.691,
+        "region": "interior",
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 4.285,
+        "nearby_streets_count": 12,
+        "nearby_streets": [
+          "COHAB I",
+          "SINHÁ SABOIA",
+          "JATOBÁ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755673"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.333028222222225,
+          -3.7090693333333338
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 98,
+        "rank": 98,
+        "name": "Castanhão",
+        "bairro": "ALTO SANTO",
+        "municipality": "ALTO SANTO",
+        "faction": "TCP/GDE",
+        "risk_score": 33.656,
+        "score": 33.656,
+        "region": "interior",
+        "parent_area": "ALTO SANTO",
+        "parent_risk_score": 42.6,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.046,
+        "nearby_streets_count": 1,
+        "nearby_streets": [
+          "CASTANHÃO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755677"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.40774537837838,
+          -5.466950162162162
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 99,
+        "rank": 99,
+        "name": "COHAB II",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
+        "faction": "CV",
+        "risk_score": 33.478,
+        "score": 33.478,
+        "region": "interior",
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 4.085,
+        "nearby_streets_count": 12,
+        "nearby_streets": [
+          "COHAB II",
+          "RUA 8",
+          "JATOBÁ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755682"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.3318,
+          -3.7005100399999997
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 100,
+        "rank": 100,
+        "name": "COHAB II",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
+        "faction": "CV",
+        "risk_score": 32.252,
+        "score": 32.252,
+        "region": "interior",
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 3.007,
+        "nearby_streets_count": 8,
+        "nearby_streets": [
+          "RUA FRANCISCO RODRIGUES DA COSTA",
+          "RUA JOSÉ RADIER DE SOUSA",
+          "SINHÁ SABOIA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755686"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.336334944444445,
+          -3.713177955555556
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 101,
+        "rank": 101,
+        "name": "LUIS ALVES DE FREITAS - LIMOEIRO DO NORTE - CV",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "CV",
+        "faction": "CV",
+        "risk_score": 32.123,
+        "score": 32.123,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 5.598,
+        "nearby_streets_count": 13,
+        "nearby_streets": [
+          "RUA HIPÓLITO JERÔNIMO DE OLIVEIRA",
+          "LUIS ALVES DE FREITAS - LIMOEIRO DO NORTE - CV",
+          "RUA JOSÉ FERREIRA SOMBRA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755690"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.09707029787234,
+          -5.132155574468085
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 102,
+        "rank": 102,
+        "name": "SALGADOS DOS MACHADOS",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
+        "faction": "PCC",
+        "risk_score": 31.251,
+        "score": 31.251,
+        "region": "interior",
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.113,
+        "nearby_streets_count": 3,
+        "nearby_streets": [
+          "SALGADOS DOS MACHADOS",
+          "RUA JOAQUIM TEOTÔNIO",
+          "RUA DO MILA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755695"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.34261556716418,
+          -3.7766170597014925
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 103,
+        "rank": 103,
         "name": "Timonha",
         "bairro": "GRANJA",
         "municipality": "GRANJA LISBOA",
         "faction": "CV",
-        "risk_score": 41.313,
-        "score": 41.313,
+        "risk_score": 30.801,
+        "score": 30.801,
         "region": "interior",
         "parent_area": "GRANJA",
-        "parent_risk_score": 49.9,
+        "parent_risk_score": 35.3,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
         "local_street_pressure": 1.794,
@@ -3548,7 +3474,7 @@
           "RUA DA ALEGRIA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
+        "generated_at": "2026-05-25T14:14:47.755699"
       },
       "geometry": {
         "type": "Point",
@@ -3561,546 +3487,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 106,
-        "rank": 106,
-        "name": "Bairro José Geraldo da Cruz",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 41.232,
-        "score": 41.232,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 1.693,
-        "nearby_streets_count": 4,
-        "nearby_streets": [
-          "BAIRRO JOSÉ GERALDO DA CRUZ",
-          "AVENIDA UNIVERSITÁRIA",
-          "JOÃO CABRAL"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.3048692,
-          -7.2387502
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 107,
-        "rank": 107,
-        "name": "Bertolândia",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 41.228,
-        "score": 41.228,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 1.665,
-        "nearby_streets_count": 3,
-        "nearby_streets": [
-          "BERTOLÂNDIA",
-          "RESIDENCIAL NOSSA SENHORA DAS DORES - JUAZEIRO DO NORTE",
-          "RESIDENCIAL SÃO SEBASTIÃO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.28222486666667,
-          -7.2311659666666666
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 108,
-        "rank": 108,
-        "name": "Condomínios Tenente Coelho",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "PCC",
-        "risk_score": 41.123,
-        "score": 41.123,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 1.615,
-        "nearby_streets_count": 5,
-        "nearby_streets": [
-          "CONDOMÍNIOS TENENTE COELHO",
-          "PEDRINHAS",
-          "VILA FATIMA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.2853975875,
-          -7.2109234375
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 109,
-        "rank": 109,
-        "name": "Residencial Nossa Senhora das Dores - Juazeiro do norte",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 41.072,
-        "score": 41.072,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 1.568,
-        "nearby_streets_count": 4,
-        "nearby_streets": [
-          "RESIDENCIAL NOSSA SENHORA DAS DORES - JUAZEIRO DO NORTE",
-          "BERTOLÂNDIA",
-          "RESIDENCIAL SÃO SEBASTIÃO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.27799215384616,
-          -7.224133384615384
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 110,
-        "rank": 110,
-        "name": "Sítio Estrela - Barbalha",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "Barbalha",
-        "faction": "CV",
-        "risk_score": 41.003,
-        "score": 41.003,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 1.448,
-        "nearby_streets_count": 2,
-        "nearby_streets": [
-          "SÍTIO ESTRELA - BARBALHA",
-          "PRAÇA MARIA FELICIO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.26650672413793,
-          -7.279947310344825
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 111,
-        "rank": 111,
-        "name": "Pedrinhas",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "PCC",
-        "risk_score": 40.873,
-        "score": 40.873,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 1.361,
-        "nearby_streets_count": 4,
-        "nearby_streets": [
-          "PEDRINHAS",
-          "VILA NOVA",
-          "RUA JOAQUIM LEANDRO DE SOUZA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.27631445,
-          -7.199595775000001
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 112,
-        "rank": 112,
-        "name": "Vila Nova",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "PCC",
-        "risk_score": 40.792,
-        "score": 40.792,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 1.306,
-        "nearby_streets_count": 3,
-        "nearby_streets": [
-          "VILA NOVA",
-          "PEDRINHAS",
-          "RUA JOAQUIM LEANDRO DE SOUZA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.27197727586208,
-          -7.198310034482757
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 113,
-        "rank": 113,
-        "name": "VILA 3 MARIAS",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 40.767,
-        "score": 40.767,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 1.288,
-        "nearby_streets_count": 2,
-        "nearby_streets": [
-          "VILA 3 MARIAS",
-          "CONDOMINIO LEANDRO BEZERRA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.310322449999994,
-          -7.176342278571428
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 114,
-        "rank": 114,
-        "name": "Lagoa - Barbalha",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "Barbalha",
-        "faction": "CV",
-        "risk_score": 40.689,
-        "score": 40.689,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 1.188,
-        "nearby_streets_count": 1,
-        "nearby_streets": [
-          "LAGOA - BARBALHA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.29101172727272,
-          -7.279823954545455
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 115,
-        "rank": 115,
-        "name": "CONDOMINIO LEANDRO BEZERRA",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 40.661,
-        "score": 40.661,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 1.196,
-        "nearby_streets_count": 2,
-        "nearby_streets": [
-          "CONDOMINIO LEANDRO BEZERRA",
-          "VILA 3 MARIAS"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.30089946,
-          -7.171924680000001
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 116,
-        "rank": 116,
-        "name": "Castanhão",
-        "bairro": "ALTO SANTO",
-        "municipality": "ALTO SANTO",
-        "faction": "TCP/GDE",
-        "risk_score": 40.568,
-        "score": 40.568,
-        "region": "interior",
-        "parent_area": "ALTO SANTO",
-        "parent_risk_score": 52.2,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 1.046,
-        "nearby_streets_count": 1,
-        "nearby_streets": [
-          "CASTANHÃO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.407745378378394,
-          -5.466950162162163
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 117,
-        "rank": 117,
-        "name": "MATA DOS LIMAS",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 40.433,
-        "score": 40.433,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 0.922,
-        "nearby_streets_count": 1,
-        "nearby_streets": [
-          "MATA DOS LIMAS"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.32526368666666,
-          -7.279065693333334
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 118,
-        "rank": 118,
-        "name": "Bela vista - Crato",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "Crato",
-        "faction": "CV",
-        "risk_score": 40.408,
-        "score": 40.408,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 0.963,
-        "nearby_streets_count": 1,
-        "nearby_streets": [
-          "BELA VISTA - CRATO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.38628216666667,
-          -7.178315916666667
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 119,
-        "rank": 119,
-        "name": "Planalto",
-        "bairro": "PENTECOSTE",
-        "municipality": "PLANALTO AYRTON SENNA",
-        "faction": "CV",
-        "risk_score": 40.259,
-        "score": 40.259,
-        "region": "interior",
-        "parent_area": "PENTECOSTE",
-        "parent_risk_score": 47.7,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 2.317,
-        "nearby_streets_count": 6,
-        "nearby_streets": [
-          "PLANALTO",
-          "RUA JOSÉ SALU",
-          "RUA AGAPITO CORDEIRO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.27512254545455,
-          -3.7948220000000004
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 120,
-        "rank": 120,
-        "name": "Santa Terezinha",
-        "bairro": "GRANJA",
-        "municipality": "GRANJA LISBOA",
-        "faction": "CV",
-        "risk_score": 40.176,
-        "score": 40.176,
-        "region": "interior",
-        "parent_area": "GRANJA",
-        "parent_risk_score": 49.9,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 0.821,
-        "nearby_streets_count": 1,
-        "nearby_streets": [
-          "SANTA TEREZINHA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -40.9919765116279,
-          -3.340925209302325
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 121,
-        "rank": 121,
-        "name": "Horto- Juazeiro do Norte",
-        "bairro": "JUAZEIRO DO NORTE",
-        "municipality": "JUAZEIRO DO NORTE",
-        "faction": "CV",
-        "risk_score": 39.914,
-        "score": 39.914,
-        "region": "interior",
-        "parent_area": "JUAZEIRO DO NORTE",
-        "parent_risk_score": 50.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 0.513,
-        "nearby_streets_count": 1,
-        "nearby_streets": [
-          "HORTO- JUAZEIRO DO NORTE"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -39.328922383561654,
-          -7.18321616438356
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 122,
-        "rank": 122,
+        "node_id": 104,
+        "rank": 104,
         "name": "Cariré",
         "bairro": "CARIRE",
         "municipality": "CARIRE",
         "faction": "PCC",
-        "risk_score": 34.812,
-        "score": 34.812,
+        "risk_score": 30.42,
+        "score": 30.42,
         "region": "interior",
         "parent_area": "CARIRE",
-        "parent_risk_score": 38.8,
+        "parent_risk_score": 32.7,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
         "local_street_pressure": 3.094,
@@ -4111,30 +3508,94 @@
           "RUA SANTO ANTÔNIO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
+        "generated_at": "2026-05-25T14:14:47.755703"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -40.47704866666667,
-          -3.9515210000000005
+          -3.951521
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 123,
-        "rank": 123,
+        "node_id": 105,
+        "rank": 105,
+        "name": "Distrito de Cacimbinha",
+        "bairro": "SOBRAL",
+        "municipality": "SOBRAL",
+        "faction": "CV",
+        "risk_score": 29.914,
+        "score": 29.914,
+        "region": "interior",
+        "parent_area": "SOBRAL",
+        "parent_risk_score": 35.5,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 0.93,
+        "nearby_streets_count": 1,
+        "nearby_streets": [
+          "DISTRITO DE CACIMBINHA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755707"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.2042639,
+          -3.8042765750000003
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 106,
+        "rank": 106,
+        "name": "Santa Terezinha",
+        "bairro": "GRANJA",
+        "municipality": "GRANJA LISBOA",
+        "faction": "CV",
+        "risk_score": 29.664,
+        "score": 29.664,
+        "region": "interior",
+        "parent_area": "GRANJA",
+        "parent_risk_score": 35.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 0.821,
+        "nearby_streets_count": 1,
+        "nearby_streets": [
+          "SANTA TEREZINHA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755711"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -40.991976511627904,
+          -3.3409252093023256
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 107,
+        "rank": 107,
         "name": "Jaibaras",
         "bairro": "CARIRE",
         "municipality": "CARIRE",
         "faction": "PCC",
-        "risk_score": 33.861,
-        "score": 33.861,
+        "risk_score": 29.469,
+        "score": 29.469,
         "region": "interior",
         "parent_area": "CARIRE",
-        "parent_risk_score": 38.8,
+        "parent_risk_score": 32.7,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
         "local_street_pressure": 2.295,
@@ -4145,30 +3606,98 @@
           "ESTRADA DO SETOR"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
+        "generated_at": "2026-05-25T14:14:47.755715"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
           -40.50053412962963,
-          -3.7736930740740764
+          -3.773693074074074
         ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "node_id": 124,
-        "rank": 124,
+        "node_id": 108,
+        "rank": 108,
+        "name": "MULTIRÃO - LIMOEIRO DO NRTE",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "LIMOEIRO DO NRTE",
+        "faction": "CV",
+        "risk_score": 29.342,
+        "score": 29.342,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 3.172,
+        "nearby_streets_count": 9,
+        "nearby_streets": [
+          "MULTIRÃO - LIMOEIRO DO NRTE",
+          "RUA PAULINO FERREIRA COSTA",
+          "BOA FE - LIMOEIRO DO NORTE - TCP"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755720"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.0932158,
+          -5.1254818
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 109,
+        "rank": 109,
+        "name": "SANTA LUZIA - LIMOEIRO DO NORTE",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "LIMOEIRO DO NORTE",
+        "faction": "CV",
+        "risk_score": 29.257,
+        "score": 29.257,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 3.063,
+        "nearby_streets_count": 8,
+        "nearby_streets": [
+          "RUA AUGUSTO FIDÉLIS",
+          "SANTA LUZIA - LIMOEIRO DO NORTE",
+          "LUIS ALVES DE FREITAS - LIMOEIRO DO NORTE - CV"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755724"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.090884439999996,
+          -5.13698312
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 110,
+        "rank": 110,
         "name": "São José Do Torto",
         "bairro": "CARIRE",
         "municipality": "CARIRE",
         "faction": "PCC",
-        "risk_score": 33.537,
-        "score": 33.537,
+        "risk_score": 29.145,
+        "score": 29.145,
         "region": "interior",
         "parent_area": "CARIRE",
-        "parent_risk_score": 38.8,
+        "parent_risk_score": 32.7,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
         "local_street_pressure": 2.035,
@@ -4178,12 +3707,12 @@
           "RUA RAIMUNDO RIBEIRO DA SILVA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
+        "generated_at": "2026-05-25T14:14:47.755729"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -40.618546590909105,
+          -40.61854659090909,
           -3.7859542878787877
         ]
       }
@@ -4191,17 +3720,85 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 125,
-        "rank": 125,
+        "node_id": 111,
+        "rank": 111,
+        "name": "CIDADE ALTA - LIMOEIRO DO NORTE",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "LIMOEIRO DO NORTE",
+        "faction": "CV",
+        "risk_score": 28.927,
+        "score": 28.927,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.762,
+        "nearby_streets_count": 6,
+        "nearby_streets": [
+          "CIDADE ALTA - LIMOEIRO DO NORTE",
+          "RUA CAETANO EMÍLIO DE OLIVEIRA",
+          "RUA MARIA JOSÉ CHAVES DE ALMEIDA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755733"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.13845989261745,
+          -5.149473798657718
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 112,
+        "rank": 112,
+        "name": "BROTOLANCIA - LIMOEIRO DO NORTE",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "LIMOEIRO DO NORTE",
+        "faction": "CV",
+        "risk_score": 28.747,
+        "score": 28.747,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.632,
+        "nearby_streets_count": 5,
+        "nearby_streets": [
+          "BROTOLANCIA - LIMOEIRO DO NORTE",
+          "RUA ENGENHEIRA GERLÊNI DE CASTRO",
+          "LIMOEIRINHO - LIMOEIRO DO NORTE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755738"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.1008468,
+          -5.156291933333334
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 113,
+        "rank": 113,
         "name": "JAIBARAS CV",
         "bairro": "CARIRE",
         "municipality": "CARIRE",
         "faction": "CV",
-        "risk_score": 33.099,
-        "score": 33.099,
+        "risk_score": 28.707,
+        "score": 28.707,
         "region": "interior",
         "parent_area": "CARIRE",
-        "parent_risk_score": 38.8,
+        "parent_risk_score": 32.7,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
         "local_street_pressure": 1.629,
@@ -4212,13 +3809,419 @@
           "ESTRADA JAÍBARAS SOBRAL"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
+        "generated_at": "2026-05-25T14:14:47.755742"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -40.498466391666675,
+          -40.49846639166667,
           -3.7853201999999997
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 114,
+        "rank": 114,
+        "name": "ILHA - LIMOEIRO DO NORTE - CV",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "CV",
+        "faction": "CV",
+        "risk_score": 28.635,
+        "score": 28.635,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.535,
+        "nearby_streets_count": 7,
+        "nearby_streets": [
+          "ILHA - LIMOEIRO DO NORTE - CV",
+          "RUA INÁCIO MENDES",
+          "RUA CÔNEGO BESSA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755747"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.104127514285715,
+          -5.1409952
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 115,
+        "rank": 115,
+        "name": "SOCORRO - LIMOEIRO DO NORTE",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "LIMOEIRO DO NORTE",
+        "faction": "CV",
+        "risk_score": 28.436,
+        "score": 28.436,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.36,
+        "nearby_streets_count": 4,
+        "nearby_streets": [
+          "SOCORRO - LIMOEIRO DO NORTE",
+          "BROTOLANCIA - LIMOEIRO DO NORTE",
+          "LIMOEIRINHO - LIMOEIRO DO NORTE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755752"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.10266135,
+          -5.160396775000001
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 116,
+        "rank": 116,
+        "name": "FLORES - RUSSAS - PCC",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "PCC",
+        "faction": "PCC",
+        "risk_score": 28.435,
+        "score": 28.435,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.267,
+        "nearby_streets_count": 6,
+        "nearby_streets": [
+          "FLORES - RUSSAS - PCC",
+          "TRAVESSA MANUEL JUNQUEIRA",
+          "TRAVESSA MARIA GOMES"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755756"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.06539577108434,
+          -5.068339228915662
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 117,
+        "rank": 117,
+        "name": "VILA DA PAZ - LIMOEIRO DO NORTE",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "LIMOEIRO DO NORTE",
+        "faction": "CV",
+        "risk_score": 28.383,
+        "score": 28.383,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.313,
+        "nearby_streets_count": 5,
+        "nearby_streets": [
+          "VILA DA PAZ - LIMOEIRO DO NORTE",
+          "RUA JOSÉ VICTOR DE OLIVEIRA",
+          "BURACO DA GIA - LIMOEIRO DO NORTE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755761"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.15064433333333,
+          -5.1528841212121215
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 118,
+        "rank": 118,
+        "name": "BOA FE - LIMOEIRO DO NORTE - TCP",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "TCP",
+        "faction": "CV",
+        "risk_score": 28.292,
+        "score": 28.292,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.205,
+        "nearby_streets_count": 7,
+        "nearby_streets": [
+          "BOA FE - LIMOEIRO DO NORTE - TCP",
+          "MULTIRÃO - LIMOEIRO DO NRTE",
+          "RUA AUGUSTO FIDÉLIS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755765"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.086490765625,
+          -5.1279575
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 119,
+        "rank": 119,
+        "name": "Pedras - Morada Nova",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "Morada Nova",
+        "faction": "CV",
+        "risk_score": 28.129,
+        "score": 28.129,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.087,
+        "nearby_streets_count": 3,
+        "nearby_streets": [
+          "PEDRAS - MORADA NOVA",
+          "RUA ANA NOGUEIRA MAIA",
+          "RUA JOÃO MONTEIRO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755770"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.24127560714286,
+          -5.130356857142857
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 120,
+        "rank": 120,
+        "name": "BURACO DA GIA - LIMOEIRO DO NORTE",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "LIMOEIRO DO NORTE",
+        "faction": "CV",
+        "risk_score": 28.033,
+        "score": 28.033,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.005,
+        "nearby_streets_count": 5,
+        "nearby_streets": [
+          "BURACO DA GIA - LIMOEIRO DO NORTE",
+          "VILA DA PAZ - LIMOEIRO DO NORTE",
+          "RUA JOSÉ VICTOR DE OLIVEIRA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755774"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.155590068965516,
+          -5.151027715517242
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 121,
+        "rank": 121,
+        "name": "LIMOEIRINHO - LIMOEIRO DO NORTE",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "LIMOEIRO DO NORTE",
+        "faction": "CV",
+        "risk_score": 28.03,
+        "score": 28.03,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.988,
+        "nearby_streets_count": 5,
+        "nearby_streets": [
+          "LIMOEIRINHO - LIMOEIRO DO NORTE",
+          "SOCORRO - LIMOEIRO DO NORTE",
+          "BROTOLANCIA - LIMOEIRO DO NORTE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755779"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.106248,
+          -5.156085289473684
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 122,
+        "rank": 122,
+        "name": "Santa Maria - Limoeiro Do Norte",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "LIMOEIRO DO NORTE",
+        "faction": "CV",
+        "risk_score": 27.955,
+        "score": 27.955,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.941,
+        "nearby_streets_count": 2,
+        "nearby_streets": [
+          "SANTA MARIA - LIMOEIRO DO NORTE",
+          "ESTRADA SANTA MARIA SANTA FÉ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755783"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.01242125,
+          -5.22775815
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 123,
+        "rank": 123,
+        "name": "LIMOEIRO DO NORTE - TOMÉ - PCC",
+        "bairro": "QUIXERE",
+        "municipality": "PCC",
+        "faction": "PCC",
+        "risk_score": 27.736,
+        "score": 27.736,
+        "region": "interior",
+        "parent_area": "QUIXERE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.713,
+        "nearby_streets_count": 4,
+        "nearby_streets": [
+          "RUA MARIA LEONILIA DE LIMA SANTIAGO",
+          "RUA RAIMUNDO GALDINO SILVEIRA LIMA",
+          "LIMOEIRO DO NORTE - TOMÉ - PCC"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755787"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -37.95330421875,
+          -5.135131640625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 124,
+        "rank": 124,
+        "name": "RAMAL DE FLORES - RUSSAS - PCC",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "PCC",
+        "faction": "PCC",
+        "risk_score": 27.494,
+        "score": 27.494,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.49,
+        "nearby_streets_count": 4,
+        "nearby_streets": [
+          "RAMAL DE FLORES - RUSSAS - PCC",
+          "TRAVESSA FRANCISCO ANTÔNIO",
+          "RUA DOIS IRMÃOS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755792"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.07556326771653,
+          -5.059321519685039
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 125,
+        "rank": 125,
+        "name": "TABULEIRO DO NORTE - SEDE - CV",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "CV",
+        "faction": "CV",
+        "risk_score": 27.405,
+        "score": 27.405,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.137,
+        "nearby_streets_count": 2,
+        "nearby_streets": [
+          "RUA AVELINO MAGALHÃES",
+          "TABULEIRO DO NORTE - SEDE - CV"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755796"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.12483395964126,
+          -5.251629919282511
         ]
       }
     },
@@ -4227,40 +4230,366 @@
       "properties": {
         "node_id": 126,
         "rank": 126,
-        "name": "Cidade De Jardim",
-        "bairro": "JARDIM",
-        "municipality": "BOM JARDIM",
-        "faction": "TCP/GDE",
-        "risk_score": 26.568,
-        "score": 26.568,
+        "name": "BOM NOME - LIMOEIRO DO NORTE - TCP",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "TCP",
+        "faction": "CV",
+        "risk_score": 27.356,
+        "score": 27.356,
         "region": "interior",
-        "parent_area": "JARDIM",
-        "parent_risk_score": 32.2,
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 1.363,
-        "nearby_streets_count": 2,
+        "local_street_pressure": 1.337,
+        "nearby_streets_count": 4,
         "nearby_streets": [
-          "CIDADE DE JARDIM",
-          "AREA SEM NOME"
+          "BOM NOME - LIMOEIRO DO NORTE - TCP",
+          "RUA AUGUSTO FIDÉLIS",
+          "SANTA LUZIA - LIMOEIRO DO NORTE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-05-23T09:29:11.305104"
+        "generated_at": "2026-05-25T14:14:47.755801"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -39.27755052777778,
-          -7.586710472222222
+          -38.0838586875,
+          -5.144969234375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 127,
+        "rank": 127,
+        "name": "MIGUEL PEREIRA DO MAURO - RUSSAS  - PCC",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "PCC",
+        "faction": "PCC",
+        "risk_score": 27.318,
+        "score": 27.318,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.337,
+        "nearby_streets_count": 2,
+        "nearby_streets": [
+          "MIGUEL PEREIRA DO MAURO - RUSSAS  - PCC",
+          "ESTRADA JARDIM AO MIGUEL PEREIRA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755805"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.06351172,
+          -5.043986666666666
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 128,
+        "rank": 128,
+        "name": "ARRAIAL - LIMOEIRO DO NORTE - TCP",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "TCP",
+        "faction": "CV",
+        "risk_score": 27.03,
+        "score": 27.03,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.092,
+        "nearby_streets_count": 1,
+        "nearby_streets": [
+          "ARRAIAL - LIMOEIRO DO NORTE - TCP"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755809"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.07545486363636,
+          -5.097925515151515
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 129,
+        "rank": 129,
+        "name": "SAO RAIMUNDO - LIMOEIRO DO NORTE - TCP",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "TCP",
+        "faction": "CV",
+        "risk_score": 26.968,
+        "score": 26.968,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 0.961,
+        "nearby_streets_count": 3,
+        "nearby_streets": [
+          "SAO RAIMUNDO - LIMOEIRO DO NORTE - TCP",
+          "BOA FE - LIMOEIRO DO NORTE - TCP",
+          "MULTIRÃO - LIMOEIRO DO NRTE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755813"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.08666610743801,
+          -5.113307847107438
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 130,
+        "rank": 130,
+        "name": "Setor NH4 - Morada Nova",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "Morada Nova",
+        "faction": "CV",
+        "risk_score": 26.87,
+        "score": 26.87,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 0.965,
+        "nearby_streets_count": 1,
+        "nearby_streets": [
+          "SETOR NH4 - MORADA NOVA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755821"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.21349881818182,
+          -5.149599181818181
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 131,
+        "rank": 131,
+        "name": "Espinho",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "LIMOEIRO DO NORTE",
+        "faction": "CV",
+        "risk_score": 26.866,
+        "score": 26.866,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 0.961,
+        "nearby_streets_count": 1,
+        "nearby_streets": [
+          "ESPINHO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755825"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.135152875,
+          -5.116876515625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 132,
+        "rank": 132,
+        "name": "RUSSAS - MIGUEL PEREIRA - PCC",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "PCC",
+        "faction": "PCC",
+        "risk_score": 26.861,
+        "score": 26.861,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 0.904,
+        "nearby_streets_count": 3,
+        "nearby_streets": [
+          "VILA MIGUEL PEREIRA",
+          "RUSSAS - MIGUEL PEREIRA - PCC",
+          "MIGUEL PEREIRA DO MAURO - RUSSAS  - PCC"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755830"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.05053979661017,
+          -5.046198542372881
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 133,
+        "rank": 133,
+        "name": "Setor NH5 - Morada Nova",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "Morada Nova",
+        "faction": "CV",
+        "risk_score": 26.774,
+        "score": 26.774,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 0.871,
+        "nearby_streets_count": 1,
+        "nearby_streets": [
+          "SETOR NH5 - MORADA NOVA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755834"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.18899664,
+          -5.15343728
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 134,
+        "rank": 134,
+        "name": "CORREGO DE AREIA - LIMOEIRO DO NORTE",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "LIMOEIRO DO NORTE",
+        "faction": "CV",
+        "risk_score": 26.653,
+        "score": 26.653,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 0.76,
+        "nearby_streets_count": 1,
+        "nearby_streets": [
+          "CORREGO DE AREIA - LIMOEIRO DO NORTE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755839"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.12264825316456,
+          -5.198482689873418
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 135,
+        "rank": 135,
+        "name": "JARDIM DE SÃO JOSÉ - RUSSAS",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "RUSSAS",
+        "faction": "PCC",
+        "risk_score": 26.575,
+        "score": 26.575,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 0.642,
+        "nearby_streets_count": 1,
+        "nearby_streets": [
+          "JARDIM DE SÃO JOSÉ - RUSSAS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755844"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.046269478873235,
+          -5.011389183098592
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 136,
+        "rank": 136,
+        "name": "CABEÇA PRETA - LIMOEIRO DO NORTE - CV",
+        "bairro": "LIMOEIRO DO NORTE",
+        "municipality": "CV",
+        "faction": "CV",
+        "risk_score": 26.541,
+        "score": 26.541,
+        "region": "interior",
+        "parent_area": "LIMOEIRO DO NORTE",
+        "parent_risk_score": 31.2,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 0.633,
+        "nearby_streets_count": 1,
+        "nearby_streets": [
+          "CABEÇA PRETA - LIMOEIRO DO NORTE - CV"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-05-25T14:14:47.755850"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.02829920289855,
+          -5.159871362318841
         ]
       }
     }
   ],
   "metadata": {
-    "total": 126,
+    "total": 136,
     "source": "Sentinela Micronodes Dynamic Overlay",
     "threshold_min_score": 31.0,
-    "generated_at": "2026-05-23T09:29:11.305104",
+    "generated_at": "2026-05-25T14:14:47.755876",
     "region": "interior"
   }
 }

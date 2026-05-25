@@ -61,13 +61,39 @@ def robust_load_any(path):
     try:
         data = json.loads(content)
         if isinstance(data, list):
+            export_meta = {}
+            for item in data:
+                if not isinstance(item, dict):
+                    continue
+                item_type = item.get('type')
+                if item_type == 'header':
+                    export_meta['type'] = item_type
+                    if 'version' in item:
+                        export_meta['version'] = item.get('version')
+                    if 'comment' in item:
+                        export_meta['comment'] = item.get('comment')
+                elif item_type == 'database':
+                    if 'name' in item:
+                        export_meta['database'] = item.get('name')
+                elif item_type == 'table':
+                    if 'name' in item:
+                        export_meta['table_name'] = item.get('name')
             for item in data:
                 if isinstance(item, dict) and item.get('type') == 'table' and 'data' in item:
-                    return pd.DataFrame(item['data'])
-            return pd.DataFrame(data)
+                    df = pd.DataFrame(item['data'])
+                    df.attrs['export_meta'] = export_meta
+                    return df
+            df = pd.DataFrame(data)
+            df.attrs['export_meta'] = export_meta
+            return df
         elif isinstance(data, dict):
-            if 'data' in data: return pd.DataFrame(data['data'])
-            return pd.DataFrame([data])
+            if 'data' in data:
+                df = pd.DataFrame(data['data'])
+                df.attrs['export_meta'] = {}
+                return df
+            df = pd.DataFrame([data])
+            df.attrs['export_meta'] = {}
+            return df
     except:
         # Brute force regex para JSONs quebrados
         pattern = r'\{[^{}]*?"id":\s*?"\d+"[^{}]*?\}'
@@ -76,7 +102,9 @@ def robust_load_any(path):
         for m in matches:
             try: records.append(json.loads(m.strip().rstrip(',')))
             except: continue
-        return pd.DataFrame(records)
+        df = pd.DataFrame(records)
+        df.attrs['export_meta'] = {}
+        return df
     return pd.DataFrame()
 
 from geopy.geocoders import Nominatim
@@ -320,6 +348,7 @@ def merge(new_data_path):
 
     # Carregar APENAS os novos dados (dados_status.json)
     df_new = robust_load_any(new_data_path)
+    export_meta = df_new.attrs.get('export_meta', {}) if hasattr(df_new, 'attrs') else {}
     if df_new.empty: 
         print("Erro: Arquivo de entrada vazio!")
         return
@@ -526,8 +555,20 @@ def merge(new_data_path):
 
         # Ajustar colunas para manter compatibilidade com CSV oficial
         if not df_official.empty:
-            # Reindexar para colunas da oficial, adicionando colunas faltantes se houver
-            to_append = to_append.reindex(columns=df_official.columns, fill_value="")
+            # Alinhar ao schema oficial sem depender de reindex(fill_value), que
+            # pode falhar em algumas versoes do pandas ao criar varias colunas.
+            official_columns = list(df_official.columns)
+            for col in official_columns:
+                if col not in to_append.columns:
+                    if col in export_meta:
+                        to_append[col] = export_meta[col]
+                    else:
+                        to_append[col] = ""
+            # Sobrescrever colunas de metadados com origem do arquivo atual quando disponivel
+            for meta_col in ['type', 'version', 'comment', 'database']:
+                if meta_col in to_append.columns and export_meta.get(meta_col):
+                    to_append[meta_col] = export_meta[meta_col]
+            to_append = to_append[official_columns]
 
         # Se o CSV oficial existir, anexar; caso contrario, salvar novo arquivo completo
         if os.path.exists(OFFICIAL_CSV):
