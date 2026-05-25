@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -511,7 +511,7 @@
             if (dataCache[currentRegion] && !forceRefresh) {
                 const cached = dataCache[currentRegion];
                 updateSummaryCards(cached.riskData, cached.eff);
-                updateManagerView(cached.riskData.meta.manager_view);
+                updateManagerView(cached.riskData.meta.manager_view, cached.riskData, cached.eff);
                 renderRankingTable(cached.riskData.data);
                 return;
             }
@@ -550,7 +550,7 @@
 
                 updateLoad(90, 'Renderização', 'Gerando ranking de prioridade operacional...');
                 updateSummaryCards(riskData, eff);
-                updateManagerView(meta.manager_view);
+                updateManagerView(meta.manager_view, riskData, eff);
                 renderRankingTable(riskData.data);
                 
                 if (forceRefresh || !$('#events-feed').children().length) {
@@ -588,10 +588,26 @@
         }
 
         function updateSummaryCards(riskData, eff) {
-            const data = riskData.data;
-            const critical = data.filter(n => n.risk_score >= 90).length;
-            const high = data.filter(n => n.risk_score >= 80 && n.risk_score < 90).length;
-            
+            const data = Array.isArray(riskData.data) ? riskData.data : [];
+            const meta = riskData.meta || {};
+            const counts = meta.counts || {};
+            const thresholds = meta.risk_thresholds || {};
+            const criticalMin = Number(thresholds.critical_min ?? 71);
+            const highMin = Number(thresholds.high_min ?? 51);
+            const criticalFromMeta = Number(
+                counts['crítico'] ?? counts['critico'] ?? 0
+            );
+            const highFromMeta = Number(counts['alto'] ?? 0);
+
+            const criticalFromData = data.filter(n => Number(n.risk_score || 0) >= criticalMin).length;
+            const highFromData = data.filter(n => {
+                const score = Number(n.risk_score || 0);
+                return score >= highMin && score < criticalMin;
+            }).length;
+
+            const critical = criticalFromMeta > 0 ? criticalFromMeta : criticalFromData;
+            const high = highFromMeta > 0 ? highFromMeta : highFromData;
+
             $('#count-critical').text(critical);
             $('#count-high').text(high);
             
@@ -614,19 +630,58 @@
             $('#active-events').text(activeEvents);
         }
 
-        function updateManagerView(manager) {
-            if (!manager) return;
+        function updateManagerView(manager, riskData, eff) {
+            const meta = (riskData && riskData.meta) || {};
+            const data = Array.isArray(riskData && riskData.data) ? riskData.data : [];
+            const thresholds = meta.risk_thresholds || {};
+            const regEff = (eff && (eff[currentRegion] || eff.global)) || {};
+
+            let temperaturePct = 0;
+            if (data.length) {
+                const sum = data.reduce((acc, n) => acc + Number(n.risk_score || 0), 0);
+                temperaturePct = Number((sum / data.length).toFixed(1));
+            }
+
+            const criticalMin = Number(thresholds.critical_min ?? 71);
+            const highMin = Number(thresholds.high_min ?? 51);
+            const moderateMin = Number(thresholds.moderate_min ?? 31);
+            let temperatureLabel = 'Baixo';
+            let temperatureColor = '#A8DADC';
+
+            if (temperaturePct >= criticalMin) {
+                temperatureLabel = 'Crítico';
+                temperatureColor = '#8B0000';
+            } else if (temperaturePct >= highMin) {
+                temperatureLabel = 'Alto';
+                temperatureColor = '#E63946';
+            } else if (temperaturePct >= moderateMin) {
+                temperatureLabel = 'Moderado';
+                temperatureColor = '#F4A261';
+            }
+
+            let coveragePct = Number(manager && manager.confidence_pct);
+            if (!Number.isFinite(coveragePct)) {
+                const covRaw = (regEff.recall20 !== undefined) ? regEff.recall20 : regEff.p20;
+                coveragePct = Number.isFinite(Number(covRaw)) ? Number((Number(covRaw) * 100).toFixed(1)) : 0;
+            }
+            coveragePct = Number(coveragePct.toFixed(1));
+
+            let coverageLabel = (manager && manager.confidence_label) || 'Baixa';
+            if (coveragePct >= 80) coverageLabel = 'Alta';
+            else if (coveragePct >= 60) coverageLabel = 'Moderada';
+            else if (coveragePct >= 40) coverageLabel = 'Baixa';
+            else coverageLabel = 'Muito baixa';
             
             // Inserir Temperatura do Estado no Header de forma discreta mas visível
             const tempHtml = `
                 <div class="d-flex align-items-center gap-3 ms-4 border-start ps-4 border-secondary">
                     <div>
                         <div class="stat-label">Clima de Segurança</div>
-                        <div class="fw-bold" style="color: ${manager.state_temperature_color}">${manager.state_temperature_label} (${manager.state_temperature_pct}%)</div>
+                        <div class="fw-bold" style="color: ${temperatureColor}">${temperatureLabel} (${temperaturePct}%)</div>
                     </div>
                     <div>
                         <div class="stat-label">Cobertura @K</div>
-                        <div class="fw-bold text-white">${manager.confidence_label} (${manager.confidence_pct}%)</div>
+                        <div class="fw-bold text-white">${coverageLabel} (${coveragePct}%)</div>
                     </div>
                 </div>
             `;
@@ -644,7 +699,7 @@
                 'MASSA':   { bg: 'rgba(59,130,246,0.2)',  color: '#60a5fa', label: 'MASSA' },
                 'PCC':     { bg: 'rgba(245,158,11,0.2)',  color: '#fbbf24', label: 'PCC' },
                 'GDE':     { bg: 'rgba(16,185,129,0.2)',  color: '#34d399', label: 'GDE' },
-                'DISPUTA': { bg: 'rgba(251,146,60,0.2)',  color: '#fb923c', label: '⚔️ DISPUTA' },
+                'DISPUTA': { bg: 'rgba(251,146,60,0.2)',  color: '#fb923c', label: 'DISPUTA' },
                 'NEUTRO':  { bg: 'rgba(100,116,139,0.1)', color: '#94a3b8', label: 'NEUTRO' },
             };
             function factionBadge(f) {
@@ -658,8 +713,14 @@
             const sorted = nodes.sort((a, b) => b.risk_score - a.risk_score).slice(0, 15);
 
             sorted.forEach((node, index) => {
-                const score = node.risk_score;
-                const riskClass = score >= 90 ? 'risk-high' : (score >= 80 ? 'risk-medium' : 'risk-low');
+                const score = Number(node.risk_score || 0);
+                const statusNorm = String(node.status_label || '').toUpperCase();
+                let riskClass = 'risk-low';
+                if (statusNorm === 'CRÍTICO' || statusNorm === 'CRITICO') {
+                    riskClass = 'risk-high';
+                } else if (statusNorm === 'ALTO' || statusNorm === 'MODERADO') {
+                    riskClass = 'risk-medium';
+                }
                 
                 // Mapeamento de Tendência Real
                 let trendIcon = '<i class="fas fa-minus text-muted"></i>';
@@ -796,3 +857,5 @@
     </script>
 </body>
 </html>
+
+

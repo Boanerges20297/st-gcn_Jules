@@ -1445,7 +1445,8 @@ class TelegramGeminiGateway:
                     {"text": "🏡 Por Bairro (Fortaleza)", "callback_data": "contador_bairro"}
                 ],
                 [
-                    {"text": "🔍 Por Natureza do Crime", "callback_data": "contador_natureza"}
+                    {"text": "🚔 Por AIS", "callback_data": "contador_ais"},
+                    {"text": "🔍 Natureza/Ocorrência", "callback_data": "contador_natureza"}
                 ],
                 [
                     {"text": "↩️ Voltar", "callback_data": "menu_main"}
@@ -1467,6 +1468,9 @@ class TelegramGeminiGateway:
 
         elif data == "contador_natureza":
             self._show_contador_natureza(chat_id, message_id)
+
+        elif data == "contador_ais":
+            self._show_contador_ais(chat_id, message_id)
 
         elif "_explicabilidade" in data:
             self._show_explicabilidade(chat_id, message_id, data)
@@ -1803,7 +1807,7 @@ class TelegramGeminiGateway:
                 text = f"🧭 *CAMINHO DO CRIME — {reg_label.upper()} ({crime_label.upper()})*\n"
                 text += f"Últimas transições cronológicas de deslocamento e migração sucessivas (Janela: {days}d):\n\n"
                 for idx, r in enumerate(latest_transitions, 1):
-                    dt = r.get("datetime", "Desconhecida")
+                    dt = self._format_date_br(r.get("datetime", "Desconhecida"))
                     cidade = r.get("cidade", "Desconhecida")
                     ais = r.get("ais", "0.0")
                     bairro = r.get("bairro") or "Sem Bairro"
@@ -2220,6 +2224,84 @@ class TelegramGeminiGateway:
                 edit_message_id=message_id
             )
 
+    def _show_contador_ais(self, chat_id: int, message_id: int) -> None:
+        import csv
+        from collections import defaultdict
+        
+        path = self.project_root / "outputs" / "hermes" / "dados_brutos_90dias.csv"
+        if not path.exists():
+            path = self.project_root / "outputs" / "dados_brutos_90dias.csv"
+            
+        if not path.exists():
+            self._send_inline_keyboard(
+                chat_id,
+                "⚠️ *Dados consolidados de 90 dias não localizados.*\nCertifique-se de que os arquivos do pipeline foram gerados na VPS.",
+                [[{"text": "↩️ Voltar", "callback_data": "menu_contador"}]],
+                edit_message_id=message_id
+            )
+            return
+
+        try:
+            ais_counts = defaultdict(lambda: {"cvli": 0, "cvp": 0, "total": 0})
+            total_cvli = 0
+            total_cvp = 0
+            
+            with open(path, "r", encoding="utf-8") as f:
+                reader = csv.DictReader(f)
+                for r in reader:
+                    ais_raw = (r.get("ais") or "").strip()
+                    if not ais_raw:
+                        continue
+                    
+                    try:
+                        clean_ais = str(ais_raw).upper().replace("AIS", "").strip()
+                        if "." in clean_ais:
+                            ais_val = float(clean_ais)
+                            ais_str = f"{ais_val:.0f}"
+                        else:
+                            ais_str = str(int(clean_ais))
+                    except ValueError:
+                        ais_str = clean_ais
+                        
+                    display_ais = f"AIS {ais_str}" if not str(ais_str).upper().startswith("AIS") else ais_str
+                    
+                    tipo = (r.get("tipo") or "").strip().lower()
+                    if "cvli" in tipo:
+                       ais_counts[display_ais]["cvli"] += 1
+                       ais_counts[display_ais]["total"] += 1
+                       total_cvli += 1
+                    elif "cvp" in tipo:
+                       ais_counts[display_ais]["cvp"] += 1
+                       ais_counts[display_ais]["total"] += 1
+                       total_cvp += 1
+                       
+            sorted_ais = sorted(ais_counts.items(), key=lambda x: x[1]["cvli"], reverse=True)
+            
+            text = "📊 *CONTADOR CVLI & CVP POR AIS (90 DIAS)*\n"
+            text += f"Total Geral: {total_cvli} CVLIs | {total_cvp} CVPs\n\n"
+            text += "Áreas de Segurança Integrada (AIS) ordenadas por volume de CVLI:\n\n"
+            
+            for idx, (ais_name, counts) in enumerate(sorted_ais, 1):
+                text += f"*{idx}. 🚔 {ais_name}*\n"
+                text += f"   💀 CVLI: {counts['cvli']} | 🔫 CVP: {counts['cvp']} | 📦 Total: {counts['total']}\n\n"
+                
+            keyboard = [
+                [
+                    {"text": "↩️ Voltar", "callback_data": "menu_contador"},
+                    {"text": "💡 Explicabilidade", "callback_data": "contador_ais_explicabilidade"}
+                ]
+            ]
+            self._send_inline_keyboard(chat_id, text, keyboard, edit_message_id=message_id)
+            self._log_conversation(chat_id, "Visualizou Contador CVLI/CVP por AIS", text)
+        except Exception as e:
+            logging.exception("Erro ao calcular contador por AIS")
+            self._send_inline_keyboard(
+                chat_id,
+                f"❌ *Erro ao processar contador por AIS*:\n\n{e}",
+                [[{"text": "↩️ Voltar", "callback_data": "menu_contador"}]],
+                edit_message_id=message_id
+            )
+
     def handle_update(self, update: dict) -> None:
         if "callback_query" in update:
             self._handle_callback_query(update["callback_query"])
@@ -2345,6 +2427,30 @@ class TelegramGeminiGateway:
         cleaned = str(name).strip("'`\"[](){}<> \t\r\n")
         nfkd_form = unicodedata.normalize('NFKD', cleaned)
         return "".join([c for c in nfkd_form if not unicodedata.combining(c)]).strip().upper()
+
+    def _format_date_br(self, date_str: str) -> str:
+        if not date_str:
+            return ""
+        date_str = str(date_str).strip()
+        try:
+            # Handle time component if present
+            parts = date_str.split(" ")
+            date_part = parts[0]
+            time_part = " " + parts[1].split(".")[0] if len(parts) > 1 else ""
+            
+            # Skip if already in dd/mm/yyyy
+            if "/" in date_part:
+                return date_str
+                
+            # Format yyyy-mm-dd to dd/mm/yyyy
+            if "-" in date_part:
+                dt_parts = date_part.split("-")
+                if len(dt_parts) == 3 and len(dt_parts[0]) == 4:
+                    return f"{dt_parts[2]}/{dt_parts[1]}/{dt_parts[0]}{time_part}"
+        except Exception:
+            pass
+        return date_str
+
 
     def _load_valid_locations(self) -> None:
         if hasattr(self, "_valid_cities_set"):
@@ -2524,7 +2630,8 @@ class TelegramGeminiGateway:
             if events:
                 text_res += "🔥 *Últimas Ocorrências Registradas (Máx. 10):*\n"
                 for idx, ev in enumerate(events[:10], 1):
-                    text_res += f"*{idx}.* `[{ev['data']}]` {ev['nature']} — _{ev['street']}_\n"
+                    formatted_dt = self._format_date_br(ev['data'])
+                    text_res += f"*{idx}.* `[{formatted_dt}]` {ev['nature']} — _{ev['street']}_\n"
             else:
                 text_res += "✅ *Nenhuma ocorrência criminal registrada nesta localidade nos últimos 14 dias.*\n"
 
@@ -2586,7 +2693,8 @@ class TelegramGeminiGateway:
                                     cvp_count += 1
                                 street = row.get("name") or row.get("rua") or "NÃO ESPECIFICADA"
                                 nature = row.get("nature") or row.get("tipo_evento") or "NÃO ESPECIFICADO"
-                                local_events.append(f"- [{row.get('data')}] {nature} na rua {street}")
+                                formatted_dt = self._format_date_br(row.get('data'))
+                                local_events.append(f"- [{formatted_dt}] {nature} na rua {street}")
             except Exception as e:
                 logging.error("Erro ao carregar dados do local para explicabilidade: %s", e)
 
@@ -2741,8 +2849,9 @@ class TelegramGeminiGateway:
                     for idx, r in enumerate(latest_transitions, 1):
                         ais_raw = r.get('ais') or ''
                         display_ais = f"AIS {ais_raw}" if not str(ais_raw).upper().startswith("AIS") else ais_raw
+                        formatted_dt = self._format_date_br(r.get('datetime'))
                         nodes.append(
-                            f"{idx}. {display_ais} ({r.get('cidade')}) em {r.get('datetime')}: "
+                            f"{idx}. {display_ais} ({r.get('cidade')}) em {formatted_dt}: "
                             f"Origem {r.get('bairro')} (Rua {r.get('rua')}) -> Destino {r.get('prox_bairro')} (Rua {r.get('prox_rua')}) | "
                             f"Deslocamento: {r.get('distancia_para_prox_km')} km em {r.get('dias_para_prox')} dias"
                         )
@@ -2979,6 +3088,58 @@ class TelegramGeminiGateway:
                 f"com base nos volumes consolidados de CVLI e CVP dos 10 bairros mais críticos de Fortaleza listados abaixo:\n\n"
                 f"Contagem por Bairro em Fortaleza (90 dias):\n{bairros_text}\n\n"
                 f"Interprete o porquê de certas regiões terem altíssimos índices de roubo (CVP) com baixa letalidade (CVLI), enquanto outras registram letalidade desenfreada, relacionando com dinâmicas locais."
+            )
+
+        elif callback_data == "contador_ais_explicabilidade":
+            module_name = "Contador por AIS"
+            back_callback = "contador_ais"
+            ais_text = ""
+            try:
+                import csv
+                from collections import defaultdict
+                path = self.project_root / "outputs" / "hermes" / "dados_brutos_90dias.csv"
+                if not path.exists():
+                    path = self.project_root / "outputs" / "dados_brutos_90dias.csv"
+                if path.exists():
+                    ais_counts = defaultdict(lambda: {"cvli": 0, "cvp": 0, "total": 0})
+                    with open(path, "r", encoding="utf-8") as f:
+                        reader = csv.DictReader(f)
+                        for r in reader:
+                            ais_raw = (r.get("ais") or "").strip()
+                            if not ais_raw:
+                                continue
+                            try:
+                                clean_ais = str(ais_raw).upper().replace("AIS", "").strip()
+                                if "." in clean_ais:
+                                    ais_val = float(clean_ais)
+                                    ais_str = f"{ais_val:.0f}"
+                                else:
+                                    ais_str = str(int(clean_ais))
+                            except ValueError:
+                                ais_str = clean_ais
+                            display_ais = f"AIS {ais_str}" if not str(ais_str).upper().startswith("AIS") else ais_str
+                            
+                            tipo = (r.get("tipo") or "").strip().lower()
+                            if "cvli" in tipo:
+                               ais_counts[display_ais]["cvli"] += 1
+                               ais_counts[display_ais]["total"] += 1
+                            elif "cvp" in tipo:
+                               ais_counts[display_ais]["cvp"] += 1
+                               ais_counts[display_ais]["total"] += 1
+                    sorted_ais = sorted(ais_counts.items(), key=lambda x: x[1]["cvli"], reverse=True)
+                    nodes = []
+                    for idx, (ais_name, counts) in enumerate(sorted_ais, 1):
+                        nodes.append(f"{idx}. {ais_name} | CVLI: {counts['cvli']} | CVP: {counts['cvp']} | Total: {counts['total']}")
+                    ais_text = "\n".join(nodes)
+            except Exception as e:
+                logging.error("Erro ao carregar AIS para explicabilidade: %s", e)
+
+            query = (
+                f"Você é um analista sênior de inteligência operacional de segurança pública. Entre IMEDIATAMENTE em modo analítico, técnico e tático, não genérico ou teórico.\n\n"
+                f"Forneça uma análise de inteligência criminal sob o prisma de divisões de Áreas de Segurança Integrada (AIS) (máximo de 15 linhas) "
+                f"com base nos volumes consolidados de CVLI e CVP reais das principais AIS listadas abaixo:\n\n"
+                f"Contagem por AIS (90 dias):\n{ais_text}\n\n"
+                f"Identifique quais AIS concentram a maior carga de violência letal (CVLI) e patrimonial (CVP). Justifique taticamente como a divisão administrativa das AIS impacta a alocação de recursos policiais e a coordenação de operações de saturação de área."
             )
 
         elif callback_data == "contador_natureza_explicabilidade" or "contador" in callback_data:

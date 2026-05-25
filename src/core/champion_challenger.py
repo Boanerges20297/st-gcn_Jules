@@ -109,7 +109,7 @@ class ChampionChallenger:
         # Pesos persistidos entre reinícios
         self._cc_weight   = INIT_CC_WEIGHT
         self._last_eval   = None
-        self._load_state()
+        self._load_state(verbose=True)
         self._load_challenger()
 
     # ── API pública ───────────────────────────────────────────────
@@ -190,7 +190,7 @@ class ChampionChallenger:
         except Exception as e:
             print(f"❌ [CC] Erro ao carregar challenger: {e}")
 
-    def _load_state(self):
+    def _load_state(self, verbose=False):
         """Restaura pesos persistidos de execuções anteriores."""
         if os.path.exists(self.state_path):
             try:
@@ -199,7 +199,8 @@ class ChampionChallenger:
                 self._cc_weight = float(s.get("cc_weight", INIT_CC_WEIGHT))
                 last = s.get("last_eval")
                 self._last_eval = datetime.fromisoformat(last) if last else None
-                print(f"✅ [CC] Estado restaurado: challenger={self._cc_weight*100:.0f}%")
+                if verbose:
+                    print(f"✅ [CC] Estado restaurado: challenger={self._cc_weight*100:.0f}%")
             except Exception:
                 pass
 

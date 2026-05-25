@@ -8,7 +8,7 @@ param(
 $ErrorActionPreference = 'Stop'
 
 $pythonPath = Join-Path $ProjectRoot '.venv\Scripts\python.exe'
-$gatewayScript = Join-Path $ProjectRoot 'telegram_gemini_gateway.py'
+$gatewayScript = Join-Path $ProjectRoot 'powershell\telegram_gemini_gateway.py'
 $pidFile = Join-Path $ProjectRoot 'outputs\hermes\chat\telegram_gemini_gateway.pid'
 
 if (-not (Test-Path -LiteralPath $pythonPath)) {
@@ -19,26 +19,33 @@ if (-not (Test-Path -LiteralPath $gatewayScript)) {
     throw "Gateway script nao encontrado em $gatewayScript"
 }
 
+$hasHermes = $true
 if (-not (Test-Path -LiteralPath $HermesWorkspace)) {
-    throw "HermesWorkspace nao encontrado em $HermesWorkspace. Verifique se o HD externo esta montado e se a pasta existe, ou informe -HermesWorkspace com o caminho correto."
+    Write-Warning "HermesWorkspace nao encontrado em $HermesWorkspace. O bot do Telegram funcionara em modo stand-alone (sem SOUL.md)."
+    $hasHermes = $false
 }
 
-Push-Location $HermesWorkspace
-try {
-    if ($PSCmdlet.ShouldProcess($HermesWorkspace, 'Parar gateway nativo do Hermes para liberar o bot Telegram')) {
-        hermes gateway stop
+if ($hasHermes) {
+    Push-Location $HermesWorkspace
+    try {
+        if ($PSCmdlet.ShouldProcess($HermesWorkspace, 'Parar gateway nativo do Hermes para liberar o bot Telegram')) {
+            hermes gateway stop
+        }
     }
-}
-finally {
-    Pop-Location
+    finally {
+        Pop-Location
+    }
 }
 
 $arguments = @(
     ('"' + $gatewayScript + '"'),
     '--project-root', ('"' + $ProjectRoot + '"'),
-    '--hermes-workspace', ('"' + $HermesWorkspace + '"'),
     '--gemini-model', ('"' + $GeminiModel + '"')
 )
+
+if ($hasHermes) {
+    $arguments += @('--hermes-workspace', ('"' + $HermesWorkspace + '"'))
+}
 
 if ($PSCmdlet.ShouldProcess($ProjectRoot, 'Iniciar gateway Telegram Gemini em nova janela')) {
     $process = Start-Process -FilePath $pythonPath -ArgumentList $arguments -WorkingDirectory $ProjectRoot -WindowStyle Normal -PassThru

@@ -42,6 +42,17 @@ class STGCNEscapeEngine:
         logger.info(f"Grafo carregado (ST-GCN Matrix): {len(self.G.nodes)} nós e {len(self.G.edges)} fluxos.")
         return self.G
 
+    def _build_static_subgraph(self, lat, lon, max_distance):
+        if not self._is_loaded or self.G is None:
+            self.load_graph()
+
+        orig_node = ox.distance.nearest_nodes(self.G, X=lon, Y=lat)
+        lengths = nx.single_source_dijkstra_path_length(self.G, orig_node, cutoff=max_distance, weight='length')
+        node_ids = list(lengths.keys())
+        if len(node_ids) < 3:
+            node_ids = list(nx.ego_graph(self.G, orig_node, radius=8, undirected=True).nodes)
+        return self.G.subgraph(node_ids).copy(), orig_node
+
     def _haversine(self, lat1, lon1, lat2, lon2):
         R = 6371000 # raio terra em metros
         phi1 = math.radians(lat1)
@@ -52,7 +63,133 @@ class STGCNEscapeEngine:
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
         return R * c
 
-    def predict_escape_routes(self, lat, lon, max_distance=1500, time_horizon="5m"):
+    def _feature_centroid(self, feature):
+        geometry = feature.get('geometry') or {}
+        geom_type = geometry.get('type')
+        if geom_type == 'Point':
+            coords = geometry.get('coordinates') or []
+            if len(coords) >= 2:
+                return float(coords[1]), float(coords[0])
+        if geom_type == 'Polygon':
+            ring = (geometry.get('coordinates') or [[]])[0]
+            points = [p for p in ring if isinstance(p, (list, tuple)) and len(p) >= 2]
+            if points:
+                return (
+                    sum(float(p[1]) for p in points) / len(points),
+                    sum(float(p[0]) for p in points) / len(points),
+                )
+        return None, None
+
+    def score_street_foci(self, features, area_risk_scores=None, neighbor_distance=1000, propagation_steps=2):
+        """
+        Pontua focos de ruas como nÃ³s ST-GCN leves.
+
+        Cada foco 500m vira um nÃ³; arestas conectam focos prÃ³ximos na malha
+        territorial. O sinal inicial combina:
+          - risco previsto da Ã¡rea-mÃ£e (ST-GAT/orquestrador),
+          - histÃ³rico local do foco,
+          - densidade de logradouros agregados.
+
+        A propagaÃ§Ã£o espacial suaviza/eleva focos vizinhos de Ã¡reas quentes,
+        simulando a parte convolucional do ST-GCN em escala de rua.
+        """
+        if not features:
+            return features
+
+        area_risk_scores = area_risk_scores or {}
+
+        def norm_name(text):
+            import unicodedata
+            import re
+            if not isinstance(text, str):
+                return ''
+            out = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('ascii').upper().strip()
+            return re.sub(r'\s+', ' ', out)
+
+        nodes = []
+        max_occ = max(float((f.get('properties') or {}).get('total_occurrences') or 0) for f in features) or 1.0
+        max_streets = max(float((f.get('properties') or {}).get('street_count') or 0) for f in features) or 1.0
+
+        for idx, feature in enumerate(features):
+            props = feature.get('properties') or {}
+            lat, lon = self._feature_centroid(feature)
+            area_keys = [
+                norm_name(props.get('bairro')),
+                norm_name(props.get('cidade')),
+                norm_name(props.get('name')),
+            ]
+            area_score = 20.0
+            for key in area_keys:
+                if key and key in area_risk_scores:
+                    area_score = float(area_risk_scores[key])
+                    break
+
+            local_hist = math.log1p(float(props.get('total_occurrences') or 0)) / math.log1p(max_occ)
+            density = math.log1p(float(props.get('street_count') or 0)) / math.log1p(max_streets)
+            area_norm = max(0.0, min(1.0, area_score / 100.0))
+            seed = (0.50 * area_norm) + (0.35 * local_hist) + (0.15 * density)
+            nodes.append({
+                'idx': idx,
+                'lat': lat,
+                'lon': lon,
+                'score': seed,
+                'area_score': area_score,
+            })
+
+        adjacency = [[] for _ in nodes]
+        for i, a in enumerate(nodes):
+            if a['lat'] is None or a['lon'] is None:
+                continue
+            for j in range(i + 1, len(nodes)):
+                b = nodes[j]
+                if b['lat'] is None or b['lon'] is None:
+                    continue
+                dist = self._haversine(a['lat'], a['lon'], b['lat'], b['lon'])
+                if dist <= neighbor_distance:
+                    weight = 1.0 - (dist / neighbor_distance)
+                    adjacency[i].append((j, weight))
+                    adjacency[j].append((i, weight))
+
+        scores = [n['score'] for n in nodes]
+        for _ in range(max(0, propagation_steps)):
+            propagated = []
+            for idx, score in enumerate(scores):
+                neighbors = adjacency[idx]
+                if not neighbors:
+                    propagated.append(score)
+                    continue
+                total_w = sum(w for _, w in neighbors) or 1.0
+                neighbor_signal = sum(scores[j] * w for j, w in neighbors) / total_w
+                propagated.append((0.68 * score) + (0.32 * neighbor_signal))
+            scores = propagated
+
+        min_s, max_s = min(scores), max(scores)
+        spread = max(max_s - min_s, 1e-6)
+        for node, score in zip(nodes, scores):
+            feature = features[node['idx']]
+            props = feature.setdefault('properties', {})
+            calibrated = 100.0 * (score - min_s) / spread
+            probability = round(max(0.0, min(100.0, calibrated)), 1)
+            props['stgcn_score'] = probability
+            props['predicted_cvli_probability'] = probability
+            props['parent_area_risk_score'] = round(float(node['area_score']), 1)
+            props['stgcn_neighbor_count'] = len(adjacency[node['idx']])
+            props['score'] = probability
+            props['risk_score'] = probability
+            props['model'] = 'ST-GCN Rua/Foco 500m'
+
+        features.sort(
+            key=lambda feat: (
+                (feat.get('properties') or {}).get('stgcn_score', 0),
+                (feat.get('properties') or {}).get('total_occurrences', 0),
+            ),
+            reverse=True,
+        )
+        for rank, feature in enumerate(features, 1):
+            feature.setdefault('properties', {})['stgcn_rank'] = rank
+        return features
+
+    def predict_escape_routes(self, lat, lon, max_distance=1000, time_horizon="5m"):
         """
         Dada a geolocalização do evento, estima via ST-GCN (simulada na matriz) os eixos prováveis de fuga,
         com ênfase (atração espacial) para os nós (lat/lng) mais críticos da região.
@@ -67,15 +204,19 @@ class STGCNEscapeEngine:
             subgraph = self._local_graphs_cache[cache_key]
             orig_node = ox.distance.nearest_nodes(subgraph, X=lon, Y=lat)
         else:
-            logger.info(f"Baixando malha viária EXATA para {lat}, {lon} (raio {max_distance}m) para evitar deslocamento...")
             try:
-                # O network_type='drive' pega todas as vias trafegáveis
-                subgraph = ox.graph_from_point((lat, lon), dist=max_distance, network_type='drive')
-                orig_node = ox.distance.nearest_nodes(subgraph, X=lon, Y=lat)
+                logger.info(f"Recortando malha viaria local para {lat}, {lon} (raio {max_distance}m)...")
+                subgraph, orig_node = self._build_static_subgraph(lat, lon, max_distance)
                 self._local_graphs_cache[cache_key] = subgraph
             except Exception as e:
-                logger.error(f"Falha ao baixar malha OSM dinâmica: {e}")
-                raise RuntimeError("Não foi possível obter a malha viária perfeita para esta localidade.")
+                logger.warning(f"Falha ao usar malha local; tentando OSM dinamico: {e}")
+                try:
+                    subgraph = ox.graph_from_point((lat, lon), dist=max_distance, network_type='drive')
+                    orig_node = ox.distance.nearest_nodes(subgraph, X=lon, Y=lat)
+                    self._local_graphs_cache[cache_key] = subgraph
+                except Exception as osm_error:
+                    logger.error(f"Falha ao obter malha viaria dinamica: {osm_error}")
+                    raise RuntimeError("Não foi possível obter a malha viária para esta localidade.")
         
         routes = []
         
@@ -100,7 +241,9 @@ class STGCNEscapeEngine:
                     "time_estimate": "N/A",
                     "main_axis": "Malha Viária Regional (Raio de Cerco)",
                     "rank": -1,
-                    "is_mesh": True
+                    "is_mesh": True,
+                    "max_distance_m": max_distance,
+                    "model": "ST-GCN Rotas de Fuga"
                 }
             })
             
@@ -116,7 +259,9 @@ class STGCNEscapeEngine:
                     "time_estimate": time_horizon,
                     "main_axis": "Perímetro de Cerco Tático",
                     "rank": 0,
-                    "is_polygon": True
+                    "is_polygon": True,
+                    "max_distance_m": max_distance,
+                    "model": "ST-GCN Rotas de Fuga"
                 }
             })
         
@@ -204,7 +349,9 @@ class STGCNEscapeEngine:
                         "probability": int(prob * 100),
                         "time_estimate": time_horizon,
                         "main_axis": main_axis,
-                        "rank": idx + 1
+                        "rank": idx + 1,
+                        "max_distance_m": max_distance,
+                        "model": "ST-GCN Rotas de Fuga"
                     }
                 }
                 routes.append(route)
@@ -217,6 +364,7 @@ class STGCNEscapeEngine:
             "metadata": {
                 "model": "ST-GCN (Atração Criminométrica Georreferenciada)",
                 "origin": [lon, lat],
+                "max_distance_m": max_distance,
                 "total_routes": len(routes),
             }
         }

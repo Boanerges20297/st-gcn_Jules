@@ -553,7 +553,7 @@
                         <div class="form-check mt-1">
                             <input class="form-check-input" type="checkbox" id="toggle-all-streets">
                             <label class="form-check-label small fw-bold text-success" for="toggle-all-streets">
-                                <i class="fas fa-road"></i> Malha de Ruas (Todo Estado)
+                                <i class="fas fa-project-diagram"></i> Focos ST-GCN (Ruas 500m)
                             </label>
                         </div>
                         <h6 class="mb-2 fw-bold text-dark" id="top-list-title" style="font-size: 0.9rem;">🌡️ Top 10 Territórios em Tensão</h6>
@@ -621,26 +621,62 @@
     map.getPane('streetsPane').style.zIndex = 400; // Por padrão abaixo dos bairros
     map.getPane('streetsPane').style.pointerEvents = 'none'; // Inativo por padrão
 
+    map.createPane('escapeRoutesPane');
+    map.getPane('escapeRoutesPane').style.zIndex = 780;
+    map.getPane('escapeRoutesPane').style.pointerEvents = 'auto';
+
     // --- CAMADA DE RUAS TOTAIS (CACHE GEO) ---
     var allStreetsLayer = L.layerGroup();
     var allStreetsData = null; // Cache local para busca
     var streetsLoaded = false;
+    var streetsLoadedRegion = null;
+    var streetFocusMode = false;
+
+    function setMacroPolygonsVisible(visible) {
+        if (!geojsonLayer) return;
+
+        if (visible) {
+            if (!map.hasLayer(geojsonLayer)) {
+                map.addLayer(geojsonLayer);
+            }
+            map.getPane('areaPolygonsPane').style.pointerEvents = 'auto';
+            applyRegionFilter($('#region-filter').val());
+            return;
+        }
+
+        if (selectedLayer) {
+            try { selectedLayer.closePopup(); } catch(e) {}
+            selectedLayer = null;
+        }
+        if (map.hasLayer(geojsonLayer)) {
+            map.removeLayer(geojsonLayer);
+        }
+        map.getPane('areaPolygonsPane').style.pointerEvents = 'none';
+    }
 
     $('#toggle-all-streets').on('change', function() {
         if ($(this).is(':checked')) {
+            streetFocusMode = true;
+            setMacroPolygonsVisible(false);
             map.getPane('streetsPane').style.zIndex = 420; // Malha por cima
             map.getPane('streetsPane').style.pointerEvents = 'auto'; 
             map.getPane('areaPolygonsPane').style.pointerEvents = 'none'; // Desativa bairros para clique
-            if (!streetsLoaded) {
-                loadAllStreets();
+            if (!streetsLoaded || streetsLoadedRegion !== $('#region-filter').val()) {
+                loadStreetFoci($('#region-filter').val());
             } else {
                 map.addLayer(allStreetsLayer);
             }
         } else {
+            streetFocusMode = false;
             map.getPane('streetsPane').style.zIndex = 400; // Bairros por cima
             map.getPane('streetsPane').style.pointerEvents = 'none';
             map.getPane('areaPolygonsPane').style.pointerEvents = 'auto'; // Bairros voltam a ser superiores
             map.removeLayer(allStreetsLayer);
+            if (escapeRoutesLayer) {
+                map.removeLayer(escapeRoutesLayer);
+                escapeRoutesLayer = null;
+            }
+            setMacroPolygonsVisible(true);
         }
     });
 
@@ -673,6 +709,132 @@
             hideLoading(true);
             console.error("Erro ao carregar ruas:", err);
         });
+    }
+
+    function streetFocusColor(intensity) {
+        return intensity >= 75 ? '#7f1d1d' :
+               intensity >= 50 ? '#dc2626' :
+               intensity >= 25 ? '#f59e0b' :
+                                 '#16a34a';
+    }
+
+    function normalizeStreetFocusRegion(region) {
+        var r = String(region || 'all').toLowerCase();
+        if (r === 'capital') return 'fortaleza';
+        return r;
+    }
+
+    function featureCenterLatLng(feature, layer) {
+        try {
+            if (layer && layer.getBounds) {
+                return layer.getBounds().getCenter();
+            }
+            if (layer && layer.getLatLng) {
+                return layer.getLatLng();
+            }
+            var geom = feature && feature.geometry;
+            if (geom && geom.type === 'Polygon') {
+                var ring = geom.coordinates && geom.coordinates[0] || [];
+                var sx = 0, sy = 0, n = 0;
+                ring.forEach(function(pt) {
+                    if (pt && pt.length >= 2) {
+                        sx += Number(pt[0]);
+                        sy += Number(pt[1]);
+                        n += 1;
+                    }
+                });
+                if (n > 0) return L.latLng(sy / n, sx / n);
+            }
+            if (geom && geom.type === 'Point') {
+                return L.latLng(geom.coordinates[1], geom.coordinates[0]);
+            }
+        } catch (e) {}
+        return map.getCenter();
+    }
+
+    function loadStreetFoci(region) {
+        var selectedRegion = normalizeStreetFocusRegion(region || $('#region-filter').val() || 'all');
+        showLoading("Agrupando ruas em focos de 500m...");
+
+        fetch('/api/street_foci?region=' + encodeURIComponent(selectedRegion) + '&radius_m=500&shape=hex&min_points=2&limit=220')
+            .then(r => r.json())
+            .then(data => {
+                allStreetsData = data;
+                allStreetsLayer.clearLayers();
+
+                var builtLayer = L.geoJSON(data, {
+                    pane: 'streetsPane',
+                    style: function(feature) {
+                        var props = feature.properties || {};
+                        var color = streetFocusColor(Number(props.predicted_cvli_probability || props.stgcn_score || props.intensity_pct || 0));
+                        return {
+                            color: color,
+                            weight: 1.5,
+                            opacity: 0.9,
+                            fillColor: color,
+                            fillOpacity: 0.22
+                        };
+                    },
+                    pointToLayer: function(feature, latlng) {
+                        var props = feature.properties || {};
+                    var color = streetFocusColor(Number(props.predicted_cvli_probability || props.stgcn_score || props.intensity_pct || 0));
+                        return L.circle(latlng, {
+                            radius: Number(props.radius_m || 500),
+                            color: color,
+                            weight: 1.5,
+                            opacity: 0.9,
+                            fillColor: color,
+                            fillOpacity: 0.18,
+                            pane: 'streetsPane'
+                        });
+                    },
+                    onEachFeature: function(feature, layer) {
+                        var props = feature.properties || {};
+                        var streets = Array.isArray(props.top_streets) ? props.top_streets : [];
+                        var streetList = streets.length
+                            ? '<ol style="margin:4px 0 0 18px; padding:0;">' + streets.slice(0, 6).map(function(s){ return '<li>' + s + '</li>'; }).join('') + '</ol>'
+                            : '<span class="text-muted">Sem logradouros nomeados</span>';
+                    var stgcnScore = Number(props.predicted_cvli_probability || props.stgcn_score || 0);
+                    var popup = `<strong>${props.focus_id || props.name}</strong><br>
+                        <b>Predição ST-GCN:</b> ${stgcnScore.toFixed(1)}%<br>
+                        <b>Risco da área-mãe:</b> ${Number(props.parent_area_risk_score || 0).toFixed(1)}%<br>
+                        <b>Base:</b> ${props.bairro || props.cidade || 'CE'}<br>
+                        <b>Ruas agrupadas:</b> ${props.street_count || 0}<br>
+                        <b>Ocorrencias:</b> ${props.total_occurrences || 0}<br>
+                        <b>Raio operacional:</b> ${Math.round(props.radius_m || 500)}m<br>
+                        <b>Rotas de fuga:</b> ST-GCN ate 1km ativado neste foco<br>
+                        <b>Logradouros-chave:</b>${streetList}`;
+                        layer.bindPopup(popup);
+                    if (layer.setStyle) {
+                        layer.on('mouseover', function() {
+                            layer.setStyle({ weight: 2.5, fillOpacity: 0.34 });
+                            if (layer.bringToFront) layer.bringToFront();
+                            });
+                            layer.on('mouseout', function() {
+                                var color = streetFocusColor(Number(props.predicted_cvli_probability || props.stgcn_score || props.intensity_pct || 0));
+                            layer.setStyle({ color: color, weight: 1.5, fillOpacity: 0.22 });
+                        });
+                    }
+                    layer.on('click', function() {
+                        var center = featureCenterLatLng(feature, layer);
+                        simulateEscapeRoutes(center.lat, center.lng, props.bairro || props.cidade || props.name || 'Foco ST-GCN', 1000);
+                    });
+                }
+            });
+
+                builtLayer.eachLayer(function(layer) {
+                    allStreetsLayer.addLayer(layer);
+                });
+
+                streetsLoaded = true;
+                streetsLoadedRegion = selectedRegion;
+                map.addLayer(allStreetsLayer);
+                hideLoading(true);
+            })
+            .catch(err => {
+                hideLoading(true);
+                console.error("Erro ao carregar focos de ruas:", err);
+            });
     }
 
     // Global Map Click for Simulation (handling gaps between polygons)
@@ -2980,6 +3142,9 @@
         updateTopCriticalAreas();
         // update visible micronodes layer for selected region if visible
         updateVisibleMicronodesForRegion(val);
+        if ($('#toggle-all-streets').is(':checked')) {
+            loadStreetFoci(val);
+        }
         // Atualiza também os cards que mostram contagens por região
         try { updateDashboard('CVLI'); } catch(e) { console.warn('updateDashboard failed on region change', e); }
     });
@@ -3118,6 +3283,10 @@
     // Apply region filter to map layers (show/hide) and fit bounds to visible polygons
     function applyRegionFilter(regionFilter) {
         if (!geojsonLayer) return;
+        if (streetFocusMode) {
+            setMacroPolygonsVisible(false);
+            return;
+        }
         var visibleBounds = null;
         
         // Normalizar ambos: UI usa 'fortaleza', dados podem usar 'capital' ou 'fortaleza'
@@ -3618,14 +3787,15 @@
     // --- ST-GCN ST-GCN ESCAPE ROUTES ---
     var escapeRoutesLayer = null;
 
-    function simulateEscapeRoutes(lat, lng, bairroName) {
+    function simulateEscapeRoutes(lat, lng, bairroName, maxDistance) {
+        maxDistance = maxDistance || 1000;
         // Fechar modal lateral atual e simular fuga na malha
         document.getElementById('territory-modal-overlay').style.display = 'none';
         
         // Exibir overlay de carregamento
         showLoadingOverlay();
         var _loadingEl = document.getElementById('loading-message') || document.getElementById('loading-overlay-text');
-        if (_loadingEl) _loadingEl.textContent = "Processando malha viária criminal e construindo vetores (ST-GCN)...";
+        if (_loadingEl) _loadingEl.textContent = "Processando rotas de fuga ST-GCN em ate " + maxDistance + "m...";
         
         // Remove old routes
         if (escapeRoutesLayer) {
@@ -3633,7 +3803,7 @@
             escapeRoutesLayer = null;
         }
         
-        fetch('/api/stgcn/escape-routes?lat=' + lat + '&lon=' + lng + '&bairro=' + encodeURIComponent(bairroName))
+        fetch('/api/stgcn/escape-routes?lat=' + lat + '&lon=' + lng + '&max_distance=' + maxDistance + '&bairro=' + encodeURIComponent(bairroName))
             .then(res => {
                 hideLoadingOverlay();
                 if (!res.ok) throw new Error("Erro na rede ou script interno ST-GCN");
@@ -3652,38 +3822,50 @@
                 
                 // Exibir na tela (Render Layer)
                 escapeRoutesLayer = L.geoJSON(data, {
+                    pane: 'escapeRoutesPane',
                     style: function(feature) {
                         if (feature.properties.is_mesh) {
                             return {
-                                color: '#ffffff', // Branco puro para contraste extremo contra layers escuras
-                                weight: 2.5,
-                                opacity: 0.9,
-                                dashArray: '2, 4' // Pontilhado suave para não poluir tanto, mas super visível
+                                pane: 'escapeRoutesPane',
+                                color: '#0f172a',
+                                weight: 1.6,
+                                opacity: 0.32,
+                                dashArray: '2, 6',
+                                lineCap: 'round',
+                                lineJoin: 'round'
                             };
                         }
                         if (feature.properties.is_polygon) {
                             return {
-                                color: '#ffcc00', // Amarelo/Laranja para cerco
-                                weight: 2,
-                                opacity: 0.8,
-                                fillColor: '#ffcc00',
-                                fillOpacity: 0.15,
-                                dashArray: '8, 4'
+                                pane: 'escapeRoutesPane',
+                                color: '#7c3aed',
+                                weight: 3,
+                                opacity: 0.85,
+                                fillColor: '#fde047',
+                                fillOpacity: 0.08,
+                                dashArray: '8, 4',
+                                lineCap: 'round',
+                                lineJoin: 'round'
                             };
                         }
+                        var probability = Number(feature.properties.probability || 0);
                         return {
-                            color: '#ff2d55', // Neon red/pink alert
-                            weight: feature.properties.rank === 1 ? 5 : (feature.properties.rank === 2 ? 4 : 2),
-                            opacity: feature.properties.probability / 100,
-                            dashArray: feature.properties.rank > 2 ? '5, 5' : ''
+                            pane: 'escapeRoutesPane',
+                            color: feature.properties.rank === 1 ? '#dc2626' : '#2563eb',
+                            weight: feature.properties.rank === 1 ? 7 : (feature.properties.rank === 2 ? 5 : 4),
+                            opacity: Math.max(0.74, probability / 100),
+                            dashArray: feature.properties.rank > 2 ? '6, 7' : '',
+                            lineCap: 'round',
+                            lineJoin: 'round'
                         };
                     },
                     onEachFeature: function(f, layer) {
                         if (f.properties.is_mesh) {
                             layer.bindPopup(
                                 '<div style="background:#fff; color:#000; padding:8px; border-radius:4px; font-size:14px;">' +
-                                '<b>Malha Viária de Contenção</b><br/>' +
-                                '<b>Raio:</b> Ruas dentro da área de alcance (Cerco)' +
+                                '<b>Malha viária dentro de 1km</b><br/>' +
+                                '<b>O que é:</b> todas as ruas alcançáveis no raio operacional do foco.<br/>' +
+                                '<b>Uso tático:</b> apoio para bloqueio e patrulhamento de área.' +
                                 '</div>'
                             );
                             return;
@@ -3691,18 +3873,21 @@
                         if (f.properties.is_polygon) {
                             layer.bindPopup(
                                 '<div style="background:#fff; color:#000; padding:8px; border-radius:4px; font-size:14px;">' +
-                                '<b>Perímetro de Cerco Tático</b><br/>' +
-                                '<b>Tempo Est:</b> ' + f.properties.time_estimate + 
+                                '<b>Perímetro de cerco recomendado</b><br/>' +
+                                '<b>Tempo estimado:</b> ' + f.properties.time_estimate + '<br/>' +
+                                '<b>Leitura:</b> janela sugerida para montar o cerco nesse entorno.' + 
                                 '</div>'
                             );
                             return;
                         }
+                        var routeType = (Number(f.properties.rank || 99) === 1) ? 'Rota principal' : 'Rota alternativa';
                         layer.bindPopup(
                             '<div style="background:#fff; color:#000; padding:8px; border-radius:4px; font-size:14px;">' +
-                            '<b>Fuga Preditiva (ST-GCN)</b><br/>' +
-                            '<b>Eixo Principal:</b> ' + f.properties.main_axis + '<br/>' +
-                            '<b>Probabilidade:</b> ' + f.properties.probability + '%<br/>' +
-                            '<b>Tempo Est:</b> ' + f.properties.time_estimate + 
+                            '<b>' + routeType + ' de fuga (ST-GCN)</b><br/>' +
+                            '<b>Trecho provável:</b> ' + f.properties.main_axis + '<br/>' +
+                            '<b>Chance relativa:</b> ' + f.properties.probability + '%<br/>' +
+                            '<b>Tempo estimado:</b> ' + f.properties.time_estimate + '<br/>' +
+                            '<b>Leitura:</b> percentual representa prioridade entre as rotas simuladas desse foco.' + 
                             '</div>'
                         );
                     }

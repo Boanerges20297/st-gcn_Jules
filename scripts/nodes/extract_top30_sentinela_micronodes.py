@@ -11,7 +11,13 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-import app
+# Tenta reutilizar o app já importado em __main__ se for o caso, evitando circular import e inicialização dupla
+import sys
+if '__main__' in sys.modules and hasattr(sys.modules['__main__'], 'orchestrator') and sys.modules['__main__'].orchestrator is not None:
+    app = sys.modules['__main__']
+else:
+    import app
+
 from src.core.orchestrator import normalize_name
 
 OUT_DIR = BASE_DIR / 'outputs'
@@ -205,7 +211,7 @@ def load_geo_street_points():
     return points
 
 
-def _compute_local_street_signal(node, street_points):
+def _compute_local_street_signal(node, spatial_grid, cell_size):
     lon = node.get('lon')
     lat = node.get('lat')
     if lon is None or lat is None:
@@ -216,7 +222,16 @@ def _compute_local_street_signal(node, street_points):
     pressure = 0.0
     street_weights = {}
 
-    for street in street_points:
+    cell_y = int(math.floor(lat / cell_size))
+    cell_x = int(math.floor(lon / cell_size))
+
+    # Coletar apenas as ruas das células adjacentes (3x3 grid)
+    candidate_streets = []
+    for dy in (-1, 0, 1):
+        for dx in (-1, 0, 1):
+            candidate_streets.extend(spatial_grid.get((cell_y + dy, cell_x + dx), []))
+
+    for street in candidate_streets:
         distance = _haversine_meters(lon, lat, street['lng'], street['lat'])
         if distance > 1800:
             continue
@@ -261,6 +276,15 @@ def process_micronodes(risk_scores):
 
     display_name_map = _build_display_name_map()
     street_points = load_geo_street_points()
+    
+    # Criar grid espacial para acelerar a busca das ruas próximas
+    spatial_grid = {}
+    cell_size = 0.02 # ~2.2km (maior que o raio de busca de 1.8km)
+    for street in street_points:
+        cell_y = int(math.floor(street['lat'] / cell_size))
+        cell_x = int(math.floor(street['lng'] / cell_size))
+        spatial_grid.setdefault((cell_y, cell_x), []).append(street)
+        
     processed = []
 
     for feat in data.get('features', []):
@@ -295,7 +319,7 @@ def process_micronodes(risk_scores):
             'lat': lat,
             'parent_norm': parent_norm,
             'municipality_norm': city_norm,
-        }, street_points)
+        }, spatial_grid, cell_size)
 
         processed.append({
             'name': micronodo_name,

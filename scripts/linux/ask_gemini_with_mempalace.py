@@ -657,6 +657,7 @@ PERGUNTA DO USUARIO:
         latest_answer_path = chat_dir / f"gemini_chat_{args.scope}_{args.chat_id}_latest.md"
     history_answer_path = history_dir / f"gemini_chat_{args.scope}_{timestamp}.md"
     history_prompt_path = history_dir / f"gemini_chat_prompt_{args.scope}_{timestamp}.txt"
+    query_line = args.query.replace("\r\n", " ").replace("\n", " ")
 
     content = "\n".join(
         [
@@ -665,7 +666,7 @@ PERGUNTA DO USUARIO:
             f"Gerado em: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
             f"Escopo: {scope_config['label']}",
             f"Modelo: {result['model_used']}",
-            f"Pergunta: {args.query}",
+            f"Pergunta: {query_line}",
             f"Fonte: Report Preview",
             "",
             result["text"],

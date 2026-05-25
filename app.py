@@ -40,6 +40,7 @@ import subprocess
 import warnings
 import logging
 import unicodedata
+import math
 from datetime import datetime, timedelta
 import re
 from shapely.geometry import Point
@@ -861,13 +862,14 @@ def load_data_and_models():
 
     try:
         orchestrator = StateOrchestrator(BASE_DIR)
+        start_stgcn_street_warmup()
         print("✅ Motor de Inteligência ST-GAT Ativo.")
 
         # Champion/Challenger — inicializa após o orchestrator
         global champion_challenger
         if ChampionChallenger is not None:
             try:
-                champion_challenger = ChampionChallenger(BASE_DIR)
+                champion_challenger = orchestrator.champion_challenger
             except Exception as cc_err:
                 print(f"⚠️ [CC] Falha ao inicializar champion_challenger: {cc_err}")
 
@@ -1404,6 +1406,375 @@ def get_all_streets():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
     return jsonify([])
+
+_STREET_FOCI_CACHE = {}
+_STREET_FOCI_CACHE_LOCK = threading.Lock()
+_STREET_FOCI_WARMUP_STATUS = {
+    'running': False,
+    'completed': [],
+    'errors': [],
+    'started_at': None,
+    'finished_at': None,
+}
+_MUNICIPALITY_SHAPES_CACHE = None
+
+def _load_municipality_shapes_for_street_foci():
+    global _MUNICIPALITY_SHAPES_CACHE
+    if _MUNICIPALITY_SHAPES_CACHE is not None:
+        return _MUNICIPALITY_SHAPES_CACHE
+
+    shapes = []
+    path = os.path.join(BASE_DIR, 'data', 'static', 'municipios_ceara.geojson')
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            payload = json.load(f)
+        for feature in payload.get('features', []):
+            props = feature.get('properties') or {}
+            name = props.get('name') or props.get('NAME') or props.get('nome') or props.get('NM_MUN') or ''
+            geom = feature.get('geometry')
+            if name and geom:
+                shapes.append((normalize_name(str(name)), shape(geom)))
+    except Exception:
+        logging.exception("Falha ao carregar municipios_ceara.geojson para filtro de focos")
+    _MUNICIPALITY_SHAPES_CACHE = shapes
+    return shapes
+
+def _municipality_from_lnglat(lng, lat):
+    try:
+        point = Point(float(lng), float(lat))
+        for name_norm, geom in _load_municipality_shapes_for_street_foci():
+            minx, miny, maxx, maxy = geom.bounds
+            if not (minx <= lng <= maxx and miny <= lat <= maxy):
+                continue
+            if geom.contains(point) or geom.touches(point):
+                return name_norm
+    except Exception:
+        pass
+    return ''
+
+def _street_region_from_point(street):
+    try:
+        lat = float(street.get('lat'))
+        lng = float(street.get('lng'))
+    except Exception:
+        return 'interior'
+
+    # 1. Tentar ler o município/cidade diretamente das propriedades (super rápido)
+    city_raw = street.get('cidade') or street.get('municipio') or street.get('municipality') or ''
+    if city_raw:
+        city_norm = normalize_name(str(city_raw))
+        if city_norm == 'FORTALEZA':
+            return 'fortaleza'
+        if city_norm in {normalize_name(city) for city in _RMF_CITIES}:
+            return 'rmf'
+        return 'interior'
+
+    # 2. Bounding boxes geográficas rápidas
+    if -3.92 <= lat <= -3.68 and -38.70 <= lng <= -38.36:
+        return 'fortaleza'
+    if -4.25 <= lat <= -3.45 and -39.05 <= lng <= -38.05:
+        return 'rmf'
+
+    # 3. Fallback pesado (só se tudo falhar, o que é raríssimo) com busca otimizada por bbox
+    municipality_norm = _municipality_from_lnglat(lng, lat)
+    if municipality_norm == 'FORTALEZA':
+        return 'fortaleza'
+    if municipality_norm in {normalize_name(city) for city in _RMF_CITIES}:
+        return 'rmf'
+    return 'interior'
+
+def _haversine_meters(lng1, lat1, lng2, lat2):
+    lng1, lat1, lng2, lat2 = map(math.radians, [lng1, lat1, lng2, lat2])
+    dlng = lng2 - lng1
+    dlat = lat2 - lat1
+    a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlng / 2) ** 2
+    return 6371000 * (2 * math.atan2(math.sqrt(a), math.sqrt(1 - a)))
+
+def _hexagon_geometry(lng, lat, radius_m):
+    coords = []
+    cos_lat = max(0.15, math.cos(math.radians(lat)))
+    for i in range(6):
+        angle = math.radians(60 * i + 30)
+        dy = math.sin(angle) * radius_m
+        dx = math.cos(angle) * radius_m
+        coords.append([
+            lng + (dx / (111320.0 * cos_lat)),
+            lat + (dy / 110540.0),
+        ])
+    coords.append(coords[0])
+    return {'type': 'Polygon', 'coordinates': [coords]}
+
+def _get_area_risk_scores_for_street_foci():
+    if orchestrator is None:
+        return {}
+
+    try:
+        exogenous_shocks, _ = build_current_exogenous_shocks()
+        scores_map = orchestrator.get_combined_risk(exogenous_shocks)
+    except Exception:
+        try:
+            scores_map = orchestrator.get_combined_risk()
+        except Exception:
+            logging.exception("Erro ao obter scores das areas para ST-GCN de ruas")
+            return {}
+
+    return {normalize_name(str(key)): float(value) for key, value in (scores_map or {}).items()}
+
+def _apply_stgcn_street_predictions(features):
+    global stgcn_engine
+    if not features:
+        return features
+
+    try:
+        if stgcn_engine is None:
+            from src.core.stgcn_escape_engine import STGCNEscapeEngine
+            stgcn_engine = STGCNEscapeEngine(data_dir=os.path.join(BASE_DIR, 'data', 'static'), base_dir=BASE_DIR)
+
+        area_risk_scores = _get_area_risk_scores_for_street_foci()
+        return stgcn_engine.score_street_foci(
+            features,
+            area_risk_scores=area_risk_scores,
+            neighbor_distance=1000,
+            propagation_steps=2,
+        )
+    except Exception:
+        logging.exception("Falha ao aplicar ST-GCN nos focos de ruas; usando score historico")
+        return features
+
+def _slice_street_foci_payload(payload, limit):
+    sliced = dict(payload)
+    features = list(payload.get('features') or [])
+    sliced['features'] = features[:limit]
+    metadata = dict(payload.get('metadata') or {})
+    metadata['total'] = len(sliced['features'])
+    metadata['total_available'] = len(features)
+    sliced['metadata'] = metadata
+    return sliced
+
+def _build_street_foci_payload(region='all', radius_m=500, shape_kind='hex', min_points=2, limit=1200):
+    cache_key = (region, radius_m, shape_kind, min_points)
+    with _STREET_FOCI_CACHE_LOCK:
+        cached = _STREET_FOCI_CACHE.get(cache_key)
+    if cached:
+        return _slice_street_foci_payload(cached, limit)
+
+    path = os.path.join(BASE_DIR, 'data', 'geo_streets_cache.json')
+    if not os.path.exists(path):
+        return {'type': 'FeatureCollection', 'features': [], 'metadata': {'total': 0}}
+
+    with open(path, 'r', encoding='utf-8') as f:
+        raw_streets = json.load(f) or []
+
+    points = []
+    region_norm = str(region or 'all').lower()
+    if region_norm == 'capital':
+        region_norm = 'fortaleza'
+
+    for idx, item in enumerate(raw_streets):
+        try:
+            lat = float(item.get('lat'))
+            lng = float(item.get('lng'))
+        except Exception:
+            continue
+        if not (-8.0 <= lat <= -2.0 and -42.0 <= lng <= -37.0):
+            continue
+
+        item_region = _street_region_from_point(item)
+        if region_norm not in ('all', item_region):
+            continue
+
+        points.append({
+            'idx': idx,
+            'lat': lat,
+            'lng': lng,
+            'rua': str(item.get('rua') or item.get('street') or 'Logradouro sem nome').strip(),
+            'bairro': str(item.get('bairro') or '').strip(),
+            'cidade': str(item.get('cidade') or item.get('municipio') or '').strip(),
+            'region': item_region,
+            'ocorrencias': max(1, int(float(item.get('ocorrencias') or item.get('occurrences') or 1))),
+        })
+
+    parent = list(range(len(points)))
+
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    def union(a, b):
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            parent[rb] = ra
+
+    lat_cell = radius_m / 110540.0
+    grid = {}
+    for i, p in enumerate(points):
+        lon_cell = radius_m / (111320.0 * max(0.15, math.cos(math.radians(p['lat']))))
+        key = (int(math.floor(p['lat'] / lat_cell)), int(math.floor(p['lng'] / lon_cell)))
+        p['_grid_key'] = key
+        grid.setdefault(key, []).append(i)
+
+    for i, p in enumerate(points):
+        gy, gx = p['_grid_key']
+        for dy in (-1, 0, 1):
+            for dx in (-1, 0, 1):
+                for j in grid.get((gy + dy, gx + dx), []):
+                    if j <= i:
+                        continue
+                    q = points[j]
+                    if _haversine_meters(p['lng'], p['lat'], q['lng'], q['lat']) <= radius_m:
+                        union(i, j)
+
+    groups = {}
+    for i, p in enumerate(points):
+        groups.setdefault(find(i), []).append(p)
+
+    features = []
+    for group in groups.values():
+        if len(group) < min_points:
+            continue
+
+        total_occ = sum(p['ocorrencias'] for p in group)
+        weight_sum = max(1, total_occ)
+        lat = sum(p['lat'] * p['ocorrencias'] for p in group) / weight_sum
+        lng = sum(p['lng'] * p['ocorrencias'] for p in group) / weight_sum
+        streets_rank, bairros_rank, cities_rank, region_rank = {}, {}, {}, {}
+        max_distance = 0.0
+        for p in group:
+            streets_rank[p['rua']] = streets_rank.get(p['rua'], 0) + p['ocorrencias']
+            if p['bairro']:
+                bairros_rank[p['bairro']] = bairros_rank.get(p['bairro'], 0) + p['ocorrencias']
+            if p['cidade']:
+                cities_rank[p['cidade']] = cities_rank.get(p['cidade'], 0) + p['ocorrencias']
+            region_rank[p['region']] = region_rank.get(p['region'], 0) + p['ocorrencias']
+            max_distance = max(max_distance, _haversine_meters(lng, lat, p['lng'], p['lat']))
+
+        top_streets = [name for name, _ in sorted(streets_rank.items(), key=lambda item: item[1], reverse=True)[:6]]
+        bairro = next(iter(sorted(bairros_rank.items(), key=lambda item: item[1], reverse=True)), ('', 0))[0]
+        cidade = next(iter(sorted(cities_rank.items(), key=lambda item: item[1], reverse=True)), ('', 0))[0]
+        focus_region = next(iter(sorted(region_rank.items(), key=lambda item: item[1], reverse=True)), ('interior', 0))[0]
+        focus_radius = max(180, min(radius_m, max_distance + 80))
+        geometry = _hexagon_geometry(lng, lat, focus_radius) if shape_kind == 'hex' else {
+            'type': 'Point',
+            'coordinates': [lng, lat],
+        }
+
+        features.append({
+            'type': 'Feature',
+            'properties': {
+                'name': f"Foco 500m - {bairro or cidade or 'CE'}",
+                'focus_id': '',
+                'region': focus_region,
+                'bairro': bairro,
+                'cidade': cidade,
+                'radius_m': round(focus_radius, 1),
+                'cluster_distance_m': radius_m,
+                'street_count': len(group),
+                'total_occurrences': total_occ,
+                'top_streets': top_streets,
+                'score': total_occ,
+                'risk_score': total_occ,
+                'is_street_focus': True,
+            },
+            'geometry': geometry,
+        })
+
+    features.sort(
+        key=lambda feat: (
+            (feat.get('properties') or {}).get('total_occurrences', 0),
+            (feat.get('properties') or {}).get('street_count', 0),
+        ),
+        reverse=True,
+    )
+    max_candidates = max(300, min(1600, max(limit, 1200)))
+    features = features[:max_candidates]
+    features = _apply_stgcn_street_predictions(features)
+    max_occ = max((feat['properties']['total_occurrences'] for feat in features), default=1)
+    for rank, feat in enumerate(features, 1):
+        props = feat['properties']
+        props['rank'] = rank
+        props['focus_id'] = f"FOCO-{props['region'].upper()}-{rank:04d}"
+        props['intensity_pct'] = round(100.0 * props['total_occurrences'] / max_occ, 1)
+
+    payload = {
+        'type': 'FeatureCollection',
+        'features': features,
+        'metadata': {
+            'total': len(features),
+            'total_available': len(features),
+            'source': 'geo_streets_cache clustered into 500m tactical foci',
+            'model': 'ST-GCN Rua/Foco 500m',
+            'radius_m': radius_m,
+            'shape': shape_kind,
+            'min_points': min_points,
+            'region': region_norm,
+            'generated_at': datetime.now().isoformat(),
+        }
+    }
+    with _STREET_FOCI_CACHE_LOCK:
+        _STREET_FOCI_CACHE[cache_key] = payload
+    return _slice_street_foci_payload(payload, limit)
+
+def _warm_stgcn_street_pipeline():
+    global stgcn_engine
+    if _STREET_FOCI_WARMUP_STATUS.get('running'):
+        return
+
+    _STREET_FOCI_WARMUP_STATUS.update({
+        'running': True,
+        'completed': [],
+        'errors': [],
+        'started_at': datetime.now().isoformat(),
+        'finished_at': None,
+    })
+    try:
+        if stgcn_engine is None:
+            from src.core.stgcn_escape_engine import STGCNEscapeEngine
+            stgcn_engine = STGCNEscapeEngine(data_dir=os.path.join(BASE_DIR, 'data', 'static'), base_dir=BASE_DIR)
+
+        print("🧠 ST-GCN ruas/focos: aquecimento em paralelo iniciado.")
+        for region in ('fortaleza', 'rmf', 'interior', 'all'):
+            try:
+                _build_street_foci_payload(region, radius_m=500, shape_kind='hex', min_points=2, limit=1600)
+                _STREET_FOCI_WARMUP_STATUS['completed'].append(region)
+                print(f"✅ ST-GCN ruas/focos aquecido: {region}")
+            except Exception as exc:
+                msg = f"{region}: {exc}"
+                _STREET_FOCI_WARMUP_STATUS['errors'].append(msg)
+                logging.exception("Falha no aquecimento ST-GCN de ruas (%s)", region)
+    finally:
+        _STREET_FOCI_WARMUP_STATUS['running'] = False
+        _STREET_FOCI_WARMUP_STATUS['finished_at'] = datetime.now().isoformat()
+
+def start_stgcn_street_warmup():
+    threading.Thread(target=_warm_stgcn_street_pipeline, daemon=True).start()
+
+@app.route('/api/street_foci')
+def get_street_foci():
+    """Agrupa ruas/pontos georreferenciados em focos tÃ¡ticos de atÃ© 500m."""
+    region = request.args.get('region', 'all').lower()
+    shape_kind = request.args.get('shape', 'hex').lower()
+    if shape_kind not in ('hex', 'circle'):
+        shape_kind = 'hex'
+    try:
+        radius_m = max(100, min(1000, int(float(request.args.get('radius_m', 500)))))
+    except Exception:
+        radius_m = 500
+    try:
+        min_points = max(1, min(20, int(float(request.args.get('min_points', 2)))))
+    except Exception:
+        min_points = 2
+    try:
+        limit = max(1, min(5000, int(float(request.args.get('limit', 1200)))))
+    except Exception:
+        limit = 1200
+
+    try:
+        return jsonify(_build_street_foci_payload(region, radius_m, shape_kind, min_points, limit))
+    except Exception as e:
+        logging.exception("Erro ao gerar focos de ruas")
+        return jsonify({'error': str(e), 'type': 'FeatureCollection', 'features': []}), 500
 
 @app.route('/api/visible_micronodes')
 @app.route('/api/top20_micro_nodes')
@@ -3234,13 +3605,17 @@ def predict_escape():
         lon = float(request.args.get('lon'))
     except (TypeError, ValueError):
         return jsonify({"error": "Parâmetros lat e lon são necessários e devem ser números."}), 400
+    try:
+        max_distance = max(250, min(2000, int(float(request.args.get('max_distance', 1000)))))
+    except Exception:
+        max_distance = 1000
         
     try:
         if stgcn_engine is None:
             from src.core.stgcn_escape_engine import STGCNEscapeEngine
-            stgcn_engine = STGCNEscapeEngine(data_dir=os.path.join(BASE_DIR, 'data', 'static'))
+            stgcn_engine = STGCNEscapeEngine(data_dir=os.path.join(BASE_DIR, 'data', 'static'), base_dir=BASE_DIR)
         
-        result = stgcn_engine.predict_escape_routes(lat, lon, max_distance=1500)
+        result = stgcn_engine.predict_escape_routes(lat, lon, max_distance=max_distance)
         return jsonify(result), 200
     except Exception as e:
         import traceback

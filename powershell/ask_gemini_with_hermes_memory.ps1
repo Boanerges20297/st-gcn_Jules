@@ -351,12 +351,15 @@ $csvPath = Join-Path $outputsDir $scopeConfig.Csv
 $tactical14dPath = Join-Path $outputsDir 'dados_status_enriquecido_14d_latest.csv'
 $tactical14dSummaryMdPath = Join-Path $outputsDir 'dados_status_enriquecido_14d_summary_latest.md'
 $tactical14dSummaryJsonPath = Join-Path $outputsDir 'dados_status_enriquecido_14d_summary_latest.json'
-$soulPath = Join-Path $HermesWorkspace '.hermes\SOUL.md'
+$soulText = ''
+if (-not [string]::IsNullOrWhiteSpace($HermesWorkspace) -and (Test-Path -LiteralPath $HermesWorkspace -ErrorAction SilentlyContinue)) {
+    $soulPath = Join-Path $HermesWorkspace '.hermes\SOUL.md'
+    $soulText = Read-OptionalFile -Path $soulPath
+}
 $localHermesPath = Join-Path $ProjectRoot '.hermes.md'
 
 New-Item -ItemType Directory -Path $historyDir -Force | Out-Null
 
-$soulText = Read-OptionalFile -Path $soulPath
 $localHermesText = Read-OptionalFile -Path $localHermesPath
 $briefText = Read-OptionalFile -Path $briefPath
 $csvExcerpt = Get-CsvExcerpt -Path $csvPath
@@ -443,7 +446,7 @@ $content = @(
     ('Gerado em: ' + (Get-Date -Format 'yyyy-MM-dd HH:mm:ss')),
     ('Escopo: ' + $scopeConfig.Label),
     ('Modelo Gemini CLI: ' + $result.ModelUsed),
-    ('Pergunta: ' + $Query),
+    ('Pergunta: ' + $Query.Replace("`r`n", " ").Replace("`n", " ")),
     ('CSV base: outputs/hermes/' + $scopeConfig.Csv),
     ('CSV tatico 14d: outputs/hermes/dados_status_enriquecido_14d_latest.csv'),
     '',
