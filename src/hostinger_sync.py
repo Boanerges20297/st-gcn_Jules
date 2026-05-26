@@ -109,11 +109,29 @@ class HostingerSyncManager:
                     })
         env_data.update(os.environ)
 
+        host = str(env_data.get('HOSTINGER_SYNC_HOST', '')).strip()
+        user = str(env_data.get('HOSTINGER_SYNC_USER', '')).strip()
+        password = str(env_data.get('HOSTINGER_SYNC_PASSWORD', '')).strip()
+
+        # Fallback para variáveis já usadas nos scripts de deploy do projeto.
+        host_ssh = str(env_data.get('HOST_SSH', '')).strip()
+        if (not host or not user) and host_ssh:
+            if '@' in host_ssh:
+                parsed_user, parsed_host = host_ssh.split('@', 1)
+                if not user:
+                    user = parsed_user.strip()
+                if not host:
+                    host = parsed_host.strip()
+            elif not host:
+                host = host_ssh
+        if not password:
+            password = str(env_data.get('PASSWORD_VPS_SSH', '')).strip()
+
         return HostingerSyncConfig(
             enabled=str(env_data.get('HOSTINGER_SYNC_ENABLED', 'false')).strip().lower() in {'1', 'true', 'yes', 'on'},
-            host=str(env_data.get('HOSTINGER_SYNC_HOST', '')).strip(),
-            user=str(env_data.get('HOSTINGER_SYNC_USER', '')).strip(),
-            password=str(env_data.get('HOSTINGER_SYNC_PASSWORD', '')).strip(),
+            host=host,
+            user=user,
+            password=password,
             port=int(str(env_data.get('HOSTINGER_SYNC_PORT', '22'))),
             target_dir=str(env_data.get('HOSTINGER_SYNC_TARGET_DIR', DEFAULT_TARGET_DIR)).strip() or DEFAULT_TARGET_DIR,
             timeout_seconds=int(str(env_data.get('HOSTINGER_SYNC_TIMEOUT_SECONDS', '30'))),
@@ -139,7 +157,16 @@ class HostingerSyncManager:
 
     def _sync_event(self, key: str, fingerprint: str, relative_paths: Iterable[str]) -> dict:
         if not self.config.is_configured:
-            return {'status': 'disabled', 'reason': 'hostinger sync not configured'}
+            reason = []
+            if not self.config.enabled:
+                reason.append('HOSTINGER_SYNC_ENABLED=false')
+            if not self.config.host:
+                reason.append('HOSTINGER_SYNC_HOST/HOST_SSH ausente')
+            if not self.config.user:
+                reason.append('HOSTINGER_SYNC_USER/HOST_SSH ausente')
+            if not self.config.password:
+                reason.append('HOSTINGER_SYNC_PASSWORD/PASSWORD_VPS_SSH ausente')
+            return {'status': 'disabled', 'reason': '; '.join(reason) or 'hostinger sync not configured'}
 
         state = self._load_state()
         current = state.get(key, {})

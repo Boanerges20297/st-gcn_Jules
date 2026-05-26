@@ -361,6 +361,33 @@ try {
     Write-Host "Destino: $TargetDir"
     Write-Host ("Grupos: " + ($Groups -join ', '))
     Write-Host ("DryRun: " + [string]$DryRun.IsPresent)
+    
+    # ============================================================
+    # Deploy das mudanças do Telegram Gateway
+    # ============================================================
+    if (-not $DryRun) {
+        Write-Host "`n[DEPLOY TELEGRAM] Iniciando deploy das mudanças do gateway Telegram..."
+        $deployScript = Join-Path $root 'powershell' 'deploy_telegram_changes.ps1'
+        if (Test-Path -LiteralPath $deployScript) {
+            try {
+                $deployLogPath = Join-Path $root 'logs' 'deploy_telegram_changes.log'
+                New-Item -ItemType Directory -Path (Split-Path $deployLogPath) -Force | Out-Null
+                
+                & powershell -ExecutionPolicy Bypass -File $deployScript -NoRestart 2>&1 | Tee-Object -FilePath $deployLogPath -Append
+                
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host "[DEPLOY TELEGRAM] ✅ Deploy concluído com sucesso!"
+                    Write-Host "[DEPLOY TELEGRAM] Log: $deployLogPath"
+                } else {
+                    Write-Warning "[DEPLOY TELEGRAM] ⚠️ Deploy retornou com código de saída: $LASTEXITCODE"
+                }
+            } catch {
+                Write-Warning "[DEPLOY TELEGRAM] ⚠️ Erro ao executar deploy: $_"
+            }
+        } else {
+            Write-Warning "[DEPLOY TELEGRAM] Script nao encontrado em: $deployScript"
+        }
+    }
 }
 finally {
     if (Test-Path -LiteralPath $workspace) {

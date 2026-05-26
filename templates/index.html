@@ -656,16 +656,7 @@
 
     $('#toggle-all-streets').on('change', function() {
         if ($(this).is(':checked')) {
-            streetFocusMode = true;
-            setMacroPolygonsVisible(false);
-            map.getPane('streetsPane').style.zIndex = 420; // Malha por cima
-            map.getPane('streetsPane').style.pointerEvents = 'auto'; 
-            map.getPane('areaPolygonsPane').style.pointerEvents = 'none'; // Desativa bairros para clique
-            if (!streetsLoaded || streetsLoadedRegion !== $('#region-filter').val()) {
-                loadStreetFoci($('#region-filter').val());
-            } else {
-                map.addLayer(allStreetsLayer);
-            }
+            syncStreetFociForRegion($('#region-filter').val());
         } else {
             streetFocusMode = false;
             map.getPane('streetsPane').style.zIndex = 400; // Bairros por cima
@@ -722,6 +713,27 @@
         var r = String(region || 'all').toLowerCase();
         if (r === 'capital') return 'fortaleza';
         return r;
+    }
+
+    function syncStreetFociForRegion(region) {
+        if (!$('#toggle-all-streets').is(':checked')) return;
+
+        var targetRegion = normalizeStreetFocusRegion(region || $('#region-filter').val() || 'all');
+        streetFocusMode = true;
+        setMacroPolygonsVisible(false);
+        map.getPane('streetsPane').style.zIndex = 420;
+        map.getPane('streetsPane').style.pointerEvents = 'auto';
+        map.getPane('areaPolygonsPane').style.pointerEvents = 'none';
+
+        var shouldReload = !streetsLoaded
+            || streetsLoadedRegion !== targetRegion
+            || allStreetsLayer.getLayers().length === 0;
+
+        if (shouldReload) {
+            loadStreetFoci(targetRegion);
+        } else if (!map.hasLayer(allStreetsLayer)) {
+            map.addLayer(allStreetsLayer);
+        }
     }
 
     function featureCenterLatLng(feature, layer) {
@@ -791,20 +803,33 @@
                     onEachFeature: function(feature, layer) {
                         var props = feature.properties || {};
                         var streets = Array.isArray(props.top_streets) ? props.top_streets : [];
-                        var streetList = streets.length
-                            ? '<ol style="margin:4px 0 0 18px; padding:0;">' + streets.slice(0, 6).map(function(s){ return '<li>' + s + '</li>'; }).join('') + '</ol>'
-                            : '<span class="text-muted">Sem logradouros nomeados</span>';
-                    var stgcnScore = Number(props.predicted_cvli_probability || props.stgcn_score || 0);
-                    var popup = `<strong>${props.focus_id || props.name}</strong><br>
-                        <b>Predição ST-GCN:</b> ${stgcnScore.toFixed(1)}%<br>
-                        <b>Risco da área-mãe:</b> ${Number(props.parent_area_risk_score || 0).toFixed(1)}%<br>
-                        <b>Base:</b> ${props.bairro || props.cidade || 'CE'}<br>
-                        <b>Ruas agrupadas:</b> ${props.street_count || 0}<br>
-                        <b>Ocorrencias:</b> ${props.total_occurrences || 0}<br>
-                        <b>Raio operacional:</b> ${Math.round(props.radius_m || 500)}m<br>
-                        <b>Rotas de fuga:</b> ST-GCN ate 1km ativado neste foco<br>
-                        <b>Logradouros-chave:</b>${streetList}`;
-                        layer.bindPopup(popup);
+                        var stgcnScore = Number(props.predicted_cvli_probability || props.stgcn_score || 0);
+                        var hoverTooltip = `<strong>${props.focus_id || props.name}</strong><br>
+                            <b>Predição ST-GCN:</b> ${stgcnScore.toFixed(1)}%<br>
+                            <b>Base:</b> ${props.bairro || props.cidade || 'CE'}<br>
+                            <b>Raio:</b> ${Math.round(props.radius_m || 500)}m`;
+                        layer.bindTooltip(hoverTooltip, {
+                            sticky: true,
+                            direction: 'top',
+                            opacity: 0.95
+                        });
+
+                        var entrada = streets.slice(0, 3);
+                        var saida = streets.slice(3, 6);
+                        var entradaList = entrada.length
+                            ? '<ol style="margin:4px 0 8px 18px; padding:0;">' + entrada.map(function(s){ return '<li>' + s + '</li>'; }).join('') + '</ol>'
+                            : '<span class="text-muted">Sem vias de entrada sugeridas</span>';
+                        var saidaList = saida.length
+                            ? '<ol style="margin:4px 0 0 18px; padding:0;">' + saida.map(function(s){ return '<li>' + s + '</li>'; }).join('') + '</ol>'
+                            : '<span class="text-muted">Sem vias de saída sugeridas</span>';
+
+                        var clickPopup = `<strong>${props.focus_id || props.name}</strong><br>
+                            <b>Risco da área-mãe:</b> ${Number(props.parent_area_risk_score || 0).toFixed(1)}%<br>
+                            <b>Ruas agrupadas:</b> ${props.street_count || 0} | <b>Ocorrências:</b> ${props.total_occurrences || 0}<br>
+                            <b>Pontos estratégicos de ENTRADA:</b>${entradaList}
+                            <b>Pontos estratégicos de SAÍDA:</b>${saidaList}
+                            <small class="text-muted">Lista derivada dos logradouros-chave do foco ST-GCN.</small>`;
+                        layer.bindPopup(clickPopup);
                     if (layer.setStyle) {
                         layer.on('mouseover', function() {
                             layer.setStyle({ weight: 2.5, fillOpacity: 0.34 });
@@ -816,8 +841,7 @@
                         });
                     }
                     layer.on('click', function() {
-                        var center = featureCenterLatLng(feature, layer);
-                        simulateEscapeRoutes(center.lat, center.lng, props.bairro || props.cidade || props.name || 'Foco ST-GCN', 1000);
+                        layer.openPopup();
                     });
                 }
             });
@@ -3142,9 +3166,6 @@
         updateTopCriticalAreas();
         // update visible micronodes layer for selected region if visible
         updateVisibleMicronodesForRegion(val);
-        if ($('#toggle-all-streets').is(':checked')) {
-            loadStreetFoci(val);
-        }
         // Atualiza também os cards que mostram contagens por região
         try { updateDashboard('CVLI'); } catch(e) { console.warn('updateDashboard failed on region change', e); }
     });
@@ -3284,7 +3305,7 @@
     function applyRegionFilter(regionFilter) {
         if (!geojsonLayer) return;
         if (streetFocusMode) {
-            setMacroPolygonsVisible(false);
+            syncStreetFociForRegion(regionFilter);
             return;
         }
         var visibleBounds = null;

@@ -752,6 +752,39 @@ class TelegramGeminiGateway:
         return self._extract_answer_body(scope, chat_id)
 
     def _send_inline_keyboard(self, chat_id: int, text: str, keyboard: list[list[dict]], edit_message_id: int | None = None) -> None:
+        text = (text or "").strip() or "Resposta vazia."
+
+        if len(text) > 3800:
+            chunks = []
+            remaining = text
+            while remaining:
+                chunks.append(remaining[:3800])
+                remaining = remaining[3800:]
+
+            if edit_message_id and chunks:
+                first_payload = {
+                    "chat_id": chat_id,
+                    "message_id": edit_message_id,
+                    "text": chunks[0],
+                    "parse_mode": "Markdown",
+                }
+                try:
+                    self._api("editMessageText", first_payload)
+                except Exception:
+                    first_payload.pop("parse_mode", None)
+                    try:
+                        self._api("editMessageText", first_payload)
+                    except Exception:
+                        self._send_message(chat_id, chunks[0])
+            elif chunks:
+                self._send_message(chat_id, chunks[0])
+
+            for chunk in chunks[1:-1]:
+                self._send_message(chat_id, chunk)
+
+            self._send_inline_keyboard(chat_id, chunks[-1], keyboard, edit_message_id=None)
+            return
+
         payload = {
             "chat_id": chat_id,
             "text": text,
@@ -1334,7 +1367,7 @@ class TelegramGeminiGateway:
             region = data.split("_")[1]
             self._trigger_predictive_risk(chat_id, message_id, region)
             
-        elif data.startswith("sentinela_"):
+        elif data.startswith("sentinela_") and not data.endswith("_explicabilidade"):
             region = data.split("_")[1]
             self._show_sentinela_micronodes(chat_id, message_id, region)
 
@@ -1654,9 +1687,6 @@ class TelegramGeminiGateway:
                     faction = r.get("faction", "Neutro")
                     streets = r.get("nearby_streets", "")
                     
-                    if len(streets) > 60:
-                        streets = streets[:57] + "..."
-                        
                     text += f"*{idx}. 📍 {m_id}* (Bairro: {bairro})\n"
                     text += f" 🛡️ Score: {score} | Facção: {faction}\n"
                     if streets:
@@ -1702,8 +1732,6 @@ class TelegramGeminiGateway:
                     cleaned_lines.append(line)
             
             full_text = "\n".join(cleaned_lines)
-            if len(full_text) > 3800:
-                full_text = full_text[:3700] + "\n\n...(conteúdo truncado para exibição)..."
                 
             keyboard = [
                 [

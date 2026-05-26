@@ -925,7 +925,8 @@ class StateOrchestrator:
                 elif sync_result.get('status') == 'skipped':
                     print("ℹ️ [Hostinger] Publicação ignorada (nenhum dado novo ou alterado no snapshot).")
                 elif sync_result.get('status') == 'disabled':
-                    print("ℹ️ [Hostinger] Publicação automática inativa (HOSTINGER_SYNC_ENABLED=false).")
+                    reason = sync_result.get('reason', 'configuração ausente')
+                    print(f"ℹ️ [Hostinger] Publicação automática inativa ({reason}).")
                 else:
                     print(f"ℹ️ [Hostinger] Sincronização: {sync_result.get('status')} - {sync_result.get('reason', '')}")
             except Exception as sync_err:

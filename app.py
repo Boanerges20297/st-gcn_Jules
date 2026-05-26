@@ -1356,7 +1356,7 @@ def build_current_exogenous_shocks():
 
 def rebuild_dynamic_micronode_exports(force=False):
     """Ensures micronode overlay files match the current model state."""
-    global _MICRONODE_EXPORT_BUILT_AT
+    global _MICRONODE_EXPORT_BUILT_AT, _MICRONODE_GEOMETRY_CACHE
     output_files = [
         os.path.join(BASE_DIR, 'outputs', 'visible_micronodes_capital.geojson'),
         os.path.join(BASE_DIR, 'outputs', 'visible_micronodes_rmf.geojson'),
@@ -1376,6 +1376,7 @@ def rebuild_dynamic_micronode_exports(force=False):
 
             build_all_micronode_exports(ensure_runtime=False)
             _MICRONODE_EXPORT_BUILT_AT = datetime.now()
+            _MICRONODE_GEOMETRY_CACHE = None
             print("✅ Micronodos dinâmicos regenerados.")
             return True
         except Exception as error:
@@ -1417,6 +1418,7 @@ _STREET_FOCI_WARMUP_STATUS = {
     'finished_at': None,
 }
 _MUNICIPALITY_SHAPES_CACHE = None
+_MICRONODE_GEOMETRY_CACHE = None
 
 def _load_municipality_shapes_for_street_foci():
     global _MUNICIPALITY_SHAPES_CACHE
@@ -1503,6 +1505,56 @@ def _hexagon_geometry(lng, lat, radius_m):
         ])
     coords.append(coords[0])
     return {'type': 'Polygon', 'coordinates': [coords]}
+
+def _load_micronode_geometries():
+    """Carrega geometrias dos micronodos para evitar sobreposição com focos ST-GCN."""
+    global _MICRONODE_GEOMETRY_CACHE
+    if _MICRONODE_GEOMETRY_CACHE is not None:
+        return _MICRONODE_GEOMETRY_CACHE
+
+    geometries = []
+    candidates = [
+        os.path.join(BASE_DIR, 'outputs', 'visible_micronodes.geojson'),
+        os.path.join(BASE_DIR, 'data', 'raw', 'inteligencia', 'micronodos_faccoes_2026.geojson'),
+    ]
+    try:
+        for path in candidates:
+            if not os.path.exists(path):
+                continue
+            with open(path, 'r', encoding='utf-8') as f:
+                payload = json.load(f)
+            for feature in (payload.get('features') or []):
+                geom = feature.get('geometry')
+                if not geom:
+                    continue
+                try:
+                    geometries.append(shape(geom))
+                except Exception:
+                    continue
+            if geometries:
+                break
+    except Exception:
+        logging.exception("Falha ao carregar geometrias de micronodos para filtro de sobreposição")
+
+    _MICRONODE_GEOMETRY_CACHE = geometries
+    return geometries
+
+def _feature_intersects_existing_micronodes(feature):
+    geom = feature.get('geometry')
+    if not geom:
+        return False
+    try:
+        focus_geom = shape(geom)
+    except Exception:
+        return False
+
+    for mn_geom in _load_micronode_geometries():
+        try:
+            if focus_geom.intersects(mn_geom):
+                return True
+        except Exception:
+            continue
+    return False
 
 def _get_area_risk_scores_for_street_foci():
     if orchestrator is None:
@@ -1654,7 +1706,8 @@ def _build_street_foci_payload(region='all', radius_m=500, shape_kind='hex', min
         bairro = next(iter(sorted(bairros_rank.items(), key=lambda item: item[1], reverse=True)), ('', 0))[0]
         cidade = next(iter(sorted(cities_rank.items(), key=lambda item: item[1], reverse=True)), ('', 0))[0]
         focus_region = next(iter(sorted(region_rank.items(), key=lambda item: item[1], reverse=True)), ('interior', 0))[0]
-        focus_radius = max(180, min(radius_m, max_distance + 80))
+        # Margem conservadora para mais: cobertura operacional um pouco maior que o cluster base.
+        focus_radius = max(220, min(radius_m * 1.35, max_distance + 140))
         geometry = _hexagon_geometry(lng, lat, focus_radius) if shape_kind == 'hex' else {
             'type': 'Point',
             'coordinates': [lng, lat],
@@ -1690,6 +1743,31 @@ def _build_street_foci_payload(region='all', radius_m=500, shape_kind='hex', min
     max_candidates = max(300, min(1600, max(limit, 1200)))
     features = features[:max_candidates]
     features = _apply_stgcn_street_predictions(features)
+
+    # Viés preditivo conservador (tende para cima) e filtragem para focos de alto risco.
+    scored = []
+    for feat in features:
+        props = feat.get('properties') or {}
+        base_pred = float(props.get('predicted_cvli_probability') or props.get('stgcn_score') or props.get('risk_score') or 0.0)
+        conservative_pred = max(base_pred, min(100.0, base_pred + 8.0))
+        props['predicted_cvli_probability_raw'] = round(base_pred, 2)
+        props['predicted_cvli_probability'] = round(conservative_pred, 2)
+        props['stgcn_score'] = round(conservative_pred, 2)
+        props['risk_score'] = round(conservative_pred, 2)
+        props['score'] = round(conservative_pred, 2)
+        scored.append(feat)
+
+    # Mantém focos realmente altos; fallback mantém os melhores caso o filtro seja restritivo demais.
+    high_risk = [f for f in scored if float((f.get('properties') or {}).get('predicted_cvli_probability') or 0) >= 55.0]
+    features = high_risk if len(high_risk) >= 10 else sorted(
+        scored,
+        key=lambda feat: float((feat.get('properties') or {}).get('predicted_cvli_probability') or 0),
+        reverse=True
+    )[:max(20, min(120, len(scored)))]
+
+    # Remove focos que sobrepõem micronodos já existentes.
+    features = [f for f in features if not _feature_intersects_existing_micronodes(f)]
+
     max_occ = max((feat['properties']['total_occurrences'] for feat in features), default=1)
     for rank, feat in enumerate(features, 1):
         props = feat['properties']
