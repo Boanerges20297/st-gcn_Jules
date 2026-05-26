@@ -1461,7 +1461,6 @@ def _street_region_from_point(street):
     except Exception:
         return 'interior'
 
-    # 1. Tentar ler o município/cidade diretamente das propriedades (super rápido)
     city_raw = street.get('cidade') or street.get('municipio') or street.get('municipality') or ''
     if city_raw:
         city_norm = normalize_name(str(city_raw))
@@ -1471,20 +1470,19 @@ def _street_region_from_point(street):
             return 'rmf'
         return 'interior'
 
-    # 2. Bounding boxes geográficas rápidas
-    if -3.92 <= lat <= -3.68 and -38.70 <= lng <= -38.36:
-        return 'fortaleza'
-    if -4.25 <= lat <= -3.45 and -39.05 <= lng <= -38.05:
-        return 'rmf'
-
-    # 3. Fallback pesado (só se tudo falhar, o que é raríssimo) com busca otimizada por bbox
+    # Resolve municipality before bbox so RMF cities inside the Fortaleza envelope
+    # do not leak into the Fortaleza-only filter.
     municipality_norm = _municipality_from_lnglat(lng, lat)
     if municipality_norm == 'FORTALEZA':
         return 'fortaleza'
     if municipality_norm in {normalize_name(city) for city in _RMF_CITIES}:
         return 'rmf'
-    return 'interior'
 
+    if -3.92 <= lat <= -3.68 and -38.70 <= lng <= -38.36:
+        return 'fortaleza'
+    if -4.25 <= lat <= -3.45 and -39.05 <= lng <= -38.05:
+        return 'rmf'
+    return 'interior'
 def _haversine_meters(lng1, lat1, lng2, lat2):
     lng1, lat1, lng2, lat2 = map(math.radians, [lng1, lat1, lng2, lat2])
     dlng = lng2 - lng1
@@ -1548,14 +1546,21 @@ def _feature_intersects_existing_micronodes(feature):
     except Exception:
         return False
 
+    focus_area = float(getattr(focus_geom, 'area', 0.0) or 0.0)
+    focus_centroid = focus_geom.centroid
     for mn_geom in _load_micronode_geometries():
         try:
-            if focus_geom.intersects(mn_geom):
+            if mn_geom.contains(focus_centroid):
+                return True
+            if focus_area > 0 and focus_geom.intersects(mn_geom):
+                overlap_ratio = focus_geom.intersection(mn_geom).area / focus_area
+                if overlap_ratio >= 0.35:
+                    return True
+            elif focus_geom.intersects(mn_geom):
                 return True
         except Exception:
             continue
     return False
-
 def _get_area_risk_scores_for_street_foci():
     if orchestrator is None:
         return {}
@@ -1603,8 +1608,19 @@ def _slice_street_foci_payload(payload, limit):
     sliced['metadata'] = metadata
     return sliced
 
+def _is_point_in_requested_street_region(lng, lat, region_norm, item_region):
+    if region_norm == 'all':
+        return True
+    municipality_norm = _municipality_from_lnglat(lng, lat)
+    if region_norm == 'fortaleza':
+        return municipality_norm == 'FORTALEZA'
+    if municipality_norm:
+        municipality_region = 'rmf' if municipality_norm in {normalize_name(city) for city in _RMF_CITIES} else 'interior'
+        return municipality_region == region_norm
+    return item_region == region_norm
+
 def _build_street_foci_payload(region='all', radius_m=500, shape_kind='hex', min_points=2, limit=1200):
-    cache_key = (region, radius_m, shape_kind, min_points)
+    cache_key = ('street-foci-v3-grid', region, radius_m, shape_kind, min_points)
     with _STREET_FOCI_CACHE_LOCK:
         cached = _STREET_FOCI_CACHE.get(cache_key)
     if cached:
@@ -1632,7 +1648,7 @@ def _build_street_foci_payload(region='all', radius_m=500, shape_kind='hex', min
             continue
 
         item_region = _street_region_from_point(item)
-        if region_norm not in ('all', item_region):
+        if not _is_point_in_requested_street_region(lng, lat, region_norm, item_region):
             continue
 
         points.append({
@@ -1646,41 +1662,12 @@ def _build_street_foci_payload(region='all', radius_m=500, shape_kind='hex', min
             'ocorrencias': max(1, int(float(item.get('ocorrencias') or item.get('occurrences') or 1))),
         })
 
-    parent = list(range(len(points)))
-
-    def find(i):
-        while parent[i] != i:
-            parent[i] = parent[parent[i]]
-            i = parent[i]
-        return i
-
-    def union(a, b):
-        ra, rb = find(a), find(b)
-        if ra != rb:
-            parent[rb] = ra
-
     lat_cell = radius_m / 110540.0
-    grid = {}
-    for i, p in enumerate(points):
+    groups = {}
+    for p in points:
         lon_cell = radius_m / (111320.0 * max(0.15, math.cos(math.radians(p['lat']))))
         key = (int(math.floor(p['lat'] / lat_cell)), int(math.floor(p['lng'] / lon_cell)))
-        p['_grid_key'] = key
-        grid.setdefault(key, []).append(i)
-
-    for i, p in enumerate(points):
-        gy, gx = p['_grid_key']
-        for dy in (-1, 0, 1):
-            for dx in (-1, 0, 1):
-                for j in grid.get((gy + dy, gx + dx), []):
-                    if j <= i:
-                        continue
-                    q = points[j]
-                    if _haversine_meters(p['lng'], p['lat'], q['lng'], q['lat']) <= radius_m:
-                        union(i, j)
-
-    groups = {}
-    for i, p in enumerate(points):
-        groups.setdefault(find(i), []).append(p)
+        groups.setdefault(key, []).append(p)
 
     features = []
     for group in groups.values():
@@ -1706,8 +1693,8 @@ def _build_street_foci_payload(region='all', radius_m=500, shape_kind='hex', min
         bairro = next(iter(sorted(bairros_rank.items(), key=lambda item: item[1], reverse=True)), ('', 0))[0]
         cidade = next(iter(sorted(cities_rank.items(), key=lambda item: item[1], reverse=True)), ('', 0))[0]
         focus_region = next(iter(sorted(region_rank.items(), key=lambda item: item[1], reverse=True)), ('interior', 0))[0]
-        # Margem conservadora para mais: cobertura operacional um pouco maior que o cluster base.
-        focus_radius = max(220, min(radius_m * 1.35, max_distance + 140))
+        # Margem conservadora para mais, sem transformar uma celula de 500m em cobertura municipal.
+        focus_radius = max(300, min(radius_m * 1.25, max_distance + 180))
         geometry = _hexagon_geometry(lng, lat, focus_radius) if shape_kind == 'hex' else {
             'type': 'Point',
             'coordinates': [lng, lat],
@@ -1757,17 +1744,23 @@ def _build_street_foci_payload(region='all', radius_m=500, shape_kind='hex', min
         props['score'] = round(conservative_pred, 2)
         scored.append(feat)
 
-    # Mantém focos realmente altos; fallback mantém os melhores caso o filtro seja restritivo demais.
-    high_risk = [f for f in scored if float((f.get('properties') or {}).get('predicted_cvli_probability') or 0) >= 55.0]
-    features = high_risk if len(high_risk) >= 10 else sorted(
-        scored,
+    non_overlapping = [f for f in scored if not _feature_intersects_existing_micronodes(f)]
+    sorted_non_overlapping = sorted(
+        non_overlapping,
         key=lambda feat: float((feat.get('properties') or {}).get('predicted_cvli_probability') or 0),
         reverse=True
-    )[:max(20, min(120, len(scored)))]
-
-    # Remove focos que sobrepõem micronodos já existentes.
-    features = [f for f in features if not _feature_intersects_existing_micronodes(f)]
-
+    )
+    tactical_risk = [
+        f for f in sorted_non_overlapping
+        if float((f.get('properties') or {}).get('predicted_cvli_probability') or 0) >= 31.0
+    ]
+    target_count = max(limit, 220 if region_norm == 'fortaleza' else 120)
+    if tactical_risk:
+        tactical_ids = {id(feature) for feature in tactical_risk}
+        fill_features = [feature for feature in sorted_non_overlapping if id(feature) not in tactical_ids]
+        features = (tactical_risk + fill_features)[:target_count]
+    else:
+        features = sorted_non_overlapping[:target_count]
     max_occ = max((feat['properties']['total_occurrences'] for feat in features), default=1)
     for rank, feat in enumerate(features, 1):
         props = feat['properties']
@@ -1781,7 +1774,7 @@ def _build_street_foci_payload(region='all', radius_m=500, shape_kind='hex', min
         'metadata': {
             'total': len(features),
             'total_available': len(features),
-            'source': 'geo_streets_cache clustered into 500m tactical foci',
+            'source': 'geo_streets_cache bucketed into 500m tactical foci',
             'model': 'ST-GCN Rua/Foco 500m',
             'radius_m': radius_m,
             'shape': shape_kind,

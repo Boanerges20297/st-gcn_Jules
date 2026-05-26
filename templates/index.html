@@ -85,6 +85,10 @@
         
         /* Polygon interaction styles */
         .leaflet-interactive { cursor: pointer; }
+        .leaflet-container path:focus,
+        .leaflet-container .leaflet-interactive:focus {
+            outline: none;
+        }
         .leaflet-container { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
         /* WEEK 4: Enhanced Dashboard Styles */
@@ -814,22 +818,6 @@
                             opacity: 0.95
                         });
 
-                        var entrada = streets.slice(0, 3);
-                        var saida = streets.slice(3, 6);
-                        var entradaList = entrada.length
-                            ? '<ol style="margin:4px 0 8px 18px; padding:0;">' + entrada.map(function(s){ return '<li>' + s + '</li>'; }).join('') + '</ol>'
-                            : '<span class="text-muted">Sem vias de entrada sugeridas</span>';
-                        var saidaList = saida.length
-                            ? '<ol style="margin:4px 0 0 18px; padding:0;">' + saida.map(function(s){ return '<li>' + s + '</li>'; }).join('') + '</ol>'
-                            : '<span class="text-muted">Sem vias de saída sugeridas</span>';
-
-                        var clickPopup = `<strong>${props.focus_id || props.name}</strong><br>
-                            <b>Risco da área-mãe:</b> ${Number(props.parent_area_risk_score || 0).toFixed(1)}%<br>
-                            <b>Ruas agrupadas:</b> ${props.street_count || 0} | <b>Ocorrências:</b> ${props.total_occurrences || 0}<br>
-                            <b>Pontos estratégicos de ENTRADA:</b>${entradaList}
-                            <b>Pontos estratégicos de SAÍDA:</b>${saidaList}
-                            <small class="text-muted">Lista derivada dos logradouros-chave do foco ST-GCN.</small>`;
-                        layer.bindPopup(clickPopup);
                     if (layer.setStyle) {
                         layer.on('mouseover', function() {
                             layer.setStyle({ weight: 2.5, fillOpacity: 0.34 });
@@ -841,7 +829,9 @@
                         });
                     }
                     layer.on('click', function() {
-                        layer.openPopup();
+                        var center = featureCenterLatLng(feature, layer);
+                        var routeRadius = Math.max(1000, Math.round(Number(props.radius_m || 500) * 2));
+                        simulateEscapeRoutes(center.lat, center.lng, props.bairro || props.cidade || props.name || 'Foco ST-GCN', routeRadius);
                     });
                 }
             });
@@ -1647,6 +1637,33 @@
         });
     }
 
+    function syncRiskCardsFromVisibleMap() {
+        try {
+            var criticalRisk = 0, highRisk = 0, mediumRisk = 0, stableAreas = 0;
+            if (geojsonLayer) {
+                geojsonLayer.eachLayer(function(layer) {
+                    if (!map.hasLayer(layer)) return;
+                    var props = (layer.feature && layer.feature.properties) || {};
+                    var score = (typeof props.risk_score === 'number')
+                        ? props.risk_score
+                        : (typeof props.risk_score_cvli === 'number' ? props.risk_score_cvli : null);
+                    if (score === null) return;
+
+                    if (score >= 71) criticalRisk++;
+                    else if (score >= 51) highRisk++;
+                    else if (score >= 31) mediumRisk++;
+                    else stableAreas++;
+                });
+            }
+            $('#high-risk-count').text(criticalRisk);
+            $('#medium-risk-count').text(highRisk);
+            $('#low-risk-count').text(mediumRisk);
+            $('#stable-areas-count').text(stableAreas);
+        } catch (e) {
+            console.warn('Erro ao atualizar contagens por regiao:', e);
+        }
+    }
+
     function updateDashboard(mode) {
         // Mode is always CVLI
         mode = 'CVLI';
@@ -1748,30 +1765,7 @@
             console.warn('Failed to update metrics', e);
         }
 
-        // Cards reflect the same risk bands rendered on the map.
-        try {
-            var criticalRisk = 0, highRisk = 0, mediumRisk = 0, stableAreas = 0;
-            if (geojsonLayer) {
-                geojsonLayer.eachLayer(function(layer) {
-                    var props = (layer.feature && layer.feature.properties) || {};
-                    var score = (typeof props.risk_score === 'number')
-                        ? props.risk_score
-                        : (typeof props.risk_score_cvli === 'number' ? props.risk_score_cvli : null);
-                    if (score === null) return;
-
-                    if (score >= 71) criticalRisk++;
-                    else if (score >= 51) highRisk++;
-                    else if (score >= 31) mediumRisk++;
-                    else stableAreas++;
-                });
-            }
-            $('#high-risk-count').text(criticalRisk);
-            $('#medium-risk-count').text(highRisk);
-            $('#low-risk-count').text(mediumRisk);
-            $('#stable-areas-count').text(stableAreas);
-        } catch (e) {
-            console.warn('Erro ao atualizar contagens por regiao:', e);
-        }
+        syncRiskCardsFromVisibleMap();
         // Update Map Style
         if (geojsonLayer) {
             geojsonLayer.eachLayer(function(layer) {
@@ -1785,8 +1779,7 @@
             });
         }
 
-        // Polygons are updated via geojsonLayer.eachLayer above - no markers needed
-        updateTopCriticalAreas();
+        // Polygons are updated via geojsonLayer.eachLayer above - no markers needed.
     }
 
     function addSimulationPoint(latlng) {
@@ -3332,6 +3325,7 @@
         // Isso garante que os micronodes sejam pré-carregados ao trocar de região,
         // mesmo se o checkbox não estiver marcado no momento
         updateVisibleMicronodesForRegion(regionFilter);
+        syncRiskCardsFromVisibleMap();
     }
 
     // ===== Monitor de Atualização de Modelos =====
@@ -3819,9 +3813,9 @@
                         if (feature.properties.is_mesh) {
                             return {
                                 pane: 'escapeRoutesPane',
-                                color: '#0f172a',
-                                weight: 1.6,
-                                opacity: 0.32,
+                                color: '#2563eb',
+                                weight: 1.0,
+                                opacity: 0.18,
                                 dashArray: '2, 6',
                                 lineCap: 'round',
                                 lineJoin: 'round'

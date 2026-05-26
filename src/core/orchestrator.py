@@ -905,33 +905,80 @@ class StateOrchestrator:
                 for path in paths:
                     scope_df.to_csv(path, index=False, encoding='utf-8-sig')
 
+            # --- EXPORTAÇÃO DE RUAS CRÍTICAS ---
+            try:
+                ruas_criticas_path = os.path.join(self.root, 'data', 'raw', 'ruas_criticas_por_bairro.json')
+                if os.path.exists(ruas_criticas_path):
+                    with open(ruas_criticas_path, 'r', encoding='utf-8') as f:
+                        ruas_criticas_map = json.load(f)
+                    
+                    # Converter para DataFrame para exportação
+                    ruas_rows = []
+                    for bairro, ruas_str in ruas_criticas_map.items():
+                        ruas_list = [r.strip() for r in ruas_str.split(',') if r.strip()]
+                        for idx, rua in enumerate(ruas_list, 1):
+                            ruas_rows.append({
+                                'bairro': bairro,
+                                'posicao': idx,
+                                'logradouro': rua
+                            })
+                    
+                    if ruas_rows:
+                        ruas_df = pd.DataFrame(ruas_rows)
+                        
+                        # Salvar CSVs de ruas críticas
+                        ruas_csv_path = os.path.join(output_dir, 'ruas_criticas_latest.csv')
+                        ruas_history_csv = os.path.join(history_dir, f'ruas_criticas_{timestamp_slug}.csv')
+                        
+                        for path in (ruas_csv_path, ruas_history_csv):
+                            ruas_df.to_csv(path, index=False, encoding='utf-8-sig')
+                        
+                        artifact['artifacts']['latest_ruas_criticas_csv'] = 'outputs/hermes/ruas_criticas_latest.csv'
+                        artifact['artifacts']['history_ruas_criticas_csv'] = f'outputs/hermes/history/ruas_criticas_{timestamp_slug}.csv'
+                        print(f"✅ [Hermes] Ruas críticas exportadas: {len(ruas_rows)} logradouros em {len(ruas_rows) // max(1, len(ruas_criticas_map))} bairros.")
+                    else:
+                        print("ℹ️ [Hermes] Nenhuma rua crítica encontrada para exportar.")
+                else:
+                    print(f"ℹ️ [Hermes] Arquivo de ruas críticas não encontrado em {ruas_criticas_path}")
+            except Exception as ruas_err:
+                print(f"⚠️ [Hermes] Erro ao exportar ruas críticas: {ruas_err}")
+
             for path in (json_path, history_json_path):
                 with open(path, 'w', encoding='utf-8') as f:
                     json.dump(artifact, f, indent=2, ensure_ascii=False)
             
             print(f"✅ [Hermes] Artefatos analíticos exportados com sucesso para o Telegram Bot ({len(csv_rows)} registros).")
             
-            # --- PUBLICAÇÃO DIRETA PARA A VPS HOSTINGER (Telegram Bot) ---
-            try:
-                from src.hostinger_sync import HostingerSyncManager
-                print("🔄 [Hostinger] Iniciando publicação automática dos novos artefatos para a VPS...")
-                sync_manager = HostingerSyncManager(self.root)
-                sync_result = sync_manager.sync_risk_artifacts(artifact)
-                
-                if sync_result.get('status') == 'synced':
-                    uploaded = sync_result.get('uploaded_files', [])
-                    print(f"✅ [Hostinger] Publicação concluída com sucesso! {len(uploaded)} arquivo(s) atualizados na VPS:")
-                    for f in uploaded:
-                        print(f"  - {f}")
-                elif sync_result.get('status') == 'skipped':
-                    print("ℹ️ [Hostinger] Publicação ignorada (nenhum dado novo ou alterado no snapshot).")
-                elif sync_result.get('status') == 'disabled':
-                    reason = sync_result.get('reason', 'configuração ausente')
-                    print(f"ℹ️ [Hostinger] Publicação automática inativa ({reason}).")
-                else:
-                    print(f"ℹ️ [Hostinger] Sincronização: {sync_result.get('status')} - {sync_result.get('reason', '')}")
-            except Exception as sync_err:
-                print(f"⚠️ [Hostinger] Falha na publicação automática para a VPS: {sync_err}")
+            # --- PUBLICAÇÃO ASSÍNCRONA PARA A VPS HOSTINGER (Telegram Bot) ---
+            def _publish_hostinger_background(snapshot_artifact):
+                try:
+                    from src.hostinger_sync import HostingerSyncManager
+                    print("🔄 [Hostinger] Publicação automática em background iniciada para a VPS...", flush=True)
+                    sync_manager = HostingerSyncManager(self.root)
+                    sync_result = sync_manager.sync_risk_artifacts(snapshot_artifact)
+
+                    if sync_result.get('status') == 'synced':
+                        uploaded = sync_result.get('uploaded_files', [])
+                        print(f"✅ [Hostinger] Publicação em background concluída! {len(uploaded)} arquivo(s) atualizados na VPS:", flush=True)
+                        for file_path in uploaded:
+                            print(f"  - {file_path}", flush=True)
+                    elif sync_result.get('status') == 'skipped':
+                        print("ℹ️ [Hostinger] Publicação em background ignorada (nenhum dado novo ou alterado no snapshot).", flush=True)
+                    elif sync_result.get('status') == 'disabled':
+                        reason = sync_result.get('reason', 'configuração ausente')
+                        print(f"ℹ️ [Hostinger] Publicação automática inativa ({reason}).", flush=True)
+                    else:
+                        print(f"ℹ️ [Hostinger] Sincronização em background: {sync_result.get('status')} - {sync_result.get('reason', '')}", flush=True)
+                except Exception as sync_err:
+                    print(f"⚠️ [Hostinger] Falha na publicação automática em background para a VPS: {sync_err}", flush=True)
+
+            print("🔄 [Hostinger] Publicação automática agendada em background; inicialização liberada.", flush=True)
+            threading.Thread(
+                target=_publish_hostinger_background,
+                args=(artifact.copy(),),
+                name='hostinger-risk-sync',
+                daemon=True,
+            ).start()
         except Exception as e:
             print(f"❌ [Hermes] Erro ao exportar artefatos para o Telegram Bot: {e}")
 
