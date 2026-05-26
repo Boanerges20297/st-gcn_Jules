@@ -1748,59 +1748,30 @@
             console.warn('Failed to update metrics', e);
         }
 
-        // Recalculate Stats based on current region filter
-        var regionFilter = $('#region-filter').val() || 'all';
-
-        // Preferir contagens/estatísticas vindas do backend por região quando disponíveis.
+        // Cards reflect the same risk bands rendered on the map.
         try {
-            if (metaDataGlobal && metaDataGlobal.counts_by_region && metaDataGlobal.counts_by_region[regionFilter]) {
-                var rc = metaDataGlobal.counts_by_region[regionFilter];
-                $('#high-risk-count').text(rc['crítico'] || rc['critico'] || 0);
-                $('#medium-risk-count').text(rc['alto'] || 0);
-                $('#low-risk-count').text(rc['moderado'] || 0);
-                $('#stable-areas-count').text(rc['baixo'] || 0);
-            } else if (regionFilter === 'all' && metaDataGlobal && metaDataGlobal.counts) {
-                // fallback to global counts when 'all' selected
-                var counts = metaDataGlobal.counts;
-                $('#high-risk-count').text(counts['crítico'] || counts['critico'] || 0);
-                $('#medium-risk-count').text(counts['alto'] || 0);
-                $('#low-risk-count').text(counts['moderado'] || 0);
-                $('#stable-areas-count').text(counts['baixo'] || 0);
-            } else {
-                // Fallback: contar direto das camadas visíveis (apenas features com score numérico)
-                var criticalRisk = 0, highRisk = 0, mediumRisk = 0, stableAreas = 0;
-                if (geojsonLayer) {
-                    // Função para normalizar regions  
-                    function normalizeRegion(region) {
-                        if (!region) return 'unknown';
-                        var r = String(region).toLowerCase();
-                        if (r === 'capital' || r === 'fortaleza') return 'fortaleza';
-                        return r;
-                    }                    var normalizedFilter = normalizeRegion(regionFilter);
-                    
-                    geojsonLayer.eachLayer(function(layer) {
-                        var props = layer.feature.properties;
-                        var regionValue = props.region || props.region_type || 'unknown';
-                        var normalizedRegion = normalizeRegion(regionValue);
-                        var score = (typeof props.risk_score === 'number') ? props.risk_score : (typeof props.risk_score_cvli === 'number' ? props.risk_score_cvli : null);
-                        if (normalizedFilter === 'all' || normalizedFilter === normalizedRegion) {
-                            if (score === null) return;
-                            if (score >= 90) criticalRisk++;
-                            else if (score >= 80) highRisk++;
-                            else if (score >= 50) mediumRisk++;
-                            else stableAreas++;
-                        }
-                    });
-                }
-                $('#high-risk-count').text(criticalRisk);
-                $('#medium-risk-count').text(highRisk);
-                $('#low-risk-count').text(mediumRisk);
-                $('#stable-areas-count').text(stableAreas);
-            }
-        } catch (e) {
-            console.warn('Erro ao atualizar contagens por região:', e);
-        }
+            var criticalRisk = 0, highRisk = 0, mediumRisk = 0, stableAreas = 0;
+            if (geojsonLayer) {
+                geojsonLayer.eachLayer(function(layer) {
+                    var props = (layer.feature && layer.feature.properties) || {};
+                    var score = (typeof props.risk_score === 'number')
+                        ? props.risk_score
+                        : (typeof props.risk_score_cvli === 'number' ? props.risk_score_cvli : null);
+                    if (score === null) return;
 
+                    if (score >= 71) criticalRisk++;
+                    else if (score >= 51) highRisk++;
+                    else if (score >= 31) mediumRisk++;
+                    else stableAreas++;
+                });
+            }
+            $('#high-risk-count').text(criticalRisk);
+            $('#medium-risk-count').text(highRisk);
+            $('#low-risk-count').text(mediumRisk);
+            $('#stable-areas-count').text(stableAreas);
+        } catch (e) {
+            console.warn('Erro ao atualizar contagens por regiao:', e);
+        }
         // Update Map Style
         if (geojsonLayer) {
             geojsonLayer.eachLayer(function(layer) {

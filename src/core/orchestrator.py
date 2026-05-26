@@ -7,6 +7,7 @@ import os
 import pandas as pd
 import unicodedata
 import re
+import threading
 from datetime import datetime
 
 # --- Champion/Challenger LGBM Lean (Sentinela V3) ---
