@@ -429,6 +429,1366 @@
         "cpu_percent": 97.9
       },
       "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T07:40:59.738635",
+      "type": "high_cpu",
+      "severity": "HIGH",
+      "message": "CPU alta: 99.9%",
+      "details": {
+        "cpu_percent": 99.9
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T08:23:21.543958",
+      "type": "high_cpu",
+      "severity": "HIGH",
+      "message": "CPU alta: 93.5%",
+      "details": {
+        "cpu_percent": 93.5
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T15:12:49.926571",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T15:12:49.940852",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T15:12:49.953589",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T15:12:49.966027",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:00:37.407599",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:00:37.438748",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:00:37.467147",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:00:37.487687",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:10:37.527306",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:10:37.597133",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:10:37.637718",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:10:37.771063",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:20:38.055554",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:20:38.105018",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:20:38.124414",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:20:38.159369",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:30:38.232638",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:30:38.266085",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:30:38.297104",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:30:38.331224",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:40:38.375791",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:40:38.417586",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:40:38.441056",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:40:38.465080",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:50:38.731147",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:50:38.818230",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:50:38.873491",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T19:50:38.915533",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:00:38.974446",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:00:39.006206",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:00:39.034295",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:00:39.069054",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:10:39.097480",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:10:39.102019",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:10:39.116671",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:10:39.132015",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:20:39.164118",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:20:39.176706",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:20:39.192690",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:20:39.210823",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:30:39.239355",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:30:39.257658",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:30:39.273741",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:30:39.290778",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:40:39.334529",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:40:39.359755",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:40:39.383726",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:40:39.404987",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:50:39.453345",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:50:39.469364",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:50:39.485280",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T20:50:39.505340",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T21:00:39.538096",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T21:00:39.552716",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T21:00:39.571788",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-26T21:00:39.589869",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T09:25:16.123256",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T09:25:16.149015",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T09:25:16.161332",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T09:25:16.173572",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T09:35:16.201806",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T09:35:16.220516",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T09:35:16.238431",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T09:35:16.255242",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T09:45:16.283572",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T09:45:16.298779",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T09:45:16.313941",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T09:45:16.331865",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T09:55:16.372351",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T09:55:16.399414",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T09:55:16.428453",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T09:55:16.453237",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:10:45.732873",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:10:45.991044",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:10:46.126548",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:10:46.266537",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:20:47.833392",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:20:47.875209",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:20:47.910185",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:20:47.951729",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:30:48.050181",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:30:48.074810",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:30:48.079304",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:30:48.095135",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:40:48.330350",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:40:48.358070",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 35.0% -> 35.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.35,
+        "new_value": 0.35,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:40:48.386976",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 15.8% -> 15.8% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.1579,
+        "new_value": 0.1579,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:40:48.410841",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 30.0% -> 30.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.3,
+        "new_value": 0.3,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T14:58:38.415352",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 10.53%",
+      "details": {
+        "error_rate_percent": 10.526315789473683
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-05-27T15:34:24.704492",
+      "type": "high_cpu",
+      "severity": "HIGH",
+      "message": "CPU alta: 86.8%",
+      "details": {
+        "cpu_percent": 86.8
+      },
+      "resolved": false
     }
   ]
 }

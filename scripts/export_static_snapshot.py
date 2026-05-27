@@ -119,6 +119,174 @@ def _normalize_polygon_lookup_name(value: Any) -> str:
     return report_app.normalize_name(text.split("- AIS")[0].strip())
 
 
+def _load_municipality_geometry_index() -> Dict[str, Any]:
+    """
+    Carrega os polígonos oficiais dos municípios do Ceará a partir do app.py.
+
+    Retorna:
+      {
+        "ARACATI": shapely_geometry,
+        "FORTALEZA": shapely_geometry,
+        ...
+      }
+    """
+    try:
+        shapes = report_app._load_municipality_shapes_for_street_foci()
+    except Exception:
+        shapes = []
+
+    index: Dict[str, Any] = {}
+    for name_norm, geometry in shapes or []:
+        if name_norm and geometry is not None and not getattr(geometry, "is_empty", True):
+            index[str(name_norm)] = geometry
+    return index
+
+
+def _representative_lnglat_for_city(city_norm: str, municipality_index: Dict[str, Any]) -> Tuple[float, float] | None:
+    """
+    Retorna um ponto garantidamente dentro do município.
+    Usa representative_point(), não centroid, porque centroid pode cair fora em geometrias irregulares.
+    """
+    geometry = municipality_index.get(city_norm)
+    if geometry is None:
+        return None
+
+    try:
+        point = geometry.representative_point()
+        return float(point.x), float(point.y)
+    except Exception:
+        return None
+
+
+def _sanitize_cvli_points_payload(cvli_payload: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Corrige a exportação estática dos pinpoints CVLI.
+
+    Problema encontrado:
+    - A rota /api/cvli_points já entrega pontos, mas algumas coordenadas do CSV podem estar
+      fora do município declarado.
+    - O filtro anterior por bbox (-8..-2, -42..-37) ainda deixa passar pontos fora do Ceará
+      ou no município errado.
+    - No painel principal isso pode estar mascarado por outra camada/fonte, mas no snapshot
+      estático o GeoJSON é gravado cru.
+
+    Estratégia:
+    1. Se o ponto cai dentro do município declarado, mantém a coordenada original.
+    2. Se o ponto cai fora do Ceará ou em município diferente, mas a cidade declarada existe
+       no mapa oficial, reposiciona no representative_point() do município declarado.
+    3. Se não for possível validar nem corrigir, descarta o ponto.
+    """
+    municipality_index = _load_municipality_geometry_index()
+    if not municipality_index:
+        print("⚠️ [CVLI EXPORT] Sem municipios_ceara.geojson; exportando CVLI sem saneamento geográfico.")
+        return cvli_payload
+
+    original_features = list(cvli_payload.get("features") or [])
+    sanitized_features = []
+
+    stats = {
+        "input": len(original_features),
+        "kept": 0,
+        "corrected_to_declared_city": 0,
+        "discarded": 0,
+        "city_mismatch": 0,
+        "outside_ceara": 0,
+    }
+
+    for feature in original_features:
+        try:
+            props = dict(feature.get("properties") or {})
+            geometry = dict(feature.get("geometry") or {})
+            coords = geometry.get("coordinates") or []
+
+            if geometry.get("type") != "Point" or not isinstance(coords, list) or len(coords) < 2:
+                stats["discarded"] += 1
+                continue
+
+            lng = _safe_float(coords[0], None)
+            lat = _safe_float(coords[1], None)
+
+            if lng is None or lat is None or not math.isfinite(lng) or not math.isfinite(lat):
+                stats["discarded"] += 1
+                continue
+
+            declared_city = str(props.get("cidade") or props.get("municipio") or "").strip()
+            declared_city_norm = report_app.normalize_name(declared_city)
+
+            try:
+                actual_city_norm = report_app._municipality_from_lnglat(lng, lat)
+            except Exception:
+                actual_city_norm = ""
+
+            # Caso bom: o ponto caiu em algum município do Ceará e bate com a cidade declarada.
+            if actual_city_norm and (not declared_city_norm or actual_city_norm == declared_city_norm):
+                sanitized_features.append(feature)
+                stats["kept"] += 1
+                continue
+
+            if actual_city_norm and declared_city_norm and actual_city_norm != declared_city_norm:
+                stats["city_mismatch"] += 1
+            elif not actual_city_norm:
+                stats["outside_ceara"] += 1
+
+            # Caso ruim, mas recuperável: cidade declarada existe no shape oficial.
+            if declared_city_norm:
+                fallback = _representative_lnglat_for_city(declared_city_norm, municipality_index)
+                if fallback:
+                    fallback_lng, fallback_lat = fallback
+
+                    corrected_feature = dict(feature)
+                    corrected_props = dict(props)
+                    corrected_props["geo_sanitized"] = True
+                    corrected_props["geo_sanitized_reason"] = (
+                        "city_mismatch" if actual_city_norm else "outside_ceara"
+                    )
+                    corrected_props["declared_city_norm"] = declared_city_norm
+                    corrected_props["actual_city_norm_from_original_point"] = actual_city_norm
+                    corrected_props["original_coordinates"] = [lng, lat]
+
+                    corrected_feature["properties"] = corrected_props
+                    corrected_feature["geometry"] = {
+                        "type": "Point",
+                        "coordinates": [fallback_lng, fallback_lat],
+                    }
+
+                    # Recalculate region based on the fallback coordinates
+                    new_region = report_app._street_region_from_point({
+                        "lat": fallback_lat,
+                        "lng": fallback_lng,
+                        "cidade": declared_city,
+                    })
+                    corrected_props["region"] = new_region
+
+                    sanitized_features.append(corrected_feature)
+                    stats["corrected_to_declared_city"] += 1
+                    continue
+
+            stats["discarded"] += 1
+
+        except Exception:
+            stats["discarded"] += 1
+            continue
+
+    sanitized_payload = dict(cvli_payload)
+    sanitized_payload["features"] = sanitized_features
+
+    metadata = dict(sanitized_payload.get("metadata") or {})
+    metadata["geo_sanitization"] = stats
+    sanitized_payload["metadata"] = metadata
+
+    print(
+        "[CVLI EXPORT] saneamento geográfico | "
+        f"entrada={stats['input']} | mantidos={stats['kept']} | "
+        f"corrigidos={stats['corrected_to_declared_city']} | "
+        f"divergentes={stats['city_mismatch']} | fora_ceara={stats['outside_ceara']} | "
+        f"descartados={stats['discarded']}"
+    )
+
+    return sanitized_payload
+
+
 def _extract_peak_hours(item: Dict[str, Any], metrics: Dict[str, Any] | None = None) -> str:
     source_metrics = dict(metrics or item.get("metrics") or {})
     peak_hours = item.get("peak_hours")
@@ -870,6 +1038,9 @@ def export_snapshot(output_dir: Path) -> Path:
     risk_payload = _request_json("/api/risk", report_app.get_risk)
     polygons_payload = _request_json("/api/polygons", report_app.get_polygons)
     micronodes_payload = _request_json("/api/micronodes", report_app.get_micronodes)
+    cvli_points_payload = _sanitize_cvli_points_payload(
+        _request_json("/api/cvli_points?region=all&days=90", report_app.get_cvli_points)
+    )
     peak_hours_cache = report_app._compute_peak_hours_cache() or {}
 
     risk_items = _dedupe_risk_items(list(risk_payload.get("data", [])))
@@ -982,6 +1153,7 @@ def export_snapshot(output_dir: Path) -> Path:
     _write_json(output_dir / "explainability_academics.json", _build_explainability_academics(risk_items))
     _write_json(output_dir / "polygons.geojson", _enrich_polygons_with_risk(polygons_payload, risk_items, peak_hours_cache))
     _write_json(output_dir / "micronodes.geojson", _enrich_micronodes_with_peak_hours(micronodes_payload, peak_hours_cache))
+    _write_json(output_dir / "cvli_points.geojson", cvli_points_payload)
 
     return output_dir
 

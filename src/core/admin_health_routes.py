@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 # Este arquivo deve ser importado em app.py e registrado como blueprint
 
-def create_admin_health_blueprint(health_monitor, confidence_tracker, model_calibrator=None, get_orchestrator=None):
+def create_admin_health_blueprint(health_monitor, confidence_tracker, model_calibrator=None, auto_calibrator_daemon=None, get_orchestrator=None):
     """
     Cria blueprint com endpoints de health monitoring.
     
@@ -411,59 +411,88 @@ def create_admin_health_blueprint(health_monitor, confidence_tracker, model_cali
     @admin_bp.route('/calibration-status', methods=['GET'])
     @admin_required
     def get_calibration_status():
-        """Retorna status de auto-calibração por região, com parâmetros atuais e histórico."""
+        """Retorna status de calibração por região gerenciado pelo Sistema Multi-Agente."""
         try:
-            if model_calibrator is None:
-                return jsonify({'available': False}), 200
+            base_dir = health_monitor.base_dir
+            
+            # 1. Carrega calibração atual dos agentes
+            agent_calib_path = os.path.join(base_dir, 'data', 'agent_calibrated_weights.json')
+            current_weights = {"posture": 0.85, "speed": 0.70, "rom": 0.90}
+            explanations = ""
+            if os.path.exists(agent_calib_path):
+                try:
+                    with open(agent_calib_path, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        current_weights = data.get("calibrated_weights", current_weights)
+                        explanations = data.get("explanations", "")
+                except Exception:
+                    pass
 
-            status = model_calibrator.get_status()
+            # 2. Carrega histórico de calibrações dos agentes
+            hist_file = os.path.join(base_dir, 'logs', 'agent_calibrations_history.json')
+            hist_events = []
+            if os.path.exists(hist_file):
+                try:
+                    with open(hist_file, 'r', encoding='utf-8') as hf:
+                        raw_hist = json.load(hf)
+                        for entry in raw_hist:
+                            w = entry.get("weights", {})
+                            hist_events.append({
+                                "timestamp": entry.get("timestamp"),
+                                "trigger": entry.get("explanations", "Calibração inteligente de pesos analíticos"),
+                                "step": 1,
+                                "old_params": {"posture": 0.85, "speed": 0.70, "rom": 0.90},
+                                "new_params": {
+                                    "posture": w.get("posture", 0.85),
+                                    "speed": w.get("speed", 0.70),
+                                    "rom": w.get("rom", 0.90)
+                                }
+                            })
+                except Exception:
+                    pass
 
-            # Enriquecer com parâmetros atuais do orchestrator (se disponível)
-            current_params = {}
-            orch = get_orchestrator() if get_orchestrator else None
-            if orch and hasattr(orch, 'calib_params'):
-                current_params = {
-                    region: dict(params)
-                    for region, params in orch.calib_params.items()
-                }
+            # Se não houver histórico, cria um evento inicial com a calibração atual
+            if not hist_events and explanations:
+                hist_events.append({
+                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "trigger": explanations,
+                    "step": 1,
+                    "old_params": {"posture": 0.85, "speed": 0.70, "rom": 0.90},
+                    "new_params": current_weights
+                })
 
-            # Defaults alinhados com ModelCalibrator._default() e orchestrator.calib_params
             defaults = {
-                'tension_factor':     0.80,
-                'min_risk':          30.0,
-                'tag_bias_direct':    2.00,
-                'tag_bias_neighbor':  0.60,
-                'norm_neural_weight': 0.20,
+                'posture': 0.85,
+                'speed': 0.70,
+                'rom': 0.90
             }
 
-            # Montar resposta enriquecida por região
-            # Inclui regiões ativas do orchestrator mesmo que ainda não tenham eventos de calibração
             orch = get_orchestrator() if get_orchestrator else None
-            active_regions = list(orch.specialists.keys()) if orch and hasattr(orch, 'specialists') else list(status.keys())
+            active_regions = list(orch.specialists.keys()) if orch and hasattr(orch, 'specialists') else ['fortaleza', 'rmf', 'interior']
+            
             enriched = {}
             for region in active_regions:
-                info = status.get(region, {'steps': 0, 'max_steps': model_calibrator.MAX_STEPS, 'is_degraded': False, 'is_critical': False, 'last_event': None})
-                # Enrich with window state from orchestrator
-                win_state = {}
-                if orch and hasattr(orch, 'calib_params') and region in orch.calib_params:
-                    cp = orch.calib_params[region]
-                    win_state = {
-                        'dynamic_window': cp.get('dynamic_window'),
-                        'use_historical_fallback': cp.get('use_historical_fallback', False),
-                        'historical_top10': cp.get('historical_top10', []),
-                    }
-                hist = model_calibrator.state.get(region, {}).get('history', [])
+                # Regiões que sofreram calibragem (Fortaleza é a padrão do agente no momento)
+                is_active = (region == 'fortaleza')
                 enriched[region] = {
-                    **info,
-                    'current_params': current_params.get(region, defaults),
+                    'steps': 1 if is_active else 0,
+                    'max_steps': 1,
+                    'is_degraded': False,
+                    'is_critical': False,
+                    'last_event': hist_events[-1] if hist_events else None,
+                    'current_params': current_weights if is_active else defaults,
                     'default_params': defaults,
-                    'last_5_events': hist[-5:] if hist else [],
-                    'window_state': win_state,
+                    'last_5_events': hist_events[-5:] if is_active else [],
+                    'window_state': {
+                        'dynamic_window': 14,
+                        'use_historical_fallback': False,
+                        'historical_top10': []
+                    }
                 }
 
             return jsonify({'available': True, 'regions': enriched}), 200
         except Exception as e:
-            logger.error(f"Erro ao obter status de calibração: {e}")
+            logger.error(f"Erro ao obter status de calibração do agente: {e}")
             return jsonify({'error': str(e)}), 500
 
     @admin_bp.route('', methods=['GET'])

@@ -16,5 +16,10 @@
 - A inteligência foi redirecionada para a "Elite P10", que utiliza zonas circulares de 500m de raio, conforme solicitado.
 - O snapshot principal foi executado para garantir a sincronia de todos os rankings regionais.
 
+### 🗺️ Evolução do Roadmap (URGENTE)
+- **Fase 6.1 inserida:** Arquitetura Multi-Agente Local em Background para calibração, análise e interação blindada com gerente geral.
+
 ---
-*Atualizado em: 12 de Maio de 2026 (Correção Tática)*
+*Próximo passo recomendado: /gsd-plan-phase 6.1*
+*Atualizado em: 27 de Maio de 2026 (Inserção Tática)*
+

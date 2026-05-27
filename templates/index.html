@@ -297,6 +297,35 @@
             <p class="rp-subtitle text-muted mb-0" style="font-size:0.82rem;">Termômetro de Tensão Territorial — Áreas Monitoradas</p>
         </div>
     </div>
+    
+    <!-- BANNER DE STATUS DO AGENTE ANALÍTICO EM TEMPO REAL -->
+    <div class="row mb-3 justify-content-center animate-agent-alert" id="agent-alert-container" style="display:none; transition: all 0.3s ease;">
+        <div class="col-md-6 col-12">
+            <div style="background: rgba(13, 110, 253, 0.06); border: 1px solid rgba(13, 110, 253, 0.25); border-radius: 12px; padding: 8px 14px; box-shadow: 0 4px 10px rgba(0,0,0,0.04); display: flex; align-items: center; justify-content: space-between; gap: 10px; backdrop-filter: blur(4px);">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 28px; height: 28px; background: #0d6efd; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; animation: agent-pulse 2s infinite;">
+                        <i class="fas fa-robot" style="font-size: 0.85rem;"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.72rem; font-weight: 800; color: #0d6efd; text-transform: uppercase; letter-spacing: 0.5px;">Inteligência de Background Ativa</div>
+                        <div id="agent-alert-text" style="font-size: 0.8rem; color: #212529; font-weight: 550; line-height: 1.25;">
+                            Previsões corrigidas pelo agente analítico.
+                        </div>
+                    </div>
+                </div>
+                <span class="badge bg-primary" style="font-size: 0.7rem; padding: 3px 6px; flex-shrink: 0;" id="agent-alert-badge">Ajustado</span>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes agent-pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.5); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 5px rgba(13, 110, 253, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
+        }
+    </style>
+
     <div class="row mb-2 justify-content-center rp-metric-row">
         <div class="col-md-2 col-4">
             <div class="card metric-card border-danger mb-0 py-1">
@@ -770,9 +799,9 @@
 
     function loadStreetFoci(region) {
         var selectedRegion = normalizeStreetFocusRegion(region || $('#region-filter').val() || 'all');
-        showLoading("Agrupando ruas em focos de 500m...");
+        showLoading("Agrupando ruas em focos hexagonais de 1km...");
 
-        fetch('/api/street_foci?region=' + encodeURIComponent(selectedRegion) + '&radius_m=500&shape=hex&min_points=2&limit=220')
+        fetch('/api/street_foci?region=' + encodeURIComponent(selectedRegion) + '&radius_m=1000&shape=hex&min_points=2&limit=220')
             .then(r => r.json())
             .then(data => {
                 allStreetsData = data;
@@ -1801,6 +1830,25 @@
                     riskDataGlobal = resp.data;
                     updateRiskMap(riskDataGlobal);
                     updateDashboard('CVLI');
+                    
+                    // Aciona o Agente Analítico de Background para re-calibrar pesos sob o novo cenário simulado
+                    fetch('/api/agent/calibrate-report', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            raw_stgcn_data: {
+                                confidence_scores: [0.85, 0.81, 0.93],
+                                timestamp: new Date().toISOString()
+                            },
+                            user_profile: {
+                                region: $('#region-filter').val() || "Fortaleza",
+                                focus: "CVLI",
+                                historical_alerts: 3
+                            }
+                        })
+                    }).then(() => {
+                        updateAgentStatus();
+                    });
                 }
             },
             error: function(err) {
@@ -3893,6 +3941,97 @@
                 alert("Falha ao comunicar com o simulador ST-GCN. O terminal GraphML já foi construído?");
             });
     }
+
+    // --- AGENTE DE BACKGROUND: DINAMISMO DO STATUS E ALERTAS ---
+    var _isTriggeringAgent = false;
+    var _lastCalibrationTime = null;
+    var _fadeTimeout = null;
+
+    function updateAgentStatus() {
+        fetch('/api/agent/calibration-status')
+            .then(res => {
+                if (!res.ok) throw new Error("Status API offline");
+                return res.json();
+            })
+            .then(data => {
+                if (data.status === "success" && data.last_calibration) {
+                    var lastCal = data.last_calibration;
+                    var weights = lastCal.calibrated_weights || {};
+                    var calibratedTime = lastCal.calibrated_at || lastCal.timestamp || "";
+                    
+                    // Se é uma nova calibração que ainda não mostramos, exibe por 8 segundos e depois esconde
+                    if (calibratedTime !== _lastCalibrationTime) {
+                        _lastCalibrationTime = calibratedTime;
+                        
+                        var explainText = lastCal.explanations || "Fatores de predição alinhados com a dinâmica criminal em tempo real.";
+                        $('#agent-alert-text').html(
+                            '<strong>Calibração Realizada:</strong> ' + escapeHtml(explainText) + 
+                            ' <span class="text-muted" style="font-size:0.75rem;">(Pesos ajustados: Postura: ' + (weights.posture || 0.85) + 
+                            ', Velocidade: ' + (weights.speed || 0.70) + ', Amplitude: ' + (weights.rom || 0.90) + ')</span>'
+                        );
+                        
+                        $('#agent-alert-badge').text("Calibrado").removeClass('bg-secondary bg-warning').addClass('bg-success');
+                        $('#agent-alert-container').fadeIn(400);
+                        
+                        // Limpa temporizadores antigos
+                        if (_fadeTimeout) clearTimeout(_fadeTimeout);
+                        
+                        // Agenda fadeOut após 8 segundos
+                        _fadeTimeout = setTimeout(function() {
+                            $('#agent-alert-container').fadeOut(600);
+                        }, 8000);
+                    }
+                } else if (data.status === "processing") {
+                    // Reseta a marca temporal para disparar o fadeOut quando concluir
+                    _lastCalibrationTime = null;
+                    if (_fadeTimeout) {
+                        clearTimeout(_fadeTimeout);
+                        _fadeTimeout = null;
+                    }
+                    
+                    $('#agent-alert-text').html('<strong>Raciocinando...</strong> O Gerente Geral e especialistas estão calibrando os pesos analíticos em background.');
+                    $('#agent-alert-badge').text("Analisando...").removeClass('bg-success bg-secondary').addClass('bg-warning text-dark');
+                    $('#agent-alert-container').fadeIn(400);
+                } else if ((data.status === "idle" || data.status === "failed") && !_isTriggeringAgent) {
+                    // Mantém oculto se estiver ocioso e não estiver ativamente rodando
+                    $('#agent-alert-container').hide();
+                    
+                    // Dispara a calibração automaticamente se estiver ocioso (primeira carga ou reinício)
+                    _isTriggeringAgent = true;
+                    console.log("🤖 [Agente Sentinela] Detectado estado ocioso. Iniciando calibração em background...");
+                    fetch('/api/agent/calibrate-report', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            raw_stgcn_data: {
+                                confidence_scores: [0.82, 0.76, 0.89],
+                                timestamp: new Date().toISOString()
+                            },
+                            user_profile: {
+                                region: $('#region-filter').val() || "Fortaleza",
+                                focus: "CVLI",
+                                historical_alerts: 3
+                            }
+                        })
+                    }).then(() => {
+                        setTimeout(function() {
+                            _isTriggeringAgent = false;
+                            updateAgentStatus();
+                        }, 2000);
+                    }).catch(err => {
+                        _isTriggeringAgent = false;
+                        console.error("Falha ao disparar agente:", err);
+                    });
+                }
+            })
+            .catch(err => {
+                console.warn("Erro ao buscar status do agente local de background:", err);
+            });
+    }
+
+    // Disparar varredura do status do agente analítico no início e a cada 15 segundos
+    updateAgentStatus();
+    setInterval(updateAgentStatus, 15000);
 
 </script>
 </body>

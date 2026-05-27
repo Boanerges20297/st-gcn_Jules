@@ -2728,14 +2728,15 @@ class TelegramGeminiGateway:
 
             events_summary = "\n".join(local_events[:15]) if local_events else "Nenhuma ocorrência registrada nos últimos 14 dias."
             query = (
-                f"Você é um analista sênior de inteligência operacional de segurança pública. Entre IMEDIATAMENTE em modo analítico, técnico e tático, não genérico ou teórico.\n\n"
-                f"Forneça uma análise de inteligência criminal extremamente precisa, direta e assertiva (máximo de 15 linhas) "
-                f"sobre a dinâmica recente na localidade '{location_name}'. Justifique as métricas reais com base nas ocorrências listadas abaixo:\n\n"
-                f"Estatísticas de 14 dias para {location_name}:\n"
+                f"Você é o Assessor de Inteligência Crítica e Estratégica do Comandante. Trate-o obrigatoriamente por 'Comandante' no início do relatório.\n"
+                f"Não faça apenas leituras ou resumos passivos e transcritivos dos dados fornecidos. Faça sua própria análise crítica e contraponha ativamente as previsões ou tendências gerais do modelo ST-GAT caso perceba discrepâncias ou indícios sutis nos dados históricos dos últimos 90 dias.\n\n"
+                f"Forneça uma análise crítica operacional de inteligência criminal extremamente focada (máximo de 15 linhas) "
+                f"sobre a dinâmica recente na localidade '{location_name}'. Justifique as métricas reais confrontando com as ocorrências abaixo:\n\n"
+                f"Métricas Reais de 14 dias para {location_name}:\n"
                 f"- CVLI (Homicídios/Letais): {cvli_count}\n"
                 f"- CVP (Roubos/Patrimoniais): {cvp_count}\n\n"
-                f"Lista de ocorrências reais:\n{events_summary}\n\n"
-                f"Identifique hipóteses táticas plausíveis: controle territorial por facções, padrões de dias/ruas, dinâmicas de atração de roubos ou correlação de migração criminal."
+                f"Ocorrências Reais:\n{events_summary}\n\n"
+                f"Identifique atritos ocultos: conflito territorial/expansão de facções específicas, padrões de reincidência sutil de dias/vias, atração de CVP mascarando riscos ou se a tendência real dos dados brutos aponta para um cenário diferente do previsível pelo modelo ST-GAT."
             )
 
         # 2. DADOS RECENTES (14d resumo/ranking)
@@ -2752,11 +2753,12 @@ class TelegramGeminiGateway:
                 logging.error("Erro ao carregar resumo de 14 dias para explicabilidade: %s", e)
                 
             query = (
-                f"Você é um analista sênior de inteligência operacional de segurança pública. Entre IMEDIATAMENTE em modo analítico, técnico e tático, não genérico ou teórico.\n\n"
-                f"Forneça uma análise estratégica de dinâmica criminal (máximo de 15 linhas) "
-                f"sobre a dinâmica e ranking geral dos últimos 14 dias no Ceará com base no resumo dos dados reais abaixo:\n\n"
+                f"Você é o Assessor de Inteligência Crítica e Estratégica do Comandante. Trate-o obrigatoriamente por 'Comandante' no início do relatório.\n"
+                f"Não faça apenas leituras ou resumos passivos e transcritivos dos dados fornecidos. Faça sua própria análise crítica e contraponha ativamente as previsões ou tendências gerais do modelo ST-GAT caso perceba discrepâncias ou indícios sutis nos dados históricos dos últimos 90 dias.\n\n"
+                f"Forneça uma análise crítica operacional de inteligência criminal extremamente focada (máximo de 15 linhas) "
+                f"sobre a dinâmica geral e ranking dos últimos 14 dias no Ceará com base no resumo dos dados reais abaixo:\n\n"
                 f"Resumo dos dados reais de 14 dias:\n{summary_content[:3000]}\n\n"
-                f"Destaque e analise as cidades e bairros que estão no topo de crimes patrimoniais (CVP) ou letais (CVLI). Apresente hipóteses de redes, conflitos operacionais e orientações táticas acionáveis."
+                f"Aponte anomalias críticas e discuta se áreas quentes atuais apontam para transições silenciosas de criminalidade letal ou patrimonial. Questione as predições do modelo ST-GAT se houver indício real de novo foco tático em ascensão."
             )
 
         # 3. SENTINELA (Micronodos Críticos)
@@ -2790,11 +2792,12 @@ class TelegramGeminiGateway:
                 logging.error("Erro ao carregar micronodos para explicabilidade: %s", e)
                 
             query = (
-                f"Você é um analista sênior de inteligência operacional de segurança pública. Entre IMEDIATAMENTE em modo analítico, técnico e tático, não genérico ou teórico.\n\n"
-                f"Forneça uma análise tática sobre os micronodos críticos da região {region.upper()} (máximo de 15 linhas) "
-                f"com base nos dados consolidados reais listados abaixo:\n\n"
+                f"Você é o Assessor de Inteligência Crítica e Estratégica do Comandante. Trate-o obrigatoriamente por 'Comandante' no início do relatório.\n"
+                f"Não faça apenas leituras ou resumos passivos e transcritivos dos dados fornecidos. Faça sua própria análise crítica e contraponha ativamente as previsões ou tendências gerais do modelo ST-GAT caso perceba discrepâncias ou indícios sutis nos dados históricos dos últimos 90 dias.\n\n"
+                f"Forneça uma análise crítica operacional de inteligência criminal extremamente focada (máximo de 15 linhas) "
+                f"sobre os micronodos críticos na região {region.upper()} baseada nos dados consolidados reais abaixo:\n\n"
                 f"Top 10 Micronodos Críticos ({region.upper()}):\n{micronodes_text}\n\n"
-                f"Explique a dinâmica operacional da dominância territorial das facções informadas nos respectivos bairros e eixos viários, justificando o porquê de esses pontos serem focos críticos de reincidência de homicídios (CVLI)."
+                f"Identifique se a influência de facções e a reincidência em pontos específicos destes bairros e eixos viários indicam descompasso com os modelos preditivos automáticos. Contrapunha o risco reportado com o risco real latente observado em campo."
             )
 
         # 4. CAMINHO DO CRIME (Vetor de Deslocamento)
@@ -2889,11 +2892,12 @@ class TelegramGeminiGateway:
 
             crime_label = "CVLI (Homicídios)" if crime_type == "cvli" else "CVP (Roubos)"
             query = (
-                f"Você é um analista sênior de inteligência operacional de segurança pública. Entre IMEDIATAMENTE em modo analítico, técnico e tático, não genérico ou teórico.\n\n"
-                f"Forneça uma análise de inteligência criminal extremamente assertiva e focada (máximo de 15 linhas) "
+                f"Você é o Assessor de Inteligência Crítica e Estratégica do Comandante. Trate-o obrigatoriamente por 'Comandante' no início do relatório.\n"
+                f"Não faça apenas leituras ou resumos passivos e transcritivos dos dados fornecidos. Faça sua própria análise crítica e contraponha ativamente as previsões ou tendências gerais do modelo ST-GAT caso perceba discrepâncias ou indícios sutis nos dados históricos dos últimos 90 dias.\n\n"
+                f"Forneça uma análise crítica operacional de inteligência criminal extremamente focada (máximo de 15 linhas) "
                 f"sobre as rotas e migrações cronológicas sucessivas de {crime_label} na região {region.upper()} nos últimos {days} dias com base nos dados reais listados abaixo:\n\n"
                 f"Rotas de Migração Recentes ({region.upper()}):\n{transitions_text}\n\n"
-                f"Identifique o vetor migratório da criminalidade (se os focos estão migrando entre bairros limítrofes, mudando de AIS ou se intensificando na mesma área). Apresente hipóteses operacionais concretas."
+                f"Contrapunha a previsão estática do modelo apontando para onde o vetor migratório real dos dados está inclinando a tendência (se há um descolamento silencioso para outra área adjacente e por quê)."
             )
 
         # 5. RANKING POR RUAS (Logradouros Críticos)
@@ -2962,11 +2966,12 @@ class TelegramGeminiGateway:
                 logging.error("Erro ao carregar ruas críticas para explicabilidade: %s", e)
 
             query = (
-                f"Você é um analista sênior de inteligência operacional de segurança pública. Entre IMEDIATAMENTE em modo analítico, técnico e tático, não genérico ou teórico.\n\n"
-                f"Forneça uma análise operacional de vias urbanas críticas (máximo de 15 linhas) "
-                f"sobre a recorrência e reincidência de homicídios no ranking de ruas da região {region.upper()} nos últimos {days} dias com base nos dados reais listados abaixo:\n\n"
+                f"Você é o Assessor de Inteligência Crítica e Estratégica do Comandante. Trate-o obrigatoriamente por 'Comandante' no início do relatório.\n"
+                f"Não faça apenas leituras ou resumos passivos e transcritivos dos dados fornecidos. Faça sua própria análise crítica e contraponha ativamente as previsões ou tendências gerais do modelo ST-GAT caso perceba discrepâncias ou indícios sutis nos dados históricos dos últimos 90 dias.\n\n"
+                f"Forneça uma análise crítica operacional de inteligência criminal extremamente focada (máximo de 15 linhas) "
+                f"sobre o ranking de vias urbanas críticas da região {region.upper()} nos últimos {days} dias com base nos dados reais listados abaixo:\n\n"
                 f"Ruas Críticas com Maior Reincidência de CVLI:\n{streets_text}\n\n"
-                f"Identifique o porquê de estas ruas específicas concentrarem reincidência criminal recorrente (fatores urbanísticos, rotas de fuga, vulnerabilidade, divisão de territórios de facções) e proponha hipóteses para ações de patrulhamento cirúrgico."
+                f"Examine se a concentração nessas vias aponta para eixos de atrito não mapeados adequadamente pelo modelo ST-GAT. Indique onde o policiamento deve se antecipar fisicamente para quebrar esse fluxo."
             )
 
         # 6. JANELAS TEMPORAIS HISTÓRICAS
@@ -3020,8 +3025,9 @@ class TelegramGeminiGateway:
                 logging.error("Erro ao carregar dados de janelas temporais para explicabilidade: %s", e)
 
             query = (
-                f"Você é um analista sênior de inteligência operacional de segurança pública. Entre IMEDIATAMENTE em modo analítico, técnico e tático, não genérico ou teórico.\n\n"
-                f"Forneça uma análise de inteligência criminal extremamente focada (máximo de 15 linhas) "
+                f"Você é o Assessor de Inteligência Crítica e Estratégica do Comandante. Trate-o obrigatoriamente por 'Comandante' no início do relatório.\n"
+                f"Não faça apenas leituras ou resumos passivos e transcritivos dos dados fornecidos. Faça sua própria análise crítica e contraponha ativamente as previsões ou tendências gerais do modelo ST-GAT caso perceba discrepâncias ou indícios sutis nos dados históricos dos últimos 90 dias.\n\n"
+                f"Forneça uma análise crítica operacional de inteligência criminal extremamente focada (máximo de 15 linhas) "
                 f"sobre a dinâmica acumulada nos últimos {days} dias com base nos dados reais consolidados abaixo:\n\n"
                 f"Estatísticas Gerais ({days} dias):\n"
                 f"- Total de Ocorrências: {total}\n"
@@ -3029,7 +3035,7 @@ class TelegramGeminiGateway:
                 f"- CVP (Roubos/Patrimoniais): {cvp_count}\n\n"
                 f"Top 5 Cidades:\n{cidades_summary}\n\n"
                 f"Top 5 Bairros (Fortaleza):\n{bairros_summary}\n\n"
-                f"Interprete o equilíbrio tático entre combater roubos (CVP) e homicídios (CVLI), destacando tendências de interiorização, estabilidade na capital ou aquecimento de rotas específicas."
+                f"Interprete o equilíbrio tático real e a tendência de interiorização de facções. Contraponha ativamente a predição estática da rede neural se identificar bairros ou cidades com crescimento súbito de homicídios nos últimos 90 dias."
             )
 
         # 7. CONTADORES (Cidade / Bairro / Natureza)
@@ -3067,11 +3073,12 @@ class TelegramGeminiGateway:
                 logging.error("Erro ao carregar cidades para explicabilidade: %s", e)
 
             query = (
-                f"Você é um analista sênior de inteligência operacional de segurança pública. Entre IMEDIATAMENTE em modo analítico, técnico e tático, não genérico ou teórico.\n\n"
-                f"Forneça uma análise de inteligência criminal macrorregional por cidades (máximo de 15 linhas) "
-                f"com base nos volumes consolidados de CVLI e CVP reais das 10 principais cidades do Ceará listadas abaixo:\n\n"
+                f"Você é o Assessor de Inteligência Crítica e Estratégica do Comandante. Trate-o obrigatoriamente por 'Comandante' no início do relatório.\n"
+                f"Não faça apenas leituras ou resumos passivos e transcritivos dos dados fornecidos. Faça sua própria análise crítica e contraponha ativamente as previsões ou tendências gerais do modelo ST-GAT caso perceba discrepâncias ou indícios sutis nos dados históricos dos últimos 90 dias.\n\n"
+                f"Forneça uma análise crítica macrorregional de inteligência criminal por cidades (máximo de 15 linhas) "
+                f"com base nos volumes consolidados de CVLI e CVP reais das 10 principais cidades do Ceará abaixo:\n\n"
                 f"Contagem por Cidade (90 dias):\n{cities_text}\n\n"
-                f"Justifique taticamente a desproporção entre crimes patrimoniais (CVP) e letais (CVLI) em cada município, relacionando com a interiorização de facções ou presença de eixos logísticos."
+                f"Analise criticamente se a interiorização de facções ou novos eixos logísticos estão gerando distorções de violência que divergem das previsões automáticas do modelo preditivo."
             )
 
         elif callback_data == "contador_bairro_explicabilidade":
@@ -3111,11 +3118,12 @@ class TelegramGeminiGateway:
                 logging.error("Erro ao carregar bairros para explicabilidade: %s", e)
 
             query = (
-                f"Você é um analista sênior de inteligência operacional de segurança pública. Entre IMEDIATAMENTE em modo analítico, técnico e tático, não genérico ou teórico.\n\n"
-                f"Forneça uma análise de inteligência tática urbana e territorial (máximo de 15 linhas) "
-                f"com base nos volumes consolidados de CVLI e CVP dos 10 bairros mais críticos de Fortaleza listados abaixo:\n\n"
+                f"Você é o Assessor de Inteligência Crítica e Estratégica do Comandante. Trate-o obrigatoriamente por 'Comandante' no início do relatório.\n"
+                f"Não faça apenas leituras ou resumos passivos e transcritivos dos dados fornecidos. Faça sua própria análise crítica e contraponha ativamente as previsões ou tendências gerais do modelo ST-GAT caso perceba discrepâncias ou indícios sutis nos dados históricos dos últimos 90 dias.\n\n"
+                f"Forneça uma análise crítica de inteligência tática urbana e territorial (máximo de 15 linhas) "
+                f"com base nos volumes de CVLI e CVP dos 10 bairros mais críticos de Fortaleza abaixo:\n\n"
                 f"Contagem por Bairro em Fortaleza (90 dias):\n{bairros_text}\n\n"
-                f"Interprete o porquê de certas regiões terem altíssimos índices de roubo (CVP) com baixa letalidade (CVLI), enquanto outras registram letalidade desenfreada, relacionando com dinâmicas locais."
+                f"Analise o descompasso entre roubos (CVP) e assassinatos (CVLI). Por exemplo, contraponha o modelo se Barroso aponta alta probabilidade predita, mas a tendência real de alta de CVLI se inclina para a Messejana nos últimos 90 dias devido à taxa de incidência recente, alertando o Comandante com foco e criticidade."
             )
 
         elif callback_data == "contador_ais_explicabilidade":
@@ -3163,11 +3171,12 @@ class TelegramGeminiGateway:
                 logging.error("Erro ao carregar AIS para explicabilidade: %s", e)
 
             query = (
-                f"Você é um analista sênior de inteligência operacional de segurança pública. Entre IMEDIATAMENTE em modo analítico, técnico e tático, não genérico ou teórico.\n\n"
-                f"Forneça uma análise de inteligência criminal sob o prisma de divisões de Áreas de Segurança Integrada (AIS) (máximo de 15 linhas) "
-                f"com base nos volumes consolidados de CVLI e CVP reais das principais AIS listadas abaixo:\n\n"
+                f"Você é o Assessor de Inteligência Crítica e Estratégica do Comandante. Trate-o obrigatoriamente por 'Comandante' no início do relatório.\n"
+                f"Não faça apenas leituras ou resumos passivos e transcritivos dos dados fornecidos. Faça sua própria análise crítica e contraponha ativamente as previsões ou tendências gerais do modelo ST-GAT caso perceba discrepâncias ou indícios sutis nos dados históricos dos últimos 90 dias.\n\n"
+                f"Forneça uma análise crítica sob o prisma de divisões de Áreas de Segurança Integrada (AIS) (máximo de 15 linhas) "
+                f"com base nos volumes consolidados reais das principais AIS listadas abaixo:\n\n"
                 f"Contagem por AIS (90 dias):\n{ais_text}\n\n"
-                f"Identifique quais AIS concentram a maior carga de violência letal (CVLI) e patrimonial (CVP). Justifique taticamente como a divisão administrativa das AIS impacta a alocação de recursos policiais e a coordenação de operações de saturação de área."
+                f"Indique se a carga de violência de certas AIS denota falha nas predições gerais do modelo preditivo e aponte desvios que demandam remanejamento tático."
             )
 
         elif callback_data == "contador_natureza_explicabilidade" or "contador" in callback_data:
@@ -3198,18 +3207,19 @@ class TelegramGeminiGateway:
                 logging.error("Erro ao carregar naturezas para explicabilidade: %s", e)
 
             query = (
-                f"Você é um analista sênior de inteligência operacional de segurança pública. Entre IMEDIATAMENTE em modo analítico, técnico e tático, não genérico ou teórico.\n\n"
-                f"Forneça uma análise tática e comportamental de dinâmicas criminais (máximo de 15 linhas) "
-                f"com base na distribuição por naturezas/tipologias de delitos do Ceará nos últimos 90 dias listadas abaixo:\n\n"
+                f"Você é o Assessor de Inteligência Crítica e Estratégica do Comandante. Trate-o obrigatoriamente por 'Comandante' no início do relatório.\n"
+                f"Não faça apenas leituras ou resumos passivos e transcritivos dos dados fornecidos. Faça sua própria análise crítica e contraponha ativamente as previsões ou tendências gerais do modelo ST-GAT caso perceba discrepâncias ou indícios sutis nos dados históricos dos últimos 90 dias.\n\n"
+                f"Forneça uma análise crítica tática e comportamental de dinâmicas criminais (máximo de 15 linhas) "
+                f"com base na distribuição por naturezas de delitos no Ceará nos últimos 90 dias listadas abaixo:\n\n"
                 f"Top 10 Naturezas Registradas (90 dias):\n{nature_text}\n\n"
-                f"Analise a relação de causa-efeito e coexistência espacial dessas naturezas (por exemplo, a correlação entre roubos patrimoniais comuns, roubos a farmácias e assassinatos). Justifique os padrões observados nos dados."
+                f"Avalie a correlação causal entre roubos e homicídios recentes. Desafie o modelo se a dinâmica sugerir anomalias locais não contempladas na modelagem matemática tradicional do ST-GAT."
             )
 
         # FALLBACK / GERAL
         else:
             query = (
-                "Forneça uma explicação conceitual clara e concisa sobre as metodologias de cálculo de estatísticas e inteligência "
-                "criminal integradas no Report Preview."
+                f"Você é o Assessor de Inteligência Crítica e Estratégica do Comandante. Trate-o obrigatoriamente por 'Comandante' no início do relatório.\n"
+                f"Forneça uma análise operacional metodológica e conceitual concisa sobre a correlação entre os dados reais consolidados e os modelos preditivos ST-GAT no Report Preview."
             )
             back_callback = "menu_main"
             module_name = "Report Preview"
@@ -3245,7 +3255,7 @@ class TelegramGeminiGateway:
                 
                 self._send_inline_keyboard(
                     chat_id,
-                    f"💡 *EXPLICABILIDADE METODOLÓGICA — {module_name.upper()}*\n\n{answer}",
+                    f"🧠 *ANÁLISE DE INTELIGÊNCIA CRÍTICA — {module_name.upper()}*\n\n{answer}",
                     keyboard
                 )
                 self._log_conversation(chat_id, f"Solicitou Explicabilidade ({module_name})", answer)

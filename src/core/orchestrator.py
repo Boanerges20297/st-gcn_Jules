@@ -83,6 +83,8 @@ class StateOrchestrator:
         }
         
         self._window_state_path = os.path.join(self.root, 'data', 'window_state.json')
+        self._hermes_export_lock = threading.Lock()
+        self._last_hermes_export_fingerprint = None
         self.dates = None
         self._initialize_models()
         self._restore_window_state()
@@ -657,6 +659,20 @@ class StateOrchestrator:
         print("🔄 [Hermes] Iniciando exportação de artefatos analíticos para o Telegram Bot...")
         try:
             artifact = self._build_hermes_rankings(scores_map, component_details)
+            export_fingerprint = json.dumps(
+                {
+                    'data_limit': artifact.get('data_limit'),
+                    'rankings': artifact.get('rankings', {}),
+                    'status_enriquecido_14d': artifact.get('status_enriquecido_14d', {}),
+                },
+                ensure_ascii=False,
+                sort_keys=True,
+            )
+            with self._hermes_export_lock:
+                if self._last_hermes_export_fingerprint == export_fingerprint:
+                    print("ℹ️ [Hermes] Snapshot idêntico ao último exportado; pulando reexportação duplicada.")
+                    return
+
             output_dir = os.path.join(self.root, 'outputs', 'hermes')
             history_dir = os.path.join(output_dir, 'history')
             os.makedirs(output_dir, exist_ok=True)
@@ -979,6 +995,8 @@ class StateOrchestrator:
                 name='hostinger-risk-sync',
                 daemon=True,
             ).start()
+            with self._hermes_export_lock:
+                self._last_hermes_export_fingerprint = export_fingerprint
         except Exception as e:
             print(f"❌ [Hermes] Erro ao exportar artefatos para o Telegram Bot: {e}")
 

@@ -76,9 +76,11 @@ def sync_google_sheets(csv_url: str, exogenous_file_path: str):
         now_str = now.strftime("%Y-%m-%d %H:%M:%S")
         
         try:
-            from src.llm_service import process_exogenous_text
+            from src.llm_service import process_exogenous_text, busca_bairro, busca_municipio
         except ImportError:
             process_exogenous_text = None
+            busca_bairro = None
+            busca_municipio = None
         
         for r in data_rows:
             row = r + [''] * (7 - len(r))
@@ -108,8 +110,9 @@ def sync_google_sheets(csv_url: str, exogenous_file_path: str):
             if (ev_id and ev_id in existing_ids) or (desc_norm and desc_norm in existing_texts):
                 continue
                 
-            # 4. LLM Enrichment
+            # 4. LLM Enrichment & Robust Fallback
             natureza, municipio, bairro, severity = "OUTROS", "", "", "LOW"
+            parsed_items = None
             if process_exogenous_text and descricao:
                 try:
                     parsed_items = process_exogenous_text(descricao)
@@ -122,17 +125,81 @@ def sync_google_sheets(csv_url: str, exogenous_file_path: str):
                 except Exception as e:
                     logger.warning(f"LLM parse failed for id {ev_id}: {e}")
 
+            # 4.1 Geo-varredura determinística de fallback se vier vazio (processa o texto completo)
+            if not bairro and busca_bairro:
+                bairro = (busca_bairro(descricao) or "").upper()
+            if not municipio and busca_municipio:
+                municipio = (busca_municipio(descricao) or "").upper()
+            if bairro and not municipio:
+                municipio = "FORTALEZA"
+
+            # 4.2 Restauração de Natureza real se vier DESCONHECIDO/OUTROS
+            if natureza in ("DESCONHECIDO", "OUTROS", ""):
+                desc_upper = descricao.upper()
+                if "EXPULSAO DE MORADORES" in desc_upper or "EXPULSÃO DE MORADORES" in desc_upper or "EXPULSAO" in desc_upper:
+                    natureza = "EXPULSÃO DE MORADORES"
+                elif "DESLOCAMENTO FORCADO" in desc_upper or "DESLOCAMENTO FORÇADO" in desc_upper:
+                    natureza = "DESLOCAMENTO FORÇADO"
+                elif "HOMICIDIO" in desc_upper or "HOMICÍDIO" in desc_upper:
+                    natureza = "HOMICÍDIO"
+                elif "LESAO A BALA" in desc_upper or "LESÃO A BALA" in desc_upper:
+                    natureza = "LESÃO A BALA"
+                elif "ACHADO DE CADAVER" in desc_upper or "ACHADO DE CADÁVER" in desc_upper:
+                    natureza = "ACHADO DE CADÁVER"
+
+            # Se ainda assim não detectou, tenta extrair o prefixo de cabeçalho
+            if natureza in ("DESCONHECIDO", "OUTROS", ""):
+                match_nature = re.match(r'^([A-ZÀ-Úa-zà-ú\s]+)\s*-\s*', descricao)
+                if match_nature:
+                    candidate = match_nature.group(1).strip()
+                    if len(candidate) > 3 and len(candidate) < 40:
+                        natureza = candidate.upper()
+
+            # Forçar atualização de severidade baseada na natureza corrigida
+            if natureza in ("HOMICÍDIO", "LESÃO A BALA"):
+                severity = "HIGH"
+            elif natureza in ("EXPULSÃO DE MORADORES", "DESLOCAMENTO FORÇADO"):
+                severity = "MEDIUM"
+
+            # 4.3 Limpeza de Metadados de WhatsApp e Horários
+            # Remover padrão do WhatsApp: [HH:MM, DD/MM/YYYY] Remetente:
+            clean_text = re.sub(r'\[\d{2}:\d{2},\s+\d{2}/\d{2}/\d{4}\]\s*[^:]+:\s*', '', descricao)
+            # Remover metadados do rodapé da mensagem (ex: - BARROSO - FORTALEZA - 14:09)
+            clean_text = re.sub(r'\s*-\s*[A-ZÀ-Úa-zà-ú\s]+\s*-\s*[A-ZÀ-Úa-zà-ú\s]+\s*-\s*\d{2}:\d{2}\s*$', '', clean_text)
+            clean_text = clean_text.strip()
+
+            # Se clean_text começar com a natureza (mesmo com acentos diferentes), remove para evitar duplicação no dashboard
+            def normalize_for_check(text):
+                if not text: return ""
+                import unicodedata
+                return "".join(c for c in unicodedata.normalize('NFD', text.lower()) if unicodedata.category(c) != 'Mn')
+
+            norm_clean = normalize_for_check(clean_text)
+            norm_nature = normalize_for_check(natureza)
+            if norm_nature and norm_clean.startswith(norm_nature):
+                clean_text = clean_text[len(norm_nature):].strip()
+                clean_text = re.sub(r'^[-\s:]+', '', clean_text)
+            clean_text = clean_text.strip()
+
+            # 4.4 Formatação do Resumo Premium e Localização Completa
+            b_display = bairro.title() if bairro else "local não identificado"
+            resumo = f"{natureza} em {b_display}"
+
+            localizacao_completa = clean_text[:120]
+            if not localizacao_completa:
+                localizacao_completa = descricao[:120]
+
             new_event = {
                 "id": ev_id,
                 "bairro": bairro,
                 "conflict_severity": severity,
                 "descricao": descricao,
                 "is_suppression": False,
-                "localizacao_completa": descricao[:120],
+                "localizacao_completa": localizacao_completa,
                 "municipio": municipio,
                 "natureza": natureza,
                 "raw_text": descricao,
-                "resumo": descricao[:80],
+                "resumo": resumo,
                 "sexo": "",
                 "timestamp": short_time,
                 "ingested_at": now_str,

@@ -1,0 +1,29 @@
+{
+  "global": {
+    "total_nodes": 1700,
+    "active_locations": 16,
+    "top_region": "rmf",
+    "top_name": "MARACANAU",
+    "avg_risk": 20.1
+  },
+  "regions": {
+    "fortaleza": {
+      "total_nodes": 114,
+      "avg_risk": 21.92,
+      "max_risk": 78.3,
+      "top_name": "CAJAZEIRAS"
+    },
+    "rmf": {
+      "total_nodes": 19,
+      "avg_risk": 16.72,
+      "max_risk": 85.3,
+      "top_name": "MARACANAU"
+    },
+    "interior": {
+      "total_nodes": 50,
+      "avg_risk": 20.3,
+      "max_risk": 78.6,
+      "top_name": "ITAPAJE"
+    }
+  }
+}

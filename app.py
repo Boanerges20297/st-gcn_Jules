@@ -281,23 +281,36 @@ _SNAPSHOT_EXPORT_LOCK = threading.Lock()
 
 # === REGISTRAR HEALTH MONITOR BLUEPRINT (antes de load_data_and_models) ===
 model_calibrator = None
+auto_calibrator_daemon = None
 try:
     from src.core.health_monitor import HealthMonitor, ConfidenceTracker
     from src.core.admin_health_routes import create_admin_health_blueprint
     from src.core.model_calibrator import ModelCalibrator
+    from src.core.auto_calibrator_daemon import AutoCalibratorDaemon
     
     health_monitor = HealthMonitor(base_dir=BASE_DIR)
     confidence_tracker = ConfidenceTracker(base_dir=BASE_DIR)
     model_calibrator = ModelCalibrator(base_dir=BASE_DIR, health_monitor=health_monitor)
+    auto_calibrator_daemon = AutoCalibratorDaemon(
+        health_monitor=health_monitor,
+        confidence_tracker=confidence_tracker,
+        model_calibrator=model_calibrator,
+        check_interval=300  # 5 minutos
+    )
     # Popular confidence_tracker com histórico já existente do efficiency_monitor
     efficiency_history_path = os.path.join(BASE_DIR, 'logs', 'efficiency_history.json')
     confidence_tracker.seed_from_efficiency_history(efficiency_history_path)
     admin_bp = create_admin_health_blueprint(
         health_monitor, confidence_tracker, model_calibrator,
+        auto_calibrator_daemon=auto_calibrator_daemon,
         get_orchestrator=lambda: orchestrator
     )
     app.register_blueprint(admin_bp)
     print("✅ Admin Dashboard Registrado em /api/admin/health")
+    
+    # Iniciar auto-calibrator daemon (Desativado em favor do Sistema Multi-Agente para evitar conflito de pesos)
+    # auto_calibrator_daemon.start()
+    print("🔧 Auto-Calibrator Daemon desativado (Gerenciamento exclusivo via Sistema Multi-Agente)")
 
     # Registro API V4 (Sentinela Granular)
     if create_v4_api_blueprint:
@@ -945,6 +958,7 @@ _RMF_CITIES = {
     'BEBERIBE','CASCAVEL','CHOROZINHO','PACAJUS','PINDORETAMA',
     'SAO LUIS DO CURU','PARACURU','PARAIPABA','TRAIRI','GENERAL SAMPAIO',
     'ITAPIPOCA','ACARAPE','REDENÇÃO','REDENCAO','PALMACIA','PALMÁCIA',
+    'SAO GONCALO DO AMARANTE', 'SÃO GONÇALO DO AMARANTE'
 }
 
 def _classify_region(props: dict) -> str:
@@ -1408,6 +1422,137 @@ def get_all_streets():
             return jsonify({"error": str(e)}), 500
     return jsonify([])
 
+@app.route('/api/cvli_points')
+def get_cvli_points():
+    """Retorna pontos CVLI recentes geocodificados para calibragem de densidade."""
+    region = request.args.get('region', 'all').lower()
+    if region == 'capital':
+        region = 'fortaleza'
+    try:
+        days = max(1, min(365, int(float(request.args.get('days', 90)))))
+    except Exception:
+        days = 90
+
+    path = os.path.join(BASE_DIR, 'data', 'raw', 'dados_status_ocorrencias_gerais_ENRIQUECIDO.csv')
+    if not os.path.exists(path):
+        return jsonify({'type': 'FeatureCollection', 'features': [], 'metadata': {'total': 0}})
+
+    try:
+        cols = [
+            'id', 'id_evento', 'data', 'hora', 'tipo', 'bairro', 'cidade',
+            'latitude', 'longitude', 'tipo_evento', 'name', 'qtd_mortes',
+            'arma', 'sexo', 'idade'
+        ]
+        df = pd.read_csv(path, usecols=lambda col: col in cols, low_memory=False)
+        df = df[df['tipo'].astype(str).str.lower().eq('cvli')].copy()
+        df['event_date'] = pd.to_datetime(df['data'], errors='coerce')
+        df['latitude'] = pd.to_numeric(df['latitude'], errors='coerce')
+        df['longitude'] = pd.to_numeric(df['longitude'], errors='coerce')
+        df = df.dropna(subset=['event_date', 'latitude', 'longitude'])
+        df = df[
+            (df['latitude'].between(-8.0, -2.0)) &
+            (df['longitude'].between(-42.0, -37.0))
+        ].copy()
+
+        latest_available = df['event_date'].max()
+        if pd.isna(latest_available):
+            return jsonify({'type': 'FeatureCollection', 'features': [], 'metadata': {'total': 0}})
+        today = pd.Timestamp(datetime.now().date())
+        reference_date = min(latest_available.normalize(), today)
+        cutoff = reference_date - pd.Timedelta(days=days - 1)
+        df = df[(df['event_date'] >= cutoff) & (df['event_date'] <= reference_date)].copy()
+
+        features = []
+        
+        # Load google maps api cache from data_processing.py logic if available
+        cache_path = os.path.join(BASE_DIR, 'data', 'geo_streets_cache.json')
+        cache_coords = {}
+        if os.path.exists(cache_path):
+            try:
+                import json
+                with open(cache_path, 'r', encoding='utf-8') as f:
+                    streets_data = json.load(f)
+                    cache_coords = {(round(float(c['lat']), 3), round(float(c['lng']), 3)): c for c in streets_data}
+            except Exception as e:
+                logging.warning(f"Erro ao carregar cache de ruas: {e}")
+
+        for _, row in df.sort_values('event_date', ascending=False).iterrows():
+            lat = float(row['latitude'])
+            lng = float(row['longitude'])
+            
+            cidade_raw = str(row.get('cidade') or '').strip()
+            bairro_raw = str(row.get('bairro') or '').strip()
+            local = str(row.get('name') or '').strip()
+            
+            # Use Nominatim API data from cache if present
+            cached = cache_coords.get((round(lat, 3), round(lng, 3)))
+            if cached and cached.get('source') == 'auto_update':
+                if cached.get('cidade'): cidade_raw = cached['cidade']
+                if cached.get('bairro'): bairro_raw = cached['bairro']
+                if cached.get('rua'): local = cached['rua']
+            
+            # Saneamento de coordenadas / cidade para o filtro regional
+            declared_city_norm = normalize_name(cidade_raw)
+            try:
+                actual_city_norm = _municipality_from_lnglat(lng, lat)
+            except Exception:
+                actual_city_norm = ""
+
+            # Se o ponto cai fora do local declarado mas bate com um município válido
+            if actual_city_norm and declared_city_norm and actual_city_norm != declared_city_norm:
+                # Se for Fortaleza, RMF ou Interior, confia no mapa e sobrescreve a cidade
+                cidade_raw = actual_city_norm
+
+            item_region = _street_region_from_point({
+                'lat': lat,
+                'lng': lng,
+                'cidade': cidade_raw,
+            })
+            if region != 'all' and item_region != region:
+                continue
+
+            event_date = row['event_date']
+            victims_raw = pd.to_numeric(row.get('qtd_mortes'), errors='coerce')
+            victims = int(victims_raw) if pd.notna(victims_raw) and victims_raw > 0 else 1
+            features.append({
+                'type': 'Feature',
+                'properties': {
+                    'id': str(row.get('id_evento') or row.get('id') or ''),
+                    'data': event_date.strftime('%Y-%m-%d'),
+                    'hora': str(row.get('hora') or ''),
+                    'local': local,
+                    'rua': local,
+                    'bairro': bairro_raw,
+                    'cidade': cidade_raw,
+                    'vitimas': victims,
+                    'arma': str(row.get('arma') or '').strip(),
+                    'sexo': str(row.get('sexo') or '').strip(),
+                    'idade': str(row.get('idade') or '').strip(),
+                    'tipo_evento': str(row.get('tipo_evento') or 'CVLI').strip(),
+                    'region': item_region,
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [lng, lat],
+                },
+            })
+
+        return jsonify({
+            'type': 'FeatureCollection',
+            'features': features,
+            'metadata': {
+                'total': len(features),
+                'days': days,
+                'region': region,
+                'latest_available_date': latest_available.strftime('%Y-%m-%d'),
+                'reference_date': reference_date.strftime('%Y-%m-%d'),
+                'cutoff_date': cutoff.strftime('%Y-%m-%d'),
+            }
+        })
+    except Exception as e:
+        logging.exception("Erro ao carregar pontos CVLI")
+        return jsonify({'error': str(e), 'type': 'FeatureCollection', 'features': []}), 500
+
 _STREET_FOCI_CACHE = {}
 _STREET_FOCI_CACHE_LOCK = threading.Lock()
 _STREET_FOCI_WARMUP_STATUS = {
@@ -1461,6 +1606,16 @@ def _street_region_from_point(street):
     except Exception:
         return 'interior'
 
+    # Resolve municipality by physical coordinates first to prevent outliers
+    municipality_norm = _municipality_from_lnglat(lng, lat)
+    if municipality_norm == 'FORTALEZA':
+        return 'fortaleza'
+    if municipality_norm in {normalize_name(city) for city in _RMF_CITIES}:
+        return 'rmf'
+    if municipality_norm:
+        return 'interior'
+
+    # Fallback to textual city if coordinates yielded nothing
     city_raw = street.get('cidade') or street.get('municipio') or street.get('municipality') or ''
     if city_raw:
         city_norm = normalize_name(str(city_raw))
@@ -1469,14 +1624,6 @@ def _street_region_from_point(street):
         if city_norm in {normalize_name(city) for city in _RMF_CITIES}:
             return 'rmf'
         return 'interior'
-
-    # Resolve municipality before bbox so RMF cities inside the Fortaleza envelope
-    # do not leak into the Fortaleza-only filter.
-    municipality_norm = _municipality_from_lnglat(lng, lat)
-    if municipality_norm == 'FORTALEZA':
-        return 'fortaleza'
-    if municipality_norm in {normalize_name(city) for city in _RMF_CITIES}:
-        return 'rmf'
 
     if -3.92 <= lat <= -3.68 and -38.70 <= lng <= -38.36:
         return 'fortaleza'
@@ -1619,7 +1766,7 @@ def _is_point_in_requested_street_region(lng, lat, region_norm, item_region):
         return municipality_region == region_norm
     return item_region == region_norm
 
-def _build_street_foci_payload(region='all', radius_m=500, shape_kind='hex', min_points=2, limit=1200):
+def _build_street_foci_payload(region='all', radius_m=1000, shape_kind='hex', min_points=2, limit=50):
     cache_key = ('street-foci-v3-grid', region, radius_m, shape_kind, min_points)
     with _STREET_FOCI_CACHE_LOCK:
         cached = _STREET_FOCI_CACHE.get(cache_key)
@@ -1693,8 +1840,8 @@ def _build_street_foci_payload(region='all', radius_m=500, shape_kind='hex', min
         bairro = next(iter(sorted(bairros_rank.items(), key=lambda item: item[1], reverse=True)), ('', 0))[0]
         cidade = next(iter(sorted(cities_rank.items(), key=lambda item: item[1], reverse=True)), ('', 0))[0]
         focus_region = next(iter(sorted(region_rank.items(), key=lambda item: item[1], reverse=True)), ('interior', 0))[0]
-        # Margem conservadora para mais, sem transformar uma celula de 500m em cobertura municipal.
-        focus_radius = max(300, min(radius_m * 1.25, max_distance + 180))
+        # Keep the drawn hexagon inside the requested operational radius.
+        focus_radius = max(250, min(radius_m, max_distance + 120))
         geometry = _hexagon_geometry(lng, lat, focus_radius) if shape_kind == 'hex' else {
             'type': 'Point',
             'coordinates': [lng, lat],
@@ -1703,7 +1850,7 @@ def _build_street_foci_payload(region='all', radius_m=500, shape_kind='hex', min
         features.append({
             'type': 'Feature',
             'properties': {
-                'name': f"Foco 500m - {bairro or cidade or 'CE'}",
+                'name': f"Foco 1km - {bairro or cidade or 'CE'}",
                 'focus_id': '',
                 'region': focus_region,
                 'bairro': bairro,
@@ -1754,13 +1901,8 @@ def _build_street_foci_payload(region='all', radius_m=500, shape_kind='hex', min
         f for f in sorted_non_overlapping
         if float((f.get('properties') or {}).get('predicted_cvli_probability') or 0) >= 31.0
     ]
-    target_count = max(limit, 220 if region_norm == 'fortaleza' else 120)
-    if tactical_risk:
-        tactical_ids = {id(feature) for feature in tactical_risk}
-        fill_features = [feature for feature in sorted_non_overlapping if id(feature) not in tactical_ids]
-        features = (tactical_risk + fill_features)[:target_count]
-    else:
-        features = sorted_non_overlapping[:target_count]
+    target_count = min(max(limit, 1), 50)
+    features = tactical_risk[:target_count]
     max_occ = max((feat['properties']['total_occurrences'] for feat in features), default=1)
     for rank, feat in enumerate(features, 1):
         props = feat['properties']
@@ -1774,8 +1916,8 @@ def _build_street_foci_payload(region='all', radius_m=500, shape_kind='hex', min
         'metadata': {
             'total': len(features),
             'total_available': len(features),
-            'source': 'geo_streets_cache bucketed into 500m tactical foci',
-            'model': 'ST-GCN Rua/Foco 500m',
+            'source': 'geo_streets_cache bucketed into 1km tactical foci',
+            'model': 'ST-GCN Rua/Foco 1km',
             'radius_m': radius_m,
             'shape': shape_kind,
             'min_points': min_points,
@@ -1807,7 +1949,7 @@ def _warm_stgcn_street_pipeline():
         print("🧠 ST-GCN ruas/focos: aquecimento em paralelo iniciado.")
         for region in ('fortaleza', 'rmf', 'interior', 'all'):
             try:
-                _build_street_foci_payload(region, radius_m=500, shape_kind='hex', min_points=2, limit=1600)
+                _build_street_foci_payload(region, radius_m=1000, shape_kind='hex', min_points=2, limit=50)
                 _STREET_FOCI_WARMUP_STATUS['completed'].append(region)
                 print(f"✅ ST-GCN ruas/focos aquecido: {region}")
             except Exception as exc:
@@ -1823,23 +1965,23 @@ def start_stgcn_street_warmup():
 
 @app.route('/api/street_foci')
 def get_street_foci():
-    """Agrupa ruas/pontos georreferenciados em focos tÃ¡ticos de atÃ© 500m."""
+    """Agrupa ruas/pontos georreferenciados em focos táticos de até 1km."""
     region = request.args.get('region', 'all').lower()
     shape_kind = request.args.get('shape', 'hex').lower()
     if shape_kind not in ('hex', 'circle'):
         shape_kind = 'hex'
     try:
-        radius_m = max(100, min(1000, int(float(request.args.get('radius_m', 500)))))
+        radius_m = max(100, min(1000, int(float(request.args.get('radius_m', 1000)))))
     except Exception:
-        radius_m = 500
+        radius_m = 1000
     try:
         min_points = max(1, min(20, int(float(request.args.get('min_points', 2)))))
     except Exception:
         min_points = 2
     try:
-        limit = max(1, min(5000, int(float(request.args.get('limit', 1200)))))
+        limit = max(1, min(50, int(float(request.args.get('limit', 50)))))
     except Exception:
-        limit = 1200
+        limit = 50
 
     try:
         return jsonify(_build_street_foci_payload(region, radius_m, shape_kind, min_points, limit))
@@ -3704,8 +3846,161 @@ def get_efficiency_latest():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Cache em memória e em arquivo para pesos de calibração do agente de background
+AGENT_CALIBRATION_CACHE_FILE = os.path.join(BASE_DIR, 'data', 'agent_calibrated_weights.json')
+_agent_calibration_state = {
+    "status": "idle",
+    "last_calibration": None
+}
+
+@app.route('/api/agent/calibrate-report', methods=['POST'])
+def run_agent_calibration():
+    """
+    Aciona o sistema multi-agente local de background de forma assíncrona.
+    Recebe os dados brutos e o perfil do usuário, disparando a calibração em Thread paralela.
+    """
+    global _agent_calibration_state
+    try:
+        req_data = request.get_json() or {}
+    except Exception:
+        req_data = {}
+
+    raw_stgcn_data = req_data.get("raw_stgcn_data", {
+        "confidence_scores": [0.82, 0.76, 0.89],
+        "timestamp": datetime.now().isoformat()
+    })
+    user_profile = req_data.get("user_profile", {
+        "region": "Fortaleza",
+        "focus": "CVLI",
+        "historical_alerts": 3
+    })
+
+    def _async_calibration_worker():
+        global _agent_calibration_state
+        _agent_calibration_state["status"] = "processing"
+        try:
+            from src.agent.multi_agent_system import GeneralManagerAgent
+            manager = GeneralManagerAgent()
+            # Executa raciocínio analítico em malha fechada localmente
+            result = manager.process_and_calibrate(raw_stgcn_data, user_profile)
+            
+            # Grava no estado e persiste no cache local
+            _agent_calibration_state["status"] = "success"
+            _agent_calibration_state["last_calibration"] = result
+            
+            os.makedirs(os.path.dirname(AGENT_CALIBRATION_CACHE_FILE), exist_ok=True)
+            with open(AGENT_CALIBRATION_CACHE_FILE, 'w', encoding='utf-8') as f:
+                json.dump(result, f, indent=2, ensure_ascii=False)
+                
+            # Salvar histórico de calibrações dos agentes
+            try:
+                hist_file = os.path.join(BASE_DIR, 'logs', 'agent_calibrations_history.json')
+                hist_data = []
+                if os.path.exists(hist_file):
+                    with open(hist_file, 'r', encoding='utf-8') as hf:
+                        hist_data = json.load(hf)
+                hist_data.append({
+                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "weights": result.get("calibrated_weights"),
+                    "explanations": result.get("explanations")
+                })
+                # Manter apenas as últimas 50 calibrações
+                hist_data = hist_data[-50:]
+                with open(hist_file, 'w', encoding='utf-8') as hf:
+                    json.dump(hist_data, hf, indent=2, ensure_ascii=False)
+            except Exception as he:
+                print(f"🤖 [Multi-Agent Background] Erro ao gravar histórico: {he}")
+                
+            print(f"🤖 [Multi-Agent Background] Calibração concluída! Pesos: {result.get('calibrated_weights')}")
+        except Exception as err:
+            _agent_calibration_state["status"] = "failed"
+            _agent_calibration_state["error"] = str(err)
+            print(f"🤖 [Multi-Agent Background] Erro na thread de calibração: {err}")
+
+    # Disparar calibração em Thread de Background (Não bloqueante)
+    threading.Thread(target=_async_calibration_worker, daemon=True).start()
+
+    return jsonify({
+        "message": "Calibração assíncrona do agente de background iniciada com sucesso.",
+        "current_status": _agent_calibration_state["status"]
+    }), 202
+
+@app.route('/api/agent/calibration-status', methods=['GET'])
+def get_agent_calibration_status():
+    """Retorna o status atual ou o último resultado gerado pelo agente local de background."""
+    if os.path.exists(AGENT_CALIBRATION_CACHE_FILE) and not _agent_calibration_state.get("last_calibration"):
+        try:
+            with open(AGENT_CALIBRATION_CACHE_FILE, 'r', encoding='utf-8') as f:
+                _agent_calibration_state["last_calibration"] = json.load(f)
+                # Mantém o status como 'idle' no primeiro carregamento pós-reboot
+                # para forçar o frontend a disparar uma nova rodada viva de debates.
+                _agent_calibration_state["status"] = "idle"
+        except Exception:
+            pass
+            
+    return jsonify(_agent_calibration_state), 200
+
 if __name__ == "__main__":
+    import atexit
+    
+    # Registrar cleanup ao desligar
+    def _cleanup_on_shutdown():
+        """Para daemons e faz cleanup ao desligar o app."""
+        print("\n[SHUTDOWN] Parando daemons...")
+        
+        # Sinaliza para o monitor de agentes (listen_agents.py) que a aplicação foi encerrada
+        try:
+            shutdown_file = os.path.join(BASE_DIR, 'logs', '.app_shutdown')
+            with open(shutdown_file, 'w') as f:
+                f.write('shutdown')
+            print("[SHUTDOWN] ✅ Sinal de parada enviado ao Monitor de Diálogos")
+        except Exception:
+            pass
+
+        try:
+            if auto_calibrator_daemon:
+                auto_calibrator_daemon.stop()
+                print("[SHUTDOWN] ✅ Auto-Calibrator parado")
+        except Exception as e:
+            print(f"[SHUTDOWN] ⚠️ Erro ao parar Auto-Calibrator: {e}")
+    
+    atexit.register(_cleanup_on_shutdown)
+    
     load_data_and_models()
+    
+    # --- DISPARO DO SISTEMA MULTI-AGENTE OPERACIONAL NO STARTUP ---
+    def _run_startup_agent_calibration():
+        print("\n🤖 [Multi-Agent Background] Inicializando agentes de decisão local no startup...")
+        try:
+            from src.agent.multi_agent_system import GeneralManagerAgent
+            manager = GeneralManagerAgent()
+            # Dados padrão de telemetria inicial
+            raw_stgcn_data = {
+                "confidence_scores": [0.85, 0.80, 0.90],
+                "timestamp": datetime.now().isoformat()
+            }
+            user_profile = {
+                "region": "GLOBAL",
+                "focus": "CVLI",
+                "historical_alerts": 0,
+                "startup": True
+            }
+            result = manager.process_and_calibrate(raw_stgcn_data, user_profile)
+            
+            # Persistir no cache inicial
+            os.makedirs(os.path.dirname(AGENT_CALIBRATION_CACHE_FILE), exist_ok=True)
+            with open(AGENT_CALIBRATION_CACHE_FILE, 'w', encoding='utf-8') as f:
+                json.dump(result, f, indent=2, ensure_ascii=False)
+            
+            global _agent_calibration_state
+            _agent_calibration_state["status"] = "success"
+            _agent_calibration_state["last_calibration"] = result
+            print("🤖 [Multi-Agent Background] ✅ Calibração e alinhamento de startup concluídos com sucesso.")
+        except Exception as e:
+            print(f"🤖 [Multi-Agent Background] ⚠️ Falha ao alinhar agentes no startup: {e}")
+
+    threading.Thread(target=_run_startup_agent_calibration, daemon=True).start()
+
     print("\n" + "="*50)
     print("DASHBOARD CPRAIO PRONTO")
     app_port = int(os.environ.get('APP_PORT', os.environ.get('PORT', '5050')))

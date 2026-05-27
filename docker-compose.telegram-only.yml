@@ -10,6 +10,8 @@ services:
       PYTHONUNBUFFERED: 1
       REPORTPREVIEW_RUNTIME_DIR: /app/outputs/mempalace/chat
       MEMPALACE_CONTEXT_PATH: /app/.mempalace.md
+      STATIC_SCREENSHOT_REPO_DIR: /app/outputs/hermes/screenshot-report_preview
+      TELEGRAM_SCREENSHOT_APP_PORT: 4173
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs

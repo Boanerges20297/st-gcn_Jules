@@ -1021,10 +1021,9 @@
 
         // ===== AUTO-AJUSTE / CALIBRAÇÃO =====
         const PARAM_LABELS = {
-            tension_factor:     '⚡ Peso Tensão',
-            tag_bias_direct:    '🎯 TAG Bias',
-            tag_bias_neighbor:  '🔗 Vizinhos',
-            min_risk:           '🔥 Calor Mín',
+            posture:     '⚡ Peso Postura',
+            speed:       '🏃‍♂️ Peso Velocidade',
+            rom:         '📏 Peso Amplitude',
         };
         const REGION_LABELS = {
             fortaleza: '🏙️ Fortaleza',
@@ -1057,16 +1056,11 @@
 
                 container.innerHTML = Object.entries(regions).map(([region, info]) => {
                     const steps = info.steps || 0;
-                    const maxSteps = info.max_steps || 5;
-                    const isCritical = info.is_critical;
-                    const isDegraded = info.is_degraded;
-                    const cardClass = isCritical ? 'critical' : isDegraded ? 'degraded' : 'recovered';
-                    const badgeClass = isCritical ? 'critical' : isDegraded ? 'degraded' : 'ok';
-                    const badgeLabel = isCritical
-                        ? `⚠️ CRÍTICO - Intervenção Manual (${steps}/${maxSteps})`
-                        : isDegraded
-                            ? `🔧 Ajuste Ativo: Cobertura Territorial (${steps}/${maxSteps})`
-                            : '✅ Cobertura Normal';
+                    const cardClass = steps > 0 ? 'recovered' : 'recovered';
+                    const badgeClass = steps > 0 ? 'ok' : 'ok';
+                    const badgeLabel = steps > 0
+                        ? `🤖 Calibração via Agentes Ativa`
+                        : '✅ Pesos Padrão Ativos';
 
                     const cur = info.current_params || {};
                     const def = info.default_params || {};
@@ -1114,7 +1108,7 @@
                             const text = ev.trigger || ev.event || 'Evento';
                             const extra = isRollback
                                 ? ` <span style="color:#10b981">(${ev.steps_reverted} passo(s) revertidos)</span>`
-                                : ev.step ? ` <span style="color:#fbbf24">Passo ${ev.step}/${maxSteps}</span>` : '';
+                                : ev.step ? ` <span style="color:#fbbf24">Ajuste via Agente</span>` : '';
                             return `
                                 <div class="calib-event">
                                     <div class="calib-event-icon">${icon}</div>

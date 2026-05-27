@@ -1,4 +1,5 @@
 import csv
+import json
 import re
 import os
 import unicodedata
@@ -9,7 +10,7 @@ from datetime import datetime
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_RAW_DIR = os.path.join(PROJECT_DIR)
 
-ARQUIVO_ENTRADA = os.path.join(DATA_RAW_DIR, 'ocorrencias_tropa.csv')
+ARQUIVO_ENTRADA = os.path.join(DATA_RAW_DIR, 'ocorrencias_tropa.json')
 ARQUIVO_SAIDA = os.path.join(DATA_RAW_DIR, 'ocorrencias_tropa_limpo_fortaleza.csv')
 
 SECTION_KEYWORDS = (
@@ -316,36 +317,67 @@ def extrair_qtd_veiculos(sections):
         return 0
     return max(count_vehicle_mentions(block) for block in blocks)
 
+
+def carregar_registros(arquivo):
+    with open(arquivo, 'r', encoding='utf-8') as json_file:
+        conteudo = json_file.read()
+
+    try:
+        dados = json.loads(conteudo)
+    except json.JSONDecodeError as erro:
+        conteudo_limpo = re.sub(r',\s*([}\]])', r'\1', conteudo)
+        try:
+            dados = json.loads(conteudo_limpo)
+        except json.JSONDecodeError:
+            raise RuntimeError(
+                f"Falha ao ler o arquivo JSON '{arquivo}'. Verifique se o export veio bem formatado."
+            ) from erro
+
+    if isinstance(dados, dict):
+        for chave in ('data', 'rows', 'records', 'result'):
+            if chave in dados:
+                dados = dados[chave]
+                break
+
+    if isinstance(dados, dict):
+        return list(dados.values())
+
+    if isinstance(dados, list):
+        return dados
+
+    raise RuntimeError(f"Formato JSON inesperado em '{arquivo}'.")
+
+
 def processar_granular():
     resumo_final = []
 
-    with open(ARQUIVO_ENTRADA, 'r', encoding='utf-8-sig', newline='') as csv_file:
-        reader = csv.DictReader(csv_file)
-        for row in reader:
-            ocorrencia = str(row.get('ocorrencia', ''))
-            sections = extract_sections(ocorrencia)
-            cidade = extract_city(sections, ocorrencia)
-            if cidade != 'FORTALEZA':
-                continue
+    registros = carregar_registros(ARQUIVO_ENTRADA)
 
-            try:
-                dt = datetime.strptime(str(row.get('data_registro', '')).strip(), '%Y-%m-%d %H:%M:%S')
-            except ValueError:
-                continue
+    for row in registros:
+        ocorrencia = str(row.get('ocorrencia', ''))
+        sections = extract_sections(ocorrencia)
+        cidade = extract_city(sections, ocorrencia)
+        if cidade != 'FORTALEZA':
+            continue
 
-            qtd_drogas_gramas, qtd_drogas_itens = extrair_qtd_drogas(sections)
+        try:
+            dt = datetime.strptime(str(row.get('data_registro', '')).strip(), '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            continue
 
-            resumo_final.append({
-                'data': dt.strftime('%Y-%m-%d'),
-                'hora': dt.strftime('%H:%M:%S'),
-                'bairro': extract_bairro(sections, ocorrencia),
-                'cidade': 'FORTALEZA',
-                'natureza': extract_natureza(sections, ocorrencia),
-                'qtd_armas': extrair_qtd_armas(sections, ocorrencia),
-                'qtd_drogas': qtd_drogas_gramas,
-                'qtd_drogas_itens': qtd_drogas_itens,
-                'qtd_veiculos_apreendidos': extrair_qtd_veiculos(sections),
-            })
+        qtd_drogas_gramas, qtd_drogas_itens = extrair_qtd_drogas(sections)
+
+        resumo_final.append({
+            'data': dt.strftime('%Y-%m-%d'),
+            'hora': dt.strftime('%H:%M:%S'),
+            'bairro': extract_bairro(sections, ocorrencia),
+            'cidade': 'FORTALEZA',
+            'natureza': extract_natureza(sections, ocorrencia),
+            'qtd_armas': extrair_qtd_armas(sections, ocorrencia),
+            'qtd_drogas': qtd_drogas_gramas,
+            'qtd_drogas_itens': qtd_drogas_itens,
+            'qtd_veiculos_apreendidos': extrair_qtd_veiculos(sections),
+        })
 
     resumo_final.sort(key=lambda registro: (registro['data'], registro['hora']))
 

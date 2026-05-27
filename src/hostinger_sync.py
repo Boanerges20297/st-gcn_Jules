@@ -5,6 +5,7 @@ import json
 import os
 import posixpath
 import tempfile
+import time
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -230,13 +231,49 @@ class HostingerSyncManager:
                     relative_path.replace('\\', '/'),
                 )
                 self._ensure_remote_dir(ssh, posixpath.dirname(remote_path))
-                sftp.put(str(local_path), remote_path)
+                self._wait_for_stable_file(local_path)
+                self._safe_put_file(sftp, local_path, remote_path)
                 uploaded.append(relative_path)
         finally:
             sftp.close()
             ssh.close()
 
         return uploaded
+
+    @staticmethod
+    def _wait_for_stable_file(local_path: Path, checks: int = 3, delay_seconds: float = 0.5) -> None:
+        previous_size = None
+        stable_count = 0
+
+        for _ in range(max(checks * 4, 4)):
+            current_size = local_path.stat().st_size
+            if current_size == previous_size:
+                stable_count += 1
+                if stable_count >= checks:
+                    return
+            else:
+                stable_count = 0
+                previous_size = current_size
+            time.sleep(delay_seconds)
+
+    def _safe_put_file(self, sftp, local_path: Path, remote_path: str, retries: int = 3) -> None:
+        last_error = None
+
+        for attempt in range(1, retries + 1):
+            try:
+                sftp.put(str(local_path), remote_path)
+                remote_size = sftp.stat(remote_path).st_size
+                local_size = local_path.stat().st_size
+                if remote_size != local_size:
+                    raise RuntimeError(f'size mismatch in put! {remote_size} != {local_size}')
+                return
+            except Exception as exc:
+                last_error = exc
+                if attempt >= retries:
+                    break
+                time.sleep(attempt)
+
+        raise RuntimeError(f'failed to upload {local_path} -> {remote_path}: {last_error}')
 
     @staticmethod
     def _ensure_remote_dir(ssh_client, remote_dir: str) -> None:
