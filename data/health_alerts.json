@@ -1789,6 +1789,26 @@
         "cpu_percent": 86.8
       },
       "resolved": false
+    },
+    {
+      "timestamp": "2026-06-02T00:21:17.605905",
+      "type": "high_error_rate",
+      "severity": "MEDIUM",
+      "message": "Taxa de erro elevada: 15.38%",
+      "details": {
+        "error_rate_percent": 15.384615384615385
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-02T00:25:52.139876",
+      "type": "high_cpu",
+      "severity": "HIGH",
+      "message": "CPU alta: 97.0%",
+      "details": {
+        "cpu_percent": 97.0
+      },
+      "resolved": false
     }
   ]
 }

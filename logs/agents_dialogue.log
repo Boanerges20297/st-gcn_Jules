@@ -497,3 +497,207 @@ Traduza a seguinte justificativa técnica em uma mensagem fluida e acolhedora em
 📥 RESPOSTA DO ESPECIALISTA:
 {"output": "Os pesos do modelo preditivo foram recalibrados com sucesso de forma din\u00e2mica para mitigar falsos positivos nas m\u00e9tricas de amplitude (ROM), velocidade de deslocamento e an\u00e1lise postural."}
 ================================================================================
+
+================================================================================
+🕒 [2026-06-02 00:21:18] INTERCEPTAÇÃO DE DIÁLOGO
+📢 REMETENTE:   GERENTE GERAL
+👤 DESTINATÁRIO: ESPECIALISTA EM ANÁLISE DE DADOS COMPLEXOS
+----------------------------------------
+💬 PROMPT ENVIADO:
+=== MEMÓRIA E DIRETIVAS DO MEMPALACE (RESUMO) ===
+Este arquivo serve como o "Cofre de Contexto" para a IA. Ele deve ser lido no início de cada interação para garantir que decisões passadas e estados de treino não sejam perdidos.
+---
+- **Tentativa Ativa:** 77 (Sentinela V4 - Clean Palace).
+- **Paradigma:** Retorno ao `DeepSTGAT_64` (Estabilidade > Capacidade bruta).
+- **Canais:** 38 (37 base + MemPalace Gated).
+- **Status:** Época 2 em curso. P@10 inicial estabilizado em 31%.
+- **Dispositivo:** Rodando em CPU (tempo estimado por época: 18 min).
+1. **Mecanismo Anti-Vício:** Implementado **Channel Dropout de 50%** no Canal 38 (Memória). O modelo é forçado a prever sem o MemPalace em metade dos batches para evitar dependência viciada no erro passado.
+2. **Blindagem de Validação:** O registro de surpresas no `TrainingVault` foi movido para **fora do loop de validação**. O modelo agora é validado no "futuro cego" puro, registrando o erro no cofre apenas após o cálculo da métrica.
+3. **CVP Ratio (Canal 39):** Integração definitiva da razão `CVP / (CVLI + 1)` como preditor de escalada.
+
+=== DADOS EM TEMPO REAL ===
+Dados brutos da predição: {"confidence_scores": [0.85, 0.8, 0.9], "timestamp": "2026-06-02T00:21:06.191033"}
+Perfil regional/histórico: {"region": "GLOBAL", "focus": "CVLI", "historical_alerts": 0, "startup": true}
+----------------------------------------
+📥 RESPOSTA DO ESPECIALISTA:
+{"anomalies_detected": true, "geographical_drift": false, "next_probable_cvli_hotspot": "BARROSO (Baseado na converg\u00eancia recente de tens\u00f5es territoriais)", "technical_summary": "An\u00e1lise de background local de ocorr\u00eancias ex\u00f3genas conclu\u00edda com sucesso."}
+================================================================================
+
+================================================================================
+🕒 [2026-06-02 00:21:21] INTERCEPTAÇÃO DE DIÁLOGO
+📢 REMETENTE:   GERENTE GERAL
+👤 DESTINATÁRIO: ESPECIALISTA EM ANÁLISE DE DADOS COMPLEXOS
+----------------------------------------
+💬 PROMPT ENVIADO:
+=== MEMÓRIA E DIRETIVAS DO MEMPALACE (RESUMO) ===
+Este arquivo serve como o "Cofre de Contexto" para a IA. Ele deve ser lido no início de cada interação para garantir que decisões passadas e estados de treino não sejam perdidos.
+---
+- **Tentativa Ativa:** 77 (Sentinela V4 - Clean Palace).
+- **Paradigma:** Retorno ao `DeepSTGAT_64` (Estabilidade > Capacidade bruta).
+- **Canais:** 38 (37 base + MemPalace Gated).
+- **Status:** Época 2 em curso. P@10 inicial estabilizado em 31%.
+- **Dispositivo:** Rodando em CPU (tempo estimado por época: 18 min).
+1. **Mecanismo Anti-Vício:** Implementado **Channel Dropout de 50%** no Canal 38 (Memória). O modelo é forçado a prever sem o MemPalace em metade dos batches para evitar dependência viciada no erro passado.
+2. **Blindagem de Validação:** O registro de surpresas no `TrainingVault` foi movido para **fora do loop de validação**. O modelo agora é validado no "futuro cego" puro, registrando o erro no cofre apenas após o cálculo da métrica.
+3. **CVP Ratio (Canal 39):** Integração definitiva da razão `CVP / (CVLI + 1)` como preditor de escalada.
+
+=== DADOS EM TEMPO REAL ===
+Dados brutos da predição: {"confidence_scores": [0.82, 0.76, 0.89], "timestamp": "2026-06-02T03:21:11.541Z"}
+Perfil regional/histórico: {"region": "fortaleza", "focus": "CVLI", "historical_alerts": 3}
+----------------------------------------
+📥 RESPOSTA DO ESPECIALISTA:
+{"anomalies_detected": true, "geographical_drift": false, "next_probable_cvli_hotspot": "BARROSO (Baseado na converg\u00eancia recente de tens\u00f5es territoriais)", "technical_summary": "An\u00e1lise de background local de ocorr\u00eancias ex\u00f3genas conclu\u00edda com sucesso."}
+================================================================================
+
+================================================================================
+🕒 [2026-06-02 00:21:29] INTERCEPTAÇÃO DE DIÁLOGO
+📢 REMETENTE:   GERENTE GERAL
+👤 DESTINATÁRIO: ESPECIALISTA EM CALIBRAÇÃO DE PESOS
+----------------------------------------
+💬 PROMPT ENVIADO:
+Com base na análise técnica de anomalias: {"anomalies_detected": true, "geographical_drift": false, "next_probable_cvli_hotspot": "BARROSO (Baseado na converg\u00eancia recente de tens\u00f5es territoriais)", "technical_summary": "An\u00e1lise de background local de ocorr\u00eancias ex\u00f3genas conclu\u00edda com sucesso."}
+Calcule os pesos ideais de calibração para postura, velocidade e rom.
+----------------------------------------
+📥 RESPOSTA DO ESPECIALISTA:
+{"weights": {"posture": 0.85, "speed": 0.7, "rom": 0.9}, "justification": "Calibra\u00e7\u00e3o t\u00e1tica de pesos anal\u00edticos calculada via modelo de background local."}
+================================================================================
+
+================================================================================
+🕒 [2026-06-02 00:21:32] INTERCEPTAÇÃO DE DIÁLOGO
+📢 REMETENTE:   GERENTE GERAL
+👤 DESTINATÁRIO: ESPECIALISTA EM CALIBRAÇÃO DE PESOS
+----------------------------------------
+💬 PROMPT ENVIADO:
+Com base na análise técnica de anomalias: {"anomalies_detected": true, "geographical_drift": false, "next_probable_cvli_hotspot": "BARROSO (Baseado na converg\u00eancia recente de tens\u00f5es territoriais)", "technical_summary": "An\u00e1lise de background local de ocorr\u00eancias ex\u00f3genas conclu\u00edda com sucesso."}
+Calcule os pesos ideais de calibração para postura, velocidade e rom.
+----------------------------------------
+📥 RESPOSTA DO ESPECIALISTA:
+{"weights": {"posture": 0.85, "speed": 0.7, "rom": 0.9}, "justification": "Calibra\u00e7\u00e3o t\u00e1tica de pesos anal\u00edticos calculada via modelo de background local."}
+================================================================================
+
+================================================================================
+🕒 [2026-06-02 00:21:39] INTERCEPTAÇÃO DE DIÁLOGO
+📢 REMETENTE:   GERENTE GERAL
+👤 DESTINATÁRIO: ESPECIALISTA EM INTERAÇÃO DO USUÁRIO
+----------------------------------------
+💬 PROMPT ENVIADO:
+Traduza a seguinte justificativa técnica em uma mensagem fluida e acolhedora em português para o tomador de decisão (policial/gestor): 'Calibração tática de pesos analíticos calculada via modelo de background local.'
+----------------------------------------
+📥 RESPOSTA DO ESPECIALISTA:
+{"output": "Os pesos do modelo preditivo foram recalibrados com sucesso de forma din\u00e2mica para mitigar falsos positivos nas m\u00e9tricas de amplitude (ROM), velocidade de deslocamento e an\u00e1lise postural."}
+================================================================================
+
+================================================================================
+🕒 [2026-06-02 00:21:42] INTERCEPTAÇÃO DE DIÁLOGO
+📢 REMETENTE:   GERENTE GERAL
+👤 DESTINATÁRIO: ESPECIALISTA EM INTERAÇÃO DO USUÁRIO
+----------------------------------------
+💬 PROMPT ENVIADO:
+Traduza a seguinte justificativa técnica em uma mensagem fluida e acolhedora em português para o tomador de decisão (policial/gestor): 'Calibração tática de pesos analíticos calculada via modelo de background local.'
+----------------------------------------
+📥 RESPOSTA DO ESPECIALISTA:
+{"output": "Os pesos do modelo preditivo foram recalibrados com sucesso de forma din\u00e2mica para mitigar falsos positivos nas m\u00e9tricas de amplitude (ROM), velocidade de deslocamento e an\u00e1lise postural."}
+================================================================================
+
+================================================================================
+🕒 [2026-06-02 00:25:49] INTERCEPTAÇÃO DE DIÁLOGO
+📢 REMETENTE:   GERENTE GERAL
+👤 DESTINATÁRIO: ESPECIALISTA EM ANÁLISE DE DADOS COMPLEXOS
+----------------------------------------
+💬 PROMPT ENVIADO:
+=== MEMÓRIA E DIRETIVAS DO MEMPALACE (RESUMO) ===
+Este arquivo serve como o "Cofre de Contexto" para a IA. Ele deve ser lido no início de cada interação para garantir que decisões passadas e estados de treino não sejam perdidos.
+---
+- **Tentativa Ativa:** 77 (Sentinela V4 - Clean Palace).
+- **Paradigma:** Retorno ao `DeepSTGAT_64` (Estabilidade > Capacidade bruta).
+- **Canais:** 38 (37 base + MemPalace Gated).
+- **Status:** Época 2 em curso. P@10 inicial estabilizado em 31%.
+- **Dispositivo:** Rodando em CPU (tempo estimado por época: 18 min).
+1. **Mecanismo Anti-Vício:** Implementado **Channel Dropout de 50%** no Canal 38 (Memória). O modelo é forçado a prever sem o MemPalace em metade dos batches para evitar dependência viciada no erro passado.
+2. **Blindagem de Validação:** O registro de surpresas no `TrainingVault` foi movido para **fora do loop de validação**. O modelo agora é validado no "futuro cego" puro, registrando o erro no cofre apenas após o cálculo da métrica.
+3. **CVP Ratio (Canal 39):** Integração definitiva da razão `CVP / (CVLI + 1)` como preditor de escalada.
+
+=== DADOS EM TEMPO REAL ===
+Dados brutos da predição: {"confidence_scores": [0.85, 0.8, 0.9], "timestamp": "2026-06-02T00:25:39.233236"}
+Perfil regional/histórico: {"region": "GLOBAL", "focus": "CVLI", "historical_alerts": 0, "startup": true}
+----------------------------------------
+📥 RESPOSTA DO ESPECIALISTA:
+{"anomalies_detected": true, "geographical_drift": false, "next_probable_cvli_hotspot": "BARROSO (Baseado na converg\u00eancia recente de tens\u00f5es territoriais)", "technical_summary": "An\u00e1lise de background local de ocorr\u00eancias ex\u00f3genas conclu\u00edda com sucesso."}
+================================================================================
+
+================================================================================
+🕒 [2026-06-02 00:25:52] INTERCEPTAÇÃO DE DIÁLOGO
+📢 REMETENTE:   GERENTE GERAL
+👤 DESTINATÁRIO: ESPECIALISTA EM ANÁLISE DE DADOS COMPLEXOS
+----------------------------------------
+💬 PROMPT ENVIADO:
+=== MEMÓRIA E DIRETIVAS DO MEMPALACE (RESUMO) ===
+Este arquivo serve como o "Cofre de Contexto" para a IA. Ele deve ser lido no início de cada interação para garantir que decisões passadas e estados de treino não sejam perdidos.
+---
+- **Tentativa Ativa:** 77 (Sentinela V4 - Clean Palace).
+- **Paradigma:** Retorno ao `DeepSTGAT_64` (Estabilidade > Capacidade bruta).
+- **Canais:** 38 (37 base + MemPalace Gated).
+- **Status:** Época 2 em curso. P@10 inicial estabilizado em 31%.
+- **Dispositivo:** Rodando em CPU (tempo estimado por época: 18 min).
+1. **Mecanismo Anti-Vício:** Implementado **Channel Dropout de 50%** no Canal 38 (Memória). O modelo é forçado a prever sem o MemPalace em metade dos batches para evitar dependência viciada no erro passado.
+2. **Blindagem de Validação:** O registro de surpresas no `TrainingVault` foi movido para **fora do loop de validação**. O modelo agora é validado no "futuro cego" puro, registrando o erro no cofre apenas após o cálculo da métrica.
+3. **CVP Ratio (Canal 39):** Integração definitiva da razão `CVP / (CVLI + 1)` como preditor de escalada.
+
+=== DADOS EM TEMPO REAL ===
+Dados brutos da predição: {"confidence_scores": [0.82, 0.76, 0.89], "timestamp": "2026-06-02T03:25:42.391Z"}
+Perfil regional/histórico: {"region": "fortaleza", "focus": "CVLI", "historical_alerts": 3}
+----------------------------------------
+📥 RESPOSTA DO ESPECIALISTA:
+{"anomalies_detected": true, "geographical_drift": false, "next_probable_cvli_hotspot": "BARROSO (Baseado na converg\u00eancia recente de tens\u00f5es territoriais)", "technical_summary": "An\u00e1lise de background local de ocorr\u00eancias ex\u00f3genas conclu\u00edda com sucesso."}
+================================================================================
+
+================================================================================
+🕒 [2026-06-02 00:25:59] INTERCEPTAÇÃO DE DIÁLOGO
+📢 REMETENTE:   GERENTE GERAL
+👤 DESTINATÁRIO: ESPECIALISTA EM CALIBRAÇÃO DE PESOS
+----------------------------------------
+💬 PROMPT ENVIADO:
+Com base na análise técnica de anomalias: {"anomalies_detected": true, "geographical_drift": false, "next_probable_cvli_hotspot": "BARROSO (Baseado na converg\u00eancia recente de tens\u00f5es territoriais)", "technical_summary": "An\u00e1lise de background local de ocorr\u00eancias ex\u00f3genas conclu\u00edda com sucesso."}
+Calcule os pesos ideais de calibração para postura, velocidade e rom.
+----------------------------------------
+📥 RESPOSTA DO ESPECIALISTA:
+{"weights": {"posture": 0.85, "speed": 0.7, "rom": 0.9}, "justification": "Calibra\u00e7\u00e3o t\u00e1tica de pesos anal\u00edticos calculada via modelo de background local."}
+================================================================================
+
+================================================================================
+🕒 [2026-06-02 00:26:02] INTERCEPTAÇÃO DE DIÁLOGO
+📢 REMETENTE:   GERENTE GERAL
+👤 DESTINATÁRIO: ESPECIALISTA EM CALIBRAÇÃO DE PESOS
+----------------------------------------
+💬 PROMPT ENVIADO:
+Com base na análise técnica de anomalias: {"anomalies_detected": true, "geographical_drift": false, "next_probable_cvli_hotspot": "BARROSO (Baseado na converg\u00eancia recente de tens\u00f5es territoriais)", "technical_summary": "An\u00e1lise de background local de ocorr\u00eancias ex\u00f3genas conclu\u00edda com sucesso."}
+Calcule os pesos ideais de calibração para postura, velocidade e rom.
+----------------------------------------
+📥 RESPOSTA DO ESPECIALISTA:
+{"weights": {"posture": 0.85, "speed": 0.7, "rom": 0.9}, "justification": "Calibra\u00e7\u00e3o t\u00e1tica de pesos anal\u00edticos calculada via modelo de background local."}
+================================================================================
+
+================================================================================
+🕒 [2026-06-02 00:26:09] INTERCEPTAÇÃO DE DIÁLOGO
+📢 REMETENTE:   GERENTE GERAL
+👤 DESTINATÁRIO: ESPECIALISTA EM INTERAÇÃO DO USUÁRIO
+----------------------------------------
+💬 PROMPT ENVIADO:
+Traduza a seguinte justificativa técnica em uma mensagem fluida e acolhedora em português para o tomador de decisão (policial/gestor): 'Calibração tática de pesos analíticos calculada via modelo de background local.'
+----------------------------------------
+📥 RESPOSTA DO ESPECIALISTA:
+{"output": "Os pesos do modelo preditivo foram recalibrados com sucesso de forma din\u00e2mica para mitigar falsos positivos nas m\u00e9tricas de amplitude (ROM), velocidade de deslocamento e an\u00e1lise postural."}
+================================================================================
+
+================================================================================
+🕒 [2026-06-02 00:26:12] INTERCEPTAÇÃO DE DIÁLOGO
+📢 REMETENTE:   GERENTE GERAL
+👤 DESTINATÁRIO: ESPECIALISTA EM INTERAÇÃO DO USUÁRIO
+----------------------------------------
+💬 PROMPT ENVIADO:
+Traduza a seguinte justificativa técnica em uma mensagem fluida e acolhedora em português para o tomador de decisão (policial/gestor): 'Calibração tática de pesos analíticos calculada via modelo de background local.'
+----------------------------------------
+📥 RESPOSTA DO ESPECIALISTA:
+{"output": "Os pesos do modelo preditivo foram recalibrados com sucesso de forma din\u00e2mica para mitigar falsos positivos nas m\u00e9tricas de amplitude (ROM), velocidade de deslocamento e an\u00e1lise postural."}
+================================================================================

@@ -1,9 +1,9 @@
 {
-  "last_checked_at": "2026-05-27T15:22:00",
+  "last_checked_at": "2026-06-02T00:20:47",
   "last_updated_at": "2026-05-27T09:20:29",
   "source_url": "https://www.google.com/maps/d/u/0/kml?mid=1lI0FmNXDPrezPhzeryZTCEP0rl8BDuE",
-  "status": "no_change",
-  "fallback_used": false,
+  "status": "download_failed",
+  "fallback_used": true,
   "download_sha256": "66eafb7c64dccfc43e5dfc699cc0b7b3789e9dae404461f698a68d416c6b17c9",
   "download_semantic_sha256": "c60eb00e1b3db318059a877abd46c5a5e35d2bbd84dc5d611e0e4ebbdcc4806c",
   "headers": {
@@ -12,5 +12,5 @@
     "content_length": "",
     "content_type": "application/vnd.google-earth.kmz"
   },
-  "last_error": ""
+  "last_error": "403 Client Error: Forbidden for url: https://www.google.com/maps/d/kml?mid=1lI0FmNXDPrezPhzeryZTCEP0rl8BDuE"
 }
