@@ -249,6 +249,24 @@ class ModelCalibrator:
                 'tag_bias_neighbor': 0.60,
                 'norm_neural_weight': 0.20,
             }
+            last_params = None
+            for event in reversed(info.get('history', [])):
+                if event.get('event') == 'full_rollback':
+                    break
+                if event.get('new_params'):
+                    last_params = event.get('new_params')
+                    break
+            if last_params:
+                new_cp = {
+                    param: value
+                    for param, value in last_params.items()
+                    if param in _PARAM_LIMITS
+                }
+                if region in orchestrator.calib_params:
+                    orchestrator.calib_params[region].update(new_cp)
+                    print(f"🔄 [Calibrator] Reapplied learned params for {region}: {new_cp}")
+                continue
+
             # Recalcula parâmetros acumulados (p20 steps por simplicidade)
             step = _STEPS['p20']
             new_cp = {}

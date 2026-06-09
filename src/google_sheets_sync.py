@@ -6,8 +6,98 @@ import requests
 import re
 from io import StringIO
 from datetime import datetime, timedelta
+from urllib.parse import urlparse, parse_qs
 
 logger = logging.getLogger(__name__)
+
+
+def _extract_sheet_id(url: str) -> str:
+    if not url:
+        return ""
+    m = re.search(r"/spreadsheets/d/([a-zA-Z0-9-_]+)", url)
+    return m.group(1) if m else ""
+
+
+def _extract_gid(url: str) -> str:
+    if not url:
+        return ""
+    try:
+        parsed = urlparse(url)
+        qs = parse_qs(parsed.query)
+        gid = (qs.get("gid") or [""])[0]
+        if gid:
+            return gid
+        if parsed.fragment:
+            frag_qs = parse_qs(parsed.fragment.replace("#", ""))
+            gid = (frag_qs.get("gid") or [""])[0]
+            if gid:
+                return gid
+    except Exception:
+        pass
+    return ""
+
+
+def _build_candidate_csv_urls(raw_url: str):
+    if not raw_url:
+        return []
+
+    raw_url = raw_url.strip()
+    candidates = []
+
+    # Se já for URL de export CSV, manter como primeira tentativa.
+    if "export?format=csv" in raw_url:
+        candidates.append(raw_url)
+
+    sheet_id = _extract_sheet_id(raw_url)
+    gid = _extract_gid(raw_url)
+    if sheet_id:
+        # Formato clássico de export.
+        if gid:
+            candidates.append(f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}")
+        candidates.append(f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv")
+
+        # Fallback alternativo (gviz), útil quando export retorna 410/403.
+        if gid:
+            candidates.append(f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&gid={gid}")
+        candidates.append(f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv")
+
+    # Remover duplicadas preservando ordem.
+    seen = set()
+    dedup = []
+    for u in candidates:
+        if u not in seen:
+            dedup.append(u)
+            seen.add(u)
+    return dedup
+
+
+def _download_sheets_csv(raw_url: str, timeout: int = 15):
+    candidates = _build_candidate_csv_urls(raw_url)
+    if not candidates:
+        raise ValueError("URL da planilha inválida ou vazia.")
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (compatible; ReportPreview/1.0; +https://localhost)"
+    }
+    errors = []
+
+    for url in candidates:
+        try:
+            response = requests.get(url, timeout=timeout, headers=headers)
+            response.raise_for_status()
+            response.encoding = "utf-8"
+
+            # Algumas respostas não são CSV de fato (HTML de login/permissão).
+            content_type = (response.headers.get("content-type") or "").lower()
+            body = response.text or ""
+            if "text/csv" not in content_type and "<html" in body[:500].lower():
+                raise ValueError("Resposta HTML em vez de CSV (permissão/link da planilha).")
+
+            return response.text
+        except Exception as exc:
+            errors.append(f"{url} -> {exc}")
+
+    raise RuntimeError("Falha ao baixar CSV da planilha. Tentativas: " + " | ".join(errors))
 
 def normalize_name(name):
     if not name: return ""
@@ -25,11 +115,7 @@ def sync_google_sheets(csv_url: str, exogenous_file_path: str):
         return {"status": "error", "message": "Google Sheets CSV URL not configured"}
 
     try:
-        response = requests.get(csv_url, timeout=15)
-        response.raise_for_status()
-        response.encoding = 'utf-8'
-        
-        content = response.text
+        content = _download_sheets_csv(csv_url, timeout=15)
         reader = csv.reader(StringIO(content))
         rows = list(reader)
         
@@ -83,6 +169,8 @@ def sync_google_sheets(csv_url: str, exogenous_file_path: str):
             busca_municipio = None
         
         for r in data_rows:
+            if not r or not r[0].strip() or not any(col.strip() for col in r[1:]):
+                continue
             row = r + [''] * (7 - len(r))
             ev_id = str(row[0]).strip()
             iso_time = row[1].strip()

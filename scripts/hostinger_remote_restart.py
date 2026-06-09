@@ -30,6 +30,21 @@ def main():
     host = env.get('HOSTINGER_HOST_SSH') or env.get('HOSTINGER_HOST') or env.get('HOSTING_HOST')
     user = env.get('HOSTINGGER_USER') or env.get('HOSTINGER_USER') or env.get('HOSTINGER_SYNC_USER') or env.get('USER')
     password = env.get('VPS_HOSTINGER_PASSWORD') or env.get('HOSTINGER_SYNC_PASSWORD')
+
+    host_ssh = env.get('HOST_SSH', '').strip()
+    if (not host or not user) and host_ssh:
+        if '@' in host_ssh:
+            parsed_user, parsed_host = host_ssh.split('@', 1)
+            if not user:
+                user = parsed_user.strip()
+            if not host:
+                host = parsed_host.strip()
+        elif not host:
+            host = host_ssh
+
+    if not password:
+        password = env.get('PASSWORD_VPS_SSH', '').strip()
+
     target_dir = env.get('HOSTINGER_SYNC_TARGET_DIR', '/home/reportpreview/apps/report-preview')
     port = int(env.get('HOSTINGER_SYNC_PORT', '22'))
 

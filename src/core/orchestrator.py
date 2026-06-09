@@ -24,9 +24,9 @@ except ImportError:
 # ============================================================================
 
 try:
-    from .architectures import DeepSTGAT_64, DeepSTGAT_32, ShallowGAT
+    from .architectures import DeepSTGAT_64, DeepSTGAT_32, ShallowGAT, get_model_class
 except ImportError:
-    from architectures import DeepSTGAT_64, DeepSTGAT_32, ShallowGAT
+    from architectures import DeepSTGAT_64, DeepSTGAT_32, ShallowGAT, get_model_class
 
 def normalize_name(text):
     if not isinstance(text, str): return ""
@@ -85,6 +85,8 @@ class StateOrchestrator:
         self._window_state_path = os.path.join(self.root, 'data', 'window_state.json')
         self._hermes_export_lock = threading.Lock()
         self._last_hermes_export_fingerprint = None
+        self._risk_cache = {}
+        self._risk_cache_lock = threading.Lock()
         self.dates = None
         self._initialize_models()
         self._restore_window_state()
@@ -200,12 +202,16 @@ class StateOrchestrator:
                     data = self._load_pickle_safe(cfg['data_path'])
                     if not data: continue
                     num_nodes = len(data['nodes_gdf'])
-                    model = cfg['class'](num_nodes=num_nodes, in_channels=cfg['in_channels'], time_steps=cfg['window']).to(self.device)
                     ckpt = torch.load(cfg['model_path'], map_location=self.device, weights_only=False)
-                    state_dict = ckpt['model_state_dict'] if 'model_state_dict' in ckpt else ckpt
+                    ckpt_meta = ckpt if isinstance(ckpt, dict) else {}
+                    model_class = get_model_class(ckpt_meta.get('model_class')) if ckpt_meta.get('model_class') else cfg['class']
+                    in_channels = int(ckpt_meta.get('in_channels', cfg['in_channels']))
+                    window = int(ckpt_meta.get('window', cfg['window']))
+                    model = model_class(num_nodes=num_nodes, in_channels=in_channels, time_steps=window).to(self.device)
+                    state_dict = ckpt['model_state_dict'] if isinstance(ckpt, dict) and 'model_state_dict' in ckpt else ckpt
                     model.load_state_dict(state_dict, strict=False)
                     model.eval()
-                    self.specialists[region] = {'model': model, 'data': data, 'window': cfg['window'], 'channels': cfg['in_channels']}
+                    self.specialists[region] = {'model': model, 'data': data, 'window': window, 'channels': in_channels}
                     if self.dates is None:
                         self.dates = data.get('dates')
                     print(f"✅ Orquestrador: Especialista {region.upper()} carregado ({cfg['in_channels']} Canais).")
@@ -669,9 +675,7 @@ class StateOrchestrator:
                 sort_keys=True,
             )
             with self._hermes_export_lock:
-                if self._last_hermes_export_fingerprint == export_fingerprint:
-                    print("ℹ️ [Hermes] Snapshot idêntico ao último exportado; pulando reexportação duplicada.")
-                    return
+                self._last_hermes_export_fingerprint = export_fingerprint
 
             output_dir = os.path.join(self.root, 'outputs', 'hermes')
             history_dir = os.path.join(output_dir, 'history')
@@ -1001,6 +1005,24 @@ class StateOrchestrator:
             print(f"❌ [Hermes] Erro ao exportar artefatos para o Telegram Bot: {e}")
 
     def get_combined_risk(self, exogenous_shocks=None, return_trends=False):
+        # Generate cache key based on exogenous shocks
+        if exogenous_shocks is None:
+            cache_key = None
+        else:
+            cache_items = []
+            for k, v in sorted(exogenous_shocks.items()):
+                if isinstance(v, dict):
+                    cache_items.append((k, float(v.get('intensity', 0.0)), float(v.get('suppression_intensity', 0.0))))
+                else:
+                    cache_items.append((k, float(v)))
+            cache_key = tuple(cache_items)
+
+        # Check cache
+        with self._risk_cache_lock:
+            if cache_key in self._risk_cache:
+                cached_scores, cached_trends = self._risk_cache[cache_key]
+                return (dict(cached_scores), dict(cached_trends)) if return_trends else dict(cached_scores)
+
         combined_scores = {}
         trends = {}
         component_details = {}
@@ -1101,7 +1123,12 @@ class StateOrchestrator:
             neighbor_signal = np.clip((data['adj_geo'].dot((sim_impact > 0).astype(float))) * (cp.get('tag_bias_neighbor', 0.6)/0.6), 0, 1)
             # Nó com evento direto também recebe inclusão máxima (não apenas seus vizinhos)
             own_event_signal = (sim_impact > 0).astype(float)
-            inclusion_signal = np.clip(np.maximum.reduce([recent_crime_signal, neighbor_signal, own_event_signal]), 0, 1)
+            suppression_neighbor_signal = np.clip((data['adj_geo'].dot((sim_relief > 0).astype(float))) * (cp.get('tag_bias_neighbor', 0.6)/0.6), 0, 1)
+            own_suppression_signal = (sim_relief > 0).astype(float)
+            suppression_signal = np.clip(np.maximum(suppression_neighbor_signal, own_suppression_signal), 0, 1)
+
+            raw_inclusion_signal = np.maximum.reduce([recent_crime_signal, neighbor_signal, own_event_signal])
+            inclusion_signal = np.clip(raw_inclusion_signal - (0.85 * suppression_signal), 0, 1)
             calm_signal = np.clip(-momentum_feat[:, -1, 3], 0, 30) / 30.0
 
             if cp.get('use_historical_fallback') and cp.get('historical_top10'):
@@ -1124,6 +1151,10 @@ class StateOrchestrator:
                     + (tension_weight * norm_tension)
                     + (inclusion_weight * inclusion_signal)
                 )
+
+            # Supressão precisa reduzir risco de forma perceptível no nó alvo e no entorno imediato.
+            suppression_discount = (0.22 * own_suppression_signal) + (0.10 * suppression_neighbor_signal)
+            final_logic = final_logic - suppression_discount
             
             out_norm = np.clip(final_logic, 0, 1) * 100.0
             for i, row in data['nodes_gdf'].iterrows():
@@ -1165,6 +1196,10 @@ class StateOrchestrator:
 
         self._write_hermes_outputs(combined_scores, component_details)
         self._log_predict_p10(combined_scores)
+        
+        with self._risk_cache_lock:
+            self._risk_cache[cache_key] = (combined_scores, trends)
+            
         return (combined_scores, trends) if return_trends else combined_scores
 
     def _log_predict_p10(self, scores_map):

@@ -265,6 +265,15 @@ _PEAK_HOURS_CACHE = None  # {bairro_norm: "Entre XHs e YHs"}
 _MICRONODE_EXPORT_BUILT_AT = None
 _MICRONODE_EXPORT_LOCK = threading.Lock()
 
+_API_RISK_CACHE = None
+_API_RISK_CACHE_LOCK = threading.Lock()
+
+def invalidate_api_risk_cache():
+    global _API_RISK_CACHE
+    with _API_RISK_CACHE_LOCK:
+        _API_RISK_CACHE = None
+
+
 # Cache global para explicabilidade para evitar redundância de I/O em loops
 _EXOGENOUS_EVENTS_CACHE = None
 _RUAS_CRITICAS_FORTALEZA_CACHE = None
@@ -278,6 +287,42 @@ _SNAPSHOT_EXPORT_STATUS = {
     'copied_count': 0
 }
 _SNAPSHOT_EXPORT_LOCK = threading.Lock()
+_MODEL_UPDATE_STATUS_LOCK = threading.Lock()
+_MODEL_UPDATE_STATUS = {
+    'status': 'idle',
+    'progress': 0,
+    'message': None,
+    'error': None,
+    'revision': 0,
+    'updated_at': None,
+    'expires_at': None,
+}
+
+
+def _set_model_update_status(status='idle', progress=0, message=None,
+                             error=None, bump_revision=False, ttl_seconds=20):
+    now = datetime.now()
+    with _MODEL_UPDATE_STATUS_LOCK:
+        _MODEL_UPDATE_STATUS['status'] = status
+        _MODEL_UPDATE_STATUS['progress'] = progress
+        _MODEL_UPDATE_STATUS['message'] = message
+        _MODEL_UPDATE_STATUS['error'] = error
+        _MODEL_UPDATE_STATUS['updated_at'] = now.isoformat()
+        _MODEL_UPDATE_STATUS['expires_at'] = (now.timestamp() + ttl_seconds) if status != 'idle' else None
+        if bump_revision:
+            _MODEL_UPDATE_STATUS['revision'] += 1
+
+
+def _get_model_update_status_payload():
+    with _MODEL_UPDATE_STATUS_LOCK:
+        payload = dict(_MODEL_UPDATE_STATUS)
+
+    expires_at = payload.get('expires_at')
+    if payload['status'] != 'idle' and expires_at and datetime.now().timestamp() > expires_at:
+        _set_model_update_status(status='idle', progress=0, message=None, error=None, ttl_seconds=0)
+        with _MODEL_UPDATE_STATUS_LOCK:
+            payload = dict(_MODEL_UPDATE_STATUS)
+    return payload
 
 # === REGISTRAR HEALTH MONITOR BLUEPRINT (antes de load_data_and_models) ===
 model_calibrator = None
@@ -308,9 +353,7 @@ try:
     app.register_blueprint(admin_bp)
     print("✅ Admin Dashboard Registrado em /api/admin/health")
     
-    # Iniciar auto-calibrator daemon (Desativado em favor do Sistema Multi-Agente para evitar conflito de pesos)
-    # auto_calibrator_daemon.start()
-    print("🔧 Auto-Calibrator Daemon desativado (Gerenciamento exclusivo via Sistema Multi-Agente)")
+    print("🔧 Auto-Calibrator Daemon pronto para intervenção ativa por desvio/convergência")
 
     # Registro API V4 (Sentinela Granular)
     if create_v4_api_blueprint:
@@ -874,6 +917,7 @@ def load_data_and_models():
         print("❌ Erro Crítico: Nenhum dado regional encontrado.")
 
     try:
+        invalidate_api_risk_cache()
         orchestrator = StateOrchestrator(BASE_DIR)
         start_stgcn_street_warmup()
         print("✅ Motor de Inteligência ST-GAT Ativo.")
@@ -1476,13 +1520,41 @@ def get_cvli_points():
             except Exception as e:
                 logging.warning(f"Erro ao carregar cache de ruas: {e}")
 
-        for _, row in df.sort_values('event_date', ascending=False).iterrows():
+        df = df.sort_values('event_date', ascending=False).copy()
+        df['hora_norm'] = df['hora'].astype(str).fillna('').str.strip()
+        df['bairro_norm'] = df['bairro'].astype(str).fillna('').str.strip().str.upper()
+        df['cidade_norm'] = df['cidade'].astype(str).fillna('').str.strip().str.upper()
+        df['tipo_evento_norm'] = df['tipo_evento'].astype(str).fillna('CVLI').str.strip().str.upper()
+        df['occurrence_key'] = (
+            df['event_date'].dt.strftime('%Y-%m-%d').fillna('') + '|' +
+            df['hora_norm'] + '|' +
+            df['bairro_norm'] + '|' +
+            df['cidade_norm'] + '|' +
+            df['tipo_evento_norm']
+        )
+
+        grouped = df.groupby('occurrence_key', as_index=False).agg(
+            event_date=('event_date', 'min'),
+            hora=('hora_norm', 'first'),
+            bairro=('bairro', 'first'),
+            cidade=('cidade', 'first'),
+            local=('name', 'first'),
+            tipo_evento=('tipo_evento', 'first'),
+            latitude=('latitude', 'mean'),
+            longitude=('longitude', 'mean'),
+            qtd_mortes_max=('qtd_mortes', lambda s: pd.to_numeric(s, errors='coerce').fillna(0).max()),
+            row_count=('id', 'count'),
+            related_ids=('id_evento', lambda s: [str(v) for v in s.dropna().tolist() if str(v).strip()]),
+            fallback_ids=('id', lambda s: [str(v) for v in s.dropna().tolist() if str(v).strip()]),
+        )
+
+        for _, row in grouped.iterrows():
             lat = float(row['latitude'])
             lng = float(row['longitude'])
             
             cidade_raw = str(row.get('cidade') or '').strip()
             bairro_raw = str(row.get('bairro') or '').strip()
-            local = str(row.get('name') or '').strip()
+            local = str(row.get('local') or '').strip()
             
             # Use Nominatim API data from cache if present
             cached = cache_coords.get((round(lat, 3), round(lng, 3)))
@@ -1512,12 +1584,20 @@ def get_cvli_points():
                 continue
 
             event_date = row['event_date']
-            victims_raw = pd.to_numeric(row.get('qtd_mortes'), errors='coerce')
-            victims = int(victims_raw) if pd.notna(victims_raw) and victims_raw > 0 else 1
+            deaths_reported = int(row.get('qtd_mortes_max') or 0)
+            occurrence_rows = int(row.get('row_count') or 1)
+            # Regra robusta: se o dataset já traz total de vítimas (>1), respeita esse valor.
+            # Caso contrário, usa a quantidade de linhas da mesma ocorrência para não subcontar vítimas múltiplas.
+            victims = deaths_reported if deaths_reported > 1 else max(1, occurrence_rows)
+            ids = row.get('related_ids') or []
+            if not ids:
+                ids = row.get('fallback_ids') or []
+            primary_id = ids[0] if ids else ''
             features.append({
                 'type': 'Feature',
                 'properties': {
-                    'id': str(row.get('id_evento') or row.get('id') or ''),
+                    'id': primary_id,
+                    'related_ids': ids,
                     'data': event_date.strftime('%Y-%m-%d'),
                     'hora': str(row.get('hora') or ''),
                     'local': local,
@@ -1525,9 +1605,9 @@ def get_cvli_points():
                     'bairro': bairro_raw,
                     'cidade': cidade_raw,
                     'vitimas': victims,
-                    'arma': str(row.get('arma') or '').strip(),
-                    'sexo': str(row.get('sexo') or '').strip(),
-                    'idade': str(row.get('idade') or '').strip(),
+                    'arma': '',
+                    'sexo': '',
+                    'idade': '',
                     'tipo_evento': str(row.get('tipo_evento') or 'CVLI').strip(),
                     'region': item_region,
                 },
@@ -2116,6 +2196,20 @@ get_top20_micro_nodes = get_visible_micronodes
 def get_risk():
     if nodes_gdf is None or orchestrator is None:
         return jsonify({'error': 'Inicializando...'}), 503
+        
+    target_region = request.args.get('region', 'global').lower()
+    
+    global _API_RISK_CACHE
+    with _API_RISK_CACHE_LOCK:
+        if _API_RISK_CACHE is not None:
+            import copy
+            meta = copy.deepcopy(_API_RISK_CACHE['meta'])
+            results = copy.deepcopy(_API_RISK_CACHE['data'])
+            if target_region != 'global' and target_region in meta.get('counts_by_region', {}):
+                meta['counts'] = meta['counts_by_region'][target_region]
+                results = [r for r in results if r.get('region_type') == target_region]
+            return jsonify({'meta': meta, 'data': results})
+
     try:
         exogenous_shocks, exogenous_shocks_map = build_current_exogenous_shocks()
 
@@ -2305,13 +2399,17 @@ def get_risk():
                     except: pass
 
                 all_scores.append(score)
+                row_cidade = row.get('cidade')
+                if not isinstance(row_cidade, str) or pd.isna(row_cidade) or not row_cidade:
+                    row_cidade = 'Fortaleza' if reg == 'fortaleza' else name
                 node_result = {
                     'node_id': i, 'name': name, 'clean_name': name_norm,
                     'tension_score': score, 'risk_score': score,
                     'status_label': status, 'css_class': css,
                     'color': color, 'trend': trend, 
                     'metrics': node_metrics,
-                    'faction': str(row.get('faction', 'N/A')), 'region_type': reg
+                    'faction': str(row.get('faction', 'N/A')), 'region_type': reg,
+                    'cidade': str(row_cidade)
                 }
                 results.append(node_result)
                 region_buckets[reg].append(node_result)
@@ -2447,14 +2545,16 @@ def get_risk():
                 deduped_region = []
                 seen_names = set()
                 for r in sorted_region:
-                    if r.get('name') not in seen_names:
-                        seen_names.add(r.get('name'))
+                    name_norm = normalize_name(r.get('name'))
+                    if name_norm not in seen_names:
+                        seen_names.add(name_norm)
                         deduped_region.append(r)
                 
                 meta['top10_by_region'][region_key] = [{
                     'name': r.get('name'), 'node_id': r.get('node_id'), 'risk_score': r.get('risk_score'),
                     'status_label': r.get('status_label'), 'region_type': r.get('region_type'),
-                    'peak_hours': (r.get('metrics') or {}).get('peak_hours', '')
+                    'peak_hours': (r.get('metrics') or {}).get('peak_hours', ''),
+                    'cidade': r.get('cidade')
                 } for r in deduped_region[:10]]
         except Exception:
             meta['counts_by_region'] = {}
@@ -2466,15 +2566,17 @@ def get_risk():
             meta['top10'] = []
             seen_names_all = set()
             for r in sorted_results:
-                if r.get('name') not in seen_names_all:
-                    seen_names_all.add(r.get('name'))
+                name_norm = normalize_name(r.get('name'))
+                if name_norm not in seen_names_all:
+                    seen_names_all.add(name_norm)
                     meta['top10'].append({
                         'name': r.get('name'),
                         'node_id': r.get('node_id'),
                         'risk_score': r.get('risk_score'),
                         'status_label': r.get('status_label'),
                         'region_type': r.get('region_type'),
-                        'peak_hours': (r.get('metrics') or {}).get('peak_hours', '')
+                        'peak_hours': (r.get('metrics') or {}).get('peak_hours', ''),
+                        'cidade': r.get('cidade')
                     })
                     if len(meta['top10']) >= 10:
                         break
@@ -2517,8 +2619,16 @@ def get_risk():
             print(f"Erro ao calcular datas de inteligência: {e}")
             meta['intelligence_label'] = "Janela de Inteligência: Ativa"
 
+        # Cache the unfiltered results
+        import copy
+        cache_payload = {
+            'meta': copy.deepcopy(meta),
+            'data': copy.deepcopy(results)
+        }
+        with _API_RISK_CACHE_LOCK:
+            _API_RISK_CACHE = cache_payload
+
         # --- CORREÇÃO: Respeitar Filtro de Região nas caixas de resumo ---
-        target_region = request.args.get('region', 'global').lower()
         if target_region != 'global' and target_region in meta.get('counts_by_region', {}):
             meta['counts'] = meta['counts_by_region'][target_region]
             # Envia apenas os resultados daquela região
@@ -2607,7 +2717,40 @@ def simulate_risk():
         if not points:
             return jsonify({'error': 'Nenhum ponto fornecido'}), 400
 
-        # 1. Mapear pontos [lat, lng] para nomes de bairros normalizados
+        # 1. Mapear pontos [lat, lng] para nomes canônicos da malha especialista
+        def _has_specialist_owner(name_norm):
+            try:
+                owners = getattr(orchestrator, '_node_owners', {}) or {}
+                return name_norm in owners
+            except Exception:
+                return False
+
+        def _nearest_specialist_name(lat_p, lng_p):
+            best_name = None
+            best_dist = None
+            try:
+                for _, spec in orchestrator.specialists.items():
+                    spec_nodes = spec.get('data', {}).get('nodes_gdf') if isinstance(spec, dict) else None
+                    if spec_nodes is None or spec_nodes.empty:
+                        continue
+                    for _, srow in spec_nodes.iterrows():
+                        lat_s = srow.get('lat')
+                        lng_s = srow.get('long')
+                        if lat_s is None or lng_s is None:
+                            continue
+                        try:
+                            lat_s = float(lat_s)
+                            lng_s = float(lng_s)
+                        except (TypeError, ValueError):
+                            continue
+                        dist = (lat_s - lat_p) ** 2 + (lng_s - lng_p) ** 2
+                        if best_dist is None or dist < best_dist:
+                            best_dist = dist
+                            best_name = normalize_name(str(srow.get('name', '')))
+            except Exception:
+                return None
+            return best_name
+
         temp_shocks = {}
         intensity_per_point = 0.25 # Cada equipe/conflito contribui com 25% de intensidade
         
@@ -2620,6 +2763,12 @@ def simulate_risk():
                 nearest_idx = dists.idxmin()
                 row = nodes_gdf.loc[nearest_idx]
                 name_norm = normalize_name(str(row['name']))
+
+                # Se o nó mais próximo não participa da malha especialista, aproximar para o nó canônico válido
+                if not _has_specialist_owner(name_norm):
+                    fallback_name = _nearest_specialist_name(lat_p, lng_p)
+                    if fallback_name:
+                        name_norm = fallback_name
                 
                 # Configurar Shock Simulado (CUMULATIVO)
                 is_supp = (sim_type == 'suppression')
@@ -2627,15 +2776,22 @@ def simulate_risk():
                 if name_norm not in temp_shocks:
                     temp_shocks[name_norm] = {
                         'intensity': 0.0,
+                        'suppression_intensity': 0.0,
                         'is_critical': not is_supp,
                         'is_suppression': is_supp
                     }
                 
-                # Incrementa intensidade (mais pontos no mesmo bairro = mais força)
-                temp_shocks[name_norm]['intensity'] += intensity_per_point
-                # Cap de 1.0 (100%) para evitar valores irreais
-                if temp_shocks[name_norm]['intensity'] > 1.0:
-                    temp_shocks[name_norm]['intensity'] = 1.0
+                # Incrementa intensidade por tipo (mais pontos no mesmo bairro = mais força)
+                if is_supp:
+                    temp_shocks[name_norm]['suppression_intensity'] += intensity_per_point
+                    # Cap de 1.0 (100%) para evitar valores irreais
+                    if temp_shocks[name_norm]['suppression_intensity'] > 1.0:
+                        temp_shocks[name_norm]['suppression_intensity'] = 1.0
+                else:
+                    temp_shocks[name_norm]['intensity'] += intensity_per_point
+                    # Cap de 1.0 (100%) para evitar valores irreais
+                    if temp_shocks[name_norm]['intensity'] > 1.0:
+                        temp_shocks[name_norm]['intensity'] = 1.0
                     
             except Exception as e:
                 print(f"Erro ao processar ponto de simulação {pt}: {e}")
@@ -2692,6 +2848,7 @@ def simulate_risk():
             results.append({
                 'node_id': i, 'name': name, 'clean_name': name_norm,
                 'tension_score': score, 'risk_score': score,
+                'risk_score_cvli': score,
                 'status_label': status, 'css_class': css,
                 'color': color, 'trend': trend, 
                 'metrics': node_metrics,
@@ -3068,7 +3225,8 @@ def get_geo_critical_streets():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/model-update-status')
-def model_status(): return jsonify({"status": "idle"})
+def model_status():
+    return jsonify(_get_model_update_status_payload())
 
 @app.route('/api/anomaly_status')
 def anomaly_status():
@@ -3464,6 +3622,31 @@ def explain_node(node_id):
             explanation = gen.explain_node_ranking(int(node_id), int(rank_pos), context)
             explanation['risk_score_pct'] = float(score_pct)
 
+            # Indicador executivo de tendência futura (14 dias)
+            delta_7d = int(cvli_recent_7 - cvli_prev_7)
+            if delta_7d >= 2:
+                trend_direction = 'up'
+                trend_label = 'Alta de Risco'
+                trend_message = 'Pressão criminal em aceleração nas últimas janelas comparáveis.'
+            elif delta_7d <= -2:
+                trend_direction = 'down'
+                trend_label = 'Queda de Risco'
+                trend_message = 'Sinal de arrefecimento recente, mantendo monitoramento ativo.'
+            else:
+                trend_direction = 'stable'
+                trend_label = 'Estável'
+                trend_message = 'Sem ruptura relevante de tendência no curto prazo.'
+
+            explanation['future_trend'] = {
+                'direction': trend_direction,
+                'label': trend_label,
+                'delta_7d': delta_7d,
+                'cvli_recent_7': int(cvli_recent_7),
+                'cvli_prev_7': int(cvli_prev_7),
+                'message': trend_message,
+                'horizon_days': 14,
+            }
+
             # Percentil de confiança na previsão
             conf_pct = float(explanation.get('confidence_pct', round(float(explanation.get('confidence', heuristic_confidence)) * 100.0, 1)))
             if conf_pct >= 80:
@@ -3664,6 +3847,7 @@ def save_exogenous():
         # this file and perform their own enrichment rather than relying
         # on a duplicate file being written here.
 
+        invalidate_api_risk_cache()
         return jsonify({'saved': len(points)})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -3760,6 +3944,7 @@ def sync_exogenous_from_sheets():
         exogenous_path = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
         result = sync_google_sheets(csv_url, exogenous_path)
         
+        invalidate_api_risk_cache()
         return jsonify(result), 200 if result.get("status") == "success" else 500
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -3771,22 +3956,22 @@ def get_pending_exogenous_count():
         import csv as csv_mod
         from io import StringIO
         from dotenv import load_dotenv
+        from src.google_sheets_sync import _download_sheets_csv
         load_dotenv()
         
         csv_url = os.environ.get("GOOGLE_SHEETS_CSV_URL")
         if not csv_url:
             return jsonify({"pending": 0, "total_sheet": 0, "total_local": 0}), 200
-        
-        resp = requests.get(csv_url, timeout=10)
-        resp.encoding = 'utf-8'
-        resp.raise_for_status()
-        
-        reader = csv_mod.reader(StringIO(resp.text))
+
+        csv_text = _download_sheets_csv(csv_url, timeout=10)
+        reader = csv_mod.reader(StringIO(csv_text))
         rows = list(reader)
         sheet_ids = set()
         for r in rows[1:]:
             if r and r[0].strip():
-                sheet_ids.add(r[0].strip())
+                # Check if there is any other column with content to avoid empty rows
+                if any(col.strip() for col in r[1:]):
+                    sheet_ids.add(r[0].strip())
         
         exogenous_path = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
         local_ids = set()
@@ -3850,8 +4035,93 @@ def get_efficiency_latest():
 AGENT_CALIBRATION_CACHE_FILE = os.path.join(BASE_DIR, 'data', 'agent_calibrated_weights.json')
 _agent_calibration_state = {
     "status": "idle",
-    "last_calibration": None
+    "last_calibration": None,
+    "error": None
 }
+
+
+def _persist_agent_result(result: dict):
+    global _agent_calibration_state
+
+    _agent_calibration_state["status"] = "success"
+    _agent_calibration_state["error"] = None
+    _agent_calibration_state["last_calibration"] = result
+
+    os.makedirs(os.path.dirname(AGENT_CALIBRATION_CACHE_FILE), exist_ok=True)
+    with open(AGENT_CALIBRATION_CACHE_FILE, 'w', encoding='utf-8') as f:
+        json.dump(result, f, indent=2, ensure_ascii=False)
+
+    hist_file = os.path.join(BASE_DIR, 'logs', 'agent_calibrations_history.json')
+    hist_data = []
+    if os.path.exists(hist_file):
+        with open(hist_file, 'r', encoding='utf-8') as hf:
+            hist_data = json.load(hf)
+    hist_data.append({
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "weights": result.get("calibrated_weights"),
+        "explanations": result.get("explanations"),
+        "target_region": result.get("target_region"),
+    })
+    hist_data = hist_data[-50:]
+    with open(hist_file, 'w', encoding='utf-8') as hf:
+        json.dump(hist_data, hf, indent=2, ensure_ascii=False)
+
+    try:
+        from src.agent.calibration_memory import record_agent_decision
+        record_agent_decision(BASE_DIR, result, source='app_persist')
+    except Exception as exc:
+        print(f"⚠️ [Calibration Memory] Falha ao registrar decisão: {exc}")
+
+
+def _build_live_agent_payload(region: str = 'global'):
+    if orchestrator is None:
+        return None, None
+
+    scores_map = orchestrator.get_combined_risk()
+    top_predictions = [
+        {'name': name, 'score': round(float(score), 4)}
+        for name, score in sorted(scores_map.items(), key=lambda item: item[1], reverse=True)[:10]
+    ]
+    confidence = confidence_tracker.get_current_confidence(region=region) if confidence_tracker else {}
+    raw_stgcn_data = {
+        'timestamp': datetime.now().isoformat(),
+        'region': region,
+        'confidence_scores': confidence,
+        'top_predictions': top_predictions,
+        'combined_risk_sample_size': len(scores_map),
+    }
+    user_profile = {
+        'region': region.upper(),
+        'focus': 'CVLI',
+        'historical_alerts': len(health_monitor.get_active_alerts()) if health_monitor else 0,
+    }
+    return raw_stgcn_data, user_profile
+
+
+def _handle_agent_intervention(event: dict):
+    result = {
+        'status': event.get('status', 'success'),
+        'manager_decision': 'Intervenção automática aplicada ao modelo por desvio semântico ou erro de convergência.',
+        'calibrated_weights': event.get('new_params'),
+        'explanations': ((event.get('agent_review') or {}).get('explanations')
+                         or ((event.get('agent_review') or {}).get('data_analysis') or {}).get('technical_summary')
+                         or f"{event.get('region', '').upper()}: ajuste automático aplicado para {event.get('metric', '')}."),
+        'data_analysis': (event.get('agent_review') or {}).get('data_analysis', {}),
+        'calibrated_at': event.get('timestamp'),
+        'target_region': event.get('region'),
+        'affected_metric': event.get('metric'),
+        'operational_params': event.get('new_params'),
+    }
+    _persist_agent_result(result)
+    invalidate_api_risk_cache()
+    _set_model_update_status(
+        status='updating_models',
+        progress=100,
+        message='Intervenção automática aplicada. Recalculando risco e sincronizando dashboards...',
+        error=None,
+        bump_revision=True,
+        ttl_seconds=30,
+    )
 
 @app.route('/api/agent/calibrate-report', methods=['POST'])
 def run_agent_calibration():
@@ -3865,56 +4135,51 @@ def run_agent_calibration():
     except Exception:
         req_data = {}
 
-    raw_stgcn_data = req_data.get("raw_stgcn_data", {
-        "confidence_scores": [0.82, 0.76, 0.89],
-        "timestamp": datetime.now().isoformat()
-    })
-    user_profile = req_data.get("user_profile", {
-        "region": "Fortaleza",
-        "focus": "CVLI",
-        "historical_alerts": 3
-    })
+    raw_stgcn_data = req_data.get("raw_stgcn_data")
+    user_profile = req_data.get("user_profile")
+    if raw_stgcn_data is None or user_profile is None:
+        region = (req_data.get('region') or 'global').lower()
+        raw_stgcn_data, user_profile = _build_live_agent_payload(region)
+    if raw_stgcn_data is None or user_profile is None:
+        return jsonify({'error': 'Dados vivos indisponíveis para acionar o agente.'}), 503
 
     def _async_calibration_worker():
         global _agent_calibration_state
         _agent_calibration_state["status"] = "processing"
+        _agent_calibration_state["error"] = None
+        _set_model_update_status(
+            status='agent_intervening',
+            progress=35,
+            message='Agente analisando desvio semântico e recalibrando previsões...',
+            error=None,
+            ttl_seconds=45,
+        )
         try:
             from src.agent.multi_agent_system import GeneralManagerAgent
-            manager = GeneralManagerAgent()
+            manager = GeneralManagerAgent(base_dir=BASE_DIR)
             # Executa raciocínio analítico em malha fechada localmente
             result = manager.process_and_calibrate(raw_stgcn_data, user_profile)
-            
-            # Grava no estado e persiste no cache local
-            _agent_calibration_state["status"] = "success"
-            _agent_calibration_state["last_calibration"] = result
-            
-            os.makedirs(os.path.dirname(AGENT_CALIBRATION_CACHE_FILE), exist_ok=True)
-            with open(AGENT_CALIBRATION_CACHE_FILE, 'w', encoding='utf-8') as f:
-                json.dump(result, f, indent=2, ensure_ascii=False)
-                
-            # Salvar histórico de calibrações dos agentes
-            try:
-                hist_file = os.path.join(BASE_DIR, 'logs', 'agent_calibrations_history.json')
-                hist_data = []
-                if os.path.exists(hist_file):
-                    with open(hist_file, 'r', encoding='utf-8') as hf:
-                        hist_data = json.load(hf)
-                hist_data.append({
-                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "weights": result.get("calibrated_weights"),
-                    "explanations": result.get("explanations")
-                })
-                # Manter apenas as últimas 50 calibrações
-                hist_data = hist_data[-50:]
-                with open(hist_file, 'w', encoding='utf-8') as hf:
-                    json.dump(hist_data, hf, indent=2, ensure_ascii=False)
-            except Exception as he:
-                print(f"🤖 [Multi-Agent Background] Erro ao gravar histórico: {he}")
-                
+            _persist_agent_result(result)
+            invalidate_api_risk_cache()
+            _set_model_update_status(
+                status='updating_models',
+                progress=100,
+                message='Calibração concluída. Recalculando risco e atualizando dashboards...',
+                error=None,
+                bump_revision=True,
+                ttl_seconds=30,
+            )
             print(f"🤖 [Multi-Agent Background] Calibração concluída! Pesos: {result.get('calibrated_weights')}")
         except Exception as err:
             _agent_calibration_state["status"] = "failed"
             _agent_calibration_state["error"] = str(err)
+            _set_model_update_status(
+                status='error',
+                progress=0,
+                message='Falha na intervenção automática do agente.',
+                error=str(err),
+                ttl_seconds=45,
+            )
             print(f"🤖 [Multi-Agent Background] Erro na thread de calibração: {err}")
 
     # Disparar calibração em Thread de Background (Não bloqueante)
@@ -3967,39 +4232,12 @@ if __name__ == "__main__":
     atexit.register(_cleanup_on_shutdown)
     
     load_data_and_models()
-    
-    # --- DISPARO DO SISTEMA MULTI-AGENTE OPERACIONAL NO STARTUP ---
-    def _run_startup_agent_calibration():
-        print("\n🤖 [Multi-Agent Background] Inicializando agentes de decisão local no startup...")
-        try:
-            from src.agent.multi_agent_system import GeneralManagerAgent
-            manager = GeneralManagerAgent()
-            # Dados padrão de telemetria inicial
-            raw_stgcn_data = {
-                "confidence_scores": [0.85, 0.80, 0.90],
-                "timestamp": datetime.now().isoformat()
-            }
-            user_profile = {
-                "region": "GLOBAL",
-                "focus": "CVLI",
-                "historical_alerts": 0,
-                "startup": True
-            }
-            result = manager.process_and_calibrate(raw_stgcn_data, user_profile)
-            
-            # Persistir no cache inicial
-            os.makedirs(os.path.dirname(AGENT_CALIBRATION_CACHE_FILE), exist_ok=True)
-            with open(AGENT_CALIBRATION_CACHE_FILE, 'w', encoding='utf-8') as f:
-                json.dump(result, f, indent=2, ensure_ascii=False)
-            
-            global _agent_calibration_state
-            _agent_calibration_state["status"] = "success"
-            _agent_calibration_state["last_calibration"] = result
-            print("🤖 [Multi-Agent Background] ✅ Calibração e alinhamento de startup concluídos com sucesso.")
-        except Exception as e:
-            print(f"🤖 [Multi-Agent Background] ⚠️ Falha ao alinhar agentes no startup: {e}")
 
-    threading.Thread(target=_run_startup_agent_calibration, daemon=True).start()
+    if auto_calibrator_daemon:
+        auto_calibrator_daemon.orchestrator_getter = lambda: orchestrator
+        auto_calibrator_daemon.intervention_callback = _handle_agent_intervention
+        auto_calibrator_daemon.start()
+        print("🤖 [Multi-Agent Background] Monitoramento ativo para desvio semântico e convergência.")
 
     print("\n" + "="*50)
     print("DASHBOARD CPRAIO PRONTO")

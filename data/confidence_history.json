@@ -692,7 +692,7 @@
   },
   {
     "date": "2026-05-31 00:00:00",
-    "timestamp": "2026-06-02T00:27:42.945706",
+    "timestamp": "2026-06-02T19:09:04.174509",
     "global": {
       "p10": 0.6,
       "p20": 0.45,
@@ -742,6 +742,118 @@
         "active_locations": 6,
         "total_nodes": 50,
         "total_events": 8,
+        "f1_score": 0.0
+      }
+    }
+  },
+  {
+    "date": "2026-06-02 00:00:00",
+    "timestamp": "2026-06-05T16:57:01.850146",
+    "global": {
+      "p10": 0.4,
+      "p20": 0.35,
+      "precision": 0.4,
+      "recall": 0.6364,
+      "recall10": 0.3636,
+      "recall20": 0.6364,
+      "active_locations": 11,
+      "total_nodes": 178,
+      "total_events": 17,
+      "assigned_total_events": 17,
+      "unmapped_total_events": 0,
+      "f1_score": 0.4912
+    },
+    "regions": {
+      "fortaleza": {
+        "p10": 0.3,
+        "p20": 0.15,
+        "precision": 0.3,
+        "recall": 1.0,
+        "recall10": 1.0,
+        "recall20": 1.0,
+        "active_locations": 3,
+        "total_nodes": 109,
+        "total_events": 3,
+        "f1_score": 0.0
+      },
+      "rmf": {
+        "p10": 0.1,
+        "p20": 0.1053,
+        "precision": 0.1,
+        "recall": 1.0,
+        "recall10": 0.5,
+        "recall20": 1.0,
+        "active_locations": 2,
+        "total_nodes": 19,
+        "total_events": 6,
+        "f1_score": 0.0
+      },
+      "interior": {
+        "p10": 0.5,
+        "p20": 0.3,
+        "precision": 0.5,
+        "recall": 1.0,
+        "recall10": 0.8333,
+        "recall20": 1.0,
+        "active_locations": 6,
+        "total_nodes": 50,
+        "total_events": 8,
+        "f1_score": 0.0
+      }
+    }
+  },
+  {
+    "date": "2026-06-08 00:00:00",
+    "timestamp": "2026-06-09T14:11:55.692257",
+    "global": {
+      "p10": 0.6,
+      "p20": 0.35,
+      "precision": 0.6,
+      "recall": 0.6364,
+      "recall10": 0.5455,
+      "recall20": 0.6364,
+      "active_locations": 11,
+      "total_nodes": 178,
+      "total_events": 16,
+      "assigned_total_events": 16,
+      "unmapped_total_events": 0,
+      "f1_score": 0.6177
+    },
+    "regions": {
+      "fortaleza": {
+        "p10": 0.2,
+        "p20": 0.1,
+        "precision": 0.2,
+        "recall": 1.0,
+        "recall10": 1.0,
+        "recall20": 1.0,
+        "active_locations": 2,
+        "total_nodes": 109,
+        "total_events": 2,
+        "f1_score": 0.0
+      },
+      "rmf": {
+        "p10": 0.2,
+        "p20": 0.2105,
+        "precision": 0.2,
+        "recall": 1.0,
+        "recall10": 0.5,
+        "recall20": 1.0,
+        "active_locations": 4,
+        "total_nodes": 19,
+        "total_events": 7,
+        "f1_score": 0.0
+      },
+      "interior": {
+        "p10": 0.5,
+        "p20": 0.25,
+        "precision": 0.5,
+        "recall": 1.0,
+        "recall10": 1.0,
+        "recall20": 1.0,
+        "active_locations": 5,
+        "total_nodes": 50,
+        "total_events": 7,
         "f1_score": 0.0
       }
     }

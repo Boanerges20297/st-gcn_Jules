@@ -1,0 +1,1825 @@
+[
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.45,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.7,
+      "tag_bias_neighbor": 0.95,
+      "norm_neural_weight": 0.7,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:39:40.828090",
+    "semantic_tags": [
+      "fallback_historico",
+      "metric:p20",
+      "tensao_reduzida"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p10",
+    "weights": {
+      "tension_factor": 0.3,
+      "min_risk": 30.0,
+      "tag_bias_direct": 3.0,
+      "tag_bias_neighbor": 1.1,
+      "norm_neural_weight": 0.9,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:39:41.026803",
+    "semantic_tags": [
+      "fallback_historico",
+      "metric:p10",
+      "rede_neural_dominante",
+      "tensao_reduzida"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "interior",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:39:41.276621",
+    "semantic_tags": [
+      "metric:p20"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.45,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.7,
+      "tag_bias_neighbor": 0.95,
+      "norm_neural_weight": 0.7,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:39:41.601516",
+    "semantic_tags": [
+      "fallback_historico",
+      "janela:30",
+      "metric:p20",
+      "tensao_reduzida"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p10",
+    "weights": {
+      "tension_factor": 0.3,
+      "min_risk": 30.0,
+      "tag_bias_direct": 3.0,
+      "tag_bias_neighbor": 1.1,
+      "norm_neural_weight": 0.9,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:39:41.793038",
+    "semantic_tags": [
+      "fallback_historico",
+      "janela:30",
+      "metric:p10",
+      "rede_neural_dominante",
+      "tensao_reduzida"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:42:43.311546",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "metric:p20",
+      "rede_neural_baixa",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p10",
+    "weights": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:42:43.477713",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "metric:p10",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "interior",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:42:43.688351",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:42:43.848596",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "janela:30",
+      "metric:p20",
+      "rede_neural_baixa",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p10",
+    "weights": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:42:43.959681",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "janela:30",
+      "metric:p10",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:46:49.463882",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "metric:p20",
+      "rede_neural_baixa",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p10",
+    "weights": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:46:49.656611",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "metric:p10",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "interior",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:46:49.940087",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:46:50.241026",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "janela:30",
+      "metric:p20",
+      "rede_neural_baixa",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p10",
+    "weights": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:46:50.422904",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "janela:30",
+      "metric:p10",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "fortaleza",
+    "metric": "p20",
+    "trigger": "fortaleza.p20=15.0%",
+    "old_params": {
+      "tension_factor": 3.0,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "new_params": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "semantic_review": {},
+    "old_value": 0.15,
+    "new_value": 0.15,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-05T16:51:50.491026",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "metric:p20",
+      "rede_neural_baixa",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "fortaleza",
+    "metric": "p10",
+    "trigger": "fortaleza.p10=30.0%",
+    "old_params": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "new_params": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "semantic_review": {},
+    "old_value": 0.3,
+    "new_value": 0.3,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-05T16:51:50.657478",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "metric:p10",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "interior",
+    "metric": "p20",
+    "trigger": "interior.p20=30.0%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.3,
+    "new_value": 0.3,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-05T16:51:50.824009",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "rmf",
+    "metric": "p20",
+    "trigger": "rmf.p20=10.5%",
+    "old_params": {
+      "tension_factor": 3.0,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "new_params": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "semantic_review": {},
+    "old_value": 0.1053,
+    "new_value": 0.1053,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-05T16:51:50.982370",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "janela:30",
+      "metric:p20",
+      "rede_neural_baixa",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "rmf",
+    "metric": "p10",
+    "trigger": "rmf.p10=10.0%",
+    "old_params": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "new_params": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "semantic_review": {},
+    "old_value": 0.1,
+    "new_value": 0.1,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-05T16:51:51.082313",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "janela:30",
+      "metric:p10",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:56:52.068268",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "metric:p20",
+      "rede_neural_baixa",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p10",
+    "weights": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:56:52.226763",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "metric:p10",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "interior",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:56:52.474386",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:56:52.815552",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "janela:30",
+      "metric:p20",
+      "rede_neural_baixa",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p10",
+    "weights": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-05T16:56:52.965652",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "janela:30",
+      "metric:p10",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-09T13:50:29.038396",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "metric:p20",
+      "rede_neural_baixa",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p10",
+    "weights": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-09T13:50:29.249579",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "metric:p10",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "interior",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-09T13:50:29.502855",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-09T13:50:29.740620",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "janela:30",
+      "metric:p20",
+      "rede_neural_baixa",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p10",
+    "weights": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-09T13:50:29.904180",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "janela:30",
+      "metric:p10",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "fortaleza",
+    "metric": "p20",
+    "trigger": "fortaleza.p20=15.0%",
+    "old_params": {
+      "tension_factor": 3.0,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "new_params": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "semantic_review": {},
+    "old_value": 0.15,
+    "new_value": 0.1,
+    "improvement_pct": -33.33333333333333,
+    "outcome": "degraded",
+    "timestamp": "2026-06-09T13:55:30.050295",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "metric:p20",
+      "rede_neural_baixa",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "fortaleza",
+    "metric": "p10",
+    "trigger": "fortaleza.p10=30.0%",
+    "old_params": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "new_params": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "semantic_review": {},
+    "old_value": 0.3,
+    "new_value": 0.2,
+    "improvement_pct": -33.33333333333333,
+    "outcome": "degraded",
+    "timestamp": "2026-06-09T13:55:30.219475",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "metric:p10",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "interior",
+    "metric": "p20",
+    "trigger": "interior.p20=30.0%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.3,
+    "new_value": 0.25,
+    "improvement_pct": -16.666666666666664,
+    "outcome": "degraded",
+    "timestamp": "2026-06-09T13:55:30.380029",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "rmf",
+    "metric": "p20",
+    "trigger": "rmf.p20=10.5%",
+    "old_params": {
+      "tension_factor": 3.0,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "new_params": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "semantic_review": {},
+    "old_value": 0.1053,
+    "new_value": 0.2105,
+    "improvement_pct": 99.90503323836656,
+    "outcome": "improved",
+    "timestamp": "2026-06-09T13:55:30.541686",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "janela:30",
+      "metric:p20",
+      "rede_neural_baixa",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "rmf",
+    "metric": "p10",
+    "trigger": "rmf.p10=10.0%",
+    "old_params": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "new_params": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "semantic_review": {},
+    "old_value": 0.1,
+    "new_value": 0.2,
+    "improvement_pct": 100.0,
+    "outcome": "improved",
+    "timestamp": "2026-06-09T13:55:30.702722",
+    "semantic_tags": [
+      "fallback_historico",
+      "intel_trigger_forte",
+      "janela:30",
+      "metric:p10",
+      "tensao_alta"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-09T14:00:31.027331",
+    "semantic_tags": [
+      "fallback_historico",
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p10",
+    "weights": {
+      "tension_factor": 0.55,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.5,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-09T14:00:31.319435",
+    "semantic_tags": [
+      "fallback_historico",
+      "metric:p10"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "interior",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-09T14:00:31.740897",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-09T14:00:32.187611",
+    "semantic_tags": [
+      "fallback_historico",
+      "janela:30",
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p10",
+    "weights": {
+      "tension_factor": 0.55,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.5,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-09T14:00:32.485159",
+    "semantic_tags": [
+      "fallback_historico",
+      "janela:30",
+      "metric:p10"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "fortaleza",
+    "metric": "p20",
+    "trigger": "fortaleza.p20=10.0%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "semantic_review": {},
+    "old_value": 0.1,
+    "new_value": 0.1,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-09T14:05:32.626955",
+    "semantic_tags": [
+      "fallback_historico",
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "fortaleza",
+    "metric": "p10",
+    "trigger": "fortaleza.p10=20.0%",
+    "old_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "new_params": {
+      "tension_factor": 0.55,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.5,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "semantic_review": {},
+    "old_value": 0.2,
+    "new_value": 0.2,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-09T14:05:32.746080",
+    "semantic_tags": [
+      "fallback_historico",
+      "metric:p10"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "interior",
+    "metric": "p20",
+    "trigger": "interior.p20=25.0%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.25,
+    "new_value": 0.25,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-09T14:05:32.873113",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "rmf",
+    "metric": "p20",
+    "trigger": "rmf.p20=21.1%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "semantic_review": {},
+    "old_value": 0.2105,
+    "new_value": 0.2105,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-09T14:05:33.044818",
+    "semantic_tags": [
+      "fallback_historico",
+      "janela:30",
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "rmf",
+    "metric": "p10",
+    "trigger": "rmf.p10=20.0%",
+    "old_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "new_params": {
+      "tension_factor": 0.55,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.5,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "semantic_review": {},
+    "old_value": 0.2,
+    "new_value": 0.2,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-09T14:05:33.237533",
+    "semantic_tags": [
+      "fallback_historico",
+      "janela:30",
+      "metric:p10"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.45,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.7,
+      "tag_bias_neighbor": 0.95,
+      "norm_neural_weight": 0.7,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-09T14:10:33.625216",
+    "semantic_tags": [
+      "fallback_historico",
+      "metric:p20",
+      "tensao_reduzida"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p10",
+    "weights": {
+      "tension_factor": 0.3,
+      "min_risk": 30.0,
+      "tag_bias_direct": 3.0,
+      "tag_bias_neighbor": 1.1,
+      "norm_neural_weight": 0.9,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-09T14:10:33.810243",
+    "semantic_tags": [
+      "fallback_historico",
+      "metric:p10",
+      "rede_neural_dominante",
+      "tensao_reduzida"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "interior",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-09T14:10:34.083859",
+    "semantic_tags": [
+      "metric:p20"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.45,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.7,
+      "tag_bias_neighbor": 0.95,
+      "norm_neural_weight": 0.7,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-09T14:10:34.560479",
+    "semantic_tags": [
+      "fallback_historico",
+      "janela:30",
+      "metric:p20",
+      "tensao_reduzida"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p10",
+    "weights": {
+      "tension_factor": 0.3,
+      "min_risk": 30.0,
+      "tag_bias_direct": 3.0,
+      "tag_bias_neighbor": 1.1,
+      "norm_neural_weight": 0.9,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10_sample": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-09T14:10:34.751600",
+    "semantic_tags": [
+      "fallback_historico",
+      "janela:30",
+      "metric:p10",
+      "rede_neural_dominante",
+      "tensao_reduzida"
+    ]
+  }
+]

@@ -26,9 +26,24 @@ def load_env(path: Path):
     return data
 
 env = load_env(ENV_PATH)
-host = env.get('HOSTINGER_HOST_SSH') or env.get('HOSTINGER_HOST')
+host = env.get('HOSTINGER_HOST_SSH') or env.get('HOSTINGER_HOST') or env.get('HOSTINGER_SYNC_HOST')
 user = env.get('HOSTINGGER_USER') or env.get('HOSTINGER_USER') or env.get('HOSTINGER_SYNC_USER')
 password = env.get('VPS_HOSTINGER_PASSWORD') or env.get('HOSTINGER_SYNC_PASSWORD')
+
+host_ssh = env.get('HOST_SSH', '').strip()
+if (not host or not user) and host_ssh:
+    if '@' in host_ssh:
+        parsed_user, parsed_host = host_ssh.split('@', 1)
+        if not user:
+            user = parsed_user.strip()
+        if not host:
+            host = parsed_host.strip()
+    elif not host:
+        host = host_ssh
+
+if not password:
+    password = env.get('PASSWORD_VPS_SSH', '').strip()
+
 target_dir = env.get('HOSTINGER_SYNC_TARGET_DIR', '/home/reportpreview/apps/report-preview')
 port = int(env.get('HOSTINGER_SYNC_PORT', '22'))
 
@@ -58,6 +73,17 @@ FILES = [
     'outputs/hermes/total_cvli_rua.csv',
     'outputs/hermes/total_cvli_micronodo.csv',
     'outputs/hermes/caminho_crime.csv',
+    'outputs/hermes/risk_snapshot_latest.json',
+    'outputs/hermes/risk_snapshot_latest.md',
+    'outputs/hermes/risk_brief_latest.md',
+    'outputs/hermes/risk_snapshot_latest.csv',
+    'outputs/hermes/risk_fortaleza_latest.csv',
+    'outputs/hermes/risk_rmf_latest.csv',
+    'outputs/hermes/risk_interior_latest.csv',
+    'outputs/hermes/dados_status_enriquecido_14d_latest.csv',
+    'outputs/hermes/dados_status_enriquecido_14d_summary_latest.json',
+    'outputs/hermes/dados_status_enriquecido_14d_summary_latest.md',
+    'outputs/hermes/ruas_criticas_latest.csv',
     'scripts/generate_pipeline_artifacts.py',
 ]
 
@@ -73,6 +99,7 @@ def main():
     ssh.connect(hostname=host, port=port, username=user, password=password, timeout=30)
     sftp = ssh.open_sftp()
     uploaded = []
+    skipped = []
     try:
         for rel in FILES:
             local = BASE / rel
@@ -81,18 +108,43 @@ def main():
                 continue
             remote = posixpath.join(target_dir, rel.replace('\\', '/'))
             remote_dir = posixpath.dirname(remote)
-            print(f'Preparando {rel} -> {remote}')
-            ensure_remote_dir(ssh, remote_dir)
-            sftp.put(str(local), remote)
-            uploaded.append(rel)
-            print(f'  Enviado: {rel}')
+            
+            # Check modification time and size
+            local_stat = local.stat()
+            local_mtime = int(local_stat.st_mtime)
+            local_size = local_stat.st_size
+            
+            should_upload = True
+            try:
+                remote_stat = sftp.stat(remote)
+                remote_mtime = int(remote_stat.st_mtime)
+                remote_size = remote_stat.st_size
+                if remote_size == local_size and abs(remote_mtime - local_mtime) <= 2:
+                    skipped.append(rel)
+                    should_upload = False
+            except IOError:
+                pass
+                
+            if should_upload:
+                print(f'Enviando {rel} -> {remote}')
+                ensure_remote_dir(ssh, remote_dir)
+                sftp.put(str(local), remote)
+                sftp.utime(remote, (local_mtime, local_mtime))
+                uploaded.append(rel)
+                print(f'  Enviado: {rel}')
     finally:
         sftp.close()
         ssh.close()
 
     print('\nResumo:')
-    for u in uploaded:
-        print(' -', u)
+    if uploaded:
+        print('Enviados:')
+        for u in uploaded:
+            print(' -', u)
+    if skipped:
+        print('Ignorados (sem alteracoes):')
+        for s in skipped:
+            print(' -', s)
 
 if __name__ == '__main__':
     main()

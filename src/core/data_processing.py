@@ -142,8 +142,158 @@ def update_geo_streets_cache(df):
             json.dump(streets_data, f, ensure_ascii=False, indent=4)
         logging.info(f"✅ Cache de ruas atualizado: {len(streets_data)} logradouros mapeados.")
 
+def check_and_download_mysql_data():
+    """
+    Verifica se há novos dados no banco de dados MySQL e baixa apenas os novos registros.
+    """
+    import pymysql
+    import decimal
+    from dotenv import load_dotenv
+    load_dotenv()
+
+    json_path = os.path.join('data', 'raw', 'dados_status.json')
+    enriched_csv_path = os.path.join('data', 'raw', 'dados_status_ocorrencias_gerais_ENRIQUECIDO.csv')
+    max_local_id = 0
+    local_data_exists = False
+    
+    # 1. Obter o maior ID do CSV Enriquecido Oficial para evitar reprocessar registros antigos
+    if os.path.exists(enriched_csv_path):
+        try:
+            df_enr = pd.read_csv(enriched_csv_path, usecols=['id'], low_memory=False)
+            if not df_enr.empty and 'id' in df_enr.columns:
+                max_local_id = int(pd.to_numeric(df_enr['id'], errors='coerce').max())
+                local_data_exists = True
+                logging.info(f"ID máximo local no ENRIQUECIDO.csv: {max_local_id}")
+        except Exception as e:
+            logging.warning(f"Não foi possível ler ENRIQUECIDO.csv: {e}")
+
+    # Fallback pro dados_status.json se o CSV não estiver presente
+    if not local_data_exists and os.path.exists(json_path):
+        try:
+            with open(json_path, 'r', encoding='utf-8') as f:
+                content = json.load(f)
+            for item in content:
+                if isinstance(item, dict) and item.get('type') == 'table' and 'data' in item:
+                    data_rows = item['data']
+                    if data_rows:
+                        ids = []
+                        for row in data_rows:
+                            val = row.get('id')
+                            if val is not None:
+                                try:
+                                    ids.append(int(float(val)))
+                                except ValueError:
+                                    pass
+                        if ids:
+                            max_local_id = max(ids)
+                            local_data_exists = True
+                            logging.info(f"ID máximo local no dados_status.json: {max_local_id}")
+        except Exception as e:
+            logging.warning(f"Não foi possível ler dados_status.json local: {e}")
+            
+    host = os.getenv('MYSQL_HOST', '').replace('"', '')
+    port = int(os.getenv('MYSQL_PORT', '3306').replace('"', ''))
+    user = os.getenv('MYSQL_USER', '').replace('"', '')
+    password = os.getenv('MYSQL_PASSWORD', '').replace('"', '')
+    database = os.getenv('MYSQL_DATABASE', '').replace('"', '')
+    
+    if not host or not user or not database:
+        logging.warning("Configurações de conexão MySQL incompletas no arquivo .env. Pulando verificação do banco.")
+        return
+        
+    try:
+        conn = pymysql.connect(
+            host=host,
+            port=port,
+            user=user,
+            password=password,
+            database=database,
+            charset='utf8mb4',
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        try:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT MAX(id) as max_id FROM dados_status")
+                res = cursor.fetchone()
+                max_db_id = res['max_id'] if res and res['max_id'] is not None else 0
+                logging.info(f"ID máximo no banco de dados MySQL: {max_db_id}")
+                
+                if max_db_id > max_local_id or not local_data_exists:
+                    logging.info(f"Novos dados detectados no MySQL. Baixando registros com id > {max_local_id}...")
+                    cursor.execute("SELECT * FROM dados_status WHERE id > %s ORDER BY id DESC", (max_local_id,))
+                    rows = cursor.fetchall()
+                    
+                    formatted_rows = []
+                    for row in rows:
+                        formatted_row = {}
+                        for k, v in row.items():
+                            if v is None:
+                                formatted_row[k] = None
+                            elif isinstance(v, (int, float, decimal.Decimal)):
+                                formatted_row[k] = str(v)
+                            elif hasattr(v, 'strftime'):
+                                if hasattr(v, 'hour'):
+                                    import datetime
+                                    if isinstance(v, datetime.timedelta):
+                                        total_seconds = int(v.total_seconds())
+                                        hours = total_seconds // 3600
+                                        minutes = (total_seconds % 3600) // 60
+                                        seconds = total_seconds % 60
+                                        formatted_row[k] = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+                                    else:
+                                        formatted_row[k] = v.strftime('%H:%M:%S')
+                                else:
+                                    formatted_row[k] = v.strftime('%Y-%m-%d')
+                            elif isinstance(v, bytes):
+                                formatted_row[k] = v.decode('utf-8', errors='ignore')
+                            else:
+                                formatted_row[k] = str(v)
+                        formatted_rows.append(formatted_row)
+                    
+                    json_data = [
+                        {"type": "header", "version": "5.1.3", "comment": "Export to JSON plugin for PHPMyAdmin"},
+                        {"type": "database", "name": database},
+                        {
+                            "type": "table",
+                            "name": "dados_status",
+                            "database": database,
+                            "data": formatted_rows
+                        }
+                    ]
+                    
+                    os.makedirs(os.path.dirname(json_path), exist_ok=True)
+                    with open(json_path, 'w', encoding='utf-8') as f:
+                        json.dump(json_data, f, ensure_ascii=False, indent=4)
+                    logging.info(f"Sucesso! {len(formatted_rows)} registros salvos em {json_path}")
+                    return True
+                else:
+                    logging.info("Nenhum dado novo encontrado no MySQL.")
+        finally:
+            conn.close()
+    except Exception as e:
+        logging.error(f"Erro ao consultar banco de dados MySQL: {e}")
+    return False
+
 def process_ism_data():
     logging.info("🚀 Iniciando Rebuild ISM com Inteligência Territorial Atualizada...")
+    
+    # Executa a verificação e download do banco MySQL
+    try:
+        if check_and_download_mysql_data():
+            logging.info("Disparando scripts/merge_new_data.py para mesclar os novos dados...")
+            import subprocess
+            merge_script = os.path.join('scripts', 'merge_new_data.py')
+            if os.path.exists(merge_script):
+                # Passa o arquivo dados_status.json para mesclagem
+                subprocess.run([sys.executable, merge_script, os.path.join('data', 'raw', 'dados_status.json')], check=False)
+                logging.info("Merge finalizado. O script de merge disparou a execução subsequente de data_processing.py.")
+                sys.exit(0)
+            else:
+                logging.warning("Script scripts/merge_new_data.py não encontrado.")
+    except Exception as e:
+        logging.error(f"Erro na extração MySQL automática: {e}")
+
+
     
     # 0. Carregar Inteligência de Facções
     faccoes_dict = {}

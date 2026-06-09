@@ -7,6 +7,12 @@ import unicodedata
 import subprocess
 import sys
 
+# Force UTF-8 stdout/stderr to prevent cp1252 UnicodeEncodeErrors on Windows
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8')
+
 # --- AIS Lookup (Mapeamento oficial de 34 AIS) ---
 try:
     sys.path.insert(0, os.path.join(os.getcwd(), 'scripts'))
@@ -16,6 +22,8 @@ except Exception as e:
     print(f"[AIS] Aviso: AIS Lookup nao carregado: {e}")
     _AIS_LOOKUP = None
 from datetime import datetime
+from dotenv import load_dotenv
+load_dotenv()
 
 try:
     from src.hostinger_sync import HostingerSyncManager
@@ -98,7 +106,7 @@ if os.path.exists(cache_path):
 # Com 147k registros, temos quase todas as ruas mapeadas
 if os.path.exists(OFFICIAL_CSV):
     try:
-        print(f"🔍 Minerando ruas de {OFFICIAL_CSV} para cache local...", flush=True)
+        print(f"Minerando ruas de {OFFICIAL_CSV} para cache local...", flush=True)
         # Lendo apenas colunas necessárias para economizar memória
         df_hist = pd.read_csv(OFFICIAL_CSV, usecols=['latitude', 'longitude', 'name'], low_memory=False)
         df_hist = df_hist.dropna(subset=['latitude', 'longitude', 'name'])
@@ -106,15 +114,15 @@ if os.path.exists(OFFICIAL_CSV):
             k = f"{round(float(row['latitude']), 3)}_{round(float(row['longitude']), 3)}"
             if k not in GEO_CACHE:
                 GEO_CACHE[k] = str(row['name']).upper()
-        print(f"✅ Cache histórico reconstruído: {len(GEO_CACHE)} ruas identificadas localmente.", flush=True)
+        print(f"Cache historico reconstruido: {len(GEO_CACHE)} ruas identificadas localmente.", flush=True)
         del df_hist # Liberar memória
     except Exception as e:
-        print(f"⚠️ Aviso: Falha ao minerar CSV histórico: {e}", flush=True)
+        print(f"Aviso: Falha ao minerar CSV historico: {e}", flush=True)
 
 LAST_GEO_REQUEST = [0]
 
 # --- CONFIGURAÇÃO GOOGLE MAPS API ---
-GOOGLE_API_KEY = "AIzaSyDiyGKvZeWK_6PYgbzOullUYAU_kGc8x6c"
+GOOGLE_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "").replace('"', '')
 
 def get_street_from_coords(lat, lon):
     """Busca rua via Google Maps API com alta velocidade."""
@@ -303,9 +311,9 @@ def incremental_update_streets_cache(df_new_rows):
         try:
             with open(cache_path, 'w', encoding='utf-8') as f:
                 json.dump(existing, f, ensure_ascii=False, indent=2)
-            print(f"✅ Cache de ruas incrementado: {len(existing)} entradas em {cache_path}")
+            print(f"Cache de ruas incrementado: {len(existing)} entradas em {cache_path}")
         except Exception as e:
-            print(f"⚠️ Falha ao salvar cache incremental: {e}")
+            print(f"Falha ao salvar cache incremental: {e}")
 
 
 def merge(new_data_path):
@@ -313,18 +321,28 @@ def merge(new_data_path):
     
     if os.path.exists(OFFICIAL_CSV):
         df_official = pd.read_csv(OFFICIAL_CSV, low_memory=False)
-        print(f"✓ Base oficial carregada: {len(df_official)} registros")
+        # Normalização preventiva de bairros e cidades da base histórica
+        if 'bairro' in df_official.columns:
+            df_official['bairro'] = df_official['bairro'].apply(normalize_text)
+        if 'cidade' in df_official.columns:
+            df_official['cidade'] = df_official['cidade'].apply(normalize_text)
+        print(f"[OK] Base oficial carregada e normalizada: {len(df_official)} registros")
     else:
         df_official = pd.DataFrame()
-        print("⚠ Base oficial não existe, será criada nova")
+        print("[WARN] Base oficial nao existe, sera criada nova")
 
     # Carregar APENAS os novos dados (dados_status.json)
     df_new = robust_load_any(new_data_path)
+    if not df_new.empty:
+        if 'bairro' in df_new.columns:
+            df_new['bairro'] = df_new['bairro'].apply(normalize_text)
+        if 'cidade' in df_new.columns:
+            df_new['cidade'] = df_new['cidade'].apply(normalize_text)
     if df_new.empty: 
         print("Erro: Arquivo de entrada vazio!")
         return
     
-    print(f"✓ Novos dados carregados: {len(df_new)} registros")
+    print(f"[OK] Novos dados carregados: {len(df_new)} registros")
 
     with open(BAIRROS_REF, 'r', encoding='utf-8') as f:
         geo_ref = json.load(f)
@@ -351,21 +369,21 @@ def merge(new_data_path):
                             'name': clean_name,
                             'geometry': shape(feat['geometry'])
                         })
-            print(f"✓ {len(polygons)} polígonos de bairros de Fortaleza carregados para geoprocessamento de precisão.")
+            print(f"[OK] {len(polygons)} polígonos de bairros de Fortaleza carregados para geoprocessamento de precisão.")
         except Exception as e:
-            print(f"⚠ Aviso ao carregar polígonos: {e}. Usando apenas centróides como fallback.")
+            print(f"[WARN] Aviso ao carregar polígonos: {e}. Usando apenas centróides como fallback.")
 
     # Termos de natureza para disparar geolocalizacao reversa
     invalid_street_terms = ['HOMICIDIO', 'BALA', 'FOGO', 'LESAO', 'MORTE', 'CADAVER', 'LATROCINIO', 'TIRO']
 
     # --- FILTRAGEM PRÉVIA (Evitar reprocessar o que já existe) ---
-    print(f"🔍 Filtrando registros inéditos...")
+    print(f"Filtrando registros inéditos...")
     if not df_official.empty and 'id' in df_official.columns:
         existing_ids = set(df_official['id'].astype(str).unique())
         df_new['id_str'] = df_new['id'].astype(str)
         df_new = df_new[~df_new['id_str'].isin(existing_ids)].copy()
         df_new = df_new.drop(columns=['id_str'])
-        print(f"✨ {len(df_new)} novos registros identificados para enriquecimento.")
+        print(f"New records identified for enrichment: {len(df_new)}")
     
     if df_new.empty:
         print("✅ Nenhum dado novo para processar. Indo direto para convergência.")
@@ -393,19 +411,19 @@ def merge(new_data_path):
                     street_found = GEO_CACHE[key_cache]
                     df_new.at[idx, 'name'] = street_found
                     if (i+1) % 100 == 0 or i < 10:
-                        print(f"  ⚡ {i+1}/{len(df_new)} [CACHE HISTÓRICO]: {street_found}", flush=True)
+                        print(f"  [CACHE HISTORICO]: {street_found}", flush=True)
                 else:
                     # 2. Rua Inédita: Chama Google Maps
                     # Incrementa contador de cota
                     merge.google_calls = getattr(merge, 'google_calls', 0) + 1
                     
-                    print(f"  🌐 {i+1}/{len(df_new)} [GOOGLE #{merge.google_calls}] Consultando internet...", flush=True)
+                    print(f"  [GOOGLE #{merge.google_calls}] Consultando internet...", flush=True)
                     street_found = get_street_from_coords(lat, lon)
                     if street_found and street_found not in ["TIMEOUT_API", "FALHA"]:
                         df_new.at[idx, 'name'] = street_found
-                        print(f"  ✅ {i+1}/{len(df_new)} [GOOGLE OK]: {street_found}", flush=True)
+                        print(f"  [GOOGLE OK]: {street_found}", flush=True)
                     else:
-                        print(f"  ❌ {i+1}/{len(df_new)} [GOOGLE FALHA]: Rua não encontrada.", flush=True)
+                        print(f"  [GOOGLE FALHA]: Rua não encontrada.", flush=True)
             
             # Lógica de Qualidade Total para o Bairro:
             # 1. Se for Fortaleza, forçamos o cálculo baseado em lat/long se as coordenadas forem válidas
@@ -429,17 +447,18 @@ def merge(new_data_path):
                     bairro_set = True
                     if i < 5:
                         print(f"  [DEBUG] {i+1}/{len(df_new)} [RESOLVED BAIRRO (FALLBACK)]: {bairro_resolved}", flush=True)
-
+ 
             if not bairro_set and not has_bairro and (pd.isna(lat) or pd.isna(lon)):
                 if (i+1) % 100 == 0 or i < 10:
-                    print(f"  ⚪ {i+1}/{len(df_new)} [COORD INVÁLIDA] - Sem coordenadas para inferir bairro", flush=True)
-
+                    print(f"  [COORD INVALIDA] - Sem coordenadas para inferir bairro", flush=True)
+ 
             # Progresso resumido
             if (i+1) % 500 == 0:
-                print(f"  ⏳ Progresso Geral: {i+1}/{len(df_new)} ({(i+1)/len(df_new)*100:.1f}%)")
+                print(f"  Progresso Geral: {i+1}/{len(df_new)} ({(i+1)/len(df_new)*100:.1f}%)")
 
-            # Normalização de Bairro
+            # Normalização de Bairro e Cidade
             df_new.at[idx, 'bairro'] = normalize_text(df_new.at[idx, 'bairro'])
+            df_new.at[idx, 'cidade'] = normalize_text(df_new.at[idx, 'cidade'])
 
             # 2. Enriquecimento Temporal e Climático (V33 - Pular se já tiver clima)
             dt_str = row.get('data')
@@ -608,18 +627,18 @@ def merge(new_data_path):
     
     if not did_append:
         df_combined.to_csv(OFFICIAL_CSV, index=False, encoding='utf-8')
-        print(f"✅ SUCESSO! Base atualizada em {OFFICIAL_CSV} com colunas ordenadas.")
+        print(f"[OK] SUCESSO! Base atualizada em {OFFICIAL_CSV} com colunas ordenadas.")
         # Construir cache de ruas críticas geolocalizadas (reconstrução completa)
-        print("\n📍 Construindo cache de ruas críticas (reconstrucao completa)...")
+        print("\nConstruindo cache de ruas críticas (reconstrucao completa)...")
         build_streets_cache(df_combined)
     else:
-        print("✅ CSV oficial atualizado por append; evitando reescrita completa.")
+        print("[OK] CSV oficial atualizado por append; evitando reescrita completa.")
         # Atualizacao incremental do cache de ruas apenas com os novos registros
         if 'to_append' in globals() and not to_append.empty:
-            print("\n📍 Atualizando cache de ruas criticamente de forma incremental...")
+            print("\nAtualizando cache de ruas criticamente de forma incremental...")
             incremental_update_streets_cache(to_append)
         else:
-            print("\n📍 Nenhum registro novo para atualizar o cache incremental.")
+            print("\nNenhum registro novo para atualizar o cache incremental.")
     
     # 7. Disparar processamento subsequente
     dp_path = os.path.join('src', 'core', 'data_processing.py')

@@ -5,6 +5,8 @@ import json
 import os
 import re
 import shutil
+import subprocess
+import time
 import unicodedata
 import zipfile
 from datetime import datetime
@@ -26,12 +28,26 @@ STATIC_KML_PATH = os.path.join(BASE_DIR, 'data', 'static', 'ORCRIMS 2026.kml')
 LOCAL_KMZ_PATH = os.path.join(INTEL_DIR, 'ORCRIMS 2026.kmz')
 UPDATE_STATUS_PATH = os.path.join(INTEL_DIR, 'orcrim_update_status.json')
 REQUEST_TIMEOUT = 60
+CHROME_DOWNLOAD_TIMEOUT = 45
+CHROME_PATH_CANDIDATES = [
+    r'C:\Program Files\Google\Chrome\Application\chrome.exe',
+    r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe',
+    os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Google', 'Chrome', 'Application', 'chrome.exe'),
+]
 INTELLIGENCE_OUTPUTS = [
     os.path.join(INTEL_DIR, 'micronodos_faccoes_2026.csv'),
     os.path.join(INTEL_DIR, 'bairros_faccoes_2026.csv'),
     os.path.join(BASE_DIR, 'data', 'raw', 'inteligencia_faccoes.csv'),
     os.path.join(INTEL_DIR, 'micronodos_faccoes_2026.geojson'),
 ]
+
+
+class GoogleMapsAuthError(RuntimeError):
+    """Falha de autenticação/autorização ao exportar o mapa do Google My Maps."""
+
+
+class ChromeProfileDownloadTimeout(RuntimeError):
+    """Chrome foi aberto, mas o download autenticado não apareceu a tempo."""
 
 
 def haversine(lon1, lat1, lon2, lat2):
@@ -294,9 +310,172 @@ def _resolve_official_url():
     return ''
 
 
+def _load_env_for_cookies():
+    env_path = os.path.join(BASE_DIR, '.env')
+    data = {}
+    if os.path.exists(env_path):
+        try:
+            with open(env_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        k, v = line.split('=', 1)
+                        data[k.strip()] = v.strip().strip('"').strip("'")
+        except Exception:
+            pass
+    return data
+
+
+def _env_flag(name: str, default: bool = False) -> bool:
+    value = os.environ.get(name)
+    if value is None:
+        value = _load_env_for_cookies().get(name)
+    if value is None:
+        return default
+    return str(value).strip().lower() in {'1', 'true', 'yes', 'on'}
+
+
+def _find_chrome_executable() -> str:
+    for candidate in CHROME_PATH_CANDIDATES:
+        if candidate and os.path.exists(candidate):
+            return candidate
+    return ''
+
+
+def _chrome_download_candidates():
+    if not os.path.exists(DOWNLOADS_DIR):
+        return []
+    candidates = []
+    for name in os.listdir(DOWNLOADS_DIR):
+        lower_name = name.lower()
+        if lower_name.endswith(('.kmz', '.kml', '.crdownload')):
+            candidates.append(os.path.join(DOWNLOADS_DIR, name))
+    return candidates
+
+
+def _wait_for_downloaded_kml_via_chrome(started_at: float):
+    deadline = time.time() + CHROME_DOWNLOAD_TIMEOUT
+    while time.time() < deadline:
+        for path in sorted(_chrome_download_candidates(), key=lambda item: os.path.getmtime(item), reverse=True):
+            if path.lower().endswith('.crdownload'):
+                continue
+            try:
+                stat = os.stat(path)
+            except FileNotFoundError:
+                continue
+            if stat.st_mtime + 1 < started_at:
+                continue
+            if stat.st_size <= 0:
+                continue
+            return path
+        time.sleep(1)
+    raise ChromeProfileDownloadTimeout(
+        'Chrome foi aberto com o perfil logado, mas nenhum KML/KMZ novo apareceu em Downloads '
+        f'em até {CHROME_DOWNLOAD_TIMEOUT}s.'
+    )
+
+
+def _download_payload_via_logged_in_chrome(source_url: str):
+    chrome_executable = _find_chrome_executable()
+    if not chrome_executable:
+        raise RuntimeError('Google Chrome não encontrado para fallback autenticado.')
+
+    profile_name = os.environ.get('ORCRIMS_CHROME_PROFILE') or _load_env_for_cookies().get('ORCRIMS_CHROME_PROFILE') or 'Default'
+    started_at = time.time()
+    print(f'🌐 [ORCRIMS] Tentando exportar via Chrome logado (perfil={profile_name})...')
+    subprocess.Popen(
+        [
+            chrome_executable,
+            f'--profile-directory={profile_name}',
+            '--new-window',
+            source_url,
+        ],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    downloaded_path = _wait_for_downloaded_kml_via_chrome(started_at)
+    print(f'📥 [ORCRIMS] Download detectado via Chrome: {downloaded_path}')
+    with open(downloaded_path, 'rb') as file_obj:
+        return file_obj.read(), {
+            'content_type': 'application/vnd.google-earth.kmz' if downloaded_path.lower().endswith('.kmz') else 'application/vnd.google-earth.kml+xml',
+            'downloaded_via': 'chrome_profile',
+            'download_path': downloaded_path,
+            'profile': profile_name,
+        }
+
+
+def _build_google_session(source_url: str) -> requests.Session:
+    session = requests.Session()
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Referer': source_url.replace('/kml?', '/viewer?'),
+    })
+
+    try:
+        env = _load_env_for_cookies()
+        cookie_header = env.get('GOOGLE_MAPS_COOKIE', '')
+        if cookie_header:
+            loaded = 0
+            for item in cookie_header.split(';'):
+                item = item.strip()
+                if not item or '=' not in item:
+                    continue
+                name, value = item.split('=', 1)
+                name = name.strip()
+                value = value.strip()
+                if not name:
+                    continue
+                session.cookies.set(name, value, domain='.google.com')
+                session.cookies.set(name, value, domain='www.google.com')
+                loaded += 1
+            print(f"🔑 [ORCRIMS] Cookies de autenticação carregados do .env ({loaded} entradas)")
+        else:
+            print("⚠️ [ORCRIMS] GOOGLE_MAPS_COOKIE não definido no .env")
+    except Exception as e:
+        print(f"⚠️ [ORCRIMS] Erro ao carregar .env para cookies: {e}")
+
+    return session
+
+
+def _raise_for_google_auth_failure(response: requests.Response, source_url: str):
+    final_url = response.url or ''
+    history_urls = [item.headers.get('Location', '') for item in response.history]
+    content_type = (response.headers.get('Content-Type') or '').lower()
+    body_text = ''
+
+    if 'text/' in content_type or 'html' in content_type:
+        try:
+            body_text = response.text[:4000]
+        except Exception:
+            body_text = ''
+
+    auth_markers = (
+        'accounts.google.com',
+        'servicelogin',
+        'cookiemismatch',
+        'signin/identifier',
+    )
+    combined_targets = ' '.join([final_url] + history_urls + [body_text]).lower()
+    if any(marker in combined_targets for marker in auth_markers):
+        raise GoogleMapsAuthError(
+            'Google não aceitou a sessão do GOOGLE_MAPS_COOKIE para exportar o My Maps '
+            f'(url final: {final_url or source_url}). Atualize o cookie autenticado no .env.'
+        )
+
+    if response.status_code == 403 and 'google.com/maps/d' in final_url:
+        raise GoogleMapsAuthError(
+            'Google bloqueou a exportação autenticada do My Maps. '
+            'Verifique se o GOOGLE_MAPS_COOKIE ainda representa uma sessão válida no navegador.'
+        )
+
+
 def _download_official_payload(source_url: str):
     print(f'⬇️ [ORCRIMS] Baixando KML oficial: {source_url}')
-    response = requests.get(source_url, timeout=REQUEST_TIMEOUT)
+    session = _build_google_session(source_url)
+    response = session.get(source_url, timeout=REQUEST_TIMEOUT)
+    _raise_for_google_auth_failure(response, source_url)
     response.raise_for_status()
     content = response.content
     print(
@@ -308,6 +487,8 @@ def _download_official_payload(source_url: str):
         'last_modified': response.headers.get('Last-Modified', ''),
         'content_length': response.headers.get('Content-Length', ''),
         'content_type': response.headers.get('Content-Type', ''),
+        'final_url': response.url or source_url,
+        'redirect_chain': [item.headers.get('Location', '') for item in response.history],
     }
 
 
@@ -547,16 +728,37 @@ def refresh_orcrim_from_official(force: bool = False):
         payload_bytes, headers = _download_official_payload(source_url)
         kml_bytes = _extract_kml_bytes_from_payload(payload_bytes)
     except Exception as error:
-        print(f'❌ [ORCRIMS] Falha ao baixar KML oficial: {error}')
-        current_status.update({
-            'last_checked_at': _iso_now(),
-            'last_error': str(error),
-            'source_url': source_url,
-            'status': 'download_failed',
-            'fallback_used': fallback_available,
-        })
-        _write_update_status(current_status)
-        return {'updated': False, 'reason': 'download_failed', 'fallback_used': fallback_available, 'error': str(error)}
+        download_failures = [str(error)]
+        if isinstance(error, GoogleMapsAuthError) and _env_flag('ORCRIMS_USE_CHROME_FALLBACK', default=True):
+            print(f'⚠️ [ORCRIMS] Sessão por cookie rejeitada. Tentando Chrome logado: {error}')
+            try:
+                payload_bytes, headers = _download_payload_via_logged_in_chrome(source_url)
+                kml_bytes = _extract_kml_bytes_from_payload(payload_bytes)
+            except Exception as chrome_error:
+                download_failures.append(f'chrome_profile: {chrome_error}')
+                error = chrome_error
+            else:
+                error = None
+        if error is None:
+            pass
+        else:
+            combined_error = ' | '.join(download_failures)
+            print(f'❌ [ORCRIMS] Falha ao baixar KML oficial: {combined_error}')
+            if fallback_available:
+                status = 'fallback_active'
+            elif isinstance(error, GoogleMapsAuthError):
+                status = 'auth_cookie_invalid'
+            else:
+                status = 'download_failed'
+            current_status.update({
+                'last_checked_at': _iso_now(),
+                'last_error': combined_error,
+                'source_url': source_url,
+                'status': status,
+                'fallback_used': fallback_available,
+            })
+            _write_update_status(current_status)
+            return {'updated': False, 'reason': status, 'fallback_used': fallback_available, 'error': combined_error}
 
     downloaded_raw_hash = _get_content_hash(kml_bytes)
     downloaded_semantic_hash = _get_semantic_content_hash(kml_bytes)

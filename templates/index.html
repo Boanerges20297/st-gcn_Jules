@@ -410,24 +410,6 @@
                         <small class="text-primary fw-bold" id="horizon-info">Horizonte de Predição: 14 dias</small>
                         <small class="text-success d-block" id="validity-info">📅 Janela de Inteligência: Projeção 14 dias (Tempo Real)</small>
                         <small class="text-secondary d-block" id="model-window-info">Modelo: ST-GAT Elite v3 (Janela: 120d)</small>
-                        
-                        <!-- Indicador de Áreas Estáveis -->
-                        <div class="alert alert-success mt-2 mb-2 p-2">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="mb-0">
-                                    <i class="fas fa-check-circle me-1"></i>
-                                    <strong>Áreas Estáveis:</strong>
-                                </small>
-                                <span class="badge bg-success" id="stable-areas-count">29</span>
-                            </div>
-                            <small class="text-muted d-block" style="font-size: 0.75rem;">Baixa Tensão (&lt;30)</small>
-                        </div>
-                        
-                        <div class="alert alert-info alert-sm mt-2 mb-2 p-2" id="ranking-info" style="display:none;">
-                                <small><strong>Sistema de Ranking Dinamico:</strong></small><br>
-                            <small id="ranking-details" class="text-muted"></small>
-                                <small id="risk-band-details" class="text-muted d-block mt-1"></small>
-                        </div>
                     </div>
 
                     <div class="d-grid gap-1 mb-2" style="gap: 6px !important;">
@@ -582,6 +564,12 @@
                                     <i class="fas fa-microchip"></i> Detalhamento Micronós (KML 2026)
                                 </label>
                             </div>
+                            <div class="form-check mt-1">
+                                <input class="form-check-input" type="checkbox" id="toggle-cvli-points-90d">
+                                <label class="form-check-label small fw-bold text-dark" for="toggle-cvli-points-90d">
+                                    <i class="fas fa-map-pin"></i> Pinpoints CVLI (90 dias)
+                                </label>
+                            </div>
                         </div>
                         <div class="form-check mt-1">
                             <input class="form-check-input" type="checkbox" id="toggle-all-streets">
@@ -650,6 +638,10 @@
     map.createPane('micronodesPane');
     map.getPane('micronodesPane').style.zIndex = 650;
 
+    map.createPane('cvliPointsPane');
+    map.getPane('cvliPointsPane').style.zIndex = 655;
+    map.getPane('cvliPointsPane').style.pointerEvents = 'auto';
+
     map.createPane('streetsPane');
     map.getPane('streetsPane').style.zIndex = 400; // Por padrão abaixo dos bairros
     map.getPane('streetsPane').style.pointerEvents = 'none'; // Inativo por padrão
@@ -664,6 +656,98 @@
     var streetsLoaded = false;
     var streetsLoadedRegion = null;
     var streetFocusMode = false;
+    var cvliPoints90dLayer = L.layerGroup();
+    var cvliPoints90dLoadedRegion = null;
+
+    function normalizeCvliPointsRegion(region) {
+        var r = String(region || 'all').toLowerCase();
+        if (r === 'capital') return 'fortaleza';
+        return r;
+    }
+
+    function loadCvliPoints90d(region, cb, options) {
+        options = options || {};
+        var targetRegion = normalizeCvliPointsRegion(region || $('#region-filter').val() || 'all');
+        var forceRefresh = !!options.refresh;
+
+        if (!forceRefresh && cvliPoints90dLoadedRegion === targetRegion && cvliPoints90dLayer.getLayers().length > 0) {
+            if (!map.hasLayer(cvliPoints90dLayer)) {
+                map.addLayer(cvliPoints90dLayer);
+            }
+            if (cb) cb(null);
+            return;
+        }
+
+        fetch('/api/cvli_points?days=90&region=' + encodeURIComponent(targetRegion))
+            .then(function(resp) {
+                if (!resp.ok) throw new Error('Falha ao carregar pontos CVLI');
+                return resp.json();
+            })
+            .then(function(data) {
+                cvliPoints90dLayer.clearLayers();
+                (data.features || []).forEach(function(feature) {
+                    var coords = (((feature || {}).geometry || {}).coordinates) || [];
+                    if (coords.length < 2) return;
+                    var props = feature.properties || {};
+                    var latlng = [coords[1], coords[0]];
+                    var victims = Number(props.vitimas || 1);
+                    var relatedIds = Array.isArray(props.related_ids) ? props.related_ids : [];
+                    var marker = L.marker(latlng, {
+                        pane: 'cvliPointsPane',
+                        icon: makeCvliPinIcon(victims),
+                    }).bindPopup(
+                        '<strong>CVLI</strong><br>' +
+                        '<strong>Data:</strong> ' + (props.data || '—') + '<br>' +
+                        '<strong>Hora:</strong> ' + (props.hora || '—') + '<br>' +
+                        '<strong>Local:</strong> ' + (props.local || props.rua || '—') + '<br>' +
+                        '<strong>Bairro:</strong> ' + (props.bairro || '—') + '<br>' +
+                        '<strong>Cidade:</strong> ' + (props.cidade || '—') + '<br>' +
+                        '<strong>Vítimas:</strong> ' + victims + '<br>' +
+                        '<strong>Registros agregados:</strong> ' + Math.max(1, relatedIds.length)
+                    );
+                    cvliPoints90dLayer.addLayer(marker);
+                });
+
+                cvliPoints90dLoadedRegion = targetRegion;
+                if ($('#toggle-cvli-points-90d').prop('checked') && !map.hasLayer(cvliPoints90dLayer)) {
+                    map.addLayer(cvliPoints90dLayer);
+                }
+                if (cb) cb(null, data);
+            })
+            .catch(function(err) {
+                console.warn('[CVLI90D] load error', err);
+                if (cb) cb(err);
+            });
+    }
+
+    function updateCvliPoints90dForRegion(region) {
+        if (!$('#toggle-cvli-points-90d').prop('checked')) {
+            try { cvliPoints90dLayer.clearLayers(); } catch (e) {}
+            if (map.hasLayer(cvliPoints90dLayer)) map.removeLayer(cvliPoints90dLayer);
+            cvliPoints90dLoadedRegion = null;
+            return;
+        }
+
+        loadCvliPoints90d(region, function(err) {
+            if (err) console.warn('[CVLI90D] update failed', err);
+        });
+    }
+
+    function makeCvliPinIcon(victims) {
+        var size = Math.max(16, Math.min(22, 14 + Number(victims || 1)));
+        var bodyBlue = '#0b5ed7';
+        var centerRed = '#dc2626';
+        var height = Math.round(size * 1.45);
+        var centerSize = Math.max(5, Math.round(size * 0.38));
+        var html = '' +
+            '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;">' +
+            '  <div style="width:' + size + 'px;height:' + size + 'px;background:' + bodyBlue + ';border-radius:' + Math.round(size / 2) + 'px;border:2px solid #ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;">' +
+            '    <div style="width:' + centerSize + 'px;height:' + centerSize + 'px;background:' + centerRed + ';border-radius:50%;border:1px solid rgba(255,255,255,0.95);"></div>' +
+            '  </div>' +
+            '  <div style="width:0;height:0;border-left:' + Math.round(size * 0.34) + 'px solid transparent;border-right:' + Math.round(size * 0.34) + 'px solid transparent;border-top:' + Math.round(size * 0.48) + 'px solid ' + bodyBlue + ';margin-top:-2px;opacity:0.98"></div>' +
+            '</div>';
+        return L.divIcon({ html: html, className: '', iconSize: [size + 4, height], iconAnchor: [Math.round((size + 4) / 2), height - 2] });
+    }
 
     function setMacroPolygonsVisible(visible) {
         if (!geojsonLayer) return;
@@ -900,7 +984,11 @@
         
         // Fallback apenas se risk_score for nulo
         if (score === undefined || score === null) {
-            score = feature.properties.risk_score_cvli || 0;
+            score = feature.properties.risk_score_cvli;
+        }
+
+        if (typeof score !== 'number' || isNaN(score)) {
+            score = 0;
         }
 
         var fill = getColor(score);
@@ -2088,6 +2176,7 @@
             if (r) {
                 // Atualizar scores e labels vindos da simulação
                 feature.properties.risk_score = (typeof r.risk_score === 'number') ? r.risk_score : null;
+                feature.properties.risk_score_cvli = (typeof r.risk_score_cvli === 'number') ? r.risk_score_cvli : (typeof r.risk_score === 'number' ? r.risk_score : null);
                 if (r.status_label) feature.properties.status_label = r.status_label;
                 if (r.risk_text) feature.properties.risk_text = r.risk_text;
                 if (r.metrics) feature.properties.metrics = r.metrics;
@@ -2807,6 +2896,32 @@
             .then(data => {
                 if (requestToken !== explainabilityRequestToken) return;
                 var html = '';
+
+                // 0. Tendência Futura (prioridade executiva)
+                var trend = data.future_trend || null;
+                if (!trend) {
+                    var legacyTrend = (data.trend_label || data.temporal_pattern || '').toString().toLowerCase();
+                    if (legacyTrend) {
+                        trend = {
+                            direction: legacyTrend.indexOf('increas') >= 0 || legacyTrend.indexOf('alta') >= 0 ? 'up' : (legacyTrend.indexOf('queda') >= 0 || legacyTrend.indexOf('down') >= 0 ? 'down' : 'stable'),
+                            label: legacyTrend.indexOf('increas') >= 0 || legacyTrend.indexOf('alta') >= 0 ? 'Alta de Risco' : (legacyTrend.indexOf('queda') >= 0 || legacyTrend.indexOf('down') >= 0 ? 'Queda de Risco' : 'Estável'),
+                            message: 'Tendência inferida a partir do padrão temporal recente.',
+                            horizon_days: 14
+                        };
+                    }
+                }
+                if (trend) {
+                    var trendColor = trend.direction === 'up' ? '#dc3545' : (trend.direction === 'down' ? '#198754' : '#0d6efd');
+                    var trendIcon = trend.direction === 'up' ? '↗' : (trend.direction === 'down' ? '↘' : '→');
+                    var horizon = trend.horizon_days || 14;
+                    html += '<div style="background:#f8fbff; border:1px solid #dbe7ff; border-left:4px solid ' + trendColor + '; padding:10px 12px; margin:8px 0; border-radius:6px;">'
+                          + '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">'
+                          + '<strong style="font-size:0.9rem; color:#1f2937;">Tendência Futura (' + horizon + 'd)</strong>'
+                          + '<span style="font-weight:700; color:' + trendColor + ';">' + trendIcon + ' ' + (trend.label || 'Estável') + '</span>'
+                          + '</div>'
+                          + '<div style="font-size:0.88rem; color:#334155;">' + (trend.message || 'Sem desvio relevante na série recente.') + '</div>'
+                          + '</div>';
+                }
                 
                 // 1. Resumo Principal
                 if (data.summary) {
@@ -2816,10 +2931,8 @@
                 if (data.structured_result) {
                     var sections = [
                         ['Síntese Executiva', data.structured_result.executive_summary],
-                        ['Justificativa Técnica', data.structured_result.technical_basis],
-                        ['Leitura de Confiança', data.structured_result.confidence_basis],
                         ['Orientação Gerencial', data.structured_result.manager_guidance],
-                        ['Nota Metodológica', data.structured_result.methodology_note]
+                        ['Leitura de Confiança', data.structured_result.confidence_basis]
                     ];
 
                     sections.forEach(function(section) {
@@ -2834,8 +2947,15 @@
                 // 2. Fatores Reais (Metrics-based)
                 if (data.factors && data.factors.length > 0) {
                     html += '<div class="mb-2"><strong style="font-size: 0.9rem;">Fatores Prioritários para Decisão:</strong></div>';
-                    
-                    data.factors.forEach(function(f) {
+
+                    var prioritizedFactors = data.factors
+                        .filter(function(f) { return f && (f.importance === 'high' || f.importance === 'medium'); })
+                        .slice(0, 4);
+                    if (prioritizedFactors.length === 0) {
+                        prioritizedFactors = data.factors.slice(0, 3);
+                    }
+
+                    prioritizedFactors.forEach(function(f) {
                         var color = '#f8f9fa';
                         if (f.importance === 'high') color = '#fff5f5';
                         else if (f.importance === 'medium') color = '#fffaf0';
@@ -2874,23 +2994,11 @@
                 }
 
                 if (data.confidence_components && data.confidence_components.length > 0) {
-                    html += '<div class="mt-3"><strong style="font-size: 0.9rem;">Subsídios da Confiança:</strong></div>';
-                    data.confidence_components.forEach(function(component) {
-                        var accent = component.direction === 'negative' ? '#dc3545' : '#198754';
-                        html += '<div style="background:#fbfcfd; padding:8px 10px; margin:6px 0; border-radius:6px; border-left:3px solid ' + accent + '; font-size:0.88rem;">'
-                              + '<div style="font-weight:700; color:#495057; margin-bottom:2px;">' + component.name + ' (' + component.score_pct.toFixed(1) + '%)</div>'
-                              + '<div>' + component.text + '</div>'
-                              + '</div>';
-                    });
-                }
-
-                if (data.confidence_caveats && data.confidence_caveats.length > 0) {
-                    html += '<div class="mt-3"><strong style="font-size: 0.9rem;">Ressalvas:</strong></div>';
-                    data.confidence_caveats.forEach(function(caveat) {
-                        html += '<div style="background:#fff8e1; padding:8px 10px; margin:6px 0; border-radius:6px; border-left:3px solid #ffc107; font-size:0.88rem;">'
-                              + caveat
-                              + '</div>';
-                    });
+                    var positives = data.confidence_components.filter(function(c){ return c && c.direction !== 'negative'; }).length;
+                    var negatives = data.confidence_components.filter(function(c){ return c && c.direction === 'negative'; }).length;
+                    html += '<div class="mt-3" style="background:#f8f9fb; border:1px solid #e9ecef; border-radius:6px; padding:8px 10px; font-size:0.86rem; color:#495057;">'
+                          + '<strong>Leitura Sintética:</strong> ' + positives + ' sinal(is) favorável(is) e ' + negatives + ' sinal(is) de cautela.'
+                          + '</div>';
                 }
 
                 $('#explanation-content').html(html || '<p class="text-muted">Dados insuficientes para gerar explicação tática.</p>');
@@ -3004,7 +3112,8 @@
             var displayIdx = 1;
             
             topFromServer.forEach(function(item) {
-                var displayString = (item.name || 'Desconhecido').toUpperCase() + '|' + (item.cidade || 'Fortaleza').toUpperCase();
+                var itemCity = item.cidade || (item.region_type === 'fortaleza' ? 'Fortaleza' : 'RMF/Interior');
+                var displayString = (item.name || 'Desconhecido').toUpperCase() + '|' + itemCity.toUpperCase();
                 if (addedItems.has(displayString)) {
                     return;
                 }
@@ -3134,15 +3243,15 @@
             // Create a clickable item
             html += `<a href="#" class="list-group-item list-group-item-action py-2 ps-2 pe-1" data-idx="${idx}">
                         <div class="d-flex w-100 justify-content-between align-items-center">
-                            <span class="mb-1" style="line-height:1.2;">
-                                ${idx+1}. ${item.name}${regionSuffix}${peakHoursHtml}
-                            </span>
-                            <div class="text-end ms-2" style="min-width: 70px;">
-                                <small class="d-block text-muted" style="font-size: 0.7rem; line-height: 1;">Tensão</small>
-                                <span class="${riskInfo.class} fw-bold" style="font-size: 0.85rem;">${riskInfo.label}</span>
-                            </div>
+                             <span class="mb-1" style="line-height:1.2;">
+                                 ${idx+1}. ${item.name}${regionSuffix}${peakHoursHtml}
+                             </span>
+                             <div class="text-end ms-2" style="min-width: 70px;">
+                                 <small class="d-block text-muted" style="font-size: 0.7rem; line-height: 1;">Tensão</small>
+                                 <span class="${riskInfo.class} fw-bold" style="font-size: 0.85rem;">${riskInfo.label}</span>
+                             </div>
                         </div>
-                    </a>`;
+                     </a>`;
         });
 
         // Also apply the region filter to the visible map layers
@@ -3285,9 +3394,24 @@
         }
     });
 
+    $('#toggle-cvli-points-90d').on('change', function() {
+        var checked = $(this).prop('checked');
+        var region = $('#region-filter').val();
+        if (checked) {
+            updateCvliPoints90dForRegion(region);
+        } else {
+            try { cvliPoints90dLayer.clearLayers(); } catch (e) {}
+            if (map.hasLayer(cvliPoints90dLayer)) map.removeLayer(cvliPoints90dLayer);
+            cvliPoints90dLoadedRegion = null;
+        }
+    });
+
     $('#region-filter').on('change', function() {
         if ($('#toggle-micronodes-kml').is(':checked')) {
             applyMicronodesRegionFilter($(this).val());
+        }
+        if ($('#toggle-cvli-points-90d').is(':checked')) {
+            updateCvliPoints90dForRegion($(this).val());
         }
     });
 
@@ -3437,6 +3561,8 @@
             type: 'GET',
             dataType: 'json',
             success: function(data) {
+                var currentRevision = data.revision || 0;
+                var handledRevision = parseInt(sessionStorage.getItem('handledModelUpdateRevision') || '0', 10);
                 if (data.status !== 'idle' && data.status !== 'error') {
                     // Atualização em progresso
                     showLoadingWithProgress(
@@ -3444,7 +3570,8 @@
                         data.progress || 0
                     );
                     
-                    if (data.status === 'updating_models' && data.progress >= 95) {
+                    if (data.status === 'updating_models' && data.progress >= 95 && currentRevision > handledRevision) {
+                        sessionStorage.setItem('handledModelUpdateRevision', String(currentRevision));
                         // Aguarda um pouco para recarregar dados
                         setTimeout(function() {
                             location.reload();
@@ -3944,7 +4071,7 @@
 
     // --- AGENTE DE BACKGROUND: DINAMISMO DO STATUS E ALERTAS ---
     var _isTriggeringAgent = false;
-    var _lastCalibrationTime = null;
+    var _lastCalibrationTime = sessionStorage.getItem('lastAgentCalibrationTime') || null;
     var _fadeTimeout = null;
 
     function updateAgentStatus() {
@@ -3962,6 +4089,9 @@
                     // Se é uma nova calibração que ainda não mostramos, exibe por 8 segundos e depois esconde
                     if (calibratedTime !== _lastCalibrationTime) {
                         _lastCalibrationTime = calibratedTime;
+                        if (calibratedTime) {
+                            sessionStorage.setItem('lastAgentCalibrationTime', calibratedTime);
+                        }
                         
                         var explainText = lastCal.explanations || "Fatores de predição alinhados com a dinâmica criminal em tempo real.";
                         $('#agent-alert-text').html(
@@ -3982,8 +4112,6 @@
                         }, 8000);
                     }
                 } else if (data.status === "processing") {
-                    // Reseta a marca temporal para disparar o fadeOut quando concluir
-                    _lastCalibrationTime = null;
                     if (_fadeTimeout) {
                         clearTimeout(_fadeTimeout);
                         _fadeTimeout = null;

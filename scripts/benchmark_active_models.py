@@ -24,7 +24,7 @@ import torch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from src.core.architectures import ShallowGAT  # noqa: E402
+from src.core.architectures import ShallowGAT, get_model_class  # noqa: E402
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -103,7 +103,7 @@ def build_input(features: np.ndarray, ti: int, window: int, channels: int) -> tu
     return x_final, momentum
 
 
-def load_region(cfg: RegionConfig) -> tuple[dict, ShallowGAT, list[torch.Tensor]]:
+def load_region(cfg: RegionConfig) -> tuple[dict, torch.nn.Module, list[torch.Tensor], RegionConfig]:
     data_path = ROOT / "data" / "processed" / cfg.processed_file
     model_path = ROOT / "models" / "active" / cfg.model_file
 
@@ -111,13 +111,22 @@ def load_region(cfg: RegionConfig) -> tuple[dict, ShallowGAT, list[torch.Tensor]
         data = pickle.load(f)
 
     num_nodes = len(data["nodes_gdf"])
-    model = ShallowGAT(num_nodes=num_nodes, in_channels=cfg.channels, time_steps=cfg.window).to(DEVICE)
     ckpt = torch.load(model_path, map_location=DEVICE, weights_only=False)
+    ckpt_meta = ckpt if isinstance(ckpt, dict) else {}
+    runtime_cfg = RegionConfig(
+        cfg.key,
+        cfg.model_file,
+        cfg.processed_file,
+        window=int(ckpt_meta.get("window", cfg.window)),
+        channels=int(ckpt_meta.get("in_channels", cfg.channels)),
+    )
+    model_class = get_model_class(ckpt_meta.get("model_class")) if ckpt_meta.get("model_class") else ShallowGAT
+    model = model_class(num_nodes=num_nodes, in_channels=runtime_cfg.channels, time_steps=runtime_cfg.window).to(DEVICE)
     state_dict = ckpt.get("model_state_dict", ckpt) if isinstance(ckpt, dict) else ckpt
     model.load_state_dict(state_dict, strict=False)
     model.eval()
 
-    return data, model, norm_adj(data["adj_geo"], data["adj_conflict"])
+    return data, model, norm_adj(data["adj_geo"], data["adj_conflict"]), runtime_cfg
 
 
 def horizon_target(features: np.ndarray, ti: int, horizon: int, allow_partial: bool) -> np.ndarray | None:
@@ -151,7 +160,7 @@ def recall_against_events(scores: np.ndarray, targets: np.ndarray, k: int) -> fl
     return float(len(top_pred & positives) / len(positives))
 
 
-def score_day(data: dict, model: ShallowGAT, adj: list[torch.Tensor], cfg: RegionConfig, ti: int) -> np.ndarray:
+def score_day(data: dict, model: torch.nn.Module, adj: list[torch.Tensor], cfg: RegionConfig, ti: int) -> np.ndarray:
     features = data["node_features"]
     x_final, momentum = build_input(features, ti, cfg.window, cfg.channels)
     x = torch.from_numpy(x_final).float().permute(2, 0, 1).unsqueeze(0).to(DEVICE)
@@ -190,7 +199,7 @@ def date_indices(dates: list[pd.Timestamp], start: str, end: str) -> list[int]:
     return [i for i, d in enumerate(pd.to_datetime(dates)) if start_ts <= d <= end_ts]
 
 
-def evaluate_period(cfg: RegionConfig, data: dict, model: ShallowGAT, adj: list[torch.Tensor], label: str, start: str, end: str, allow_partial: bool) -> list[dict]:
+def evaluate_period(cfg: RegionConfig, data: dict, model: torch.nn.Module, adj: list[torch.Tensor], label: str, start: str, end: str, allow_partial: bool) -> list[dict]:
     rows: list[dict] = []
     features = data["node_features"]
     dates = pd.to_datetime(data["dates"])
@@ -266,11 +275,11 @@ def main() -> None:
     print(f"Device: {DEVICE}")
     for cfg in REGIONS:
         print(f"\n[{cfg.key}] carregando {cfg.model_file}...")
-        data, model, adj = load_region(cfg)
+        data, model, adj, runtime_cfg = load_region(cfg)
         dates = pd.to_datetime(data["dates"])
         print(f"  grid: {data['node_features'].shape} | datas: {dates[0].date()} -> {dates[-1].date()}")
-        all_rows.extend(evaluate_period(cfg, data, model, adj, "avaliacao", args.eval_start, args.eval_end, allow_partial=False))
-        all_rows.extend(evaluate_period(cfg, data, model, adj, "validacao", args.val_start, args.val_end, allow_partial=args.allow_partial_validation))
+        all_rows.extend(evaluate_period(runtime_cfg, data, model, adj, "avaliacao", args.eval_start, args.eval_end, allow_partial=False))
+        all_rows.extend(evaluate_period(runtime_cfg, data, model, adj, "validacao", args.val_start, args.val_end, allow_partial=args.allow_partial_validation))
 
     df = pd.DataFrame(all_rows)
     summary = summarize(all_rows)

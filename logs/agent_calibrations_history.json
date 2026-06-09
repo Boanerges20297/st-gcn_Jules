@@ -1,29 +1,1182 @@
 [
   {
-    "timestamp": "2026-05-27 15:23:02",
+    "timestamp": "2026-06-05 09:13:19",
     "weights": {
-      "posture": 0.85,
-      "speed": 0.7,
-      "rom": 0.9
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
     },
-    "explanations": "Os pesos do modelo preditivo foram recalibrados com sucesso de forma dinâmica para mitigar falsos positivos nas métricas de amplitude (ROM), velocidade de deslocamento e análise postural."
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
   },
   {
-    "timestamp": "2026-06-02 00:21:42",
+    "timestamp": "2026-06-05 09:13:19",
     "weights": {
-      "posture": 0.85,
-      "speed": 0.7,
-      "rom": 0.9
+      "tension_factor": 0.55,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.5,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
     },
-    "explanations": "Os pesos do modelo preditivo foram recalibrados com sucesso de forma dinâmica para mitigar falsos positivos nas métricas de amplitude (ROM), velocidade de deslocamento e análise postural."
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "target_region": "rmf"
   },
   {
-    "timestamp": "2026-06-02 00:26:12",
+    "timestamp": "2026-06-05 09:23:20",
     "weights": {
-      "posture": 0.85,
-      "speed": 0.7,
-      "rom": 0.9
+      "tension_factor": 0.45,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.7,
+      "tag_bias_neighbor": 0.95,
+      "norm_neural_weight": 0.7,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
     },
-    "explanations": "Os pesos do modelo preditivo foram recalibrados com sucesso de forma dinâmica para mitigar falsos positivos nas métricas de amplitude (ROM), velocidade de deslocamento e análise postural."
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-05 09:23:20",
+    "weights": {
+      "tension_factor": 0.3,
+      "min_risk": 30.0,
+      "tag_bias_direct": 3.0,
+      "tag_bias_neighbor": 1.1,
+      "norm_neural_weight": 0.9,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-05 09:23:20",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "target_region": "interior"
+  },
+  {
+    "timestamp": "2026-06-05 09:23:20",
+    "weights": {
+      "tension_factor": 0.45,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.7,
+      "tag_bias_neighbor": 0.95,
+      "norm_neural_weight": 0.7,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-05 09:23:20",
+    "weights": {
+      "tension_factor": 0.3,
+      "min_risk": 30.0,
+      "tag_bias_direct": 3.0,
+      "tag_bias_neighbor": 1.1,
+      "norm_neural_weight": 0.9,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-05 09:33:21",
+    "weights": {
+      "tension_factor": 0.2,
+      "min_risk": 30.0,
+      "tag_bias_direct": 3.2,
+      "tag_bias_neighbor": 1.2,
+      "norm_neural_weight": 0.9,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-05 09:33:21",
+    "weights": {
+      "tension_factor": 0.5,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.6,
+      "tag_bias_neighbor": 0.9,
+      "norm_neural_weight": 0.65,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "target_region": "interior"
+  },
+  {
+    "timestamp": "2026-06-05 09:33:21",
+    "weights": {
+      "tension_factor": 0.2,
+      "min_risk": 30.0,
+      "tag_bias_direct": 3.2,
+      "tag_bias_neighbor": 1.2,
+      "norm_neural_weight": 0.9,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-05 09:43:21",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-05 09:43:22",
+    "weights": {
+      "tension_factor": 0.55,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.5,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-05 09:43:22",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "target_region": "interior"
+  },
+  {
+    "timestamp": "2026-06-05 09:43:22",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-05 09:43:22",
+    "weights": {
+      "tension_factor": 0.55,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.5,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-05 16:39:40",
+    "weights": {
+      "tension_factor": 0.45,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.7,
+      "tag_bias_neighbor": 0.95,
+      "norm_neural_weight": 0.7,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-05 16:39:40",
+    "weights": {
+      "tension_factor": 0.3,
+      "min_risk": 30.0,
+      "tag_bias_direct": 3.0,
+      "tag_bias_neighbor": 1.1,
+      "norm_neural_weight": 0.9,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-05 16:39:41",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "target_region": "interior"
+  },
+  {
+    "timestamp": "2026-06-05 16:39:41",
+    "weights": {
+      "tension_factor": 0.45,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.7,
+      "tag_bias_neighbor": 0.95,
+      "norm_neural_weight": 0.7,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-05 16:39:41",
+    "weights": {
+      "tension_factor": 0.3,
+      "min_risk": 30.0,
+      "tag_bias_direct": 3.0,
+      "tag_bias_neighbor": 1.1,
+      "norm_neural_weight": 0.9,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-05 16:42:43",
+    "weights": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-05 16:42:43",
+    "weights": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-05 16:42:43",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "target_region": "interior"
+  },
+  {
+    "timestamp": "2026-06-05 16:42:43",
+    "weights": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-05 16:42:43",
+    "weights": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-05 16:46:49",
+    "weights": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-05 16:46:49",
+    "weights": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-05 16:46:49",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "target_region": "interior"
+  },
+  {
+    "timestamp": "2026-06-05 16:46:50",
+    "weights": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-05 16:46:50",
+    "weights": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-05 16:56:52",
+    "weights": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-05 16:56:52",
+    "weights": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-05 16:56:52",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "target_region": "interior"
+  },
+  {
+    "timestamp": "2026-06-05 16:56:52",
+    "weights": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-05 16:56:52",
+    "weights": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-09 13:50:29",
+    "weights": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-09 13:50:29",
+    "weights": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-09 13:50:29",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "target_region": "interior"
+  },
+  {
+    "timestamp": "2026-06-09 13:50:29",
+    "weights": {
+      "tension_factor": 2.9,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-09 13:50:29",
+    "weights": {
+      "tension_factor": 2.75,
+      "min_risk": 30.0,
+      "tag_bias_direct": 5.0,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-09 14:00:30",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-09 14:00:31",
+    "weights": {
+      "tension_factor": 0.55,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.5,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-09 14:00:31",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "target_region": "interior"
+  },
+  {
+    "timestamp": "2026-06-09 14:00:32",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-09 14:00:32",
+    "weights": {
+      "tension_factor": 0.55,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.5,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-09 14:10:33",
+    "weights": {
+      "tension_factor": 0.45,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.7,
+      "tag_bias_neighbor": 0.95,
+      "norm_neural_weight": 0.7,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-09 14:10:33",
+    "weights": {
+      "tension_factor": 0.3,
+      "min_risk": 30.0,
+      "tag_bias_direct": 3.0,
+      "tag_bias_neighbor": 1.1,
+      "norm_neural_weight": 0.9,
+      "dynamic_window": null,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "BARRA DO CEARA",
+        "ALTO ALEGRE",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "SIQUEIRA",
+        "JOSE WALTER",
+        "PLANALTO AYRTON SENNA",
+        "MONDUBIM",
+        "PEDRAS",
+        "BARROSO"
+      ]
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-09 14:10:34",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "target_region": "interior"
+  },
+  {
+    "timestamp": "2026-06-09 14:10:34",
+    "weights": {
+      "tension_factor": 0.45,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.7,
+      "tag_bias_neighbor": 0.95,
+      "norm_neural_weight": 0.7,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-09 14:10:34",
+    "weights": {
+      "tension_factor": 0.3,
+      "min_risk": 30.0,
+      "tag_bias_direct": 3.0,
+      "tag_bias_neighbor": 1.1,
+      "norm_neural_weight": 0.9,
+      "dynamic_window": 30,
+      "use_historical_fallback": true,
+      "historical_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "PACATUBA",
+        "PINDORETAMA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "ITAITINGA",
+        "SAO LUIS DO CURU"
+      ]
+    },
+    "explanations": "RMF: ajuste automático aplicado para p10.",
+    "target_region": "rmf"
   }
 ]

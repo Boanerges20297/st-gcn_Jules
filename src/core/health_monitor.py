@@ -308,6 +308,18 @@ class HealthMonitor:
         # Retornar mais recentes primeiro
         alerts = sorted(alerts, key=lambda x: x['timestamp'], reverse=True)[:limit]
         return [self._enrich_alert(a) for a in alerts]
+
+    def get_active_alerts(self, limit: Optional[int] = None) -> List[Dict]:
+        """
+        Alias de compatibilidade para consumidores antigos do monitor.
+
+        Args:
+            limit: NÃºmero mÃ¡ximo de alertas ativos. `None` retorna todos.
+        """
+        active_alerts = self.get_alerts(limit=len(self.alerts_history), resolved=False)
+        if limit is None:
+            return active_alerts
+        return active_alerts[:limit]
     
     def check_system_health(self, thresholds: Dict = None) -> Tuple[str, List[str]]:
         """

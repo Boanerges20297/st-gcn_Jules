@@ -67,7 +67,6 @@ class HostingerSyncManager:
         return _sha256_bytes(encoded)
 
     def sync_risk_artifacts(self, artifact: dict) -> dict:
-        fingerprint = self.build_risk_fingerprint(artifact)
         relative_paths = [
             'outputs/hermes/risk_snapshot_latest.json',
             'outputs/hermes/risk_snapshot_latest.md',
@@ -84,6 +83,7 @@ class HostingerSyncManager:
             'outputs/hermes/top_30_micronodes_rmf.csv',
             'outputs/hermes/top_30_micronodes_interior.csv',
         ]
+        fingerprint = self._build_files_fingerprint(relative_paths)
         return self._sync_event('risk_outputs', fingerprint, relative_paths)
 
     def sync_data_merge_artifacts(self) -> dict:
@@ -230,10 +230,30 @@ class HostingerSyncManager:
                     self.config.target_dir,
                     relative_path.replace('\\', '/'),
                 )
-                self._ensure_remote_dir(ssh, posixpath.dirname(remote_path))
-                self._wait_for_stable_file(local_path)
-                self._safe_put_file(sftp, local_path, remote_path)
-                uploaded.append(relative_path)
+                
+                # Check modification time and size of local vs remote file
+                local_stat = local_path.stat()
+                local_mtime = int(local_stat.st_mtime)
+                local_size = local_stat.st_size
+                
+                should_upload = True
+                try:
+                    remote_stat = sftp.stat(remote_path)
+                    remote_mtime = int(remote_stat.st_mtime)
+                    remote_size = remote_stat.st_size
+                    if remote_size == local_size and abs(remote_mtime - local_mtime) <= 2:
+                        # Skip upload since it's already updated
+                        should_upload = False
+                except IOError:
+                    # Remote file does not exist
+                    pass
+
+                if should_upload:
+                    self._ensure_remote_dir(ssh, posixpath.dirname(remote_path))
+                    self._wait_for_stable_file(local_path)
+                    self._safe_put_file(sftp, local_path, remote_path)
+                    sftp.utime(remote_path, (local_mtime, local_mtime))
+                    uploaded.append(relative_path)
         finally:
             sftp.close()
             ssh.close()

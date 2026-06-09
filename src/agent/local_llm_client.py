@@ -19,7 +19,7 @@ class LocalLLMClient:
     def generate(self, prompt: str, system_prompt: str = None, temperature: float = 0.1, response_format: str = None) -> str:
         """
         Executa uma chamada de geração direta para o Ollama local.
-        Levanta erros reais e impede fallbacks artificiais (mocks).
+        Levanta erros reais e impede fallbacks artificiais.
         """
         url = f"{self.base_url.rstrip('/')}/api/generate"
         
@@ -40,37 +40,17 @@ class LocalLLMClient:
         if response_format == "json":
             payload["format"] = "json"
 
-        # Redução do timeout para 10s para evitar travamento da thread e CPU spikes na máquina do usuário.
-        # Caso o Ollama demore mais do que 10s, acionamos um fallback estruturado inteligente.
         try:
-            response = requests.post(url, json=payload, timeout=10)
-            if response.status_code == 200:
-                result_json = response.json()
-                return result_json.get("response", "").strip()
-            else:
-                raise RuntimeError(f"Ollama retornou status {response.status_code}")
+            response = requests.post(url, json=payload, timeout=self.timeout)
+            response.raise_for_status()
+            result_json = response.json()
+            content = result_json.get("response", "").strip()
+            if not content:
+                raise RuntimeError("Ollama retornou resposta vazia")
+            return content
         except requests.exceptions.RequestException as e:
-            logger.warning(f"Ollama local demorou para responder ou está inacessível. Detalhes: {e}. Executando fallback tático...")
-            
-            # Fallback estruturado inteligente com base no prompt fornecido para garantir que o fluxo continue
-            prompt_upper = prompt.upper()
-            if "CALCULE OS PESOS IDEAIS" in prompt_upper or "WEIGHTS" in prompt_upper:
-                return json.dumps({
-                    "weights": {"posture": 0.85, "speed": 0.70, "rom": 0.90},
-                    "justification": "Calibração tática de pesos analíticos calculada via modelo de background local."
-                })
-            elif "TRADUZA A SEGUINTE JUSTIFICATIVA" in prompt_upper or "TOMADOR DE DECISÃO" in prompt_upper:
-                return json.dumps({
-                    "output": "Os pesos do modelo preditivo foram recalibrados com sucesso de forma dinâmica para mitigar falsos positivos nas métricas de amplitude (ROM), velocidade de deslocamento e análise postural."
-                })
-            else:
-                # Fallback para o especialista em dados complexos
-                return json.dumps({
-                    "anomalies_detected": True,
-                    "geographical_drift": False,
-                    "next_probable_cvli_hotspot": "BARROSO (Baseado na convergência recente de tensões territoriais)",
-                    "technical_summary": "Análise de background local de ocorrências exógenas concluída com sucesso."
-                })
+            logger.error("Falha ao consultar Ollama local: %s", e)
+            raise RuntimeError(f"Falha ao consultar Ollama local: {e}") from e
 
     def parse_json_safely(self, text: str) -> dict:
         """

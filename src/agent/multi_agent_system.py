@@ -1,6 +1,8 @@
 import json
 import logging
+import os
 from typing import Dict, Any
+from src.agent.calibration_memory import CalibrationSemanticMemory, record_agent_decision
 from src.agent.local_llm_client import LocalLLMClient
 
 logger = logging.getLogger(__name__)
@@ -102,8 +104,10 @@ class GeneralManagerAgent:
     O ÚNICO agente exposto publicamente para o backend. 
     Administra, coordena a delegação para os especialistas sob demanda, harmoniza e formula a resposta final.
     """
-    def __init__(self, base_url: str = "http://localhost:11434", model_name: str = "llama3:8b"):
+    def __init__(self, base_url: str = "http://localhost:11434", model_name: str = "llama3:8b", base_dir: str = None):
         self.client = LocalLLMClient(base_url=base_url, model_name=model_name)
+        self.base_dir = base_dir or os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+        self.semantic_memory = CalibrationSemanticMemory(self.base_dir)
         
         # Instanciar os especialistas como membros estritamente privados
         self._calibrator = _CalibrationAgent(self.client)
@@ -133,9 +137,15 @@ class GeneralManagerAgent:
         # 1. Agente 4 analisa os dados complexos brutamente enriquecido com MemPalace (apenas resumo executivo)
         mempalace_lines = mempalace_context.split('\n')
         mempalace_summary = "\n".join([line for line in mempalace_lines if line.strip() and not line.startswith('#')][:10])
+        target_region = str(user_profile.get("region") or raw_stgcn_data.get("region") or "global").lower()
+        calibration_experience = self.semantic_memory.format_for_prompt(region=target_region)
         
         analyst_prompt = (
             f"=== MEMÓRIA E DIRETIVAS DO MEMPALACE (RESUMO) ===\n{mempalace_summary}\n\n"
+            f"=== MEMORIA SEMANTICA DE CALIBRACOES ANTERIORES ===\n"
+            f"{calibration_experience}\n\n"
+            f"Use esta memoria para reconhecer sinais que antecederam calibracoes boas ou ruins. "
+            f"Outcomes 'degraded' e improvement_pct <= 0 sao contraexemplos; outcomes 'improved' sao padroes reutilizaveis quando o contexto bater.\n\n"
             f"=== DADOS EM TEMPO REAL ===\n"
             f"Dados brutos da predição: {json.dumps(raw_stgcn_data)}\n"
             f"Perfil regional/histórico: {json.dumps(user_profile)}"
@@ -146,19 +156,16 @@ class GeneralManagerAgent:
         
         # 2. Agente 2 calcula os pesos matemáticos com base nas anomalias detectadas
         calibrator_prompt = (
+            f"Memoria semantica de calibracoes anteriores para esta regiao: {calibration_experience}\n"
+            f"Aprenda com experiencias positivas e negativas: preserve padroes associados a melhora e evite parametros ligados a degradacao.\n"
             f"Com base na análise técnica de anomalias: {json.dumps(analyst_data)}\n"
             f"Calcule os pesos ideais de calibração para postura, velocidade e rom."
         )
         calibrator_raw = self._calibrator.execute(calibrator_prompt)
         wiretap.record_interaction("Gerente Geral", self._calibrator.name, calibrator_prompt, calibrator_raw)
         calibration_data = self.client.parse_json_safely(calibrator_raw)
-        
-        # Se falhar o parse, garante fallback seguro
-        if "weights" not in calibration_data:
-            calibration_data = {
-                "weights": {"posture": 0.85, "speed": 0.70, "rom": 0.90},
-                "justification": "Fallback de emergência ativado pelo Gerente Geral por inconsistência na resposta do especialista."
-            }
+        if "weights" not in calibration_data or "justification" not in calibration_data:
+            raise ValueError("Especialista de calibração retornou payload inválido")
 
         # 3. Agente 3 redige a justificativa em linguagem humana refinada para o relatório do gerente
         interactor_prompt = (
@@ -168,7 +175,9 @@ class GeneralManagerAgent:
         interactor_raw = self._interactor.execute(interactor_prompt)
         wiretap.record_interaction("Gerente Geral", self._interactor.name, interactor_prompt, interactor_raw)
         interactor_data = self.client.parse_json_safely(interactor_raw)
-        friendly_output = interactor_data.get("output", calibration_data.get("justification"))
+        friendly_output = interactor_data.get("output")
+        if not friendly_output:
+            raise ValueError("Especialista de interação retornou payload inválido")
 
         # 4. O Gerente Geral compila tudo, revisa criticamente e formula o output de negócios
         response = {
@@ -177,8 +186,16 @@ class GeneralManagerAgent:
             "calibrated_weights": calibration_data.get("weights"),
             "explanations": friendly_output,
             "data_analysis": analyst_data,
-            "calibrated_at": raw_stgcn_data.get("timestamp", "")
+            "calibrated_at": raw_stgcn_data.get("timestamp", ""),
+            "should_intervene": bool(
+                analyst_data.get("anomalies_detected") or analyst_data.get("geographical_drift")
+            ),
+            "target_region": user_profile.get("region", "global")
         }
+        try:
+            record_agent_decision(self.base_dir, response, source="general_manager")
+        except Exception as exc:
+            logger.warning("Gerente Geral: falha ao registrar memoria semantica: %s", exc)
         
         logger.info("Gerente Geral: Resposta em malha fechada consolidada com sucesso.")
         return response

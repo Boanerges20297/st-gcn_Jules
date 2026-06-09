@@ -616,10 +616,28 @@
         const autoRefreshInterval = 30000; // 30 segundos
         
         // Carregar dados iniciais
+        let lastModelRevision = null;
+
         document.addEventListener('DOMContentLoaded', function() {
             updateDashboard();
             setInterval(updateDashboard, autoRefreshInterval);
         });
+
+        async function checkModelUpdateRevision() {
+            try {
+                const response = await fetch('/api/model-update-status', { cache: 'no-store' });
+                const data = await response.json();
+                if (lastModelRevision === null) {
+                    lastModelRevision = data.revision || 0;
+                    return;
+                }
+                if ((data.revision || 0) !== lastModelRevision && data.status !== 'error') {
+                    location.reload();
+                }
+            } catch (error) {
+                console.error('Erro ao verificar revisão do modelo:', error);
+            }
+        }
         
         async function updateDashboard() {
             try {
@@ -651,6 +669,7 @@
 
                 // Update Calibration
                 updateCalibration();
+                checkModelUpdateRevision();
             } catch (error) {
                 console.error('Erro ao atualizar dashboard:', error);
                 document.getElementById('status-indicator').innerHTML = 
@@ -686,7 +705,9 @@
                 const orcrimStatusMap = {
                     updated: { label: 'Atualizado', color: '#10b981' },
                     no_change: { label: 'Sem mudança', color: '#60a5fa' },
+                    fallback_active: { label: 'Base local válida', color: '#10b981' },
                     fallback_restored: { label: 'Fallback ativo', color: '#f59e0b' },
+                    auth_cookie_invalid: { label: 'Cookie invÃ¡lido', color: '#f97316' },
                     download_failed: { label: 'Falha download', color: '#ef4444' },
                     no_official_link_found: { label: 'Sem link oficial', color: '#f97316' },
                     manual_import: { label: 'Importação manual', color: '#a78bfa' },
@@ -699,7 +720,9 @@
 
                 const workingKml = orcrim.working_kml || {};
                 const fallbackLabel = orcrim.fallback_used ? ' | fallback da última base válida aplicado' : '';
-                document.getElementById('orcrim-detail').textContent = orcrim.last_error
+                document.getElementById('orcrim-detail').textContent = orcrim.status === 'fallback_active'
+                    ? `${workingKml.modified_at || 'KML local válido'}${fallbackLabel}`
+                    : orcrim.last_error
                     ? `${orcrim.last_error}${fallbackLabel}`
                     : `${workingKml.modified_at || 'sem KML local'}${fallbackLabel}`;
 

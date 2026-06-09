@@ -11,6 +11,8 @@ import time
 from datetime import datetime
 from typing import Dict, List, Optional
 
+from src.agent.calibration_memory import record_validation_outcome
+
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +24,11 @@ _CONFIDENCE_THRESHOLDS = {
 }
 
 _ADJUSTMENT_COOLDOWN = 300
+_SEMANTIC_REVIEW_THRESHOLDS = {
+    'p20': 0.78,
+    'p10': 0.58,
+    'faction_coverage': 0.90,
+}
 
 
 class AutoCalibratorDaemon:
@@ -37,7 +44,11 @@ class AutoCalibratorDaemon:
         self.health_monitor = health_monitor
         self.confidence_tracker = confidence_tracker
         self.model_calibrator = model_calibrator
+        self.base_dir = getattr(model_calibrator, 'base_dir', None)
         self.check_interval = check_interval
+        self.orchestrator_getter = None
+        self.intervention_callback = None
+        self._agent_manager = None
 
         self.running = False
         self.thread = None
@@ -122,6 +133,32 @@ class AutoCalibratorDaemon:
             })
 
             degradations = self._diagnose_degradations(region, confidence)
+            semantic_review = None
+            if degradations or self._should_run_semantic_review(confidence):
+                try:
+                    semantic_review = self._run_agent_review(region, confidence)
+                    if semantic_review:
+                        cycle_data['alerts_dispatched'].append({
+                            'region': region,
+                            'type': 'agent_review',
+                            'timestamp': datetime.now().isoformat(),
+                            'should_intervene': semantic_review.get('should_intervene', False),
+                            'analysis': semantic_review.get('data_analysis', {}),
+                        })
+                except Exception as exc:
+                    logger.error("[Auto-Calibrator] %s: revisão do agente falhou: %s", region, exc)
+                    if self.health_monitor:
+                        self.health_monitor.add_alert(
+                            alert_type=f'agent_review_failed_{region}',
+                            severity='HIGH',
+                            message=f'{region.upper()}: revisão semântica do agente falhou: {exc}',
+                            details={'region': region},
+                        )
+
+            if semantic_review and semantic_review.get('should_intervene') and not degradations:
+                p20_value = confidence.get('p20', 1.0)
+                degradations.append(('p20', min(p20_value, _CONFIDENCE_THRESHOLDS['p20'] - 0.01), _CONFIDENCE_THRESHOLDS['p20']))
+
             if not degradations:
                 logger.debug("[Auto-Calibrator] %s: metricas saudaveis", region)
                 continue
@@ -138,6 +175,7 @@ class AutoCalibratorDaemon:
                     metric,
                     current_value,
                     threshold,
+                    semantic_review=semantic_review,
                 )
                 if adjustment:
                     cycle_data['adjustments_made'].append(adjustment)
@@ -168,6 +206,14 @@ class AutoCalibratorDaemon:
             pass
         return ['fortaleza', 'rmf', 'interior', 'global']
 
+    def _get_orchestrator(self):
+        if callable(self.orchestrator_getter):
+            try:
+                return self.orchestrator_getter()
+            except Exception as exc:
+                logger.error("[Auto-Calibrator] Falha ao obter orchestrator: %s", exc)
+        return None
+
     def _is_in_cooldown(self, region: str) -> bool:
         last_adj = self.last_adjustment.get(region)
         if not last_adj:
@@ -197,14 +243,82 @@ class AutoCalibratorDaemon:
 
         return degradations
 
+    def _should_run_semantic_review(self, confidence: Dict) -> bool:
+        p20 = confidence.get('p20', 1.0)
+        p10 = confidence.get('p10', 1.0)
+        coverage = confidence.get('faction_coverage', 1.0)
+        convergence_gap = abs(p10 - p20)
+        return (
+            p20 < _SEMANTIC_REVIEW_THRESHOLDS['p20']
+            or p10 < _SEMANTIC_REVIEW_THRESHOLDS['p10']
+            or coverage < _SEMANTIC_REVIEW_THRESHOLDS['faction_coverage']
+            or convergence_gap > 0.22
+        )
+
+    def _build_agent_payload(self, region: str, confidence: Dict) -> Optional[Dict]:
+        orchestrator = self._get_orchestrator()
+        if orchestrator is None:
+            return None
+
+        scores_map = orchestrator.get_combined_risk()
+        top_predictions = [
+            {'name': name, 'score': round(float(score), 4)}
+            for name, score in sorted(scores_map.items(), key=lambda item: item[1], reverse=True)[:10]
+        ]
+        return {
+            'raw_stgcn_data': {
+                'timestamp': datetime.now().isoformat(),
+                'region': region,
+                'confidence_scores': {
+                    'p10': confidence.get('p10'),
+                    'p20': confidence.get('p20'),
+                    'faction_coverage': confidence.get('faction_coverage'),
+                },
+                'top_predictions': top_predictions,
+                'combined_risk_sample_size': len(scores_map),
+            },
+            'user_profile': {
+                'region': region.upper(),
+                'focus': 'CVLI',
+                'historical_alerts': len(self.health_monitor.get_active_alerts()) if self.health_monitor else 0,
+                'trigger': 'semantic_deviation_or_convergence_error',
+            },
+        }
+
+    def _run_agent_review(self, region: str, confidence: Dict) -> Optional[Dict]:
+        payload = self._build_agent_payload(region, confidence)
+        if payload is None:
+            return None
+
+        if self._agent_manager is None:
+            from src.agent.multi_agent_system import GeneralManagerAgent
+            self._agent_manager = GeneralManagerAgent(base_dir=self.base_dir)
+
+        return self._agent_manager.process_and_calibrate(
+            payload['raw_stgcn_data'],
+            payload['user_profile'],
+        )
+
+    def _notify_intervention(self, event: Dict):
+        if callable(self.intervention_callback):
+            try:
+                self.intervention_callback(event)
+            except Exception as exc:
+                logger.error("[Auto-Calibrator] Falha no callback de intervenção: %s", exc)
+
     def _apply_adjustment(
         self,
         region: str,
         metric: str,
         current_value: float,
         threshold: float,
+        semantic_review: Optional[Dict] = None,
     ) -> Optional[Dict]:
         try:
+            orchestrator = self._get_orchestrator()
+            if orchestrator is None:
+                raise RuntimeError('Orchestrator indisponível para aplicar calibração')
+
             reg_state = self.model_calibrator.state.get(region, {})
             current_steps = reg_state.get('steps', 0)
 
@@ -232,7 +346,16 @@ class AutoCalibratorDaemon:
                     )
                 return None
 
-            old_cp = dict(reg_state.get('calib_params', {}))
+            old_cp = dict(orchestrator.calib_params.get(region, {}))
+
+            self.model_calibrator.on_degradation(
+                orchestrator,
+                region,
+                metric,
+                current_value,
+                threshold,
+            )
+            new_cp = dict(orchestrator.calib_params.get(region, {}))
 
             logger.info(
                 "[Auto-Calibrator] %s: passo %s/%s aplicado para %s=%.1f%%",
@@ -251,8 +374,22 @@ class AutoCalibratorDaemon:
                 'threshold': threshold,
                 'step_number': current_steps + 1,
                 'old_params': old_cp,
+                'new_params': new_cp,
+                'semantic_review': semantic_review,
                 'status': 'applied',
             }
+
+            self._notify_intervention({
+                'status': 'success',
+                'region': region,
+                'metric': metric,
+                'current_value': current_value,
+                'threshold': threshold,
+                'old_params': old_cp,
+                'new_params': new_cp,
+                'agent_review': semantic_review,
+                'timestamp': adjustment['timestamp'],
+            })
 
             self.last_adjustment[region] = datetime.now()
             return adjustment
@@ -306,7 +443,7 @@ class AutoCalibratorDaemon:
                     },
                 )
 
-            return {
+            validation = {
                 'timestamp': datetime.now().isoformat(),
                 'region': region,
                 'metric': metric,
@@ -315,6 +452,12 @@ class AutoCalibratorDaemon:
                 'improvement_pct': improvement_pct,
                 'status': status,
             }
+            if self.base_dir:
+                try:
+                    record_validation_outcome(self.base_dir, adjustment, validation)
+                except Exception as exc:
+                    logger.warning("[Auto-Calibrator] Falha ao registrar memoria semantica: %s", exc)
+            return validation
 
         except Exception as exc:
             logger.error(
