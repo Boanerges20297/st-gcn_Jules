@@ -27,7 +27,8 @@ class FastRelationalGCN(nn.Module):
         self.W_geo = nn.Linear(in_features, out_features)
         self.W_conf = nn.Linear(in_features, out_features)
         self.dropout = nn.Dropout(dropout)
-        self.bn = nn.BatchNorm1d(out_features)
+        # LayerNorm em vez de BatchNorm1d: estavel com batch_size=1
+        self.ln = nn.LayerNorm(out_features)
         self.prelu = nn.PReLU()
 
     def forward(self, x, adj_list):
@@ -36,8 +37,8 @@ class FastRelationalGCN(nn.Module):
         h_geo = torch.matmul(adj_geo, self.W_geo(x))
         h_conf = torch.matmul(adj_conf, self.W_conf(x))
         out = h_self + h_geo + h_conf
-        BT, N, C = out.shape
-        out = self.bn(out.view(-1, C)).view(BT, N, C)
+        # LayerNorm opera sobre a ultima dimensao (features), sem restricao de batch size
+        out = self.ln(out)
         return self.dropout(self.prelu(out))
 
 class GlobalSpatialAttention(nn.Module):
@@ -78,7 +79,9 @@ class PureSTGCNBlock(nn.Module):
         self.time_conv = nn.Conv2d(in_channels, out_channels, (1, 3), padding=(0, 1))
         self.prelu = nn.PReLU()
         self.gcn = FastRelationalGCN(out_channels, out_channels, dropout)
-        self.out_norm = nn.BatchNorm2d(out_channels)
+        # InstanceNorm2d em vez de BatchNorm2d: estavel com batch_size=1
+        # (normaliza por canal dentro de cada amostra, independente do batch)
+        self.out_norm = nn.InstanceNorm2d(out_channels, affine=True)
         self.residual = nn.Conv2d(in_channels, out_channels, 1) if in_channels != out_channels else nn.Identity()
 
     def forward(self, x, adj_list):

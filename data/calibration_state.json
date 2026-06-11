@@ -4440,6 +4440,246 @@
           "tag_bias_neighbor": 0.6,
           "norm_neural_weight": 0.2
         }
+      },
+      {
+        "timestamp": "2026-06-10T13:19:03.007098",
+        "trigger": "fortaleza.p20=10.0% < 70%",
+        "step": 1,
+        "old_params": {
+          "tension_factor": 3.0,
+          "min_risk": 30.0,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2,
+          "dynamic_window": null,
+          "use_historical_fallback": true,
+          "historical_top10": [
+            "BARRA DO CEARA",
+            "ALTO ALEGRE",
+            "MESSEJANA",
+            "GRANJA LISBOA",
+            "SIQUEIRA",
+            "JOSE WALTER",
+            "PLANALTO AYRTON SENNA",
+            "MONDUBIM",
+            "PEDRAS",
+            "BARROSO"
+          ]
+        },
+        "new_params": {
+          "tension_factor": 2.9,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      {
+        "timestamp": "2026-06-10T13:19:03.045229",
+        "trigger": "fortaleza.p10=20.0% < 50%",
+        "step": 2,
+        "old_params": {
+          "tension_factor": 2.9,
+          "min_risk": 30.0,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.7,
+          "norm_neural_weight": 0.35,
+          "dynamic_window": null,
+          "use_historical_fallback": true,
+          "historical_top10": [
+            "BARRA DO CEARA",
+            "ALTO ALEGRE",
+            "MESSEJANA",
+            "GRANJA LISBOA",
+            "SIQUEIRA",
+            "JOSE WALTER",
+            "PLANALTO AYRTON SENNA",
+            "MONDUBIM",
+            "PEDRAS",
+            "BARROSO"
+          ]
+        },
+        "new_params": {
+          "tension_factor": 2.75,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.85,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.55
+        }
+      },
+      {
+        "timestamp": "2026-06-10T13:19:12.925222",
+        "event": "full_rollback",
+        "trigger": "fortaleza.faction_coverage=100.0% recuperado acima do limite",
+        "steps_reverted": 2,
+        "params_before": {
+          "tension_factor": 2.75,
+          "min_risk": 30.0,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.85,
+          "norm_neural_weight": 0.55,
+          "dynamic_window": 60,
+          "use_historical_fallback": false,
+          "historical_top10": [
+            "BARRA DO CEARA",
+            "ALTO ALEGRE",
+            "MESSEJANA",
+            "GRANJA LISBOA",
+            "SIQUEIRA",
+            "JOSE WALTER",
+            "PLANALTO AYRTON SENNA",
+            "MONDUBIM",
+            "PEDRAS",
+            "BARROSO"
+          ]
+        },
+        "params_after": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      {
+        "timestamp": "2026-06-10T15:53:39.534088",
+        "trigger": "fortaleza.p20=10.0% < 70%",
+        "step": 1,
+        "old_params": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2,
+          "dynamic_window": 60,
+          "use_historical_fallback": false
+        },
+        "new_params": {
+          "tension_factor": 0.7,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      {
+        "timestamp": "2026-06-10T15:53:39.611562",
+        "trigger": "fortaleza.p10=10.0% < 50%",
+        "step": 2,
+        "old_params": {
+          "tension_factor": 0.7,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "norm_neural_weight": 0.35,
+          "dynamic_window": 60,
+          "use_historical_fallback": false
+        },
+        "new_params": {
+          "tension_factor": 0.55,
+          "tag_bias_direct": 2.5,
+          "tag_bias_neighbor": 0.85,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.55
+        }
+      },
+      {
+        "timestamp": "2026-06-10T15:53:49.410823",
+        "event": "full_rollback",
+        "trigger": "fortaleza.faction_coverage=100.0% recuperado acima do limite",
+        "steps_reverted": 2,
+        "params_before": {
+          "tension_factor": 0.55,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.5,
+          "tag_bias_neighbor": 0.85,
+          "norm_neural_weight": 0.55,
+          "dynamic_window": 30,
+          "use_historical_fallback": false
+        },
+        "params_after": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      {
+        "timestamp": "2026-06-10T23:21:56.673786",
+        "trigger": "fortaleza.p20=10.0% < 70%",
+        "step": 1,
+        "old_params": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2,
+          "dynamic_window": 30,
+          "use_historical_fallback": false
+        },
+        "new_params": {
+          "tension_factor": 0.7,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      {
+        "timestamp": "2026-06-10T23:21:56.814615",
+        "trigger": "fortaleza.p10=20.0% < 50%",
+        "step": 2,
+        "old_params": {
+          "tension_factor": 0.7,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "norm_neural_weight": 0.35,
+          "dynamic_window": 30,
+          "use_historical_fallback": false
+        },
+        "new_params": {
+          "tension_factor": 0.55,
+          "tag_bias_direct": 2.5,
+          "tag_bias_neighbor": 0.85,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.55
+        }
+      },
+      {
+        "timestamp": "2026-06-10T23:22:06.563854",
+        "event": "full_rollback",
+        "trigger": "fortaleza.faction_coverage=100.0% recuperado acima do limite",
+        "steps_reverted": 2,
+        "params_before": {
+          "tension_factor": 3.0,
+          "min_risk": 30.0,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.85,
+          "norm_neural_weight": 0.55,
+          "dynamic_window": 30,
+          "use_historical_fallback": true,
+          "historical_top10": [
+            "BARRA DO CEARA",
+            "ALTO ALEGRE",
+            "MESSEJANA",
+            "GRANJA LISBOA",
+            "SIQUEIRA",
+            "JOSE WALTER",
+            "PLANALTO AYRTON SENNA",
+            "MONDUBIM",
+            "PEDRAS",
+            "BARROSO"
+          ]
+        },
+        "params_after": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
       }
     ]
   },
@@ -6360,6 +6600,135 @@
           "tag_bias_direct": 2.4,
           "tag_bias_neighbor": 0.8,
           "norm_neural_weight": 0.5,
+          "dynamic_window": null,
+          "use_historical_fallback": false
+        },
+        "params_after": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      {
+        "timestamp": "2026-06-10T13:19:03.150695",
+        "trigger": "interior.p20=25.0% < 70%",
+        "step": 1,
+        "old_params": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2,
+          "dynamic_window": null,
+          "use_historical_fallback": false
+        },
+        "new_params": {
+          "tension_factor": 0.7,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      {
+        "timestamp": "2026-06-10T13:19:13.013398",
+        "event": "full_rollback",
+        "trigger": "interior.faction_coverage=100.0% recuperado acima do limite",
+        "steps_reverted": 1,
+        "params_before": {
+          "tension_factor": 0.7,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "norm_neural_weight": 0.35,
+          "dynamic_window": null,
+          "use_historical_fallback": false
+        },
+        "params_after": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      {
+        "timestamp": "2026-06-10T15:53:39.814564",
+        "trigger": "interior.p20=25.0% < 70%",
+        "step": 1,
+        "old_params": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2,
+          "dynamic_window": null,
+          "use_historical_fallback": false
+        },
+        "new_params": {
+          "tension_factor": 0.7,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      {
+        "timestamp": "2026-06-10T15:53:49.624644",
+        "event": "full_rollback",
+        "trigger": "interior.faction_coverage=100.0% recuperado acima do limite",
+        "steps_reverted": 1,
+        "params_before": {
+          "tension_factor": 0.7,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "norm_neural_weight": 0.35,
+          "dynamic_window": null,
+          "use_historical_fallback": false
+        },
+        "params_after": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      {
+        "timestamp": "2026-06-10T23:21:56.928532",
+        "trigger": "interior.p20=25.0% < 70%",
+        "step": 1,
+        "old_params": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2,
+          "dynamic_window": null,
+          "use_historical_fallback": false
+        },
+        "new_params": {
+          "tension_factor": 0.7,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      {
+        "timestamp": "2026-06-10T23:22:06.676778",
+        "event": "full_rollback",
+        "trigger": "interior.faction_coverage=100.0% recuperado acima do limite",
+        "steps_reverted": 1,
+        "params_before": {
+          "tension_factor": 0.7,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "norm_neural_weight": 0.35,
           "dynamic_window": null,
           "use_historical_fallback": false
         },
@@ -10798,6 +11167,306 @@
           "tag_bias_direct": 3.0,
           "tag_bias_neighbor": 1.1,
           "norm_neural_weight": 0.9,
+          "dynamic_window": 30,
+          "use_historical_fallback": true,
+          "historical_top10": [
+            "MARACANAU",
+            "CAUCAIA",
+            "HORIZONTE",
+            "PACAJUS",
+            "PACATUBA",
+            "PINDORETAMA",
+            "EUSEBIO",
+            "PARAIPABA",
+            "ITAITINGA",
+            "SAO LUIS DO CURU"
+          ]
+        },
+        "params_after": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      {
+        "timestamp": "2026-06-10T13:19:03.261221",
+        "trigger": "rmf.p20=21.1% < 70%",
+        "step": 1,
+        "old_params": {
+          "tension_factor": 3.0,
+          "min_risk": 30.0,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2,
+          "dynamic_window": 30,
+          "use_historical_fallback": true,
+          "historical_top10": [
+            "MARACANAU",
+            "CAUCAIA",
+            "HORIZONTE",
+            "PACAJUS",
+            "PACATUBA",
+            "PINDORETAMA",
+            "EUSEBIO",
+            "PARAIPABA",
+            "ITAITINGA",
+            "SAO LUIS DO CURU"
+          ]
+        },
+        "new_params": {
+          "tension_factor": 2.9,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      {
+        "timestamp": "2026-06-10T13:19:03.335093",
+        "trigger": "rmf.p10=20.0% < 50%",
+        "step": 2,
+        "old_params": {
+          "tension_factor": 2.9,
+          "min_risk": 30.0,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.7,
+          "norm_neural_weight": 0.35,
+          "dynamic_window": 30,
+          "use_historical_fallback": true,
+          "historical_top10": [
+            "MARACANAU",
+            "CAUCAIA",
+            "HORIZONTE",
+            "PACAJUS",
+            "PACATUBA",
+            "PINDORETAMA",
+            "EUSEBIO",
+            "PARAIPABA",
+            "ITAITINGA",
+            "SAO LUIS DO CURU"
+          ]
+        },
+        "new_params": {
+          "tension_factor": 2.75,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.85,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.55
+        }
+      },
+      {
+        "timestamp": "2026-06-10T13:19:12.968747",
+        "event": "full_rollback",
+        "trigger": "rmf.faction_coverage=100.0% recuperado acima do limite",
+        "steps_reverted": 2,
+        "params_before": {
+          "tension_factor": 2.75,
+          "min_risk": 30.0,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.85,
+          "norm_neural_weight": 0.55,
+          "dynamic_window": 30,
+          "use_historical_fallback": true,
+          "historical_top10": [
+            "MARACANAU",
+            "CAUCAIA",
+            "HORIZONTE",
+            "PACAJUS",
+            "PACATUBA",
+            "PINDORETAMA",
+            "EUSEBIO",
+            "PARAIPABA",
+            "ITAITINGA",
+            "SAO LUIS DO CURU"
+          ]
+        },
+        "params_after": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      {
+        "timestamp": "2026-06-10T15:53:39.983879",
+        "trigger": "rmf.p20=21.1% < 70%",
+        "step": 1,
+        "old_params": {
+          "tension_factor": 3.0,
+          "min_risk": 30.0,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2,
+          "dynamic_window": 30,
+          "use_historical_fallback": true,
+          "historical_top10": [
+            "MARACANAU",
+            "CAUCAIA",
+            "HORIZONTE",
+            "PACAJUS",
+            "PACATUBA",
+            "PINDORETAMA",
+            "EUSEBIO",
+            "PARAIPABA",
+            "ITAITINGA",
+            "SAO LUIS DO CURU"
+          ]
+        },
+        "new_params": {
+          "tension_factor": 2.9,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      {
+        "timestamp": "2026-06-10T15:53:40.060158",
+        "trigger": "rmf.p10=20.0% < 50%",
+        "step": 2,
+        "old_params": {
+          "tension_factor": 2.9,
+          "min_risk": 30.0,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.7,
+          "norm_neural_weight": 0.35,
+          "dynamic_window": 30,
+          "use_historical_fallback": true,
+          "historical_top10": [
+            "MARACANAU",
+            "CAUCAIA",
+            "HORIZONTE",
+            "PACAJUS",
+            "PACATUBA",
+            "PINDORETAMA",
+            "EUSEBIO",
+            "PARAIPABA",
+            "ITAITINGA",
+            "SAO LUIS DO CURU"
+          ]
+        },
+        "new_params": {
+          "tension_factor": 2.75,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.85,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.55
+        }
+      },
+      {
+        "timestamp": "2026-06-10T15:53:49.515679",
+        "event": "full_rollback",
+        "trigger": "rmf.faction_coverage=100.0% recuperado acima do limite",
+        "steps_reverted": 2,
+        "params_before": {
+          "tension_factor": 2.75,
+          "min_risk": 30.0,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.85,
+          "norm_neural_weight": 0.55,
+          "dynamic_window": 30,
+          "use_historical_fallback": true,
+          "historical_top10": [
+            "MARACANAU",
+            "CAUCAIA",
+            "HORIZONTE",
+            "PACAJUS",
+            "PACATUBA",
+            "PINDORETAMA",
+            "EUSEBIO",
+            "PARAIPABA",
+            "ITAITINGA",
+            "SAO LUIS DO CURU"
+          ]
+        },
+        "params_after": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      {
+        "timestamp": "2026-06-10T23:21:57.034650",
+        "trigger": "rmf.p20=21.1% < 70%",
+        "step": 1,
+        "old_params": {
+          "tension_factor": 3.0,
+          "min_risk": 30.0,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2,
+          "dynamic_window": 30,
+          "use_historical_fallback": true,
+          "historical_top10": [
+            "MARACANAU",
+            "CAUCAIA",
+            "HORIZONTE",
+            "PACAJUS",
+            "PACATUBA",
+            "PINDORETAMA",
+            "EUSEBIO",
+            "PARAIPABA",
+            "ITAITINGA",
+            "SAO LUIS DO CURU"
+          ]
+        },
+        "new_params": {
+          "tension_factor": 2.9,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      {
+        "timestamp": "2026-06-10T23:21:57.074428",
+        "trigger": "rmf.p10=20.0% < 50%",
+        "step": 2,
+        "old_params": {
+          "tension_factor": 2.9,
+          "min_risk": 30.0,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.7,
+          "norm_neural_weight": 0.35,
+          "dynamic_window": 30,
+          "use_historical_fallback": true,
+          "historical_top10": [
+            "MARACANAU",
+            "CAUCAIA",
+            "HORIZONTE",
+            "PACAJUS",
+            "PACATUBA",
+            "PINDORETAMA",
+            "EUSEBIO",
+            "PARAIPABA",
+            "ITAITINGA",
+            "SAO LUIS DO CURU"
+          ]
+        },
+        "new_params": {
+          "tension_factor": 2.75,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.85,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.55
+        }
+      },
+      {
+        "timestamp": "2026-06-10T23:22:06.621359",
+        "event": "full_rollback",
+        "trigger": "rmf.faction_coverage=100.0% recuperado acima do limite",
+        "steps_reverted": 2,
+        "params_before": {
+          "tension_factor": 2.75,
+          "min_risk": 30.0,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.85,
+          "norm_neural_weight": 0.55,
           "dynamic_window": 30,
           "use_historical_fallback": true,
           "historical_top10": [

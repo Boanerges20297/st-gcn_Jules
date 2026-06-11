@@ -41,6 +41,7 @@ import warnings
 import logging
 import unicodedata
 import math
+import difflib
 from datetime import datetime, timedelta
 import re
 from shapely.geometry import Point
@@ -265,13 +266,181 @@ _PEAK_HOURS_CACHE = None  # {bairro_norm: "Entre XHs e YHs"}
 _MICRONODE_EXPORT_BUILT_AT = None
 _MICRONODE_EXPORT_LOCK = threading.Lock()
 
-_API_RISK_CACHE = None
+_API_RISK_CACHE = {}
 _API_RISK_CACHE_LOCK = threading.Lock()
+_CVLI_OPTIONAL_MODELS_CACHE = None
 
 def invalidate_api_risk_cache():
     global _API_RISK_CACHE
     with _API_RISK_CACHE_LOCK:
-        _API_RISK_CACHE = None
+        _API_RISK_CACHE = {}
+
+
+def normalize_model_mode(value) -> str:
+    mode = str(value or 'stgat').strip().lower()
+    aliases = {
+        'stgat': 'stgat',
+        'default': 'stgat',
+        'cvli_tactical': 'cvli_tactical',
+        'cvli_tactical_only': 'cvli_tactical',
+        'tactical': 'cvli_tactical',
+        'short20_mix': 'short20_mix',
+        'short20': 'short20_mix',
+        'shortlist20': 'short20_mix',
+    }
+    return aliases.get(mode, 'stgat')
+
+
+def _load_optional_cvli_models():
+    global _CVLI_OPTIONAL_MODELS_CACHE
+    if _CVLI_OPTIONAL_MODELS_CACHE is not None:
+        return _CVLI_OPTIONAL_MODELS_CACHE
+
+    rankings_path = os.path.join(BASE_DIR, 'outputs', 'cvli_first_candidate_rankings.json')
+    metadata_path = os.path.join(BASE_DIR, 'outputs', 'cvli_first_candidate_metadata.json')
+    tactical_summary_path = os.path.join(BASE_DIR, 'outputs', 'cvli_first_architecture_summary.json')
+    shortlist_summary_path = os.path.join(BASE_DIR, 'outputs', 'cvli_shortlist_rerank_summary.json')
+
+    optional_models = {
+        'stgat': {
+            'mode': 'stgat',
+            'label': 'ST-GAT (Padrão)',
+            'description': 'Arquitetura campeã atualmente ativa no motor regional.',
+            'kind': 'champion',
+            'fortaleza_scores': {},
+            'metrics': None,
+        }
+    }
+
+    if not os.path.exists(rankings_path):
+        _CVLI_OPTIONAL_MODELS_CACHE = optional_models
+        return _CVLI_OPTIONAL_MODELS_CACHE
+
+    try:
+        with open(rankings_path, 'r', encoding='utf-8') as fh:
+            rankings = json.load(fh) or []
+    except Exception:
+        rankings = []
+
+    try:
+        with open(metadata_path, 'r', encoding='utf-8') as fh:
+            metadata = json.load(fh) or {}
+    except Exception:
+        metadata = {}
+
+    summary_by_family = {}
+    for path in (tactical_summary_path, shortlist_summary_path):
+        try:
+            if os.path.exists(path):
+                with open(path, 'r', encoding='utf-8') as fh:
+                    for row in (json.load(fh) or []):
+                        family = str(row.get('family') or '').strip().upper()
+                        if family:
+                            summary_by_family[family] = row
+        except Exception:
+            continue
+
+    family_to_mode = {
+        'CVLI_TACTICAL_ONLY': 'cvli_tactical',
+        'SHORT20_MIX': 'short20_mix',
+    }
+    mode_meta = {
+        'cvli_tactical': {
+            'label': 'CVLI Tático',
+            'description': 'Foca no momentum recente de CVLI para maximizar acerto no top 10.',
+            'kind': 'experimental',
+        },
+        'short20_mix': {
+            'label': 'CVLI Shortlist 20',
+            'description': 'Shortlist tática com ajuste estrutural leve para equilibrar topo e cobertura.',
+            'kind': 'experimental',
+        },
+    }
+
+    grouped_scores = {mode: [] for mode in mode_meta}
+    for row in rankings:
+        family = str(row.get('modelo') or '').strip().upper()
+        mode = family_to_mode.get(family)
+        if not mode:
+            continue
+        bairro = normalize_name(row.get('bairro') or '')
+        if not bairro:
+            continue
+        grouped_scores[mode].append({
+            'bairro': bairro,
+            'rank': int(row.get('rank') or 999),
+            'raw_score': float(row.get('score') or 0.0),
+        })
+
+    for family, mode in family_to_mode.items():
+        items = grouped_scores.get(mode) or []
+        if not items:
+            continue
+        raw_values = [item['raw_score'] for item in items]
+        raw_min = min(raw_values)
+        raw_max = max(raw_values)
+        fortaleza_scores = {}
+        for item in items:
+            if raw_max > raw_min:
+                scaled_raw = 15.0 + 85.0 * ((item['raw_score'] - raw_min) / (raw_max - raw_min))
+            else:
+                scaled_raw = 50.0
+            rank_score = max(18.0, 100.0 - ((item['rank'] - 1) * 2.1))
+            score_pct = round((0.7 * scaled_raw) + (0.3 * rank_score), 1)
+            fortaleza_scores[item['bairro']] = score_pct
+
+        metrics = summary_by_family.get(family, {})
+        optional_models[mode] = {
+            'mode': mode,
+            'label': mode_meta[mode]['label'],
+            'description': mode_meta[mode]['description'],
+            'kind': mode_meta[mode]['kind'],
+            'fortaleza_scores': fortaleza_scores,
+            'metrics': {
+                'p10': metrics.get('p10'),
+                'p20': metrics.get('p20'),
+                'r10': metrics.get('r10'),
+                'r20': metrics.get('r20'),
+            },
+            'reference_date': metadata.get('reference_date'),
+            'prediction_window': {
+                'start': metadata.get('prediction_start'),
+                'end': metadata.get('prediction_end'),
+            },
+        }
+
+    _CVLI_OPTIONAL_MODELS_CACHE = optional_models
+    return _CVLI_OPTIONAL_MODELS_CACHE
+
+
+def _get_model_selection_meta(selected_mode: str):
+    optional_models = _load_optional_cvli_models()
+    selected = optional_models.get(selected_mode) or optional_models['stgat']
+    available = []
+    for mode in ('stgat', 'cvli_tactical', 'short20_mix'):
+        model = optional_models.get(mode)
+        if not model:
+            continue
+        available.append({
+            'mode': mode,
+            'label': model.get('label'),
+            'description': model.get('description'),
+            'kind': model.get('kind'),
+            'metrics': model.get('metrics'),
+        })
+    return selected, available
+
+
+def _resolve_optional_model_score(name_norm: str, fortaleza_scores: dict):
+    if not fortaleza_scores:
+        return None
+    exact = fortaleza_scores.get(name_norm)
+    if exact is not None:
+        return exact
+    matches = difflib.get_close_matches(name_norm, list(fortaleza_scores.keys()), n=1, cutoff=0.88)
+    if matches:
+        return fortaleza_scores.get(matches[0])
+    return None
 
 
 # Cache global para explicabilidade para evitar redundância de I/O em loops
@@ -2198,13 +2367,16 @@ def get_risk():
         return jsonify({'error': 'Inicializando...'}), 503
         
     target_region = request.args.get('region', 'global').lower()
+    selected_model_mode = normalize_model_mode(request.args.get('model_mode', 'stgat'))
+    selected_model_meta, available_model_modes = _get_model_selection_meta(selected_model_mode)
     
     global _API_RISK_CACHE
     with _API_RISK_CACHE_LOCK:
-        if _API_RISK_CACHE is not None:
+        cache_entry = _API_RISK_CACHE.get(selected_model_mode)
+        if cache_entry is not None:
             import copy
-            meta = copy.deepcopy(_API_RISK_CACHE['meta'])
-            results = copy.deepcopy(_API_RISK_CACHE['data'])
+            meta = copy.deepcopy(cache_entry['meta'])
+            results = copy.deepcopy(cache_entry['data'])
             if target_region != 'global' and target_region in meta.get('counts_by_region', {}):
                 meta['counts'] = meta['counts_by_region'][target_region]
                 results = [r for r in results if r.get('region_type') == target_region]
@@ -2331,6 +2503,8 @@ def get_risk():
         except Exception as _exo_err:
             print(f"⚠️ Erro ao carregar localidades por município: {_exo_err}")
 
+        fortaleza_override_scores = selected_model_meta.get('fortaleza_scores') or {}
+
         for i, row in nodes_gdf.iterrows():
             try:
                 name = str(row['name'])
@@ -2345,6 +2519,11 @@ def get_risk():
                 if name_norm in _RMF_NODES: reg = 'rmf'
                 
                 if reg not in region_buckets: region_buckets[reg] = []
+
+                if reg == 'fortaleza' and selected_model_mode != 'stgat':
+                    override_score = _resolve_optional_model_score(name_norm, fortaleza_override_scores)
+                    if override_score is not None:
+                        score = normalize_risk_score(override_score)
 
                 level, status, css, color, score = classify_risk_score(score)
 
@@ -2528,6 +2707,13 @@ def get_risk():
             }
 
         meta['risk_thresholds'] = get_risk_thresholds_meta()
+        meta['selected_model_mode'] = selected_model_mode
+        meta['selected_model_label'] = selected_model_meta.get('label')
+        meta['selected_model_kind'] = selected_model_meta.get('kind')
+        meta['selected_model_description'] = selected_model_meta.get('description')
+        meta['available_model_modes'] = available_model_modes
+        if selected_model_meta.get('metrics'):
+            meta['selected_model_metrics'] = selected_model_meta.get('metrics')
 
         # Build counts by region and top10 by region
         try:
@@ -2619,6 +2805,21 @@ def get_risk():
             print(f"Erro ao calcular datas de inteligência: {e}")
             meta['intelligence_label'] = "Janela de Inteligência: Ativa"
 
+        if selected_model_mode != 'stgat':
+            metrics = selected_model_meta.get('metrics') or {}
+            metric_bits = []
+            if isinstance(metrics.get('p10'), (int, float)):
+                metric_bits.append(f"P@10 hist.: {metrics['p10'] * 100:.1f}%")
+            if isinstance(metrics.get('p20'), (int, float)):
+                metric_bits.append(f"P@20 hist.: {metrics['p20'] * 100:.1f}%")
+            meta['model_architecture'] = f"{selected_model_meta.get('label')} (Opcional Fortaleza)"
+            meta['intelligence_label'] = (
+                f"{meta.get('intelligence_label', 'Janela de Inteligência: Ativa')} • "
+                f"Modo opcional aplicado somente em Fortaleza"
+            )
+            if metric_bits:
+                meta['selected_model_validation_text'] = ' | '.join(metric_bits)
+
         # Cache the unfiltered results
         import copy
         cache_payload = {
@@ -2626,7 +2827,7 @@ def get_risk():
             'data': copy.deepcopy(results)
         }
         with _API_RISK_CACHE_LOCK:
-            _API_RISK_CACHE = cache_payload
+            _API_RISK_CACHE[selected_model_mode] = cache_payload
 
         # --- CORREÇÃO: Respeitar Filtro de Região nas caixas de resumo ---
         if target_region != 'global' and target_region in meta.get('counts_by_region', {}):

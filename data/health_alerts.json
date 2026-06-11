@@ -13539,6 +13539,677 @@
         "cpu_percent": 81.0
       },
       "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T13:18:37.979282",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 85.2%",
+      "details": {
+        "memory_percent": 85.2
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T13:19:02.983662",
+      "type": "agent_review_failed_fortaleza",
+      "severity": "HIGH",
+      "message": "FORTALEZA: revisão semântica do agente falhou: Falha ao consultar Ollama local: 404 Client Error: Not Found for url: http://localhost:11434/api/generate",
+      "details": {
+        "region": "fortaleza"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T13:19:03.017316",
+      "type": "auto_calibration_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração FORTALEZA] Passo 1/5 — P20=10.0% abaixo de 70%. tension_factor=2.9, tag_bias=5.0",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "step": 1,
+        "new_params": {
+          "tension_factor": 2.9,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-06-10T13:19:12.907648",
+      "resolved_reason": "Região FORTALEZA reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-06-10T13:19:03.055156",
+      "type": "auto_calibration_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração FORTALEZA] Passo 2/5 — P10=20.0% abaixo de 50%. tension_factor=2.75, tag_bias=5.0",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p10",
+        "step": 2,
+        "new_params": {
+          "tension_factor": 2.75,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.85,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.55
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-06-10T13:19:12.907648",
+      "resolved_reason": "Região FORTALEZA reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-06-10T13:19:03.128957",
+      "type": "agent_review_failed_interior",
+      "severity": "HIGH",
+      "message": "INTERIOR: revisão semântica do agente falhou: Falha ao consultar Ollama local: 404 Client Error: Not Found for url: http://localhost:11434/api/generate",
+      "details": {
+        "region": "interior"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T13:19:03.161201",
+      "type": "auto_calibration_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração INTERIOR] Passo 1/5 — P20=25.0% abaixo de 70%. tension_factor=0.7, tag_bias=2.2",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "step": 1,
+        "new_params": {
+          "tension_factor": 0.7,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-06-10T13:19:12.907648",
+      "resolved_reason": "Região INTERIOR reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-06-10T13:19:03.228842",
+      "type": "agent_review_failed_rmf",
+      "severity": "HIGH",
+      "message": "RMF: revisão semântica do agente falhou: Falha ao consultar Ollama local: 404 Client Error: Not Found for url: http://localhost:11434/api/generate",
+      "details": {
+        "region": "rmf"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T13:19:03.279566",
+      "type": "auto_calibration_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração RMF] Passo 1/5 — P20=21.1% abaixo de 70%. tension_factor=2.9, tag_bias=5.0",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "step": 1,
+        "new_params": {
+          "tension_factor": 2.9,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-06-10T13:19:12.907648",
+      "resolved_reason": "Região RMF reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-06-10T13:19:03.344599",
+      "type": "auto_calibration_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração RMF] Passo 2/5 — P10=20.0% abaixo de 50%. tension_factor=2.75, tag_bias=5.0",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "step": 2,
+        "new_params": {
+          "tension_factor": 2.75,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.85,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.55
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-06-10T13:19:12.907648",
+      "resolved_reason": "Região RMF reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-06-10T13:19:12.933544",
+      "type": "calibration_rollback_fortaleza",
+      "severity": "LOW",
+      "message": "[Rollback FORTALEZA] FACTION_COVERAGE=100.0% — recuperado. 2 passo(s) revertidos, parâmetros restaurados ao estado original.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "steps_reverted": 2,
+        "params_restored": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T13:19:12.977436",
+      "type": "calibration_rollback_rmf",
+      "severity": "LOW",
+      "message": "[Rollback RMF] FACTION_COVERAGE=100.0% — recuperado. 2 passo(s) revertidos, parâmetros restaurados ao estado original.",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "steps_reverted": 2,
+        "params_restored": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T13:19:13.022025",
+      "type": "calibration_rollback_interior",
+      "severity": "LOW",
+      "message": "[Rollback INTERIOR] FACTION_COVERAGE=100.0% — recuperado. 1 passo(s) revertidos, parâmetros restaurados ao estado original.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "steps_reverted": 1,
+        "params_restored": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T15:53:07.685621",
+      "type": "high_memory",
+      "severity": "HIGH",
+      "message": "Memória alta: 89.2%",
+      "details": {
+        "memory_percent": 89.2
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T15:53:39.490212",
+      "type": "agent_review_failed_fortaleza",
+      "severity": "HIGH",
+      "message": "FORTALEZA: revisão semântica do agente falhou: Falha ao consultar Ollama local: 404 Client Error: Not Found for url: http://localhost:11434/api/generate",
+      "details": {
+        "region": "fortaleza"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T15:53:39.555525",
+      "type": "auto_calibration_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração FORTALEZA] Passo 1/5 — P20=10.0% abaixo de 70%. tension_factor=0.7, tag_bias=2.2",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "step": 1,
+        "new_params": {
+          "tension_factor": 0.7,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-06-10T15:53:49.364711",
+      "resolved_reason": "Região FORTALEZA reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-06-10T15:53:39.633009",
+      "type": "auto_calibration_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração FORTALEZA] Passo 2/5 — P10=10.0% abaixo de 50%. tension_factor=0.55, tag_bias=2.5",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p10",
+        "step": 2,
+        "new_params": {
+          "tension_factor": 0.55,
+          "tag_bias_direct": 2.5,
+          "tag_bias_neighbor": 0.85,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.55
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-06-10T15:53:49.364711",
+      "resolved_reason": "Região FORTALEZA reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-06-10T15:53:39.762681",
+      "type": "agent_review_failed_interior",
+      "severity": "HIGH",
+      "message": "INTERIOR: revisão semântica do agente falhou: Falha ao consultar Ollama local: 404 Client Error: Not Found for url: http://localhost:11434/api/generate",
+      "details": {
+        "region": "interior"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T15:53:39.836304",
+      "type": "auto_calibration_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração INTERIOR] Passo 1/5 — P20=25.0% abaixo de 70%. tension_factor=0.7, tag_bias=2.2",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "step": 1,
+        "new_params": {
+          "tension_factor": 0.7,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-06-10T15:53:49.364711",
+      "resolved_reason": "Região INTERIOR reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-06-10T15:53:39.939711",
+      "type": "agent_review_failed_rmf",
+      "severity": "HIGH",
+      "message": "RMF: revisão semântica do agente falhou: Falha ao consultar Ollama local: 404 Client Error: Not Found for url: http://localhost:11434/api/generate",
+      "details": {
+        "region": "rmf"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T15:53:40.004845",
+      "type": "auto_calibration_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração RMF] Passo 1/5 — P20=21.1% abaixo de 70%. tension_factor=2.9, tag_bias=5.0",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "step": 1,
+        "new_params": {
+          "tension_factor": 2.9,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-06-10T15:53:49.364711",
+      "resolved_reason": "Região RMF reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-06-10T15:53:40.079963",
+      "type": "auto_calibration_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração RMF] Passo 2/5 — P10=20.0% abaixo de 50%. tension_factor=2.75, tag_bias=5.0",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "step": 2,
+        "new_params": {
+          "tension_factor": 2.75,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.85,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.55
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-06-10T15:53:49.364711",
+      "resolved_reason": "Região RMF reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-06-10T15:53:49.431828",
+      "type": "calibration_rollback_fortaleza",
+      "severity": "LOW",
+      "message": "[Rollback FORTALEZA] FACTION_COVERAGE=100.0% — recuperado. 2 passo(s) revertidos, parâmetros restaurados ao estado original.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "steps_reverted": 2,
+        "params_restored": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T15:53:49.536754",
+      "type": "calibration_rollback_rmf",
+      "severity": "LOW",
+      "message": "[Rollback RMF] FACTION_COVERAGE=100.0% — recuperado. 2 passo(s) revertidos, parâmetros restaurados ao estado original.",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "steps_reverted": 2,
+        "params_restored": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T15:53:49.646094",
+      "type": "calibration_rollback_interior",
+      "severity": "LOW",
+      "message": "[Rollback INTERIOR] FACTION_COVERAGE=100.0% — recuperado. 1 passo(s) revertidos, parâmetros restaurados ao estado original.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "steps_reverted": 1,
+        "params_restored": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T23:21:56.646814",
+      "type": "agent_review_failed_fortaleza",
+      "severity": "HIGH",
+      "message": "FORTALEZA: revisão semântica do agente falhou: Falha ao consultar Ollama local: 404 Client Error: Not Found for url: http://localhost:11434/api/generate",
+      "details": {
+        "region": "fortaleza"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T23:21:56.730602",
+      "type": "auto_calibration_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração FORTALEZA] Passo 1/5 — P20=10.0% abaixo de 70%. tension_factor=0.7, tag_bias=2.2",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "step": 1,
+        "new_params": {
+          "tension_factor": 0.7,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-06-10T23:22:06.540615",
+      "resolved_reason": "Região FORTALEZA reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-06-10T23:21:56.825862",
+      "type": "auto_calibration_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração FORTALEZA] Passo 2/5 — P10=20.0% abaixo de 50%. tension_factor=0.55, tag_bias=2.5",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p10",
+        "step": 2,
+        "new_params": {
+          "tension_factor": 0.55,
+          "tag_bias_direct": 2.5,
+          "tag_bias_neighbor": 0.85,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.55
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-06-10T23:22:06.540615",
+      "resolved_reason": "Região FORTALEZA reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-06-10T23:21:56.905838",
+      "type": "agent_review_failed_interior",
+      "severity": "HIGH",
+      "message": "INTERIOR: revisão semântica do agente falhou: Falha ao consultar Ollama local: 404 Client Error: Not Found for url: http://localhost:11434/api/generate",
+      "details": {
+        "region": "interior"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T23:21:56.939767",
+      "type": "auto_calibration_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração INTERIOR] Passo 1/5 — P20=25.0% abaixo de 70%. tension_factor=0.7, tag_bias=2.2",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "step": 1,
+        "new_params": {
+          "tension_factor": 0.7,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-06-10T23:22:06.540615",
+      "resolved_reason": "Região INTERIOR reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-06-10T23:21:57.011674",
+      "type": "agent_review_failed_rmf",
+      "severity": "HIGH",
+      "message": "RMF: revisão semântica do agente falhou: Falha ao consultar Ollama local: 404 Client Error: Not Found for url: http://localhost:11434/api/generate",
+      "details": {
+        "region": "rmf"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T23:21:57.045939",
+      "type": "auto_calibration_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração RMF] Passo 1/5 — P20=21.1% abaixo de 70%. tension_factor=2.9, tag_bias=5.0",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "step": 1,
+        "new_params": {
+          "tension_factor": 2.9,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-06-10T23:22:06.540615",
+      "resolved_reason": "Região RMF reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-06-10T23:21:57.086076",
+      "type": "auto_calibration_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-calibração RMF] Passo 2/5 — P10=20.0% abaixo de 50%. tension_factor=2.75, tag_bias=5.0",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "step": 2,
+        "new_params": {
+          "tension_factor": 2.75,
+          "tag_bias_direct": 5.0,
+          "tag_bias_neighbor": 0.85,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.55
+        }
+      },
+      "resolved": true,
+      "resolved_at": "2026-06-10T23:22:06.540615",
+      "resolved_reason": "Região RMF reavaliada: alertas territoriais por facção foram desativados. Health dashboard agora deve seguir métricas regionais P10/P20."
+    },
+    {
+      "timestamp": "2026-06-10T23:22:06.575805",
+      "type": "calibration_rollback_fortaleza",
+      "severity": "LOW",
+      "message": "[Rollback FORTALEZA] FACTION_COVERAGE=100.0% — recuperado. 2 passo(s) revertidos, parâmetros restaurados ao estado original.",
+      "details": {
+        "region": "fortaleza",
+        "metric": "faction_coverage",
+        "steps_reverted": 2,
+        "params_restored": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T23:22:06.632679",
+      "type": "calibration_rollback_rmf",
+      "severity": "LOW",
+      "message": "[Rollback RMF] FACTION_COVERAGE=100.0% — recuperado. 2 passo(s) revertidos, parâmetros restaurados ao estado original.",
+      "details": {
+        "region": "rmf",
+        "metric": "faction_coverage",
+        "steps_reverted": 2,
+        "params_restored": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T23:22:06.688340",
+      "type": "calibration_rollback_interior",
+      "severity": "LOW",
+      "message": "[Rollback INTERIOR] FACTION_COVERAGE=100.0% — recuperado. 1 passo(s) revertidos, parâmetros restaurados ao estado original.",
+      "details": {
+        "region": "interior",
+        "metric": "faction_coverage",
+        "steps_reverted": 1,
+        "params_restored": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T23:26:57.137559",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P20: 10.0% -> 10.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p20",
+        "old_value": 0.1,
+        "new_value": 0.1,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T23:26:57.174455",
+      "type": "calibration_validation_fortaleza",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] fortaleza/P10: 20.0% -> 20.0% (+0.0%)",
+      "details": {
+        "region": "fortaleza",
+        "metric": "p10",
+        "old_value": 0.2,
+        "new_value": 0.2,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T23:26:57.212950",
+      "type": "calibration_validation_interior",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] interior/P20: 25.0% -> 25.0% (+0.0%)",
+      "details": {
+        "region": "interior",
+        "metric": "p20",
+        "old_value": 0.25,
+        "new_value": 0.25,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T23:26:57.251752",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P20: 21.1% -> 21.1% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p20",
+        "old_value": 0.2105,
+        "new_value": 0.2105,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
+    },
+    {
+      "timestamp": "2026-06-10T23:26:57.294666",
+      "type": "calibration_validation_rmf",
+      "severity": "MEDIUM",
+      "message": "[Auto-Calibrator] rmf/P10: 20.0% -> 20.0% (+0.0%)",
+      "details": {
+        "region": "rmf",
+        "metric": "p10",
+        "old_value": 0.2,
+        "new_value": 0.2,
+        "improvement_pct": 0.0,
+        "status": "degraded"
+      },
+      "resolved": false
     }
   ]
 }

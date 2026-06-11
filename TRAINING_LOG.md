@@ -2760,3 +2760,142 @@ Para quebrar o platÃ´ de P@10 = 40%, abandonamos a matriz de adjacÃªncia puramen
 
 ### Status
 - **Status:** **OPERACIONAL** (Aguardando prÃ³ximo merge para primeiro registro real).
+
+
+---
+
+## Tentativa 120 (Autolog - FORTALEZA) - 2026-06-09 18:48
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 90 dias
+- **Learning Rate**: 0.001
+- **Dropout**: 0.30
+- **Épocas**: 40
+- **Patience**: 12
+- **Grad Accumulation**: 16
+
+### 2. Loss & Ranking
+- **Modelo**: PureSTGCN_64
+- **Focal Alpha**: 0.55
+- **Focal Gamma**: 2.0
+- **Ranking Weight**: 12.0
+- **Indecision Weight**: 0.8
+- **Scheduler**: onecycle
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- **Colapso de Validação:** O modelo sofreu um colapso rápido de performance na validação (Val P@10 caiu de 26.81% na época 1 para 21.18% na época 5). O aprendizado foi excessivamente agressivo sob a taxa lr=0.001 e grad_accum=16, gerando instabilidade estatística nas camadas de BatchNorm com batch size efetivo de 1. O treino foi interrompido manualmente.
+
+---
+
+## Tentativa 121 (Autolog - FORTALEZA) - 2026-06-09 19:00
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### 1. Hiperparâmetros (Carga Automática)
+- **Target (Horizonte)**: 14 dias
+- **Janela (Window)**: 90 dias
+- **Learning Rate**: 0.0003
+- **Dropout**: 0.30
+- **Épocas**: 30
+- **Patience**: 10
+- **Grad Accumulation**: 32
+
+### 2. Loss & Ranking
+- **Modelo**: PureSTGCN_64
+- **Focal Alpha**: 0.55
+- **Focal Gamma**: 2.0
+- **Ranking Weight**: 12.0
+- **Indecision Weight**: 0.8
+- **Scheduler**: onecycle
+- **Métrica de Avaliação**: P@10
+
+### 3. Resultados
+- *(A preencher após a conclusão)*
+
+
+---
+
+## Tentativa 122 (Autolog - FORTALEZA) - 2026-06-09 23:41
+
+**Arquivo de Origem:** `train_all_specialists.py` + `architectures.py`
+
+### 1. AnÃ¡lise Criteriosa Realizada
+
+**Causa Raiz Identificada:** BatchNorm com batch size efetivo = 1.
+O loop de treino itera sobre lista de tensores individuais (1,41,109,90).
+`grad_accum` acumula gradientes mas o BatchNorm calcula estatÃ­sticas
+a cada forward com N=1 â€” running_mean/var ficam impossÃ­veis de estimar.
+Em eval(), as running stats divergentes causam o colapso de P@10.
+
+**Canais mortos detectados:** [1,26,31,32,33,34,35,36] (8/37 = 21.6% zeros puros).
+**42% amostras val com <10 eventos** â€” P@10 instÃ¡vel por definiÃ§Ã£o.
+
+### 2. Patches Aplicados
+
+- **PATCH 1 (architectures.py):** `FastRelationalGCN.bn` â†’ `nn.LayerNorm` (estÃ¡vel com batch=1)
+- **PATCH 2 (architectures.py):** `PureSTGCNBlock.out_norm` â†’ `nn.InstanceNorm2d(affine=True)` (estÃ¡vel com batch=1)
+- **PATCH 3 (train_all_specialists.py):** Val loop filtra amostras com `n_events >= k_eval` (P@10 mais estÃ¡vel)
+
+### 3. HiperparÃ¢metros
+
+- **Modelo**: PureSTGCN_64 (com LayerNorm/InstanceNorm)
+- **Learning Rate**: 0.0005
+- **Dropout**: 0.30
+- **Ã‰pocas**: 30
+- **Patience**: 10
+- **Grad Accumulation**: 1 (desnecessÃ¡rio com normas estÃ¡veis)
+- **Janela**: 90 dias
+- **Scheduler**: onecycle
+- **Focal Alpha**: 0.55, **Gamma**: 2.0, **Ranking Weight**: 12.0
+
+### 4. Resultados
+
+- *(A preencher apÃ³s conclusÃ£o)*
+
+
+---
+
+## Tentativa 122 â€” RESULTADO FINAL
+
+### Conclusao
+
+**Problema identificado:** Overfitting. O patch do BatchNorm resolveu o colapso subito (causado por running stats divergentes), porem expÃ´s o problema real: loss de treino cai consistentemente (8.47 -> 4.67) mas P@10 validacao regride junto (31.71% -> 18.53%). O modelo decora o ranking de treino em vez de generalizar.
+
+**Melhor resultado salvo:** P@10 = 31.71% (E002)
+
+| Epocas | P@10 Val | Loss |
+|---|---|---|
+| E001 | 31.63% | 8.47 |
+| E002 | **31.71% (RECORDE)** | 7.90 |
+| E003-E012 | 30.16% -> 18.53% | 7.85 -> 4.67 |
+
+**Causa:** lr=0.0005 + 1288 opt_steps/epoch gera aprendizado rapido demais para um dataset com sinal fraco (correlacao maxima 0.195). Modelo memoriza em vez de aprender.
+
+---
+
+## Tentativa 123 (Autolog - FORTALEZA) - 2026-06-09 22:50
+
+**Arquivo de Origem:** `train_all_specialists.py`
+
+### Motivacao
+
+Overfitting confirmado na T122. Solucao: arquitetura FortalezaHeteroSTGAT com separacao
+de streams dinamico/contextual + LR muito baixo + regularizacao forte.
+
+### Hiperparametros
+
+- **Modelo**: FortalezaHeteroSTGAT (separacao dinamico/contextual, atencao multi-cabeca)
+- **Learning Rate**: 0.0001 (4x menor que T122)
+- **Dropout**: 0.40 (33% maior que T122)
+- **Weight Decay**: 0.02 (4x maior que T122, L2 forte)
+- **Epocas**: 40
+- **Patience**: 12
+- **Grad Accumulation**: 1
+- **Janela**: 90 dias
+- **Scheduler**: onecycle
+
+### 3. Resultados
+
+- *(A preencher apos conclusao)*

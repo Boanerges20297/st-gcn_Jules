@@ -1,0 +1,108 @@
+{
+  "cutoff": "2026-02-28",
+  "historical_concentration": {
+    "50%": 12,
+    "70%": 21,
+    "80%": 26,
+    "90%": 32,
+    "95%": 36
+  },
+  "best_blend": {
+    "w_ewma": 0.6,
+    "w_lgbm": 0.2,
+    "w_hist": 0.2,
+    "w_target": 0.0,
+    "p10": 0.23255813953488377,
+    "p20": 0.14534883720930233,
+    "r10": 0.5451135105204872,
+    "r20": 0.6559108527131783
+  },
+  "inside_top32_mean": 0.8495570321151718,
+  "inside_top32_median": 0.8333333333333334,
+  "inside_top32_all_windows": 33,
+  "inside_top32_windows": 86,
+  "historical_top10_names": [
+    "JANGURURSSU",
+    "BARRA DO CEARA",
+    "MESSEJANA",
+    "GRANJA LISBOA",
+    "PREFEITO JOSE WALTER",
+    "PLANALTO AYRTON SENNA",
+    "MONDUBIM",
+    "SIQUEIRA",
+    "BARROSO",
+    "QUINTINO CUNHA"
+  ],
+  "position_volatility": [
+    {
+      "bairro": "JANGURURSSU",
+      "avg_rank": 4.77906976744186,
+      "min_rank": 1,
+      "max_rank": 7,
+      "std_rank": 1.6167809158993138
+    },
+    {
+      "bairro": "BARRA DO CEARA",
+      "avg_rank": 4.976744186046512,
+      "min_rank": 1,
+      "max_rank": 9,
+      "std_rank": 2.051526624906135
+    },
+    {
+      "bairro": "MESSEJANA",
+      "avg_rank": 1.6046511627906976,
+      "min_rank": 1,
+      "max_rank": 7,
+      "std_rank": 1.2964985920712886
+    },
+    {
+      "bairro": "GRANJA LISBOA",
+      "avg_rank": 9.046511627906977,
+      "min_rank": 3,
+      "max_rank": 13,
+      "std_rank": 1.9936350855951437
+    },
+    {
+      "bairro": "PREFEITO JOSE WALTER",
+      "avg_rank": 7.953488372093023,
+      "min_rank": 5,
+      "max_rank": 11,
+      "std_rank": 1.5914522893884302
+    },
+    {
+      "bairro": "PLANALTO AYRTON SENNA",
+      "avg_rank": 11.127906976744185,
+      "min_rank": 8,
+      "max_rank": 14,
+      "std_rank": 1.583317914776957
+    },
+    {
+      "bairro": "MONDUBIM",
+      "avg_rank": 4.3023255813953485,
+      "min_rank": 2,
+      "max_rank": 10,
+      "std_rank": 2.4875025648782407
+    },
+    {
+      "bairro": "SIQUEIRA",
+      "avg_rank": 10.406976744186046,
+      "min_rank": 2,
+      "max_rank": 15,
+      "std_rank": 4.43657606031882
+    },
+    {
+      "bairro": "BARROSO",
+      "avg_rank": 6.0,
+      "min_rank": 2,
+      "max_rank": 11,
+      "std_rank": 2.4824968676061645
+    },
+    {
+      "bairro": "QUINTINO CUNHA",
+      "avg_rank": 12.930232558139535,
+      "min_rank": 7,
+      "max_rank": 16,
+      "std_rank": 1.885012477131111
+    }
+  ]
+}

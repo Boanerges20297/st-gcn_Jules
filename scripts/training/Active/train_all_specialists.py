@@ -51,23 +51,23 @@ TRAIN_BATCH_LOG_EVERY = int(os.environ.get("TRAIN_BATCH_LOG_EVERY", "30"))
 
 REGION_CONFIGS = {
     'fortaleza': dict(
-        window=60,
-        lr=2e-4,
-        epochs=18,
-        patience=6,
-        dropout=0.30,
+        window=90,
+        lr=0.0001,          # T123: LR baixo para combater overfitting (loss cai, P@10 val cai)
+        epochs=40,          # T123: mais epocas com LR lento = convergencia mais suave
+        patience=12,
+        dropout=0.40,       # T123: dropout maior para regularizacao
         margin=1.0,
         k_eval=10,
         use_momentum=True,
-        grad_accum=64,
+        grad_accum=1,
         output_name='fortaleza_model_active.pth',
-        model_class='PureSTGCN_64',
+        model_class='FortalezaHeteroSTGAT',  # T123: arquitetura com separacao dinamico/contextual
         focal_alpha=0.55,
         focal_gamma=2.0,
         ranking_weight=12.0,
         indecision_weight=0.8,
-        weight_decay=0.005,
-        scheduler='static',
+        weight_decay=0.02,  # T123: weight_decay alto para L2 regularization forte
+        scheduler='onecycle',
     ),
     'rmf': dict(
         window=14,
@@ -369,16 +369,20 @@ class SpecialistTrainer:
             pk10 = []
             pk20 = []
             val_start = time.time()
+            k_eval = self.cfg.get('k_eval', 10)
             with torch.no_grad():
                 for val_step, (vx, vy) in enumerate(zip(val_x, val_y), start=1):
-                    if (vy > 0).sum() > 0:
+                    n_events = int((vy > 0).sum().item())
+                    # CAUSA C fix: so calcula P@K quando ha eventos suficientes para
+                    # a metrica ser estatisticamente significativa (evita ruido)
+                    if n_events >= k_eval:
                         vpred = model(vx.to(DEVICE), [adj_geo, adj_conf]).squeeze()
-                        k10 = min(10, (vy > 0).sum().item(), n_nodes)
+                        k10 = min(10, n_events, n_nodes)
                         _, t10_idx = torch.topk(vy.to(DEVICE), k10)
                         _, p10_idx = torch.topk(vpred, 10)
                         pk10.append(len(set(t10_idx.cpu().numpy()) & set(p10_idx.cpu().numpy())) / k10)
 
-                        k20 = min(20, (vy > 0).sum().item(), n_nodes)
+                        k20 = min(20, n_events, n_nodes)
                         _, t20_idx = torch.topk(vy.to(DEVICE), k20)
                         _, p20_idx = torch.topk(vpred, min(20, n_nodes))
                         pk20.append(len(set(t20_idx.cpu().numpy()) & set(p20_idx.cpu().numpy())) / k20)

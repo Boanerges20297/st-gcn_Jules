@@ -1,7 +1,7 @@
 ====================================================================
 SENTINELA V3 FREEZE — MODELO CANDIDATO A PRODUÇÃO
-Gerado em: 11/05/2026 19:29:45
-Dados até: 2026-05-11 | Horizonte: 14 dias
+Gerado em: 10/06/2026 16:04:55
+Dados até: 2026-06-08 | Horizonte: 14 dias
 ====================================================================
 
 PERFORMANCE (validação sombra T57 — Mar→Abr/2026):
@@ -12,44 +12,44 @@ PERFORMANCE (validação sombra T57 — Mar→Abr/2026):
 
 FEATURE IMPORTANCE:
   chuva_mm              : 0.0%
-  cvp_cvli_ratio        : 10.8%
-  cvp_ewma_14d          : 9.8%
-  cvp_ewma_30d          : 9.5%
-  cvp_ewma_7d           : 5.3%
+  cvp_cvli_ratio        : 9.1%
+  cvp_ewma_14d          : 5.7%
+  cvp_ewma_30d          : 8.4%
+  cvp_ewma_7d           : 5.8%
   dia_quente_cvp        : 0.0%
   feriado               : 0.0%
-  hist_pct              : 14.6%
-  intel_ewma_14d        : 9.2%
-  intel_ewma_7d         : 7.1%
-  inter_chuva_hist      : 3.0%
-  inter_feriado_hist    : 0.1%
-  inter_intel_cvli      : 12.6%
-  nbr_cvli_30d          : 8.8%
-  target_enc            : 9.2%
+  hist_pct              : 17.2%
+  intel_ewma_14d        : 10.1%
+  intel_ewma_7d         : 6.5%
+  inter_chuva_hist      : 4.8%
+  inter_feriado_hist    : 0.2%
+  inter_intel_cvli      : 13.8%
+  nbr_cvli_30d          : 8.2%
+  target_enc            : 10.1%
 
 RANKING TOP-20 (score ensemble):
  Rank                Bairro  Score_Final  feat_cvp_cvli_ratio  feat_intel_ewma_14d  feat_nbr_cvli_30d
-    1               BARROSO       1.0000               8.0845               0.1358                3.0
-    2             MESSEJANA       0.7293              11.4756               0.7288                4.0
-    3            BOM JARDIM       0.5348              19.9732               0.0880                1.0
-    4                ANCURI       0.4899               4.1079               0.0000                5.0
-    5                 CURIO       0.4578               2.3795               0.2426                6.0
-    6       PARQUE SOLEDADE       0.4453               4.0201               0.0000                0.0
-    7        BARRA DO CEARA       0.3887               7.4612               0.4945                0.0
-    8        ALTO ALEGRE II       0.3834               6.0935               0.0000                2.0
-    9            JANGURUSSU       0.3799              10.6959               0.4363                6.0
-   10           CIDADE NOVA       0.3757               2.5505               0.0000                1.0
-   11           GUADALAJARA       0.3559               5.4816               0.0000                1.0
-   12  PREFEITO JOSE WALTER       0.3444              11.2668               0.0000                3.0
-   13             URUCUTUBA       0.3436               3.2300               0.0000                2.0
-   14 PLANALTO AYRTON SENNA       0.3039               4.5197               0.0000                2.0
-   15         GRANJA LISBOA       0.2776               5.6115               0.0098                2.0
-   16       CRISTO REDENTOR       0.2691               4.0177               0.1244                0.0
-   17  JARDIM DAS OLIVEIRAS       0.2652               3.6166               0.0011                7.0
-   18        VICENTE PINZON       0.2316               4.8122               0.3380                1.0
-   19         EDSON QUEIROZ       0.2262               2.1521               0.0018                1.0
-   20              SIQUEIRA       0.2187              11.2030               0.1179                2.0
+    1             MESSEJANA       0.8696              23.5846               0.1822                4.0
+    2        BARRA DO CEARA       0.8625              12.4144               0.6163                0.0
+    3           JANGURURSSU       0.5171              19.7707               0.0000                1.0
+    4       JOSE DE ALENCAR       0.4766               5.6193               0.1132                3.0
+    5              MONDUBIM       0.4357              24.8265               0.3666                2.0
+    6    PARQUE DOIS IRMAOS       0.3323              11.2562               0.0000                3.0
+    7            CAJAZEIRAS       0.3133              11.6226               0.0012                3.0
+    8    PRAIA DO FURUTO II       0.3115               7.9919               0.0000                1.0
+    9               BARROSO       0.3099              12.1398               0.0958                6.0
+   10              SIQUEIRA       0.3002              26.7963               0.0295                1.0
+   11         LAGOA REDONDA       0.2987               4.7753               0.3555                2.0
+   12  PREFEITO JOSE WALTER       0.2854              22.1657               0.0000                1.0
+   13               PASSARE       0.2765              27.4373               0.3981                4.0
+   14        QUINTINO CUNHA       0.2719              30.6841               0.1869                2.0
+   15         GRANJA LISBOA       0.2679              11.2955               0.6580                1.0
+   16            BONSUCESSO       0.2454              15.6230               0.0145                1.0
+   17 PLANALTO AYRTON SENNA       0.2368               7.3405               0.0000                1.0
+   18                 CURIO       0.1942               1.4997               0.5531                4.0
+   19         MANOEL SATIRO       0.1572              23.1015               0.0000                2.0
+   20      CARLITO PAMPLONA       0.1556               4.9569               0.0173                2.0
 
 ====================================================================
 INSTRUÇÃO DE PROMOÇÃO (executar após revisão manual):
-  copy "c:\Users\STI01\Desktop\Projetos\Report Preview\tests\Sentinela\lgbm_lean_v3_freeze.pkl" "c:\Users\STI01\Desktop\Projetos\Report Preview\models\active\lgbm_lean_v3_freeze.pkl"
+  copy "C:\Users\STI01\Desktop\Projetos\Report Preview\tests\Sentinela\lgbm_lean_v3_freeze.pkl" "C:\Users\STI01\Desktop\Projetos\Report Preview\models\active\lgbm_lean_v3_freeze.pkl"

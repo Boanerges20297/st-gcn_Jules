@@ -1,0 +1,44 @@
+{
+  "generated_at": "2026-06-10T22:46:16.413187",
+  "reference_date": "2026-06-08",
+  "prediction_start": "2026-06-08",
+  "prediction_end": "2026-06-22",
+  "models": [
+    {
+      "name": "CVLI_TACTICAL_ONLY",
+      "description": "Score baseado apenas em momentum recente de CVLI (7d/14d/30d).",
+      "focus": "maximizar P@10"
+    },
+    {
+      "name": "SHORT20_MIX",
+      "description": "Shortlist tática por CVLI recente com reranqueamento leve estrutural + intel.",
+      "focus": "equilibrar topo e cobertura"
+    }
+  ],
+  "top10": {
+    "CVLI_TACTICAL_ONLY": [
+      "BARRA DO CEARA",
+      "MESSEJANA",
+      "PARQUE DOIS IRMAOS",
+      "JOSE DE ALENCAR",
+      "PRAIA DO FURUTO II",
+      "CAJAZEIRAS",
+      "BONSUCESSO",
+      "ANCURI",
+      "JANGURURSSU",
+      "CURIO"
+    ],
+    "SHORT20_MIX": [
+      "BARRA DO CEARA",
+      "MESSEJANA",
+      "JANGURURSSU",
+      "JOSE DE ALENCAR",
+      "PRAIA DO FURUTO II",
+      "PARQUE DOIS IRMAOS",
+      "BONSUCESSO",
+      "MONDUBIM",
+      "SIQUEIRA",
+      "CAJAZEIRAS"
+    ]
+  }
+}

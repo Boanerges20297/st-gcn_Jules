@@ -410,6 +410,7 @@
                         <small class="text-primary fw-bold" id="horizon-info">Horizonte de Predição: 14 dias</small>
                         <small class="text-success d-block" id="validity-info">📅 Janela de Inteligência: Projeção 14 dias (Tempo Real)</small>
                         <small class="text-secondary d-block" id="model-window-info">Modelo: ST-GAT Elite v3 (Janela: 120d)</small>
+                        <small class="text-warning d-none" id="model-validation-info"></small>
                     </div>
 
                     <div class="d-grid gap-1 mb-2" style="gap: 6px !important;">
@@ -552,6 +553,15 @@
                                 <option value="rmf">Região Metropolitana (RMF)</option>
                                 <option value="interior">Interior do Estado</option>
                             </select>
+                            <label for="model-mode-filter" class="form-label small fw-bold text-muted mt-2">Modelo de previsão:</label>
+                            <select class="form-select form-select-sm" id="model-mode-filter">
+                                <option value="stgat" selected>ST-GAT (Padrão)</option>
+                                <option value="cvli_tactical">CVLI Tático (Experimental)</option>
+                                <option value="short20_mix">CVLI Shortlist 20 (Experimental)</option>
+                            </select>
+                            <small class="text-muted d-block mt-1" id="model-selector-help">
+                                ST-GAT segue como campeão. Os demais modos são opcionais para comparação em Fortaleza.
+                            </small>
                             <div class="form-check mt-2">
                                 <input class="form-check-input" type="checkbox" id="toggle-visible-micronodes">
                                 <label class="form-check-label small fw-bold text-danger" for="toggle-visible-micronodes">
@@ -1073,6 +1083,7 @@
     var selectedLayer = null;  // território em destaque (borda dourada)
     var riskDataGlobal = null;
     var metaDataGlobal = null;
+    var DEFAULT_MODEL_MODE = 'stgat';
     var selectedExplainabilityState = {
         feature: null,
         explanation: null,
@@ -1191,7 +1202,7 @@
                             layer.on('popupopen', function() {
                                 var streetsDiv = document.getElementById('streets-' + rank);
                                 if (streetsDiv && streetsDiv.textContent === 'Carregando...') {
-                                    fetch('/api/territory?name=' + encodeURIComponent(cleanName))
+                                    fetch('/api/territory?name=' + encodeURIComponent(cleanName) + '&model_mode=' + encodeURIComponent(getSelectedModelMode()))
                                         .then(r => r.json())
                                         .then(data => {
                                             if (data && data.metrics && data.metrics.critical_streets) {
@@ -1805,6 +1816,20 @@
             var modelArch = (metaDataGlobal && metaDataGlobal.model_architecture) || 'ST-GAT Elite v3';
             var modelWindow = (metaDataGlobal && metaDataGlobal.model_window_cvli) || 120;
             $('#model-window-info').html('Modelo: <strong>' + modelArch + '</strong> (Janela: ' + modelWindow + 'd)');
+            var selectedDescription = (metaDataGlobal && metaDataGlobal.selected_model_description) || '';
+            var validationText = (metaDataGlobal && metaDataGlobal.selected_model_validation_text) || '';
+            if (selectedDescription) {
+                var selectorHelp = selectedDescription;
+                if (metaDataGlobal.selected_model_mode && metaDataGlobal.selected_model_mode !== 'stgat') {
+                    selectorHelp += ' Fortaleza usa o modo opcional; RMF e Interior seguem no ST-GAT.';
+                }
+                $('#model-selector-help').text(selectorHelp);
+            }
+            if (validationText) {
+                $('#model-validation-info').removeClass('d-none').text(validationText);
+            } else {
+                $('#model-validation-info').addClass('d-none').text('');
+            }
             
             // Mostra informações de ranking se disponível
             if (metaDataGlobal && metaDataGlobal.ranking_info) {
@@ -1969,7 +1994,7 @@
         showLoading('Restaurando Estado Original...', 'Recuperando dados históricos.');
         
         $.ajax({
-            url: '/api/risk',
+            url: buildRiskApiUrl(),
             dataType: 'json',
             cache: false,
             success: function(resp) {
@@ -2006,6 +2031,19 @@
             .trim();
     }
 
+    function getSelectedModelMode() {
+        if (!$('#model-mode-filter').length) return DEFAULT_MODEL_MODE;
+        return $('#model-mode-filter').val() || DEFAULT_MODEL_MODE;
+    }
+
+    function buildRiskApiUrl(region) {
+        var params = [];
+        if (region) params.push('region=' + encodeURIComponent(region));
+        var modelMode = getSelectedModelMode();
+        if (modelMode) params.push('model_mode=' + encodeURIComponent(modelMode));
+        return '/api/risk' + (params.length ? '?' + params.join('&') : '');
+    }
+
     function reloadMapLayer() {
         return new Promise(function(resolve, reject) {
             // Preserve user's current region filter so a reload doesn't reset the view
@@ -2017,7 +2055,7 @@
 
             $.when(
                 $.ajax({url: '/api/polygons', dataType: 'json', cache: false}),
-                $.ajax({url: '/api/risk', dataType: 'json', cache: false})
+                $.ajax({url: buildRiskApiUrl(), dataType: 'json', cache: false})
             ).done(function(polygonsArgs, riskArgs) {
                 var geojson = polygonsArgs[0];
                 var riskResp = riskArgs[0];
@@ -2137,6 +2175,7 @@
             try {
                 // Also update the Top Critical Areas list to reflect the current filter
                 try { updateTopCriticalAreas(); } catch(e) {}
+                try { updateDashboard('CVLI'); } catch(e) { console.warn('Failed to update dashboard after map reload', e); }
             } catch(e) { console.warn('Failed to update Top Critical Areas', e); }
 
             // Resolver a promise assim que a camada foi adicionada
@@ -2200,7 +2239,7 @@
     // Show loading overlay while initial data (polygons + risk) are fetched
     showLoading('Carregando mapa de tensão...', 'Aguarde enquanto o sistema obtém previsões.');
 
-    var reqRisk = $.ajax({url: '/api/risk', dataType: 'json', cache: false});
+    var reqRisk = $.ajax({url: buildRiskApiUrl(), dataType: 'json', cache: false});
     reqRisk.fail(function(jqXHR, textStatus, errorThrown) {
         console.error('Erro ao baixar risco:', textStatus, errorThrown);
         if (jqXHR && jqXHR.status === 503) {
@@ -3289,6 +3328,17 @@
         updateVisibleMicronodesForRegion(val);
         // Atualiza também os cards que mostram contagens por região
         try { updateDashboard('CVLI'); } catch(e) { console.warn('updateDashboard failed on region change', e); }
+    });
+
+    $('#model-mode-filter').on('change', function() {
+        showLoading('Trocando modelo...', 'Atualizando o mapa com a estratégia selecionada.');
+        reloadMapLayer()
+            .catch(function(err) {
+                console.error('Falha ao trocar modelo', err);
+            })
+            .finally(function() {
+                hideLoading();
+            });
     });
 
     // Micronodes KML 2026 layer

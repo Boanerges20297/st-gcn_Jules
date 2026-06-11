@@ -2255,16 +2255,16 @@
       "active_locations": 11,
       "total_events": 16,
       "ranking_top10": [
-        "MARACANAU",
         "CAUCAIA",
-        "PARQUE DOIS IRMAOS",
         "TIANGUA",
-        "JUAZEIRO DO NORTE",
-        "ALVARO WEYNE",
-        "BARRA DO CEARA",
-        "BARROSO",
         "ITAPAJE",
-        "ITAPIUNA"
+        "MARACANAU",
+        "JUAZEIRO DO NORTE",
+        "ITAPIUNA",
+        "GROAIRAS",
+        "TRAIRI",
+        "PARQUE DOIS IRMAOS",
+        "ALVARO WEYNE"
       ],
       "gt_sample": [
         "PARQUE DOIS IRMAOS",
@@ -2282,30 +2282,33 @@
       "p5": 0.6,
       "recall5": 0.2727,
       "hits5": [
-        "PARQUE DOIS IRMAOS",
         "TIANGUA",
+        "ITAPAJE",
         "JUAZEIRO DO NORTE"
       ],
-      "p10": 0.6,
-      "recall10": 0.5455,
+      "p10": 0.8,
+      "recall10": 0.7273,
       "hits10": [
-        "PARQUE DOIS IRMAOS",
         "TIANGUA",
-        "JUAZEIRO DO NORTE",
-        "ALVARO WEYNE",
         "ITAPAJE",
-        "ITAPIUNA"
-      ],
-      "p20": 0.35,
-      "recall20": 0.6364,
-      "hits20": [
-        "PARQUE DOIS IRMAOS",
-        "TIANGUA",
         "JUAZEIRO DO NORTE",
-        "ALVARO WEYNE",
-        "ITAPAJE",
         "ITAPIUNA",
-        "GROAIRAS"
+        "GROAIRAS",
+        "TRAIRI",
+        "PARQUE DOIS IRMAOS",
+        "ALVARO WEYNE"
+      ],
+      "p20": 0.4,
+      "recall20": 0.7273,
+      "hits20": [
+        "TIANGUA",
+        "ITAPAJE",
+        "JUAZEIRO DO NORTE",
+        "ITAPIUNA",
+        "GROAIRAS",
+        "TRAIRI",
+        "PARQUE DOIS IRMAOS",
+        "ALVARO WEYNE"
       ]
     },
     "fortaleza": {
@@ -2316,13 +2319,13 @@
         "PARQUE DOIS IRMAOS",
         "ALVARO WEYNE",
         "BARRA DO CEARA",
-        "BARROSO",
+        "CAJAZEIRAS",
+        "BONSUCESSO",
         "JOSE DE ALENCAR",
-        "MONDUBIM",
-        "ALTO ALEGRE",
-        "JOAO",
-        "JOSE WALTER",
-        "SIQUEIRA"
+        "LAGOA REDONDA",
+        "QUINTINO CUNHA",
+        "ANCURI",
+        "MONDUBIM"
       ],
       "gt_sample": [
         "PARQUE DOIS IRMAOS",
@@ -2352,16 +2355,16 @@
       "active_locations": 4,
       "total_events": 7,
       "ranking_top10": [
-        "MARACANAU",
         "CAUCAIA",
+        "MARACANAU",
+        "TRAIRI",
         "EUSEBIO",
-        "ITAITINGA",
-        "PACATUBA",
+        "HORIZONTE",
+        "PACAJUS",
         "PINDORETAMA",
         "PARAIPABA",
         "SAO LUIS DO CURU",
-        "PACAJUS",
-        "HORIZONTE"
+        "ITAITINGA"
       ],
       "gt_sample": [
         "PACATUBA",
@@ -2372,21 +2375,21 @@
       "p5": 0.4,
       "recall5": 0.5,
       "hits5": [
-        "EUSEBIO",
-        "PACATUBA"
+        "TRAIRI",
+        "EUSEBIO"
       ],
       "p10": 0.2,
       "recall10": 0.5,
       "hits10": [
-        "EUSEBIO",
-        "PACATUBA"
+        "TRAIRI",
+        "EUSEBIO"
       ],
       "p20": 0.2105,
       "recall20": 1.0,
       "hits20": [
+        "TRAIRI",
         "EUSEBIO",
         "PACATUBA",
-        "TRAIRI",
         "GUAIUBA"
       ]
     },
@@ -2396,15 +2399,15 @@
       "total_events": 7,
       "ranking_top10": [
         "TIANGUA",
-        "JUAZEIRO DO NORTE",
         "ITAPAJE",
+        "JUAZEIRO DO NORTE",
         "ITAPIUNA",
         "GROAIRAS",
+        "SOBRAL",
         "IGUATU",
         "BATURITE",
-        "SOBRAL",
-        "URUBURETAMA",
-        "MIRAIMA"
+        "LIMOEIRO DO NORTE",
+        "VARZEA ALEGRE"
       ],
       "gt_sample": [
         "JUAZEIRO DO NORTE",
@@ -2417,8 +2420,8 @@
       "recall5": 1.0,
       "hits5": [
         "TIANGUA",
-        "JUAZEIRO DO NORTE",
         "ITAPAJE",
+        "JUAZEIRO DO NORTE",
         "ITAPIUNA",
         "GROAIRAS"
       ],
@@ -2426,8 +2429,8 @@
       "recall10": 1.0,
       "hits10": [
         "TIANGUA",
-        "JUAZEIRO DO NORTE",
         "ITAPAJE",
+        "JUAZEIRO DO NORTE",
         "ITAPIUNA",
         "GROAIRAS"
       ],
@@ -2435,8 +2438,8 @@
       "recall20": 1.0,
       "hits20": [
         "TIANGUA",
-        "JUAZEIRO DO NORTE",
         "ITAPAJE",
+        "JUAZEIRO DO NORTE",
         "ITAPIUNA",
         "GROAIRAS"
       ]

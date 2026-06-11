@@ -204,9 +204,28 @@ class StateOrchestrator:
                     num_nodes = len(data['nodes_gdf'])
                     ckpt = torch.load(cfg['model_path'], map_location=self.device, weights_only=False)
                     ckpt_meta = ckpt if isinstance(ckpt, dict) else {}
-                    model_class = get_model_class(ckpt_meta.get('model_class')) if ckpt_meta.get('model_class') else cfg['class']
-                    in_channels = int(ckpt_meta.get('in_channels', cfg['in_channels']))
-                    window = int(ckpt_meta.get('window', cfg['window']))
+                    legacy_config = ckpt_meta.get('config') if isinstance(ckpt_meta.get('config'), dict) else {}
+                    resolved_arch = (
+                        ckpt_meta.get('model_class')
+                        or ckpt_meta.get('architecture')
+                        or ckpt_meta.get('arch')
+                        or legacy_config.get('model_class')
+                        or legacy_config.get('architecture')
+                        or legacy_config.get('arch')
+                    )
+                    model_class = get_model_class(resolved_arch) if resolved_arch else cfg['class']
+                    in_channels = int(
+                        ckpt_meta.get('in_channels')
+                        or legacy_config.get('in_channels')
+                        or cfg['in_channels']
+                    )
+                    window = int(
+                        ckpt_meta.get('window')
+                        or ckpt_meta.get('seq_len')
+                        or legacy_config.get('window')
+                        or legacy_config.get('seq_len')
+                        or cfg['window']
+                    )
                     model = model_class(num_nodes=num_nodes, in_channels=in_channels, time_steps=window).to(self.device)
                     state_dict = ckpt['model_state_dict'] if isinstance(ckpt, dict) and 'model_state_dict' in ckpt else ckpt
                     model.load_state_dict(state_dict, strict=False)
@@ -214,7 +233,10 @@ class StateOrchestrator:
                     self.specialists[region] = {'model': model, 'data': data, 'window': window, 'channels': in_channels}
                     if self.dates is None:
                         self.dates = data.get('dates')
-                    print(f"✅ Orquestrador: Especialista {region.upper()} carregado ({cfg['in_channels']} Canais).")
+                    print(
+                        f"✅ Orquestrador: Especialista {region.upper()} carregado "
+                        f"({in_channels} Canais, {model_class.__name__})."
+                    )
                 except Exception as e:
                     print(f"❌ Erro ao carregar {region}: {e}")
         self._node_owners = {normalize_name(str(r['name'])): reg for reg, spec in self.specialists.items() for _, r in spec['data']['nodes_gdf'].iterrows()}

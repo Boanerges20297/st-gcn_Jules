@@ -1,0 +1,463 @@
+{
+  "cutoff": "2026-02-28",
+  "eval_start": "2026-03-01",
+  "eval_end": "2026-05-25",
+  "windows_total": 86,
+  "summary": [
+    {
+      "model": "Active_Ensemble",
+      "p10": 0.21976744186046515,
+      "p20": 0.13837209302325582,
+      "r10": 0.4824197120708748,
+      "r20": 0.6218023255813954,
+      "windows": 86
+    },
+    {
+      "model": "FrozenFeb_Ensemble",
+      "p10": 0.2127906976744186,
+      "p20": 0.14534883720930233,
+      "r10": 0.5040143964562569,
+      "r20": 0.6626661129568107,
+      "windows": 86
+    },
+    {
+      "model": "EWMA",
+      "p10": 0.2023255813953488,
+      "p20": 0.15930232558139537,
+      "r10": 0.47396179401993355,
+      "r20": 0.6965946843853821,
+      "windows": 86
+    },
+    {
+      "model": "Active_LGBM",
+      "p10": 0.19069767441860466,
+      "p20": 0.12848837209302327,
+      "r10": 0.46566998892580286,
+      "r20": 0.5983803986710963,
+      "windows": 86
+    },
+    {
+      "model": "FrozenFeb_LGBM",
+      "p10": 0.16627906976744186,
+      "p20": 0.11686046511627908,
+      "r10": 0.4159468438538206,
+      "r20": 0.5530869324473976,
+      "windows": 86
+    }
+  ],
+  "focus": {
+    "FrozenFeb_Ensemble": {
+      "best": [
+        {
+          "pred_date": "2026-03-24",
+          "eval_end": "2026-04-07",
+          "model": "FrozenFeb_Ensemble",
+          "n_bairros_gt": 8,
+          "n_cvli_gt": 8.0,
+          "p10": 0.5,
+          "p20": 0.25,
+          "r10": 0.625,
+          "r20": 0.625,
+          "top10": "[\"MESSEJANA\", \"MONDUBIM\", \"JOSE DE ALENCAR\", \"JANGURURSSU\", \"PREFEITO JOSE WALTER\", \"BARRA DO CEARA\", \"PASSARE\", \"BARROSO\", \"GRANJA LISBOA\", \"LAGOA REDONDA\"]",
+          "month": "2026-03"
+        },
+        {
+          "pred_date": "2026-03-17",
+          "eval_end": "2026-03-31",
+          "model": "FrozenFeb_Ensemble",
+          "n_bairros_gt": 7,
+          "n_cvli_gt": 8.0,
+          "p10": 0.4,
+          "p20": 0.2,
+          "r10": 0.5714285714285714,
+          "r20": 0.5714285714285714,
+          "top10": "[\"MESSEJANA\", \"JOSE DE ALENCAR\", \"MONDUBIM\", \"JANGURURSSU\", \"PREFEITO JOSE WALTER\", \"BARRA DO CEARA\", \"PASSARE\", \"BARROSO\", \"LAGOA REDONDA\", \"GRANJA LISBOA\"]",
+          "month": "2026-03"
+        },
+        {
+          "pred_date": "2026-03-11",
+          "eval_end": "2026-03-25",
+          "model": "FrozenFeb_Ensemble",
+          "n_bairros_gt": 7,
+          "n_cvli_gt": 8.0,
+          "p10": 0.4,
+          "p20": 0.3,
+          "r10": 0.5714285714285714,
+          "r20": 0.8571428571428571,
+          "top10": "[\"MESSEJANA\", \"MONDUBIM\", \"JANGURURSSU\", \"PREFEITO JOSE WALTER\", \"LAGOA REDONDA\", \"BARROSO\", \"BARRA DO CEARA\", \"JOSE DE ALENCAR\", \"GRANJA LISBOA\", \"PLANALTO AYRTON SENNA\"]",
+          "month": "2026-03"
+        },
+        {
+          "pred_date": "2026-03-12",
+          "eval_end": "2026-03-26",
+          "model": "FrozenFeb_Ensemble",
+          "n_bairros_gt": 7,
+          "n_cvli_gt": 8.0,
+          "p10": 0.4,
+          "p20": 0.25,
+          "r10": 0.5714285714285714,
+          "r20": 0.7142857142857143,
+          "top10": "[\"MESSEJANA\", \"MONDUBIM\", \"JOSE DE ALENCAR\", \"JANGURURSSU\", \"PASSARE\", \"PREFEITO JOSE WALTER\", \"BARRA DO CEARA\", \"BARROSO\", \"LAGOA REDONDA\", \"QUINTINO CUNHA\"]",
+          "month": "2026-03"
+        },
+        {
+          "pred_date": "2026-03-13",
+          "eval_end": "2026-03-27",
+          "model": "FrozenFeb_Ensemble",
+          "n_bairros_gt": 7,
+          "n_cvli_gt": 7.0,
+          "p10": 0.4,
+          "p20": 0.2,
+          "r10": 0.5714285714285714,
+          "r20": 0.5714285714285714,
+          "top10": "[\"MESSEJANA\", \"JOSE DE ALENCAR\", \"MONDUBIM\", \"JANGURURSSU\", \"PREFEITO JOSE WALTER\", \"BARRA DO CEARA\", \"PASSARE\", \"BARROSO\", \"LAGOA REDONDA\", \"GRANJA LISBOA\"]",
+          "month": "2026-03"
+        }
+      ],
+      "worst": [
+        {
+          "pred_date": "2026-05-16",
+          "eval_end": "2026-05-30",
+          "model": "FrozenFeb_Ensemble",
+          "n_bairros_gt": 6,
+          "n_cvli_gt": 6.0,
+          "p10": 0.1,
+          "p20": 0.1,
+          "r10": 0.16666666666666666,
+          "r20": 0.3333333333333333,
+          "top10": "[\"JANGURURSSU\", \"MESSEJANA\", \"CAJAZEIRAS\", \"SIQUEIRA\", \"BARRA DO CEARA\", \"PREFEITO JOSE WALTER\", \"MONDUBIM\", \"GRANJA LISBOA\", \"BARROSO\", \"PLANALTO AYRTON SENNA\"]",
+          "month": "2026-05"
+        },
+        {
+          "pred_date": "2026-05-21",
+          "eval_end": "2026-06-04",
+          "model": "FrozenFeb_Ensemble",
+          "n_bairros_gt": 4,
+          "n_cvli_gt": 4.0,
+          "p10": 0.1,
+          "p20": 0.1,
+          "r10": 0.25,
+          "r20": 0.5,
+          "top10": "[\"BARRA DO CEARA\", \"JANGURURSSU\", \"MESSEJANA\", \"BONSUCESSO\", \"CAJAZEIRAS\", \"SIQUEIRA\", \"MONDUBIM\", \"PREFEITO JOSE WALTER\", \"BARROSO\", \"GRANJA LISBOA\"]",
+          "month": "2026-05"
+        },
+        {
+          "pred_date": "2026-05-20",
+          "eval_end": "2026-06-03",
+          "model": "FrozenFeb_Ensemble",
+          "n_bairros_gt": 4,
+          "n_cvli_gt": 4.0,
+          "p10": 0.1,
+          "p20": 0.1,
+          "r10": 0.25,
+          "r20": 0.5,
+          "top10": "[\"BARRA DO CEARA\", \"JANGURURSSU\", \"MESSEJANA\", \"BONSUCESSO\", \"CAJAZEIRAS\", \"SIQUEIRA\", \"MONDUBIM\", \"PREFEITO JOSE WALTER\", \"BARROSO\", \"GRANJA LISBOA\"]",
+          "month": "2026-05"
+        },
+        {
+          "pred_date": "2026-05-22",
+          "eval_end": "2026-06-05",
+          "model": "FrozenFeb_Ensemble",
+          "n_bairros_gt": 4,
+          "n_cvli_gt": 4.0,
+          "p10": 0.1,
+          "p20": 0.1,
+          "r10": 0.25,
+          "r20": 0.5,
+          "top10": "[\"BARRA DO CEARA\", \"JANGURURSSU\", \"MESSEJANA\", \"BONSUCESSO\", \"CAJAZEIRAS\", \"SIQUEIRA\", \"MONDUBIM\", \"PREFEITO JOSE WALTER\", \"BARROSO\", \"GRANJA LISBOA\"]",
+          "month": "2026-05"
+        },
+        {
+          "pred_date": "2026-04-21",
+          "eval_end": "2026-05-05",
+          "model": "FrozenFeb_Ensemble",
+          "n_bairros_gt": 2,
+          "n_cvli_gt": 2.0,
+          "p10": 0.0,
+          "p20": 0.05,
+          "r10": 0.0,
+          "r20": 0.5,
+          "top10": "[\"MESSEJANA\", \"MONDUBIM\", \"PREFEITO JOSE WALTER\", \"JANGURURSSU\", \"BARRA DO CEARA\", \"BARROSO\", \"PLANALTO AYRTON SENNA\", \"GRANJA LISBOA\", \"PASSARE\", \"VICENTE PINZON\"]",
+          "month": "2026-04"
+        }
+      ]
+    },
+    "Active_Ensemble": {
+      "best": [
+        {
+          "pred_date": "2026-03-24",
+          "eval_end": "2026-04-07",
+          "model": "Active_Ensemble",
+          "n_bairros_gt": 8,
+          "n_cvli_gt": 8.0,
+          "p10": 0.5,
+          "p20": 0.25,
+          "r10": 0.625,
+          "r20": 0.625,
+          "top10": "[\"MESSEJANA\", \"JOSE DE ALENCAR\", \"MONDUBIM\", \"BARROSO\", \"JANGURURSSU\", \"PREFEITO JOSE WALTER\", \"PASSARE\", \"BARRA DO CEARA\", \"LAGOA REDONDA\", \"GRANJA PORTUGAL\"]",
+          "month": "2026-03"
+        },
+        {
+          "pred_date": "2026-03-06",
+          "eval_end": "2026-03-20",
+          "model": "Active_Ensemble",
+          "n_bairros_gt": 6,
+          "n_cvli_gt": 10.0,
+          "p10": 0.4,
+          "p20": 0.25,
+          "r10": 0.6666666666666666,
+          "r20": 0.8333333333333334,
+          "top10": "[\"BARROSO\", \"MESSEJANA\", \"LAGOA REDONDA\", \"GRANJA LISBOA\", \"PREFEITO JOSE WALTER\", \"MONDUBIM\", \"JANGURURSSU\", \"PLANALTO AYRTON SENNA\", \"JOSE DE ALENCAR\", \"PASSARE\"]",
+          "month": "2026-03"
+        },
+        {
+          "pred_date": "2026-03-11",
+          "eval_end": "2026-03-25",
+          "model": "Active_Ensemble",
+          "n_bairros_gt": 7,
+          "n_cvli_gt": 8.0,
+          "p10": 0.4,
+          "p20": 0.35,
+          "r10": 0.5714285714285714,
+          "r20": 1.0,
+          "top10": "[\"MESSEJANA\", \"MONDUBIM\", \"BARROSO\", \"LAGOA REDONDA\", \"JOSE DE ALENCAR\", \"JANGURURSSU\", \"BARRA DO CEARA\", \"PREFEITO JOSE WALTER\", \"GRANJA LISBOA\", \"PLANALTO AYRTON SENNA\"]",
+          "month": "2026-03"
+        },
+        {
+          "pred_date": "2026-03-12",
+          "eval_end": "2026-03-26",
+          "model": "Active_Ensemble",
+          "n_bairros_gt": 7,
+          "n_cvli_gt": 8.0,
+          "p10": 0.4,
+          "p20": 0.3,
+          "r10": 0.5714285714285714,
+          "r20": 0.8571428571428571,
+          "top10": "[\"MESSEJANA\", \"JOSE DE ALENCAR\", \"MONDUBIM\", \"PASSARE\", \"BARROSO\", \"LAGOA REDONDA\", \"JANGURURSSU\", \"PREFEITO JOSE WALTER\", \"BARRA DO CEARA\", \"GRANJA LISBOA\"]",
+          "month": "2026-03"
+        },
+        {
+          "pred_date": "2026-03-09",
+          "eval_end": "2026-03-23",
+          "model": "Active_Ensemble",
+          "n_bairros_gt": 6,
+          "n_cvli_gt": 7.0,
+          "p10": 0.4,
+          "p20": 0.3,
+          "r10": 0.6666666666666666,
+          "r20": 1.0,
+          "top10": "[\"MESSEJANA\", \"BARROSO\", \"LAGOA REDONDA\", \"JOSE DE ALENCAR\", \"MONDUBIM\", \"GRANJA LISBOA\", \"PREFEITO JOSE WALTER\", \"PLANALTO AYRTON SENNA\", \"JANGURURSSU\", \"PASSARE\"]",
+          "month": "2026-03"
+        }
+      ],
+      "worst": [
+        {
+          "pred_date": "2026-04-20",
+          "eval_end": "2026-05-04",
+          "model": "Active_Ensemble",
+          "n_bairros_gt": 1,
+          "n_cvli_gt": 1.0,
+          "p10": 0.0,
+          "p20": 0.05,
+          "r10": 0.0,
+          "r20": 1.0,
+          "top10": "[\"MESSEJANA\", \"BARROSO\", \"MONDUBIM\", \"BARRA DO CEARA\", \"PLANALTO AYRTON SENNA\", \"PREFEITO JOSE WALTER\", \"JANGURURSSU\", \"PASSARE\", \"JOSE DE ALENCAR\", \"VICENTE PINZON\"]",
+          "month": "2026-04"
+        },
+        {
+          "pred_date": "2026-04-27",
+          "eval_end": "2026-05-11",
+          "model": "Active_Ensemble",
+          "n_bairros_gt": 3,
+          "n_cvli_gt": 3.0,
+          "p10": 0.0,
+          "p20": 0.05,
+          "r10": 0.0,
+          "r20": 0.3333333333333333,
+          "top10": "[\"MESSEJANA\", \"MONDUBIM\", \"JANGURURSSU\", \"PREFEITO JOSE WALTER\", \"BARRA DO CEARA\", \"BARROSO\", \"PLANALTO AYRTON SENNA\", \"JOSE DE ALENCAR\", \"PASSARE\", \"VICENTE PINZON\"]",
+          "month": "2026-04"
+        },
+        {
+          "pred_date": "2026-04-26",
+          "eval_end": "2026-05-10",
+          "model": "Active_Ensemble",
+          "n_bairros_gt": 3,
+          "n_cvli_gt": 3.0,
+          "p10": 0.0,
+          "p20": 0.05,
+          "r10": 0.0,
+          "r20": 0.3333333333333333,
+          "top10": "[\"MESSEJANA\", \"MONDUBIM\", \"JANGURURSSU\", \"BARRA DO CEARA\", \"PREFEITO JOSE WALTER\", \"BARROSO\", \"PLANALTO AYRTON SENNA\", \"JOSE DE ALENCAR\", \"PASSARE\", \"VICENTE PINZON\"]",
+          "month": "2026-04"
+        },
+        {
+          "pred_date": "2026-04-25",
+          "eval_end": "2026-05-09",
+          "model": "Active_Ensemble",
+          "n_bairros_gt": 2,
+          "n_cvli_gt": 2.0,
+          "p10": 0.0,
+          "p20": 0.05,
+          "r10": 0.0,
+          "r20": 0.5,
+          "top10": "[\"MESSEJANA\", \"MONDUBIM\", \"BARRA DO CEARA\", \"JANGURURSSU\", \"BARROSO\", \"PREFEITO JOSE WALTER\", \"PLANALTO AYRTON SENNA\", \"JOSE DE ALENCAR\", \"PASSARE\", \"VICENTE PINZON\"]",
+          "month": "2026-04"
+        },
+        {
+          "pred_date": "2026-04-24",
+          "eval_end": "2026-05-08",
+          "model": "Active_Ensemble",
+          "n_bairros_gt": 2,
+          "n_cvli_gt": 2.0,
+          "p10": 0.0,
+          "p20": 0.05,
+          "r10": 0.0,
+          "r20": 0.5,
+          "top10": "[\"MESSEJANA\", \"MONDUBIM\", \"BARROSO\", \"BARRA DO CEARA\", \"PREFEITO JOSE WALTER\", \"JANGURURSSU\", \"PLANALTO AYRTON SENNA\", \"JOSE DE ALENCAR\", \"PASSARE\", \"VICENTE PINZON\"]",
+          "month": "2026-04"
+        }
+      ]
+    },
+    "EWMA": {
+      "best": [
+        {
+          "pred_date": "2026-03-17",
+          "eval_end": "2026-03-31",
+          "model": "EWMA",
+          "n_bairros_gt": 7,
+          "n_cvli_gt": 8.0,
+          "p10": 0.4,
+          "p20": 0.25,
+          "r10": 0.5714285714285714,
+          "r20": 0.7142857142857143,
+          "top10": "[\"JOSE DE ALENCAR\", \"MESSEJANA\", \"LAGOA REDONDA\", \"MONDUBIM\", \"PASSARE\", \"GRANJA PORTUGAL\", \"CURIO\", \"BARROSO\", \"GRANJA LISBOA\", \"CARLITO PAMPLONA\"]",
+          "month": "2026-03"
+        },
+        {
+          "pred_date": "2026-03-18",
+          "eval_end": "2026-04-01",
+          "model": "EWMA",
+          "n_bairros_gt": 7,
+          "n_cvli_gt": 8.0,
+          "p10": 0.4,
+          "p20": 0.25,
+          "r10": 0.5714285714285714,
+          "r20": 0.7142857142857143,
+          "top10": "[\"JOSE DE ALENCAR\", \"MESSEJANA\", \"LAGOA REDONDA\", \"MONDUBIM\", \"PASSARE\", \"GRANJA PORTUGAL\", \"BARROSO\", \"CURIO\", \"GRANJA LISBOA\", \"CARLITO PAMPLONA\"]",
+          "month": "2026-03"
+        },
+        {
+          "pred_date": "2026-03-11",
+          "eval_end": "2026-03-25",
+          "model": "EWMA",
+          "n_bairros_gt": 7,
+          "n_cvli_gt": 8.0,
+          "p10": 0.4,
+          "p20": 0.3,
+          "r10": 0.5714285714285714,
+          "r20": 0.8571428571428571,
+          "top10": "[\"MESSEJANA\", \"JOSE DE ALENCAR\", \"LAGOA REDONDA\", \"MONDUBIM\", \"CURIO\", \"BARROSO\", \"GRANJA LISBOA\", \"CARLITO PAMPLONA\", \"QUINTINO CUNHA\", \"JANGURURSSU\"]",
+          "month": "2026-03"
+        },
+        {
+          "pred_date": "2026-03-12",
+          "eval_end": "2026-03-26",
+          "model": "EWMA",
+          "n_bairros_gt": 7,
+          "n_cvli_gt": 8.0,
+          "p10": 0.4,
+          "p20": 0.25,
+          "r10": 0.5714285714285714,
+          "r20": 0.7142857142857143,
+          "top10": "[\"JOSE DE ALENCAR\", \"MESSEJANA\", \"LAGOA REDONDA\", \"MONDUBIM\", \"PASSARE\", \"CURIO\", \"BARROSO\", \"GRANJA LISBOA\", \"CARLITO PAMPLONA\", \"JANGURURSSU\"]",
+          "month": "2026-03"
+        },
+        {
+          "pred_date": "2026-03-13",
+          "eval_end": "2026-03-27",
+          "model": "EWMA",
+          "n_bairros_gt": 7,
+          "n_cvli_gt": 7.0,
+          "p10": 0.4,
+          "p20": 0.25,
+          "r10": 0.5714285714285714,
+          "r20": 0.7142857142857143,
+          "top10": "[\"JOSE DE ALENCAR\", \"MESSEJANA\", \"LAGOA REDONDA\", \"MONDUBIM\", \"GRANJA PORTUGAL\", \"PASSARE\", \"CURIO\", \"BARROSO\", \"GRANJA LISBOA\", \"CARLITO PAMPLONA\"]",
+          "month": "2026-03"
+        }
+      ],
+      "worst": [
+        {
+          "pred_date": "2026-04-28",
+          "eval_end": "2026-05-12",
+          "model": "EWMA",
+          "n_bairros_gt": 3,
+          "n_cvli_gt": 3.0,
+          "p10": 0.1,
+          "p20": 0.05,
+          "r10": 0.3333333333333333,
+          "r20": 0.3333333333333333,
+          "top10": "[\"MESSEJANA\", \"JOSE DE ALENCAR\", \"CANINDEZINHO\", \"BARROSO\", \"MONDUBIM\", \"PARQUE DOIS IRMAOS\", \"BARRA DO CEARA\", \"LAGOA REDONDA\", \"CURIO\", \"BONSUCESSO\"]",
+          "month": "2026-04"
+        },
+        {
+          "pred_date": "2026-05-16",
+          "eval_end": "2026-05-30",
+          "model": "EWMA",
+          "n_bairros_gt": 6,
+          "n_cvli_gt": 6.0,
+          "p10": 0.1,
+          "p20": 0.2,
+          "r10": 0.16666666666666666,
+          "r20": 0.6666666666666666,
+          "top10": "[\"CAJAZEIRAS\", \"JANGURURSSU\", \"MESSEJANA\", \"CURIO\", \"SIQUEIRA\", \"JOSE DE ALENCAR\", \"BARROSO\", \"MONDUBIM\", \"CANINDEZINHO\", \"LAGOA REDONDA\"]",
+          "month": "2026-05"
+        },
+        {
+          "pred_date": "2026-04-19",
+          "eval_end": "2026-05-03",
+          "model": "EWMA",
+          "n_bairros_gt": 1,
+          "n_cvli_gt": 1.0,
+          "p10": 0.0,
+          "p20": 0.0,
+          "r10": 0.0,
+          "r20": 0.0,
+          "top10": "[\"MESSEJANA\", \"JOSE DE ALENCAR\", \"CANINDEZINHO\", \"BARROSO\", \"PARQUE DOIS IRMAOS\", \"MONDUBIM\", \"BARRA DO CEARA\", \"LAGOA REDONDA\", \"CURIO\", \"BONSUCESSO\"]",
+          "month": "2026-04"
+        },
+        {
+          "pred_date": "2026-04-20",
+          "eval_end": "2026-05-04",
+          "model": "EWMA",
+          "n_bairros_gt": 1,
+          "n_cvli_gt": 1.0,
+          "p10": 0.0,
+          "p20": 0.0,
+          "r10": 0.0,
+          "r20": 0.0,
+          "top10": "[\"MESSEJANA\", \"JOSE DE ALENCAR\", \"CANINDEZINHO\", \"BARROSO\", \"PARQUE DOIS IRMAOS\", \"MONDUBIM\", \"BARRA DO CEARA\", \"LAGOA REDONDA\", \"CURIO\", \"BONSUCESSO\"]",
+          "month": "2026-04"
+        },
+        {
+          "pred_date": "2026-05-05",
+          "eval_end": "2026-05-19",
+          "model": "EWMA",
+          "n_bairros_gt": 3,
+          "n_cvli_gt": 4.0,
+          "p10": 0.0,
+          "p20": 0.05,
+          "r10": 0.0,
+          "r20": 0.3333333333333333,
+          "top10": "[\"MESSEJANA\", \"CURIO\", \"SIQUEIRA\", \"JOSE DE ALENCAR\", \"CANINDEZINHO\", \"BARROSO\", \"MONDUBIM\", \"PARQUE DOIS IRMAOS\", \"LAGOA REDONDA\", \"BARRA DO CEARA\"]",
+          "month": "2026-05"
+        }
+      ]
+    }
+  },
+  "artifacts": {
+    "daily_csv": "C:\\Users\\STI01\\Desktop\\Projetos\\Report Preview\\outputs\\validation_holdout_mar_to_jun_2026.csv",
+    "summary_csv": "C:\\Users\\STI01\\Desktop\\Projetos\\Report Preview\\outputs\\validation_holdout_mar_to_jun_2026_summary.csv",
+    "monthly_csv": "C:\\Users\\STI01\\Desktop\\Projetos\\Report Preview\\outputs\\validation_holdout_mar_to_jun_2026_monthly.csv"
+  }
+}
