@@ -150,10 +150,15 @@ class ExplanationGenerator:
             'importance': 'medium' if rank > 10 else 'high'
         })
 
+        model_family = str(context.get('model_family') or 'modelo operacional')
+        primary_signal_label = str(context.get('primary_signal_label') or 'sinal principal do ranking')
+        expected_cvli_14d = self._safe_float(context.get('expected_cvli_14d'))
         signal_text = (
-            f"🎯 **Sinal modelado consistente**: A confiança de {confidence * 100.0:.1f}% indica que a criticidade "
-            "não está apoiada em um único evento isolado, mas em um padrão espacial e temporal recorrente aprendido pelo modelo."
+            f"🎯 **Leitura do {model_family}**: A confiança de {confidence * 100.0:.1f}% indica que a criticidade "
+            f"não está apoiada em um único evento isolado, mas em um padrão recorrente no {primary_signal_label.lower()}."
         )
+        if expected_cvli_14d > 0:
+            signal_text += f" A projeção operacional para 14 dias está em {expected_cvli_14d:.2f}."
         factors.append({
             'name': 'Consistência do Modelo',
             'explanation': signal_text,
@@ -273,6 +278,8 @@ class ExplanationGenerator:
         critical_streets_count = self._safe_int(context.get('critical_streets_count'))
         tension_index = self._safe_float(context.get('tension_index'))
         faction = str(context.get('faction') or 'NEUTRO').upper()
+        territorial_support_pct = self._safe_float(context.get('territorial_support_pct'))
+        primary_signal_label = str(context.get('primary_signal_label') or 'sinal principal do ranking')
 
         rank_strength = self._clamp((100.0 - top_slice_pct) / 100.0, 0.0, 1.0)
         score_separation = self._clamp((score_zscore + 1.5) / 3.0, 0.0, 1.0)
@@ -364,6 +371,12 @@ class ExplanationGenerator:
                 'direction': 'positive',
                 'score_pct': round(temporal_signal * 100.0, 1),
                 'text': f"CVLI 7d={cvli_recent_7} contra {cvli_prev_7} na janela anterior; CVLI 14d={cvli_recent_14} contra {cvli_prev_14}.",
+            },
+            {
+                'name': 'Sustentação territorial do modelo',
+                'direction': 'positive',
+                'score_pct': round(self._clamp(territorial_support_pct / 100.0, 0.0, 1.0) * 100.0, 1),
+                'text': f"O {primary_signal_label.lower()} trabalha com suporte territorial de {self._pt_number(territorial_support_pct)}% nesta leitura.",
             },
             {
                 'name': 'Corroboração espacial',
@@ -772,8 +785,8 @@ class ExplanationGenerator:
             )
 
         methodology_note = (
-            'Esta explicação usa regras auditáveis sobre sinais reais do pipeline: ranking, séries de CVLI, adjacência territorial, tensão faccional, '
-            'eventos exógenos, inteligência e contexto operacional. A confiança indica consistência entre evidências para apoio à decisão, e não probabilidade causal calibrada.'
+            'Esta explicação usa regras auditáveis sobre sinais reais do pipeline Poisson: score esperado no horizonte, séries de CVLI, suporte territorial, '
+            'adjacência, eventos exógenos, inteligência e contexto operacional. A confiança indica consistência entre evidências para apoio à decisão, e não probabilidade causal calibrada.'
         )
 
         return {

@@ -1,237 +1,5 @@
 [
   {
-    "date": "2026-05-08 00:00:00",
-    "total_events": 13,
-    "brute_cvli": 13,
-    "exogenous": 0,
-    "exogenous_conflict": 0,
-    "police_qualified_actions_7d": 0,
-    "police_administrative_events_7d": 0,
-    "assigned_total_events": 13,
-    "unmapped_total_events": 0,
-    "assigned_brute_cvli": 13,
-    "assigned_exogenous": 0,
-    "unmapped_exogenous": 0,
-    "assigned_police_qualified_actions": 0,
-    "unmapped_police_qualified_actions": 0,
-    "unmapped_exogenous_sample": [],
-    "global": {
-      "total_nodes": 191,
-      "active_locations": 11,
-      "total_events": 13,
-      "ranking_top10": [
-        "CAUCAIA",
-        "JUAZEIRO DO NORTE",
-        "PARQUE IRACEMA",
-        "CURIO",
-        "ITAPIUNA",
-        "VARZEA ALEGRE",
-        "BARROSO",
-        "CANINDEZINHO",
-        "ARATUBA",
-        "CARIRE"
-      ],
-      "gt_sample": [
-        "AEROPORTO",
-        "ANCURI",
-        "BARROSO",
-        "BOM JARDIM",
-        "CANINDEZINHO",
-        "CONJUNTO PALMEIRAS",
-        "CAUCAIA",
-        "HORIZONTE",
-        "ITAITINGA",
-        "JUAZEIRO DO NORTE",
-        "CARIRE"
-      ],
-      "p5": 0.4,
-      "recall5": 0.1818,
-      "hits5": [
-        "CAUCAIA",
-        "JUAZEIRO DO NORTE"
-      ],
-      "p10": 0.5,
-      "recall10": 0.4545,
-      "hits10": [
-        "CAUCAIA",
-        "JUAZEIRO DO NORTE",
-        "BARROSO",
-        "CANINDEZINHO",
-        "CARIRE"
-      ],
-      "p20": 0.45,
-      "recall20": 0.8182,
-      "hits20": [
-        "CAUCAIA",
-        "JUAZEIRO DO NORTE",
-        "BARROSO",
-        "CANINDEZINHO",
-        "CARIRE",
-        "BOM JARDIM",
-        "CONJUNTO PALMEIRAS",
-        "AEROPORTO",
-        "ANCURI"
-      ]
-    },
-    "fortaleza": {
-      "total_nodes": 122,
-      "active_locations": 6,
-      "total_events": 7,
-      "ranking_top10": [
-        "PARQUE IRACEMA",
-        "CURIO",
-        "BARROSO",
-        "CANINDEZINHO",
-        "BOM JARDIM",
-        "CONJUNTO PALMEIRAS",
-        "AEROLANDIA",
-        "AEROPORTO",
-        "ANCURI",
-        "ALTO ALEGRE"
-      ],
-      "gt_sample": [
-        "AEROPORTO",
-        "ANCURI",
-        "BARROSO",
-        "BOM JARDIM",
-        "CANINDEZINHO",
-        "CONJUNTO PALMEIRAS"
-      ],
-      "p5": 0.6,
-      "recall5": 0.5,
-      "hits5": [
-        "BARROSO",
-        "CANINDEZINHO",
-        "BOM JARDIM"
-      ],
-      "p10": 0.6,
-      "recall10": 1.0,
-      "hits10": [
-        "BARROSO",
-        "CANINDEZINHO",
-        "BOM JARDIM",
-        "CONJUNTO PALMEIRAS",
-        "AEROPORTO",
-        "ANCURI"
-      ],
-      "p20": 0.3,
-      "recall20": 1.0,
-      "hits20": [
-        "BARROSO",
-        "CANINDEZINHO",
-        "BOM JARDIM",
-        "CONJUNTO PALMEIRAS",
-        "AEROPORTO",
-        "ANCURI"
-      ]
-    },
-    "rmf": {
-      "total_nodes": 19,
-      "active_locations": 3,
-      "total_events": 3,
-      "ranking_top10": [
-        "CAUCAIA",
-        "MARACANAU",
-        "ITAITINGA",
-        "HORIZONTE",
-        "PARAIPABA",
-        "PACAJUS",
-        "PACATUBA",
-        "PINDORETAMA",
-        "EUSEBIO",
-        "SAO LUIS DO CURU"
-      ],
-      "gt_sample": [
-        "CAUCAIA",
-        "HORIZONTE",
-        "ITAITINGA"
-      ],
-      "p5": 0.6,
-      "recall5": 1.0,
-      "hits5": [
-        "CAUCAIA",
-        "ITAITINGA",
-        "HORIZONTE"
-      ],
-      "p10": 0.3,
-      "recall10": 1.0,
-      "hits10": [
-        "CAUCAIA",
-        "ITAITINGA",
-        "HORIZONTE"
-      ],
-      "p20": 0.1579,
-      "recall20": 1.0,
-      "hits20": [
-        "CAUCAIA",
-        "ITAITINGA",
-        "HORIZONTE"
-      ]
-    },
-    "interior": {
-      "total_nodes": 50,
-      "active_locations": 2,
-      "total_events": 3,
-      "ranking_top10": [
-        "JUAZEIRO DO NORTE",
-        "ITAPIUNA",
-        "VARZEA ALEGRE",
-        "ARATUBA",
-        "CARIRE",
-        "JAGUARUANA",
-        "VICOSA DO CEARA",
-        "BATURITE",
-        "LIMOEIRO DO NORTE",
-        "CRATO"
-      ],
-      "gt_sample": [
-        "JUAZEIRO DO NORTE",
-        "CARIRE"
-      ],
-      "p5": 0.4,
-      "recall5": 1.0,
-      "hits5": [
-        "JUAZEIRO DO NORTE",
-        "CARIRE"
-      ],
-      "p10": 0.2,
-      "recall10": 1.0,
-      "hits10": [
-        "JUAZEIRO DO NORTE",
-        "CARIRE"
-      ],
-      "p20": 0.1,
-      "recall20": 1.0,
-      "hits20": [
-        "JUAZEIRO DO NORTE",
-        "CARIRE"
-      ]
-    }
-  },
-  {
-    "date": "2026-05-12",
-    "total_events": 0,
-    "brute_cvli": 0,
-    "exogenous": 0,
-    "exogenous_conflict": 0,
-    "police_qualified_actions_7d": 0,
-    "police_administrative_events_7d": 0,
-    "assigned_total_events": 0,
-    "unmapped_total_events": 0,
-    "assigned_brute_cvli": 0,
-    "assigned_exogenous": 0,
-    "unmapped_exogenous": 0,
-    "assigned_police_qualified_actions": 0,
-    "unmapped_police_qualified_actions": 0,
-    "unmapped_exogenous_sample": [],
-    "global": {
-      "status": "no_scores",
-      "p5": 0.0,
-      "p10": 0.0,
-      "p20": 0.0
-    }
-  },
-  {
     "date": "2026-05-11 00:00:00",
     "total_events": 13,
     "brute_cvli": 13,
@@ -2235,6 +2003,29 @@
     }
   },
   {
+    "date": "2026-06-11",
+    "total_events": 0,
+    "brute_cvli": 0,
+    "exogenous": 0,
+    "exogenous_conflict": 0,
+    "police_qualified_actions_7d": 0,
+    "police_administrative_events_7d": 0,
+    "assigned_total_events": 0,
+    "unmapped_total_events": 0,
+    "assigned_brute_cvli": 0,
+    "assigned_exogenous": 0,
+    "unmapped_exogenous": 0,
+    "assigned_police_qualified_actions": 0,
+    "unmapped_police_qualified_actions": 0,
+    "unmapped_exogenous_sample": [],
+    "global": {
+      "status": "no_scores",
+      "p5": 0.0,
+      "p10": 0.0,
+      "p20": 0.0
+    }
+  },
+  {
     "date": "2026-06-08 00:00:00",
     "total_events": 16,
     "brute_cvli": 16,
@@ -2255,16 +2046,16 @@
       "active_locations": 11,
       "total_events": 16,
       "ranking_top10": [
-        "CAUCAIA",
         "TIANGUA",
         "ITAPAJE",
-        "MARACANAU",
+        "TRAIRI",
         "JUAZEIRO DO NORTE",
         "ITAPIUNA",
         "GROAIRAS",
-        "TRAIRI",
         "PARQUE DOIS IRMAOS",
-        "ALVARO WEYNE"
+        "ALVARO WEYNE",
+        "CAJAZEIRAS",
+        "JOSE DE ALENCAR"
       ],
       "gt_sample": [
         "PARQUE DOIS IRMAOS",
@@ -2274,27 +2065,29 @@
         "GUAIUBA",
         "TRAIRI",
         "JUAZEIRO DO NORTE",
-        "TIANGUA",
         "GROAIRAS",
+        "TIANGUA",
         "ITAPAJE",
         "ITAPIUNA"
       ],
-      "p5": 0.6,
-      "recall5": 0.2727,
+      "p5": 1.0,
+      "recall5": 0.4545,
       "hits5": [
         "TIANGUA",
         "ITAPAJE",
-        "JUAZEIRO DO NORTE"
+        "TRAIRI",
+        "JUAZEIRO DO NORTE",
+        "ITAPIUNA"
       ],
       "p10": 0.8,
       "recall10": 0.7273,
       "hits10": [
         "TIANGUA",
         "ITAPAJE",
+        "TRAIRI",
         "JUAZEIRO DO NORTE",
         "ITAPIUNA",
         "GROAIRAS",
-        "TRAIRI",
         "PARQUE DOIS IRMAOS",
         "ALVARO WEYNE"
       ],
@@ -2303,10 +2096,10 @@
       "hits20": [
         "TIANGUA",
         "ITAPAJE",
+        "TRAIRI",
         "JUAZEIRO DO NORTE",
         "ITAPIUNA",
         "GROAIRAS",
-        "TRAIRI",
         "PARQUE DOIS IRMAOS",
         "ALVARO WEYNE"
       ]
@@ -2318,14 +2111,14 @@
       "ranking_top10": [
         "PARQUE DOIS IRMAOS",
         "ALVARO WEYNE",
-        "BARRA DO CEARA",
         "CAJAZEIRAS",
-        "BONSUCESSO",
         "JOSE DE ALENCAR",
-        "LAGOA REDONDA",
-        "QUINTINO CUNHA",
+        "BARRA DO CEARA",
+        "BONSUCESSO",
         "ANCURI",
-        "MONDUBIM"
+        "SAO BENTO",
+        "LAGOA REDONDA",
+        "CURIO"
       ],
       "gt_sample": [
         "PARQUE DOIS IRMAOS",
@@ -2355,16 +2148,16 @@
       "active_locations": 4,
       "total_events": 7,
       "ranking_top10": [
+        "TRAIRI",
         "CAUCAIA",
         "MARACANAU",
-        "TRAIRI",
         "EUSEBIO",
         "HORIZONTE",
-        "PACAJUS",
-        "PINDORETAMA",
-        "PARAIPABA",
+        "SAO GONCALO DO AMARANTE",
+        "BEBERIBE",
+        "CASCAVEL",
         "SAO LUIS DO CURU",
-        "ITAITINGA"
+        "MARANGUAPE"
       ],
       "gt_sample": [
         "PACATUBA",
@@ -2389,8 +2182,8 @@
       "hits20": [
         "TRAIRI",
         "EUSEBIO",
-        "PACATUBA",
-        "GUAIUBA"
+        "GUAIUBA",
+        "PACATUBA"
       ]
     },
     "interior": {
@@ -2403,16 +2196,16 @@
         "JUAZEIRO DO NORTE",
         "ITAPIUNA",
         "GROAIRAS",
+        "VARZEA ALEGRE",
+        "ALTO SANTO",
         "SOBRAL",
         "IGUATU",
-        "BATURITE",
-        "LIMOEIRO DO NORTE",
-        "VARZEA ALEGRE"
+        "BATURITE"
       ],
       "gt_sample": [
         "JUAZEIRO DO NORTE",
-        "TIANGUA",
         "GROAIRAS",
+        "TIANGUA",
         "ITAPAJE",
         "ITAPIUNA"
       ],
@@ -2442,6 +2235,289 @@
         "JUAZEIRO DO NORTE",
         "ITAPIUNA",
         "GROAIRAS"
+      ]
+    }
+  },
+  {
+    "date": "2026-06-12 00:00:00",
+    "total_events": 70,
+    "brute_cvli": 70,
+    "exogenous": 0,
+    "exogenous_conflict": 0,
+    "police_qualified_actions_7d": 0,
+    "police_administrative_events_7d": 0,
+    "assigned_total_events": 70,
+    "unmapped_total_events": 0,
+    "assigned_brute_cvli": 70,
+    "assigned_exogenous": 0,
+    "unmapped_exogenous": 0,
+    "assigned_police_qualified_actions": 0,
+    "unmapped_police_qualified_actions": 0,
+    "unmapped_exogenous_sample": [],
+    "global": {
+      "total_nodes": 170,
+      "active_locations": 38,
+      "total_events": 70,
+      "ranking_top10": [
+        "SOBRAL",
+        "JUAZEIRO DO NORTE",
+        "CAUCAIA",
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "AMONTADA",
+        "ALVARO WEYNE",
+        "ITAPIUNA",
+        "CRATO",
+        "ITAPIPOCA"
+      ],
+      "gt_sample": [
+        "BARRA DO CEARA",
+        "CANINDEZINHO",
+        "MESSEJANA",
+        "ALVARO WEYNE",
+        "CAUCAIA",
+        "PACATUBA",
+        "SAO GONCALO DO AMARANTE",
+        "TRAIRI",
+        "EUSEBIO",
+        "ITAITINGA",
+        "GUAIUBA",
+        "PARAIPABA",
+        "SOBRAL",
+        "JUAZEIRO DO NORTE",
+        "ITAPIPOCA"
+      ],
+      "p5": 1.0,
+      "recall5": 0.1316,
+      "hits5": [
+        "SOBRAL",
+        "JUAZEIRO DO NORTE",
+        "CAUCAIA",
+        "BARRA DO CEARA",
+        "MESSEJANA"
+      ],
+      "p10": 1.0,
+      "recall10": 0.2632,
+      "hits10": [
+        "SOBRAL",
+        "JUAZEIRO DO NORTE",
+        "CAUCAIA",
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "AMONTADA",
+        "ALVARO WEYNE",
+        "ITAPIUNA",
+        "CRATO",
+        "ITAPIPOCA"
+      ],
+      "p20": 0.9,
+      "recall20": 0.4737,
+      "hits20": [
+        "SOBRAL",
+        "JUAZEIRO DO NORTE",
+        "CAUCAIA",
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "AMONTADA",
+        "ALVARO WEYNE",
+        "ITAPIUNA",
+        "CRATO",
+        "ITAPIPOCA",
+        "MORADA NOVA",
+        "TRAIRI",
+        "CANINDEZINHO",
+        "BOA VIAGEM",
+        "LIMOEIRO DO NORTE",
+        "FORQUILHA",
+        "PEDRA BRANCA",
+        "VICOSA DO CEARA"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 101,
+      "active_locations": 4,
+      "total_events": 5,
+      "ranking_top10": [
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "ALVARO WEYNE",
+        "GRANJA LISBOA",
+        "CANINDEZINHO",
+        "JOSE WALTER",
+        "JOSE DE ALENCAR",
+        "SIQUEIRA",
+        "BARROSO",
+        "PLANALTO AYRTON SENNA"
+      ],
+      "gt_sample": [
+        "BARRA DO CEARA",
+        "CANINDEZINHO",
+        "MESSEJANA",
+        "ALVARO WEYNE"
+      ],
+      "p5": 0.8,
+      "recall5": 1.0,
+      "hits5": [
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "ALVARO WEYNE",
+        "CANINDEZINHO"
+      ],
+      "p10": 0.4,
+      "recall10": 1.0,
+      "hits10": [
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "ALVARO WEYNE",
+        "CANINDEZINHO"
+      ],
+      "p20": 0.2,
+      "recall20": 1.0,
+      "hits20": [
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "ALVARO WEYNE",
+        "CANINDEZINHO"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 19,
+      "active_locations": 8,
+      "total_events": 16,
+      "ranking_top10": [
+        "CAUCAIA",
+        "TRAIRI",
+        "SAO GONCALO DO AMARANTE",
+        "ITAITINGA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "MARACANAU",
+        "MARANGUAPE",
+        "PACATUBA",
+        "PACAJUS"
+      ],
+      "gt_sample": [
+        "CAUCAIA",
+        "PACATUBA",
+        "SAO GONCALO DO AMARANTE",
+        "TRAIRI",
+        "EUSEBIO",
+        "ITAITINGA",
+        "GUAIUBA",
+        "PARAIPABA"
+      ],
+      "p5": 1.0,
+      "recall5": 0.625,
+      "hits5": [
+        "CAUCAIA",
+        "TRAIRI",
+        "SAO GONCALO DO AMARANTE",
+        "ITAITINGA",
+        "EUSEBIO"
+      ],
+      "p10": 0.7,
+      "recall10": 0.875,
+      "hits10": [
+        "CAUCAIA",
+        "TRAIRI",
+        "SAO GONCALO DO AMARANTE",
+        "ITAITINGA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "PACATUBA"
+      ],
+      "p20": 0.4211,
+      "recall20": 1.0,
+      "hits20": [
+        "CAUCAIA",
+        "TRAIRI",
+        "SAO GONCALO DO AMARANTE",
+        "ITAITINGA",
+        "EUSEBIO",
+        "PARAIPABA",
+        "PACATUBA",
+        "GUAIUBA"
+      ]
+    },
+    "interior": {
+      "total_nodes": 50,
+      "active_locations": 26,
+      "total_events": 49,
+      "ranking_top10": [
+        "SOBRAL",
+        "JUAZEIRO DO NORTE",
+        "AMONTADA",
+        "ITAPIUNA",
+        "CRATO",
+        "ITAPIPOCA",
+        "MORADA NOVA",
+        "BOA VIAGEM",
+        "LIMOEIRO DO NORTE",
+        "FORQUILHA"
+      ],
+      "gt_sample": [
+        "SOBRAL",
+        "JUAZEIRO DO NORTE",
+        "ITAPIPOCA",
+        "CRATO",
+        "AMONTADA",
+        "MORADA NOVA",
+        "CANINDE",
+        "TIANGUA",
+        "ITAPAJE",
+        "BOA VIAGEM",
+        "RUSSAS",
+        "FORQUILHA",
+        "GROAIRAS",
+        "CARIRE",
+        "LIMOEIRO DO NORTE"
+      ],
+      "p5": 1.0,
+      "recall5": 0.1923,
+      "hits5": [
+        "SOBRAL",
+        "JUAZEIRO DO NORTE",
+        "AMONTADA",
+        "ITAPIUNA",
+        "CRATO"
+      ],
+      "p10": 1.0,
+      "recall10": 0.3846,
+      "hits10": [
+        "SOBRAL",
+        "JUAZEIRO DO NORTE",
+        "AMONTADA",
+        "ITAPIUNA",
+        "CRATO",
+        "ITAPIPOCA",
+        "MORADA NOVA",
+        "BOA VIAGEM",
+        "LIMOEIRO DO NORTE",
+        "FORQUILHA"
+      ],
+      "p20": 1.0,
+      "recall20": 0.7692,
+      "hits20": [
+        "SOBRAL",
+        "JUAZEIRO DO NORTE",
+        "AMONTADA",
+        "ITAPIUNA",
+        "CRATO",
+        "ITAPIPOCA",
+        "MORADA NOVA",
+        "BOA VIAGEM",
+        "LIMOEIRO DO NORTE",
+        "FORQUILHA",
+        "PEDRA BRANCA",
+        "VICOSA DO CEARA",
+        "SENADOR POMPEU",
+        "IRAUCUBA",
+        "GRACA",
+        "NOVO ORIENTE",
+        "TAUA",
+        "RUSSAS",
+        "CANINDE",
+        "TIANGUA"
       ]
     }
   }

@@ -2,50 +2,28 @@
   "status": "success",
   "manager_decision": "Intervenção automática aplicada ao modelo por desvio semântico ou erro de convergência.",
   "calibrated_weights": {
-    "tension_factor": 2.75,
+    "tension_factor": 0.7,
     "min_risk": 30.0,
-    "tag_bias_direct": 5.0,
-    "tag_bias_neighbor": 0.85,
-    "norm_neural_weight": 0.55,
-    "dynamic_window": 30,
-    "use_historical_fallback": true,
-    "historical_top10": [
-      "MARACANAU",
-      "CAUCAIA",
-      "HORIZONTE",
-      "PACAJUS",
-      "PACATUBA",
-      "PINDORETAMA",
-      "EUSEBIO",
-      "PARAIPABA",
-      "ITAITINGA",
-      "SAO LUIS DO CURU"
-    ]
+    "tag_bias_direct": 2.2,
+    "tag_bias_neighbor": 0.7,
+    "norm_neural_weight": 0.35,
+    "dynamic_window": null,
+    "use_historical_fallback": false,
+    "historical_fallback_manual": false
   },
-  "explanations": "RMF: ajuste automático aplicado para p10.",
+  "explanations": "RMF: ajuste automático aplicado para p20.",
   "data_analysis": {},
-  "calibrated_at": "2026-06-10T23:21:57.110740",
+  "calibrated_at": "2026-06-14T23:35:47.107864",
   "target_region": "rmf",
-  "affected_metric": "p10",
+  "affected_metric": "p20",
   "operational_params": {
-    "tension_factor": 2.75,
+    "tension_factor": 0.7,
     "min_risk": 30.0,
-    "tag_bias_direct": 5.0,
-    "tag_bias_neighbor": 0.85,
-    "norm_neural_weight": 0.55,
-    "dynamic_window": 30,
-    "use_historical_fallback": true,
-    "historical_top10": [
-      "MARACANAU",
-      "CAUCAIA",
-      "HORIZONTE",
-      "PACAJUS",
-      "PACATUBA",
-      "PINDORETAMA",
-      "EUSEBIO",
-      "PARAIPABA",
-      "ITAITINGA",
-      "SAO LUIS DO CURU"
-    ]
+    "tag_bias_direct": 2.2,
+    "tag_bias_neighbor": 0.7,
+    "norm_neural_weight": 0.35,
+    "dynamic_window": null,
+    "use_historical_fallback": false,
+    "historical_fallback_manual": false
   }
 }

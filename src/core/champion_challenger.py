@@ -91,7 +91,7 @@ class ChampionChallenger:
 
     def __init__(self, base_dir: str):
         self.base_dir    = base_dir
-        self.model_path  = os.path.join(base_dir, "models", "active", "lgbm_lean_v3_freeze.pkl")
+        self.model_path  = os.path.join(base_dir, "models", "active", "production", "challengers", "lgbm_lean_v3_freeze.pkl")
         self.cc_log      = os.path.join(base_dir, "logs", "cc_decisions.jsonl")
         self.state_path  = os.path.join(base_dir, "data", "cc_state.json")
         self.csv_enrich  = os.path.join(base_dir, "data", "raw", "dados_status_ocorrencias_gerais_ENRIQUECIDO.csv")

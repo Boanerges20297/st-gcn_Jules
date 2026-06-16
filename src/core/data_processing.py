@@ -58,6 +58,30 @@ def clean_name(n):
     n = n.strip()
     return SUBDIVISION_TO_CITY.get(n, n)
 
+
+def sanitize_qtd_mortes(value, event_type):
+    """CVLI sem qtd_mortes explícita ainda representa pelo menos uma morte."""
+    try:
+        qty = float(value)
+    except Exception:
+        qty = np.nan
+
+    if not np.isfinite(qty) or qty <= 0:
+        return 1.0 if str(event_type or '').lower() == 'cvli' else 0.0
+    return qty
+
+
+def resolve_occurrence_location(bairro, cidade):
+    """Fora de Fortaleza, prioriza a cidade para evitar colisão com bairros homônimos da capital."""
+    bairro_clean = clean_name(bairro)
+    cidade_clean = clean_name(cidade)
+
+    if cidade_clean == 'FORTALEZA':
+        return bairro_clean or cidade_clean
+    if cidade_clean:
+        return cidade_clean
+    return bairro_clean
+
 def update_geo_streets_cache(df):
     """
     Verifica se existem novas coordenadas de CVLI no dataframe e as mapeia para o cache de ruas.
@@ -344,12 +368,12 @@ def process_ism_data():
                 'tipo': str(row.get('tipo', '')).lower(),
                 'bairro': row.get('bairro'),
                 'cidade': row.get('cidade'),
-                'loc_clean': clean_name(row.get('bairro', row.get('cidade'))),
+                'loc_clean': resolve_occurrence_location(row.get('bairro'), row.get('cidade')),
                 'tipo_evento': str(row.get('tipo_evento', '')).upper(),
                 'arma': str(row.get('arma', '')).upper(),
                 'latitude': row.get('latitude'),
                 'longitude': row.get('longitude'),
-                'qtd_mortes': float(row.get('qtd_mortes', 1)) # Nova coluna de anomalias
+                'qtd_mortes': sanitize_qtd_mortes(row.get('qtd_mortes', 1), row.get('tipo', '')) # Nova coluna de anomalias
             })
     else:
         with open(OCORRENCIAS_FILE, 'r', encoding='utf-8') as f:
@@ -373,12 +397,15 @@ def process_ism_data():
                     'tipo': str(extract_scalar('tipo') or '').lower(),
                     'bairro': extract_scalar('bairro'),
                     'cidade': extract_scalar('municipio') or extract_scalar('cidade'),
-                    'loc_clean': clean_name(extract_scalar('bairro_geo') or extract_scalar('bairro') or extract_scalar('municipio') or extract_scalar('cidade')),
+                    'loc_clean': resolve_occurrence_location(
+                        extract_scalar('bairro_geo') or extract_scalar('bairro'),
+                        extract_scalar('municipio') or extract_scalar('cidade')
+                    ),
                     'tipo_evento': str(extract_scalar('tipo_evento') or '').upper(),
                     'arma': str(extract_scalar('arma') or '').upper(),
                     'latitude': extract_scalar('latitude'),
                     'longitude': extract_scalar('longitude'),
-                    'qtd_mortes': float(extract_scalar('qtd_mortes') or 1)
+                    'qtd_mortes': sanitize_qtd_mortes(extract_scalar('qtd_mortes'), extract_scalar('tipo'))
                 })
             except: continue
     

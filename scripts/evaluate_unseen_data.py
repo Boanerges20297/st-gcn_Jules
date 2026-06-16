@@ -83,7 +83,7 @@ def evaluate_region(region_key):
     Y = np.stack(Y)
 
     # 3. Carregar Modelo
-    model_path = os.path.join(ROOT_DIR, 'models', 'active', f'{region_key}_model.pth')
+    model_path = os.path.join(ROOT_DIR, 'models', 'active', 'legacy_torch', f'{region_key}_model.pth')
     if not os.path.exists(model_path):
         logging.error(f"❌ Modelo não encontrado em {model_path}")
         return

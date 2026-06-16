@@ -1,5 +1,5 @@
 {
-  "last_checked_at": "2026-06-10T23:06:24",
+  "last_checked_at": "2026-06-14T21:55:46",
   "last_updated_at": "2026-06-04T21:38:49",
   "source_url": "https://www.google.com/maps/d/u/0/kml?mid=1lI0FmNXDPrezPhzeryZTCEP0rl8BDuE",
   "status": "fallback_active",
@@ -12,5 +12,5 @@
     "content_length": "",
     "content_type": "application/vnd.google-earth.kmz"
   },
-  "last_error": "Google bloqueou a exportação autenticada do My Maps. Verifique se o GOOGLE_MAPS_COOKIE ainda representa uma sessão válida no navegador. | chrome_profile: Chrome foi aberto com o perfil logado, mas nenhum KML/KMZ novo apareceu em Downloads em até 45s."
+  "last_error": "chrome_profile_cookies: browser-cookie3 falhou ao ler o perfil Default: Unable to get key for cookie decryption | env_cookie: Google não aceitou a sessão do GOOGLE_MAPS_COOKIE para exportar o My Maps (url final: https://accounts.google.com/CookieMismatch). Atualize o cookie autenticado no .env."
 }

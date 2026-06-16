@@ -1,0 +1,4 @@
+﻿model_type,days_scored,positive_days,hit1_event,p5_event,p10_event,p20_event,recall10_event,recall20_event,overlap10_rank,mrr_event,model,region,train_samples,val_samples
+deep,2,2,0.5,0.2,0.1,0.125,0.04772727272727273,0.11818181818181818,0.1,0.75,ShallowGAT,fortaleza,4,2
+classic,2,2,0.5,0.2,0.1,0.175,0.05,0.1659090909090909,0.05,0.5384615384615384,zero_baseline,fortaleza,4,2
+classic,2,2,0.0,0.5,0.5,0.45,0.23409090909090907,0.425,0.25,0.375,logit_classifier,fortaleza,4,2

@@ -14,7 +14,7 @@ except ImportError:
     from src.core.architectures import DeepSTGAT_64
 
 def analyze_weights(region_key):
-    model_path = f'models/active/{region_key}_model.pth'
+    model_path = f'models/active/legacy_torch/{region_key}_model.pth'
     if not os.path.exists(model_path):
         print(f"Modelo {region_key} não encontrado.")
         return

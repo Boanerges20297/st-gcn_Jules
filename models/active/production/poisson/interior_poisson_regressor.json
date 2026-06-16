@@ -1,0 +1,57 @@
+{
+  "generated_at": "2026-06-13T08:50:16.633461",
+  "artifact_path": "C:\\Users\\Boanerges\\Desktop\\Projetos\\Report Preview\\models\\active\\interior_poisson_regressor.pkl",
+  "backend_type": "regional_poisson_regressor",
+  "region": "interior",
+  "window": 14,
+  "horizon_days": 14,
+  "feature_cols": [
+    "lag_1",
+    "sum_7",
+    "sum_14",
+    "sum_30",
+    "sum_60",
+    "mean_7",
+    "mean_14",
+    "mean_30",
+    "mean_60",
+    "hist_mean",
+    "hist_sum",
+    "momentum_7",
+    "momentum_14",
+    "momentum_30",
+    "cold_streak_inv",
+    "tension_index",
+    "recent_cvli_static",
+    "total_cvli_static",
+    "sin_dow",
+    "cos_dow",
+    "sin_month",
+    "cos_month",
+    "is_weekend"
+  ],
+  "train_rows": 53450,
+  "benchmark_metrics": {
+    "validation_split": {
+      "train_start": "2022-01-01",
+      "train_end": "2024-12-31",
+      "val_start": "2025-01-01",
+      "val_end": "2025-12-31",
+      "horizon_days": 14
+    },
+    "interior_2025": {
+      "model_type": "classic",
+      "days_scored": 352,
+      "positive_days": 352,
+      "hit1_event": 0.9403409090909091,
+      "p5_event": 0.843181818181818,
+      "p10_event": 0.7275568181818183,
+      "p20_event": 0.6259943181818182,
+      "recall10_event": 0.34160501107864943,
+      "recall20_event": 0.5880912533038308,
+      "overlap10_rank": 0.2622159090909091,
+      "mrr_event": 0.9701704545454546
+    },
+    "selection_rationale": "Padronização estadual do backend Poisson para reduzir custo operacional do app."
+  }
+}

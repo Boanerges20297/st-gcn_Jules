@@ -667,100 +667,16 @@ def perform_validation_log(df_eval, window_days=14):
     Filtra para os últimos `window_days` dias para obter um gabarito tático real.
     Registra o resultado regional detalhado em VALIDATION_LOG.md.
     """
-    print(f"\n📊 Iniciando Validação Regional Detalhada (Gabarito - Últimos {window_days} dias)...")
-    
-    # 1. Carregar Orquestrador para obter as predições e mapeamento regional
     try:
-        from src.core.orchestrator import StateOrchestrator, normalize_name
-        orchestrator = StateOrchestrator(os.getcwd())
-        scores_map = orchestrator.get_combined_risk()
-        if not scores_map:
-            print("  - Não foi possível obter scores do Orquestrador para validação.")
-            return
+        from src.core.validation_logger import append_validation_log
+        append_validation_log(
+            df_eval=df_eval,
+            project_root=os.getcwd(),
+            window_days=window_days,
+            source_label='merge_new_data',
+        )
     except Exception as e:
-        print(f"  - Erro ao carregar StateOrchestrator: {e}")
-        return
-
-    # 2. Mapeamento de Bairros para Regiões (via Orquestrador)
-    node_to_region = {}
-    for reg, spec in orchestrator.specialists.items():
-        for _, row in spec['data']['nodes_gdf'].iterrows():
-            node_to_region[normalize_name(str(row['name']))] = reg
-
-    # 3. Preparar Ground Truth por Região
-    df_eval['data'] = pd.to_datetime(df_eval['data'], errors='coerce')
-    
-    max_date = df_eval['data'].max()
-    if pd.isna(max_date):
-        print("  - Erro: Nenhuma data válida encontrada na base.")
-        return
-        
-    cutoff_date = max_date - pd.Timedelta(days=window_days)
-    mask_time = df_eval['data'] >= cutoff_date
-    mask_cvli = df_eval['tipo'].str.lower() == 'cvli'
-    
-    cvlis = df_eval[mask_time & mask_cvli].copy()
-    
-    if cvlis.empty:
-        print(f"  - Nenhum CVLI nos últimos {window_days} dias para validar.")
-        return
-
-    cvlis['node_norm'] = cvlis['bairro'].apply(normalize_name)
-    cvlis['region'] = cvlis['node_norm'].map(node_to_region)
-    
-    # Registrar métricas por região
-    regions = ['fortaleza', 'rmf', 'interior']
-    results = []
-    
-    for reg in regions:
-        reg_cvlis = cvlis[cvlis['region'] == reg]
-        total_bruto = len(reg_cvlis)
-        
-        # Obter Top 10/20 da região
-        reg_nodes = [n for n, r in node_to_region.items() if r == reg]
-        reg_scores = {n: scores_map.get(n, 0.0) for n in reg_nodes}
-        top_pred = sorted(reg_scores.keys(), key=lambda x: reg_scores[x], reverse=True)
-        
-        # Gabarito (bairros com crime na nova entrada)
-        gt_bairros = set(reg_cvlis['node_norm'].unique())
-        
-        # Cálculo de Hits (P@k)
-        hits10 = len(gt_bairros.intersection(set(top_pred[:10])))
-        hits20 = len(gt_bairros.intersection(set(top_pred[:20])))
-        
-        p10 = hits10 / 10.0
-        p20 = hits20 / 20.0
-        r10 = hits10 / total_bruto if total_bruto > 0 else 0.0
-        r20 = hits20 / total_bruto if total_bruto > 0 else 0.0
-        
-        results.append({
-            'region': reg.upper(),
-            'total': total_bruto,
-            'hits': hits10,
-            'p10': f"{p10*100:.1f}%",
-            'p20': f"{p20*100:.1f}%",
-            'r10': f"{r10*100:.1f}%",
-            'r20': f"{r20*100:.1f}%",
-            'status': "✅" if p10 >= 0.4 else ("⚠️" if p10 >= 0.2 else "🚨")
-        })
-
-    # 4. Registrar no VALIDATION_LOG.md
-    log_path = os.path.join(os.getcwd(), 'VALIDATION_LOG.md')
-    now_str = datetime.now().strftime('%Y-%m-%d %H:%M')
-    start_d = cvlis['data'].min().strftime('%Y-%m-%d')
-    end_d = cvlis['data'].max().strftime('%Y-%m-%d')
-    
-    with open(log_path, 'a', encoding='utf-8') as f:
-        f.write(f"\n### 🔄 Sessão de Validação: {now_str}\n")
-        f.write(f"**Período Gabarito:** {start_d} a {end_d}\n\n")
-        f.write("| Região    | N_CVLI Bruto | Hits Bruto | P@10  |  P@20 |  R@10  |  R@20  | Status |\n")
-        f.write("|:----------|:------------:|:----------:|:-----:|:-----:|:------:|:------:|:------:|\n")
-        for res in results:
-            region_padded = res['region'].ljust(9)
-            f.write(f"| {region_padded} | {res['total']:^12} | {res['hits']:^10} | {res['p10']:^5} | {res['p20']:^5} | {res['r10']:^6} | {res['r20']:^6} | {res['status']:^6} |\n")
-        f.write("\n---\n")
-        
-    print(f"  ✅ Validação regional concluída e registrada em {log_path}")
+        print(f"  - Erro ao registrar validação: {e}")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

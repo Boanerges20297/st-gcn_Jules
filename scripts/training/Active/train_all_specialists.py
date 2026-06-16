@@ -48,6 +48,12 @@ logging.basicConfig(
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 PREDICT_HORIZON = 14
 TRAIN_BATCH_LOG_EVERY = int(os.environ.get("TRAIN_BATCH_LOG_EVERY", "30"))
+TEMPORAL_SPLIT = {
+    'train_start': '2022-01-01',
+    'train_end': '2024-12-31',
+    'val_start': '2025-01-01',
+    'val_end': '2025-12-31',
+}
 
 REGION_CONFIGS = {
     'fortaleza': dict(
@@ -60,7 +66,7 @@ REGION_CONFIGS = {
         k_eval=10,
         use_momentum=True,
         grad_accum=1,
-        output_name='fortaleza_model_active.pth',
+        output_name=os.path.join('legacy_torch', 'fortaleza_model_active.pth'),
         model_class='FortalezaHeteroSTGAT',  # T123: arquitetura com separacao dinamico/contextual
         focal_alpha=0.55,
         focal_gamma=2.0,
@@ -79,7 +85,7 @@ REGION_CONFIGS = {
         k_eval=5,
         use_momentum=True,
         grad_accum=8,
-        output_name='rmf_model.pth',
+        output_name=os.path.join('legacy_torch', 'rmf_model.pth'),
         focal_alpha=0.50,
         focal_gamma=2.0,
         ranking_weight=10.0,
@@ -95,7 +101,7 @@ REGION_CONFIGS = {
         k_eval=10,
         use_momentum=True,
         grad_accum=4,
-        output_name='interior_model.pth',
+        output_name=os.path.join('legacy_torch', 'interior_model.pth'),
         focal_alpha=0.40,
         focal_gamma=2.0,
         ranking_weight=15.0,
@@ -134,6 +140,13 @@ def inject_momentum_channels(features):
     if enriched.shape[2] >= 37:
         enriched[:, :, 33:37] = momentum_feat[:, :, :4]
     return enriched
+
+
+def build_temporal_split_config():
+    return {
+        key: pd.Timestamp(value)
+        for key, value in TEMPORAL_SPLIT.items()
+    }
 
 
 class BinaryFocalRankingLoss(nn.Module):
@@ -194,6 +207,7 @@ class SpecialistTrainer:
             data = pickle.load(f)
 
         nf = data['node_features']
+        dates = pd.to_datetime(data['dates'])
         adj_geo_np = data['adj_geo']
         adj_conf_np = data['adj_conflict']
         n_nodes, total_steps, _ = nf.shape
@@ -205,16 +219,29 @@ class SpecialistTrainer:
         self.vault = TrainingVault(n_nodes, ROOT_DIR)
 
         x_list, y_list = [], []
+        train_samples, val_samples = [], []
         window = self.cfg['window']
         total_windows = max(0, total_steps - PREDICT_HORIZON - window)
+        split_cfg = build_temporal_split_config()
         build_start = time.time()
         logging.info(
-            "Preparando janelas | region=%s | total_steps=%s | candidate_windows=%s",
+            (
+                "Preparando janelas | region=%s | total_steps=%s | candidate_windows=%s "
+                "| train=%s..%s | val=%s..%s"
+            ),
             self.region_key,
             total_steps,
             total_windows,
+            split_cfg['train_start'].date(),
+            split_cfg['train_end'].date(),
+            split_cfg['val_start'].date(),
+            split_cfg['val_end'].date(),
         )
         for t in range(window, total_steps - PREDICT_HORIZON):
+            history_start = dates[t - window]
+            target_start = dates[t]
+            target_end = dates[t + PREDICT_HORIZON - 1]
+
             x_win = features[:, t - window:t, :].copy()
             x = torch.tensor(x_win, dtype=torch.float32).permute(2, 0, 1).unsqueeze(0)
             y = torch.tensor(nf[:, t:t + PREDICT_HORIZON, 0].sum(axis=1), dtype=torch.float32)
@@ -224,6 +251,25 @@ class SpecialistTrainer:
                 x = torch.cat([x, padding], dim=1)
             elif x.shape[1] > 41:
                 x = x[:, :41, :, :]
+
+            sample = {
+                'x': x,
+                'y': y,
+                'history_start': history_start,
+                'target_start': target_start,
+                'target_end': target_end,
+            }
+
+            if (
+                history_start >= split_cfg['train_start']
+                and target_end <= split_cfg['train_end']
+            ):
+                train_samples.append(sample)
+            elif (
+                target_start >= split_cfg['val_start']
+                and target_end <= split_cfg['val_end']
+            ):
+                val_samples.append(sample)
 
             x_list.append(x)
             y_list.append(y)
@@ -237,14 +283,29 @@ class SpecialistTrainer:
                     time.time() - build_start,
                 )
 
-        split = int(len(x_list) * 0.85)
-        train_x, train_y = x_list[:split], y_list[:split]
-        val_x, val_y = x_list[split:], y_list[split:]
+        train_x = [sample['x'] for sample in train_samples]
+        train_y = [sample['y'] for sample in train_samples]
+        val_x = [sample['x'] for sample in val_samples]
+        val_y = [sample['y'] for sample in val_samples]
         if not train_x or not val_x:
             raise RuntimeError(
                 f"Janela insuficiente para treino/validacao em {self.region_key}: "
                 f"train={len(train_x)} | val={len(val_x)}"
             )
+        logging.info(
+            (
+                "Split temporal aplicado | region=%s | train_windows=%s | val_windows=%s "
+                "| first_train_target=%s | last_train_target=%s | "
+                "first_val_target=%s | last_val_target=%s"
+            ),
+            self.region_key,
+            len(train_samples),
+            len(val_samples),
+            train_samples[0]['target_start'].date(),
+            train_samples[-1]['target_end'].date(),
+            val_samples[0]['target_start'].date(),
+            val_samples[-1]['target_end'].date(),
+        )
 
         model = self._build_model(n_nodes=n_nodes, in_channels=41, window=window).to(DEVICE)
         optimizer = torch.optim.AdamW(
@@ -420,6 +481,8 @@ class SpecialistTrainer:
             if avg_p10 > best_pk:
                 best_pk = avg_p10
                 no_improve = 0
+                output_path = os.path.join(ROOT_DIR, 'models', 'active', self.cfg['output_name'])
+                os.makedirs(os.path.dirname(output_path), exist_ok=True)
                 torch.save(
                     {
                         'model_state_dict': model.state_dict(),
@@ -427,8 +490,12 @@ class SpecialistTrainer:
                         'window': window,
                         'in_channels': 41,
                         'region': self.region_key,
+                        'train_start': str(split_cfg['train_start'].date()),
+                        'train_end': str(split_cfg['train_end'].date()),
+                        'val_start': str(split_cfg['val_start'].date()),
+                        'val_end': str(split_cfg['val_end'].date()),
                     },
-                    os.path.join(ROOT_DIR, 'models', 'active', self.cfg['output_name']),
+                    output_path,
                 )
                 logging.info(f"NOVO RECORDE: {best_pk * 100:.2f}%")
             else:

@@ -409,7 +409,7 @@
                         <small class="text-muted d-block" id="base-historica-info">Base Histórica: 19/11/2025 → 19/03/2026 (120 dias)</small>
                         <small class="text-primary fw-bold" id="horizon-info">Horizonte de Predição: 14 dias</small>
                         <small class="text-success d-block" id="validity-info">📅 Janela de Inteligência: Projeção 14 dias (Tempo Real)</small>
-                        <small class="text-secondary d-block" id="model-window-info">Modelo: ST-GAT Elite v3 (Janela: 120d)</small>
+                        <small class="text-secondary d-block" id="model-window-info">Modelo: Poisson Ranker Estadual (Janela: 120d)</small>
                         <small class="text-warning d-none" id="model-validation-info"></small>
                     </div>
 
@@ -555,12 +555,12 @@
                             </select>
                             <label for="model-mode-filter" class="form-label small fw-bold text-muted mt-2">Modelo de previsão:</label>
                             <select class="form-select form-select-sm" id="model-mode-filter">
-                                <option value="stgat" selected>ST-GAT (Padrão)</option>
+                                <option value="stgat" selected>Poisson Ranker (Padrão)</option>
                                 <option value="cvli_tactical">CVLI Tático (Experimental)</option>
                                 <option value="short20_mix">CVLI Shortlist 20 (Experimental)</option>
                             </select>
                             <small class="text-muted d-block mt-1" id="model-selector-help">
-                                ST-GAT segue como campeão. Os demais modos são opcionais para comparação em Fortaleza.
+                                Poisson Ranker segue como champion operacional estadual. Os demais modos são comparativos para Fortaleza.
                             </small>
                             <div class="form-check mt-2">
                                 <input class="form-check-input" type="checkbox" id="toggle-visible-micronodes">
@@ -596,7 +596,7 @@
     </div>
     <div class="row mt-4">
         <div class="col-12 text-center text-muted">
-            <small>Sistema desenvolvido para apoio à decisão tática. Baseado em modelo ST-GAT.</small>
+            <small>Sistema desenvolvido para apoio à decisão tática. O backend ativo estadual é o Poisson Ranker.</small>
         </div>
     </div>
 </div>
@@ -760,7 +760,7 @@
     }
 
     function setMacroPolygonsVisible(visible) {
-        if (!geojsonLayer) return;
+        if (!geojsonLayer || !geojsonSourceData) return;
 
         if (visible) {
             if (!map.hasLayer(geojsonLayer)) {
@@ -1080,6 +1080,7 @@
     }
 
     var geojsonLayer = null;
+    var geojsonSourceData = null;
     var selectedLayer = null;  // território em destaque (borda dourada)
     var riskDataGlobal = null;
     var metaDataGlobal = null;
@@ -1114,7 +1115,8 @@
         // region optional: capital|rmf|interior
         var url = '/api/visible_micronodes';
         var query = [];
-        if (region) query.push('region=' + encodeURIComponent(region));
+        var normalizedRegion = normalizeDashboardRegion(region, 'all');
+        if (normalizedRegion) query.push('region=' + encodeURIComponent(normalizedRegion));
         if (options && options.refresh) query.push('refresh=1');
         if (query.length) url += '?' + query.join('&');
         console.log('[Micronodes] Loading', url);
@@ -1247,7 +1249,7 @@
                 });
 
                 console.log('[Micronodes] Built layers:', visibleMicronodesLayer.getLayers().length);
-                visibleMicronodesLoadedRegion = region || 'all';
+                visibleMicronodesLoadedRegion = normalizedRegion || 'all';
                 
                 // Ensure layer is added to map if checkbox is checked
                 if ($('#toggle-visible-micronodes').prop('checked')) {
@@ -1267,6 +1269,7 @@
     }
 
     function updateVisibleMicronodesForRegion(region){
+        var normalizedRegion = normalizeDashboardRegion(region, 'all');
         console.log('[Micronodes] updateVisibleMicronodesForRegion: region=' + region + ', checking=' + $('#toggle-visible-micronodes').prop('checked') + ', loadedRegion=' + visibleMicronodesLoadedRegion);
         
         // If checkbox is unchecked, remove layer
@@ -1279,7 +1282,7 @@
         }
         
         // If already loaded for this region, just ensure layer is visible
-        if (visibleMicronodesLoadedRegion === region){
+        if (visibleMicronodesLoadedRegion === normalizedRegion){
             var markerCount = visibleMicronodesLayer.getLayers().length;
             console.log('[Micronodes] Already loaded for region, markers in layer:', markerCount);
             if (markerCount === 0) {
@@ -1296,11 +1299,11 @@
             }
         }
         
-        console.log('[Micronodes] Loading region:', region);
+        console.log('[Micronodes] Loading region:', normalizedRegion);
         // Load the data
-        loadVisibleMicronodes(region, function(err){
+        loadVisibleMicronodes(normalizedRegion, function(err){
             if (err){ console.warn('[Micronodes] load error', err); return; }
-            console.log('[Micronodes] Callback: region=' + region + ', checkbox=' + $('#toggle-visible-micronodes').prop('checked'));
+            console.log('[Micronodes] Callback: region=' + normalizedRegion + ', checkbox=' + $('#toggle-visible-micronodes').prop('checked'));
         });
     }
 
@@ -1506,6 +1509,11 @@
         var confidencePct = (typeof data.confidence_pct === 'number')
             ? data.confidence_pct.toFixed(1) + '%'
             : (typeof data.confidence === 'number' ? (data.confidence * 100).toFixed(1) + '%' : 'N/D');
+        var modelFamily = data.model_family || data.model_architecture || 'Poisson Ranker Estadual';
+        var primarySignalLabel = data.primary_signal_label || 'Sinal Poisson do ranking operacional';
+        var expectedCvli14d = (typeof data.expected_cvli_14d === 'number')
+            ? data.expected_cvli_14d.toFixed(2)
+            : 'N/D';
         var reportMoment = formatTimestampForReport(state.capturedAt);
         var argumentBullets = [];
 
@@ -1534,6 +1542,16 @@
         var argumentsSection = buildExplainabilityList(argumentBullets, function(item) {
             return formatReportText(item);
         }, true);
+
+        var modelSection = '';
+        modelSection += '<p><strong>Modelo ativo:</strong> ' + escapeHtml(modelFamily) + '</p>';
+        modelSection += '<p><strong>Sinal principal:</strong> ' + escapeHtml(primarySignalLabel) + '</p>';
+        modelSection += '<p><strong>CVLI esperado no horizonte de 14 dias:</strong> ' + escapeHtml(expectedCvli14d) + '</p>';
+        modelSection += buildExplainabilityList(data.model_drivers || [], function(driver) {
+            if (!driver || !driver.label) return '';
+            var valueText = (typeof driver.value_pct === 'number') ? driver.value_pct.toFixed(1) + '%' : 'N/D';
+            return '<strong>' + escapeHtml(driver.label) + ':</strong> ' + escapeHtml(valueText);
+        }, false);
 
         var factorsSection = buildExplainabilityList(data.factors || [], function(factor) {
             if (!factor || !factor.explanation) return '';
@@ -1605,9 +1623,11 @@
             + '<div class="meta-card"><span class="label">Status</span><span class="value">' + escapeHtml(statusLabel) + '</span></div>'
             + '<div class="meta-card"><span class="label">Risco estimado</span><span class="value">' + escapeHtml(riskScore) + '</span></div>'
             + '<div class="meta-card"><span class="label">Confiança</span><span class="value">' + escapeHtml(confidencePct) + '</span></div>'
+            + '<div class="meta-card"><span class="label">Modelo ativo</span><span class="value">' + escapeHtml(modelFamily) + '</span></div>'
             + '<div class="meta-card"><span class="label">Extraído em</span><span class="value">' + escapeHtml(reportMoment) + '</span></div>'
             + '</section>'
             + buildExplainabilitySection('Síntese executiva', executiveSection)
+            + buildExplainabilitySection('Leitura do modelo ativo', modelSection)
             + buildExplainabilitySection('Subsídios argumentativos para o gestor', argumentsSection)
             + buildExplainabilitySection('Fatores prioritários para decisão', factorsSection)
             + buildExplainabilitySection('Leitura de confiança e ressalvas', confidenceSection)
@@ -1666,6 +1686,8 @@
                         ? '✅ ' + data.imported + ' evento(s) importado(s) com sucesso!'
                         : '✅ Nenhum evento novo encontrado na planilha.';
                     setExportScreenshotStatus(msg, 'success');
+                    // Atualizar badge após sync para refletir estado real
+                    if (typeof checkPendingSheetEvents === 'function') checkPendingSheetEvents();
                     // Reload anomaly status to reflect new events
                     if (typeof loadAnomalyStatus === 'function') loadAnomalyStatus();
                 } else {
@@ -1813,7 +1835,7 @@
 
         // Show model's internal window and architecture
         try {
-            var modelArch = (metaDataGlobal && metaDataGlobal.model_architecture) || 'ST-GAT Elite v3';
+            var modelArch = (metaDataGlobal && metaDataGlobal.model_architecture) || 'Poisson Ranker Estadual';
             var modelWindow = (metaDataGlobal && metaDataGlobal.model_window_cvli) || 120;
             $('#model-window-info').html('Modelo: <strong>' + modelArch + '</strong> (Janela: ' + modelWindow + 'd)');
             var selectedDescription = (metaDataGlobal && metaDataGlobal.selected_model_description) || '';
@@ -1821,7 +1843,7 @@
             if (selectedDescription) {
                 var selectorHelp = selectedDescription;
                 if (metaDataGlobal.selected_model_mode && metaDataGlobal.selected_model_mode !== 'stgat') {
-                    selectorHelp += ' Fortaleza usa o modo opcional; RMF e Interior seguem no ST-GAT.';
+                    selectorHelp += ' O comparativo opcional atua só em Fortaleza; o champion estadual é o Poisson Ranker.';
                 }
                 $('#model-selector-help').text(selectorHelp);
             }
@@ -2031,6 +2053,19 @@
             .trim();
     }
 
+    function normalizeDashboardRegion(region, fallback) {
+        var r = String(region || fallback || 'unknown').trim().toLowerCase();
+        if (r === 'capital' || r === 'fortaleza') return 'fortaleza';
+        if (r === 'metropolitana') return 'rmf';
+        return r;
+    }
+
+    function normalizeLayerRegion(region, fallback) {
+        var normalized = normalizeDashboardRegion(region, fallback);
+        if (normalized === 'fortaleza') return 'capital';
+        return normalized;
+    }
+
     function getSelectedModelMode() {
         if (!$('#model-mode-filter').length) return DEFAULT_MODEL_MODE;
         return $('#model-mode-filter').val() || DEFAULT_MODEL_MODE;
@@ -2038,10 +2073,30 @@
 
     function buildRiskApiUrl(region) {
         var params = [];
-        if (region) params.push('region=' + encodeURIComponent(region));
+        if (region) params.push('region=' + encodeURIComponent(normalizeDashboardRegion(region, 'all')));
         var modelMode = getSelectedModelMode();
         if (modelMode) params.push('model_mode=' + encodeURIComponent(modelMode));
         return '/api/risk' + (params.length ? '?' + params.join('&') : '');
+    }
+
+    function filterGeojsonFeaturesByRegion(sourceData, regionFilter) {
+        if (!sourceData || !Array.isArray(sourceData.features)) {
+            return { type: 'FeatureCollection', features: [] };
+        }
+
+        var normalizedFilter = normalizeLayerRegion(regionFilter, 'all');
+        if (normalizedFilter === 'all') {
+            return sourceData;
+        }
+
+        return {
+            type: 'FeatureCollection',
+            features: sourceData.features.filter(function(feature) {
+                var props = (feature && feature.properties) || {};
+                var regionValue = props.region || props.region_type || 'unknown';
+                return normalizeLayerRegion(regionValue, 'unknown') === normalizedFilter;
+            })
+        };
     }
 
     function reloadMapLayer() {
@@ -2061,13 +2116,14 @@
                 var riskResp = riskArgs[0];
                 riskDataGlobal = riskResp.data || riskResp;
                 metaDataGlobal = riskResp.meta || {};
+                geojsonSourceData = geojson;
 
                 // MAPA DE NOMES -> DADOS
                 // Build a map keyed by normalized name + region to avoid collisions
                 var riskByName = {};
                 riskDataGlobal.forEach(function(item) {
                     try {
-                        var regionKey = (item.region_type || item.region || '').toString().toLowerCase() || 'unknown';
+                        var regionKey = normalizeDashboardRegion(item.region_type || item.region, 'unknown');
                         var nameKey = item.clean_name || normalizeName(item.name || '');
                         var composite = nameKey + '|' + regionKey;
                         riskByName[composite] = item;
@@ -2081,7 +2137,7 @@
                 geojson.features.forEach(function(feature) {
                     var rawName = feature.properties.Name || feature.properties.name || feature.properties.NOME || "";
                     var normName = normalizeName(rawName);
-                    var regionType = (feature.properties.region_type || '').toString().toLowerCase() || 'unknown';
+                    var regionType = normalizeDashboardRegion(feature.properties.region_type, 'unknown');
                     var compositeKey = normName + '|' + regionType;
                     var r = riskByName[compositeKey] || riskByName[normName] || {};
                     
@@ -2188,7 +2244,7 @@
     }
 
     function updateRiskMap(riskData) {
-        if (!riskData || !geojsonLayer) return;
+        if (!riskData || !geojsonLayer || !geojsonSourceData) return;
         
         // 1. Atualizar o cache global de risco com os dados da simulação
         riskDataGlobal = riskData;
@@ -2196,19 +2252,18 @@
         // 2. Criar mapeamento rápido de Nome -> Dados de Simulação
         var riskByName = {};
         riskData.forEach(function(item) {
-            var regionKey = (item.region_type || item.region || '').toString().toLowerCase();
+            var regionKey = normalizeDashboardRegion(item.region_type || item.region, 'unknown');
             var nameKey = item.clean_name || normalizeName(item.name || '');
             var composite = nameKey + '|' + regionKey;
             riskByName[composite] = item;
             if (nameKey) riskByName[nameKey] = item;
         });
 
-        // 3. Atualizar as propriedades de cada feature no geojsonLayer existente
-        geojsonLayer.eachLayer(function(layer) {
-            var feature = layer.feature;
+        // 3. Atualizar as propriedades de cada feature na fonte completa
+        (geojsonSourceData.features || []).forEach(function(feature) {
             var rawName = feature.properties.Name || feature.properties.name || feature.properties.NOME || "";
             var normName = normalizeName(rawName);
-            var regionType = (feature.properties.region_type || '').toString().toLowerCase();
+            var regionType = normalizeDashboardRegion(feature.properties.region_type, 'unknown');
             var compositeKey = normName + '|' + regionType;
             
             var r = riskByName[compositeKey] || riskByName[normName];
@@ -2219,18 +2274,14 @@
                 if (r.status_label) feature.properties.status_label = r.status_label;
                 if (r.risk_text) feature.properties.risk_text = r.risk_text;
                 if (r.metrics) feature.properties.metrics = r.metrics;
-                    feature.properties.peak_hours = (r.peak_hours || ((r.metrics || {}).peak_hours) || feature.properties.peak_hours || '');
+                feature.properties.peak_hours = (r.peak_hours || ((r.metrics || {}).peak_hours) || feature.properties.peak_hours || '');
                 if (r.faction) feature.properties.faction = r.faction;
-                
-                // Aplicar novo estilo visual imediatamente
-                if (typeof layer.setStyle === 'function') {
-                    layer.setStyle(style(feature));
-                }
             }
         });
 
         // 4. Sincronizar painéis laterais e estatísticas
         try {
+            applyRegionFilter($('#region-filter').val() || 'fortaleza');
             updateDashboard('CVLI');
             updateTopCriticalAreas();
         } catch(e) { console.warn('Dashboard sync failed after simulation', e); }
@@ -2259,6 +2310,7 @@
         var riskResp = riskArgs[0];
         riskDataGlobal = riskResp.data || riskResp;
         metaDataGlobal = riskResp.meta || {};
+        geojsonSourceData = geojson;
 
         // Build mapping keyed by normalized name + region to prevent same-name collisions across regions
         var riskByName = {};
@@ -2962,6 +3014,18 @@
                           + '</div>';
                 }
                 
+                var modelFamily = data.model_family || data.model_architecture || 'Poisson Ranker';
+                var primarySignalLabel = data.primary_signal_label || 'Sinal Poisson do ranking operacional';
+                if (modelFamily || primarySignalLabel) {
+                    html += '<div style="background:#eef6ff; border:1px solid #d7e6ff; border-radius:6px; padding:10px 12px; margin:8px 0;">'
+                          + '<div style="font-size:0.82rem; font-weight:700; color:#315ea8; margin-bottom:4px;">Leitura do modelo ativo</div>'
+                          + '<div style="font-size:0.9rem; color:#1f2937;"><strong>' + escapeHtml(modelFamily) + '</strong> usando <strong>' + escapeHtml(primarySignalLabel) + '</strong>.</div>';
+                    if (typeof data.expected_cvli_14d === 'number') {
+                        html += '<div style="font-size:0.85rem; color:#475569; margin-top:4px;">CVLI esperado no horizonte de 14 dias: <strong>' + data.expected_cvli_14d.toFixed(2) + '</strong>.</div>';
+                    }
+                    html += '</div>';
+                }
+
                 // 1. Resumo Principal
                 if (data.summary) {
                     html += '<p class="mb-3" style="font-size: 0.95rem;">' + data.summary + '</p>';
@@ -2983,7 +3047,20 @@
                     });
                 }
 
-                // 2. Fatores Reais (Metrics-based)
+                // 2. Drivers do Poisson
+                if (data.model_drivers && data.model_drivers.length > 0) {
+                    html += '<div class="mb-2"><strong style="font-size: 0.9rem;">Drivers do Poisson para esta área:</strong></div>';
+                    data.model_drivers.forEach(function(driver) {
+                        if (!driver) return;
+                        var valueText = (typeof driver.value_pct === 'number') ? driver.value_pct.toFixed(1) + '%' : 'N/D';
+                        html += '<div style="display:flex; justify-content:space-between; align-items:center; background:#f8f9fb; border:1px solid #e9ecef; border-radius:6px; padding:8px 10px; margin:6px 0;">'
+                              + '<span style="font-size:0.88rem; color:#1f2937;">' + escapeHtml(driver.label || 'Driver') + '</span>'
+                              + '<strong style="font-size:0.86rem; color:#315ea8;">' + escapeHtml(valueText) + '</strong>'
+                              + '</div>';
+                    });
+                }
+
+                // 3. Fatores Reais (Metrics-based)
                 if (data.factors && data.factors.length > 0) {
                     html += '<div class="mb-2"><strong style="font-size: 0.9rem;">Fatores Prioritários para Decisão:</strong></div>';
 
@@ -3005,7 +3082,7 @@
                     });
                 }
 
-                // 3. Nota de Confiança + barra de percentil
+                // 4. Nota de Confiança + barra de percentil
                 var confPct   = (typeof data.confidence_pct   === 'number') ? data.confidence_pct   : (typeof data.confidence === 'number' ? Math.round(data.confidence * 100) : null);
                 var confLabel = data.confidence_label || null;
                 if (confPct !== null) {
@@ -3136,7 +3213,7 @@
         }
 
         // If backend provided a Top10 ranking, prefer per-region top10 when available
-        var regionFilter = $('#region-filter').val();
+        var regionFilter = normalizeDashboardRegion($('#region-filter').val(), 'all');
         var serverTop = null;
         if (metaDataGlobal && metaDataGlobal.top10_by_region && metaDataGlobal.top10_by_region[regionFilter] && metaDataGlobal.top10_by_region[regionFilter].length > 0) {
             serverTop = metaDataGlobal.top10_by_region[regionFilter];
@@ -3151,7 +3228,8 @@
             var displayIdx = 1;
             
             topFromServer.forEach(function(item) {
-                var itemCity = item.cidade || (item.region_type === 'fortaleza' ? 'Fortaleza' : 'RMF/Interior');
+                var itemRegion = normalizeDashboardRegion(item.region_type, 'unknown');
+                var itemCity = item.cidade || (itemRegion === 'fortaleza' ? 'Fortaleza' : 'RMF/Interior');
                 var displayString = (item.name || 'Desconhecido').toUpperCase() + '|' + itemCity.toUpperCase();
                 if (addedItems.has(displayString)) {
                     return;
@@ -3214,16 +3292,13 @@
         }
 
         // Use geojsonLayer layers to access up-to-date properties
-        var regionFilter = $('#region-filter').val();
+        var regionFilter = normalizeDashboardRegion($('#region-filter').val(), 'all');
 
         // Map to array for sorting
         var items = [];
         // Função para normalizar regions  
         function normalizeRegion(region) {
-            if (!region) return 'unknown';
-            var r = String(region).toLowerCase();
-            if (r === 'capital' || r === 'fortaleza') return 'fortaleza';
-            return r;
+            return normalizeDashboardRegion(region, 'unknown');
         }
         var normalizedFilter = normalizeRegion(regionFilter);
         
@@ -3420,11 +3495,9 @@
 
     function applyMicronodesRegionFilter(regionFilter) {
         if (micronodesLayer.getLayers().length === 0) return;
-        var rf = String(regionFilter || 'all').toLowerCase();
-        if (rf === 'fortaleza' || rf === 'capital') rf = 'capital';
+        var rf = normalizeLayerRegion(regionFilter, 'all');
         micronodesLayer.eachLayer(function(layer) {
-            var reg = String((layer.feature && layer.feature.properties && layer.feature.properties.region) || 'interior').toLowerCase();
-            if (reg === 'fortaleza') reg = 'capital';
+            var reg = normalizeLayerRegion((layer.feature && layer.feature.properties && layer.feature.properties.region) || 'interior', 'interior');
             var show = (rf === 'all') || (rf === reg);
             if (show) { if (!map.hasLayer(layer)) map.addLayer(layer); }
             else       { if (map.hasLayer(layer))  map.removeLayer(layer); }
@@ -3495,16 +3568,18 @@
             return;
         }
         var visibleBounds = null;
-        
-        // Normalizar ambos: UI usa 'fortaleza', dados podem usar 'capital' ou 'fortaleza'
-        function normalizeRegion(region) {
-            if (!region) return 'unknown';
-            var r = String(region).toLowerCase();
-            if (r === 'fortaleza' || r === 'capital') return 'capital';
-            return r; // 'rmf', 'interior', etc
+        var filteredGeojson = filterGeojsonFeaturesByRegion(geojsonSourceData, regionFilter);
+
+        if (selectedLayer) {
+            try { selectedLayer.closePopup(); } catch(e) {}
+            selectedLayer = null;
         }
-        
-        var normalizedFilter = normalizeRegion(regionFilter);
+
+        geojsonLayer.clearLayers();
+        geojsonLayer.addData(filteredGeojson);
+        if (!map.hasLayer(geojsonLayer)) {
+            map.addLayer(geojsonLayer);
+        }
         
         geojsonLayer.eachLayer(function(layer) {
             var props = (layer.feature && layer.feature.properties) || {};
@@ -3551,6 +3626,56 @@
     }
 
     // ===== Monitor de Atualização de Modelos =====
+    // Sobrescreve o filtro legado usando rerender do subconjunto ativo.
+    function applyRegionFilter(regionFilter) {
+        if (!geojsonLayer || !geojsonSourceData) return;
+        if (streetFocusMode) {
+            syncStreetFociForRegion(regionFilter);
+            return;
+        }
+
+        var visibleBounds = null;
+        var filteredGeojson = filterGeojsonFeaturesByRegion(geojsonSourceData, regionFilter);
+
+        if (selectedLayer) {
+            try { selectedLayer.closePopup(); } catch (e) {}
+            selectedLayer = null;
+        }
+
+        geojsonLayer.clearLayers();
+        geojsonLayer.addData(filteredGeojson);
+        if (!map.hasLayer(geojsonLayer)) {
+            map.addLayer(geojsonLayer);
+        }
+
+        geojsonLayer.eachLayer(function(layer) {
+            try {
+                if (layer.setStyle) layer.setStyle(style(layer.feature));
+                if (layer.getBounds) {
+                    var b = layer.getBounds();
+                    visibleBounds = visibleBounds ? visibleBounds.extend(b) : b;
+                }
+            } catch (e) {}
+        });
+
+        if (visibleBounds) {
+            var normalizedRegion = normalizeDashboardRegion(regionFilter, 'all');
+            var maxZ = normalizedRegion === 'fortaleza' ? 12.5
+                     : normalizedRegion === 'rmf'       ? 11.0
+                     : normalizedRegion === 'interior'  ? 9.0
+                     : 10.5;
+            map.fitBounds(visibleBounds, {
+                padding: [32, 32],
+                maxZoom: maxZ,
+                animate: !initialMapLoad,
+                duration: 0.7
+            });
+        }
+
+        updateVisibleMicronodesForRegion(regionFilter);
+        syncRiskCardsFromVisibleMap();
+    }
+
     var modelUpdateCheckInterval = null;
     var lastCalibrationTime = null;
 

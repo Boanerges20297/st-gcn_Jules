@@ -45,7 +45,7 @@ def build_momentum_features(features):
 def evaluate():
     DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     region = 'fortaleza'
-    model_path = 'models/active/fortaleza_model_active.pth'
+    model_path = 'models/active/legacy_torch/fortaleza_model_active.pth'
     data_path = f'data/processed/processed_{region}.pkl'
 
     print(f"🚀 Avaliando Modelo Blindado: {model_path}")

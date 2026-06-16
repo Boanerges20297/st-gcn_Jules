@@ -1,0 +1,95 @@
+{
+  "generated_at": "2026-06-12T21:24:08.876773",
+  "device": "cpu",
+  "args": {
+    "regions": [
+      "fortaleza"
+    ],
+    "cutoff": "2025-12-31",
+    "train_start": "2022-01-01",
+    "train_end": "2024-12-31",
+    "val_start": "2025-01-01",
+    "val_end": "2025-12-31",
+    "horizon_days": 14,
+    "deep_epochs": 1,
+    "max_train_samples": 8,
+    "max_val_samples": 4,
+    "classical_models": [
+      "zero_baseline",
+      "logit_classifier"
+    ],
+    "deep_models": [
+      "ShallowGAT"
+    ],
+    "seed": 42
+  },
+  "raw_summary": {
+    "rows_cvli": 11704,
+    "locations": 296,
+    "date_min": "2022-01-01",
+    "date_max": "2025-12-31",
+    "daily_mean": 8.017796030116358,
+    "daily_var": 10.443518700833543,
+    "daily_fano": 1.3025423272936494,
+    "daily_zero_rate": 0.0006844626967830253,
+    "daily_acf_1": 0.08881421659683299,
+    "daily_acf_7": 0.12153915830830957,
+    "positive_days_share_eq_1": 0.0027397260273972603,
+    "positive_days_share_gt_1": 0.9972602739726028,
+    "positive_days_p95": 14.0,
+    "positive_days_max": 20.0
+  },
+  "results": [
+    {
+      "model_type": "classic",
+      "days_scored": 4,
+      "positive_days": 4,
+      "hit1_event": 0.75,
+      "p5_event": 0.6,
+      "p10_event": 0.6,
+      "p20_event": 0.4625,
+      "recall10_event": 0.28498526936026936,
+      "recall20_event": 0.430881734006734,
+      "overlap10_rank": 0.4,
+      "mrr_event": 0.8333333333333334,
+      "model": "logit_classifier",
+      "region": "fortaleza",
+      "train_samples": 8,
+      "val_samples": 4
+    },
+    {
+      "model_type": "deep",
+      "days_scored": 4,
+      "positive_days": 4,
+      "hit1_event": 0.75,
+      "p5_event": 0.6000000000000001,
+      "p10_event": 0.475,
+      "p20_event": 0.475,
+      "recall10_event": 0.2303872053872054,
+      "recall20_event": 0.4521359427609427,
+      "overlap10_rank": 0.25,
+      "mrr_event": 0.8333333333333333,
+      "model": "ShallowGAT",
+      "region": "fortaleza",
+      "train_samples": 8,
+      "val_samples": 4
+    },
+    {
+      "model_type": "classic",
+      "days_scored": 4,
+      "positive_days": 4,
+      "hit1_event": 0.5,
+      "p5_event": 0.15000000000000002,
+      "p10_event": 0.125,
+      "p20_event": 0.1625,
+      "recall10_event": 0.05914351851851852,
+      "recall20_event": 0.15760732323232324,
+      "overlap10_rank": 0.07500000000000001,
+      "mrr_event": 0.5442307692307693,
+      "model": "zero_baseline",
+      "region": "fortaleza",
+      "train_samples": 8,
+      "val_samples": 4
+    }
+  ]
+}

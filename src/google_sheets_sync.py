@@ -122,8 +122,16 @@ def sync_google_sheets(csv_url: str, exogenous_file_path: str):
         if len(rows) <= 1:
              return {"status": "success", "imported": 0, "message": "No data rows in spreadsheet."}
 
+        # Detectar esquema da planilha pelo cabeçalho.
+        # Esquema A (com ID): id | data | col2 | col3 | col4 | descricao
+        # Esquema B (sem ID): data | natureza | municipio | bairro | descricao
+        header = [c.strip().lower() for c in rows[0]] if rows else []
+        _has_id_col = header and not any(
+            kw in header[0] for kw in ('data', 'hora', 'date', 'time', 'timestamp')
+        )
+
         data_rows = rows[1:]
-        
+
         # Load local events
         existing_events = []
         if os.path.exists(exogenous_file_path):
@@ -169,12 +177,22 @@ def sync_google_sheets(csv_url: str, exogenous_file_path: str):
             busca_municipio = None
         
         for r in data_rows:
-            if not r or not r[0].strip() or not any(col.strip() for col in r[1:]):
+            # Ignorar linhas completamente vazias ou com apenas data/hora (linhas fantasma)
+            if not r or not any(col.strip() for col in r[1:]):
                 continue
             row = r + [''] * (7 - len(r))
-            ev_id = str(row[0]).strip()
-            iso_time = row[1].strip()
-            descricao = row[5].strip() or ' - '.join(c.strip() for c in row[2:6] if c.strip())
+
+            if _has_id_col:
+                # Esquema A: id | data | ... | descricao
+                ev_id = str(row[0]).strip()
+                iso_time = row[1].strip()
+                descricao = row[5].strip() or ' - '.join(c.strip() for c in row[2:6] if c.strip())
+            else:
+                # Esquema B: data | natureza | municipio | bairro | descricao
+                iso_time = row[0].strip()
+                # Gerar ID determinístico a partir da data+descrição para deduplicação
+                descricao = row[4].strip() or ' - '.join(c.strip() for c in row[1:5] if c.strip())
+                ev_id = normalize_name(iso_time + descricao)[:64]
             
             # 1. Parse date for cutoff check
             event_date_obj = None
@@ -199,7 +217,14 @@ def sync_google_sheets(csv_url: str, exogenous_file_path: str):
                 continue
                 
             # 4. LLM Enrichment & Robust Fallback
-            natureza, municipio, bairro, severity = "OUTROS", "", "", "LOW"
+            # No esquema B os campos já vêm na planilha — usá-los como base
+            if not _has_id_col:
+                natureza = row[1].strip().upper() or "OUTROS"
+                municipio = row[2].strip().upper()
+                bairro = row[3].strip().upper()
+            else:
+                natureza, municipio, bairro = "OUTROS", "", ""
+            severity = "LOW"
             parsed_items = None
             if process_exogenous_text and descricao:
                 try:

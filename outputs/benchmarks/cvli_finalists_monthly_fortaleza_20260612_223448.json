@@ -1,0 +1,137 @@
+{
+  "generated_at": "2026-06-12T22:34:48.944158",
+  "region": "fortaleza",
+  "args": {
+    "region": "fortaleza",
+    "train_start": "2022-01-01",
+    "train_end": "2024-12-31",
+    "val_start": "2025-01-01",
+    "val_end": "2025-03-31",
+    "horizon_days": 14,
+    "models": [
+      "poisson_regressor",
+      "histgb_classifier"
+    ],
+    "seed": 42
+  },
+  "summary": [
+    {
+      "months": 3,
+      "hit1_mean": 0.8716931216931217,
+      "hit1_std": 0.11438548946628815,
+      "p10_mean": 0.532100187745349,
+      "p10_std": 0.11862843756486284,
+      "mrr_mean": 0.9251322751322751,
+      "mrr_std": 0.05721751932084052,
+      "worst_hit1": 0.7222222222222222,
+      "worst_p10": 0.38214285714285706,
+      "best_hit1": 1.0,
+      "best_p10": 0.672222222222222,
+      "model": "poisson_regressor"
+    },
+    {
+      "months": 3,
+      "hit1_mean": 0.6507509813961426,
+      "hit1_std": 0.2404700439995622,
+      "p10_mean": 0.5386883427206007,
+      "p10_std": 0.08600118696750544,
+      "mrr_mean": 0.7848426108794774,
+      "mrr_std": 0.17632547993086642,
+      "worst_hit1": 0.32142857142857145,
+      "worst_p10": 0.4178571428571428,
+      "best_hit1": 0.8888888888888888,
+      "best_p10": 0.6111111111111112,
+      "model": "histgb_classifier"
+    }
+  ],
+  "monthly": {
+    "poisson_regressor": [
+      {
+        "model_type": "classic",
+        "days_scored": 31,
+        "positive_days": 31,
+        "hit1_event": 1.0,
+        "p5_event": 0.6967741935483873,
+        "p10_event": 0.5419354838709678,
+        "p20_event": 0.45483870967741935,
+        "recall10_event": 0.2576071804723905,
+        "recall20_event": 0.43154877548654763,
+        "overlap10_rank": 0.2709677419354839,
+        "mrr_event": 1.0,
+        "month": "2025-01"
+      },
+      {
+        "model_type": "classic",
+        "days_scored": 28,
+        "positive_days": 28,
+        "hit1_event": 0.8928571428571429,
+        "p5_event": 0.5071428571428572,
+        "p10_event": 0.38214285714285706,
+        "p20_event": 0.45,
+        "recall10_event": 0.18053173621253826,
+        "recall20_event": 0.4175771382841167,
+        "overlap10_rank": 0.17142857142857146,
+        "mrr_event": 0.9142857142857144,
+        "month": "2025-02"
+      },
+      {
+        "model_type": "classic",
+        "days_scored": 18,
+        "positive_days": 18,
+        "hit1_event": 0.7222222222222222,
+        "p5_event": 0.7111111111111111,
+        "p10_event": 0.672222222222222,
+        "p20_event": 0.5111111111111111,
+        "recall10_event": 0.32909549790607134,
+        "recall20_event": 0.4978004578504309,
+        "overlap10_rank": 0.4166666666666667,
+        "mrr_event": 0.8611111111111112,
+        "month": "2025-03"
+      }
+    ],
+    "histgb_classifier": [
+      {
+        "model_type": "classic",
+        "days_scored": 31,
+        "positive_days": 31,
+        "hit1_event": 0.7419354838709677,
+        "p5_event": 0.7419354838709679,
+        "p10_event": 0.5870967741935482,
+        "p20_event": 0.41935483870967744,
+        "recall10_event": 0.27627295864654694,
+        "recall20_event": 0.39407649017894825,
+        "overlap10_rank": 0.23225806451612904,
+        "mrr_event": 0.8709677419354839,
+        "month": "2025-01"
+      },
+      {
+        "model_type": "classic",
+        "days_scored": 28,
+        "positive_days": 28,
+        "hit1_event": 0.32142857142857145,
+        "p5_event": 0.3071428571428572,
+        "p10_event": 0.4178571428571428,
+        "p20_event": 0.34642857142857153,
+        "recall10_event": 0.19252323102300503,
+        "recall20_event": 0.3187491775659766,
+        "overlap10_rank": 0.14285714285714285,
+        "mrr_event": 0.5391156462585034,
+        "month": "2025-02"
+      },
+      {
+        "model_type": "classic",
+        "days_scored": 18,
+        "positive_days": 18,
+        "hit1_event": 0.8888888888888888,
+        "p5_event": 0.6888888888888888,
+        "p10_event": 0.6111111111111112,
+        "p20_event": 0.5194444444444444,
+        "recall10_event": 0.30338989111350806,
+        "recall20_event": 0.5022789479381888,
+        "overlap10_rank": 0.40555555555555556,
+        "mrr_event": 0.9444444444444444,
+        "month": "2025-03"
+      }
+    ]
+  }
+}

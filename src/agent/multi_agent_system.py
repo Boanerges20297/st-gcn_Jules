@@ -104,7 +104,7 @@ class GeneralManagerAgent:
     O ÚNICO agente exposto publicamente para o backend. 
     Administra, coordena a delegação para os especialistas sob demanda, harmoniza e formula a resposta final.
     """
-    def __init__(self, base_url: str = "http://localhost:11434", model_name: str = "llama3:8b", base_dir: str = None):
+    def __init__(self, base_url: str = "http://localhost:11434", model_name: str = "qwen2.5:1.5b", base_dir: str = None):
         self.client = LocalLLMClient(base_url=base_url, model_name=model_name)
         self.base_dir = base_dir or os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
         self.semantic_memory = CalibrationSemanticMemory(self.base_dir)

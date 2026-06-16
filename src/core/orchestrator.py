@@ -28,6 +28,11 @@ try:
 except ImportError:
     from architectures import DeepSTGAT_64, DeepSTGAT_32, ShallowGAT, get_model_class
 
+try:
+    from .fortaleza_poisson_backend import FortalezaPoissonRuntime, load_payload as load_poisson_payload
+except ImportError:
+    from fortaleza_poisson_backend import FortalezaPoissonRuntime, load_payload as load_poisson_payload
+
 def normalize_name(text):
     if not isinstance(text, str): return ""
     text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('ASCII').upper().strip()
@@ -35,38 +40,33 @@ def normalize_name(text):
     return text.strip()
 
 class StateOrchestrator:
+    FORTALEZA_PRIMARY_LABEL = 'Poisson Ranker Operacional'
+    RMF_INTERIOR_LABEL = 'Poisson Ranker Regional'
+    HYBRID_MODEL_LABEL = 'Poisson Ranker Estadual'
+
     def __init__(self, project_root):
         self.root = project_root
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         
         # ⭐ ATUALIZAÇÃO (2026-03-18): Modelo oficial de Fortaleza agora é retreinado com Blindagem Temporal
         # Paradigma Tentativa 49: Gradiente Agressivo + Z-Score Local.
-        fortaleza_model_file = 'fortaleza_model_active.pth'
-        has_momentum_fortaleza = True
-
-        interior_model_file   = 'interior_model.pth'
-        interior_has_momentum = True
-        
         self.configs = {
             'fortaleza': {
-                'model_path': os.path.join(self.root, 'models', 'active', fortaleza_model_file),
+                'model_path': os.path.join(self.root, 'models', 'active', 'production', 'poisson', 'fortaleza_poisson_regressor.pkl'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_fortaleza.pkl'),
-                'class': ShallowGAT,
-                'in_channels': 41, 
-                'window': 14 
+                'backend_type': 'classical_poisson',
+                'window': 90,
             },
             'rmf': {
-                'model_path': os.path.join(self.root, 'models', 'active', 'rmf_model.pth'),
+                'model_path': os.path.join(self.root, 'models', 'active', 'production', 'poisson', 'rmf_poisson_regressor.pkl'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_rmf.pkl'),
-                'class': ShallowGAT,
-                'in_channels': 41,
+                'backend_type': 'classical_poisson',
                 'window': 14
             },
             'interior': {
-                'model_path': os.path.join(self.root, 'models', 'active', interior_model_file),
+                'model_path': os.path.join(self.root, 'models', 'active', 'production', 'poisson', 'interior_poisson_regressor.pkl'),
                 'data_path': os.path.join(self.root, 'data', 'processed', 'processed_interior.pkl'),
-                'class': ShallowGAT,
-                'in_channels': 41,
+                'backend_type': 'classical_poisson',
                 'window': 14
             }
         }
@@ -93,12 +93,14 @@ class StateOrchestrator:
         
         # --- Champion/Challenger (Sentinela V3) ---
         self.champion_challenger = None
-        if ChampionChallenger is not None:
+        if ChampionChallenger is not None and self.configs.get('fortaleza', {}).get('backend_type') == 'torch_graph':
             try:
                 self.champion_challenger = ChampionChallenger(self.root)
                 print("✅ [Sentinela V3] Refinamento LGBM integrado ao Orquestrador.")
             except Exception as cc_err:
                 print(f"⚠️ [Sentinela V3] Falha ao integrar: {cc_err}")
+        elif self.configs.get('fortaleza', {}).get('backend_type') != 'torch_graph':
+            print("ℹ️ [Champion/Challenger] Desativado: Fortaleza agora opera com backend Poisson promovido.")
 
     def _restore_window_state(self):
         try:
@@ -110,9 +112,11 @@ class StateOrchestrator:
                     if region in self.calib_params:
                         dw = state.get('dynamic_window')
                         hf = state.get('use_historical_fallback', False)
+                        hf_manual = state.get('historical_fallback_manual', False)
                         self.calib_params[region]['dynamic_window'] = dw
-                        self.calib_params[region]['use_historical_fallback'] = hf
-                        if hf:
+                        self.calib_params[region]['use_historical_fallback'] = bool(hf and hf_manual)
+                        self.calib_params[region]['historical_fallback_manual'] = bool(hf_manual)
+                        if hf and hf_manual:
                             self._load_historical_fallback(region)
         except Exception as e:
             print(f"⚠️ [Window State] Erro ao restaurar: {e}")
@@ -125,6 +129,7 @@ class StateOrchestrator:
                 state[region] = {
                     'dynamic_window': cp.get('dynamic_window'),
                     'use_historical_fallback': cp.get('use_historical_fallback', False),
+                    'historical_fallback_manual': cp.get('historical_fallback_manual', False),
                     'historical_top10': cp.get('historical_top10', []),
                     'updated_at': datetime.now().isoformat(),
                 }
@@ -160,12 +165,13 @@ class StateOrchestrator:
                     print(f"📉 [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. Reduzindo janela {current_window}d → {next_rung}d.")
                     cp['dynamic_window'] = next_rung
                     cp['use_historical_fallback'] = False
+                    cp['historical_fallback_manual'] = False
                     self._save_window_state()
             else:
                 if not cp.get('use_historical_fallback', False):
-                    print(f"📉 [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. ATIVANDO fallback histórico.")
-                    cp['use_historical_fallback'] = True
-                    self._load_historical_fallback(region)
+                    print(f"📉 [Auto-Tune] P10={efficiency_score*100:.1f}% em {region.upper()}. Fallback histórico permanece desativado (somente ativação manual).")
+                    cp['use_historical_fallback'] = False
+                    cp['historical_fallback_manual'] = False
                     self._save_window_state()
 
         elif efficiency_score >= 0.55:
@@ -184,6 +190,7 @@ class StateOrchestrator:
 
             if cp.get('use_historical_fallback'):
                 cp['use_historical_fallback'] = False
+            cp['historical_fallback_manual'] = False
             self._save_window_state()
 
     def _load_historical_fallback(self, region):
@@ -201,42 +208,64 @@ class StateOrchestrator:
                 try:
                     data = self._load_pickle_safe(cfg['data_path'])
                     if not data: continue
-                    num_nodes = len(data['nodes_gdf'])
-                    ckpt = torch.load(cfg['model_path'], map_location=self.device, weights_only=False)
-                    ckpt_meta = ckpt if isinstance(ckpt, dict) else {}
-                    legacy_config = ckpt_meta.get('config') if isinstance(ckpt_meta.get('config'), dict) else {}
-                    resolved_arch = (
-                        ckpt_meta.get('model_class')
-                        or ckpt_meta.get('architecture')
-                        or ckpt_meta.get('arch')
-                        or legacy_config.get('model_class')
-                        or legacy_config.get('architecture')
-                        or legacy_config.get('arch')
-                    )
-                    model_class = get_model_class(resolved_arch) if resolved_arch else cfg['class']
-                    in_channels = int(
-                        ckpt_meta.get('in_channels')
-                        or legacy_config.get('in_channels')
-                        or cfg['in_channels']
-                    )
-                    window = int(
-                        ckpt_meta.get('window')
-                        or ckpt_meta.get('seq_len')
-                        or legacy_config.get('window')
-                        or legacy_config.get('seq_len')
-                        or cfg['window']
-                    )
-                    model = model_class(num_nodes=num_nodes, in_channels=in_channels, time_steps=window).to(self.device)
-                    state_dict = ckpt['model_state_dict'] if isinstance(ckpt, dict) and 'model_state_dict' in ckpt else ckpt
-                    model.load_state_dict(state_dict, strict=False)
-                    model.eval()
-                    self.specialists[region] = {'model': model, 'data': data, 'window': window, 'channels': in_channels}
+                    backend_type = cfg.get('backend_type', 'torch_graph')
+                    if backend_type == 'classical_poisson':
+                        payload = load_poisson_payload(cfg['model_path'])
+                        runtime = FortalezaPoissonRuntime(payload=payload, data=data)
+                        window = int(payload.get('window', cfg['window']))
+                        self.specialists[region] = {
+                            'model': runtime,
+                            'data': data,
+                            'window': window,
+                            'channels': 37,
+                            'backend_type': backend_type,
+                        }
+                    else:
+                        num_nodes = len(data['nodes_gdf'])
+                        ckpt = torch.load(cfg['model_path'], map_location=self.device, weights_only=False)
+                        ckpt_meta = ckpt if isinstance(ckpt, dict) else {}
+                        legacy_config = ckpt_meta.get('config') if isinstance(ckpt_meta.get('config'), dict) else {}
+                        resolved_arch = (
+                            ckpt_meta.get('model_class')
+                            or ckpt_meta.get('architecture')
+                            or ckpt_meta.get('arch')
+                            or legacy_config.get('model_class')
+                            or legacy_config.get('architecture')
+                            or legacy_config.get('arch')
+                        )
+                        model_class = get_model_class(resolved_arch) if resolved_arch else cfg['class']
+                        in_channels = int(
+                            ckpt_meta.get('in_channels')
+                            or legacy_config.get('in_channels')
+                            or cfg['in_channels']
+                        )
+                        window = int(
+                            ckpt_meta.get('window')
+                            or ckpt_meta.get('seq_len')
+                            or legacy_config.get('window')
+                            or legacy_config.get('seq_len')
+                            or cfg['window']
+                        )
+                        model = model_class(num_nodes=num_nodes, in_channels=in_channels, time_steps=window).to(self.device)
+                        state_dict = ckpt['model_state_dict'] if isinstance(ckpt, dict) and 'model_state_dict' in ckpt else ckpt
+                        model.load_state_dict(state_dict, strict=False)
+                        model.eval()
+                        self.specialists[region] = {
+                            'model': model,
+                            'data': data,
+                            'window': window,
+                            'channels': in_channels,
+                            'backend_type': backend_type,
+                        }
                     if self.dates is None:
                         self.dates = data.get('dates')
-                    print(
-                        f"✅ Orquestrador: Especialista {region.upper()} carregado "
-                        f"({in_channels} Canais, {model_class.__name__})."
-                    )
+                    if backend_type == 'classical_poisson':
+                        print(f"✅ Orquestrador: Especialista {region.upper()} carregado (Poisson Ranker, janela={window}d).")
+                    else:
+                        print(
+                            f"✅ Orquestrador: Especialista {region.upper()} carregado "
+                            f"({in_channels} Canais, {model_class.__name__})."
+                        )
                 except Exception as e:
                     print(f"❌ Erro ao carregar {region}: {e}")
         self._node_owners = {normalize_name(str(r['name'])): reg for reg, spec in self.specialists.items() for _, r in spec['data']['nodes_gdf'].iterrows()}
@@ -321,8 +350,9 @@ class StateOrchestrator:
         return round(max(5.0, min(99.0, base * 100.0)), 1)
 
     def _build_driver_list(self, item):
+        primary_signal_label = item.get('primary_signal_label') or 'Sinal principal do modelo'
         drivers = [
-            ('sinal_neural', float(item.get('neural_score', 0.0)), 'Sinal neural do ST-GAT'),
+            ('sinal_modelo', float(item.get('neural_score', 0.0)), primary_signal_label),
             ('tensao_territorial', float(item.get('tension_score', 0.0)), 'Tensão territorial'),
             ('inclusao_recente', float(item.get('inclusion_score', 0.0)), 'Atividade recente e vizinhança'),
         ]
@@ -494,7 +524,7 @@ class StateOrchestrator:
             'data_limit': data_limit,
             'source': 'src/core/orchestrator.py:get_combined_risk',
             'model': {
-                'type': 'ST-GAT + Sentinela V3',
+                'type': self.HYBRID_MODEL_LABEL,
                 'challenger': cc_status,
             },
             'rankings': {
@@ -1051,9 +1081,19 @@ class StateOrchestrator:
         
         for region, spec in self.specialists.items():
             model, data, window = spec['model'], spec['data'], spec['window']
+            backend_type = spec.get('backend_type', 'torch_graph')
             channels = spec.get('channels', 29)
             cp = self.calib_params.get(region, next(iter(self.calib_params.values())))
             num_nodes = len(data['nodes_gdf'])
+            if backend_type == 'classical_poisson':
+                region_scores, region_details = model.predict_scores(exogenous_shocks)
+                for name_key, score_value in region_scores.items():
+                    if self._node_owners.get(name_key, region) == region:
+                        combined_scores[name_key] = float(score_value)
+                        if return_trends:
+                            trends[name_key] = 'stable'
+                        component_details[name_key] = region_details[name_key]
+                continue
             
             extra_history = 60
             total_window = window + extra_history
@@ -1129,14 +1169,19 @@ class StateOrchestrator:
             historical_cvli = data['nodes_gdf'][historical_col].fillna(0).values.astype(float)
 
             # Tensão territorial não deve sozinha promover bairros frios.
-            # Exigimos atividade CVLI recente real ou lastro histórico relevante.
             historical_support = np.clip((historical_cvli - 20.0) / 40.0, 0, 1)
             live_support = np.maximum(
                 np.clip(current_cvli_recent / 1.0, 0, 1),
                 np.clip(current_cvli_30d / 2.0, 0, 1)
             )
+            recent_activity_gate = np.maximum(
+                np.clip(current_cvli_recent / 1.0, 0, 1),
+                np.clip(current_cvli_30d / 3.0, 0, 1)
+            )
+            # Histórico sozinho não deve sustentar risco alto em território frio.
+            historical_carry = historical_support * (0.20 + (0.80 * recent_activity_gate))
             territorial_support = np.maximum(
-                historical_support,
+                historical_carry,
                 live_support
             )
             norm_tension = norm_tension * territorial_support
@@ -1216,6 +1261,7 @@ class StateOrchestrator:
                 print(f"⚠️ [Sentinela V3] Falha ao aplicar refinamento: {e}")
         # ---------------------------------------
 
+        self._last_component_details = dict(component_details)
         self._write_hermes_outputs(combined_scores, component_details)
         self._log_predict_p10(combined_scores)
         
@@ -1223,6 +1269,9 @@ class StateOrchestrator:
             self._risk_cache[cache_key] = (combined_scores, trends)
             
         return (combined_scores, trends) if return_trends else combined_scores
+
+    def get_last_component_details(self):
+        return dict(getattr(self, '_last_component_details', {}) or {})
 
     def _log_predict_p10(self, scores_map):
         """Registra o top-10 predito por região a cada cálculo de risco para análise e validação."""

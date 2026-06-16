@@ -49,10 +49,11 @@ from shapely.geometry import mapping
 from shapely.geometry import shape
 from shapely.ops import unary_union
 
-# --- Orquestrador Regional ST-GAT ---
+# --- Orquestrador Regional Híbrido ---
 try:
     from src.core.orchestrator import StateOrchestrator, normalize_name
     from src.core.efficiency_monitor import EfficiencyMonitor
+    from src.core.validation_logger import append_validation_log
     orchestrator = None 
 except ImportError:
     # Fallback se o PYTHONPATH não incluir a raiz corretamente
@@ -60,6 +61,7 @@ except ImportError:
     sys.path.append(os.getcwd())
     from src.core.orchestrator import StateOrchestrator
     from src.core.efficiency_monitor import EfficiencyMonitor
+    from src.core.validation_logger import append_validation_log
     def normalize_name(text):
         if not isinstance(text, str): return ""
         text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('ASCII').upper().strip()
@@ -85,6 +87,7 @@ logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+RISK_MODEL_NAME = "Poisson Ranker Estadual"
 STATIC_EXPORT_SCRIPT = os.path.join(BASE_DIR, 'scripts', 'export_static_snapshot.py')
 STATIC_EXPORT_OUTPUT_DIR = os.path.normpath(
     os.environ.get('STATIC_EXPORT_OUTPUT_DIR', os.path.join(BASE_DIR, 'static_export', 'data'))
@@ -304,8 +307,8 @@ def _load_optional_cvli_models():
     optional_models = {
         'stgat': {
             'mode': 'stgat',
-            'label': 'ST-GAT (Padrão)',
-            'description': 'Arquitetura campeã atualmente ativa no motor regional.',
+            'label': 'Poisson Ranker (Padrão)',
+            'description': 'Champion operacional estadual ativo em Fortaleza, RMF e Interior.',
             'kind': 'champion',
             'fortaleza_scores': {},
             'metrics': None,
@@ -978,13 +981,17 @@ def load_data_and_models():
     # Limpeza de eventos exógenos antigos
     archive_old_exogenous_events()
 
-    # --- ATUALIZAÇÃO OFICIAL DO ORCRIMS NO STARTUP ---
-    try:
-        from data.raw.inteligencia.import_orcrim_kml import refresh_orcrim_from_official
-        refresh_result = refresh_orcrim_from_official()
-        print(f"🧭 [ORCRIMS] Resultado do refresh no startup: {refresh_result}")
-    except Exception as e:
-        print(f"⚠️ [ORCRIMS] Falha ao atualizar ORCRIMS no startup: {e}")
+    # --- ATUALIZAÇÃO OFICIAL DO ORCRIMS NO STARTUP (background) ---
+    def _refresh_orcrim_background():
+        try:
+            from data.raw.inteligencia.import_orcrim_kml import refresh_orcrim_from_official
+            refresh_result = refresh_orcrim_from_official()
+            print(f"🧭 [ORCRIMS] Resultado do refresh em background: {refresh_result}")
+        except Exception as e:
+            print(f"⚠️ [ORCRIMS] Falha ao atualizar ORCRIMS em background: {e}")
+
+    import threading
+    threading.Thread(target=_refresh_orcrim_background, daemon=True, name="orcrims-refresh").start()
 
     # --- ATUALIZAÇÃO DINÂMICA DE RUAS CRÍTICAS (CACHE GEO) ---
     try:
@@ -1089,7 +1096,7 @@ def load_data_and_models():
         invalidate_api_risk_cache()
         orchestrator = StateOrchestrator(BASE_DIR)
         start_stgcn_street_warmup()
-        print("✅ Motor de Inteligência ST-GAT Ativo.")
+        print(f"✅ Motor de Inteligência Ativo: {RISK_MODEL_NAME}.")
 
         # Champion/Challenger — inicializa após o orchestrator
         global champion_challenger
@@ -1117,6 +1124,21 @@ def load_data_and_models():
         # Iniciar Monitor de Eficiência e Relatórios
         efficiency_monitor = EfficiencyMonitor(BASE_DIR, orchestrator, nodes_gdf)
         generate_daily_ranking_report()
+
+        try:
+            enriched_path = os.path.join(BASE_DIR, 'data', 'raw', 'dados_status_ocorrencias_gerais_ENRIQUECIDO.csv')
+            if os.path.exists(enriched_path):
+                df_validation = pd.read_csv(enriched_path, low_memory=False)
+                append_validation_log(
+                    df_eval=df_validation,
+                    project_root=BASE_DIR,
+                    window_days=14,
+                    source_label='startup',
+                    orchestrator=orchestrator,
+                    model_label=RISK_MODEL_NAME,
+                )
+        except Exception as validation_exc:
+            print(f"⚠️ Falha ao registrar VALIDATION_LOG no startup: {validation_exc}")
 
         # Calcular cache de horários de pico em background (não bloqueia startup)
         threading.Thread(target=_compute_peak_hours_cache, daemon=True).start()
@@ -1200,7 +1222,8 @@ def _classify_region(props: dict) -> str:
 
 
 def _normalize_polygon_lookup_name(text: str) -> str:
-    return re.sub(r'\s+', ' ', normalize_name(text or '')).strip()
+    normalized = re.sub(r'\s+', ' ', normalize_name(text or '')).strip()
+    return normalized.split('- AIS')[0].strip()
 
 
 def _build_micronode_polygon_lookup_keys(micronodo=None, bairro=None, name=None):
@@ -2787,13 +2810,13 @@ def get_risk():
                 meta['prediction_window'] = f"{start_pred.strftime('%d/%m')} a {end_pred.strftime('%d/%m')}"
                 meta['intelligence_label'] = f"Janela de Inteligência: {meta['prediction_window']} (Atualizada com Eventos de Hoje)"
                 meta['window_cvli'] = len(orchestrator.dates)
-                meta['model_architecture'] = "Deep ST-GAT Elite (Regionalizado)"
+                meta['model_architecture'] = RISK_MODEL_NAME
                 meta['model_window_cvli'] = 120 # Nova janela de 120 dias para todos
                 
             else:
                 meta['intelligence_label'] = "Janela de Inteligência: Projeção 14 dias (Tempo Real)"
                 meta['last_date_base'] = 'N/A'
-                meta['model_architecture'] = "ST-GAT Elite v3"
+                meta['model_architecture'] = RISK_MODEL_NAME
                 meta['model_window_cvli'] = 120
                 
             # Adicionar métricas de eficiência separadamente para que frontend (Cov@20) não fique com N/A
@@ -2812,7 +2835,7 @@ def get_risk():
                 metric_bits.append(f"P@10 hist.: {metrics['p10'] * 100:.1f}%")
             if isinstance(metrics.get('p20'), (int, float)):
                 metric_bits.append(f"P@20 hist.: {metrics['p20'] * 100:.1f}%")
-            meta['model_architecture'] = f"{selected_model_meta.get('label')} (Opcional Fortaleza)"
+            meta['model_architecture'] = f"{selected_model_meta.get('label')} (Comparativo Fortaleza)"
             meta['intelligence_label'] = (
                 f"{meta.get('intelligence_label', 'Janela de Inteligência: Ativa')} • "
                 f"Modo opcional aplicado somente em Fortaleza"
@@ -3075,15 +3098,29 @@ def simulate_risk():
 @app.route('/api/polygons')
 def get_polygons():
     features = []
-    ais_files = [('fortaleza', 'AIS - CAPITAL.geojson'), ('rmf', 'AIS - METROPOLITANA.geojson'), ('interior', 'AIS - INTERIOR.geojson')]
-    for reg, fname in ais_files:
+    polygon_files = [
+        ('fortaleza', 'nodes_polygons.geojson'),
+        ('rmf', 'AIS - METROPOLITANA.geojson'),
+        ('interior', 'AIS - INTERIOR.geojson'),
+    ]
+    for reg, fname in polygon_files:
         path = os.path.join(BASE_DIR, 'data', 'static', fname)
         if os.path.exists(path):
             try:
                 with open(path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                     for feat in data.get('features', []):
+                        feat.setdefault('properties', {})
+                        if reg == 'fortaleza':
+                            source_region = str(feat['properties'].get('region_type') or '').strip().lower()
+                            if source_region and source_region not in ('capital', 'fortaleza'):
+                                continue
                         feat['properties']['region_type'] = reg
+                        if reg == 'fortaleza':
+                            raw_name = feat['properties'].get('bairro') or feat['properties'].get('NOME') or feat['properties'].get('name') or feat['properties'].get('Name')
+                            clean_name = _normalize_polygon_lookup_name(raw_name)
+                            if clean_name:
+                                feat['properties']['bairro'] = clean_name
                         features.append(feat)
             except: pass
     return jsonify({"type": "FeatureCollection", "features": features})
@@ -3541,6 +3578,12 @@ def explain_node(node_id):
         scores_map = orchestrator.get_combined_risk()
         score_pct = float(scores_map.get(name_norm, 20.0))
         score_10 = score_pct / 10.0
+        component_details = {}
+        try:
+            component_details = orchestrator.get_last_component_details()
+        except Exception:
+            component_details = {}
+        component_meta = component_details.get(name_norm, {}) if isinstance(component_details, dict) else {}
         
         # (pulei blocos intermediários de ranking para brevidade no replace)
         all_scores = []
@@ -3818,10 +3861,40 @@ def explain_node(node_id):
                 'trend_label': str(temporal_pattern).lower(),
                 'critical_streets': critical_streets,
                 'critical_streets_count': critical_streets_count,
+                'model_family': str(component_meta.get('model_family') or 'Poisson Ranker'),
+                'model_architecture': RISK_MODEL_NAME,
+                'primary_signal_label': str(component_meta.get('primary_signal_label') or 'Sinal Poisson do ranking operacional'),
+                'model_signal_score': float(component_meta.get('model_signal_score', component_meta.get('neural_score', 0.0)) or 0.0),
+                'territorial_support_pct': float(component_meta.get('territorial_support_pct', 0.0) or 0.0),
+                'historical_support_pct': float(component_meta.get('historical_support_pct', 0.0) or 0.0),
+                'live_support_pct': float(component_meta.get('live_support_pct', 0.0) or 0.0),
+                'expected_cvli_14d': float(component_meta.get('expected_cvli_14d', 0.0) or 0.0),
             }
 
             explanation = gen.explain_node_ranking(int(node_id), int(rank_pos), context)
             explanation['risk_score_pct'] = float(score_pct)
+            explanation['model_family'] = context['model_family']
+            explanation['model_architecture'] = context['model_architecture']
+            explanation['primary_signal_label'] = context['primary_signal_label']
+            explanation['model_signal_score'] = context['model_signal_score']
+            explanation['expected_cvli_14d'] = context['expected_cvli_14d']
+            explanation['territorial_support_pct'] = context['territorial_support_pct']
+            explanation['historical_support_pct'] = context['historical_support_pct']
+            explanation['live_support_pct'] = context['live_support_pct']
+            explanation['model_drivers'] = [
+                {
+                    'label': context['primary_signal_label'],
+                    'value_pct': round(float(context['model_signal_score']), 1),
+                },
+                {
+                    'label': 'Suporte territorial',
+                    'value_pct': round(float(context['territorial_support_pct']), 1),
+                },
+                {
+                    'label': 'Atividade recente e vizinhança',
+                    'value_pct': round(float(component_meta.get('inclusion_score', 0.0) or 0.0), 1),
+                },
+            ]
 
             # Indicador executivo de tendência futura (14 dias)
             delta_7d = int(cvli_recent_7 - cvli_prev_7)
@@ -3877,6 +3950,8 @@ def explain_node(node_id):
                 'caveats': [],
                 'explanation_available': False,
                 'source': 'unavailable',
+                'model_family': str(component_meta.get('model_family') or 'Poisson Ranker'),
+                'model_architecture': RISK_MODEL_NAME,
             }
             # Log the underlying exception for diagnostics without crashing
             logging.exception('ExplanationGenerator failed: %s', e)
@@ -4167,28 +4242,68 @@ def get_pending_exogenous_count():
         csv_text = _download_sheets_csv(csv_url, timeout=10)
         reader = csv_mod.reader(StringIO(csv_text))
         rows = list(reader)
-        sheet_ids = set()
-        for r in rows[1:]:
-            if r and r[0].strip():
-                # Check if there is any other column with content to avoid empty rows
-                if any(col.strip() for col in r[1:]):
-                    sheet_ids.add(r[0].strip())
-        
+
+        # Detectar se a planilha tem coluna de ID explícita ou começa direto com Data/Hora.
+        # Se o cabeçalho da primeira coluna não for numérico/id-like, a "chave" é o
+        # conteúdo normalizado da linha inteira (mesmo critério usado no sync).
+        from src.google_sheets_sync import normalize_name as _norm
+        from datetime import datetime as _dt, timedelta as _td
+        _now = _dt.now()
+        _cutoff = (_now - _td(days=7)).date()
+
+        # Construir conjunto de todas as chaves já conhecidas (local + archives)
+        known_keys = set()
         exogenous_path = os.path.join(BASE_DIR, 'data', 'exogenous_events.json')
-        local_ids = set()
         if os.path.exists(exogenous_path):
             with open(exogenous_path, 'r', encoding='utf-8') as f:
                 try:
-                    events = json.load(f)
-                    local_ids = {ev.get("id") for ev in events if ev.get("id")}
+                    for ev in json.load(f):
+                        if ev.get("id"): known_keys.add(str(ev["id"]).strip())
+                        if ev.get("raw_text"): known_keys.add(_norm(ev["raw_text"]))
                 except json.JSONDecodeError:
                     pass
-        
-        pending = len(sheet_ids - local_ids)
+
+        archives_dir = os.path.join(BASE_DIR, 'data', 'archives')
+        if os.path.exists(archives_dir):
+            for arch_file in os.listdir(archives_dir):
+                if arch_file.endswith('.json'):
+                    try:
+                        with open(os.path.join(archives_dir, arch_file), 'r', encoding='utf-8') as af:
+                            for ev in json.load(af):
+                                if ev.get("id"): known_keys.add(str(ev["id"]).strip())
+                                if ev.get("raw_text"): known_keys.add(_norm(ev["raw_text"]))
+                    except Exception:
+                        pass
+
+        # Contar eventos pendentes por linha (não por chave) para evitar dupla contagem
+        pending = 0
+        for r in rows[1:]:
+            # Ignorar linhas sem conteúdo além da data/hora (linhas fantasma)
+            if not r or not any(col.strip() for col in r[1:]):
+                continue
+            # Ignorar linhas fora da janela de 7 dias (mesmo critério do sync)
+            try:
+                date_val = _dt.fromisoformat(r[0].strip().replace('Z', '+00:00')).date()
+                if date_val < _cutoff:
+                    continue
+            except Exception:
+                pass
+            ev_id = r[0].strip()
+            desc = r[4].strip() if len(r) > 4 else ""
+            desc_norm = _norm(desc) if desc else _norm(" ".join(c.strip() for c in r if c.strip()))
+            # Evento é conhecido se qualquer uma das suas chaves já existir
+            if ev_id in known_keys or (desc_norm and desc_norm in known_keys):
+                continue
+            pending += 1
+        total_sheet = sum(
+            1 for r in rows[1:]
+            if r and any(col.strip() for col in r[1:])
+        )
+        total_local = len(known_keys)
         return jsonify({
             "pending": pending,
-            "total_sheet": len(sheet_ids),
-            "total_local": len(local_ids),
+            "total_sheet": total_sheet,
+            "total_local": total_local,
         }), 200
     except Exception as e:
         return jsonify({"pending": 0, "error": str(e)}), 200

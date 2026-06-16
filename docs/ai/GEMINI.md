@@ -1,34 +1,34 @@
-# 🧠 Estado Atual do Projeto - Report Preview
+# Gemini no Projeto
 
-## 🌍 Contexto Geral
-O sistema é uma plataforma de predição de crimes violentos (CVLI) para o estado do Ceará. Até Abril/2026, utilizava exclusivamente redes **DeepSTGAT**. Agora, opera sob um **Paradigma Híbrido (Champion/Challenger)** combinando o ST-GAT com o novo **Sentinela V3 (LGBM Lean)**, atingindo **50% de P@10** e **70% de P@20** em validações sombra para Fortaleza.
+O Gemini nao e o motor principal de risco do sistema.
 
-## 🚀 Status Arquitetural (Fase 7.5 - Intervenção Tática Ativa)
-O sistema opera em regime de upgrade do núcleo neural:
-1. **Intervenção Tática (A_tactical):** Substituição da adjacência geográfica por pesos de inteligência (Atrito de Facção e Fragilidade Viária 15x).
-2. **ResGAT (Tactical Residual GAT):** Evolução do ShallowGAT para 2 camadas com skip connections, otimizando o "tempero" tático sem perder a identidade histórica (Window 60d).
-3. **Normalização Row-Stochastic:** Controle de volume via $D^{-1} A$, preservando recordes de P@20 (54.2%).
-4. **Paradigma Híbrido (Champion/Challenger):** O `app.py` continua unindo ST-GAT com Sentinela V3.
+## Papel atual
 
-**Blend Dinâmico (ChampionChallenger):**
-O `src/core/champion_challenger.py` intercede após a inferência do ST-GAT. Avalia P@10 contra dados *reais* a cada hora e ajusta o peso via suavização exponencial (EMA), permitindo ao LGBM até 50% de peso na predição final de Fortaleza sem quebrar a API.
+Hoje o score operacional principal vem do backend:
 
-## 🛠️ Diretrizes de Laboratório (tests/Sentinela/)
-- **Retreino:** `tests/Sentinela/freeze_total_v3.py` (Sem holdout, retreina V3 no dataset inteiro).
-- **Validação Sombra:** `tests/Sentinela/train_validate_v3.py`.
-- **Inferência/Explicação:** `tests/Sentinela/sentinela_inference.py`.
-- **Tempo Real:** `tests/Sentinela/finetune_realtime_v1.py` (Janela deslizante de 30 dias para pegar padrões voláteis).
-- **Promoção:** `.venv/Scripts/python.exe tests/Sentinela/promote_model.py` empurra seguro para `models/active/`.
+- `Poisson Ranker Estadual`
 
-## Logs e Planejamento
-- Tentativas e otimizações registradas em `TRAINING_LOG.md`.
-- Próximos passos operacionais geridos via `.planning/` e `tests/Sentinela/ROADMAP.md`.
+O Gemini permanece como componente auxiliar para tarefas de apoio, como:
 
-## 🇧🇷 Idioma de Interação
-- **Mandato:** Todas as interações, explicações e respostas devem ser realizadas **obrigatoriamente em Português** e voltadas à praticidade tática.
+- interpretacao de textos
+- enriquecimento narrativo
+- apoio a explicacoes
+- fluxos especificos de IA fora do ranking principal
 
-## Registro
-- **Registro de Logs:** A cada nova tentativa SEMPRE REGISTRAR EM TRAININGS_LOG.MD E ATUALIZAR OS ARQUIVOS DO .PLANING.
+## O que nao e mais verdade
 
----
-*Última atualização: 01 de Maio de 2026*
+Nao tratar mais o Gemini como parte da arquitetura champion de predicao CVLI.
+
+Em especial, este projeto nao opera mais oficialmente com:
+
+- `DeepSTGAT` como champion
+- `Champion/Challenger` ST-GAT + Sentinela como verdade corrente de producao
+- blending neural como caminho principal para `/api/risk`
+
+## Fonte de verdade para o risco
+
+Para entender a arquitetura atual, use:
+
+- [CURRENT_ARCHITECTURE.md](C:/Users/Boanerges/Desktop/Projetos/Report Preview/docs/CURRENT_ARCHITECTURE.md)
+- [CURRENT_OPERATIONS.md](C:/Users/Boanerges/Desktop/Projetos/Report Preview/docs/CURRENT_OPERATIONS.md)
+- [CVLI_STOCHASTIC_BENCHMARK.md](C:/Users/Boanerges/Desktop/Projetos/Report Preview/docs/CVLI_STOCHASTIC_BENCHMARK.md)

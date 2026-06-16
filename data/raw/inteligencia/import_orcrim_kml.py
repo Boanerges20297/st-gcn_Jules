@@ -1,13 +1,19 @@
 import geopandas as gpd
+import base64
+import ctypes
 import hashlib
 import io
 import json
 import os
 import re
+import sqlite3
+import socket
 import shutil
 import subprocess
+import tempfile
 import time
 import unicodedata
+import urllib.request
 import zipfile
 from datetime import datetime
 from math import radians, cos, sin, asin, sqrt
@@ -15,9 +21,15 @@ from xml.etree import ElementTree as ET
 
 import pandas as pd
 import requests
+import websocket
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from shapely.geometry import MultiPolygon
 from shapely.geometry import Point
 from shapely.geometry import Polygon
+try:
+    import browser_cookie3
+except Exception:
+    browser_cookie3 = None
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 INTEL_DIR = os.path.join(BASE_DIR, 'data', 'raw', 'inteligencia')
@@ -34,6 +46,10 @@ CHROME_PATH_CANDIDATES = [
     r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe',
     os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Google', 'Chrome', 'Application', 'chrome.exe'),
 ]
+CHROME_USER_DATA_DIR_CANDIDATES = [
+    os.environ.get('ORCRIMS_CHROME_USER_DATA_DIR', ''),
+    os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Google', 'Chrome', 'User Data'),
+]
 INTELLIGENCE_OUTPUTS = [
     os.path.join(INTEL_DIR, 'micronodos_faccoes_2026.csv'),
     os.path.join(INTEL_DIR, 'bairros_faccoes_2026.csv'),
@@ -48,6 +64,10 @@ class GoogleMapsAuthError(RuntimeError):
 
 class ChromeProfileDownloadTimeout(RuntimeError):
     """Chrome foi aberto, mas o download autenticado não apareceu a tempo."""
+
+
+class ChromeProfileCookieError(RuntimeError):
+    """NÃ£o foi possÃ­vel reaproveitar os cookies do perfil logado do Chrome."""
 
 
 def haversine(lon1, lat1, lon2, lat2):
@@ -342,6 +362,77 @@ def _find_chrome_executable() -> str:
     return ''
 
 
+def _find_chrome_user_data_dir() -> str:
+    env = _load_env_for_cookies()
+    explicit_dir = os.environ.get('ORCRIMS_CHROME_USER_DATA_DIR') or env.get('ORCRIMS_CHROME_USER_DATA_DIR', '')
+    candidates = [explicit_dir, *CHROME_USER_DATA_DIR_CANDIDATES]
+    for candidate in candidates:
+        if candidate and os.path.exists(candidate):
+            return candidate
+    return ''
+
+
+def _update_nested_dict(target: dict, path, value):
+    current = target
+    for key in path[:-1]:
+        next_value = current.get(key)
+        if not isinstance(next_value, dict):
+            next_value = {}
+            current[key] = next_value
+        current = next_value
+    current[path[-1]] = value
+
+
+def _prepare_chrome_profile_for_auto_download(profile_name: str):
+    user_data_dir = _find_chrome_user_data_dir()
+    if not user_data_dir:
+        return
+
+    profile_dir = os.path.join(user_data_dir, profile_name)
+    preferences_path = os.path.join(profile_dir, 'Preferences')
+    if not os.path.exists(preferences_path):
+        return
+
+    try:
+        with open(preferences_path, 'r', encoding='utf-8') as file_obj:
+            preferences = json.load(file_obj)
+    except Exception as error:
+        print(f'⚠️ [ORCRIMS] Não foi possível ler Preferences do Chrome ({preferences_path}): {error}')
+        return
+
+    os.makedirs(DOWNLOADS_DIR, exist_ok=True)
+    desired_values = {
+        ('download', 'default_directory'): DOWNLOADS_DIR,
+        ('download', 'prompt_for_download'): False,
+        ('download', 'directory_upgrade'): True,
+        ('download', 'extensions_to_open'): '',
+        ('safebrowsing', 'enabled'): True,
+    }
+
+    changed = False
+    for path, expected_value in desired_values.items():
+        current = preferences
+        for key in path[:-1]:
+            if not isinstance(current, dict):
+                current = None
+                break
+            current = current.get(key)
+        current_value = current.get(path[-1]) if isinstance(current, dict) else None
+        if current_value != expected_value:
+            _update_nested_dict(preferences, path, expected_value)
+            changed = True
+
+    if not changed:
+        return
+
+    try:
+        with open(preferences_path, 'w', encoding='utf-8') as file_obj:
+            json.dump(preferences, file_obj, ensure_ascii=False, separators=(',', ':'))
+        print(f'✅ [ORCRIMS] Preferências do Chrome ajustadas para download automático ({profile_name}).')
+    except Exception as error:
+        print(f'⚠️ [ORCRIMS] Não foi possível atualizar Preferences do Chrome ({preferences_path}): {error}')
+
+
 def _chrome_download_candidates():
     if not os.path.exists(DOWNLOADS_DIR):
         return []
@@ -375,24 +466,625 @@ def _wait_for_downloaded_kml_via_chrome(started_at: float):
     )
 
 
+def _dpapi_unprotect(ciphertext: bytes) -> bytes:
+    class DATA_BLOB(ctypes.Structure):
+        _fields_ = [('cbData', ctypes.c_uint32), ('pbData', ctypes.POINTER(ctypes.c_char))]
+
+    crypt32 = ctypes.windll.crypt32
+    kernel32 = ctypes.windll.kernel32
+
+    in_blob = DATA_BLOB(len(ciphertext), ctypes.create_string_buffer(ciphertext))
+    out_blob = DATA_BLOB()
+    if not crypt32.CryptUnprotectData(
+        ctypes.byref(in_blob),
+        None,
+        None,
+        None,
+        None,
+        0,
+        ctypes.byref(out_blob),
+    ):
+        raise ChromeProfileCookieError('Falha ao descriptografar dado protegido via DPAPI.')
+
+    try:
+        return ctypes.string_at(out_blob.pbData, out_blob.cbData)
+    finally:
+        kernel32.LocalFree(out_blob.pbData)
+
+
+def _get_chrome_master_key(user_data_dir: str) -> bytes:
+    local_state_path = os.path.join(user_data_dir, 'Local State')
+    if not os.path.exists(local_state_path):
+        raise ChromeProfileCookieError(f'Arquivo Local State nÃ£o encontrado em {local_state_path}.')
+
+    with open(local_state_path, 'r', encoding='utf-8') as file_obj:
+        local_state = json.load(file_obj)
+
+    encrypted_key_b64 = (((local_state.get('os_crypt') or {}).get('encrypted_key')) or '').strip()
+    if not encrypted_key_b64:
+        raise ChromeProfileCookieError('Chrome Local State sem os_crypt.encrypted_key.')
+
+    encrypted_key = base64.b64decode(encrypted_key_b64)
+    if encrypted_key.startswith(b'DPAPI'):
+        encrypted_key = encrypted_key[5:]
+    return _dpapi_unprotect(encrypted_key)
+
+
+def _decrypt_chrome_cookie_value(encrypted_value: bytes, master_key: bytes) -> str:
+    if not encrypted_value:
+        return ''
+
+    if encrypted_value.startswith((b'v10', b'v11', b'v20')):
+        nonce = encrypted_value[3:15]
+        cipherbytes = encrypted_value[15:]
+        plaintext = AESGCM(master_key).decrypt(nonce, cipherbytes, None)
+        return plaintext.decode('utf-8', errors='ignore')
+
+    try:
+        return _dpapi_unprotect(encrypted_value).decode('utf-8', errors='ignore')
+    except Exception:
+        return encrypted_value.decode('utf-8', errors='ignore')
+
+
+def _load_google_cookies_from_chrome_profile(profile_name: str):
+    user_data_dir = _find_chrome_user_data_dir()
+    if not user_data_dir:
+        raise ChromeProfileCookieError('DiretÃ³rio User Data do Chrome nÃ£o encontrado.')
+
+    cookie_db_candidates = [
+        os.path.join(user_data_dir, profile_name, 'Network', 'Cookies'),
+        os.path.join(user_data_dir, profile_name, 'Cookies'),
+    ]
+    cookie_db_path = next((path for path in cookie_db_candidates if os.path.exists(path)), '')
+    if not cookie_db_path:
+        raise ChromeProfileCookieError(f'Banco de cookies do perfil {profile_name} nÃ£o encontrado.')
+
+    master_key = _get_chrome_master_key(user_data_dir)
+
+    with tempfile.NamedTemporaryFile(prefix='orcrims_cookies_', suffix='.sqlite', delete=False) as temp_file:
+        temp_cookie_db = temp_file.name
+    try:
+        _copy_file_locked(cookie_db_path, temp_cookie_db)
+        conn = sqlite3.connect(temp_cookie_db)
+        try:
+            cursor = conn.execute(
+                """
+                SELECT host_key, name, value, encrypted_value, path, is_secure
+                FROM cookies
+                WHERE host_key LIKE '%google.com%'
+                """
+            )
+            cookies = []
+            for host_key, name, value, encrypted_value, path, is_secure in cursor.fetchall():
+                cookie_value = value or _decrypt_chrome_cookie_value(encrypted_value or b'', master_key)
+                if not cookie_value:
+                    continue
+                cookies.append({
+                    'host_key': host_key,
+                    'name': name,
+                    'value': cookie_value,
+                    'path': path or '/',
+                    'secure': bool(is_secure),
+                })
+        finally:
+            conn.close()
+    finally:
+        try:
+            os.remove(temp_cookie_db)
+        except OSError:
+            pass
+
+    if not cookies:
+        raise ChromeProfileCookieError(f'Nenhum cookie Google utilizÃ¡vel foi lido do perfil {profile_name}.')
+    return cookies
+
+
+def _copy_file_with_robocopy(src: str, dst: str) -> bool:
+    """Copia um arquivo em uso pelo Chrome usando robocopy (ignora locks do Windows)."""
+    src_dir = os.path.dirname(src)
+    src_file = os.path.basename(src)
+    dst_dir = os.path.dirname(dst)
+    dst_file = os.path.basename(dst)
+    os.makedirs(dst_dir, exist_ok=True)
+    if dst_file != src_file:
+        tmp_dst = os.path.join(dst_dir, src_file)
+    else:
+        tmp_dst = dst
+    try:
+        result = subprocess.run(
+            ['robocopy', src_dir, dst_dir, src_file, '/R:1', '/W:0', '/NFL', '/NDL', '/NJH', '/NJS', '/NP'],
+            capture_output=True,
+            timeout=15,
+        )
+        # robocopy retorna 1 quando copia com sucesso (não é erro)
+        if result.returncode <= 1 and os.path.exists(tmp_dst):
+            if tmp_dst != dst:
+                shutil.move(tmp_dst, dst)
+            return True
+    except Exception:
+        pass
+    return False
+
+
+def _copy_file_locked(src: str, dst: str):
+    """Copia src para dst, usando robocopy como fallback se o arquivo estiver travado."""
+    try:
+        shutil.copy2(src, dst)
+    except (PermissionError, OSError):
+        if not _copy_file_with_robocopy(src, dst):
+            raise
+
+
+def _get_free_tcp_port() -> int:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(('127.0.0.1', 0))
+        return int(sock.getsockname()[1])
+
+
+def _copy_minimal_chrome_profile(profile_name: str):
+    user_data_dir = _find_chrome_user_data_dir()
+    if not user_data_dir:
+        raise ChromeProfileCookieError('DiretÃ³rio User Data do Chrome nÃ£o encontrado.')
+
+    temp_root = tempfile.mkdtemp(prefix='orcrims_chrome_headless_')
+    temp_user_data_dir = os.path.join(temp_root, 'User Data')
+    temp_profile_dir = os.path.join(temp_user_data_dir, profile_name)
+    source_profile_dir = os.path.join(user_data_dir, profile_name)
+    if not os.path.exists(source_profile_dir):
+        raise ChromeProfileCookieError(f'Perfil do Chrome nÃ£o encontrado: {source_profile_dir}.')
+
+    ignored_dir_names = {
+        'Cache', 'Code Cache', 'GPUCache', 'ShaderCache', 'GrShaderCache',
+        'DawnCache', 'DawnGraphiteCache', 'DawnWebGPUCache', 'Crashpad',
+        'OptimizationHints', 'AutofillStates', 'VideoDecodeStats',
+    }
+    ignored_path_parts = {
+        os.path.join('Service Worker', 'CacheStorage'),
+        os.path.join('Service Worker', 'ScriptCache'),
+    }
+
+    os.makedirs(temp_profile_dir, exist_ok=True)
+    copied_files = 0
+    skipped_files = 0
+    skipped_errors = []
+    for root, dirnames, filenames in os.walk(source_profile_dir):
+        relative_root = os.path.relpath(root, source_profile_dir)
+        if relative_root == '.':
+            relative_root = ''
+        if relative_root and any(
+            relative_root == ignored_part or relative_root.startswith(ignored_part + os.sep)
+            for ignored_part in ignored_path_parts
+        ):
+            dirnames[:] = []
+            continue
+
+        dirnames[:] = [name for name in dirnames if name not in ignored_dir_names]
+        destination_root = os.path.join(temp_profile_dir, relative_root)
+        os.makedirs(destination_root, exist_ok=True)
+
+        for filename in filenames:
+            lower_filename = filename.lower()
+            if lower_filename in {'lock', 'cookies-journal', 'safe browsing cookies', 'safe browsing cookies-journal'}:
+                skipped_files += 1
+                continue
+            if relative_root.startswith('Sessions'):
+                skipped_files += 1
+                continue
+            source_path = os.path.join(root, filename)
+            destination_path = os.path.join(destination_root, filename)
+            try:
+                _copy_file_locked(source_path, destination_path)
+                copied_files += 1
+            except (PermissionError, OSError) as error:
+                skipped_files += 1
+                if len(skipped_errors) < 10:
+                    skipped_errors.append(f'{os.path.relpath(source_path, source_profile_dir)} ({error})')
+
+    local_state_source = os.path.join(user_data_dir, 'Local State')
+    if os.path.exists(local_state_source):
+        os.makedirs(temp_user_data_dir, exist_ok=True)
+        shutil.copy2(local_state_source, os.path.join(temp_user_data_dir, 'Local State'))
+
+    print(
+        f'🧪 [ORCRIMS] Perfil temporário do Chrome preparado: copiados={copied_files} | '
+        f'ignorados={skipped_files} | perfil={profile_name}'
+    )
+    if skipped_errors:
+        print(f"⚠️ [ORCRIMS] Arquivos do perfil ignorados por trava: {'; '.join(skipped_errors)}")
+
+    return temp_root, temp_user_data_dir
+
+
+def _wait_for_devtools_endpoint(port: int, timeout_seconds: int = 20):
+    deadline = time.time() + timeout_seconds
+    last_error = None
+    while time.time() < deadline:
+        try:
+            with urllib.request.urlopen(f'http://127.0.0.1:{port}/json/version', timeout=2) as response:
+                return json.loads(response.read().decode('utf-8'))
+        except Exception as error:
+            last_error = error
+            time.sleep(0.5)
+    raise ChromeProfileCookieError(f'DevTools do Chrome headless nÃ£o respondeu na porta {port}: {last_error}')
+
+
+def _list_devtools_targets(port: int):
+    with urllib.request.urlopen(f'http://127.0.0.1:{port}/json/list', timeout=5) as response:
+        return json.loads(response.read().decode('utf-8'))
+
+
+def _cdp_call(ws, method: str, params: dict | None = None, call_id: int = 1):
+    ws.send(json.dumps({'id': call_id, 'method': method, 'params': params or {}}))
+    while True:
+        payload = json.loads(ws.recv())
+        if payload.get('id') == call_id:
+            if payload.get('error'):
+                raise ChromeProfileCookieError(f'CDP {method} falhou: {payload["error"]}')
+            return payload.get('result', {})
+
+
+def _extract_google_cookies_from_cdp_target(ws, warmup_url: str | None = None):
+    try:
+        _cdp_call(ws, 'Page.enable')
+    except Exception:
+        pass
+
+    if warmup_url:
+        try:
+            _cdp_call(ws, 'Page.navigate', {'url': warmup_url})
+            time.sleep(2)
+        except Exception:
+            pass
+
+    try:
+        cookie_payload = _cdp_call(ws, 'Storage.getCookies')
+    except Exception:
+        cookie_payload = _cdp_call(ws, 'Network.getCookies')
+
+    cookies = [
+        {
+            'host_key': item.get('domain', ''),
+            'name': item.get('name', ''),
+            'value': item.get('value', ''),
+            'path': item.get('path', '/') or '/',
+            'secure': bool(item.get('secure', False)),
+        }
+        for item in cookie_payload.get('cookies', [])
+        if 'google.' in (item.get('domain', '') or '')
+    ]
+    return cookies
+
+
+def _load_google_cookies_via_browser_cookie3(profile_name: str):
+    if browser_cookie3 is None:
+        raise ChromeProfileCookieError('browser-cookie3 não está disponível neste ambiente.')
+
+    user_data_dir = _find_chrome_user_data_dir()
+    if not user_data_dir:
+        raise ChromeProfileCookieError('Diretório User Data do Chrome não encontrado.')
+
+    cookie_file = os.path.join(user_data_dir, profile_name, 'Network', 'Cookies')
+    if not os.path.exists(cookie_file):
+        cookie_file = os.path.join(user_data_dir, profile_name, 'Cookies')
+    if not os.path.exists(cookie_file):
+        raise ChromeProfileCookieError(f'Banco de cookies do perfil {profile_name} não encontrado.')
+
+    try:
+        cookie_jar = browser_cookie3.chrome(cookie_file=cookie_file, domain_name='google.com')
+    except Exception as error:
+        raise ChromeProfileCookieError(f'browser-cookie3 falhou ao ler o perfil {profile_name}: {error}') from error
+
+    cookies = []
+    for item in cookie_jar:
+        if 'google.' not in (item.domain or '') or not item.value:
+            continue
+        cookies.append({
+            'host_key': item.domain,
+            'name': item.name,
+            'value': item.value,
+            'path': item.path or '/',
+            'secure': bool(item.secure),
+        })
+    if not cookies:
+        raise ChromeProfileCookieError(f'browser-cookie3 não expôs cookies Google do perfil {profile_name}.')
+    print(f"🔐 [ORCRIMS] Cookies Google lidos via browser-cookie3 ({profile_name}): {len(cookies)} entradas.")
+    return cookies
+
+
+def _load_google_cookies_via_headless_chrome(profile_name: str, warmup_url: str | None = None):
+    chrome_executable = _find_chrome_executable()
+    if not chrome_executable:
+        raise ChromeProfileCookieError('Google Chrome nÃ£o encontrado para fallback headless.')
+
+    temp_root, temp_user_data_dir = _copy_minimal_chrome_profile(profile_name)
+    port = _get_free_tcp_port()
+    process = None
+    ws = None
+    try:
+        command = [
+            chrome_executable,
+            f'--user-data-dir={temp_user_data_dir}',
+            f'--profile-directory={profile_name}',
+            f'--remote-debugging-port={port}',
+            '--remote-allow-origins=*',
+            '--headless=new',
+            '--disable-gpu',
+            '--no-first-run',
+            '--no-default-browser-check',
+            'about:blank',
+        ]
+        process = subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        version_payload = _wait_for_devtools_endpoint(port)
+        ws = websocket.create_connection(version_payload['webSocketDebuggerUrl'], timeout=10)
+        cookies = _extract_google_cookies_from_cdp_target(ws, warmup_url=warmup_url or 'https://www.google.com/maps/')
+    finally:
+        if ws is not None:
+            try:
+                ws.close()
+            except Exception:
+                pass
+        if process is not None:
+            try:
+                process.terminate()
+                process.wait(timeout=5)
+            except Exception:
+                try:
+                    process.kill()
+                except Exception:
+                    pass
+        shutil.rmtree(temp_root, ignore_errors=True)
+
+    if not cookies:
+        raise ChromeProfileCookieError(f'Chrome headless nÃ£o expÃ´s cookies Google do perfil {profile_name}.')
+    print(f"🔐 [ORCRIMS] Cookies Google expostos via Chrome headless ({profile_name}): {len(cookies)} entradas.")
+    return cookies
+
+
+def _chrome_debug_port() -> int:
+    raw = os.environ.get('ORCRIMS_CHROME_DEBUG_PORT') or _load_env_for_cookies().get('ORCRIMS_CHROME_DEBUG_PORT') or ''
+    try:
+        return int(str(raw).strip())
+    except (TypeError, ValueError):
+        return 9222
+
+
+def _probe_devtools_endpoint(port: int):
+    try:
+        with urllib.request.urlopen(f'http://127.0.0.1:{port}/json/version', timeout=2) as response:
+            return json.loads(response.read().decode('utf-8'))
+    except Exception:
+        return None
+
+
+def _pick_cdp_target_ws(port: int) -> str:
+    try:
+        targets = _list_devtools_targets(port)
+    except Exception:
+        targets = []
+    page_target = next(
+        (item for item in targets if item.get('type') == 'page' and item.get('webSocketDebuggerUrl')),
+        None,
+    )
+    if page_target:
+        return page_target['webSocketDebuggerUrl']
+    any_target = next((item for item in targets if item.get('webSocketDebuggerUrl')), None)
+    if any_target:
+        return any_target['webSocketDebuggerUrl']
+    version_payload = _probe_devtools_endpoint(port) or {}
+    if version_payload.get('webSocketDebuggerUrl'):
+        return version_payload['webSocketDebuggerUrl']
+    raise ChromeProfileCookieError(f'Nenhum alvo CDP com WebSocket exposto na porta {port}.')
+
+
+def _get_chrome_pids() -> list:
+    """Retorna lista de PIDs do Chrome em execução."""
+    try:
+        result = subprocess.run(
+            ['tasklist', '/FI', 'IMAGENAME eq chrome.exe', '/FO', 'CSV', '/NH'],
+            capture_output=True, text=True, timeout=10,
+        )
+        pids = []
+        for line in result.stdout.splitlines():
+            parts = line.strip().strip('"').split('","')
+            if len(parts) >= 2:
+                try:
+                    pids.append(int(parts[1]))
+                except ValueError:
+                    pass
+        return pids
+    except Exception:
+        return []
+
+
+def _close_chrome_gracefully(timeout_seconds: int = 10) -> list:
+    """Fecha todas as instâncias do Chrome graciosamente. Retorna PIDs que foram fechados."""
+    pids = _get_chrome_pids()
+    if not pids:
+        return []
+    print(f'🔄 [ORCRIMS] Fechando Chrome temporariamente para captura de cookies ({len(pids)} processos)...')
+    # TASKKILL /IM envia WM_CLOSE (gracioso), não força
+    subprocess.run(['taskkill', '/IM', 'chrome.exe'], capture_output=True, timeout=10)
+    deadline = time.time() + timeout_seconds
+    while time.time() < deadline:
+        if not _get_chrome_pids():
+            break
+        time.sleep(0.5)
+    # Se ainda restam, força
+    remaining = _get_chrome_pids()
+    if remaining:
+        subprocess.run(['taskkill', '/F', '/IM', 'chrome.exe'], capture_output=True, timeout=10)
+        time.sleep(1)
+    print('✅ [ORCRIMS] Chrome fechado.')
+    return pids
+
+
+def _reopen_chrome(chrome_executable: str, user_data_dir: str, profile_name: str):
+    """Reabre o Chrome normalmente (restaura abas anteriores)."""
+    try:
+        subprocess.Popen(
+            [chrome_executable, f'--user-data-dir={user_data_dir}', f'--profile-directory={profile_name}'],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+        print('🌐 [ORCRIMS] Chrome reaberto normalmente.')
+    except Exception as e:
+        print(f'⚠️ [ORCRIMS] Não foi possível reabrir o Chrome: {e}')
+
+
+def _load_google_cookies_via_live_chrome_session(source_url: str, profile_name: str):
+    port = _chrome_debug_port()
+
+    # 1) Sessão viva já exposta com --remote-debugging-port: lemos direto.
+    if _probe_devtools_endpoint(port):
+        ws = None
+        try:
+            ws = websocket.create_connection(_pick_cdp_target_ws(port), timeout=10)
+            cookies = _extract_google_cookies_from_cdp_target(ws)
+        finally:
+            if ws is not None:
+                try:
+                    ws.close()
+                except Exception:
+                    pass
+        if cookies:
+            print(f"🔐 [ORCRIMS] Cookies capturados da sessão viva já ativa (porta {port}): {len(cookies)} entradas.")
+            return cookies
+        print(f'⚠️ [ORCRIMS] Porta de debug {port} ativa, mas sem cookies Google expostos.')
+
+    chrome_executable = _find_chrome_executable()
+    user_data_dir = _find_chrome_user_data_dir()
+    if not chrome_executable or not user_data_dir:
+        raise ChromeProfileCookieError('Chrome ou User Data não disponível para captura de sessão viva.')
+
+    # 2) Chrome está aberto sem debug port: fechar graciosamente, subir com debug,
+    #    capturar cookies, fechar e reabrir normalmente.
+    chrome_was_open = bool(_get_chrome_pids())
+    if chrome_was_open:
+        _close_chrome_gracefully()
+        time.sleep(1)
+
+    process = None
+    ws = None
+    try:
+        command = [
+            chrome_executable,
+            f'--user-data-dir={user_data_dir}',
+            f'--profile-directory={profile_name}',
+            f'--remote-debugging-port={port}',
+            '--remote-allow-origins=*',
+            '--headless=new',
+            '--disable-gpu',
+            '--no-first-run',
+            '--no-default-browser-check',
+            'about:blank',
+        ]
+        process = subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        version_payload = _wait_for_devtools_endpoint(port, timeout_seconds=20)
+        ws = websocket.create_connection(version_payload['webSocketDebuggerUrl'], timeout=10)
+        cookies = _extract_google_cookies_from_cdp_target(ws, warmup_url='https://www.google.com/maps/')
+    finally:
+        if ws is not None:
+            try:
+                ws.close()
+            except Exception:
+                pass
+        if process is not None:
+            try:
+                process.terminate()
+                process.wait(timeout=5)
+            except Exception:
+                try:
+                    process.kill()
+                except Exception:
+                    pass
+        if chrome_was_open:
+            _reopen_chrome(chrome_executable, user_data_dir, profile_name)
+
+    if not cookies:
+        raise ChromeProfileCookieError(f'Chrome não expôs cookies Google do perfil {profile_name}.')
+    print(f"🔐 [ORCRIMS] Cookies Google capturados via Chrome com debug port ({profile_name}): {len(cookies)} entradas.")
+    return cookies
+
+
+def _build_google_session_from_chrome_profile(source_url: str, profile_name: str) -> requests.Session:
+    session = requests.Session()
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Referer': source_url.replace('/kml?', '/viewer?'),
+    })
+
+    try:
+        cookies = _load_google_cookies_via_live_chrome_session(source_url, profile_name)
+    except Exception as live_error:
+        print(f'⚠️ [ORCRIMS] Captura via Chrome falhou ({live_error}). Tentando leitura direta do perfil...')
+        try:
+            cookies = _load_google_cookies_from_chrome_profile(profile_name)
+        except Exception as cookie_error:
+            print(f'⚠️ [ORCRIMS] Leitura direta do banco de cookies falhou ({cookie_error}). Tentando browser-cookie3...')
+            cookies = _load_google_cookies_via_browser_cookie3(profile_name)
+    for cookie in cookies:
+        domain = cookie['host_key'] if cookie['host_key'].startswith('.') else cookie['host_key']
+        session.cookies.set(
+            cookie['name'],
+            cookie['value'],
+            domain=domain,
+            path=cookie['path'],
+            secure=cookie['secure'],
+        )
+
+    print(f"🔐 [ORCRIMS] Cookies Google carregados do perfil do Chrome ({profile_name}): {len(cookies)} entradas.")
+    return session
+
+
+def _download_official_payload_with_session(source_url: str, session: requests.Session, download_label: str):
+    print(f'⬇️ [ORCRIMS] Baixando KML oficial via {download_label}: {source_url}')
+    response = session.get(source_url, timeout=REQUEST_TIMEOUT)
+    _raise_for_google_auth_failure(response, source_url)
+    response.raise_for_status()
+    content = response.content
+    print(
+        f"✅ [ORCRIMS] Download concluÃ­do via {download_label}: status={response.status_code} | bytes={len(content)} | "
+        f"etag={response.headers.get('ETag', 'N/A')} | last-modified={response.headers.get('Last-Modified', 'N/A')}"
+    )
+    return content, {
+        'etag': response.headers.get('ETag', ''),
+        'last_modified': response.headers.get('Last-Modified', ''),
+        'content_length': response.headers.get('Content-Length', ''),
+        'content_type': response.headers.get('Content-Type', ''),
+        'final_url': response.url or source_url,
+        'redirect_chain': [item.headers.get('Location', '') for item in response.history],
+        'downloaded_via': download_label,
+    }
+
+
+def _download_payload_via_chrome_profile_cookies(source_url: str):
+    profile_name = os.environ.get('ORCRIMS_CHROME_PROFILE') or _load_env_for_cookies().get('ORCRIMS_CHROME_PROFILE') or 'Default'
+    session = _build_google_session_from_chrome_profile(source_url, profile_name)
+    payload, headers = _download_official_payload_with_session(source_url, session, f'chrome_profile_cookies:{profile_name}')
+    headers['profile'] = profile_name
+    return payload, headers
+
+
 def _download_payload_via_logged_in_chrome(source_url: str):
     chrome_executable = _find_chrome_executable()
     if not chrome_executable:
         raise RuntimeError('Google Chrome não encontrado para fallback autenticado.')
 
     profile_name = os.environ.get('ORCRIMS_CHROME_PROFILE') or _load_env_for_cookies().get('ORCRIMS_CHROME_PROFILE') or 'Default'
+    user_data_dir = _find_chrome_user_data_dir()
+    _prepare_chrome_profile_for_auto_download(profile_name)
     started_at = time.time()
     print(f'🌐 [ORCRIMS] Tentando exportar via Chrome logado (perfil={profile_name})...')
-    subprocess.Popen(
-        [
-            chrome_executable,
-            f'--profile-directory={profile_name}',
-            '--new-window',
-            source_url,
-        ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+    command = [
+        chrome_executable,
+        f'--profile-directory={profile_name}',
+        '--new-window',
+        source_url,
+    ]
+    if user_data_dir:
+        command.insert(1, f'--user-data-dir={user_data_dir}')
+    subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     downloaded_path = _wait_for_downloaded_kml_via_chrome(started_at)
     print(f'📥 [ORCRIMS] Download detectado via Chrome: {downloaded_path}')
     with open(downloaded_path, 'rb') as file_obj:
@@ -472,24 +1164,8 @@ def _raise_for_google_auth_failure(response: requests.Response, source_url: str)
 
 
 def _download_official_payload(source_url: str):
-    print(f'⬇️ [ORCRIMS] Baixando KML oficial: {source_url}')
     session = _build_google_session(source_url)
-    response = session.get(source_url, timeout=REQUEST_TIMEOUT)
-    _raise_for_google_auth_failure(response, source_url)
-    response.raise_for_status()
-    content = response.content
-    print(
-        f"✅ [ORCRIMS] Download concluído: status={response.status_code} | bytes={len(content)} | "
-        f"etag={response.headers.get('ETag', 'N/A')} | last-modified={response.headers.get('Last-Modified', 'N/A')}"
-    )
-    return content, {
-        'etag': response.headers.get('ETag', ''),
-        'last_modified': response.headers.get('Last-Modified', ''),
-        'content_length': response.headers.get('Content-Length', ''),
-        'content_type': response.headers.get('Content-Type', ''),
-        'final_url': response.url or source_url,
-        'redirect_chain': [item.headers.get('Location', '') for item in response.history],
-    }
+    return _download_official_payload_with_session(source_url, session, 'env_cookie')
 
 
 def _extract_kml_bytes_from_payload(payload: bytes) -> bytes:
@@ -724,41 +1400,57 @@ def refresh_orcrim_from_official(force: bool = False):
         _write_update_status(current_status)
         return {'updated': False, 'reason': 'no_official_link_found', 'fallback_used': fallback_available}
 
-    try:
-        payload_bytes, headers = _download_official_payload(source_url)
-        kml_bytes = _extract_kml_bytes_from_payload(payload_bytes)
-    except Exception as error:
-        download_failures = [str(error)]
-        if isinstance(error, GoogleMapsAuthError) and _env_flag('ORCRIMS_USE_CHROME_FALLBACK', default=True):
-            print(f'⚠️ [ORCRIMS] Sessão por cookie rejeitada. Tentando Chrome logado: {error}')
-            try:
-                payload_bytes, headers = _download_payload_via_logged_in_chrome(source_url)
-                kml_bytes = _extract_kml_bytes_from_payload(payload_bytes)
-            except Exception as chrome_error:
-                download_failures.append(f'chrome_profile: {chrome_error}')
-                error = chrome_error
-            else:
-                error = None
-        if error is None:
-            pass
+    # Estratégia: a fonte de verdade é a sessão viva do Chrome logado. Pegamos os
+    # cookies daquela sessão, montamos um requests.Session() e baixamos o KMZ por HTTP.
+    # O cookie estático do .env vira fallback; o download visual do navegador é o
+    # último recurso e fica desligado por padrão.
+    payload_bytes = headers = kml_bytes = None
+    download_failures = []
+    saw_auth_error = False
+
+    if _env_flag('ORCRIMS_USE_CHROME_FALLBACK', default=True):
+        try:
+            payload_bytes, headers = _download_payload_via_chrome_profile_cookies(source_url)
+            kml_bytes = _extract_kml_bytes_from_payload(payload_bytes)
+        except Exception as chrome_error:
+            saw_auth_error = saw_auth_error or isinstance(chrome_error, GoogleMapsAuthError)
+            download_failures.append(f'chrome_profile_cookies: {chrome_error}')
+            print(f'⚠️ [ORCRIMS] Sessão viva do Chrome não resolveu ({chrome_error}). Tentando cookie do .env...')
+
+    if kml_bytes is None:
+        try:
+            payload_bytes, headers = _download_official_payload(source_url)
+            kml_bytes = _extract_kml_bytes_from_payload(payload_bytes)
+        except Exception as env_error:
+            saw_auth_error = saw_auth_error or isinstance(env_error, GoogleMapsAuthError)
+            download_failures.append(f'env_cookie: {env_error}')
+
+    if kml_bytes is None and _env_flag('ORCRIMS_USE_CHROME_UI_FALLBACK', default=False):
+        print('⚠️ [ORCRIMS] Cookies não resolveram. Último recurso: abrir Chrome logado para download visual.')
+        try:
+            payload_bytes, headers = _download_payload_via_logged_in_chrome(source_url)
+            kml_bytes = _extract_kml_bytes_from_payload(payload_bytes)
+        except Exception as ui_error:
+            download_failures.append(f'chrome_profile_ui: {ui_error}')
+
+    if kml_bytes is None:
+        combined_error = ' | '.join(download_failures)
+        print(f'❌ [ORCRIMS] Falha ao baixar KML oficial: {combined_error}')
+        if fallback_available:
+            status = 'fallback_active'
+        elif saw_auth_error:
+            status = 'auth_cookie_invalid'
         else:
-            combined_error = ' | '.join(download_failures)
-            print(f'❌ [ORCRIMS] Falha ao baixar KML oficial: {combined_error}')
-            if fallback_available:
-                status = 'fallback_active'
-            elif isinstance(error, GoogleMapsAuthError):
-                status = 'auth_cookie_invalid'
-            else:
-                status = 'download_failed'
-            current_status.update({
-                'last_checked_at': _iso_now(),
-                'last_error': combined_error,
-                'source_url': source_url,
-                'status': status,
-                'fallback_used': fallback_available,
-            })
-            _write_update_status(current_status)
-            return {'updated': False, 'reason': status, 'fallback_used': fallback_available, 'error': combined_error}
+            status = 'download_failed'
+        current_status.update({
+            'last_checked_at': _iso_now(),
+            'last_error': combined_error,
+            'source_url': source_url,
+            'status': status,
+            'fallback_used': fallback_available,
+        })
+        _write_update_status(current_status)
+        return {'updated': False, 'reason': status, 'fallback_used': fallback_available, 'error': combined_error}
 
     downloaded_raw_hash = _get_content_hash(kml_bytes)
     downloaded_semantic_hash = _get_semantic_content_hash(kml_bytes)

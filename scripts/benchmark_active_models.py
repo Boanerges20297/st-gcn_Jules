@@ -105,7 +105,7 @@ def build_input(features: np.ndarray, ti: int, window: int, channels: int) -> tu
 
 def load_region(cfg: RegionConfig) -> tuple[dict, torch.nn.Module, list[torch.Tensor], RegionConfig]:
     data_path = ROOT / "data" / "processed" / cfg.processed_file
-    model_path = ROOT / "models" / "active" / cfg.model_file
+    model_path = ROOT / "models" / "active" / "legacy_torch" / cfg.model_file
 
     with data_path.open("rb") as f:
         data = pickle.load(f)

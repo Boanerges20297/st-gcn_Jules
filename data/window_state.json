@@ -1,42 +1,23 @@
 {
   "fortaleza": {
     "dynamic_window": 30,
-    "use_historical_fallback": true,
-    "historical_top10": [
-      "BARRA DO CEARA",
-      "ALTO ALEGRE",
-      "MESSEJANA",
-      "GRANJA LISBOA",
-      "SIQUEIRA",
-      "JOSE WALTER",
-      "PLANALTO AYRTON SENNA",
-      "MONDUBIM",
-      "PEDRAS",
-      "BARROSO"
-    ],
-    "updated_at": "2026-06-10T23:22:06.538552"
+    "use_historical_fallback": false,
+    "historical_fallback_manual": false,
+    "historical_top10": [],
+    "updated_at": "2026-06-14T23:20:09.027164"
   },
   "rmf": {
-    "dynamic_window": 30,
-    "use_historical_fallback": true,
-    "historical_top10": [
-      "MARACANAU",
-      "CAUCAIA",
-      "HORIZONTE",
-      "PACAJUS",
-      "PACATUBA",
-      "PINDORETAMA",
-      "EUSEBIO",
-      "PARAIPABA",
-      "ITAITINGA",
-      "SAO LUIS DO CURU"
-    ],
-    "updated_at": "2026-06-10T23:22:06.538559"
+    "dynamic_window": null,
+    "use_historical_fallback": false,
+    "historical_fallback_manual": false,
+    "historical_top10": [],
+    "updated_at": "2026-06-14T23:20:09.027164"
   },
   "interior": {
     "dynamic_window": null,
     "use_historical_fallback": false,
+    "historical_fallback_manual": false,
     "historical_top10": [],
-    "updated_at": "2026-06-10T23:22:06.538561"
+    "updated_at": "2026-06-14T23:20:09.027164"
   }
 }

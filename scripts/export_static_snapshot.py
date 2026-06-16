@@ -1003,7 +1003,7 @@ def _build_manifest(snapshot_id: str, generated_at: str) -> Dict[str, Any]:
         "source_commit": _git_commit_sha(),
         "model_label": "ELITE P10",
         "model_architecture": getattr(report_app, "RISK_MODEL_NAME", None)
-        or "Deep ST-GAT Elite (Regionalizado)",
+        or "Poisson Ranker Estadual",
         "momentum_window_days": MOMENTUM_WINDOW_DAYS,
         "regions": ["fortaleza", "rmf", "interior"],
         "notes": "Snapshot estático publicado manualmente",
