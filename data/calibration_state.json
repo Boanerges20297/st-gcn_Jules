@@ -6760,6 +6760,51 @@
           "tag_bias_neighbor": 0.6,
           "norm_neural_weight": 0.2
         }
+      },
+      {
+        "timestamp": "2026-06-23T14:46:39.006944",
+        "trigger": "fortaleza.p20=30.0% < 70%",
+        "step": 1,
+        "old_params": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2,
+          "dynamic_window": null,
+          "use_historical_fallback": false,
+          "historical_fallback_manual": false
+        },
+        "new_params": {
+          "tension_factor": 0.7,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      {
+        "timestamp": "2026-06-23T14:57:38.119907",
+        "event": "full_rollback",
+        "trigger": "fortaleza.faction_coverage=100.0% recuperado acima do limite",
+        "steps_reverted": 1,
+        "params_before": {
+          "tension_factor": 0.7,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "norm_neural_weight": 0.35,
+          "dynamic_window": null,
+          "use_historical_fallback": false,
+          "historical_fallback_manual": false
+        },
+        "params_after": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
       }
     ]
   },
@@ -15178,6 +15223,51 @@
       },
       {
         "timestamp": "2026-06-22T16:07:08.842528",
+        "event": "full_rollback",
+        "trigger": "rmf.faction_coverage=100.0% recuperado acima do limite",
+        "steps_reverted": 1,
+        "params_before": {
+          "tension_factor": 0.7,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "norm_neural_weight": 0.35,
+          "dynamic_window": null,
+          "use_historical_fallback": false,
+          "historical_fallback_manual": false
+        },
+        "params_after": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2
+        }
+      },
+      {
+        "timestamp": "2026-06-23T14:51:39.259269",
+        "trigger": "rmf.p20=42.1% < 70%",
+        "step": 1,
+        "old_params": {
+          "tension_factor": 0.8,
+          "min_risk": 30.0,
+          "tag_bias_direct": 2.0,
+          "tag_bias_neighbor": 0.6,
+          "norm_neural_weight": 0.2,
+          "dynamic_window": null,
+          "use_historical_fallback": false,
+          "historical_fallback_manual": false
+        },
+        "new_params": {
+          "tension_factor": 0.7,
+          "tag_bias_direct": 2.2,
+          "tag_bias_neighbor": 0.7,
+          "min_risk": 30.0,
+          "norm_neural_weight": 0.35
+        }
+      },
+      {
+        "timestamp": "2026-06-23T14:57:38.740159",
         "event": "full_rollback",
         "trigger": "rmf.faction_coverage=100.0% recuperado acima do limite",
         "steps_reverted": 1,

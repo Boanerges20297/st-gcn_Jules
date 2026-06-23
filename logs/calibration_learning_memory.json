@@ -8708,5 +8708,53 @@
       "metric:p20",
       "rede_neural_baixa"
     ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-23T14:46:39.103141",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-23T14:51:39.338204",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
   }
 ]

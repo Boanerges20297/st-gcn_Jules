@@ -1,35 +1,5 @@
 [
   {
-    "timestamp": "2026-06-13 09:33:28",
-    "weights": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-13 09:33:29",
-    "weights": {
-      "tension_factor": 0.55,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.5,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
-    "target_region": "fortaleza"
-  },
-  {
     "timestamp": "2026-06-13 09:38:31",
     "weights": {
       "tension_factor": 0.7,
@@ -736,6 +706,36 @@
   },
   {
     "timestamp": "2026-06-22 16:04:14",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-23 14:46:39",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-23 14:51:39",
     "weights": {
       "tension_factor": 0.7,
       "min_risk": 30.0,
