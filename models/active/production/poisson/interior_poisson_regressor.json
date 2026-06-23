@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-13T08:50:16.633461",
-  "artifact_path": "C:\\Users\\Boanerges\\Desktop\\Projetos\\Report Preview\\models\\active\\interior_poisson_regressor.pkl",
+  "generated_at": "2026-06-16T16:08:06.827979",
+  "artifact_path": "C:\\Users\\Boanerges\\Desktop\\Projetos\\Report Preview\\models\\active\\production\\poisson\\interior_poisson_regressor.pkl",
   "backend_type": "regional_poisson_regressor",
   "region": "interior",
   "window": 14,
@@ -30,28 +30,28 @@
     "cos_month",
     "is_weekend"
   ],
-  "train_rows": 53450,
+  "train_rows": 71700,
   "benchmark_metrics": {
     "validation_split": {
       "train_start": "2022-01-01",
-      "train_end": "2024-12-31",
-      "val_start": "2025-01-01",
-      "val_end": "2025-12-31",
+      "train_end": "2025-12-31",
+      "val_start": "2026-01-01",
+      "val_end": "2026-05-31",
       "horizon_days": 14
     },
-    "interior_2025": {
+    "interior_2026": {
       "model_type": "classic",
-      "days_scored": 352,
-      "positive_days": 352,
-      "hit1_event": 0.9403409090909091,
-      "p5_event": 0.843181818181818,
-      "p10_event": 0.7275568181818183,
-      "p20_event": 0.6259943181818182,
-      "recall10_event": 0.34160501107864943,
-      "recall20_event": 0.5880912533038308,
-      "overlap10_rank": 0.2622159090909091,
-      "mrr_event": 0.9701704545454546
+      "days_scored": 138,
+      "positive_days": 138,
+      "hit1_event": 0.9855072463768116,
+      "p5_event": 0.7623188405797101,
+      "p10_event": 0.6840579710144927,
+      "p20_event": 0.5492753623188404,
+      "recall10_event": 0.4381844720342499,
+      "recall20_event": 0.6998417820096378,
+      "overlap10_rank": 0.427536231884058,
+      "mrr_event": 0.9927536231884058
     },
-    "selection_rationale": "Padronização estadual do backend Poisson para reduzir custo operacional do app."
+    "selection_rationale": "Poisson retreinado com dados ate 2025-12-31. Venceu LGBMRanker em p@10 e mrr para todas as regioes no benchmark jan-mai/2026."
   }
 }

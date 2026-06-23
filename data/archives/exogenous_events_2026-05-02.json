@@ -14,7 +14,13 @@
     "suppression_class": "administrative",
     "timestamp": "10:35",
     "ingested_at": "2026-05-04 15:37:44",
-    "date": "2026-05-01 10:35:00"
+    "date": "2026-05-01 10:35:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   },
   {
     "bairro": "Curió",
@@ -31,7 +37,13 @@
     "suppression_class": "qualified",
     "timestamp": "",
     "ingested_at": "2026-05-04 15:37:44",
-    "date": "2026-05-01 00:00:00"
+    "date": "2026-05-01 00:00:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Centro",
@@ -48,7 +60,13 @@
     "suppression_class": "neutral",
     "timestamp": "13:16",
     "ingested_at": "2026-05-04 15:37:44",
-    "date": "2026-05-01 13:16:00"
+    "date": "2026-05-01 13:16:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Taquara",
@@ -65,7 +83,13 @@
     "suppression_class": "qualified",
     "timestamp": "13:35",
     "ingested_at": "2026-05-04 15:37:44",
-    "date": "2026-05-01 13:35:00"
+    "date": "2026-05-01 13:35:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Parque Albano",
@@ -82,7 +106,13 @@
     "suppression_class": "administrative",
     "timestamp": "19:00",
     "ingested_at": "2026-05-04 15:37:44",
-    "date": "2026-05-01 19:00:00"
+    "date": "2026-05-01 19:00:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "",
@@ -99,7 +129,13 @@
     "suppression_class": "neutral",
     "timestamp": "19:17",
     "ingested_at": "2026-05-04 15:37:44",
-    "date": "2026-05-01 19:17:00"
+    "date": "2026-05-01 19:17:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   },
   {
     "bairro": "",
@@ -116,7 +152,13 @@
     "suppression_class": "administrative",
     "timestamp": "20:41",
     "ingested_at": "2026-05-04 15:37:44",
-    "date": "2026-05-01 20:41:00"
+    "date": "2026-05-01 20:41:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   },
   {
     "bairro": "",
@@ -133,7 +175,13 @@
     "suppression_class": "administrative",
     "timestamp": "23:56",
     "ingested_at": "2026-05-04 15:37:44",
-    "date": "2026-05-01 23:56:00"
+    "date": "2026-05-01 23:56:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   },
   {
     "bairro": "Presidente Vargas",
@@ -150,7 +198,13 @@
     "suppression_class": "qualified",
     "timestamp": "01:04",
     "ingested_at": "2026-05-04 15:37:44",
-    "date": "2026-05-01 01:04:00"
+    "date": "2026-05-01 01:04:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Montese",
@@ -167,6 +221,12 @@
     "suppression_class": "conflict",
     "timestamp": "22:03",
     "ingested_at": "2026-05-04 15:40:05",
-    "date": "2026-05-01 22:03:00"
+    "date": "2026-05-01 22:03:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   }
 ]

@@ -1,0 +1,110 @@
+{
+  "generated_at": "2026-06-16T16:04:16.629052",
+  "train_end": "2025-12-31",
+  "val_start": "2026-01-01",
+  "val_end": "2026-05-31",
+  "results": {
+    "fortaleza": [
+      {
+        "model": "poisson_retreinado (2025)",
+        "metrics": {
+          "model_type": "classic",
+          "days_scored": 138,
+          "positive_days": 138,
+          "hit1_event": 0.35507246376811596,
+          "p5_event": 0.2695652173913043,
+          "p10_event": 0.24782608695652175,
+          "p20_event": 0.20833333333333337,
+          "recall10_event": 0.319371570458527,
+          "recall20_event": 0.5144280437758699,
+          "overlap10_rank": 0.255072463768116,
+          "mrr_event": 0.5641859049993692
+        }
+      },
+      {
+        "model": "lgbm_ranker (lambdamart)",
+        "metrics": {
+          "model_type": "classic",
+          "days_scored": 138,
+          "positive_days": 138,
+          "hit1_event": 0.1956521739130435,
+          "p5_event": 0.18985507246376815,
+          "p10_event": 0.19347826086956524,
+          "p20_event": 0.15471014492753624,
+          "recall10_event": 0.26074389579824364,
+          "recall20_event": 0.4021951981191112,
+          "overlap10_rank": 0.20144927536231885,
+          "mrr_event": 0.3950066137566137
+        }
+      }
+    ],
+    "rmf": [
+      {
+        "model": "poisson_retreinado (2025)",
+        "metrics": {
+          "model_type": "classic",
+          "days_scored": 138,
+          "positive_days": 138,
+          "hit1_event": 0.7463768115942029,
+          "p5_event": 0.3376811594202899,
+          "p10_event": 0.3239130434782609,
+          "p20_event": 0.2749809305873379,
+          "recall10_event": 0.6247095698182654,
+          "recall20_event": 1.0,
+          "overlap10_rank": 0.6021739130434782,
+          "mrr_event": 0.8478260869565217
+        }
+      },
+      {
+        "model": "lgbm_ranker (lambdamart)",
+        "metrics": {
+          "model_type": "classic",
+          "days_scored": 138,
+          "positive_days": 138,
+          "hit1_event": 0.2753623188405797,
+          "p5_event": 0.3231884057971015,
+          "p10_event": 0.29347826086956524,
+          "p20_event": 0.2749809305873379,
+          "recall10_event": 0.5714860823556476,
+          "recall20_event": 1.0,
+          "overlap10_rank": 0.5297101449275363,
+          "mrr_event": 0.6185331576635924
+        }
+      }
+    ],
+    "interior": [
+      {
+        "model": "poisson_retreinado (2025)",
+        "metrics": {
+          "model_type": "classic",
+          "days_scored": 138,
+          "positive_days": 138,
+          "hit1_event": 0.9855072463768116,
+          "p5_event": 0.7753623188405797,
+          "p10_event": 0.6811594202898551,
+          "p20_event": 0.5492753623188404,
+          "recall10_event": 0.43624779156496074,
+          "recall20_event": 0.6998417820096378,
+          "overlap10_rank": 0.4260869565217391,
+          "mrr_event": 0.9927536231884058
+        }
+      },
+      {
+        "model": "lgbm_ranker (lambdamart)",
+        "metrics": {
+          "model_type": "classic",
+          "days_scored": 138,
+          "positive_days": 138,
+          "hit1_event": 1.0,
+          "p5_event": 0.6405797101449275,
+          "p10_event": 0.6115942028985508,
+          "p20_event": 0.48224637681159416,
+          "recall10_event": 0.38984719522611566,
+          "recall20_event": 0.6140058848150449,
+          "overlap10_rank": 0.40217391304347827,
+          "mrr_event": 1.0
+        }
+      }
+    ]
+  }
+}

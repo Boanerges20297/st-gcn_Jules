@@ -326,8 +326,9 @@ class FortalezaPoissonRuntime:
             for loc_name, info in exogenous_shocks.items():
                 norm_target = normalize_name(loc_name)
                 if isinstance(info, dict):
-                    intensity = float(info.get("intensity", 0.0))
-                    suppression = float(info.get("suppression_intensity", 0.0))
+                    # conflict_intensity é o campo gravado pelo app; intensity é o campo legado
+                    intensity = float(info.get("conflict_intensity") or info.get("intensity") or 0.0)
+                    suppression = float(info.get("suppression_intensity") or 0.0)
                     impact_value = (2.5 if self.region == "fortaleza" else 3.0) * intensity
                     relief_value = (1.3 if self.region == "fortaleza" else 1.6) * suppression
                     for i, row in nodes.iterrows():
@@ -339,10 +340,15 @@ class FortalezaPoissonRuntime:
 
         adj_geo = np.asarray(self.data["adj_geo"], dtype=float)
         recent_crime_signal = np.clip(current_cvli_recent, 0, 2) / 2.0
-        neighbor_signal = np.clip(adj_geo.dot((sim_impact > 0).astype(float)), 0, 1)
-        own_event_signal = (sim_impact > 0).astype(float)
-        suppression_neighbor_signal = np.clip(adj_geo.dot((sim_relief > 0).astype(float)), 0, 1)
-        own_suppression_signal = (sim_relief > 0).astype(float)
+
+        # Normaliza pelo impacto máximo possível (HIGH = 0.9 * multiplicador regional)
+        # para preservar a graduação de intensidade em vez de binarizar.
+        impact_max = 2.5 * 0.9 if self.region == "fortaleza" else 3.0 * 0.9
+        relief_max = 1.3 * 1.0 if self.region == "fortaleza" else 1.6 * 1.0  # supressão acumula, cap em 1.0 post-clip
+        own_event_signal = np.clip(sim_impact / impact_max, 0.0, 1.0)
+        neighbor_signal = np.clip(adj_geo.dot(own_event_signal), 0.0, 1.0)
+        own_suppression_signal = np.clip(sim_relief / relief_max, 0.0, 1.0)
+        suppression_neighbor_signal = np.clip(adj_geo.dot(own_suppression_signal), 0.0, 1.0)
         suppression_signal = np.clip(np.maximum(suppression_neighbor_signal, own_suppression_signal), 0, 1)
         raw_inclusion_signal = np.maximum.reduce([recent_crime_signal, neighbor_signal, own_event_signal])
         inclusion_signal = np.clip(raw_inclusion_signal - (0.85 * suppression_signal), 0, 1)
@@ -372,6 +378,9 @@ class FortalezaPoissonRuntime:
                 "model_signal_score": float(norm_model[idx] * 100.0),
                 "tension_score": float(norm_tension[idx] * 100.0),
                 "inclusion_score": float(inclusion_signal[idx] * 100.0),
+                "shock_conflict_intensity": float(own_event_signal[idx] * 100.0),
+                "shock_suppression_intensity": float(own_suppression_signal[idx] * 100.0),
+                "shock_neighbor_signal": float(neighbor_signal[idx] * 100.0),
                 "calm_penalty": float(calm_signal[idx] * 100.0),
                 "recent_cvli_14d": int(current_cvli_recent[idx]),
                 "recent_cvli_30d": int(current_cvli_30d[idx]),

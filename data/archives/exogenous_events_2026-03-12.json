@@ -12,7 +12,13 @@
     "sexo": "",
     "timestamp": "",
     "ingested_at": "2026-03-14 19:30:14",
-    "date": "2026-03-10 00:00:00"
+    "date": "2026-03-10 00:00:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   },
   {
     "bairro": "",
@@ -27,7 +33,13 @@
     "sexo": "",
     "timestamp": "08:37",
     "ingested_at": "2026-03-14 19:37:17",
-    "date": "2026-03-10 08:37:00"
+    "date": "2026-03-10 08:37:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": false
   },
   {
     "bairro": "Monte Castelo",
@@ -42,7 +54,13 @@
     "sexo": "",
     "timestamp": "11:41",
     "ingested_at": "2026-03-14 19:37:17",
-    "date": "2026-03-10 11:41:00"
+    "date": "2026-03-10 11:41:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": true
   },
   {
     "bairro": "",
@@ -57,7 +75,13 @@
     "sexo": "",
     "timestamp": "14:55",
     "ingested_at": "2026-03-14 19:37:17",
-    "date": "2026-03-10 14:55:00"
+    "date": "2026-03-10 14:55:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": false
   },
   {
     "bairro": "Sabiaguaba",
@@ -72,7 +96,13 @@
     "sexo": "",
     "timestamp": "15:50",
     "ingested_at": "2026-03-14 19:37:17",
-    "date": "2026-03-10 15:50:00"
+    "date": "2026-03-10 15:50:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": true
   },
   {
     "bairro": "",
@@ -87,7 +117,13 @@
     "sexo": "",
     "timestamp": "16:15",
     "ingested_at": "2026-03-14 19:37:17",
-    "date": "2026-03-10 16:15:00"
+    "date": "2026-03-10 16:15:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   },
   {
     "bairro": "",
@@ -102,7 +138,13 @@
     "sexo": "",
     "timestamp": "16:45",
     "ingested_at": "2026-03-14 19:37:17",
-    "date": "2026-03-10 16:45:00"
+    "date": "2026-03-10 16:45:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   },
   {
     "bairro": "Rodolfo Teófilo",
@@ -117,7 +159,13 @@
     "sexo": "",
     "timestamp": "17:42",
     "ingested_at": "2026-03-14 19:37:17",
-    "date": "2026-03-10 17:42:00"
+    "date": "2026-03-10 17:42:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "",
@@ -132,7 +180,13 @@
     "sexo": "MASCULINO",
     "timestamp": "07:20",
     "ingested_at": "2026-03-14 19:38:06",
-    "date": "2026-03-10 07:20:00"
+    "date": "2026-03-10 07:20:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   },
   {
     "bairro": "Itaperi",
@@ -147,7 +201,13 @@
     "sexo": "MASCULINO",
     "timestamp": "01:26",
     "ingested_at": "2026-03-14 19:38:06",
-    "date": "2026-03-10 01:26:00"
+    "date": "2026-03-10 01:26:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "",
@@ -162,7 +222,13 @@
     "sexo": "",
     "timestamp": "07:30",
     "ingested_at": "2026-03-14 19:38:57",
-    "date": "2026-03-11 07:30:00"
+    "date": "2026-03-11 07:30:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   },
   {
     "bairro": "",
@@ -177,7 +243,13 @@
     "sexo": "",
     "timestamp": "09:34",
     "ingested_at": "2026-03-14 19:38:57",
-    "date": "2026-03-11 09:34:00"
+    "date": "2026-03-11 09:34:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": false
   },
   {
     "bairro": "Mondubim",
@@ -192,7 +264,13 @@
     "sexo": "MASCULINO",
     "timestamp": "00:53",
     "ingested_at": "2026-03-14 19:39:55",
-    "date": "2026-03-11 00:53:00"
+    "date": "2026-03-11 00:53:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "",
@@ -207,6 +285,12 @@
     "sexo": "MASCULINO",
     "timestamp": "02:51",
     "ingested_at": "2026-03-14 19:39:55",
-    "date": "2026-03-11 02:51:00"
+    "date": "2026-03-11 02:51:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   }
 ]

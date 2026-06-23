@@ -12,7 +12,13 @@
     "sexo": "",
     "timestamp": "",
     "ingested_at": "2026-03-01 11:35:06",
-    "date": "2026-02-29 09:58:00"
+    "date": "2026-02-29 09:58:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   },
   {
     "bairro": "Messejana",
@@ -27,7 +33,13 @@
     "sexo": "",
     "timestamp": "09:15",
     "ingested_at": "2026-03-01 11:42:16",
-    "date": "2026-02-29 09:15:00"
+    "date": "2026-02-29 09:15:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Messejana",
@@ -42,6 +54,12 @@
     "sexo": "MASCULINO",
     "timestamp": "08:56",
     "ingested_at": "2026-03-01 20:24:14",
-    "date": "2026-02-29 08:56:00"
+    "date": "2026-02-29 08:56:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   }
 ]

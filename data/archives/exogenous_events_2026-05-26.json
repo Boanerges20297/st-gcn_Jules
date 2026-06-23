@@ -17,6 +17,12 @@
     "source": "google_sheets_webhook",
     "day_of_week": "Segunda-feira",
     "is_holiday": false,
-    "is_cvp_hot_day": false
+    "is_cvp_hot_day": false,
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.6,
+    "shock_conflict_intensity": 0.6,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   }
 ]

@@ -10,11 +10,11 @@
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 81.201,
-        "score": 81.201,
+        "risk_score": 78.049,
+        "score": 78.049,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 26.019,
@@ -25,7 +25,7 @@
           "FAVELA DA CIRANDAR"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -44,11 +44,11 @@
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 80.558,
-        "score": 80.558,
+        "risk_score": 77.428,
+        "score": 77.428,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 25.06,
@@ -59,7 +59,7 @@
           "COMUNIDADE DO CIMPELCO (COMPLEXO DA BARRA DO CEARÁ)"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -74,15 +74,49 @@
       "properties": {
         "node_id": 3,
         "rank": 3,
+        "name": "Comunidade do HX",
+        "bairro": "BARRA DO CEARÁ",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 77.269,
+        "score": 77.269,
+        "region": "capital",
+        "parent_area": "BARRA DO CEARÁ",
+        "parent_risk_score": 78.4,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 23.388,
+        "nearby_streets_count": 73,
+        "nearby_streets": [
+          "COMUNIDADE DO HX",
+          "BECO DA POMPEIA",
+          "RUA DO LEME"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.58005808695653,
+          -3.7017242173913045
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 4,
+        "rank": 4,
         "name": "Condomínio da 6 (Complexo da Barra do Ceará)",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 80.479,
-        "score": 80.479,
+        "risk_score": 77.266,
+        "score": 77.266,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 25.054,
@@ -93,7 +127,7 @@
           "FAVELA DO BICAL"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -106,17 +140,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 4,
-        "rank": 4,
+        "node_id": 5,
+        "rank": 5,
         "name": "Morro da Colônia (Complexo da Barra do Ceará)",
         "bairro": "CRISTO REDENTOR",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 80.297,
-        "score": 80.297,
+        "risk_score": 77.248,
+        "score": 77.248,
         "region": "capital",
         "parent_area": "CRISTO REDENTOR",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 24.581,
@@ -127,7 +161,7 @@
           "MORRO DA COLÔNIA (COMPLEXO DA BARRA DO CEARÁ)"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -140,51 +174,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 5,
-        "rank": 5,
-        "name": "Comunidade Olical",
-        "bairro": "BARRA DO CEARÁ",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 80.215,
-        "score": 80.215,
-        "region": "capital",
-        "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 24.697,
-        "nearby_streets_count": 95,
-        "nearby_streets": [
-          "COMUNIDADE OLICAL",
-          "CONJUNTO CIDADE DE DEUS OU CDD",
-          "COMANDINHO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.575221600000006,
-          -3.7098970000000002
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "node_id": 6,
         "rank": 6,
         "name": "Comunidade do Cimpelco (Complexo da Barra do Ceará)",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 80.173,
-        "score": 80.173,
+        "risk_score": 77.069,
+        "score": 77.069,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 24.471,
@@ -195,7 +195,7 @@
           "FAVELA DA CIRANDAR"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -210,117 +210,15 @@
       "properties": {
         "node_id": 7,
         "rank": 7,
-        "name": "Conjunto Cidade de Deus ou CDD",
-        "bairro": "BARRA DO CEARÁ",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 80.001,
-        "score": 80.001,
-        "region": "capital",
-        "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 24.24,
-        "nearby_streets_count": 94,
-        "nearby_streets": [
-          "CONJUNTO CIDADE DE DEUS OU CDD",
-          "COMUNIDADE GRAFITEIROS",
-          "COMUNIDADE OLICAL"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.57768966666667,
-          -3.711623733333333
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 8,
-        "rank": 8,
-        "name": "6 Companheiros",
-        "bairro": "BARRA DO CEARÁ",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 79.921,
-        "score": 79.921,
-        "region": "capital",
-        "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 24.299,
-        "nearby_streets_count": 90,
-        "nearby_streets": [
-          "6 COMPANHEIROS",
-          "AVENIDA 20 DE JANEIRO",
-          "COMUNIDADE GRAFITEIROS"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.57858088888889,
-          -3.7086027777777772
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 9,
-        "rank": 9,
-        "name": "Comunidade do HX",
-        "bairro": "BARRA DO CEARÁ",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 79.869,
-        "score": 79.869,
-        "region": "capital",
-        "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 23.388,
-        "nearby_streets_count": 73,
-        "nearby_streets": [
-          "COMUNIDADE DO HX",
-          "BECO DA POMPEIA",
-          "RUA DO LEME"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.58005808695653,
-          -3.7017242173913045
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 10,
-        "rank": 10,
         "name": "Canal (Complexo da Barra do Ceará)",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 79.694,
-        "score": 79.694,
+        "risk_score": 77.06,
+        "score": 77.06,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 23.181,
@@ -331,7 +229,7 @@
           "4 VARAS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -344,85 +242,119 @@
     {
       "type": "Feature",
       "properties": {
+        "node_id": 8,
+        "rank": 8,
+        "name": "Comunidade Olical",
+        "bairro": "BARRA DO CEARÁ",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 76.982,
+        "score": 76.982,
+        "region": "capital",
+        "parent_area": "BARRA DO CEARÁ",
+        "parent_risk_score": 78.4,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 24.697,
+        "nearby_streets_count": 95,
+        "nearby_streets": [
+          "COMUNIDADE OLICAL",
+          "CONJUNTO CIDADE DE DEUS OU CDD",
+          "COMANDINHO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.575221600000006,
+          -3.7098970000000002
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 9,
+        "rank": 9,
+        "name": "Conjunto Cidade de Deus ou CDD",
+        "bairro": "BARRA DO CEARÁ",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 76.884,
+        "score": 76.884,
+        "region": "capital",
+        "parent_area": "BARRA DO CEARÁ",
+        "parent_risk_score": 78.4,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 24.24,
+        "nearby_streets_count": 94,
+        "nearby_streets": [
+          "CONJUNTO CIDADE DE DEUS OU CDD",
+          "COMUNIDADE GRAFITEIROS",
+          "COMUNIDADE OLICAL"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.57768966666667,
+          -3.711623733333333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 10,
+        "rank": 10,
+        "name": "6 Companheiros",
+        "bairro": "BARRA DO CEARÁ",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 76.666,
+        "score": 76.666,
+        "region": "capital",
+        "parent_area": "BARRA DO CEARÁ",
+        "parent_risk_score": 78.4,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 24.299,
+        "nearby_streets_count": 90,
+        "nearby_streets": [
+          "6 COMPANHEIROS",
+          "AVENIDA 20 DE JANEIRO",
+          "COMUNIDADE GRAFITEIROS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.57858088888889,
+          -3.7086027777777772
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "node_id": 11,
         "rank": 11,
-        "name": "Beco da Pompeia",
-        "bairro": "BARRA DO CEARÁ",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 79.64,
-        "score": 79.64,
-        "region": "capital",
-        "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 23.947,
-        "nearby_streets_count": 75,
-        "nearby_streets": [
-          "BECO DA POMPEIA",
-          "COMUNIDADE DO HX",
-          "AREA SEM NOME"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.579242,
-          -3.702418833333334
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 12,
-        "rank": 12,
-        "name": "Beco Da Zeza",
-        "bairro": "BARRA DO CEARÁ",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 79.584,
-        "score": 79.584,
-        "region": "capital",
-        "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 23.844,
-        "nearby_streets_count": 77,
-        "nearby_streets": [
-          "BECO DA ZEZA",
-          "AREA SEM NOME",
-          "AVENIDA 20 DE JANEIRO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.58026257142857,
-          -3.7043595714285718
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 13,
-        "rank": 13,
         "name": "Comunidade Grafiteiros",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 79.54,
-        "score": 79.54,
+        "risk_score": 76.525,
+        "score": 76.525,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 23.444,
@@ -433,7 +365,7 @@
           "CONJ. JACIARA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -446,34 +378,102 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 14,
-        "rank": 14,
-        "name": "Beco da 20",
+        "node_id": 12,
+        "rank": 12,
+        "name": "Beco da Pompeia",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 78.706,
-        "score": 78.706,
+        "risk_score": 76.343,
+        "score": 76.343,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
-        "local_street_pressure": 22.354,
-        "nearby_streets_count": 76,
+        "local_street_pressure": 23.947,
+        "nearby_streets_count": 75,
         "nearby_streets": [
-          "BECO DA 20",
-          "CONJUNTO 7 PRÉDIOS",
-          "LAMA SECA"
+          "BECO DA POMPEIA",
+          "COMUNIDADE DO HX",
+          "AREA SEM NOME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.58260357142857,
-          -3.7061291428571432
+          -38.579242,
+          -3.702418833333334
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 13,
+        "rank": 13,
+        "name": "Beco Da Zeza",
+        "bairro": "BARRA DO CEARÁ",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 76.305,
+        "score": 76.305,
+        "region": "capital",
+        "parent_area": "BARRA DO CEARÁ",
+        "parent_risk_score": 78.4,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 23.844,
+        "nearby_streets_count": 77,
+        "nearby_streets": [
+          "BECO DA ZEZA",
+          "AREA SEM NOME",
+          "AVENIDA 20 DE JANEIRO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.58026257142857,
+          -3.7043595714285718
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 14,
+        "rank": 14,
+        "name": "Comunidade dos Cariocas - Caucaia",
+        "bairro": "MARECHAL RONDON",
+        "municipality": "Caucaia",
+        "faction": "CV",
+        "risk_score": 76.205,
+        "score": 76.205,
+        "region": "capital",
+        "parent_area": "MARECHAL RONDON",
+        "parent_risk_score": 97.7,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 3.429,
+        "nearby_streets_count": 8,
+        "nearby_streets": [
+          "COMUNIDADE DOS CARIOCAS - CAUCAIA",
+          "CONDOMÍNIOS",
+          "CAJUEIROS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.63100255555556,
+          -3.7793906666666666
         ]
       }
     },
@@ -482,83 +482,15 @@
       "properties": {
         "node_id": 15,
         "rank": 15,
-        "name": "Comunidade do Gueto",
-        "bairro": "BARRA DO CEARÁ",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 78.672,
-        "score": 78.672,
-        "region": "capital",
-        "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 22.281,
-        "nearby_streets_count": 81,
-        "nearby_streets": [
-          "COMUNIDADE DO GUETO",
-          "BECO DA 20",
-          "CONJUNTO 7 PRÉDIOS"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.5822696,
-          -3.7077644
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 16,
-        "rank": 16,
-        "name": "Conj. Jaciara",
-        "bairro": "BARRA DO CEARÁ",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 78.604,
-        "score": 78.604,
-        "region": "capital",
-        "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 22.241,
-        "nearby_streets_count": 88,
-        "nearby_streets": [
-          "CONJ. JACIARA",
-          "COMUNIDADE GRAFITEIROS",
-          "CONJUNTO CIDADE DE DEUS OU CDD"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.58048766666666,
-          -3.712563333333333
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 17,
-        "rank": 17,
         "name": "Comunidade do Gueto Novo",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 78.548,
-        "score": 78.548,
+        "risk_score": 75.842,
+        "score": 75.842,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 21.616,
@@ -569,7 +501,7 @@
           "COMUNIDADE GRAFITEIROS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -582,17 +514,119 @@
     {
       "type": "Feature",
       "properties": {
+        "node_id": 16,
+        "rank": 16,
+        "name": "Beco da 20",
+        "bairro": "BARRA DO CEARÁ",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 75.6,
+        "score": 75.6,
+        "region": "capital",
+        "parent_area": "BARRA DO CEARÁ",
+        "parent_risk_score": 78.4,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 22.354,
+        "nearby_streets_count": 76,
+        "nearby_streets": [
+          "BECO DA 20",
+          "CONJUNTO 7 PRÉDIOS",
+          "LAMA SECA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.58260357142857,
+          -3.7061291428571432
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 17,
+        "rank": 17,
+        "name": "Comunidade do Gueto",
+        "bairro": "BARRA DO CEARÁ",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 75.585,
+        "score": 75.585,
+        "region": "capital",
+        "parent_area": "BARRA DO CEARÁ",
+        "parent_risk_score": 78.4,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 22.281,
+        "nearby_streets_count": 81,
+        "nearby_streets": [
+          "COMUNIDADE DO GUETO",
+          "BECO DA 20",
+          "CONJUNTO 7 PRÉDIOS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.5822696,
+          -3.7077644
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "node_id": 18,
         "rank": 18,
+        "name": "Conj. Jaciara",
+        "bairro": "BARRA DO CEARÁ",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 75.471,
+        "score": 75.471,
+        "region": "capital",
+        "parent_area": "BARRA DO CEARÁ",
+        "parent_risk_score": 78.4,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 22.241,
+        "nearby_streets_count": 88,
+        "nearby_streets": [
+          "CONJ. JACIARA",
+          "COMUNIDADE GRAFITEIROS",
+          "CONJUNTO CIDADE DE DEUS OU CDD"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.58048766666666,
+          -3.712563333333333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 19,
+        "rank": 19,
         "name": "4 Varas",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 78.493,
-        "score": 78.493,
+        "risk_score": 75.402,
+        "score": 75.402,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 22.026,
@@ -603,7 +637,7 @@
           "FAVELA DA 3P"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -616,51 +650,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 19,
-        "rank": 19,
-        "name": "Conjunto 7 Prédios",
-        "bairro": "BARRA DO CEARÁ",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 78.4,
-        "score": 78.4,
-        "region": "capital",
-        "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 22.076,
-        "nearby_streets_count": 77,
-        "nearby_streets": [
-          "CONJUNTO 7 PRÉDIOS",
-          "BECO DA 20",
-          "LAMA SECA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.583178,
-          -3.7055008000000003
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "node_id": 20,
         "rank": 20,
         "name": "Favela da 3P",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 78.323,
-        "score": 78.323,
+        "risk_score": 75.188,
+        "score": 75.188,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 21.836,
@@ -671,7 +671,7 @@
           "FAVELA DA CIRANDAR"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -686,32 +686,32 @@
       "properties": {
         "node_id": 21,
         "rank": 21,
-        "name": "Quadrinhas",
+        "name": "Conjunto 7 Prédios",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 77.808,
-        "score": 77.808,
+        "risk_score": 75.164,
+        "score": 75.164,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
-        "local_street_pressure": 21.165,
-        "nearby_streets_count": 63,
+        "local_street_pressure": 22.076,
+        "nearby_streets_count": 77,
         "nearby_streets": [
-          "QUADRINHAS",
-          "FAVELINHA",
-          "RUA DO LEME"
+          "CONJUNTO 7 PRÉDIOS",
+          "BECO DA 20",
+          "LAMA SECA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.58083138461538,
-          -3.6990133846153856
+          -38.583178,
+          -3.7055008000000003
         ]
       }
     },
@@ -724,11 +724,11 @@
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 77.649,
-        "score": 77.649,
+        "risk_score": 74.791,
+        "score": 74.791,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 20.508,
@@ -739,7 +739,7 @@
           "COMUNIDADE DO CAMPINHO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -754,49 +754,15 @@
       "properties": {
         "node_id": 23,
         "rank": 23,
-        "name": "Morro do Grêmio",
-        "bairro": "BARRA DO CEARÁ",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 77.623,
-        "score": 77.623,
-        "region": "capital",
-        "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 20.697,
-        "nearby_streets_count": 63,
-        "nearby_streets": [
-          "MORRO DO GRÊMIO",
-          "RUA DO LEME",
-          "GOIABEIRAS"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.57919623809524,
-          -3.6986530000000006
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 24,
-        "rank": 24,
         "name": "Goiabeiras",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 77.491,
-        "score": 77.491,
+        "risk_score": 74.69,
+        "score": 74.69,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 20.207,
@@ -807,7 +773,7 @@
           "MORRO DO GRÊMIO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -820,17 +786,85 @@
     {
       "type": "Feature",
       "properties": {
+        "node_id": 24,
+        "rank": 24,
+        "name": "Quadrinhas",
+        "bairro": "BARRA DO CEARÁ",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 74.616,
+        "score": 74.616,
+        "region": "capital",
+        "parent_area": "BARRA DO CEARÁ",
+        "parent_risk_score": 78.4,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 21.165,
+        "nearby_streets_count": 63,
+        "nearby_streets": [
+          "QUADRINHAS",
+          "FAVELINHA",
+          "RUA DO LEME"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.58083138461538,
+          -3.6990133846153856
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "node_id": 25,
         "rank": 25,
+        "name": "Morro do Grêmio",
+        "bairro": "BARRA DO CEARÁ",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 74.588,
+        "score": 74.588,
+        "region": "capital",
+        "parent_area": "BARRA DO CEARÁ",
+        "parent_risk_score": 78.4,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 20.697,
+        "nearby_streets_count": 63,
+        "nearby_streets": [
+          "MORRO DO GRÊMIO",
+          "RUA DO LEME",
+          "GOIABEIRAS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.57919623809524,
+          -3.6986530000000006
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 26,
+        "rank": 26,
         "name": "Comunidade dos Coqueiros (Complexo da Barra do Ceará)",
         "bairro": "CRISTO REDENTOR",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 77.434,
-        "score": 77.434,
+        "risk_score": 74.343,
+        "score": 74.343,
         "region": "capital",
         "parent_area": "CRISTO REDENTOR",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 20.495,
@@ -841,7 +875,7 @@
           "RUA JOSÉ LUÍS NETO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -854,17 +888,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 26,
-        "rank": 26,
+        "node_id": 27,
+        "rank": 27,
         "name": "Lama Seca",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 77.4,
-        "score": 77.4,
+        "risk_score": 74.164,
+        "score": 74.164,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 20.631,
@@ -875,7 +909,7 @@
           "BECO DA 20"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -888,17 +922,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 27,
-        "rank": 27,
+        "node_id": 28,
+        "rank": 28,
         "name": "Comunidade Do Campinho",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 76.909,
-        "score": 76.909,
+        "risk_score": 73.794,
+        "score": 73.794,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 19.768,
@@ -909,7 +943,7 @@
           "TRAVESSA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -922,17 +956,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 28,
-        "rank": 28,
+        "node_id": 29,
+        "rank": 29,
         "name": "Fronteira (Complexo da Barra do Ceará)",
         "bairro": "CRISTO REDENTOR",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 76.752,
-        "score": 76.752,
+        "risk_score": 73.526,
+        "score": 73.526,
         "region": "capital",
         "parent_area": "CRISTO REDENTOR",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 19.683,
@@ -943,7 +977,7 @@
           "AREA SEM NOME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -956,51 +990,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 29,
-        "rank": 29,
-        "name": "B13 - (Complexo da Barra do Ceará)",
-        "bairro": "BARRA DO CEARÁ",
-        "municipality": "(Complexo da Barra do Ceará)",
-        "faction": "CV",
-        "risk_score": 76.672,
-        "score": 76.672,
-        "region": "capital",
-        "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 19.498,
-        "nearby_streets_count": 57,
-        "nearby_streets": [
-          "B13 - (COMPLEXO DA BARRA DO CEARÁ)",
-          "RUA TAMBAÚ",
-          "FAVELA DO BICAL"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.574080181818175,
-          -3.7071364545454553
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "node_id": 30,
         "rank": 30,
         "name": "Campo do Cruzeiro",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 76.642,
-        "score": 76.642,
+        "risk_score": 73.523,
+        "score": 73.523,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 19.388,
@@ -1011,7 +1011,7 @@
           "CONJUNTO 7 PRÉDIOS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -1030,11 +1030,11 @@
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 76.447,
-        "score": 76.447,
+        "risk_score": 73.512,
+        "score": 73.512,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 18.871,
@@ -1045,7 +1045,7 @@
           "RUA JANGADA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -1060,32 +1060,32 @@
       "properties": {
         "node_id": 32,
         "rank": 32,
-        "name": "Comunidade São Antonio",
+        "name": "B13 - (Complexo da Barra do Ceará)",
         "bairro": "BARRA DO CEARÁ",
-        "municipality": "Fortaleza",
+        "municipality": "(Complexo da Barra do Ceará)",
         "faction": "CV",
-        "risk_score": 75.489,
-        "score": 75.489,
+        "risk_score": 73.499,
+        "score": 73.499,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
-        "local_street_pressure": 17.655,
-        "nearby_streets_count": 52,
+        "local_street_pressure": 19.498,
+        "nearby_streets_count": 57,
         "nearby_streets": [
-          "COMUNIDADE SÃO ANTONIO",
-          "COMUNIDADE SÃO PEDRO",
-          "FAVELINHA"
+          "B13 - (COMPLEXO DA BARRA DO CEARÁ)",
+          "RUA TAMBAÚ",
+          "FAVELA DO BICAL"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.58251295,
-          -3.6966321
+          -38.574080181818175,
+          -3.7071364545454553
         ]
       }
     },
@@ -1098,11 +1098,11 @@
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 75.476,
-        "score": 75.476,
+        "risk_score": 72.671,
+        "score": 72.671,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 17.299,
@@ -1113,7 +1113,7 @@
           "RUA MANUEL MOURA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -1128,83 +1128,15 @@
       "properties": {
         "node_id": 34,
         "rank": 34,
-        "name": "Morro Do Santiago",
-        "bairro": "BARRA DO CEARÁ",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 75.188,
-        "score": 75.188,
-        "region": "capital",
-        "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 17.174,
-        "nearby_streets_count": 50,
-        "nearby_streets": [
-          "MORRO DO SANTIAGO",
-          "RUA SANTIAGO DA BARRA DO CEARÁ",
-          "COMUNIDADE DO POLO DA BARRA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.58489366176471,
-          -3.6978509852941186
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 35,
-        "rank": 35,
-        "name": "Comunidade Língua da Cobra",
-        "bairro": "BARRA DO CEARÁ",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 75.165,
-        "score": 75.165,
-        "region": "capital",
-        "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 17.394,
-        "nearby_streets_count": 54,
-        "nearby_streets": [
-          "COMUNIDADE LÍNGUA DA COBRA",
-          "MORRO DO GRÊMIO",
-          "COMUNIDADE SÃO PEDRO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.579619375,
-          -3.6965133125000005
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 36,
-        "rank": 36,
         "name": "Comunidade do Gato Morto",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 74.9,
-        "score": 74.9,
+        "risk_score": 72.423,
+        "score": 72.423,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 16.048,
@@ -1215,7 +1147,7 @@
           "COMUNIDADE RIACHO DOCE- BARRA DO CEARÁ"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -1228,34 +1160,102 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 37,
-        "rank": 37,
-        "name": "Comunidade Do Pombal",
+        "node_id": 35,
+        "rank": 35,
+        "name": "Comunidade São Antonio",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 74.421,
-        "score": 74.421,
+        "risk_score": 72.421,
+        "score": 72.421,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
-        "local_street_pressure": 16.141,
-        "nearby_streets_count": 51,
+        "local_street_pressure": 17.655,
+        "nearby_streets_count": 52,
         "nearby_streets": [
-          "COMUNIDADE DO POMBAL",
-          "MORRO DO SANTIAGO",
-          "RUA SANTIAGO DA BARRA DO CEARÁ"
+          "COMUNIDADE SÃO ANTONIO",
+          "COMUNIDADE SÃO PEDRO",
+          "FAVELINHA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.586835818181825,
-          -3.6996922272727275
+          -38.58251295,
+          -3.6966321
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 36,
+        "rank": 36,
+        "name": "Morro Do Santiago",
+        "bairro": "BARRA DO CEARÁ",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 72.156,
+        "score": 72.156,
+        "region": "capital",
+        "parent_area": "BARRA DO CEARÁ",
+        "parent_risk_score": 78.4,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 17.174,
+        "nearby_streets_count": 50,
+        "nearby_streets": [
+          "MORRO DO SANTIAGO",
+          "RUA SANTIAGO DA BARRA DO CEARÁ",
+          "COMUNIDADE DO POLO DA BARRA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.58489366176471,
+          -3.6978509852941186
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 37,
+        "rank": 37,
+        "name": "Comunidade Língua da Cobra",
+        "bairro": "BARRA DO CEARÁ",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 71.935,
+        "score": 71.935,
+        "region": "capital",
+        "parent_area": "BARRA DO CEARÁ",
+        "parent_risk_score": 78.4,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 17.394,
+        "nearby_streets_count": 54,
+        "nearby_streets": [
+          "COMUNIDADE LÍNGUA DA COBRA",
+          "MORRO DO GRÊMIO",
+          "COMUNIDADE SÃO PEDRO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.579619375,
+          -3.6965133125000005
         ]
       }
     },
@@ -1268,11 +1268,11 @@
         "bairro": "CRISTO REDENTOR",
         "municipality": "(Complexo Da Barra Do Ceará)",
         "faction": "CV",
-        "risk_score": 74.403,
-        "score": 74.403,
+        "risk_score": 71.415,
+        "score": 71.415,
         "region": "capital",
         "parent_area": "CRISTO REDENTOR",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 15.982,
@@ -1283,7 +1283,7 @@
           "LAJE DA COLÔNIA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -1298,15 +1298,49 @@
       "properties": {
         "node_id": 39,
         "rank": 39,
+        "name": "Comunidade Do Pombal",
+        "bairro": "BARRA DO CEARÁ",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 71.329,
+        "score": 71.329,
+        "region": "capital",
+        "parent_area": "BARRA DO CEARÁ",
+        "parent_risk_score": 78.4,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 16.141,
+        "nearby_streets_count": 51,
+        "nearby_streets": [
+          "COMUNIDADE DO POMBAL",
+          "MORRO DO SANTIAGO",
+          "RUA SANTIAGO DA BARRA DO CEARÁ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.586835818181825,
+          -3.6996922272727275
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 40,
+        "rank": 40,
         "name": "Comunidade São Pedro",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 74.358,
-        "score": 74.358,
+        "risk_score": 71.279,
+        "score": 71.279,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 16.034,
@@ -1317,7 +1351,7 @@
           "COMUNIDADE DO POLO DA BARRA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -1330,17 +1364,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 40,
-        "rank": 40,
+        "node_id": 41,
+        "rank": 41,
         "name": "Comunidade do Polo da Barra",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 73.562,
-        "score": 73.562,
+        "risk_score": 70.475,
+        "score": 70.475,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 14.894,
@@ -1351,7 +1385,7 @@
           "MORRO DO SANTIAGO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -1364,51 +1398,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 41,
-        "rank": 41,
-        "name": "Comunidade dos Cariocas - Caucaia",
-        "bairro": "MARECHAL RONDON",
-        "municipality": "Caucaia",
-        "faction": "CV",
-        "risk_score": 72.865,
-        "score": 72.865,
-        "region": "capital",
-        "parent_area": "MARECHAL RONDON",
-        "parent_risk_score": 93.2,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 3.429,
-        "nearby_streets_count": 8,
-        "nearby_streets": [
-          "COMUNIDADE DOS CARIOCAS - CAUCAIA",
-          "CONDOMÍNIOS",
-          "CAJUEIROS"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.63100255555556,
-          -3.7793906666666666
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "node_id": 42,
         "rank": 42,
         "name": "Vilinha",
         "bairro": "BARRA DO CEARÁ",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 72.292,
-        "score": 72.292,
+        "risk_score": 69.026,
+        "score": 69.026,
         "region": "capital",
         "parent_area": "BARRA DO CEARÁ",
-        "parent_risk_score": 83.0,
+        "parent_risk_score": 78.4,
         "parent_risk_level": "crítico",
         "parent_status": "CRÍTICO",
         "local_street_pressure": 13.287,
@@ -1419,7 +1419,7 @@
           "CAMPO DO CRUZEIRO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -1434,32 +1434,32 @@
       "properties": {
         "node_id": 43,
         "rank": 43,
-        "name": "Levada",
-        "bairro": "MESSEJANA",
+        "name": "Pantanal - Planalto Ayrton Senna",
+        "bairro": "PLANALTO AYRTON SENNA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 70.16,
-        "score": 70.16,
+        "risk_score": 59.24,
+        "score": 59.24,
         "region": "capital",
-        "parent_area": "MESSEJANA",
-        "parent_risk_score": 78.3,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 13.615,
-        "nearby_streets_count": 54,
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 13.005,
+        "nearby_streets_count": 42,
         "nearby_streets": [
-          "LEVADA",
-          "RUA DOUTOR JOAQUIM BENTO",
-          "RUA VICENTE NOBRE MACÊDO"
+          "PANTANAL - PLANALTO AYRTON SENNA",
+          "COMUNIDADE DA PORTELINHA- PLANALTO AYRTON SENNA",
+          "AREA SEM NOME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.48783283333333,
-          -3.8251020000000007
+          -38.570645,
+          -3.8331592777777783
         ]
       }
     },
@@ -1468,32 +1468,32 @@
       "properties": {
         "node_id": 44,
         "rank": 44,
-        "name": "Conjunto São Bernardo",
-        "bairro": "MESSEJANA",
+        "name": "Barreiros - Planalto Ayrton Senna",
+        "bairro": "PLANALTO AYRTON SENNA",
         "municipality": "Fortaleza",
-        "faction": "MASSA",
-        "risk_score": 69.253,
-        "score": 69.253,
+        "faction": "CV",
+        "risk_score": 58.777,
+        "score": 58.777,
         "region": "capital",
-        "parent_area": "MESSEJANA",
-        "parent_risk_score": 78.3,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 12.345,
-        "nearby_streets_count": 50,
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 13.719,
+        "nearby_streets_count": 40,
         "nearby_streets": [
-          "CONJUNTO SÃO BERNARDO",
-          "RUA CECÍLIA MEIRELES",
-          "COMUNIDADE DA PORTELINHA- MESSEJANA"
+          "BARREIROS - PLANALTO AYRTON SENNA",
+          "AREA SEM NOME",
+          "BECO PLANALTINA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.49008374999999,
-          -3.8185046250000005
+          -38.572536416666665,
+          -3.8354774166666665
         ]
       }
     },
@@ -1502,32 +1502,32 @@
       "properties": {
         "node_id": 45,
         "rank": 45,
-        "name": "Beco da Maravilha",
-        "bairro": "MESSEJANA",
+        "name": "Comunidade da Portelinha- Planalto Ayrton Senna",
+        "bairro": "PLANALTO AYRTON SENNA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 68.368,
-        "score": 68.368,
+        "risk_score": 58.566,
+        "score": 58.566,
         "region": "capital",
-        "parent_area": "MESSEJANA",
-        "parent_risk_score": 78.3,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 12.515,
-        "nearby_streets_count": 50,
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 11.459,
+        "nearby_streets_count": 47,
         "nearby_streets": [
-          "BECO DA MARAVILHA",
-          "RUA DOUTOR JOAQUIM BENTO",
-          "RUA SANTO EXPEDITO"
+          "COMUNIDADE DA PORTELINHA- PLANALTO AYRTON SENNA",
+          "LAJE - PLANALTO AYRTON SENNA",
+          "COMUNIDADE DA CAGECE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.488959,
-          -3.8290662500000003
+          -38.57347934146341,
+          -3.8277631219512194
         ]
       }
     },
@@ -1536,32 +1536,32 @@
       "properties": {
         "node_id": 46,
         "rank": 46,
-        "name": "Comunidade da Conquista",
-        "bairro": "MESSEJANA",
+        "name": "Rua Fortaleza - Planalto Ayrton Senna",
+        "bairro": "PLANALTO AYRTON SENNA",
         "municipality": "Fortaleza",
-        "faction": "MASSA",
-        "risk_score": 68.279,
-        "score": 68.279,
+        "faction": "CV",
+        "risk_score": 57.575,
+        "score": 57.575,
         "region": "capital",
-        "parent_area": "MESSEJANA",
-        "parent_risk_score": 78.3,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 12.039,
-        "nearby_streets_count": 45,
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 12.429,
+        "nearby_streets_count": 44,
         "nearby_streets": [
-          "RUA LETÍCIA",
-          "COMUNIDADE DA CONQUISTA",
-          "RUA VILAMAR DAMASCENO"
+          "RUA FORTALEZA - PLANALTO AYRTON SENNA",
+          "COMUNIDADE DA PORTELINHA- PLANALTO AYRTON SENNA",
+          "CANAL BAIXO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.493964181818185,
-          -3.8212205454545454
+          -38.57675683333333,
+          -3.833483466666666
         ]
       }
     },
@@ -1570,32 +1570,32 @@
       "properties": {
         "node_id": 47,
         "rank": 47,
-        "name": "Comunidade da Portelinha- Messejana",
-        "bairro": "MESSEJANA",
+        "name": "BARRACAL",
+        "bairro": "PLANALTO AYRTON SENNA",
         "municipality": "Fortaleza",
-        "faction": "MASSA",
-        "risk_score": 68.224,
-        "score": 68.224,
+        "faction": "CV",
+        "risk_score": 57.552,
+        "score": 57.552,
         "region": "capital",
-        "parent_area": "MESSEJANA",
-        "parent_risk_score": 78.3,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 12.343,
-        "nearby_streets_count": 47,
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 9.049,
+        "nearby_streets_count": 33,
         "nearby_streets": [
-          "COMUNIDADE DA PORTELINHA- MESSEJANA",
-          "RUA VILAMAR DAMASCENO",
-          "PARQUE IRACEMA I"
+          "BARRACAL",
+          "COMUNIDADE DA PORTELINHA- PLANALTO AYRTON SENNA",
+          "MONTE LIBANO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.4925862,
-          -3.818338
+          -38.5640046,
+          -3.8317916000000003
         ]
       }
     },
@@ -1604,32 +1604,32 @@
       "properties": {
         "node_id": 48,
         "rank": 48,
-        "name": "LAGOA SECA",
-        "bairro": "MESSEJANA",
+        "name": "Laje - Planalto Ayrton Senna",
+        "bairro": "PLANALTO AYRTON SENNA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 68.053,
-        "score": 68.053,
+        "risk_score": 57.037,
+        "score": 57.037,
         "region": "capital",
-        "parent_area": "MESSEJANA",
-        "parent_risk_score": 78.3,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 10.448,
-        "nearby_streets_count": 47,
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 13.003,
+        "nearby_streets_count": 48,
         "nearby_streets": [
-          "LAGOA SECA",
-          "RUA JURITI",
-          "RUA SANTA CLARA DE ASSIS"
+          "LAJE - PLANALTO AYRTON SENNA",
+          "COMUNIDADE DA PORTELINHA- PLANALTO AYRTON SENNA",
+          "COMUNIDADE DA CAGECE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.49977998888889,
-          -3.8235137666666668
+          -38.57442960869565,
+          -3.8303467826086957
         ]
       }
     },
@@ -1638,32 +1638,32 @@
       "properties": {
         "node_id": 49,
         "rank": 49,
-        "name": "Parque Iracema I",
-        "bairro": "MESSEJANA",
+        "name": "Comunidade Da Cagece",
+        "bairro": "PLANALTO AYRTON SENNA",
         "municipality": "Fortaleza",
-        "faction": "MASSA",
-        "risk_score": 67.847,
-        "score": 67.847,
+        "faction": "CV",
+        "risk_score": 56.993,
+        "score": 56.993,
         "region": "capital",
-        "parent_area": "MESSEJANA",
-        "parent_risk_score": 78.3,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 11.041,
-        "nearby_streets_count": 44,
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 12.836,
+        "nearby_streets_count": 48,
         "nearby_streets": [
-          "PARQUE IRACEMA I",
-          "COMUNIDADE DA PORTELINHA- MESSEJANA",
-          "RUA VILAMAR DAMASCENO"
+          "COMUNIDADE DA CAGECE",
+          "COMUNIDADE DA PORTELINHA- PLANALTO AYRTON SENNA",
+          "LAJE - PLANALTO AYRTON SENNA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.49328105882353,
-          -3.8167911176470586
+          -38.57555961111112,
+          -3.830997944444445
         ]
       }
     },
@@ -1672,32 +1672,32 @@
       "properties": {
         "node_id": 50,
         "rank": 50,
-        "name": "Cemitério",
-        "bairro": "MESSEJANA",
+        "name": "Beco Planaltina",
+        "bairro": "PLANALTO AYRTON SENNA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 66.714,
-        "score": 66.714,
+        "risk_score": 56.551,
+        "score": 56.551,
         "region": "capital",
-        "parent_area": "MESSEJANA",
-        "parent_risk_score": 78.3,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 9.397,
-        "nearby_streets_count": 39,
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 13.287,
+        "nearby_streets_count": 35,
         "nearby_streets": [
-          "RUA COPÉRNICO",
-          "CEMITÉRIO",
-          "TRAVESSA MARIO BARCELOS"
+          "BECO PLANALTINA",
+          "RUA PLANALTINA",
+          "AURORA - CIDADE NOVA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.4924548,
-          -3.836622866666667
+          -38.57216833333333,
+          -3.8373671666666667
         ]
       }
     },
@@ -1706,32 +1706,32 @@
       "properties": {
         "node_id": 51,
         "rank": 51,
-        "name": "Comunidade do Serrote - Messejana",
-        "bairro": "PARQUE SANTA MARIA",
-        "municipality": "Messejana",
+        "name": "Comunidade do Sol Nascente",
+        "bairro": "PLANALTO AYRTON SENNA",
+        "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 62.009,
-        "score": 62.009,
+        "risk_score": 56.374,
+        "score": 56.374,
         "region": "capital",
-        "parent_area": "PARQUE SANTA MARIA",
-        "parent_risk_score": 78.3,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 3.192,
-        "nearby_streets_count": 11,
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 12.604,
+        "nearby_streets_count": 37,
         "nearby_streets": [
-          "COMUNIDADE DO SERROTE - MESSEJANA",
-          "RUA COPÉRNICO",
-          "CEMITÉRIO"
+          "COMUNIDADE DO SOL NASCENTE",
+          "AURORA - CIDADE NOVA",
+          "BECO PLANALTINA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.49207783333333,
-          -3.842039083333333
+          -38.574693833333335,
+          -3.8364
         ]
       }
     },
@@ -1740,32 +1740,32 @@
       "properties": {
         "node_id": 52,
         "rank": 52,
-        "name": "Conjunto Comando Vermelho",
-        "bairro": "ÁLVARO WEYNE",
+        "name": "Rua Gaspar Dutra",
+        "bairro": "PLANALTO AYRTON SENNA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 48.781,
-        "score": 48.781,
+        "risk_score": 55.984,
+        "score": 55.984,
         "region": "capital",
-        "parent_area": "ÁLVARO WEYNE",
-        "parent_risk_score": 42.5,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 21.282,
-        "nearby_streets_count": 93,
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 12.409,
+        "nearby_streets_count": 34,
         "nearby_streets": [
-          "CONJUNTO COMANDO VERMELHO",
-          "COMANDINHO",
-          "CONJ. MARIA JOSÉ GOMES"
+          "RUA GASPAR DUTRA",
+          "FAVELA DO QUADRADO",
+          "RUA CANUDOS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.5742724,
-          -3.7126916000000003
+          -38.56910222222223,
+          -3.836132
         ]
       }
     },
@@ -1774,32 +1774,32 @@
       "properties": {
         "node_id": 53,
         "rank": 53,
-        "name": "Comandinho",
-        "bairro": "ÁLVARO WEYNE",
+        "name": "Viametro",
+        "bairro": "PLANALTO AYRTON SENNA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 48.492,
-        "score": 48.492,
+        "risk_score": 55.925,
+        "score": 55.925,
         "region": "capital",
-        "parent_area": "ÁLVARO WEYNE",
-        "parent_risk_score": 42.5,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 21.053,
-        "nearby_streets_count": 91,
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 11.641,
+        "nearby_streets_count": 46,
         "nearby_streets": [
-          "COMANDINHO",
-          "CONJUNTO COMANDO VERMELHO",
-          "COMUNIDADE OLICAL"
+          "VIAMETRO",
+          "CANAL BAIXO",
+          "COMUNIDADE DA PORTELINHA- PLANALTO AYRTON SENNA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.574475,
-          -3.710973545454546
+          -38.57927990909092,
+          -3.831438727272726
         ]
       }
     },
@@ -1808,32 +1808,32 @@
       "properties": {
         "node_id": 54,
         "rank": 54,
-        "name": "Rua Do Posto",
-        "bairro": "ÁLVARO WEYNE",
+        "name": "Favela do Quadrado",
+        "bairro": "PLANALTO AYRTON SENNA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 48.289,
-        "score": 48.289,
+        "risk_score": 55.815,
+        "score": 55.815,
         "region": "capital",
-        "parent_area": "ÁLVARO WEYNE",
-        "parent_risk_score": 42.5,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 20.478,
-        "nearby_streets_count": 88,
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 12.023,
+        "nearby_streets_count": 34,
         "nearby_streets": [
-          "RUA DO POSTO",
-          "SÃO FRANCISCO",
-          "RUA FERREIRA DOS SANTOS"
+          "FAVELA DO QUADRADO",
+          "RUA GASPAR DUTRA",
+          "COMUNIDADE DA PORTELINHA- PLANALTO AYRTON SENNA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.57113684,
-          -3.7166885199999995
+          -38.56875041666667,
+          -3.8350509166666655
         ]
       }
     },
@@ -1842,32 +1842,32 @@
       "properties": {
         "node_id": 55,
         "rank": 55,
-        "name": "Conj. Maria José Gomes",
-        "bairro": "ÁLVARO WEYNE",
+        "name": "Planalto Cidade Nova",
+        "bairro": "PLANALTO AYRTON SENNA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 48.235,
-        "score": 48.235,
+        "risk_score": 55.778,
+        "score": 55.778,
         "region": "capital",
-        "parent_area": "ÁLVARO WEYNE",
-        "parent_risk_score": 42.5,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 20.606,
-        "nearby_streets_count": 90,
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 10.261,
+        "nearby_streets_count": 37,
         "nearby_streets": [
-          "CONJ. MARIA JOSÉ GOMES",
-          "RUA DO POSTO",
-          "RUA FERREIRA DOS SANTOS"
+          "PLANALTO CIDADE NOVA",
+          "CANAL BAIXO",
+          "RUA FORTALEZA - PLANALTO AYRTON SENNA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.57149890000001,
-          -3.7145118000000004
+          -38.57929528571429,
+          -3.836477714285714
         ]
       }
     },
@@ -1876,15 +1876,185 @@
       "properties": {
         "node_id": 56,
         "rank": 56,
+        "name": "Rua Canudos",
+        "bairro": "PLANALTO AYRTON SENNA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 55.699,
+        "score": 55.699,
+        "region": "capital",
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 11.256,
+        "nearby_streets_count": 34,
+        "nearby_streets": [
+          "RUA GASPAR DUTRA",
+          "RUA CANUDOS",
+          "FAVELA DO QUADRADO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.56799221428572,
+          -3.8367025000000003
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 57,
+        "rank": 57,
+        "name": "Canal Baixo",
+        "bairro": "PLANALTO AYRTON SENNA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 55.605,
+        "score": 55.605,
+        "region": "capital",
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 11.589,
+        "nearby_streets_count": 42,
+        "nearby_streets": [
+          "CANAL BAIXO",
+          "RUA FORTALEZA - PLANALTO AYRTON SENNA",
+          "PLANALTO CIDADE NOVA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.5784596,
+          -3.834517
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 58,
+        "rank": 58,
+        "name": "Rua da Lama",
+        "bairro": "PLANALTO AYRTON SENNA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 54.822,
+        "score": 54.822,
+        "region": "capital",
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 10.298,
+        "nearby_streets_count": 32,
+        "nearby_streets": [
+          "RUA DA LAMA",
+          "RUA CANUDOS",
+          "RUA GASPAR DUTRA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.567636549999996,
+          -3.838940199999999
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 59,
+        "rank": 59,
+        "name": "Aurora - Cidade Nova",
+        "bairro": "PLANALTO AYRTON SENNA",
+        "municipality": "Cidade Nova",
+        "faction": "CV",
+        "risk_score": 54.602,
+        "score": 54.602,
+        "region": "capital",
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 10.347,
+        "nearby_streets_count": 21,
+        "nearby_streets": [
+          "AURORA - CIDADE NOVA",
+          "BECO PLANALTINA",
+          "COMUNIDADE DO SOL NASCENTE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.573438111111116,
+          -3.8378913333333333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 60,
+        "rank": 60,
+        "name": "Monte Libano",
+        "bairro": "PLANALTO AYRTON SENNA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 54.543,
+        "score": 54.543,
+        "region": "capital",
+        "parent_area": "PLANALTO AYRTON SENNA",
+        "parent_risk_score": 61.1,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 10.208,
+        "nearby_streets_count": 37,
+        "nearby_streets": [
+          "MONTE LIBANO",
+          "COMUNIDADE DA PORTELINHA- PLANALTO AYRTON SENNA",
+          "RUA MONTE LÍBANO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.56626854545455,
+          -3.8288946363636356
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 61,
+        "rank": 61,
         "name": "Comunidade Reino Encantado",
         "bairro": "ÁLVARO WEYNE",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 48.144,
-        "score": 48.144,
+        "risk_score": 47.526,
+        "score": 47.526,
         "region": "capital",
         "parent_area": "ÁLVARO WEYNE",
-        "parent_risk_score": 42.5,
+        "parent_risk_score": 40.3,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
         "local_street_pressure": 19.357,
@@ -1895,7 +2065,7 @@
           "RUA FERREIRA DOS SANTOS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -1908,17 +2078,153 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 57,
-        "rank": 57,
+        "node_id": 62,
+        "rank": 62,
+        "name": "Conjunto Comando Vermelho",
+        "bairro": "ÁLVARO WEYNE",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 47.375,
+        "score": 47.375,
+        "region": "capital",
+        "parent_area": "ÁLVARO WEYNE",
+        "parent_risk_score": 40.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 21.282,
+        "nearby_streets_count": 93,
+        "nearby_streets": [
+          "CONJUNTO COMANDO VERMELHO",
+          "COMANDINHO",
+          "CONJ. MARIA JOSÉ GOMES"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.5742724,
+          -3.7126916000000003
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 63,
+        "rank": 63,
+        "name": "Rua Do Posto",
+        "bairro": "ÁLVARO WEYNE",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 46.957,
+        "score": 46.957,
+        "region": "capital",
+        "parent_area": "ÁLVARO WEYNE",
+        "parent_risk_score": 40.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 20.478,
+        "nearby_streets_count": 88,
+        "nearby_streets": [
+          "RUA DO POSTO",
+          "SÃO FRANCISCO",
+          "RUA FERREIRA DOS SANTOS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.57113684,
+          -3.7166885199999995
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 64,
+        "rank": 64,
+        "name": "Comandinho",
+        "bairro": "ÁLVARO WEYNE",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 46.939,
+        "score": 46.939,
+        "region": "capital",
+        "parent_area": "ÁLVARO WEYNE",
+        "parent_risk_score": 40.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 21.053,
+        "nearby_streets_count": 91,
+        "nearby_streets": [
+          "COMANDINHO",
+          "CONJUNTO COMANDO VERMELHO",
+          "COMUNIDADE OLICAL"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.574475,
+          -3.710973545454546
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 65,
+        "rank": 65,
+        "name": "Conj. Maria José Gomes",
+        "bairro": "ÁLVARO WEYNE",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 46.741,
+        "score": 46.741,
+        "region": "capital",
+        "parent_area": "ÁLVARO WEYNE",
+        "parent_risk_score": 40.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 20.606,
+        "nearby_streets_count": 90,
+        "nearby_streets": [
+          "CONJ. MARIA JOSÉ GOMES",
+          "RUA DO POSTO",
+          "RUA FERREIRA DOS SANTOS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.57149890000001,
+          -3.7145118000000004
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 66,
+        "rank": 66,
         "name": "São Francisco",
         "bairro": "ÁLVARO WEYNE",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 47.543,
-        "score": 47.543,
+        "risk_score": 46.001,
+        "score": 46.001,
         "region": "capital",
         "parent_area": "ÁLVARO WEYNE",
-        "parent_risk_score": 42.5,
+        "parent_risk_score": 40.3,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
         "local_street_pressure": 19.668,
@@ -1929,7 +2235,7 @@
           "RUA FERREIRA DOS SANTOS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -1942,17 +2248,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 58,
-        "rank": 58,
+        "node_id": 67,
+        "rank": 67,
         "name": "Coelho Neto",
         "bairro": "ÁLVARO WEYNE",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 46.454,
-        "score": 46.454,
+        "risk_score": 45.036,
+        "score": 45.036,
         "region": "capital",
         "parent_area": "ÁLVARO WEYNE",
-        "parent_risk_score": 42.5,
+        "parent_risk_score": 40.3,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
         "local_street_pressure": 17.935,
@@ -1963,7 +2269,7 @@
           "SÃO FRANCISCO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
@@ -1976,340 +2282,34 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 59,
-        "rank": 59,
-        "name": "Caic",
-        "bairro": "GRANJA LISBOA",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 36.365,
-        "score": 36.365,
-        "region": "capital",
-        "parent_area": "GRANJA LISBOA",
-        "parent_risk_score": 31.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 9.749,
-        "nearby_streets_count": 45,
-        "nearby_streets": [
-          "CAIC",
-          "RESIDENCIAL MARIA ALVES CARIOCA",
-          "MUTIRÃO DA SÃO FRANCISCO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.61722188235294,
-          -3.781109235294117
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 60,
-        "rank": 60,
-        "name": "Alto da Paz",
-        "bairro": "GRANJA LISBOA",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 35.048,
-        "score": 35.048,
-        "region": "capital",
-        "parent_area": "GRANJA LISBOA",
-        "parent_risk_score": 31.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 9.248,
-        "nearby_streets_count": 47,
-        "nearby_streets": [
-          "ALTO DA PAZ",
-          "AREA SEM NOME",
-          "FAVELINHA- GRANJA LISBOA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.618707256410254,
-          -3.7897760000000003
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 61,
-        "rank": 61,
-        "name": "Comunidade Forró do Meu",
-        "bairro": "GRANJA LISBOA",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 33.947,
-        "score": 33.947,
-        "region": "capital",
-        "parent_area": "GRANJA LISBOA",
-        "parent_risk_score": 31.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 9.121,
-        "nearby_streets_count": 45,
-        "nearby_streets": [
-          "COMUNIDADE FORRÓ DO MEU",
-          "COMUNIDADE MUTIRÃO",
-          "FAVELINHA- GRANJA LISBOA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.618208615384624,
-          -3.7965139615384613
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 62,
-        "rank": 62,
-        "name": "Travessa",
-        "bairro": "GRANJA LISBOA",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 33.793,
-        "score": 33.793,
-        "region": "capital",
-        "parent_area": "GRANJA LISBOA",
-        "parent_risk_score": 31.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 11.72,
-        "nearby_streets_count": 49,
-        "nearby_streets": [
-          "TRAVESSA",
-          "BECO DO EDSON",
-          "RUA CORONEL JOÃO CORREIA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.6095238,
-          -3.7890133999999995
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 63,
-        "rank": 63,
-        "name": "Mutirão da São Francisco",
-        "bairro": "GRANJA LISBOA",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 33.641,
-        "score": 33.641,
-        "region": "capital",
-        "parent_area": "GRANJA LISBOA",
-        "parent_risk_score": 31.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 10.919,
-        "nearby_streets_count": 46,
-        "nearby_streets": [
-          "MUTIRÃO DA SÃO FRANCISCO",
-          "RESIDENCIAL MARIA ALVES CARIOCA",
-          "FAVELA DA MANGUEIRA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.61454657142857,
-          -3.7844195714285713
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 64,
-        "rank": 64,
-        "name": "Favela da Mangueira",
-        "bairro": "GRANJA LISBOA",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 33.633,
-        "score": 33.633,
-        "region": "capital",
-        "parent_area": "GRANJA LISBOA",
-        "parent_risk_score": 31.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 10.688,
-        "nearby_streets_count": 45,
-        "nearby_streets": [
-          "FAVELA DA MANGUEIRA",
-          "MUTIRÃO DA SÃO FRANCISCO",
-          "RESIDENCIAL MARIA ALVES CARIOCA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.61257855555555,
-          -3.7843851111111113
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 65,
-        "rank": 65,
-        "name": "Comunidade Mutirão",
-        "bairro": "GRANJA LISBOA",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 33.545,
-        "score": 33.545,
-        "region": "capital",
-        "parent_area": "GRANJA LISBOA",
-        "parent_risk_score": 31.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 9.666,
-        "nearby_streets_count": 46,
-        "nearby_streets": [
-          "COMUNIDADE MUTIRÃO",
-          "COMUNIDADE FORRÓ DO MEU",
-          "FAVELINHA- GRANJA LISBOA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.61543381818181,
-          -3.796630181818182
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 66,
-        "rank": 66,
-        "name": "Beco do Edson",
-        "bairro": "GRANJA LISBOA",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 33.455,
-        "score": 33.455,
-        "region": "capital",
-        "parent_area": "GRANJA LISBOA",
-        "parent_risk_score": 31.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 11.198,
-        "nearby_streets_count": 47,
-        "nearby_streets": [
-          "BECO DO EDSON",
-          "TRAVESSA",
-          "FAVELA DA MANGUEIRA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.60900399999999,
-          -3.7865444000000004
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 67,
-        "rank": 67,
-        "name": "Residencial Maria Alves Carioca",
-        "bairro": "GRANJA LISBOA",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 32.938,
-        "score": 32.938,
-        "region": "capital",
-        "parent_area": "GRANJA LISBOA",
-        "parent_risk_score": 31.0,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 10.505,
-        "nearby_streets_count": 44,
-        "nearby_streets": [
-          "RESIDENCIAL MARIA ALVES CARIOCA",
-          "MUTIRÃO DA SÃO FRANCISCO",
-          "CAIC"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.6159715,
-          -3.783128
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "node_id": 68,
         "rank": 68,
-        "name": "Favelinha- Granja Lisboa",
-        "bairro": "GRANJA LISBOA",
+        "name": "Levada",
+        "bairro": "MESSEJANA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 32.147,
-        "score": 32.147,
+        "risk_score": 42.715,
+        "score": 42.715,
         "region": "capital",
-        "parent_area": "GRANJA LISBOA",
-        "parent_risk_score": 31.0,
+        "parent_area": "MESSEJANA",
+        "parent_risk_score": 38.4,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 8.735,
-        "nearby_streets_count": 40,
+        "local_street_pressure": 13.728,
+        "nearby_streets_count": 55,
         "nearby_streets": [
-          "FAVELINHA- GRANJA LISBOA",
-          "COMUNIDADE FORRÓ DO MEU",
-          "ALTO DA PAZ"
+          "LEVADA",
+          "RUA DOUTOR JOAQUIM BENTO",
+          "RUA VICENTE NOBRE MACÊDO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.620311333333326,
-          -3.7923985333333334
+          -38.48783283333333,
+          -3.8251020000000007
         ]
       }
     },
@@ -2318,32 +2318,32 @@
       "properties": {
         "node_id": 69,
         "rank": 69,
-        "name": "CR",
-        "bairro": "GRANJA LISBOA",
+        "name": "Conjunto São Bernardo",
+        "bairro": "MESSEJANA",
         "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 32.016,
-        "score": 32.016,
+        "faction": "MASSA",
+        "risk_score": 41.7,
+        "score": 41.7,
         "region": "capital",
-        "parent_area": "GRANJA LISBOA",
-        "parent_risk_score": 31.0,
+        "parent_area": "MESSEJANA",
+        "parent_risk_score": 38.4,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 5.832,
-        "nearby_streets_count": 28,
+        "local_street_pressure": 12.345,
+        "nearby_streets_count": 50,
         "nearby_streets": [
-          "CR",
-          "CONJUNTO LEONEL BRIZOLA",
-          "COMUNIDADE RAQUEL"
+          "CONJUNTO SÃO BERNARDO",
+          "RUA CECÍLIA MEIRELES",
+          "COMUNIDADE DA PORTELINHA- MESSEJANA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.629605555555564,
-          -3.7868475000000004
+          -38.49008374999999,
+          -3.8185046250000005
         ]
       }
     },
@@ -2352,32 +2352,32 @@
       "properties": {
         "node_id": 70,
         "rank": 70,
-        "name": "Conjunto Leonel Brizola",
-        "bairro": "GRANJA LISBOA",
+        "name": "LAGOA SECA",
+        "bairro": "MESSEJANA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 31.95,
-        "score": 31.95,
+        "risk_score": 40.625,
+        "score": 40.625,
         "region": "capital",
-        "parent_area": "GRANJA LISBOA",
-        "parent_risk_score": 31.0,
+        "parent_area": "MESSEJANA",
+        "parent_risk_score": 38.4,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 8.476,
-        "nearby_streets_count": 38,
+        "local_street_pressure": 10.448,
+        "nearby_streets_count": 47,
         "nearby_streets": [
-          "CONJUNTO LEONEL BRIZOLA",
-          "CAIC",
-          "CR"
+          "LAGOA SECA",
+          "RUA JURITI",
+          "RUA SANTA CLARA DE ASSIS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.62446463636364,
-          -3.781710181818182
+          -38.49977998888889,
+          -3.8235137666666668
         ]
       }
     },
@@ -2386,41 +2386,653 @@
       "properties": {
         "node_id": 71,
         "rank": 71,
-        "name": "Comunidade Raquel",
-        "bairro": "GRANJA LISBOA",
+        "name": "Comunidade da Conquista",
+        "bairro": "MESSEJANA",
         "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 30.054,
-        "score": 30.054,
+        "faction": "MASSA",
+        "risk_score": 39.861,
+        "score": 39.861,
         "region": "capital",
-        "parent_area": "GRANJA LISBOA",
-        "parent_risk_score": 31.0,
+        "parent_area": "MESSEJANA",
+        "parent_risk_score": 38.4,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 6.34,
-        "nearby_streets_count": 27,
+        "local_street_pressure": 12.039,
+        "nearby_streets_count": 45,
         "nearby_streets": [
-          "COMUNIDADE RAQUEL",
-          "FAVELINHA- GRANJA LISBOA",
-          "COMUNIDADE FORRÓ DO MEU"
+          "RUA LETÍCIA",
+          "COMUNIDADE DA CONQUISTA",
+          "RUA VILAMAR DAMASCENO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-06-14T22:49:55.903208"
+        "generated_at": "2026-06-22T16:06:58.330449"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.625964599999996,
-          -3.7930326
+          -38.493964181818185,
+          -3.8212205454545454
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 72,
+        "rank": 72,
+        "name": "Beco da Maravilha",
+        "bairro": "MESSEJANA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 39.759,
+        "score": 39.759,
+        "region": "capital",
+        "parent_area": "MESSEJANA",
+        "parent_risk_score": 38.4,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 12.632,
+        "nearby_streets_count": 51,
+        "nearby_streets": [
+          "BECO DA MARAVILHA",
+          "RUA DOUTOR JOAQUIM BENTO",
+          "RUA SANTO EXPEDITO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.488959,
+          -3.8290662500000003
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 73,
+        "rank": 73,
+        "name": "Parque Iracema I",
+        "bairro": "MESSEJANA",
+        "municipality": "Fortaleza",
+        "faction": "MASSA",
+        "risk_score": 39.724,
+        "score": 39.724,
+        "region": "capital",
+        "parent_area": "MESSEJANA",
+        "parent_risk_score": 38.4,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 11.041,
+        "nearby_streets_count": 44,
+        "nearby_streets": [
+          "PARQUE IRACEMA I",
+          "COMUNIDADE DA PORTELINHA- MESSEJANA",
+          "RUA VILAMAR DAMASCENO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.49328105882353,
+          -3.8167911176470586
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 74,
+        "rank": 74,
+        "name": "Comunidade da Portelinha- Messejana",
+        "bairro": "MESSEJANA",
+        "municipality": "Fortaleza",
+        "faction": "MASSA",
+        "risk_score": 39.506,
+        "score": 39.506,
+        "region": "capital",
+        "parent_area": "MESSEJANA",
+        "parent_risk_score": 38.4,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 12.343,
+        "nearby_streets_count": 47,
+        "nearby_streets": [
+          "COMUNIDADE DA PORTELINHA- MESSEJANA",
+          "RUA VILAMAR DAMASCENO",
+          "PARQUE IRACEMA I"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.4925862,
+          -3.818338
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 75,
+        "rank": 75,
+        "name": "Cemitério",
+        "bairro": "MESSEJANA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 38.594,
+        "score": 38.594,
+        "region": "capital",
+        "parent_area": "MESSEJANA",
+        "parent_risk_score": 38.4,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 9.397,
+        "nearby_streets_count": 39,
+        "nearby_streets": [
+          "RUA COPÉRNICO",
+          "CEMITÉRIO",
+          "TRAVESSA MARIO BARCELOS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.4924548,
+          -3.836622866666667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 76,
+        "rank": 76,
+        "name": "Favela Do Abc",
+        "bairro": "LAGOA REDONDA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 38.025,
+        "score": 38.025,
+        "region": "capital",
+        "parent_area": "LAGOA REDONDA",
+        "parent_risk_score": 34.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 13.58,
+        "nearby_streets_count": 53,
+        "nearby_streets": [
+          "FAVELA DO ABC",
+          "RUA SANTA ISABEL",
+          "RUA PAULO DE TASSO RAMOS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.466342062500004,
+          -3.8221183125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 77,
+        "rank": 77,
+        "name": "11 De Novembro",
+        "bairro": "LAGOA REDONDA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 37.571,
+        "score": 37.571,
+        "region": "capital",
+        "parent_area": "LAGOA REDONDA",
+        "parent_risk_score": 34.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 12.737,
+        "nearby_streets_count": 45,
+        "nearby_streets": [
+          "11 DE NOVEMBRO",
+          "AREA SEM NOME",
+          "FAVELA DO PÓ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.464815124999994,
+          -3.8283326250000003
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 78,
+        "rank": 78,
+        "name": "Caixa D’água",
+        "bairro": "LAGOA REDONDA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 37.287,
+        "score": 37.287,
+        "region": "capital",
+        "parent_area": "LAGOA REDONDA",
+        "parent_risk_score": 34.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 11.689,
+        "nearby_streets_count": 43,
+        "nearby_streets": [
+          "CAIXA D’ÁGUA",
+          "11 DE NOVEMBRO",
+          "ARCO VERDE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.465474833333325,
+          -3.8305085833333337
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 79,
+        "rank": 79,
+        "name": "AP",
+        "bairro": "LAGOA REDONDA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 37.072,
+        "score": 37.072,
+        "region": "capital",
+        "parent_area": "LAGOA REDONDA",
+        "parent_risk_score": 34.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 12.68,
+        "nearby_streets_count": 44,
+        "nearby_streets": [
+          "AP",
+          "FINAL FELIZ",
+          "RUA SETE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.463950857142855,
+          -3.824943714285714
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 80,
+        "rank": 80,
+        "name": "Arco Verde",
+        "bairro": "LAGOA REDONDA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 37.011,
+        "score": 37.011,
+        "region": "capital",
+        "parent_area": "LAGOA REDONDA",
+        "parent_risk_score": 34.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 12.067,
+        "nearby_streets_count": 47,
+        "nearby_streets": [
+          "ARCO VERDE",
+          "CAIXA D’ÁGUA",
+          "11 DE NOVEMBRO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.468442058823534,
+          -3.830220647058824
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 81,
+        "rank": 81,
+        "name": "Favela Do Pó",
+        "bairro": "LAGOA REDONDA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 36.838,
+        "score": 36.838,
+        "region": "capital",
+        "parent_area": "LAGOA REDONDA",
+        "parent_risk_score": 34.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 11.919,
+        "nearby_streets_count": 37,
+        "nearby_streets": [
+          "FAVELA DO PÓ",
+          "RUA SETE",
+          "11 DE NOVEMBRO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.330449"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.4628983076923,
+          -3.827295999999999
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 82,
+        "rank": 82,
+        "name": "Final Feliz",
+        "bairro": "LAGOA REDONDA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 36.644,
+        "score": 36.644,
+        "region": "capital",
+        "parent_area": "LAGOA REDONDA",
+        "parent_risk_score": 34.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 11.213,
+        "nearby_streets_count": 41,
+        "nearby_streets": [
+          "FINAL FELIZ",
+          "AP",
+          "RUA SETE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.332455"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.46298031578948,
+          -3.823481736842106
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 83,
+        "rank": 83,
+        "name": "Comunidade Do Brooklyn",
+        "bairro": "LAGOA REDONDA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 35.46,
+        "score": 35.46,
+        "region": "capital",
+        "parent_area": "LAGOA REDONDA",
+        "parent_risk_score": 34.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 8.922,
+        "nearby_streets_count": 31,
+        "nearby_streets": [
+          "COMUNIDADE DO BROOKLYN",
+          "FAVELA DO PÓ",
+          "RUA SETE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.332455"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.46124333333334,
+          -3.830110444444445
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 84,
+        "rank": 84,
+        "name": "Comunidade Carandiru",
+        "bairro": "LAGOA REDONDA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 35.243,
+        "score": 35.243,
+        "region": "capital",
+        "parent_area": "LAGOA REDONDA",
+        "parent_risk_score": 34.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 9.017,
+        "nearby_streets_count": 35,
+        "nearby_streets": [
+          "COMUNIDADE CARANDIRU",
+          "CAIXA D’ÁGUA",
+          "SERROTE - CURIÓ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.332455"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.46487625714285,
+          -3.833965514285716
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 85,
+        "rank": 85,
+        "name": "Palmeirinha",
+        "bairro": "LAGOA REDONDA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 33.444,
+        "score": 33.444,
+        "region": "capital",
+        "parent_area": "LAGOA REDONDA",
+        "parent_risk_score": 34.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 6.439,
+        "nearby_streets_count": 21,
+        "nearby_streets": [
+          "PALMEIRINHA",
+          "COMUNIDADE ISABELZINHA",
+          "RUA SETE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.332455"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.45670834782608,
+          -3.826025
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 86,
+        "rank": 86,
+        "name": "Comunidade do Serrote - Messejana",
+        "bairro": "PARQUE SANTA MARIA",
+        "municipality": "Messejana",
+        "faction": "CV",
+        "risk_score": 33.421,
+        "score": 33.421,
+        "region": "capital",
+        "parent_area": "PARQUE SANTA MARIA",
+        "parent_risk_score": 38.4,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 3.192,
+        "nearby_streets_count": 11,
+        "nearby_streets": [
+          "COMUNIDADE DO SERROTE - MESSEJANA",
+          "RUA COPÉRNICO",
+          "CEMITÉRIO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.332455"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.49207783333333,
+          -3.842039083333333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 87,
+        "rank": 87,
+        "name": "Comunidade Isabelzinha",
+        "bairro": "LAGOA REDONDA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 33.345,
+        "score": 33.345,
+        "region": "capital",
+        "parent_area": "LAGOA REDONDA",
+        "parent_risk_score": 34.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 6.41,
+        "nearby_streets_count": 27,
+        "nearby_streets": [
+          "COMUNIDADE ISABELZINHA",
+          "PALMEIRINHA",
+          "FINAL FELIZ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.332455"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.457125166666664,
+          -3.8222726
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 88,
+        "rank": 88,
+        "name": "Serrote - Curió",
+        "bairro": "LAGOA REDONDA",
+        "municipality": "Curió",
+        "faction": "CV",
+        "risk_score": 32.73,
+        "score": 32.73,
+        "region": "capital",
+        "parent_area": "LAGOA REDONDA",
+        "parent_risk_score": 34.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 5.189,
+        "nearby_streets_count": 18,
+        "nearby_streets": [
+          "SERROTE - CURIÓ",
+          "COMUNIDADE CARANDIRU",
+          "COMUNIDADE DO BROOKLYN"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.332455"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.4605327631579,
+          -3.835901236842105
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 89,
+        "rank": 89,
+        "name": "Beco do 12",
+        "bairro": "LAGOA REDONDA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 30.253,
+        "score": 30.253,
+        "region": "capital",
+        "parent_area": "LAGOA REDONDA",
+        "parent_risk_score": 34.3,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.199,
+        "nearby_streets_count": 9,
+        "nearby_streets": [
+          "BECO DO 12",
+          "ALDEIA",
+          "BARRO DURO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-06-22T16:06:58.332455"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.45145,
+          -3.80948352173913
         ]
       }
     }
   ],
   "metadata": {
-    "total": 71,
+    "total": 89,
     "source": "Sentinela Micronodes Dynamic Overlay",
     "threshold_min_score": 31.0,
-    "generated_at": "2026-06-14T22:49:55.903208",
+    "generated_at": "2026-06-22T16:06:58.332455",
     "region": "capital"
   }
 }

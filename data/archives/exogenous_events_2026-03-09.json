@@ -12,7 +12,13 @@
     "sexo": "",
     "timestamp": "09:35",
     "ingested_at": "2026-03-08 20:19:25",
-    "date": "2026-03-08 09:35:00"
+    "date": "2026-03-08 09:35:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   },
   {
     "bairro": "",
@@ -27,7 +33,13 @@
     "sexo": "",
     "timestamp": "10:04",
     "ingested_at": "2026-03-08 20:19:25",
-    "date": "2026-03-08 10:04:00"
+    "date": "2026-03-08 10:04:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   },
   {
     "bairro": "PARQUE SOLEDADE",
@@ -42,6 +54,12 @@
     "sexo": "MASCULINO",
     "timestamp": "12:00",
     "ingested_at": "2026-03-08 20:37:40",
-    "date": "2026-03-08 12:00:00"
+    "date": "2026-03-08 12:00:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   }
 ]

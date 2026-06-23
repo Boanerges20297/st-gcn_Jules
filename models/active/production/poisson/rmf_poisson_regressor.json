@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-06-13T08:49:53.688311",
-  "artifact_path": "C:\\Users\\Boanerges\\Desktop\\Projetos\\Report Preview\\models\\active\\rmf_poisson_regressor.pkl",
+  "generated_at": "2026-06-16T16:07:54.601595",
+  "artifact_path": "C:\\Users\\Boanerges\\Desktop\\Projetos\\Report Preview\\models\\active\\production\\poisson\\rmf_poisson_regressor.pkl",
   "backend_type": "regional_poisson_regressor",
   "region": "rmf",
   "window": 14,
@@ -30,28 +30,28 @@
     "cos_month",
     "is_weekend"
   ],
-  "train_rows": 20311,
+  "train_rows": 27246,
   "benchmark_metrics": {
     "validation_split": {
       "train_start": "2022-01-01",
-      "train_end": "2024-12-31",
-      "val_start": "2025-01-01",
-      "val_end": "2025-12-31",
+      "train_end": "2025-12-31",
+      "val_start": "2026-01-01",
+      "val_end": "2026-05-31",
       "horizon_days": 14
     },
-    "rmf_2025": {
+    "rmf_2026": {
       "model_type": "classic",
-      "days_scored": 352,
-      "positive_days": 352,
-      "hit1_event": 1.0,
-      "p5_event": 0.8914772727272727,
-      "p10_event": 0.7463068181818181,
-      "p20_event": 0.6013755980861244,
-      "recall10_event": 0.6591445249825931,
+      "days_scored": 138,
+      "positive_days": 138,
+      "hit1_event": 0.7463768115942029,
+      "p5_event": 0.3420289855072464,
+      "p10_event": 0.3239130434782609,
+      "p20_event": 0.2749809305873379,
+      "recall10_event": 0.6247095698182654,
       "recall20_event": 1.0,
-      "overlap10_rank": 0.6875,
-      "mrr_event": 1.0
+      "overlap10_rank": 0.6028985507246376,
+      "mrr_event": 0.8478260869565217
     },
-    "selection_rationale": "Padronização estadual do backend Poisson para reduzir custo operacional do app."
+    "selection_rationale": "Poisson retreinado com dados ate 2025-12-31. Venceu LGBMRanker em p@10 e mrr para todas as regioes no benchmark jan-mai/2026."
   }
 }

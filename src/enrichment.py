@@ -92,6 +92,65 @@ def get_real_weather(date_obj, lat=-3.717, lon=-38.543):
         
     return _weather_cache.get(date_str)
 
+_SUPP_NATUREZAS = {
+    'achado de entorpecentes', 'abandono de material', 'veiculo localizado',
+    'cumprimento de mandado judicial', 'trafico', 'trafico de drogas',
+    'apreensao de arma', 'apreensao',
+}
+
+_CONFLICT_NATUREZAS = {
+    'homicidio a bala', 'homicidio', 'lesao a bala', 'lesao corporal a bala',
+    'achado de cadaver', 'chacina', 'execucao', 'deslocamento forcado',
+}
+
+def _normalize_natureza(text: str) -> str:
+    import unicodedata
+    if not text:
+        return ''
+    text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode().lower().strip()
+    return text
+
+
+def _compute_shock_fields(event: dict) -> dict:
+    """
+    Calcula os campos de shock que serão usados futuramente como features
+    no retreino do Poisson. Todos os campos têm prefixo 'shock_' para
+    facilitar a seleção no pipeline de treino.
+
+    Campos adicionados:
+      shock_is_conflict      bool  — evento de violência direta
+      shock_is_suppression   bool  — evento de supressão policial/operação
+      shock_severity_num     float — 0.3 (LOW) / 0.6 (MEDIUM) / 0.9 (HIGH)
+      shock_conflict_intensity float — intensidade de conflito (0..1)
+      shock_suppression_intensity float — intensidade de supressão (0..1)
+      shock_has_bairro       bool  — localização até bairro identificada
+    """
+    nat_norm = _normalize_natureza(event.get('natureza', ''))
+    severity = str(event.get('conflict_severity', '')).upper()
+
+    is_supp = nat_norm in _SUPP_NATUREZAS
+    is_conflict = nat_norm in _CONFLICT_NATUREZAS or (
+        severity in ('HIGH', 'MEDIUM') and not is_supp
+    )
+
+    severity_map = {'HIGH': 0.9, 'MEDIUM': 0.6, 'LOW': 0.3}
+    severity_num = severity_map.get(severity, 0.3)
+
+    conflict_intensity = severity_num if is_conflict else 0.0
+    suppression_intensity = severity_num if is_supp else 0.0
+
+    has_bairro = bool(str(event.get('bairro', '')).strip())
+
+    return {
+        'shock_is_conflict': is_conflict,
+        'shock_is_suppression': is_supp,
+        'shock_severity_num': severity_num,
+        'shock_conflict_intensity': conflict_intensity,
+        'shock_suppression_intensity': suppression_intensity,
+        'shock_has_bairro': has_bairro,
+    }
+
+
 def enrich_event(event, base_dir=None):
     date_str = event.get('date', '')
     if not date_str: return event
@@ -100,10 +159,13 @@ def enrich_event(event, base_dir=None):
         event['day_of_week'] = get_day_of_week_pt(dt)
         event['is_holiday'] = is_brazil_holiday(dt)
         event['is_cvp_hot_day'] = is_cvp_hot_day(dt)
-        
+
         # Clima Real
         precip = get_real_weather(dt)
         event['clima'] = get_weather_label(precip)
-        event['precipitation_mm'] = precip # Adiciona valor numérico para o modelo
+        event['precipitation_mm'] = precip
+
+        # Campos de shock para futuro retreino do Poisson
+        event.update(_compute_shock_fields(event))
     except Exception: pass
     return event

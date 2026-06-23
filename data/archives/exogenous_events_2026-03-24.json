@@ -14,7 +14,13 @@
     "timestamp": "00:10",
     "ingested_at": "2026-03-31 14:22:22",
     "date": "2026-03-23 00:10:58",
-    "source": "google_sheets_webhook"
+    "source": "google_sheets_webhook",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   },
   {
     "id": "cf9b07b6-eeb9-4792-8886-b67698cbeebb",
@@ -31,6 +37,12 @@
     "timestamp": "18:40",
     "ingested_at": "2026-03-31 14:22:22",
     "date": "2026-03-23 18:40:11",
-    "source": "google_sheets_webhook"
+    "source": "google_sheets_webhook",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.6,
+    "shock_conflict_intensity": 0.6,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   }
 ]

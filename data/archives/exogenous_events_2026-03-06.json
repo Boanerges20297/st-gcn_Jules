@@ -12,7 +12,13 @@
     "sexo": "MASCULINO",
     "timestamp": "12:15",
     "ingested_at": "2026-03-06 15:18:00",
-    "date": "2026-03-05 12:15:00"
+    "date": "2026-03-05 12:15:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   },
   {
     "bairro": "Cristo Redentor",
@@ -27,7 +33,13 @@
     "sexo": "MASCULINO",
     "timestamp": "17:40",
     "ingested_at": "2026-03-06 15:22:45",
-    "date": "2026-03-05 17:40:00"
+    "date": "2026-03-05 17:40:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Autran Nunes",
@@ -42,7 +54,13 @@
     "sexo": "",
     "timestamp": "",
     "ingested_at": "2026-03-06 15:22:45",
-    "date": "2026-03-05 00:00:00"
+    "date": "2026-03-05 00:00:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Antônio Bezerra",
@@ -57,7 +75,13 @@
     "sexo": "MASCULINO",
     "timestamp": "",
     "ingested_at": "2026-03-06 15:22:45",
-    "date": "2026-03-05 00:00:00"
+    "date": "2026-03-05 00:00:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "",
@@ -72,6 +96,12 @@
     "sexo": "MASCULINO",
     "timestamp": "18:22",
     "ingested_at": "2026-03-06 15:23:42",
-    "date": "2026-03-05 18:22:00"
+    "date": "2026-03-05 18:22:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   }
 ]

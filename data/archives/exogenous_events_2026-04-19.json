@@ -14,7 +14,13 @@
     "suppression_class": "qualified",
     "timestamp": "14:24",
     "ingested_at": "2026-04-17 20:27:28",
-    "date": "2026-04-11 14:24:00"
+    "date": "2026-04-11 14:24:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Carlito Pamplona",
@@ -31,7 +37,13 @@
     "suppression_class": "administrative",
     "timestamp": "20:03",
     "ingested_at": "2026-04-17 20:27:28",
-    "date": "2026-04-11 20:03:00"
+    "date": "2026-04-11 20:03:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Pirambu",
@@ -48,7 +60,13 @@
     "suppression_class": "qualified",
     "timestamp": "00:30",
     "ingested_at": "2026-04-17 20:27:28",
-    "date": "2026-04-11 00:30:00"
+    "date": "2026-04-11 00:30:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Mondubim",
@@ -65,7 +83,13 @@
     "suppression_class": "qualified",
     "timestamp": "00:40",
     "ingested_at": "2026-04-17 20:27:28",
-    "date": "2026-04-11 00:40:00"
+    "date": "2026-04-11 00:40:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": true
   },
   {
     "bairro": "",
@@ -82,7 +106,13 @@
     "suppression_class": "neutral",
     "timestamp": "22:06",
     "ingested_at": "2026-04-17 20:38:20",
-    "date": "2026-04-11 22:06:00"
+    "date": "2026-04-11 22:06:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": false
   },
   {
     "bairro": "Barra do Ceará",
@@ -99,7 +129,13 @@
     "suppression_class": "conflict",
     "timestamp": "07:02",
     "ingested_at": "2026-04-17 20:38:20",
-    "date": "2026-04-11 07:02:00"
+    "date": "2026-04-11 07:02:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.6,
+    "shock_conflict_intensity": 0.6,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Ancuri",
@@ -116,7 +152,13 @@
     "suppression_class": "qualified",
     "timestamp": "06:24",
     "ingested_at": "2026-04-17 20:39:25",
-    "date": "2026-04-12 06:24:00"
+    "date": "2026-04-12 06:24:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Alto da Mangueira",
@@ -133,7 +175,13 @@
     "suppression_class": "qualified",
     "timestamp": "10:56",
     "ingested_at": "2026-04-17 20:39:25",
-    "date": "2026-04-12 10:56:00"
+    "date": "2026-04-12 10:56:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Moura Brasil",
@@ -150,7 +198,13 @@
     "suppression_class": "qualified",
     "timestamp": "10:58",
     "ingested_at": "2026-04-17 20:39:25",
-    "date": "2026-04-12 10:58:00"
+    "date": "2026-04-12 10:58:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Vila Velha",
@@ -167,7 +221,13 @@
     "suppression_class": "qualified",
     "timestamp": "",
     "ingested_at": "2026-04-17 20:39:25",
-    "date": "2026-04-12 00:00:00"
+    "date": "2026-04-12 00:00:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Lagoa Redonda",
@@ -184,7 +244,13 @@
     "suppression_class": "qualified",
     "timestamp": "",
     "ingested_at": "2026-04-17 20:39:25",
-    "date": "2026-04-12 00:00:00"
+    "date": "2026-04-12 00:00:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Pecém",
@@ -201,7 +267,13 @@
     "suppression_class": "qualified",
     "timestamp": "18:45",
     "ingested_at": "2026-04-17 20:39:25",
-    "date": "2026-04-12 18:45:00"
+    "date": "2026-04-12 18:45:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": true
   },
   {
     "bairro": "José de Alencar",
@@ -218,7 +290,13 @@
     "suppression_class": "conflict",
     "timestamp": "16:38",
     "ingested_at": "2026-04-17 20:40:48",
-    "date": "2026-04-12 16:38:00"
+    "date": "2026-04-12 16:38:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Vila Velha",
@@ -235,7 +313,13 @@
     "suppression_class": "qualified",
     "timestamp": "03:38",
     "ingested_at": "2026-04-17 20:40:48",
-    "date": "2026-04-12 03:38:00"
+    "date": "2026-04-12 03:38:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Parque Dois Irmãos",
@@ -252,7 +336,13 @@
     "suppression_class": "qualified",
     "timestamp": "04:43",
     "ingested_at": "2026-04-17 20:40:48",
-    "date": "2026-04-12 04:43:00"
+    "date": "2026-04-12 04:43:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Genibaú",
@@ -269,7 +359,13 @@
     "suppression_class": "qualified",
     "timestamp": "11:52",
     "ingested_at": "2026-04-17 20:42:21",
-    "date": "2026-04-13 11:52:00"
+    "date": "2026-04-13 11:52:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": true
   },
   {
     "bairro": "",
@@ -286,7 +382,13 @@
     "suppression_class": "qualified",
     "timestamp": "13:54",
     "ingested_at": "2026-04-17 20:42:21",
-    "date": "2026-04-13 13:54:00"
+    "date": "2026-04-13 13:54:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": false
   },
   {
     "bairro": "São Miguel",
@@ -303,7 +405,13 @@
     "suppression_class": "administrative",
     "timestamp": "17:34",
     "ingested_at": "2026-04-17 20:42:21",
-    "date": "2026-04-13 17:34:00"
+    "date": "2026-04-13 17:34:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Castelão",
@@ -320,7 +428,13 @@
     "suppression_class": "administrative",
     "timestamp": "",
     "ingested_at": "2026-04-17 20:47:55",
-    "date": "2026-04-15 00:00:00"
+    "date": "2026-04-15 00:00:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Curió",
@@ -337,7 +451,13 @@
     "suppression_class": "qualified",
     "timestamp": "08:35",
     "ingested_at": "2026-04-17 20:57:00",
-    "date": "2026-04-17 08:35:00"
+    "date": "2026-04-17 08:35:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Presidente Kennedy",
@@ -354,7 +474,13 @@
     "suppression_class": "qualified",
     "timestamp": "08:53",
     "ingested_at": "2026-04-17 20:57:00",
-    "date": "2026-04-17 08:53:00"
+    "date": "2026-04-17 08:53:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Padre Julio Maria",
@@ -371,7 +497,13 @@
     "suppression_class": "neutral",
     "timestamp": "10:03",
     "ingested_at": "2026-04-17 20:57:00",
-    "date": "2026-04-17 10:03:00"
+    "date": "2026-04-17 10:03:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Parque das Nações",
@@ -388,7 +520,13 @@
     "suppression_class": "qualified",
     "timestamp": "10:35",
     "ingested_at": "2026-04-17 20:57:00",
-    "date": "2026-04-17 10:35:00"
+    "date": "2026-04-17 10:35:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Henrique Jorge",
@@ -405,7 +543,13 @@
     "suppression_class": "qualified",
     "timestamp": "12:06",
     "ingested_at": "2026-04-17 20:57:00",
-    "date": "2026-04-17 12:06:00"
+    "date": "2026-04-17 12:06:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Barra do Ceará",
@@ -422,7 +566,13 @@
     "suppression_class": "qualified",
     "timestamp": "13:15",
     "ingested_at": "2026-04-17 20:57:00",
-    "date": "2026-04-17 13:15:00"
+    "date": "2026-04-17 13:15:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": true
   },
   {
     "bairro": "CÓRREGO DOS COELHOS SIUPÉ",
@@ -439,7 +589,13 @@
     "suppression_class": "qualified",
     "timestamp": "13:57",
     "ingested_at": "2026-04-17 20:57:00",
-    "date": "2026-04-17 13:57:00"
+    "date": "2026-04-17 13:57:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Cambeba",
@@ -456,7 +612,13 @@
     "suppression_class": "qualified",
     "timestamp": "15:43",
     "ingested_at": "2026-04-17 20:57:00",
-    "date": "2026-04-17 15:43:00"
+    "date": "2026-04-17 15:43:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Meireles",
@@ -473,7 +635,13 @@
     "suppression_class": "qualified",
     "timestamp": "18:23",
     "ingested_at": "2026-04-17 20:57:00",
-    "date": "2026-04-17 18:23:00"
+    "date": "2026-04-17 18:23:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Pirambu",
@@ -490,7 +658,13 @@
     "suppression_class": "administrative",
     "timestamp": "19:14",
     "ingested_at": "2026-04-17 20:57:00",
-    "date": "2026-04-17 19:14:00"
+    "date": "2026-04-17 19:14:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Moura Brasil",
@@ -507,7 +681,13 @@
     "suppression_class": "neutral",
     "timestamp": "06:02",
     "ingested_at": "2026-04-17 20:58:13",
-    "date": "2026-04-15 06:02:00"
+    "date": "2026-04-15 06:02:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Messejana",
@@ -524,7 +704,13 @@
     "suppression_class": "neutral",
     "timestamp": "",
     "ingested_at": "2026-04-17 20:58:13",
-    "date": "2026-04-15 00:00:00"
+    "date": "2026-04-15 00:00:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "",
@@ -541,7 +727,13 @@
     "suppression_class": "administrative",
     "timestamp": "09:44",
     "ingested_at": "2026-04-17 21:00:01",
-    "date": "2026-04-16 09:44:00"
+    "date": "2026-04-16 09:44:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": true,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.3,
+    "shock_has_bairro": false
   },
   {
     "bairro": "Pici",
@@ -558,7 +750,13 @@
     "suppression_class": "administrative",
     "timestamp": "10:26",
     "ingested_at": "2026-04-17 21:00:01",
-    "date": "2026-04-16 10:26:00"
+    "date": "2026-04-16 10:26:00",
+    "shock_is_conflict": false,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.3,
+    "shock_conflict_intensity": 0.0,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   },
   {
     "bairro": "Conjunto Industrial",
@@ -575,6 +773,12 @@
     "suppression_class": "conflict",
     "timestamp": "09:13",
     "ingested_at": "2026-04-17 21:01:36",
-    "date": "2026-04-16 09:13:00"
+    "date": "2026-04-16 09:13:00",
+    "shock_is_conflict": true,
+    "shock_is_suppression": false,
+    "shock_severity_num": 0.9,
+    "shock_conflict_intensity": 0.9,
+    "shock_suppression_intensity": 0.0,
+    "shock_has_bairro": true
   }
 ]

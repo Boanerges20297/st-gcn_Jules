@@ -932,5 +932,117 @@
         "f1_score": 0.0
       }
     }
+  },
+  {
+    "date": "2026-06-15 00:00:00",
+    "timestamp": "2026-06-16T20:47:52.536506",
+    "global": {
+      "p10": 1.0,
+      "p20": 0.95,
+      "precision": 1.0,
+      "recall": 0.4524,
+      "recall10": 0.2381,
+      "recall20": 0.4524,
+      "active_locations": 42,
+      "total_nodes": 170,
+      "total_events": 78,
+      "assigned_total_events": 78,
+      "unmapped_total_events": 0,
+      "f1_score": 0.623
+    },
+    "regions": {
+      "fortaleza": {
+        "p10": 0.6,
+        "p20": 0.3,
+        "precision": 0.6,
+        "recall": 1.0,
+        "recall10": 1.0,
+        "recall20": 1.0,
+        "active_locations": 6,
+        "total_nodes": 101,
+        "total_events": 8,
+        "f1_score": 0.0
+      },
+      "rmf": {
+        "p10": 0.8,
+        "p20": 0.5263,
+        "precision": 0.8,
+        "recall": 1.0,
+        "recall10": 0.8,
+        "recall20": 1.0,
+        "active_locations": 10,
+        "total_nodes": 19,
+        "total_events": 18,
+        "f1_score": 0.0
+      },
+      "interior": {
+        "p10": 1.0,
+        "p20": 1.0,
+        "precision": 1.0,
+        "recall": 0.7692,
+        "recall10": 0.3846,
+        "recall20": 0.7692,
+        "active_locations": 26,
+        "total_nodes": 50,
+        "total_events": 52,
+        "f1_score": 0.0
+      }
+    }
+  },
+  {
+    "date": "2026-06-18 00:00:00",
+    "timestamp": "2026-06-22T16:07:08.724014",
+    "global": {
+      "p10": 1.0,
+      "p20": 0.95,
+      "precision": 1.0,
+      "recall": 0.4872,
+      "recall10": 0.2564,
+      "recall20": 0.4872,
+      "active_locations": 39,
+      "total_nodes": 170,
+      "total_events": 69,
+      "assigned_total_events": 69,
+      "unmapped_total_events": 0,
+      "f1_score": 0.6552
+    },
+    "regions": {
+      "fortaleza": {
+        "p10": 0.6,
+        "p20": 0.3,
+        "precision": 0.6,
+        "recall": 1.0,
+        "recall10": 1.0,
+        "recall20": 1.0,
+        "active_locations": 6,
+        "total_nodes": 101,
+        "total_events": 8,
+        "f1_score": 0.0
+      },
+      "rmf": {
+        "p10": 0.8,
+        "p20": 0.4211,
+        "precision": 0.8,
+        "recall": 1.0,
+        "recall10": 1.0,
+        "recall20": 1.0,
+        "active_locations": 8,
+        "total_nodes": 19,
+        "total_events": 14,
+        "f1_score": 0.0
+      },
+      "interior": {
+        "p10": 1.0,
+        "p20": 1.0,
+        "precision": 1.0,
+        "recall": 0.8,
+        "recall10": 0.4,
+        "recall20": 0.8,
+        "active_locations": 25,
+        "total_nodes": 50,
+        "total_events": 47,
+        "f1_score": 0.0
+      }
+    }
   }
 ]
