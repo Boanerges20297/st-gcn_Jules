@@ -373,7 +373,13 @@ try {
                 $deployLogPath = Join-Path $root 'logs' 'deploy_telegram_changes.log'
                 New-Item -ItemType Directory -Path (Split-Path $deployLogPath) -Force | Out-Null
                 
-                & "$deployScript" -NoRestart 2>&1 | Tee-Object -FilePath $deployLogPath -Append
+                Push-Location (Split-Path $deployScript)
+                try {
+                    & .\deploy_telegram_changes.ps1 -NoRestart 2>&1 | Tee-Object -FilePath $deployLogPath -Append
+                }
+                finally {
+                    Pop-Location
+                }
                 
                 if ($LASTEXITCODE -eq 0) {
                     Write-Host "[DEPLOY TELEGRAM] ✅ Deploy concluído com sucesso!"
