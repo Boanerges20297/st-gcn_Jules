@@ -38,6 +38,7 @@ DOWNLOADS_DIR = r'C:\Users\Boanerges\Downloads'
 CURRENT_KML_PATH = os.path.join(INTEL_DIR, 'current_orcrim.kml')
 STATIC_KML_PATH = os.path.join(BASE_DIR, 'data', 'static', 'ORCRIMS 2026.kml')
 LOCAL_KMZ_PATH = os.path.join(INTEL_DIR, 'ORCRIMS 2026.kmz')
+LOCAL_KML_PATH = os.path.join(INTEL_DIR, 'ORCRIMS 2026.kml')
 UPDATE_STATUS_PATH = os.path.join(INTEL_DIR, 'orcrim_update_status.json')
 REQUEST_TIMEOUT = 60
 CHROME_DOWNLOAD_TIMEOUT = 45
@@ -1368,6 +1369,41 @@ def _generate_intelligence_from_kml(kml_working_path: str):
     print(f"✅ [ORCRIMS] Inteligência territorial processada: micronodos={len(df_micro)} | áreas oficiais={len(df_final)}")
 
 
+def _load_kml_bytes_from_local_file() -> bytes | None:
+    """
+    Retorna os bytes KML do arquivo copiado manualmente em INTEL_DIR,
+    se for mais recente que current_orcrim.kml. Tenta KML direto e depois KMZ.
+    """
+    candidates = [
+        (LOCAL_KML_PATH, False),
+        (LOCAL_KMZ_PATH, True),
+    ]
+    current_mtime = os.path.getmtime(CURRENT_KML_PATH) if os.path.exists(CURRENT_KML_PATH) else 0.0
+
+    for path, is_kmz in candidates:
+        if not os.path.exists(path):
+            continue
+        if os.path.getmtime(path) <= current_mtime:
+            print(f'ℹ️ [ORCRIMS] Arquivo local {os.path.basename(path)} não é mais recente que current_orcrim.kml — ignorado.')
+            continue
+        try:
+            with open(path, 'rb') as f:
+                raw = f.read()
+            if is_kmz:
+                with zipfile.ZipFile(io.BytesIO(raw), 'r') as zf:
+                    kml_names = [n for n in zf.namelist() if n.lower().endswith('.kml')]
+                    if not kml_names:
+                        continue
+                    kml_bytes = zf.read(kml_names[0])
+            else:
+                kml_bytes = raw
+            print('\U0001f4c2 [ORCRIMS] Fallback local: usando {} ({} bytes)'.format(os.path.basename(path), len(kml_bytes)))
+            return kml_bytes
+        except Exception as e:
+            print('⚠️ [ORCRIMS] Falha ao ler arquivo local {}: {}'.format(os.path.basename(path), e))
+    return None
+
+
 def refresh_orcrim_from_official(force: bool = False):
     print('🔄 [ORCRIMS] Iniciando atualização no startup...')
     _log_existing_state()
@@ -1436,21 +1472,26 @@ def refresh_orcrim_from_official(force: bool = False):
     if kml_bytes is None:
         combined_error = ' | '.join(download_failures)
         print(f'❌ [ORCRIMS] Falha ao baixar KML oficial: {combined_error}')
-        if fallback_available:
-            status = 'fallback_active'
-        elif saw_auth_error:
-            status = 'auth_cookie_invalid'
+        # Tenta arquivo copiado manualmente na pasta inteligencia
+        kml_bytes = _load_kml_bytes_from_local_file()
+        if kml_bytes is not None:
+            headers = {'downloaded_via': 'local_file_fallback'}
         else:
-            status = 'download_failed'
-        current_status.update({
-            'last_checked_at': _iso_now(),
-            'last_error': combined_error,
-            'source_url': source_url,
-            'status': status,
-            'fallback_used': fallback_available,
-        })
-        _write_update_status(current_status)
-        return {'updated': False, 'reason': status, 'fallback_used': fallback_available, 'error': combined_error}
+            if fallback_available:
+                status = 'fallback_active'
+            elif saw_auth_error:
+                status = 'auth_cookie_invalid'
+            else:
+                status = 'download_failed'
+            current_status.update({
+                'last_checked_at': _iso_now(),
+                'last_error': combined_error,
+                'source_url': source_url,
+                'status': status,
+                'fallback_used': fallback_available,
+            })
+            _write_update_status(current_status)
+            return {'updated': False, 'reason': status, 'fallback_used': fallback_available, 'error': combined_error}
 
     downloaded_raw_hash = _get_content_hash(kml_bytes)
     downloaded_semantic_hash = _get_semantic_content_hash(kml_bytes)

@@ -1143,6 +1143,31 @@ def load_data_and_models():
         # Calcular cache de horários de pico em background (não bloqueia startup)
         threading.Thread(target=_compute_peak_hours_cache, daemon=True).start()
 
+        # Exportar base para o projeto Crime-Predict em background (não bloqueia startup)
+        def _run_crime_predict_export():
+            try:
+                import subprocess
+                export_script = os.path.join(BASE_DIR, 'scripts', 'export_to_crime_predict.py')
+                if os.path.exists(export_script):
+                    print("--- [EXPORT] Iniciando sincronização em background com o Crime-Predict...")
+                    completed = subprocess.run(
+                        [sys.executable, export_script],
+                        capture_output=True,
+                        text=True,
+                        encoding='utf-8',
+                        errors='replace'
+                    )
+                    if completed.returncode == 0:
+                        print("--- [EXPORT] Sincronização com o Crime-Predict concluída com sucesso.")
+                    else:
+                        print(f"--- [EXPORT] Falha na sincronização. Código: {completed.returncode}\nstdout: {completed.stdout}\nstderr: {completed.stderr}")
+                else:
+                    print("--- [EXPORT] Script export_to_crime_predict.py não encontrado.")
+            except Exception as e:
+                print(f"--- [EXPORT] Erro inesperado ao rodar exportação em background: {e}")
+
+        threading.Thread(target=_run_crime_predict_export, daemon=True, name="crime-predict-export").start()
+
         # Regenerar micronodos dinâmicos no startup para alinhar a camada ao mapa.
         rebuild_dynamic_micronode_exports(force=True)
         

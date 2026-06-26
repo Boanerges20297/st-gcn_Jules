@@ -8756,5 +8756,355 @@
       "metric:p20",
       "rede_neural_baixa"
     ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-26T14:31:41.473092",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-26T14:36:42.224842",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "fortaleza",
+    "metric": "p20",
+    "trigger": "fortaleza.p20=30.0%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.3,
+    "new_value": 0.55,
+    "improvement_pct": 83.33333333333336,
+    "outcome": "improved",
+    "timestamp": "2026-06-26T14:41:42.275401",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "rmf",
+    "metric": "p20",
+    "trigger": "rmf.p20=52.6%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.5263,
+    "new_value": 0.5263,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-26T14:41:42.344564",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-26T14:51:42.543650",
+    "semantic_tags": [
+      "metric:p20"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-26T14:56:42.818624",
+    "semantic_tags": [
+      "metric:p20"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "fortaleza",
+    "metric": "p20",
+    "trigger": "fortaleza.p20=55.0%",
+    "old_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.55,
+    "new_value": 0.55,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-26T15:01:42.900806",
+    "semantic_tags": [
+      "metric:p20"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "rmf",
+    "metric": "p20",
+    "trigger": "rmf.p20=52.6%",
+    "old_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.5263,
+    "new_value": 0.5263,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-26T15:01:43.006612",
+    "semantic_tags": [
+      "metric:p20"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-26T15:11:43.319707",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-26T15:16:43.662056",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "fortaleza",
+    "metric": "p20",
+    "trigger": "fortaleza.p20=55.0%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.55,
+    "new_value": 0.55,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-26T15:21:43.816508",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "rmf",
+    "metric": "p20",
+    "trigger": "rmf.p20=52.6%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.5263,
+    "new_value": 0.5263,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-26T15:21:43.920245",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
   }
 ]

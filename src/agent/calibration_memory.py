@@ -256,7 +256,21 @@ class CalibrationSemanticMemory:
         context = self.build_context(region=region, metric=metric)
         if context["events_considered"] == 0:
             return "Sem memoria historica validada para esta regiao/metrica."
-        return json.dumps(context, ensure_ascii=False)
+        # Versão compacta para não estourar a janela de contexto do LLM local (1.5B)
+        compact = {
+            "region": context["region"],
+            "events_considered": context["events_considered"],
+            "tag_scores": context["semantic_tag_scores"][:6],
+            "positive_patterns": [
+                {"outcome": p["outcome"], "tags": p["tags"][:3], "params": p["params"]}
+                for p in context["positive_patterns"][-3:]
+            ],
+            "negative_patterns": [
+                {"outcome": p["outcome"], "tags": p["tags"][:3], "params": p["params"]}
+                for p in context["negative_patterns"][-3:]
+            ],
+        }
+        return json.dumps(compact, ensure_ascii=False)
 
     @staticmethod
     def _compact_patterns(events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:

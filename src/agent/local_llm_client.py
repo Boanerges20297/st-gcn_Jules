@@ -11,7 +11,7 @@ class LocalLLMClient:
     Cliente de LLM Local otimizado para interagir com o Ollama ou endpoints compatíveis.
     Especializado em retornar e parsear JSONs válidos de forma cirúrgica e com velocidade.
     """
-    def __init__(self, model_name: str = "qwen2.5:1.5b", base_url: str = "http://localhost:11434", timeout: int = 300):
+    def __init__(self, model_name: str = "qwen2.5:1.5b", base_url: str = "http://localhost:11434", timeout: int = 600):
         self.model_name = os.environ.get("LOCAL_LLM_MODEL", model_name)
         self.base_url = os.environ.get("LOCAL_LLM_URL", base_url)
         self.timeout = timeout
