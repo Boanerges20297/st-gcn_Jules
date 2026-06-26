@@ -18,7 +18,9 @@ param(
 
     [switch]$DryRun,
 
-    [switch]$SkipSshPrepare
+    [switch]$SkipSshPrepare,
+
+    [switch]$SkipDeployTelegram
 )
 
 $ErrorActionPreference = 'Stop'
@@ -365,7 +367,7 @@ try {
     # ============================================================
     # Deploy das mudanças do Telegram Gateway
     # ============================================================
-    if (-not $DryRun) {
+    if (-not $DryRun -and -not $SkipDeployTelegram) {
         Write-Host "`n[DEPLOY TELEGRAM] Iniciando deploy das mudanças do gateway Telegram..."
         $deployScript = Join-Path $root 'powershell' 'deploy_telegram_changes.ps1'
         if (Test-Path -LiteralPath $deployScript) {
