@@ -88,6 +88,8 @@ app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 RISK_MODEL_NAME = "Poisson Ranker Estadual"
+DEFAULT_MODEL_MODE = "stgat_v5"
+DEFAULT_MODEL_LABEL = "ST-GAT v5 (DeepSTGAT_v5 Ativo)"
 STATIC_EXPORT_SCRIPT = os.path.join(BASE_DIR, 'scripts', 'export_static_snapshot.py')
 STATIC_EXPORT_OUTPUT_DIR = os.path.normpath(
     os.environ.get('STATIC_EXPORT_OUTPUT_DIR', os.path.join(BASE_DIR, 'static_export', 'data'))
@@ -280,10 +282,13 @@ def invalidate_api_risk_cache():
 
 
 def normalize_model_mode(value) -> str:
-    mode = str(value or 'stgat').strip().lower()
+    mode = str(value or DEFAULT_MODEL_MODE).strip().lower()
     aliases = {
         'stgat': 'stgat',
-        'default': 'stgat',
+        'default': DEFAULT_MODEL_MODE,
+        'stgat_v5': DEFAULT_MODEL_MODE,
+        'deepstgat_v5': DEFAULT_MODEL_MODE,
+        'v5': DEFAULT_MODEL_MODE,
         'cvli_tactical': 'cvli_tactical',
         'cvli_tactical_only': 'cvli_tactical',
         'tactical': 'cvli_tactical',
@@ -291,7 +296,7 @@ def normalize_model_mode(value) -> str:
         'short20': 'short20_mix',
         'shortlist20': 'short20_mix',
     }
-    return aliases.get(mode, 'stgat')
+    return aliases.get(mode, DEFAULT_MODEL_MODE)
 
 
 def _load_optional_cvli_models():
@@ -305,11 +310,19 @@ def _load_optional_cvli_models():
     shortlist_summary_path = os.path.join(BASE_DIR, 'outputs', 'cvli_shortlist_rerank_summary.json')
 
     optional_models = {
+        'stgat_v5': {
+            'mode': 'stgat_v5',
+            'label': DEFAULT_MODEL_LABEL,
+            'description': 'Modelo padrão DeepSTGAT_v5 retreinado, com atenção por aresta e Binomial Negativa.',
+            'kind': 'champion',
+            'fortaleza_scores': {},
+            'metrics': None,
+        },
         'stgat': {
             'mode': 'stgat',
-            'label': 'Poisson Ranker (Padrão)',
-            'description': 'Champion operacional estadual ativo em Fortaleza, RMF e Interior.',
-            'kind': 'champion',
+            'label': 'Poisson Ranker (Legacy)',
+            'description': 'Ranking Poisson legado disponível para comparação operacional.',
+            'kind': 'legacy',
             'fortaleza_scores': {},
             'metrics': None,
         }
@@ -418,9 +431,9 @@ def _load_optional_cvli_models():
 
 def _get_model_selection_meta(selected_mode: str):
     optional_models = _load_optional_cvli_models()
-    selected = optional_models.get(selected_mode) or optional_models['stgat']
+    selected = optional_models.get(selected_mode) or optional_models[DEFAULT_MODEL_MODE]
     available = []
-    for mode in ('stgat', 'cvli_tactical', 'short20_mix'):
+    for mode in (DEFAULT_MODEL_MODE, 'stgat', 'cvli_tactical', 'short20_mix'):
         model = optional_models.get(mode)
         if not model:
             continue
@@ -444,6 +457,12 @@ def _resolve_optional_model_score(name_norm: str, fortaleza_scores: dict):
     if matches:
         return fortaleza_scores.get(matches[0])
     return None
+
+
+def _score_map_for_model_mode(model_mode: str, exogenous_shocks=None, return_trends=False):
+    if model_mode == 'stgat_v5' and hasattr(orchestrator, 'get_combined_risk_stgat_v5'):
+        return orchestrator.get_combined_risk_stgat_v5(exogenous_shocks, return_trends=return_trends)
+    return orchestrator.get_combined_risk(exogenous_shocks, return_trends=return_trends)
 
 
 # Cache global para explicabilidade para evitar redundância de I/O em loops
@@ -503,29 +522,22 @@ try:
     from src.core.health_monitor import HealthMonitor, ConfidenceTracker
     from src.core.admin_health_routes import create_admin_health_blueprint
     from src.core.model_calibrator import ModelCalibrator
-    from src.core.auto_calibrator_daemon import AutoCalibratorDaemon
     
     health_monitor = HealthMonitor(base_dir=BASE_DIR)
     confidence_tracker = ConfidenceTracker(base_dir=BASE_DIR)
     model_calibrator = ModelCalibrator(base_dir=BASE_DIR, health_monitor=health_monitor)
-    auto_calibrator_daemon = AutoCalibratorDaemon(
-        health_monitor=health_monitor,
-        confidence_tracker=confidence_tracker,
-        model_calibrator=model_calibrator,
-        check_interval=300  # 5 minutos
-    )
     # Popular confidence_tracker com histórico já existente do efficiency_monitor
     efficiency_history_path = os.path.join(BASE_DIR, 'logs', 'efficiency_history.json')
     confidence_tracker.seed_from_efficiency_history(efficiency_history_path)
     admin_bp = create_admin_health_blueprint(
         health_monitor, confidence_tracker, model_calibrator,
-        auto_calibrator_daemon=auto_calibrator_daemon,
+        auto_calibrator_daemon=None,
         get_orchestrator=lambda: orchestrator
     )
     app.register_blueprint(admin_bp)
     print("✅ Admin Dashboard Registrado em /api/admin/health")
     
-    print("🔧 Auto-Calibrator Daemon pronto para intervenção ativa por desvio/convergência")
+    print("Auto-ajuste deterministico ativo; agente Ollama desativado.")
 
     # Registro API V4 (Sentinela Granular)
     if create_v4_api_blueprint:
@@ -1122,7 +1134,7 @@ def load_data_and_models():
             model_calibrator.reapply_on_startup(orchestrator)
         
         # Iniciar Monitor de Eficiência e Relatórios
-        efficiency_monitor = EfficiencyMonitor(BASE_DIR, orchestrator, nodes_gdf)
+        efficiency_monitor = EfficiencyMonitor(BASE_DIR, orchestrator, nodes_gdf, model_mode=DEFAULT_MODEL_MODE)
         generate_daily_ranking_report()
 
         try:
@@ -1135,7 +1147,8 @@ def load_data_and_models():
                     window_days=14,
                     source_label='startup',
                     orchestrator=orchestrator,
-                    model_label=RISK_MODEL_NAME,
+                    model_label=DEFAULT_MODEL_LABEL,
+                    model_mode=DEFAULT_MODEL_MODE,
                 )
         except Exception as validation_exc:
             print(f"⚠️ Falha ao registrar VALIDATION_LOG no startup: {validation_exc}")
@@ -2409,13 +2422,35 @@ def get_visible_micronodes():
 # Backward-compatible module attribute used by snapshot/export scripts.
 get_top20_micro_nodes = get_visible_micronodes
 
+
+@app.route('/api/ga_operational_zones')
+def get_ga_operational_zones():
+    path = os.path.join(app.root_path, 'outputs', 'experiments', 'fortaleza_hybrid_capture_h30_latest_ga_zones.geojson')
+    if not os.path.exists(path):
+        return jsonify({"type": "FeatureCollection", "features": []})
+    with open(path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    features = sorted(
+        data.get('features', []),
+        key=lambda feature: int((feature.get('properties') or {}).get('rank') or 999),
+    )
+    limit_raw = request.args.get('limit')
+    if limit_raw:
+        try:
+            features = features[:max(1, min(50, int(limit_raw)))]
+        except Exception:
+            pass
+    data['features'] = features
+    return jsonify(data)
+
+
 @app.route('/api/risk')
 def get_risk():
     if nodes_gdf is None or orchestrator is None:
         return jsonify({'error': 'Inicializando...'}), 503
         
     target_region = request.args.get('region', 'global').lower()
-    selected_model_mode = normalize_model_mode(request.args.get('model_mode', 'stgat'))
+    selected_model_mode = normalize_model_mode(request.args.get('model_mode', 'stgat_v5'))
     selected_model_meta, available_model_modes = _get_model_selection_meta(selected_model_mode)
     
     global _API_RISK_CACHE
@@ -2433,7 +2468,7 @@ def get_risk():
     try:
         exogenous_shocks, exogenous_shocks_map = build_current_exogenous_shocks()
 
-        scores_map, trends_map = orchestrator.get_combined_risk(exogenous_shocks, return_trends=True)
+        scores_map, trends_map = _score_map_for_model_mode(selected_model_mode, exogenous_shocks, return_trends=True)
             
         results = []
         meta = {'counts': {'crítico': 0, 'alto': 0, 'moderado': 0, 'baixo': 0}}
@@ -3155,6 +3190,18 @@ def _is_valid_screenshot_repo(repo_dir: str) -> bool:
     return os.path.isdir(repo_dir) and os.path.exists(os.path.join(repo_dir, 'package.json'))
 
 
+def _subprocess_env() -> dict:
+    temp_dir = os.path.expandvars(os.environ.get('TEMP') or os.environ.get('TMP') or os.path.join(os.path.expanduser('~'), 'AppData', 'Local', 'Temp'))
+    os.makedirs(temp_dir, exist_ok=True)
+    return {
+        **os.environ,
+        'PYTHONIOENCODING': 'utf-8',
+        'TEMP': temp_dir,
+        'TMP': temp_dir,
+        'TMPDIR': temp_dir,
+    }
+
+
 def _run_git_command(repo_dir: str, args: list[str]) -> subprocess.CompletedProcess:
     return subprocess.run(
         ['git', *args],
@@ -3165,11 +3212,21 @@ def _run_git_command(repo_dir: str, args: list[str]) -> subprocess.CompletedProc
         errors='replace',
         timeout=180,
         check=False,
-        env={
-            **os.environ,
-            'PYTHONIOENCODING': 'utf-8',
-        },
+        env=_subprocess_env(),
     )
+
+
+def _ensure_screenshot_git_identity(repo_dir: str) -> None:
+    defaults = {
+        'user.email': os.environ.get('SCREENSHOT_GIT_USER_EMAIL', 'boanergesteixeiraalmeida@gmail.com'),
+        'user.name': os.environ.get('SCREENSHOT_GIT_USER_NAME', 'Boanerges Teixeira Almeida'),
+    }
+    for key, value in defaults.items():
+        current = _run_git_command(repo_dir, ['config', '--local', '--get', key])
+        if current.returncode != 0 or not current.stdout.strip():
+            result = _run_git_command(repo_dir, ['config', '--local', key, value])
+            if result.returncode != 0:
+                raise RuntimeError(f'Falha ao configurar {key}: {result.stderr.strip() or result.stdout.strip()}')
 
 
 def _sync_static_snapshot_to_screenshot_app(target_data_dir: str):
@@ -3198,10 +3255,7 @@ def _sync_static_snapshot_to_screenshot_app(target_data_dir: str):
         errors='replace',
         timeout=600,
         check=False,
-        env={
-            **os.environ,
-            'PYTHONIOENCODING': 'utf-8',
-        },
+        env=_subprocess_env(),
     )
     if completed.returncode != 0:
         raise RuntimeError(
@@ -3235,6 +3289,7 @@ def _sync_static_snapshot_to_screenshot_app(target_data_dir: str):
 
 def _publish_screenshot_repo(repo_dir: str, data_subdir: str = 'public/data') -> dict[str, any]:
     logging.info('[SCREENSHOT EXPORT] Iniciando publicação git do repositório screenshot')
+    _ensure_screenshot_git_identity(repo_dir)
     # Verifica mudanças apenas na subpasta de dados exportados
     status_result = _run_git_command(repo_dir, ['status', '--porcelain', data_subdir])
     if status_result.returncode != 0:
@@ -3261,10 +3316,6 @@ def _publish_screenshot_repo(repo_dir: str, data_subdir: str = 'public/data') ->
         combined_output = (commit_result.stderr or commit_result.stdout or '').strip()
         if 'nothing to commit' not in combined_output.lower():
             raise RuntimeError(f'Falha no git commit: {combined_output}')
-
-    pull_result = _run_git_command(repo_dir, ['pull', '--rebase', '-X', 'theirs', 'origin', 'main'])
-    if pull_result.returncode != 0:
-        logging.warning(f'[SCREENSHOT EXPORT] Alerta no git pull: {pull_result.stderr.strip() or pull_result.stdout.strip()}')
 
     push_result = _run_git_command(repo_dir, ['push', 'origin', 'main'])
     if push_result.returncode != 0:
@@ -3600,15 +3651,37 @@ def explain_node(node_id):
         name_norm = normalize_name(name)
 
         # ... (mantendo lógica de scores e ranking) ...
-        scores_map = orchestrator.get_combined_risk()
+        selected_model_mode = normalize_model_mode(request.args.get('model_mode', DEFAULT_MODEL_MODE))
+        selected_model_meta, _ = _get_model_selection_meta(selected_model_mode)
+        scores_map = _score_map_for_model_mode(selected_model_mode)
+        if selected_model_mode != 'stgat':
+            fortaleza_override_scores = selected_model_meta.get('fortaleza_scores') or {}
+            if fortaleza_override_scores:
+                scores_map = dict(scores_map)
+                for _, override_row in nodes_gdf.iterrows():
+                    override_name = normalize_name(str(override_row.get('name') or override_row.get('bairro') or ''))
+                    override_region = str(override_row.get('regiao') or override_row.get('region_type') or '').lower()
+                    if override_region == 'capital':
+                        override_region = 'fortaleza'
+                    if override_region == 'fortaleza':
+                        override_score = _resolve_optional_model_score(override_name, fortaleza_override_scores)
+                        if override_score is not None:
+                            scores_map[override_name] = normalize_risk_score(override_score)
         score_pct = float(scores_map.get(name_norm, 20.0))
         score_10 = score_pct / 10.0
         component_details = {}
         try:
-            component_details = orchestrator.get_last_component_details()
+            if selected_model_mode == 'stgat':
+                component_details = orchestrator.get_last_component_details()
         except Exception:
             component_details = {}
         component_meta = component_details.get(name_norm, {}) if isinstance(component_details, dict) else {}
+        if selected_model_mode != 'stgat':
+            component_meta = {
+                **component_meta,
+                'model_family': selected_model_meta.get('label') or DEFAULT_MODEL_LABEL,
+                'primary_signal_label': selected_model_meta.get('label') or DEFAULT_MODEL_LABEL,
+            }
         
         # (pulei blocos intermediários de ranking para brevidade no replace)
         all_scores = []
@@ -4467,84 +4540,22 @@ def _handle_agent_intervention(event: dict):
 @app.route('/api/agent/calibrate-report', methods=['POST'])
 def run_agent_calibration():
     """
-    Aciona o sistema multi-agente local de background de forma assíncrona.
-    Recebe os dados brutos e o perfil do usuário, disparando a calibração em Thread paralela.
+    Endpoint legado do agente local. Desativado: o sistema usa apenas o
+    auto-ajuste deterministico do orquestrador.
     """
-    global _agent_calibration_state
-    try:
-        req_data = request.get_json() or {}
-    except Exception:
-        req_data = {}
-
-    raw_stgcn_data = req_data.get("raw_stgcn_data")
-    user_profile = req_data.get("user_profile")
-    if raw_stgcn_data is None or user_profile is None:
-        region = (req_data.get('region') or 'global').lower()
-        raw_stgcn_data, user_profile = _build_live_agent_payload(region)
-    if raw_stgcn_data is None or user_profile is None:
-        return jsonify({'error': 'Dados vivos indisponíveis para acionar o agente.'}), 503
-
-    def _async_calibration_worker():
-        global _agent_calibration_state
-        _agent_calibration_state["status"] = "processing"
-        _agent_calibration_state["error"] = None
-        _set_model_update_status(
-            status='agent_intervening',
-            progress=35,
-            message='Agente analisando desvio semântico e recalibrando previsões...',
-            error=None,
-            ttl_seconds=45,
-        )
-        try:
-            from src.agent.multi_agent_system import GeneralManagerAgent
-            manager = GeneralManagerAgent(base_dir=BASE_DIR)
-            # Executa raciocínio analítico em malha fechada localmente
-            result = manager.process_and_calibrate(raw_stgcn_data, user_profile)
-            _persist_agent_result(result)
-            invalidate_api_risk_cache()
-            _set_model_update_status(
-                status='updating_models',
-                progress=100,
-                message='Calibração concluída. Recalculando risco e atualizando dashboards...',
-                error=None,
-                bump_revision=True,
-                ttl_seconds=30,
-            )
-            print(f"🤖 [Multi-Agent Background] Calibração concluída! Pesos: {result.get('calibrated_weights')}")
-        except Exception as err:
-            _agent_calibration_state["status"] = "failed"
-            _agent_calibration_state["error"] = str(err)
-            _set_model_update_status(
-                status='error',
-                progress=0,
-                message='Falha na intervenção automática do agente.',
-                error=str(err),
-                ttl_seconds=45,
-            )
-            print(f"🤖 [Multi-Agent Background] Erro na thread de calibração: {err}")
-
-    # Disparar calibração em Thread de Background (Não bloqueante)
-    threading.Thread(target=_async_calibration_worker, daemon=True).start()
-
     return jsonify({
-        "message": "Calibração assíncrona do agente de background iniciada com sucesso.",
-        "current_status": _agent_calibration_state["status"]
-    }), 202
+        'status': 'disabled',
+        'message': 'Agente Ollama desativado. Auto-ajuste deterministico permanece no orquestrador.'
+    }), 410
 
 @app.route('/api/agent/calibration-status', methods=['GET'])
 def get_agent_calibration_status():
-    """Retorna o status atual ou o último resultado gerado pelo agente local de background."""
-    if os.path.exists(AGENT_CALIBRATION_CACHE_FILE) and not _agent_calibration_state.get("last_calibration"):
-        try:
-            with open(AGENT_CALIBRATION_CACHE_FILE, 'r', encoding='utf-8') as f:
-                _agent_calibration_state["last_calibration"] = json.load(f)
-                # Mantém o status como 'idle' no primeiro carregamento pós-reboot
-                # para forçar o frontend a disparar uma nova rodada viva de debates.
-                _agent_calibration_state["status"] = "idle"
-        except Exception:
-            pass
-            
-    return jsonify(_agent_calibration_state), 200
+    """Retorna status do agente local legado."""
+    return jsonify({
+        "status": "disabled",
+        "error": None,
+        "last_calibration": None,
+    }), 200
 
 if __name__ == "__main__":
     import atexit
@@ -4562,24 +4573,9 @@ if __name__ == "__main__":
             print("[SHUTDOWN] ✅ Sinal de parada enviado ao Monitor de Diálogos")
         except Exception:
             pass
-
-        try:
-            if auto_calibrator_daemon:
-                auto_calibrator_daemon.stop()
-                print("[SHUTDOWN] ✅ Auto-Calibrator parado")
-        except Exception as e:
-            print(f"[SHUTDOWN] ⚠️ Erro ao parar Auto-Calibrator: {e}")
-    
     atexit.register(_cleanup_on_shutdown)
     
     load_data_and_models()
-
-    if auto_calibrator_daemon:
-        auto_calibrator_daemon.orchestrator_getter = lambda: orchestrator
-        auto_calibrator_daemon.intervention_callback = _handle_agent_intervention
-        auto_calibrator_daemon.start()
-        print("🤖 [Multi-Agent Background] Monitoramento ativo para desvio semântico e convergência.")
-
     print("\n" + "="*50)
     print("DASHBOARD CPRAIO PRONTO")
     app_port = int(os.environ.get('APP_PORT', os.environ.get('PORT', '5050')))
@@ -4588,3 +4584,4 @@ if __name__ == "__main__":
     print("="*50 + "\n")
     # Usando 0.0.0.0 para maior compatibilidade, mas o link impresso é localhost
     app.run(host='0.0.0.0', port=app_port, debug=debug_mode, use_reloader=False)
+

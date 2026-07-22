@@ -495,6 +495,84 @@ def create_admin_health_blueprint(health_monitor, confidence_tracker, model_cali
             logger.error(f"Erro ao obter status de calibração do agente: {e}")
             return jsonify({'error': str(e)}), 500
 
+    @admin_bp.route('/model-status', methods=['GET'])
+    @admin_required
+    def get_model_status():
+        """
+        Retorna status dos especialistas carregados por conjunto de modelos.
+
+        Query Parameters:
+            model: 'stgat_v5' (padrão) | 'stgat' (Poisson)
+        """
+        try:
+            model_set = request.args.get('model', 'stgat_v5').strip().lower()
+            orch = get_orchestrator() if get_orchestrator else None
+            if orch is None:
+                return jsonify({'error': 'Orquestrador indisponível'}), 503
+
+            import os
+
+            # Selecionar conjunto de especialistas e configs
+            if model_set == 'stgat_v5':
+                specialists = getattr(orch, 'stgat_v5_specialists', {})
+                configs     = getattr(orch, 'stgat_v5_configs', {})
+                label       = 'ST-GAT v5 (DeepSTGAT_v5)'
+            else:
+                specialists = getattr(orch, 'specialists', {})
+                configs     = getattr(orch, 'configs', {})
+                label       = 'Poisson Ranker (Legacy)'
+
+            regions_status = {}
+            for region in ['fortaleza', 'rmf', 'interior']:
+                cfg   = configs.get(region, {})
+                spec  = specialists.get(region)
+                model_path = cfg.get('model_path', '')
+                file_exists = os.path.exists(model_path) if model_path else False
+                file_mb     = round(os.path.getsize(model_path) / 1024 / 1024, 1) if file_exists else 0
+
+                if spec:
+                    model_obj = spec.get('model')
+                    model_class = type(model_obj).__name__ if model_obj else 'N/A'
+                    # Contar parâmetros se for torch
+                    try:
+                        import torch
+                        n_params = sum(p.numel() for p in model_obj.parameters()) if hasattr(model_obj, 'parameters') else 0
+                    except Exception:
+                        n_params = 0
+                    regions_status[region] = {
+                        'loaded': True,
+                        'model_class': model_class,
+                        'window': spec.get('window', '?'),
+                        'channels': spec.get('channels', '?'),
+                        'backend_type': spec.get('backend_type', '?'),
+                        'n_params': n_params,
+                        'file_mb': file_mb,
+                        'model_path': os.path.basename(model_path),
+                    }
+                else:
+                    regions_status[region] = {
+                        'loaded': False,
+                        'model_class': 'N/A',
+                        'window': cfg.get('window', '?'),
+                        'channels': '?',
+                        'backend_type': cfg.get('backend_type', '?'),
+                        'n_params': 0,
+                        'file_mb': file_mb,
+                        'model_path': os.path.basename(model_path) if model_path else 'não configurado',
+                    }
+
+            total_loaded = sum(1 for r in regions_status.values() if r['loaded'])
+            return jsonify({
+                'model_set': model_set,
+                'label': label,
+                'total_regions': len(regions_status),
+                'total_loaded': total_loaded,
+                'regions': regions_status,
+            }), 200
+        except Exception as e:
+            logger.error(f"Erro ao obter model status: {e}")
+            return jsonify({'error': str(e)}), 500
+
     @admin_bp.route('', methods=['GET'])
     @admin_required
     def dashboard_page():

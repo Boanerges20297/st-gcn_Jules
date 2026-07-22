@@ -555,12 +555,13 @@
                             </select>
                             <label for="model-mode-filter" class="form-label small fw-bold text-muted mt-2">Modelo de previsão:</label>
                             <select class="form-select form-select-sm" id="model-mode-filter">
-                                <option value="stgat" selected>Poisson Ranker (Padrão)</option>
+                                <option value="stgat_v5" selected>ST-GAT v5 ⚡ (DeepSTGAT_v5 Ativo)</option>
+                                <option value="stgat">Poisson Ranker (Legacy)</option>
                                 <option value="cvli_tactical">CVLI Tático (Experimental)</option>
                                 <option value="short20_mix">CVLI Shortlist 20 (Experimental)</option>
                             </select>
                             <small class="text-muted d-block mt-1" id="model-selector-help">
-                                Poisson Ranker segue como champion operacional estadual. Os demais modos são comparativos para Fortaleza.
+                                ST-GAT v5 usa o modelo DeepSTGAT_v5 retreinado (07/07/2026) com atenção por aresta e Binomial Negativa. Poisson Ranker disponível como alternativa.
                             </small>
                             <div class="form-check mt-2">
                                 <input class="form-check-input" type="checkbox" id="toggle-visible-micronodes">
@@ -578,6 +579,12 @@
                                 <input class="form-check-input" type="checkbox" id="toggle-cvli-points-90d">
                                 <label class="form-check-label small fw-bold text-dark" for="toggle-cvli-points-90d">
                                     <i class="fas fa-map-pin"></i> Pinpoints CVLI (90 dias)
+                                </label>
+                            </div>
+                            <div class="form-check mt-1">
+                                <input class="form-check-input" type="checkbox" id="toggle-ga-zones">
+                                <label class="form-check-label small fw-bold text-warning" for="toggle-ga-zones">
+                                    <i class="fas fa-draw-polygon"></i> Áreas de maior risco CVLI
                                 </label>
                             </div>
                         </div>
@@ -645,6 +652,10 @@
     map.createPane('topMicronodesPane');
     map.getPane('topMicronodesPane').style.zIndex = 640;
 
+    map.createPane('gaZonesPane');
+    map.getPane('gaZonesPane').style.zIndex = 635;
+    map.getPane('gaZonesPane').style.pointerEvents = 'auto';
+
     map.createPane('micronodesPane');
     map.getPane('micronodesPane').style.zIndex = 650;
 
@@ -668,6 +679,8 @@
     var streetFocusMode = false;
     var cvliPoints90dLayer = L.layerGroup();
     var cvliPoints90dLoadedRegion = null;
+    var gaZonesLayer = L.layerGroup();
+    var gaZonesLoaded = false;
 
     function normalizeCvliPointsRegion(region) {
         var r = String(region || 'all').toLowerCase();
@@ -1084,7 +1097,7 @@
     var selectedLayer = null;  // território em destaque (borda dourada)
     var riskDataGlobal = null;
     var metaDataGlobal = null;
-    var DEFAULT_MODEL_MODE = 'stgat';
+    var DEFAULT_MODEL_MODE = 'stgat_v5';
     var selectedExplainabilityState = {
         feature: null,
         explanation: null,
@@ -1109,6 +1122,67 @@
                 + '<div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid '+color+';margin-top:-2px;border-radius:1px 1px 0 0;opacity:0.95"></div>'
                 + '</div>';
         return L.divIcon({html: html, className: '', iconSize: [18,22], iconAnchor: [9,20]});
+    }
+
+    function cvliFocusColor(score) {
+        if (score >= 0.85) return '#8B0000';
+        if (score >= 0.70) return '#E63946';
+        return '#F4A261';
+    }
+
+    function loadGaZones(){
+        return fetch('/api/ga_operational_zones')
+            .then(function(resp){ if (!resp.ok) throw new Error('GA zones ' + resp.status); return resp.json(); })
+            .then(function(data){
+                gaZonesLayer.clearLayers();
+                (data.features || []).forEach(function(feature) {
+                    var p = feature.properties || {};
+                    var coords = feature.geometry && feature.geometry.coordinates;
+                    if (!coords || coords.length < 2) return;
+                    var color = cvliFocusColor(Number(p.score || 0));
+                    var layer = L.circle([coords[1], coords[0]], {
+                        pane: 'gaZonesPane',
+                        radius: Math.max(250, Number(p.radius_km || 0.75) * 1000),
+                        color: color,
+                        weight: 0,
+                        opacity: 0,
+                        fillColor: color,
+                        fillOpacity: 0.16
+                    });
+                    layer.bindTooltip(
+                        'Evidencia historica local #' + (p.rank || '-') + ' - ' + (p.bairro || 'Fortaleza') + ' - raio ' + (p.radius_km || '-') + ' km',
+                        { sticky: true, direction: 'top', opacity: 0.92 }
+                    );
+                    gaZonesLayer.addLayer(layer);
+                });
+                gaZonesLoaded = true;
+                if ($('#toggle-ga-zones').prop('checked')) map.addLayer(gaZonesLayer);
+                return;
+                L.geoJson(data, {
+                    pane: 'gaZonesPane',
+                    pointToLayer: function(feature, latlng) {
+                        var p = feature.properties || {};
+                        var color = cvliFocusColor(Number(p.score || 0));
+                        return L.circle(latlng, {
+                            radius: Math.max(250, Number(p.radius_km || 0.75) * 1000),
+                            color: color,
+                            weight: 1,
+                            opacity: 0.35,
+                            fillColor: color,
+                            fillOpacity: 0.13
+                        });
+                    },
+                    onEachFeature: function(feature, layer) {
+                        var p = feature.properties || {};
+                        layer.bindTooltip(
+                            'Evidência histórica local #' + (p.rank || '-') + ' - ' + (p.bairro || 'Fortaleza') + ' - raio ' + (p.radius_km || '-') + ' km',
+                            { sticky: true, direction: 'top', opacity: 0.92 }
+                        );
+                    }
+                }).eachLayer(function(layer){ gaZonesLayer.addLayer(layer); });
+                gaZonesLoaded = true;
+                if ($('#toggle-ga-zones').prop('checked')) map.addLayer(gaZonesLayer);
+            });
     }
 
     function loadVisibleMicronodes(region, cb, options){
@@ -1965,25 +2039,6 @@
                     riskDataGlobal = resp.data;
                     updateRiskMap(riskDataGlobal);
                     updateDashboard('CVLI');
-                    
-                    // Aciona o Agente Analítico de Background para re-calibrar pesos sob o novo cenário simulado
-                    fetch('/api/agent/calibrate-report', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            raw_stgcn_data: {
-                                confidence_scores: [0.85, 0.81, 0.93],
-                                timestamp: new Date().toISOString()
-                            },
-                            user_profile: {
-                                region: $('#region-filter').val() || "Fortaleza",
-                                focus: "CVLI",
-                                historical_alerts: 3
-                            }
-                        })
-                    }).then(() => {
-                        updateAgentStatus();
-                    });
                 }
             },
             error: function(err) {
@@ -2972,7 +3027,7 @@
         $('#explanation-collapse').collapse('show');
         $('#explanation-content').html('<div class="small text-muted"><span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Analisando dados táticos...</div>');
 
-        fetch('/api/explain/' + nodeId + '?t=' + new Date().getTime(), {
+        fetch('/api/explain/' + nodeId + '?model_mode=' + encodeURIComponent(getSelectedModelMode()) + '&t=' + new Date().getTime(), {
             method: 'GET',
             headers: {
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -3526,6 +3581,18 @@
             try { cvliPoints90dLayer.clearLayers(); } catch (e) {}
             if (map.hasLayer(cvliPoints90dLayer)) map.removeLayer(cvliPoints90dLayer);
             cvliPoints90dLoadedRegion = null;
+        }
+    });
+
+    $('#toggle-ga-zones').on('change', function() {
+        if ($(this).prop('checked')) {
+            if (gaZonesLoaded) {
+                map.addLayer(gaZonesLayer);
+            } else {
+                loadGaZones().catch(function(err) { console.warn('[GA Zones] load error', err); });
+            }
+        } else if (map.hasLayer(gaZonesLayer)) {
+            map.removeLayer(gaZonesLayer);
         }
     });
 
@@ -4295,36 +4362,8 @@
                     $('#agent-alert-text').html('<strong>Raciocinando...</strong> O Gerente Geral e especialistas estão calibrando os pesos analíticos em background.');
                     $('#agent-alert-badge').text("Analisando...").removeClass('bg-success bg-secondary').addClass('bg-warning text-dark');
                     $('#agent-alert-container').fadeIn(400);
-                } else if ((data.status === "idle" || data.status === "failed") && !_isTriggeringAgent) {
-                    // Mantém oculto se estiver ocioso e não estiver ativamente rodando
+                } else if (data.status === "idle" || data.status === "failed" || data.status === "disabled") {
                     $('#agent-alert-container').hide();
-                    
-                    // Dispara a calibração automaticamente se estiver ocioso (primeira carga ou reinício)
-                    _isTriggeringAgent = true;
-                    console.log("🤖 [Agente Sentinela] Detectado estado ocioso. Iniciando calibração em background...");
-                    fetch('/api/agent/calibrate-report', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            raw_stgcn_data: {
-                                confidence_scores: [0.82, 0.76, 0.89],
-                                timestamp: new Date().toISOString()
-                            },
-                            user_profile: {
-                                region: $('#region-filter').val() || "Fortaleza",
-                                focus: "CVLI",
-                                historical_alerts: 3
-                            }
-                        })
-                    }).then(() => {
-                        setTimeout(function() {
-                            _isTriggeringAgent = false;
-                            updateAgentStatus();
-                        }, 2000);
-                    }).catch(err => {
-                        _isTriggeringAgent = false;
-                        console.error("Falha ao disparar agente:", err);
-                    });
                 }
             })
             .catch(err => {
@@ -4339,3 +4378,4 @@
 </script>
 </body>
 </html>
+

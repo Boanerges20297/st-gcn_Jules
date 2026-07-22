@@ -1,350 +1,5 @@
 [
   {
-    "timestamp": "2026-06-13 10:18:37",
-    "weights": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "RMF: ajuste automático aplicado para p20.",
-    "target_region": "rmf"
-  },
-  {
-    "timestamp": "2026-06-13 10:38:04",
-    "weights": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-13 10:38:05",
-    "weights": {
-      "tension_factor": 0.55,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.5,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-13 10:43:05",
-    "weights": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "RMF: ajuste automático aplicado para p20.",
-    "target_region": "rmf"
-  },
-  {
-    "timestamp": "2026-06-13 10:58:06",
-    "weights": {
-      "tension_factor": 0.45,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.7,
-      "tag_bias_neighbor": 0.95,
-      "norm_neural_weight": 0.7,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-13 10:58:07",
-    "weights": {
-      "tension_factor": 0.3,
-      "min_risk": 30.0,
-      "tag_bias_direct": 3.0,
-      "tag_bias_neighbor": 1.1,
-      "norm_neural_weight": 0.9,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-13 11:03:08",
-    "weights": {
-      "tension_factor": 0.6,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.4,
-      "tag_bias_neighbor": 0.8,
-      "norm_neural_weight": 0.5,
-      "dynamic_window": null,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "RMF: ajuste automático aplicado para p20.",
-    "target_region": "rmf"
-  },
-  {
-    "timestamp": "2026-06-14 22:04:56",
-    "weights": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-14 22:04:56",
-    "weights": {
-      "tension_factor": 0.55,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.5,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-14 22:14:14",
-    "weights": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-14 22:14:15",
-    "weights": {
-      "tension_factor": 0.55,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.5,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-14 22:17:02",
-    "weights": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-14 22:17:03",
-    "weights": {
-      "tension_factor": 0.55,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.5,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-14 22:19:15",
-    "weights": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "RMF: ajuste automático aplicado para p20.",
-    "target_region": "rmf"
-  },
-  {
-    "timestamp": "2026-06-14 22:22:03",
-    "weights": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "RMF: ajuste automático aplicado para p20.",
-    "target_region": "rmf"
-  },
-  {
-    "timestamp": "2026-06-14 22:34:16",
-    "weights": {
-      "tension_factor": 0.45,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.7,
-      "tag_bias_neighbor": 0.95,
-      "norm_neural_weight": 0.7,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-14 22:34:16",
-    "weights": {
-      "tension_factor": 0.3,
-      "min_risk": 30.0,
-      "tag_bias_direct": 3.0,
-      "tag_bias_neighbor": 1.1,
-      "norm_neural_weight": 0.9,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-14 22:37:04",
-    "weights": {
-      "tension_factor": 0.45,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.7,
-      "tag_bias_neighbor": 0.95,
-      "norm_neural_weight": 0.7,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-14 22:37:04",
-    "weights": {
-      "tension_factor": 0.3,
-      "min_risk": 30.0,
-      "tag_bias_direct": 3.0,
-      "tag_bias_neighbor": 1.1,
-      "norm_neural_weight": 0.9,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-14 22:39:17",
-    "weights": {
-      "tension_factor": 0.6,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.4,
-      "tag_bias_neighbor": 0.8,
-      "norm_neural_weight": 0.5,
-      "dynamic_window": null,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "RMF: ajuste automático aplicado para p20.",
-    "target_region": "rmf"
-  },
-  {
-    "timestamp": "2026-06-14 22:50:41",
-    "weights": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-14 22:50:42",
-    "weights": {
-      "tension_factor": 0.55,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.5,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
-    "target_region": "fortaleza"
-  },
-  {
-    "timestamp": "2026-06-14 22:54:58",
-    "weights": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": 30,
-      "use_historical_fallback": false,
-      "historical_fallback_manual": false
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
-    "target_region": "fortaleza"
-  },
-  {
     "timestamp": "2026-06-14 22:54:58",
     "weights": {
       "tension_factor": 0.55,
@@ -742,6 +397,346 @@
       "tag_bias_direct": 2.2,
       "tag_bias_neighbor": 0.7,
       "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-26 15:31:44",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-26 15:36:44",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-26 15:51:44",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-26 15:56:45",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-26 16:11:45",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-26 16:16:46",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-29 17:19:33",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "Baseado na análise técnica de anomalias e em dados históricos, os pesos ajustados para postura (0.5), velocidade (0.4) e amplitude (0.1) foram calculados para melhorar a previsão da região Fortaleza/RMF.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-29 17:19:53",
+    "weights": {
+      "posture": 0.6,
+      "speed": 0.4,
+      "rom": 0.8
+    },
+    "explanations": "Baseado na análise dos padrões de anomalias associados à melhoria e degradação, os pesos ajustados para a postura (0.6), velocidade (0.4) e amplitude (0.8) são considerados ideais para melhorar o desempenho do modelo.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-29 17:27:19",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "O histórico local e as tensões recentes indicam que a área criminal está se movendo para áreas mais próximas, o que sugere um CVLI (Caso Víctima Líquido) provável em SOBRAL. O modelo preditivo aponta para uma situação de alta probabilidade de CVLI com alto risco iminente.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-29 17:40:45",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "O modelo está em um cenário de tensão alta, com eventos recentes como tensões alargadas e redes neurais dominantes na região Fortaleza. Este cenário indica uma possibilidade crescente de CVLI em SOBRAL. Portanto, os pesos ajustados para postura (0.8), velocidade (0.5) e amplitude (0.3) são ideais para manter a precisão do modelo enquanto o cenâlio muda.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-06-29 17:44:34",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "Baseada na análise técnica de anomalias, a região RMF está em um cenário de tensão elevada com eventos recentes como tensões reduzidas e falha histórica. Este contexto sugere uma escalada na incidência de crimes violentos letais intencionais (CVLI) nas áreas próximas a Juazeiro do Norte. A convergência da IA está em alta, indicando que o modelo está ajustado para prever com precisão as tendências locais, mas não está atualizando adequadamente os riscos de CVLI em áreas fora dos padrões anteriores.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-06-30 09:05:31",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-07-07 16:26:06",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-07-07 16:26:11",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-07-07 16:36:15",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-07-07 16:36:15",
+    "weights": {
+      "tension_factor": 0.55,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.5,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-07-07 16:36:20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "target_region": "interior"
+  },
+  {
+    "timestamp": "2026-07-07 16:36:26",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-07-19 09:50:32",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-07-19 09:50:42",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "target_region": "rmf"
+  },
+  {
+    "timestamp": "2026-07-19 10:00:46",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "target_region": "fortaleza"
+  },
+  {
+    "timestamp": "2026-07-19 10:00:51",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false,
+      "historical_fallback_manual": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "target_region": "interior"
+  },
+  {
+    "timestamp": "2026-07-19 10:00:56",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
       "dynamic_window": null,
       "use_historical_fallback": false,
       "historical_fallback_manual": false

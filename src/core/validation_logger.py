@@ -16,12 +16,18 @@ def _status_for_p10(p10: float) -> str:
     return "🚨"
 
 
-def _load_scores(project_root: str, orchestrator: StateOrchestrator | None):
+def _load_scores(project_root: str, orchestrator: StateOrchestrator | None, model_mode: str = "stgat"):
     if orchestrator is not None:
-        scores_map = orchestrator.get_combined_risk()
+        if model_mode == "stgat_v5" and hasattr(orchestrator, "get_combined_risk_stgat_v5"):
+            scores_map = orchestrator.get_combined_risk_stgat_v5()
+        else:
+            scores_map = orchestrator.get_combined_risk()
         return orchestrator, scores_map
     temp_orchestrator = StateOrchestrator(project_root)
-    scores_map = temp_orchestrator.get_combined_risk()
+    if model_mode == "stgat_v5" and hasattr(temp_orchestrator, "get_combined_risk_stgat_v5"):
+        scores_map = temp_orchestrator.get_combined_risk_stgat_v5()
+    else:
+        scores_map = temp_orchestrator.get_combined_risk()
     return temp_orchestrator, scores_map
 
 
@@ -32,6 +38,7 @@ def append_validation_log(
     source_label: str = "startup",
     orchestrator: StateOrchestrator | None = None,
     model_label: str | None = None,
+    model_mode: str = "stgat",
 ) -> bool:
     """
     Registra uma sessão regional no VALIDATION_LOG.md.
@@ -43,7 +50,7 @@ def append_validation_log(
 
     print(f"\n📊 Iniciando Validação Regional Detalhada ({source_label} - últimos {window_days} dias)...")
     try:
-        orchestrator_ref, scores_map = _load_scores(project_root, orchestrator)
+        orchestrator_ref, scores_map = _load_scores(project_root, orchestrator, model_mode=model_mode)
         if not scores_map:
             print("  - Não foi possível obter scores do Orquestrador para validação.")
             return False

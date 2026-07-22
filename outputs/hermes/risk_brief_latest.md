@@ -1,8 +1,8 @@
 # Hermes Brief de Risco
 
-Dados ate DD/MM/AAAA: 23/06/2026
+Dados ate DD/MM/AAAA: 17/07/2026
 Fonte: outputs/hermes
-Snapshot consultado: outputs/hermes/history/risk_brief_20260626_144225.md
+Snapshot consultado: outputs/hermes/history/risk_brief_20260722_193747.md
 
 Use este arquivo como resposta pronta para chat e Telegram.
 Responder com leitura util para gestor: o que aparece no topo, por que importa e o que validar em seguida.
@@ -10,73 +10,73 @@ Nao dizer que o ranking esta indisponivel se ele estiver listado abaixo.
 
 ## Leitura rapida
 
-- Bairros mais criticos em Fortaleza neste snapshot: MESSEJANA, GRANJA LISBOA, BARRA DO CEARA, PLANALTO AYRTON SENNA, LAGOA REDONDA.
-- Principal driver do topo de Fortaleza: Tensão territorial, Sinal Poisson do ranking operacional, Atividade recente e vizinhança.
-- Para gestor: O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.
+- Bairros mais criticos em Fortaleza neste snapshot: MESSEJANA, GRANJA LISBOA, JOSE DE ALENCAR, BARRA DO CEARA, CONJUNTO PALMEIRAS.
+- Principal driver do topo de Fortaleza: Sinal Poisson do ranking operacional, Tensão territorial, Atividade recente e vizinhança.
+- Para gestor: O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.
 
 ## Top 10 bairros de Fortaleza
-- Leitura rapida: MESSEJANA aparece na posição 1 de 101, com risco 68.7 e nível alto; é prioridade imediata de acompanhamento.
-- Por que importa: O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.
+- Leitura rapida: MESSEJANA aparece na posição 1 de 40, com risco 86.7 e nível crítico; é prioridade imediata de acompanhamento.
+- Por que importa: O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.
 - Proxima acao: Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking.
 
-1. MESSEJANA — risco 68.7 | alto | confianca 83.9%
-2. GRANJA LISBOA — risco 63.1 | alto | confianca 78.7%
-3. BARRA DO CEARA — risco 57.1 | alto | confianca 60.3%
-4. PLANALTO AYRTON SENNA — risco 53.8 | alto | confianca 83.8%
-5. LAGOA REDONDA — risco 34.4 | moderado | confianca 75.1%
-6. VICENTE PINZON — risco 34.1 | moderado | confianca 75.1%
-7. CENTRO — risco 30.2 | baixo | confianca 74.3%
-8. CANINDEZINHO — risco 30.1 | baixo | confianca 74.4%
-9. FARIAS BRITO — risco 28.4 | baixo | confianca 73.9%
-10. CONJUNTO CEARA — risco 27.9 | baixo | confianca 73.8%
+1. MESSEJANA — risco 86.7 | crítico | confianca 82.9%
+2. GRANJA LISBOA — risco 69.1 | alto | confianca 83.8%
+3. JOSE DE ALENCAR — risco 47.0 | moderado | confianca 78.6%
+4. BARRA DO CEARA — risco 44.1 | moderado | confianca 47.0%
+5. CONJUNTO PALMEIRAS — risco 30.9 | baixo | confianca 74.5%
+6. EDSON QUEIROZ — risco 30.2 | baixo | confianca 74.3%
+7. JOSE WALTER — risco 22.3 | baixo | confianca 41.1%
+8. PLANALTO AYRTON SENNA — risco 19.7 | baixo | confianca 40.4%
+9. VARJOTA — risco 15.8 | baixo | confianca 53.8%
+10. MONDUBIM — risco 15.8 | baixo | confianca 39.1%
 
 ## Top 10 cidades - Geral
-- Leitura rapida: CAUCAIA aparece na posição 1 de 69, com risco 94.7 e nível crítico; é prioridade imediata de acompanhamento.
-- Por que importa: O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 100.0% e 6 registros recentes na janela de 30 dias.
+- Leitura rapida: CAUCAIA aparece na posição 1 de 39, com risco 93.9 e nível crítico; é prioridade imediata de acompanhamento.
+- Por que importa: O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 100.0% e 3 registros recentes na janela de 30 dias.
 - Proxima acao: Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking.
 
-1. CAUCAIA — risco 94.7 | crítico | confianca 99.0%
-2. JUAZEIRO DO NORTE — risco 87.5 | crítico | confianca 92.9%
-3. SOBRAL — risco 73.2 | crítico | confianca 88.5%
-4. MARACANAU — risco 56.2 | alto | confianca 78.4%
-5. BOA VIAGEM — risco 45.2 | moderado | confianca 83.4%
-6. ACOPIARA — risco 39.6 | moderado | confianca 86.9%
-7. ITAPIPOCA — risco 38.4 | moderado | confianca 85.9%
-8. MORADA NOVA — risco 36.6 | moderado | confianca 85.6%
-9. TIANGUA — risco 34.7 | moderado | confianca 80.1%
-10. QUIXADA — risco 33.3 | moderado | confianca 74.9%
+1. CAUCAIA — risco 93.9 | crítico | confianca 95.0%
+2. JUAZEIRO DO NORTE — risco 80.2 | crítico | confianca 92.6%
+3. SOBRAL — risco 70.0 | alto | confianca 83.4%
+4. MARACANAU — risco 67.7 | alto | confianca 93.5%
+5. BOA VIAGEM — risco 47.4 | moderado | confianca 89.1%
+6. CRATO — risco 39.5 | moderado | confianca 81.0%
+7. AMONTADA — risco 32.0 | moderado | confianca 74.8%
+8. ITAPAJE — risco 27.3 | baixo | confianca 79.0%
+9. IGUATU — risco 26.6 | baixo | confianca 78.9%
+10. ITAPIPOCA — risco 25.2 | baixo | confianca 88.3%
 
 ## Top 10 cidades - RMF
-- Leitura rapida: CAUCAIA aparece na posição 1 de 19, com risco 94.7 e nível crítico; é prioridade imediata de acompanhamento.
-- Por que importa: O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 100.0% e 6 registros recentes na janela de 30 dias.
+- Leitura rapida: CAUCAIA aparece na posição 1 de 19, com risco 93.9 e nível crítico; é prioridade imediata de acompanhamento.
+- Por que importa: O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 100.0% e 3 registros recentes na janela de 30 dias.
 - Proxima acao: Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking.
 
-1. CAUCAIA — risco 94.7 | crítico | confianca 99.0%
-2. MARACANAU — risco 56.2 | alto | confianca 78.4%
-3. TRAIRI — risco 31.3 | moderado | confianca 86.5%
-4. ITAITINGA — risco 31.0 | moderado | confianca 76.5%
-5. CASCAVEL — risco 16.7 | baixo | confianca 65.9%
-6. PINDORETAMA — risco 15.1 | baixo | confianca 65.7%
-7. MARANGUAPE — risco 9.7 | baixo | confianca 37.4%
-8. PARACURU — risco 5.5 | baixo | confianca 48.3%
-9. SAO GONCALO DO AMARANTE — risco 5.0 | baixo | confianca 48.2%
-10. PACATUBA — risco 4.7 | baixo | confianca 35.8%
+1. CAUCAIA — risco 93.9 | crítico | confianca 95.0%
+2. MARACANAU — risco 67.7 | alto | confianca 93.5%
+3. HORIZONTE — risco 15.3 | baixo | confianca 65.8%
+4. MARANGUAPE — risco 9.4 | baixo | confianca 37.3%
+5. PACAJUS — risco 5.0 | baixo | confianca 48.2%
+6. PACATUBA — risco 4.6 | baixo | confianca 35.8%
+7. CASCAVEL — risco 4.2 | baixo | confianca 48.3%
+8. ITAITINGA — risco 3.0 | baixo | confianca 48.3%
+9. TRAIRI — risco 3.0 | baixo | confianca 48.3%
+10. SAO GONCALO DO AMARANTE — risco 2.9 | baixo | confianca 35.8%
 
 ## Top 10 cidades - Interior
-- Leitura rapida: JUAZEIRO DO NORTE aparece na posição 1 de 50, com risco 87.5 e nível crítico; é prioridade imediata de acompanhamento.
-- Por que importa: O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 100.0% e 4 registros recentes na janela de 30 dias.
+- Leitura rapida: JUAZEIRO DO NORTE aparece na posição 1 de 20, com risco 80.2 e nível crítico; é prioridade imediata de acompanhamento.
+- Por que importa: O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 100.0% e 5 registros recentes na janela de 30 dias.
 - Proxima acao: Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking.
 
-1. JUAZEIRO DO NORTE — risco 87.5 | crítico | confianca 92.9%
-2. SOBRAL — risco 73.2 | crítico | confianca 88.5%
-3. BOA VIAGEM — risco 45.2 | moderado | confianca 83.4%
-4. ACOPIARA — risco 39.6 | moderado | confianca 86.9%
-5. ITAPIPOCA — risco 38.4 | moderado | confianca 85.9%
-6. MORADA NOVA — risco 36.6 | moderado | confianca 85.6%
-7. TIANGUA — risco 34.7 | moderado | confianca 80.1%
-8. QUIXADA — risco 33.3 | moderado | confianca 74.9%
-9. RUSSAS — risco 31.7 | moderado | confianca 74.6%
-10. LIMOEIRO DO NORTE — risco 31.1 | moderado | confianca 79.5%
+1. JUAZEIRO DO NORTE — risco 80.2 | crítico | confianca 92.6%
+2. SOBRAL — risco 70.0 | alto | confianca 83.4%
+3. BOA VIAGEM — risco 47.4 | moderado | confianca 89.1%
+4. CRATO — risco 39.5 | moderado | confianca 81.0%
+5. AMONTADA — risco 32.0 | moderado | confianca 74.8%
+6. ITAPAJE — risco 27.3 | baixo | confianca 79.0%
+7. IGUATU — risco 26.6 | baixo | confianca 78.9%
+8. ITAPIPOCA — risco 25.2 | baixo | confianca 88.3%
+9. BARBALHA — risco 24.7 | baixo | confianca 73.5%
+10. MORADA NOVA — risco 17.0 | baixo | confianca 54.9%
 
 ## Regra de resposta
 

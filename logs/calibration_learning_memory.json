@@ -3,1319 +3,6 @@
     "event_type": "calibration_decision",
     "source": "app_persist",
     "region": "fortaleza",
-    "metric": "p20",
-    "weights": {
-      "tension_factor": 0.45,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.7,
-      "tag_bias_neighbor": 0.95,
-      "norm_neural_weight": 0.7,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:39:40.828090",
-    "semantic_tags": [
-      "fallback_historico",
-      "metric:p20",
-      "tensao_reduzida"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "fortaleza",
-    "metric": "p10",
-    "weights": {
-      "tension_factor": 0.3,
-      "min_risk": 30.0,
-      "tag_bias_direct": 3.0,
-      "tag_bias_neighbor": 1.1,
-      "norm_neural_weight": 0.9,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:39:41.026803",
-    "semantic_tags": [
-      "fallback_historico",
-      "metric:p10",
-      "rede_neural_dominante",
-      "tensao_reduzida"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "interior",
-    "metric": "p20",
-    "weights": {
-      "tension_factor": 0.6,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.4,
-      "tag_bias_neighbor": 0.8,
-      "norm_neural_weight": 0.5,
-      "dynamic_window": null,
-      "use_historical_fallback": false
-    },
-    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:39:41.276621",
-    "semantic_tags": [
-      "metric:p20"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "rmf",
-    "metric": "p20",
-    "weights": {
-      "tension_factor": 0.45,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.7,
-      "tag_bias_neighbor": 0.95,
-      "norm_neural_weight": 0.7,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "explanations": "RMF: ajuste automático aplicado para p20.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:39:41.601516",
-    "semantic_tags": [
-      "fallback_historico",
-      "janela:30",
-      "metric:p20",
-      "tensao_reduzida"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "rmf",
-    "metric": "p10",
-    "weights": {
-      "tension_factor": 0.3,
-      "min_risk": 30.0,
-      "tag_bias_direct": 3.0,
-      "tag_bias_neighbor": 1.1,
-      "norm_neural_weight": 0.9,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "explanations": "RMF: ajuste automático aplicado para p10.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:39:41.793038",
-    "semantic_tags": [
-      "fallback_historico",
-      "janela:30",
-      "metric:p10",
-      "rede_neural_dominante",
-      "tensao_reduzida"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "fortaleza",
-    "metric": "p20",
-    "weights": {
-      "tension_factor": 2.9,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:42:43.311546",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "metric:p20",
-      "rede_neural_baixa",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "fortaleza",
-    "metric": "p10",
-    "weights": {
-      "tension_factor": 2.75,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:42:43.477713",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "metric:p10",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "interior",
-    "metric": "p20",
-    "weights": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": false
-    },
-    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:42:43.688351",
-    "semantic_tags": [
-      "metric:p20",
-      "rede_neural_baixa"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "rmf",
-    "metric": "p20",
-    "weights": {
-      "tension_factor": 2.9,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "explanations": "RMF: ajuste automático aplicado para p20.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:42:43.848596",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "janela:30",
-      "metric:p20",
-      "rede_neural_baixa",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "rmf",
-    "metric": "p10",
-    "weights": {
-      "tension_factor": 2.75,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "explanations": "RMF: ajuste automático aplicado para p10.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:42:43.959681",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "janela:30",
-      "metric:p10",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "fortaleza",
-    "metric": "p20",
-    "weights": {
-      "tension_factor": 2.9,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:46:49.463882",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "metric:p20",
-      "rede_neural_baixa",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "fortaleza",
-    "metric": "p10",
-    "weights": {
-      "tension_factor": 2.75,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:46:49.656611",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "metric:p10",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "interior",
-    "metric": "p20",
-    "weights": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": false
-    },
-    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:46:49.940087",
-    "semantic_tags": [
-      "metric:p20",
-      "rede_neural_baixa"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "rmf",
-    "metric": "p20",
-    "weights": {
-      "tension_factor": 2.9,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "explanations": "RMF: ajuste automático aplicado para p20.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:46:50.241026",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "janela:30",
-      "metric:p20",
-      "rede_neural_baixa",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "rmf",
-    "metric": "p10",
-    "weights": {
-      "tension_factor": 2.75,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "explanations": "RMF: ajuste automático aplicado para p10.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:46:50.422904",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "janela:30",
-      "metric:p10",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_validation",
-    "source": "auto_calibrator",
-    "region": "fortaleza",
-    "metric": "p20",
-    "trigger": "fortaleza.p20=15.0%",
-    "old_params": {
-      "tension_factor": 3.0,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.6,
-      "norm_neural_weight": 0.2,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "new_params": {
-      "tension_factor": 2.9,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "semantic_review": {},
-    "old_value": 0.15,
-    "new_value": 0.15,
-    "improvement_pct": 0.0,
-    "outcome": "degraded",
-    "timestamp": "2026-06-05T16:51:50.491026",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "metric:p20",
-      "rede_neural_baixa",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_validation",
-    "source": "auto_calibrator",
-    "region": "fortaleza",
-    "metric": "p10",
-    "trigger": "fortaleza.p10=30.0%",
-    "old_params": {
-      "tension_factor": 2.9,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "new_params": {
-      "tension_factor": 2.75,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "semantic_review": {},
-    "old_value": 0.3,
-    "new_value": 0.3,
-    "improvement_pct": 0.0,
-    "outcome": "degraded",
-    "timestamp": "2026-06-05T16:51:50.657478",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "metric:p10",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_validation",
-    "source": "auto_calibrator",
-    "region": "interior",
-    "metric": "p20",
-    "trigger": "interior.p20=30.0%",
-    "old_params": {
-      "tension_factor": 0.8,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.0,
-      "tag_bias_neighbor": 0.6,
-      "norm_neural_weight": 0.2,
-      "dynamic_window": null,
-      "use_historical_fallback": false
-    },
-    "new_params": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": false
-    },
-    "semantic_review": {},
-    "old_value": 0.3,
-    "new_value": 0.3,
-    "improvement_pct": 0.0,
-    "outcome": "degraded",
-    "timestamp": "2026-06-05T16:51:50.824009",
-    "semantic_tags": [
-      "metric:p20",
-      "rede_neural_baixa"
-    ]
-  },
-  {
-    "event_type": "calibration_validation",
-    "source": "auto_calibrator",
-    "region": "rmf",
-    "metric": "p20",
-    "trigger": "rmf.p20=10.5%",
-    "old_params": {
-      "tension_factor": 3.0,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.6,
-      "norm_neural_weight": 0.2,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "new_params": {
-      "tension_factor": 2.9,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "semantic_review": {},
-    "old_value": 0.1053,
-    "new_value": 0.1053,
-    "improvement_pct": 0.0,
-    "outcome": "degraded",
-    "timestamp": "2026-06-05T16:51:50.982370",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "janela:30",
-      "metric:p20",
-      "rede_neural_baixa",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_validation",
-    "source": "auto_calibrator",
-    "region": "rmf",
-    "metric": "p10",
-    "trigger": "rmf.p10=10.0%",
-    "old_params": {
-      "tension_factor": 2.9,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "new_params": {
-      "tension_factor": 2.75,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "semantic_review": {},
-    "old_value": 0.1,
-    "new_value": 0.1,
-    "improvement_pct": 0.0,
-    "outcome": "degraded",
-    "timestamp": "2026-06-05T16:51:51.082313",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "janela:30",
-      "metric:p10",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "fortaleza",
-    "metric": "p20",
-    "weights": {
-      "tension_factor": 2.9,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:56:52.068268",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "metric:p20",
-      "rede_neural_baixa",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "fortaleza",
-    "metric": "p10",
-    "weights": {
-      "tension_factor": 2.75,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:56:52.226763",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "metric:p10",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "interior",
-    "metric": "p20",
-    "weights": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": false
-    },
-    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:56:52.474386",
-    "semantic_tags": [
-      "metric:p20",
-      "rede_neural_baixa"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "rmf",
-    "metric": "p20",
-    "weights": {
-      "tension_factor": 2.9,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "explanations": "RMF: ajuste automático aplicado para p20.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:56:52.815552",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "janela:30",
-      "metric:p20",
-      "rede_neural_baixa",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "rmf",
-    "metric": "p10",
-    "weights": {
-      "tension_factor": 2.75,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "explanations": "RMF: ajuste automático aplicado para p10.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-05T16:56:52.965652",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "janela:30",
-      "metric:p10",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "fortaleza",
-    "metric": "p20",
-    "weights": {
-      "tension_factor": 2.9,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-09T13:50:29.038396",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "metric:p20",
-      "rede_neural_baixa",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "fortaleza",
-    "metric": "p10",
-    "weights": {
-      "tension_factor": 2.75,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-09T13:50:29.249579",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "metric:p10",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "interior",
-    "metric": "p20",
-    "weights": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": false
-    },
-    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-09T13:50:29.502855",
-    "semantic_tags": [
-      "metric:p20",
-      "rede_neural_baixa"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "rmf",
-    "metric": "p20",
-    "weights": {
-      "tension_factor": 2.9,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "explanations": "RMF: ajuste automático aplicado para p20.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-09T13:50:29.740620",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "janela:30",
-      "metric:p20",
-      "rede_neural_baixa",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "rmf",
-    "metric": "p10",
-    "weights": {
-      "tension_factor": 2.75,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "explanations": "RMF: ajuste automático aplicado para p10.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-09T13:50:29.904180",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "janela:30",
-      "metric:p10",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_validation",
-    "source": "auto_calibrator",
-    "region": "fortaleza",
-    "metric": "p20",
-    "trigger": "fortaleza.p20=15.0%",
-    "old_params": {
-      "tension_factor": 3.0,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.6,
-      "norm_neural_weight": 0.2,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "new_params": {
-      "tension_factor": 2.9,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "semantic_review": {},
-    "old_value": 0.15,
-    "new_value": 0.1,
-    "improvement_pct": -33.33333333333333,
-    "outcome": "degraded",
-    "timestamp": "2026-06-09T13:55:30.050295",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "metric:p20",
-      "rede_neural_baixa",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_validation",
-    "source": "auto_calibrator",
-    "region": "fortaleza",
-    "metric": "p10",
-    "trigger": "fortaleza.p10=30.0%",
-    "old_params": {
-      "tension_factor": 2.9,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "new_params": {
-      "tension_factor": 2.75,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "semantic_review": {},
-    "old_value": 0.3,
-    "new_value": 0.2,
-    "improvement_pct": -33.33333333333333,
-    "outcome": "degraded",
-    "timestamp": "2026-06-09T13:55:30.219475",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "metric:p10",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_validation",
-    "source": "auto_calibrator",
-    "region": "interior",
-    "metric": "p20",
-    "trigger": "interior.p20=30.0%",
-    "old_params": {
-      "tension_factor": 0.8,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.0,
-      "tag_bias_neighbor": 0.6,
-      "norm_neural_weight": 0.2,
-      "dynamic_window": null,
-      "use_historical_fallback": false
-    },
-    "new_params": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": false
-    },
-    "semantic_review": {},
-    "old_value": 0.3,
-    "new_value": 0.25,
-    "improvement_pct": -16.666666666666664,
-    "outcome": "degraded",
-    "timestamp": "2026-06-09T13:55:30.380029",
-    "semantic_tags": [
-      "metric:p20",
-      "rede_neural_baixa"
-    ]
-  },
-  {
-    "event_type": "calibration_validation",
-    "source": "auto_calibrator",
-    "region": "rmf",
-    "metric": "p20",
-    "trigger": "rmf.p20=10.5%",
-    "old_params": {
-      "tension_factor": 3.0,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.6,
-      "norm_neural_weight": 0.2,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "new_params": {
-      "tension_factor": 2.9,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "semantic_review": {},
-    "old_value": 0.1053,
-    "new_value": 0.2105,
-    "improvement_pct": 99.90503323836656,
-    "outcome": "improved",
-    "timestamp": "2026-06-09T13:55:30.541686",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "janela:30",
-      "metric:p20",
-      "rede_neural_baixa",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_validation",
-    "source": "auto_calibrator",
-    "region": "rmf",
-    "metric": "p10",
-    "trigger": "rmf.p10=10.0%",
-    "old_params": {
-      "tension_factor": 2.9,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "new_params": {
-      "tension_factor": 2.75,
-      "min_risk": 30.0,
-      "tag_bias_direct": 5.0,
-      "tag_bias_neighbor": 0.85,
-      "norm_neural_weight": 0.55,
-      "dynamic_window": 30,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "MARACANAU",
-        "CAUCAIA",
-        "HORIZONTE",
-        "PACAJUS",
-        "PACATUBA"
-      ]
-    },
-    "semantic_review": {},
-    "old_value": 0.1,
-    "new_value": 0.2,
-    "improvement_pct": 100.0,
-    "outcome": "improved",
-    "timestamp": "2026-06-09T13:55:30.702722",
-    "semantic_tags": [
-      "fallback_historico",
-      "intel_trigger_forte",
-      "janela:30",
-      "metric:p10",
-      "tensao_alta"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "fortaleza",
-    "metric": "p20",
-    "weights": {
-      "tension_factor": 0.7,
-      "min_risk": 30.0,
-      "tag_bias_direct": 2.2,
-      "tag_bias_neighbor": 0.7,
-      "norm_neural_weight": 0.35,
-      "dynamic_window": null,
-      "use_historical_fallback": true,
-      "historical_top10_sample": [
-        "BARRA DO CEARA",
-        "ALTO ALEGRE",
-        "MESSEJANA",
-        "GRANJA LISBOA",
-        "SIQUEIRA"
-      ]
-    },
-    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
-    "data_analysis": {},
-    "should_intervene": null,
-    "outcome": "pending_validation",
-    "timestamp": "2026-06-09T14:00:31.027331",
-    "semantic_tags": [
-      "fallback_historico",
-      "metric:p20",
-      "rede_neural_baixa"
-    ]
-  },
-  {
-    "event_type": "calibration_decision",
-    "source": "app_persist",
-    "region": "fortaleza",
     "metric": "p10",
     "weights": {
       "tension_factor": 0.55,
@@ -9105,6 +7792,1238 @@
     "semantic_tags": [
       "metric:p20",
       "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-26T15:31:44.235477",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-26T15:36:44.549834",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "fortaleza",
+    "metric": "p20",
+    "trigger": "fortaleza.p20=55.0%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.55,
+    "new_value": 0.55,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-26T15:41:44.636063",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "rmf",
+    "metric": "p20",
+    "trigger": "rmf.p20=52.6%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.5263,
+    "new_value": 0.5263,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-26T15:41:44.754807",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-26T15:51:44.974492",
+    "semantic_tags": [
+      "metric:p20"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-26T15:56:45.261981",
+    "semantic_tags": [
+      "metric:p20"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "fortaleza",
+    "metric": "p20",
+    "trigger": "fortaleza.p20=55.0%",
+    "old_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.55,
+    "new_value": 0.55,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-26T16:01:45.369839",
+    "semantic_tags": [
+      "metric:p20"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "rmf",
+    "metric": "p20",
+    "trigger": "rmf.p20=52.6%",
+    "old_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.5263,
+    "new_value": 0.5263,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-26T16:01:45.481405",
+    "semantic_tags": [
+      "metric:p20"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-26T16:11:45.789465",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-26T16:16:46.127614",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "fortaleza",
+    "metric": "p20",
+    "trigger": "fortaleza.p20=55.0%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.55,
+    "new_value": 0.55,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-26T16:21:46.221888",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "rmf",
+    "metric": "p20",
+    "trigger": "rmf.p20=52.6%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.5263,
+    "new_value": 0.5263,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-26T16:21:46.335728",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "general_manager",
+    "region": "fortaleza",
+    "metric": null,
+    "weights": {},
+    "explanations": "Baseado na análise técnica de anomalias e em dados históricos, os pesos ajustados para postura (0.5), velocidade (0.4) e amplitude (0.1) foram calculados para melhorar a previsão da região Fortaleza/RMF.",
+    "data_analysis": {
+      "anomalies_detected": false,
+      "geographical_drift": true,
+      "next_probable_cvli_hotspot": "SOBRAL",
+      "technical_summary": "A análise do histórico regional e das tensões anteriores indica que a região de SOBRAL apresenta um risco iminente para CVLI. O modelo preditivo está migrando para áreas menos atingidas, sugerindo uma tendência de escalada na região de Fortaleza/RMF."
+    },
+    "should_intervene": true,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-29T17:19:32.229381",
+    "semantic_tags": [
+      "deriva_geografica",
+      "hotspot:SOBRAL"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "Baseado na análise técnica de anomalias e em dados históricos, os pesos ajustados para postura (0.5), velocidade (0.4) e amplitude (0.1) foram calculados para melhorar a previsão da região Fortaleza/RMF.",
+    "data_analysis": {
+      "anomalies_detected": false,
+      "geographical_drift": true,
+      "next_probable_cvli_hotspot": "SOBRAL",
+      "technical_summary": "A análise do histórico regional e das tensões anteriores indica que a região de SOBRAL apresenta um risco iminente para CVLI. O modelo preditivo está migrando para áreas menos atingidas, sugerindo uma tendência de escalada na região de Fortaleza/RMF."
+    },
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-29T17:19:33.485241",
+    "semantic_tags": [
+      "deriva_geografica",
+      "hotspot:SOBRAL",
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "general_manager",
+    "region": "fortaleza",
+    "metric": null,
+    "weights": {},
+    "explanations": "Baseado na análise dos padrões de anomalias associados à melhoria e degradação, os pesos ajustados para a postura (0.6), velocidade (0.4) e amplitude (0.8) são considerados ideais para melhorar o desempenho do modelo.",
+    "data_analysis": {
+      "anomalies_detected": false,
+      "geographical_drift": true,
+      "next_probable_cvli_hotspot": "Centro de Fortaleza",
+      "technical_summary": "O modelo está em um período de ajuste contínuo, com sinais de convergência e movimento geográfico. O gerente geral deve estar atento a possíveis eventos exógenos que podem afetar o cenário criminal."
+    },
+    "should_intervene": true,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-29T17:19:52.999460",
+    "semantic_tags": [
+      "deriva_geografica",
+      "hotspot:Centro de Fortaleza"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": null,
+    "weights": {},
+    "explanations": "Baseado na análise dos padrões de anomalias associados à melhoria e degradação, os pesos ajustados para a postura (0.6), velocidade (0.4) e amplitude (0.8) são considerados ideais para melhorar o desempenho do modelo.",
+    "data_analysis": {
+      "anomalies_detected": false,
+      "geographical_drift": true,
+      "next_probable_cvli_hotspot": "Centro de Fortaleza",
+      "technical_summary": "O modelo está em um período de ajuste contínuo, com sinais de convergência e movimento geográfico. O gerente geral deve estar atento a possíveis eventos exógenos que podem afetar o cenário criminal."
+    },
+    "should_intervene": true,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-29T17:19:53.324418",
+    "semantic_tags": [
+      "deriva_geografica",
+      "hotspot:Centro de Fortaleza"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "general_manager",
+    "region": "rmf",
+    "metric": null,
+    "weights": {},
+    "explanations": "O histórico local e as tensões recentes indicam que a área criminal está se movendo para áreas mais próximas, o que sugere um CVLI (Caso Víctima Líquido) provável em SOBRAL. O modelo preditivo aponta para uma situação de alta probabilidade de CVLI com alto risco iminente.",
+    "data_analysis": {
+      "anomalies_detected": false,
+      "geographical_drift": true,
+      "next_probable_cvli_hotspot": "SOBRAL",
+      "technical_summary": "A análise do histórico regional e das tensões recentes indica que a mancha criminal está migrando para áreas mais próximas. O modelo preditivo, embora não tenha considerado todas as possibilidades, aponta SOBRAL como o local provável de um CVLI com alto risco iminente."
+    },
+    "should_intervene": true,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-29T17:27:19.538506",
+    "semantic_tags": [
+      "deriva_geografica",
+      "hotspot:SOBRAL"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "O histórico local e as tensões recentes indicam que a área criminal está se movendo para áreas mais próximas, o que sugere um CVLI (Caso Víctima Líquido) provável em SOBRAL. O modelo preditivo aponta para uma situação de alta probabilidade de CVLI com alto risco iminente.",
+    "data_analysis": {
+      "anomalies_detected": false,
+      "geographical_drift": true,
+      "next_probable_cvli_hotspot": "SOBRAL",
+      "technical_summary": "A análise do histórico regional e das tensões recentes indica que a mancha criminal está migrando para áreas mais próximas. O modelo preditivo, embora não tenha considerado todas as possibilidades, aponta SOBRAL como o local provável de um CVLI com alto risco iminente."
+    },
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-29T17:27:19.926511",
+    "semantic_tags": [
+      "deriva_geografica",
+      "hotspot:SOBRAL",
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "fortaleza",
+    "metric": "p20",
+    "trigger": "fortaleza.p20=55.0%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {
+      "status": "success",
+      "manager_decision": "Os pesos do modelo foram calibrados com sucesso de forma dinâmica para mitigar falsos positivos.",
+      "calibrated_weights": {
+        "posture": 0.5,
+        "speed": 0.4,
+        "rom": 0.1
+      },
+      "explanations": "Baseado na análise técnica de anomalias e em dados históricos, os pesos ajustados para postura (0.5), velocidade (0.4) e amplitude (0.1) foram calculados para melhorar a previsão da região Fortaleza/RMF.",
+      "data_analysis": {
+        "anomalies_detected": false,
+        "geographical_drift": true,
+        "next_probable_cvli_hotspot": "SOBRAL",
+        "technical_summary": "A análise do histórico regional e das tensões anteriores indica que a região de SOBRAL apresenta um risco iminente para CVLI. O modelo preditivo está migrando para áreas menos atingidas, sugerindo uma tendência de escalada na região de Fortaleza/RMF."
+      },
+      "calibrated_at": "2026-06-29T17:12:00.214778",
+      "should_intervene": true,
+      "target_region": "FORTALEZA"
+    },
+    "old_value": 0.55,
+    "new_value": 0.55,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-29T17:32:20.071023",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "rmf",
+    "metric": "p20",
+    "trigger": "rmf.p20=52.6%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {
+      "status": "success",
+      "manager_decision": "Os pesos do modelo foram calibrados com sucesso de forma dinâmica para mitigar falsos positivos.",
+      "calibrated_weights": {
+        "posture": 0.5,
+        "speed": 0.4,
+        "rom": 0.1
+      },
+      "explanations": "O histórico local e as tensões recentes indicam que a área criminal está se movendo para áreas mais próximas, o que sugere um CVLI (Caso Víctima Líquido) provável em SOBRAL. O modelo preditivo aponta para uma situação de alta probabilidade de CVLI com alto risco iminente.",
+      "data_analysis": {
+        "anomalies_detected": false,
+        "geographical_drift": true,
+        "next_probable_cvli_hotspot": "SOBRAL",
+        "technical_summary": "A análise do histórico regional e das tensões recentes indica que a mancha criminal está migrando para áreas mais próximas. O modelo preditivo, embora não tenha considerado todas as possibilidades, aponta SOBRAL como o local provável de um CVLI com alto risco iminente."
+      },
+      "calibrated_at": "2026-06-29T17:19:33.810402",
+      "should_intervene": true,
+      "target_region": "RMF"
+    },
+    "old_value": 0.5263,
+    "new_value": 0.5263,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-29T17:32:20.167639",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "general_manager",
+    "region": "fortaleza",
+    "metric": null,
+    "weights": {},
+    "explanations": "O modelo está em um cenário de tensão alta, com eventos recentes como tensões alargadas e redes neurais dominantes na região Fortaleza. Este cenário indica uma possibilidade crescente de CVLI em SOBRAL. Portanto, os pesos ajustados para postura (0.8), velocidade (0.5) e amplitude (0.3) são ideais para manter a precisão do modelo enquanto o cenâlio muda.",
+    "data_analysis": {
+      "anomalies_detected": false,
+      "geographical_drift": true,
+      "next_probable_cvli_hotspot": "SOBRAL",
+      "technical_summary": "A análise do perfil regional e histórico revela que a região Fortaleza está em um cenário de tensão alta, com eventos recentes como tensões alargadas e redes neurais dominantes. O modelo preditivo está migrando para novas áreas, indicando uma possibilidade crescente de CVLI em SOBRAL. Este é o local provável do próximo CVLI com base na sua skill."
+    },
+    "should_intervene": true,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-29T17:40:45.368837",
+    "semantic_tags": [
+      "deriva_geografica",
+      "hotspot:SOBRAL"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "O modelo está em um cenário de tensão alta, com eventos recentes como tensões alargadas e redes neurais dominantes na região Fortaleza. Este cenário indica uma possibilidade crescente de CVLI em SOBRAL. Portanto, os pesos ajustados para postura (0.8), velocidade (0.5) e amplitude (0.3) são ideais para manter a precisão do modelo enquanto o cenâlio muda.",
+    "data_analysis": {
+      "anomalies_detected": false,
+      "geographical_drift": true,
+      "next_probable_cvli_hotspot": "SOBRAL",
+      "technical_summary": "A análise do perfil regional e histórico revela que a região Fortaleza está em um cenário de tensão alta, com eventos recentes como tensões alargadas e redes neurais dominantes. O modelo preditivo está migrando para novas áreas, indicando uma possibilidade crescente de CVLI em SOBRAL. Este é o local provável do próximo CVLI com base na sua skill."
+    },
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-29T17:40:45.559976",
+    "semantic_tags": [
+      "deriva_geografica",
+      "hotspot:SOBRAL",
+      "metric:p20"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "general_manager",
+    "region": "rmf",
+    "metric": null,
+    "weights": {},
+    "explanations": "Baseada na análise técnica de anomalias, a região RMF está em um cenário de tensão elevada com eventos recentes como tensões reduzidas e falha histórica. Este contexto sugere uma escalada na incidência de crimes violentos letais intencionais (CVLI) nas áreas próximas a Juazeiro do Norte. A convergência da IA está em alta, indicando que o modelo está ajustado para prever com precisão as tendências locais, mas não está atualizando adequadamente os riscos de CVLI em áreas fora dos padrões anteriores.",
+    "data_analysis": {
+      "anomalies_detected": false,
+      "geographical_drift": true,
+      "next_probable_cvli_hotspot": "JUAZEIRO DO NORTE",
+      "technical_summary": "A análise do perfil regional e histórico revela que a região RMF está em um cenário de tensão elevada, com eventos recentes como tensões reduzidas e falha histórica. Este contexto sugere uma escalada na incidência de crimes violentos letais intencionais (CVLI) nas áreas próximas a Juazeiro do Norte. A convergência da IA está em alta, indicando que o modelo está ajustado para prever com precisão as tendências locais, mas não está atualizando adequadamente os riscos de CVLI em áreas fora dos padrões anteriores."
+    },
+    "should_intervene": true,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-29T17:44:34.781405",
+    "semantic_tags": [
+      "deriva_geografica",
+      "hotspot:JUAZEIRO DO NORTE"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "Baseada na análise técnica de anomalias, a região RMF está em um cenário de tensão elevada com eventos recentes como tensões reduzidas e falha histórica. Este contexto sugere uma escalada na incidência de crimes violentos letais intencionais (CVLI) nas áreas próximas a Juazeiro do Norte. A convergência da IA está em alta, indicando que o modelo está ajustado para prever com precisão as tendências locais, mas não está atualizando adequadamente os riscos de CVLI em áreas fora dos padrões anteriores.",
+    "data_analysis": {
+      "anomalies_detected": false,
+      "geographical_drift": true,
+      "next_probable_cvli_hotspot": "JUAZEIRO DO NORTE",
+      "technical_summary": "A análise do perfil regional e histórico revela que a região RMF está em um cenário de tensão elevada, com eventos recentes como tensões reduzidas e falha histórica. Este contexto sugere uma escalada na incidência de crimes violentos letais intencionais (CVLI) nas áreas próximas a Juazeiro do Norte. A convergência da IA está em alta, indicando que o modelo está ajustado para prever com precisão as tendências locais, mas não está atualizando adequadamente os riscos de CVLI em áreas fora dos padrões anteriores."
+    },
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-29T17:44:34.995458",
+    "semantic_tags": [
+      "deriva_geografica",
+      "hotspot:JUAZEIRO DO NORTE",
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "fortaleza",
+    "metric": "p20",
+    "trigger": "fortaleza.p20=55.0%",
+    "old_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {
+      "status": "success",
+      "manager_decision": "Os pesos do modelo foram calibrados com sucesso de forma dinâmica para mitigar falsos positivos.",
+      "calibrated_weights": {
+        "posture": 0.8,
+        "speed": 0.5,
+        "rom": -0.3
+      },
+      "explanations": "O modelo está em um cenário de tensão alta, com eventos recentes como tensões alargadas e redes neurais dominantes na região Fortaleza. Este cenário indica uma possibilidade crescente de CVLI em SOBRAL. Portanto, os pesos ajustados para postura (0.8), velocidade (0.5) e amplitude (0.3) são ideais para manter a precisão do modelo enquanto o cenâlio muda.",
+      "data_analysis": {
+        "anomalies_detected": false,
+        "geographical_drift": true,
+        "next_probable_cvli_hotspot": "SOBRAL",
+        "technical_summary": "A análise do perfil regional e histórico revela que a região Fortaleza está em um cenário de tensão alta, com eventos recentes como tensões alargadas e redes neurais dominantes. O modelo preditivo está migrando para novas áreas, indicando uma possibilidade crescente de CVLI em SOBRAL. Este é o local provável do próximo CVLI com base na sua skill."
+      },
+      "calibrated_at": "2026-06-29T17:37:20.198764",
+      "should_intervene": true,
+      "target_region": "FORTALEZA"
+    },
+    "old_value": 0.55,
+    "new_value": 0.55,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-29T17:49:35.126350",
+    "semantic_tags": [
+      "metric:p20"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "rmf",
+    "metric": "p20",
+    "trigger": "rmf.p20=52.6%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {
+      "status": "success",
+      "manager_decision": "Os pesos do modelo foram calibrados com sucesso de forma dinâmica para mitigar falsos positivos.",
+      "calibrated_weights": {
+        "posture": 0.6,
+        "speed": 0.4,
+        "rom": 1.0
+      },
+      "explanations": "Baseada na análise técnica de anomalias, a região RMF está em um cenário de tensão elevada com eventos recentes como tensões reduzidas e falha histórica. Este contexto sugere uma escalada na incidência de crimes violentos letais intencionais (CVLI) nas áreas próximas a Juazeiro do Norte. A convergência da IA está em alta, indicando que o modelo está ajustado para prever com precisão as tendências locais, mas não está atualizando adequadamente os riscos de CVLI em áreas fora dos padrões anteriores.",
+      "data_analysis": {
+        "anomalies_detected": false,
+        "geographical_drift": true,
+        "next_probable_cvli_hotspot": "JUAZEIRO DO NORTE",
+        "technical_summary": "A análise do perfil regional e histórico revela que a região RMF está em um cenário de tensão elevada, com eventos recentes como tensões reduzidas e falha histórica. Este contexto sugere uma escalada na incidência de crimes violentos letais intencionais (CVLI) nas áreas próximas a Juazeiro do Norte. A convergência da IA está em alta, indicando que o modelo está ajustado para prever com precisão as tendências locais, mas não está atualizando adequadamente os riscos de CVLI em áreas fora dos padrões anteriores."
+      },
+      "calibrated_at": "2026-06-29T17:40:45.595441",
+      "should_intervene": true,
+      "target_region": "RMF"
+    },
+    "old_value": 0.5263,
+    "new_value": 0.5263,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-06-29T17:49:35.232647",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-06-30T09:05:31.692404",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-07-07T16:26:06.546492",
+    "semantic_tags": [
+      "metric:p20"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-07-07T16:26:11.437096",
+    "semantic_tags": [
+      "metric:p20"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "fortaleza",
+    "metric": "p20",
+    "trigger": "fortaleza.p20=55.0%",
+    "old_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.55,
+    "new_value": 0.2,
+    "improvement_pct": -63.63636363636363,
+    "outcome": "degraded",
+    "timestamp": "2026-07-07T16:31:11.523604",
+    "semantic_tags": [
+      "metric:p20"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "rmf",
+    "metric": "p20",
+    "trigger": "rmf.p20=52.6%",
+    "old_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.5263,
+    "new_value": 0.5263,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-07-07T16:31:11.571285",
+    "semantic_tags": [
+      "metric:p20"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-07-07T16:36:15.758634",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p10",
+    "weights": {
+      "tension_factor": 0.55,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.5,
+      "tag_bias_neighbor": 0.85,
+      "norm_neural_weight": 0.55,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p10.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-07-07T16:36:15.861058",
+    "semantic_tags": [
+      "metric:p10"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "interior",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-07-07T16:36:20.182949",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-07-07T16:36:26.675482",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-07-19T09:50:32.318683",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-07-19T09:50:42.268132",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "fortaleza",
+    "metric": "p20",
+    "trigger": "fortaleza.p20=30.0%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.3,
+    "new_value": 0.25,
+    "improvement_pct": -16.666666666666664,
+    "outcome": "degraded",
+    "timestamp": "2026-07-19T09:55:42.360701",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_validation",
+    "source": "auto_calibrator",
+    "region": "rmf",
+    "metric": "p20",
+    "trigger": "rmf.p20=36.8%",
+    "old_params": {
+      "tension_factor": 0.8,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.0,
+      "tag_bias_neighbor": 0.6,
+      "norm_neural_weight": 0.2,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "new_params": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "semantic_review": {},
+    "old_value": 0.3684,
+    "new_value": 0.3684,
+    "improvement_pct": 0.0,
+    "outcome": "degraded",
+    "timestamp": "2026-07-19T09:55:42.440619",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "fortaleza",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "FORTALEZA: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-07-19T10:00:46.926419",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "interior",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.7,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.2,
+      "tag_bias_neighbor": 0.7,
+      "norm_neural_weight": 0.35,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "INTERIOR: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-07-19T10:00:51.703224",
+    "semantic_tags": [
+      "metric:p20",
+      "rede_neural_baixa"
+    ]
+  },
+  {
+    "event_type": "calibration_decision",
+    "source": "app_persist",
+    "region": "rmf",
+    "metric": "p20",
+    "weights": {
+      "tension_factor": 0.6,
+      "min_risk": 30.0,
+      "tag_bias_direct": 2.4,
+      "tag_bias_neighbor": 0.8,
+      "norm_neural_weight": 0.5,
+      "dynamic_window": null,
+      "use_historical_fallback": false
+    },
+    "explanations": "RMF: ajuste automático aplicado para p20.",
+    "data_analysis": {},
+    "should_intervene": null,
+    "outcome": "pending_validation",
+    "timestamp": "2026-07-19T10:00:56.376061",
+    "semantic_tags": [
+      "metric:p20"
     ]
   }
 ]

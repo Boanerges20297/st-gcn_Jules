@@ -2899,3 +2899,89 @@ de streams dinamico/contextual + LR muito baixo + regularizacao forte.
 ### 3. Resultados
 
 - *(A preencher apos conclusao)*
+
+
+---
+
+## Tentativa 124 (Restauração ST-GAT Original — DeepSTGAT_v5 + Top-K CVLI) — 2026-07-07
+
+### Motivação
+- Retorno à primeira versão com ST-GAT como modelo principal (Phase4/model_v4.py, fev/2026).
+- O VectGATLayer (atenção verdadeira por aresta: e_ij = LeakyReLU(a^T [Wh_i || Wh_j])) havia sido substituído por FastRelationalGCN na migração para rchitectures.py. Restaurado e modernizado como DeepSTGAT_v5.
+- Aplicado filtro Top-K de nós por CVLI recente: Fortaleza Top-40, RMF Top-40, Interior Top-20.
+- Filtro bimestral de nós ativos (≥1 CVLI por bimestre) para eliminar gradientes de bairros perpetuamente inativos.
+
+### Arquitetura — DeepSTGAT_v5
+- **Núcleo:** VectGATLayer restaurado — W(G, in, out) + a(G, 2×out, 1) por grafo; softmax por aresta mascarada por adjacência.
+- **Blocos:** 3× STGATBlock_v5: in→48→96→96 + MultiHeadTemporalAttention
+- **Parâmetros:** 1.015.881 (vs 500.905 do DeepSTGAT_64)
+- **FC head:** 96→48→PReLU→Dropout→1
+
+### Configuração Técnica (3 regiões)
+| Param | Fortaleza | RMF | Interior |
+|---|---|---|---|
+| Window | 90d | 14d | 14d |
+| LR | 0.0001 | 0.001 | 0.001 |
+| Grad Accum | 1 | 8 | 4 |
+| Epochs / Patience | 40 / 12 | 30 / 15 | 30 / 15 |
+| Loss | BinaryFocalRankingLoss | BinaryFocalRankingLoss | BinaryFocalRankingLoss |
+| ranking_weight | 12.0 | 10.0 | 15.0 |
+| Nós | 40 (top-40 CVLI) | 19 (todos disponíveis) | 20 (top-20 CVLI) |
+
+### Resultados
+| Região | Melhor P@10 | Época | P@20 | Parou |
+|---|---|---|---|---|
+| **Fortaleza** | **45.46%** | E003 | 62.96% | E015 (patience) |
+| **RMF** | **67.20%** | E001 | 100% | E016 (patience) |
+| **Interior** | **61.94%** | E003 | 100% | E018 (patience) |
+
+### Análise
+- **Interior +18.5pp** vs baseline (43.47% com top-50): reduzir de 50→20 nós concentrou hotspots reais.
+- **Fortaleza abaixo do recorde** (63.2% FortalezaHeteroSTGAT): VectGATLayer com 40 nós e LR=0.0001 convergiu rápido (E003) mas LR em subida (OneCycleLR) causou degradação depois.
+- **RMF best=E001**: OneCycleLR muito agressivo para 19 nós — modelo aprende na inicialização e piora com o treino.
+- Diagnóstico principal: anking_weight=12 × F.mse_loss(pred, raw_cvli_counts) força o modelo a memorizar magnitudes absolutas de CVLI (2022-2024 ≠ 2025 em volume).
+
+### Status
+**CONCLUÍDO** — modelos salvos em models/active/legacy_torch/.
+
+---
+
+## Tentativa 125 (NegBinomRankingLoss — Distribuição Binomial Negativa para CVLI) — 2026-07-07
+
+### Motivação
+- Substituir MSE rank_loss por perda adequada para dados de contagem com overdispersão.
+- CVLI é tipicamente modelado por Binomial Negativa (variância > média, zero-inflation natural).
+- Combinar **NB-NLL** (calibração de magnitude) + **ListMLE** (ranking puro, alinhado com P@K).
+
+### Arquitetura da Loss — NegBinomRankingLoss
+`
+mu = softplus(pred)                         # pred → média positiva
+r  = exp(log_r)  [aprendível, clamp 0.1–50] # parâmetro de dispersão aprendido
+p  = r / (r + mu)
+
+NB-NLL  = -log P(y | mu, r)     # calibração de magnitude
+ListMLE = -(softmax(target) × log_softmax(mu)).sum()  # ranking puro
+Loss    = NB-NLL + ranking_weight × ListMLE + indecision_penalty + honesty_penalty
+`
+
+### Experimento A — r_init=2.0, lr_r=0.00003 (Fortaleza solo)
+- **Configuração:** window=90, lr=0.00003, grad_accum=8, 80 épocas, patience=20
+- log_r com mesmo LR do modelo → converge lentamente
+- **Resultado:** Best P@10 = **44.78%** (E016), r=1.963 após 36 épocas (de 2.0→1.833)
+- **Observação:** Estabilidade muito melhor que T124 (sem colapso após o best), mas  converge ~0.005 por época.
+
+### Experimento B — r_init=5.0, lr_r=0.005, window=120, grad_accum=4 (EM ANDAMENTO)
+- **Motivação:** r_init=5 (menos overdispersão inicial) + LR 100× maior para log_r → converge para r real (~1.5) em 5–8 épocas.
+- **Inovação:** Optimizer com 2 param_groups: modelo lr=5e-05 | log_r lr=5e-03
+- **Configuração:** window=120 (mais contexto), grad_accum=4 (241 passos/época vs 125), 100 épocas, patience=25
+- **Filtro bimestral:** 93.8% nós ativos (era 78.9% com window=90 — janela maior capta mais bairros)
+- **Status E004:** P@10=44.16%, r=4.020 (descendo de 5.0 rapidamente)
+- **Expectativa:** r deve atingir ~1.5 por volta de E15–E18, e o P@10 deve escalar após pico do LR (~E30)
+
+### Modelos Salvos (Experimento A)
+- models/active/legacy_torch/fortaleza_model_active.pth — 44.78% P@10 (E016)
+- models/active/legacy_torch/rmf_model.pth — 67.42% P@10 (E001) [BinaryFocal]
+- models/active/legacy_torch/interior_model.pth — 62.32% P@10 (E001) [BinaryFocal]
+
+### Status
+**EM ANDAMENTO** — Experimento B (Fortaleza solo, --region fortaleza). Acompanhar convergência de r e P@10 nas épocas 15–30.

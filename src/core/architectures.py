@@ -6,6 +6,139 @@ import torch.nn.functional as F
 # NÚCLEO NEURAL REPORT PREVIEW: DEEP-STGAT (Spatial-Temporal Graph Attention)
 # ============================================================================
 
+# ============================================================================
+# ST-GAT v5 — RESTAURAÇÃO DA ATENÇÃO VERDADEIRA POR ARESTA (Phase4 lineage)
+# VectGATLayer: aprende e_ij = LeakyReLU(a^T [Wh_i || Wh_j]) por grafo
+# Introduzido em Phase4/model_v4.py (12/02/2026), modernizado aqui.
+# ============================================================================
+
+class VectGATLayer(nn.Module):
+    """
+    Vectorized multi-graph Graph Attention Layer.
+
+    Aprende coeficientes de atenção específicos por aresta (i→j) para cada
+    tipo de grafo (geo, conflito). Isso permite à rede aprender que
+    "bairro A influencia B mais que C" a partir dos próprios features,
+    ao contrário de FastRelationalGCN que usa apenas matrizes fixas.
+
+    Parâmetros aprendidos:
+        W: (num_graphs, in_features, out_features) — transformação por grafo
+        a: (num_graphs, 2*out_features, 1)         — vetor de atenção por grafo
+    """
+
+    def __init__(self, in_features, out_features, num_graphs=2, dropout=0.4):
+        super().__init__()
+        self.num_graphs = num_graphs
+        self.out_features = out_features
+        self.W = nn.Parameter(torch.empty(num_graphs, in_features, out_features))
+        self.a = nn.Parameter(torch.empty(num_graphs, 2 * out_features, 1))
+        nn.init.xavier_uniform_(self.W)
+        nn.init.xavier_uniform_(self.a)
+        self.leakyrelu = nn.LeakyReLU(0.2)
+        self.dropout = nn.Dropout(dropout)
+        self.ln = nn.LayerNorm(out_features)
+        self.prelu = nn.PReLU()
+
+    def forward(self, x, adj_list):
+        # x: (BT, N, C)
+        if isinstance(adj_list, list):
+            adjs = torch.stack(adj_list[: self.num_graphs])
+        else:
+            adjs = adj_list
+
+        # Transformação: (G, BT, N, out)
+        Wh = torch.einsum('bnc,gcf->gbnf', x, self.W)
+
+        a_src = self.a[:, : self.out_features, :]   # (G, out, 1)
+        a_dst = self.a[:, self.out_features :, :]   # (G, out, 1)
+
+        # Scores de atenção: (G, BT, N, 1)
+        f_src = torch.einsum('gbnf,gfz->gbnz', Wh, a_src)
+        f_dst = torch.einsum('gbnf,gfz->gbnz', Wh, a_dst)
+
+        # Atenção por par de nós vizinhos: (G, BT, N, N)
+        logits = self.leakyrelu(f_src + f_dst.transpose(-2, -1))
+
+        # Mascarar nós não conectados
+        mask = (adjs.unsqueeze(1) == 0)
+        logits = logits.masked_fill(mask, -9e15)
+
+        attention = F.softmax(logits, dim=-1)
+        attention = self.dropout(attention)
+
+        # Agregação + média sobre grafos: (BT, N, out)
+        out = torch.einsum('gbij,gbjf->gbif', attention, Wh).mean(dim=0)
+        return self.ln(self.prelu(out))
+
+
+class STGATBlock_v5(nn.Module):
+    """
+    Bloco ST-GAT v5: time_conv → VectGATLayer (atenção por aresta) → MultiHeadTemporalAttention.
+
+    Restauração do design original Phase4 com:
+    - PReLU na convolução temporal
+    - LayerNorm dentro do VectGATLayer
+    - Residual connection garantida
+    """
+
+    def __init__(self, in_channels, out_channels, time_steps, num_graphs=2, dropout=0.4):
+        super().__init__()
+        self.time_conv = nn.Conv2d(in_channels, out_channels, (1, 3), padding=(0, 1))
+        self.prelu = nn.PReLU()
+        self.gat = VectGATLayer(out_channels, out_channels, num_graphs, dropout)
+        self.temp_attn = MultiHeadTemporalAttention(out_channels)
+        self.residual = (
+            nn.Conv2d(in_channels, out_channels, 1) if in_channels != out_channels else nn.Identity()
+        )
+
+    def forward(self, x, adj_list):
+        res = self.residual(x)
+        x = self.prelu(self.time_conv(x))
+        B, C, N, T = x.shape
+        x_flat = x.permute(0, 3, 2, 1).reshape(B * T, N, C)
+        x_spatial = self.gat(x_flat, adj_list)
+        x = x_spatial.reshape(B, T, N, C).permute(0, 3, 2, 1)
+        x = self.temp_attn(x)
+        return x + res
+
+
+class DeepSTGAT_v5(nn.Module):
+    """
+    ST-GAT v5 — 3 camadas com VectGATLayer (atenção verdadeira por aresta).
+
+    Evolução do DeepSTGAT original (Phase4) com:
+    - 3 layers: in → 48 → 96 → 96 (maior capacidade que o original 32→64)
+    - 41 canais de entrada (37 CVLI + 4 momentum)
+    - FC head profundo: 96 → 48 → 1
+    - Suporte a 2 grafos (geo + conflito)
+
+    Alvo: superar DeepSTGAT_64 (63.2% P@10) com discriminação espacial superior
+    via atenção aprendida por aresta.
+    """
+
+    def __init__(self, num_nodes, in_channels, time_steps, num_graphs=2, dropout=0.4):
+        super().__init__()
+        self.layer1 = STGATBlock_v5(in_channels, 48, time_steps, num_graphs, dropout)
+        self.layer2 = STGATBlock_v5(48, 96, time_steps, num_graphs, dropout)
+        self.layer3 = STGATBlock_v5(96, 96, time_steps, num_graphs, dropout)
+        self.final_conv = nn.Conv2d(96, 96, kernel_size=(1, time_steps))
+        self.prelu_final = nn.PReLU()
+        self.fc = nn.Sequential(
+            nn.Linear(96, 48),
+            nn.PReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(48, 1),
+        )
+
+    def forward(self, x, adj_list):
+        x = self.layer1(x, adj_list)
+        x = self.layer2(x, adj_list)
+        x = self.layer3(x, adj_list)
+        x = self.prelu_final(self.final_conv(x)).squeeze(-1).permute(0, 2, 1)
+        return self.fc(x)
+
+
+
 class MultiHeadTemporalAttention(nn.Module):
     def __init__(self, channels, heads=2):
         super().__init__()
@@ -318,6 +451,7 @@ class FortalezaHeteroSTGAT(nn.Module):
 
 
 MODEL_REGISTRY = {
+    "DeepSTGAT_v5": DeepSTGAT_v5,          # v5: VectGATLayer restaurado + 3 camadas 48→96→96
     "DeepSTGAT_64": DeepSTGAT_64,
     "DeepSTGAT_80": DeepSTGAT_80,
     "ShallowGAT": ShallowGAT,

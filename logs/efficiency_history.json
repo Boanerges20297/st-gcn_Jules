@@ -1,677 +1,5 @@
 [
   {
-    "date": "2026-05-15 00:00:00",
-    "total_events": 19,
-    "brute_cvli": 19,
-    "exogenous": 0,
-    "exogenous_conflict": 0,
-    "police_qualified_actions_7d": 0,
-    "police_administrative_events_7d": 0,
-    "assigned_total_events": 19,
-    "unmapped_total_events": 0,
-    "assigned_brute_cvli": 19,
-    "assigned_exogenous": 0,
-    "unmapped_exogenous": 0,
-    "assigned_police_qualified_actions": 0,
-    "unmapped_police_qualified_actions": 0,
-    "unmapped_exogenous_sample": [],
-    "global": {
-      "total_nodes": 191,
-      "active_locations": 14,
-      "total_events": 19,
-      "ranking_top10": [
-        "MARACANAU",
-        "CAUCAIA",
-        "ITAPAJE",
-        "AEROLANDIA",
-        "BOM JARDIM",
-        "BARROSO",
-        "ANCURI",
-        "VARZEA ALEGRE",
-        "TIANGUA",
-        "CONJUNTO PALMEIRAS"
-      ],
-      "gt_sample": [
-        "AEROLANDIA",
-        "ANCURI",
-        "BARROSO",
-        "BOM JARDIM",
-        "CONJUNTO PALMEIRAS",
-        "HORIZONTE",
-        "ITAITINGA",
-        "TRAIRI",
-        "JUAZEIRO DO NORTE",
-        "TIANGUA",
-        "ITAPAJE",
-        "CARIRE",
-        "VARZEA ALEGRE",
-        "ALTO SANTO"
-      ],
-      "p5": 0.6,
-      "recall5": 0.2143,
-      "hits5": [
-        "ITAPAJE",
-        "AEROLANDIA",
-        "BOM JARDIM"
-      ],
-      "p10": 0.8,
-      "recall10": 0.5714,
-      "hits10": [
-        "ITAPAJE",
-        "AEROLANDIA",
-        "BOM JARDIM",
-        "BARROSO",
-        "ANCURI",
-        "VARZEA ALEGRE",
-        "TIANGUA",
-        "CONJUNTO PALMEIRAS"
-      ],
-      "p20": 0.55,
-      "recall20": 0.7857,
-      "hits20": [
-        "ITAPAJE",
-        "AEROLANDIA",
-        "BOM JARDIM",
-        "BARROSO",
-        "ANCURI",
-        "VARZEA ALEGRE",
-        "TIANGUA",
-        "CONJUNTO PALMEIRAS",
-        "ALTO SANTO",
-        "JUAZEIRO DO NORTE",
-        "CARIRE"
-      ]
-    },
-    "fortaleza": {
-      "total_nodes": 122,
-      "active_locations": 5,
-      "total_events": 6,
-      "ranking_top10": [
-        "AEROLANDIA",
-        "BOM JARDIM",
-        "BARROSO",
-        "ANCURI",
-        "CONJUNTO PALMEIRAS",
-        "CURIO",
-        "MESSEJANA",
-        "PARQUE IRACEMA",
-        "GRANJA LISBOA",
-        "JANGURUSSU"
-      ],
-      "gt_sample": [
-        "AEROLANDIA",
-        "ANCURI",
-        "BARROSO",
-        "BOM JARDIM",
-        "CONJUNTO PALMEIRAS"
-      ],
-      "p5": 1.0,
-      "recall5": 1.0,
-      "hits5": [
-        "AEROLANDIA",
-        "BOM JARDIM",
-        "BARROSO",
-        "ANCURI",
-        "CONJUNTO PALMEIRAS"
-      ],
-      "p10": 0.5,
-      "recall10": 1.0,
-      "hits10": [
-        "AEROLANDIA",
-        "BOM JARDIM",
-        "BARROSO",
-        "ANCURI",
-        "CONJUNTO PALMEIRAS"
-      ],
-      "p20": 0.25,
-      "recall20": 1.0,
-      "hits20": [
-        "AEROLANDIA",
-        "BOM JARDIM",
-        "BARROSO",
-        "ANCURI",
-        "CONJUNTO PALMEIRAS"
-      ]
-    },
-    "rmf": {
-      "total_nodes": 19,
-      "active_locations": 3,
-      "total_events": 5,
-      "ranking_top10": [
-        "MARACANAU",
-        "CAUCAIA",
-        "ITAITINGA",
-        "HORIZONTE",
-        "PARAIPABA",
-        "EUSEBIO",
-        "PACAJUS",
-        "SAO LUIS DO CURU",
-        "PINDORETAMA",
-        "PACATUBA"
-      ],
-      "gt_sample": [
-        "HORIZONTE",
-        "ITAITINGA",
-        "TRAIRI"
-      ],
-      "p5": 0.4,
-      "recall5": 0.6667,
-      "hits5": [
-        "ITAITINGA",
-        "HORIZONTE"
-      ],
-      "p10": 0.2,
-      "recall10": 0.6667,
-      "hits10": [
-        "ITAITINGA",
-        "HORIZONTE"
-      ],
-      "p20": 0.1579,
-      "recall20": 1.0,
-      "hits20": [
-        "ITAITINGA",
-        "HORIZONTE",
-        "TRAIRI"
-      ]
-    },
-    "interior": {
-      "total_nodes": 50,
-      "active_locations": 6,
-      "total_events": 8,
-      "ranking_top10": [
-        "ITAPAJE",
-        "VARZEA ALEGRE",
-        "TIANGUA",
-        "ALTO SANTO",
-        "JUAZEIRO DO NORTE",
-        "CARIRE",
-        "LIMOEIRO DO NORTE",
-        "SOBRAL",
-        "ACOPIARA",
-        "CEDRO"
-      ],
-      "gt_sample": [
-        "JUAZEIRO DO NORTE",
-        "TIANGUA",
-        "ITAPAJE",
-        "CARIRE",
-        "VARZEA ALEGRE",
-        "ALTO SANTO"
-      ],
-      "p5": 1.0,
-      "recall5": 0.8333,
-      "hits5": [
-        "ITAPAJE",
-        "VARZEA ALEGRE",
-        "TIANGUA",
-        "ALTO SANTO",
-        "JUAZEIRO DO NORTE"
-      ],
-      "p10": 0.6,
-      "recall10": 1.0,
-      "hits10": [
-        "ITAPAJE",
-        "VARZEA ALEGRE",
-        "TIANGUA",
-        "ALTO SANTO",
-        "JUAZEIRO DO NORTE",
-        "CARIRE"
-      ],
-      "p20": 0.3,
-      "recall20": 1.0,
-      "hits20": [
-        "ITAPAJE",
-        "VARZEA ALEGRE",
-        "TIANGUA",
-        "ALTO SANTO",
-        "JUAZEIRO DO NORTE",
-        "CARIRE"
-      ]
-    }
-  },
-  {
-    "date": "2026-05-20 00:00:00",
-    "total_events": 18,
-    "brute_cvli": 18,
-    "exogenous": 0,
-    "exogenous_conflict": 0,
-    "police_qualified_actions_7d": 0,
-    "police_administrative_events_7d": 0,
-    "assigned_total_events": 18,
-    "unmapped_total_events": 0,
-    "assigned_brute_cvli": 18,
-    "assigned_exogenous": 0,
-    "unmapped_exogenous": 0,
-    "assigned_police_qualified_actions": 0,
-    "unmapped_police_qualified_actions": 0,
-    "unmapped_exogenous_sample": [],
-    "global": {
-      "total_nodes": 178,
-      "active_locations": 11,
-      "total_events": 18,
-      "ranking_top10": [
-        "MARACANAU",
-        "CAUCAIA",
-        "ITAPAJE",
-        "CAJAZEIRAS",
-        "ENGENHEIRO LUCIANO CAVALCANTE",
-        "VARZEA ALEGRE",
-        "TIANGUA",
-        "BARROSO",
-        "BARRA DO CEARA",
-        "MESSEJANA"
-      ],
-      "gt_sample": [
-        "CAJAZEIRAS",
-        "CONJUNTO PALMEIRAS",
-        "ENGENHEIRO LUCIANO CAVALCANTE",
-        "ITAITINGA",
-        "TRAIRI",
-        "JUAZEIRO DO NORTE",
-        "TIANGUA",
-        "ITAPAJE",
-        "CARIRE",
-        "VARZEA ALEGRE",
-        "ALTO SANTO"
-      ],
-      "p5": 0.6,
-      "recall5": 0.2727,
-      "hits5": [
-        "ITAPAJE",
-        "CAJAZEIRAS",
-        "ENGENHEIRO LUCIANO CAVALCANTE"
-      ],
-      "p10": 0.5,
-      "recall10": 0.4545,
-      "hits10": [
-        "ITAPAJE",
-        "CAJAZEIRAS",
-        "ENGENHEIRO LUCIANO CAVALCANTE",
-        "VARZEA ALEGRE",
-        "TIANGUA"
-      ],
-      "p20": 0.35,
-      "recall20": 0.6364,
-      "hits20": [
-        "ITAPAJE",
-        "CAJAZEIRAS",
-        "ENGENHEIRO LUCIANO CAVALCANTE",
-        "VARZEA ALEGRE",
-        "TIANGUA",
-        "ALTO SANTO",
-        "JUAZEIRO DO NORTE"
-      ]
-    },
-    "fortaleza": {
-      "total_nodes": 109,
-      "active_locations": 3,
-      "total_events": 4,
-      "ranking_top10": [
-        "CAJAZEIRAS",
-        "ENGENHEIRO LUCIANO CAVALCANTE",
-        "BARROSO",
-        "BARRA DO CEARA",
-        "MESSEJANA",
-        "QUINTINO CUNHA",
-        "CURIO",
-        "SIQUEIRA",
-        "JOSE WALTER",
-        "GRANJA LISBOA"
-      ],
-      "gt_sample": [
-        "CAJAZEIRAS",
-        "CONJUNTO PALMEIRAS",
-        "ENGENHEIRO LUCIANO CAVALCANTE"
-      ],
-      "p5": 0.4,
-      "recall5": 0.6667,
-      "hits5": [
-        "CAJAZEIRAS",
-        "ENGENHEIRO LUCIANO CAVALCANTE"
-      ],
-      "p10": 0.2,
-      "recall10": 0.6667,
-      "hits10": [
-        "CAJAZEIRAS",
-        "ENGENHEIRO LUCIANO CAVALCANTE"
-      ],
-      "p20": 0.15,
-      "recall20": 1.0,
-      "hits20": [
-        "CAJAZEIRAS",
-        "ENGENHEIRO LUCIANO CAVALCANTE",
-        "CONJUNTO PALMEIRAS"
-      ]
-    },
-    "rmf": {
-      "total_nodes": 19,
-      "active_locations": 2,
-      "total_events": 6,
-      "ranking_top10": [
-        "MARACANAU",
-        "CAUCAIA",
-        "TRAIRI",
-        "HORIZONTE",
-        "ITAITINGA",
-        "PARAIPABA",
-        "EUSEBIO",
-        "PACATUBA",
-        "SAO LUIS DO CURU",
-        "PACAJUS"
-      ],
-      "gt_sample": [
-        "ITAITINGA",
-        "TRAIRI"
-      ],
-      "p5": 0.4,
-      "recall5": 1.0,
-      "hits5": [
-        "TRAIRI",
-        "ITAITINGA"
-      ],
-      "p10": 0.2,
-      "recall10": 1.0,
-      "hits10": [
-        "TRAIRI",
-        "ITAITINGA"
-      ],
-      "p20": 0.1053,
-      "recall20": 1.0,
-      "hits20": [
-        "TRAIRI",
-        "ITAITINGA"
-      ]
-    },
-    "interior": {
-      "total_nodes": 50,
-      "active_locations": 6,
-      "total_events": 8,
-      "ranking_top10": [
-        "ITAPAJE",
-        "VARZEA ALEGRE",
-        "TIANGUA",
-        "ALTO SANTO",
-        "JUAZEIRO DO NORTE",
-        "CARIRE",
-        "SOBRAL",
-        "LIMOEIRO DO NORTE",
-        "IGUATU",
-        "BATURITE"
-      ],
-      "gt_sample": [
-        "JUAZEIRO DO NORTE",
-        "TIANGUA",
-        "ITAPAJE",
-        "CARIRE",
-        "VARZEA ALEGRE",
-        "ALTO SANTO"
-      ],
-      "p5": 1.0,
-      "recall5": 0.8333,
-      "hits5": [
-        "ITAPAJE",
-        "VARZEA ALEGRE",
-        "TIANGUA",
-        "ALTO SANTO",
-        "JUAZEIRO DO NORTE"
-      ],
-      "p10": 0.6,
-      "recall10": 1.0,
-      "hits10": [
-        "ITAPAJE",
-        "VARZEA ALEGRE",
-        "TIANGUA",
-        "ALTO SANTO",
-        "JUAZEIRO DO NORTE",
-        "CARIRE"
-      ],
-      "p20": 0.3,
-      "recall20": 1.0,
-      "hits20": [
-        "ITAPAJE",
-        "VARZEA ALEGRE",
-        "TIANGUA",
-        "ALTO SANTO",
-        "JUAZEIRO DO NORTE",
-        "CARIRE"
-      ]
-    }
-  },
-  {
-    "date": "2026-05-25 00:00:00",
-    "total_events": 21,
-    "brute_cvli": 21,
-    "exogenous": 0,
-    "exogenous_conflict": 0,
-    "police_qualified_actions_7d": 0,
-    "police_administrative_events_7d": 0,
-    "assigned_total_events": 21,
-    "unmapped_total_events": 0,
-    "assigned_brute_cvli": 21,
-    "assigned_exogenous": 0,
-    "unmapped_exogenous": 0,
-    "assigned_police_qualified_actions": 0,
-    "unmapped_police_qualified_actions": 0,
-    "unmapped_exogenous_sample": [],
-    "global": {
-      "total_nodes": 178,
-      "active_locations": 15,
-      "total_events": 21,
-      "ranking_top10": [
-        "MARACANAU",
-        "CAUCAIA",
-        "BARRA DO CEARA",
-        "ITAPAJE",
-        "CAJAZEIRAS",
-        "BONSUCESSO",
-        "TIANGUA",
-        "ANCURI",
-        "SAO BENTO",
-        "VARZEA ALEGRE"
-      ],
-      "gt_sample": [
-        "ANCURI",
-        "BARRA DO CEARA",
-        "BONSUCESSO",
-        "CAJAZEIRAS",
-        "SAO BENTO",
-        "PACATUBA",
-        "ITAITINGA",
-        "TRAIRI",
-        "GROAIRAS",
-        "TIANGUA",
-        "ITAPAJE",
-        "CARIRE",
-        "VARZEA ALEGRE",
-        "ALTO SANTO",
-        "POTENGI"
-      ],
-      "p5": 0.6,
-      "recall5": 0.2,
-      "hits5": [
-        "BARRA DO CEARA",
-        "ITAPAJE",
-        "CAJAZEIRAS"
-      ],
-      "p10": 0.8,
-      "recall10": 0.5333,
-      "hits10": [
-        "BARRA DO CEARA",
-        "ITAPAJE",
-        "CAJAZEIRAS",
-        "BONSUCESSO",
-        "TIANGUA",
-        "ANCURI",
-        "SAO BENTO",
-        "VARZEA ALEGRE"
-      ],
-      "p20": 0.5,
-      "recall20": 0.6667,
-      "hits20": [
-        "BARRA DO CEARA",
-        "ITAPAJE",
-        "CAJAZEIRAS",
-        "BONSUCESSO",
-        "TIANGUA",
-        "ANCURI",
-        "SAO BENTO",
-        "VARZEA ALEGRE",
-        "ALTO SANTO",
-        "GROAIRAS"
-      ]
-    },
-    "fortaleza": {
-      "total_nodes": 109,
-      "active_locations": 5,
-      "total_events": 5,
-      "ranking_top10": [
-        "BARRA DO CEARA",
-        "CAJAZEIRAS",
-        "BONSUCESSO",
-        "ANCURI",
-        "SAO BENTO",
-        "MONDUBIM",
-        "MESSEJANA",
-        "PEDRAS",
-        "BARROSO",
-        "PLANALTO AYRTON SENNA"
-      ],
-      "gt_sample": [
-        "ANCURI",
-        "BARRA DO CEARA",
-        "BONSUCESSO",
-        "CAJAZEIRAS",
-        "SAO BENTO"
-      ],
-      "p5": 1.0,
-      "recall5": 1.0,
-      "hits5": [
-        "BARRA DO CEARA",
-        "CAJAZEIRAS",
-        "BONSUCESSO",
-        "ANCURI",
-        "SAO BENTO"
-      ],
-      "p10": 0.5,
-      "recall10": 1.0,
-      "hits10": [
-        "BARRA DO CEARA",
-        "CAJAZEIRAS",
-        "BONSUCESSO",
-        "ANCURI",
-        "SAO BENTO"
-      ],
-      "p20": 0.25,
-      "recall20": 1.0,
-      "hits20": [
-        "BARRA DO CEARA",
-        "CAJAZEIRAS",
-        "BONSUCESSO",
-        "ANCURI",
-        "SAO BENTO"
-      ]
-    },
-    "rmf": {
-      "total_nodes": 19,
-      "active_locations": 3,
-      "total_events": 7,
-      "ranking_top10": [
-        "MARACANAU",
-        "CAUCAIA",
-        "PACATUBA",
-        "HORIZONTE",
-        "ITAITINGA",
-        "PARAIPABA",
-        "TRAIRI",
-        "EUSEBIO",
-        "SAO LUIS DO CURU",
-        "PACAJUS"
-      ],
-      "gt_sample": [
-        "PACATUBA",
-        "ITAITINGA",
-        "TRAIRI"
-      ],
-      "p5": 0.4,
-      "recall5": 0.6667,
-      "hits5": [
-        "PACATUBA",
-        "ITAITINGA"
-      ],
-      "p10": 0.3,
-      "recall10": 1.0,
-      "hits10": [
-        "PACATUBA",
-        "ITAITINGA",
-        "TRAIRI"
-      ],
-      "p20": 0.1579,
-      "recall20": 1.0,
-      "hits20": [
-        "PACATUBA",
-        "ITAITINGA",
-        "TRAIRI"
-      ]
-    },
-    "interior": {
-      "total_nodes": 50,
-      "active_locations": 7,
-      "total_events": 9,
-      "ranking_top10": [
-        "ITAPAJE",
-        "TIANGUA",
-        "VARZEA ALEGRE",
-        "ALTO SANTO",
-        "GROAIRAS",
-        "POTENGI",
-        "CARIRE",
-        "LIMOEIRO DO NORTE",
-        "SOBRAL",
-        "URUBURETAMA"
-      ],
-      "gt_sample": [
-        "GROAIRAS",
-        "TIANGUA",
-        "ITAPAJE",
-        "CARIRE",
-        "VARZEA ALEGRE",
-        "ALTO SANTO",
-        "POTENGI"
-      ],
-      "p5": 1.0,
-      "recall5": 0.7143,
-      "hits5": [
-        "ITAPAJE",
-        "TIANGUA",
-        "VARZEA ALEGRE",
-        "ALTO SANTO",
-        "GROAIRAS"
-      ],
-      "p10": 0.7,
-      "recall10": 1.0,
-      "hits10": [
-        "ITAPAJE",
-        "TIANGUA",
-        "VARZEA ALEGRE",
-        "ALTO SANTO",
-        "GROAIRAS",
-        "POTENGI",
-        "CARIRE"
-      ],
-      "p20": 0.35,
-      "recall20": 1.0,
-      "hits20": [
-        "ITAPAJE",
-        "TIANGUA",
-        "VARZEA ALEGRE",
-        "ALTO SANTO",
-        "GROAIRAS",
-        "POTENGI",
-        "CARIRE"
-      ]
-    }
-  },
-  {
     "date": "2026-05-26 00:00:00",
     "total_events": 21,
     "brute_cvli": 21,
@@ -2737,6 +2065,822 @@
         "CRATO",
         "AMONTADA",
         "TAUA"
+      ]
+    }
+  },
+  {
+    "date": "2026-07-03 00:00:00",
+    "total_events": 50,
+    "brute_cvli": 50,
+    "exogenous": 0,
+    "exogenous_conflict": 0,
+    "police_qualified_actions_7d": 0,
+    "police_administrative_events_7d": 0,
+    "assigned_total_events": 50,
+    "unmapped_total_events": 0,
+    "assigned_brute_cvli": 50,
+    "assigned_exogenous": 0,
+    "unmapped_exogenous": 0,
+    "assigned_police_qualified_actions": 0,
+    "unmapped_police_qualified_actions": 0,
+    "unmapped_exogenous_sample": [],
+    "global": {
+      "total_nodes": 79,
+      "active_locations": 27,
+      "total_events": 50,
+      "ranking_top10": [
+        "JUAZEIRO DO NORTE",
+        "SOBRAL",
+        "CAUCAIA",
+        "ITAPIPOCA",
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "BOA VIAGEM",
+        "GRANJA LISBOA",
+        "CRATO",
+        "PASSARE"
+      ],
+      "gt_sample": [
+        "PASSARE",
+        "ANCURI",
+        "CAJAZEIRAS",
+        "FLORESTA",
+        "CAUCAIA",
+        "MARACANAU",
+        "CASCAVEL",
+        "SAO GONCALO DO AMARANTE",
+        "TRAIRI",
+        "PARACURU",
+        "EUSEBIO",
+        "ITAITINGA",
+        "PARAIPABA",
+        "PINDORETAMA",
+        "SOBRAL"
+      ],
+      "p5": 0.8,
+      "recall5": 0.1481,
+      "hits5": [
+        "JUAZEIRO DO NORTE",
+        "SOBRAL",
+        "CAUCAIA",
+        "ITAPIPOCA"
+      ],
+      "p10": 0.7,
+      "recall10": 0.2593,
+      "hits10": [
+        "JUAZEIRO DO NORTE",
+        "SOBRAL",
+        "CAUCAIA",
+        "ITAPIPOCA",
+        "BOA VIAGEM",
+        "CRATO",
+        "PASSARE"
+      ],
+      "p20": 0.75,
+      "recall20": 0.5556,
+      "hits20": [
+        "JUAZEIRO DO NORTE",
+        "SOBRAL",
+        "CAUCAIA",
+        "ITAPIPOCA",
+        "BOA VIAGEM",
+        "CRATO",
+        "PASSARE",
+        "CAJAZEIRAS",
+        "MARACANAU",
+        "ANCURI",
+        "SAO BENEDITO",
+        "IGUATU",
+        "FLORESTA",
+        "MORADA NOVA",
+        "CASCAVEL"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 40,
+      "active_locations": 4,
+      "total_events": 4,
+      "ranking_top10": [
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "PASSARE",
+        "PLANALTO AYRTON SENNA",
+        "CAJAZEIRAS",
+        "JOSE WALTER",
+        "ANCURI",
+        "FLORESTA",
+        "MONDUBIM"
+      ],
+      "gt_sample": [
+        "PASSARE",
+        "ANCURI",
+        "CAJAZEIRAS",
+        "FLORESTA"
+      ],
+      "p5": 0.2,
+      "recall5": 0.25,
+      "hits5": [
+        "PASSARE"
+      ],
+      "p10": 0.4,
+      "recall10": 1.0,
+      "hits10": [
+        "PASSARE",
+        "CAJAZEIRAS",
+        "ANCURI",
+        "FLORESTA"
+      ],
+      "p20": 0.2,
+      "recall20": 1.0,
+      "hits20": [
+        "PASSARE",
+        "CAJAZEIRAS",
+        "ANCURI",
+        "FLORESTA"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 19,
+      "active_locations": 10,
+      "total_events": 18,
+      "ranking_top10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "CASCAVEL",
+        "TRAIRI",
+        "ITAITINGA",
+        "MARANGUAPE",
+        "PACATUBA",
+        "EUSEBIO",
+        "PARACURU",
+        "SAO GONCALO DO AMARANTE"
+      ],
+      "gt_sample": [
+        "CAUCAIA",
+        "MARACANAU",
+        "CASCAVEL",
+        "SAO GONCALO DO AMARANTE",
+        "TRAIRI",
+        "PARACURU",
+        "EUSEBIO",
+        "ITAITINGA",
+        "PARAIPABA",
+        "PINDORETAMA"
+      ],
+      "p5": 1.0,
+      "recall5": 0.5,
+      "hits5": [
+        "CAUCAIA",
+        "MARACANAU",
+        "CASCAVEL",
+        "TRAIRI",
+        "ITAITINGA"
+      ],
+      "p10": 0.8,
+      "recall10": 0.8,
+      "hits10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "CASCAVEL",
+        "TRAIRI",
+        "ITAITINGA",
+        "EUSEBIO",
+        "PARACURU",
+        "SAO GONCALO DO AMARANTE"
+      ],
+      "p20": 0.5263,
+      "recall20": 1.0,
+      "hits20": [
+        "CAUCAIA",
+        "MARACANAU",
+        "CASCAVEL",
+        "TRAIRI",
+        "ITAITINGA",
+        "EUSEBIO",
+        "PARACURU",
+        "SAO GONCALO DO AMARANTE",
+        "PINDORETAMA",
+        "PARAIPABA"
+      ]
+    },
+    "interior": {
+      "total_nodes": 20,
+      "active_locations": 13,
+      "total_events": 28,
+      "ranking_top10": [
+        "JUAZEIRO DO NORTE",
+        "SOBRAL",
+        "ITAPIPOCA",
+        "BOA VIAGEM",
+        "CRATO",
+        "SAO BENEDITO",
+        "IGUATU",
+        "MORADA NOVA",
+        "AMONTADA",
+        "TIANGUA"
+      ],
+      "gt_sample": [
+        "SOBRAL",
+        "JUAZEIRO DO NORTE",
+        "ITAPIPOCA",
+        "CRATO",
+        "AMONTADA",
+        "QUIXADA",
+        "MORADA NOVA",
+        "TIANGUA",
+        "BOA VIAGEM",
+        "RUSSAS",
+        "IGUATU",
+        "SAO BENEDITO",
+        "FORQUILHA"
+      ],
+      "p5": 1.0,
+      "recall5": 0.3846,
+      "hits5": [
+        "JUAZEIRO DO NORTE",
+        "SOBRAL",
+        "ITAPIPOCA",
+        "BOA VIAGEM",
+        "CRATO"
+      ],
+      "p10": 1.0,
+      "recall10": 0.7692,
+      "hits10": [
+        "JUAZEIRO DO NORTE",
+        "SOBRAL",
+        "ITAPIPOCA",
+        "BOA VIAGEM",
+        "CRATO",
+        "SAO BENEDITO",
+        "IGUATU",
+        "MORADA NOVA",
+        "AMONTADA",
+        "TIANGUA"
+      ],
+      "p20": 0.65,
+      "recall20": 1.0,
+      "hits20": [
+        "JUAZEIRO DO NORTE",
+        "SOBRAL",
+        "ITAPIPOCA",
+        "BOA VIAGEM",
+        "CRATO",
+        "SAO BENEDITO",
+        "IGUATU",
+        "MORADA NOVA",
+        "AMONTADA",
+        "TIANGUA",
+        "QUIXADA",
+        "RUSSAS",
+        "FORQUILHA"
+      ]
+    }
+  },
+  {
+    "date": "2026-07-10 00:00:00",
+    "total_events": 51,
+    "brute_cvli": 51,
+    "exogenous": 0,
+    "exogenous_conflict": 0,
+    "police_qualified_actions_7d": 0,
+    "police_administrative_events_7d": 0,
+    "assigned_total_events": 51,
+    "unmapped_total_events": 0,
+    "assigned_brute_cvli": 51,
+    "assigned_exogenous": 0,
+    "unmapped_exogenous": 0,
+    "assigned_police_qualified_actions": 0,
+    "unmapped_police_qualified_actions": 0,
+    "unmapped_exogenous_sample": [],
+    "global": {
+      "total_nodes": 79,
+      "active_locations": 27,
+      "total_events": 51,
+      "ranking_top10": [
+        "CAUCAIA",
+        "JUAZEIRO DO NORTE",
+        "SOBRAL",
+        "GRANJA LISBOA",
+        "MARACANAU",
+        "ITAPIPOCA",
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "VARJOTA",
+        "MORADA NOVA"
+      ],
+      "gt_sample": [
+        "GRANJA LISBOA",
+        "VARJOTA",
+        "CONJUNTO PALMEIRAS",
+        "EDSON QUEIROZ",
+        "FLORESTA",
+        "JOSE DE ALENCAR",
+        "CAUCAIA",
+        "MARACANAU",
+        "CASCAVEL",
+        "PACAJUS",
+        "HORIZONTE",
+        "TRAIRI",
+        "ITAITINGA",
+        "SOBRAL",
+        "JUAZEIRO DO NORTE"
+      ],
+      "p5": 1.0,
+      "recall5": 0.1852,
+      "hits5": [
+        "CAUCAIA",
+        "JUAZEIRO DO NORTE",
+        "SOBRAL",
+        "GRANJA LISBOA",
+        "MARACANAU"
+      ],
+      "p10": 0.8,
+      "recall10": 0.2963,
+      "hits10": [
+        "CAUCAIA",
+        "JUAZEIRO DO NORTE",
+        "SOBRAL",
+        "GRANJA LISBOA",
+        "MARACANAU",
+        "ITAPIPOCA",
+        "VARJOTA",
+        "MORADA NOVA"
+      ],
+      "p20": 0.85,
+      "recall20": 0.6296,
+      "hits20": [
+        "CAUCAIA",
+        "JUAZEIRO DO NORTE",
+        "SOBRAL",
+        "GRANJA LISBOA",
+        "MARACANAU",
+        "ITAPIPOCA",
+        "VARJOTA",
+        "MORADA NOVA",
+        "JOSE DE ALENCAR",
+        "BOA VIAGEM",
+        "CONJUNTO PALMEIRAS",
+        "EDSON QUEIROZ",
+        "ITAPAJE",
+        "RUSSAS",
+        "IGUATU",
+        "BARBALHA",
+        "FLORESTA"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 40,
+      "active_locations": 6,
+      "total_events": 6,
+      "ranking_top10": [
+        "GRANJA LISBOA",
+        "BARRA DO CEARA",
+        "MESSEJANA",
+        "VARJOTA",
+        "JOSE DE ALENCAR",
+        "CONJUNTO PALMEIRAS",
+        "EDSON QUEIROZ",
+        "PLANALTO AYRTON SENNA",
+        "FLORESTA",
+        "JOSE WALTER"
+      ],
+      "gt_sample": [
+        "GRANJA LISBOA",
+        "VARJOTA",
+        "CONJUNTO PALMEIRAS",
+        "EDSON QUEIROZ",
+        "FLORESTA",
+        "JOSE DE ALENCAR"
+      ],
+      "p5": 0.6,
+      "recall5": 0.5,
+      "hits5": [
+        "GRANJA LISBOA",
+        "VARJOTA",
+        "JOSE DE ALENCAR"
+      ],
+      "p10": 0.6,
+      "recall10": 1.0,
+      "hits10": [
+        "GRANJA LISBOA",
+        "VARJOTA",
+        "JOSE DE ALENCAR",
+        "CONJUNTO PALMEIRAS",
+        "EDSON QUEIROZ",
+        "FLORESTA"
+      ],
+      "p20": 0.3,
+      "recall20": 1.0,
+      "hits20": [
+        "GRANJA LISBOA",
+        "VARJOTA",
+        "JOSE DE ALENCAR",
+        "CONJUNTO PALMEIRAS",
+        "EDSON QUEIROZ",
+        "FLORESTA"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 19,
+      "active_locations": 7,
+      "total_events": 15,
+      "ranking_top10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "PACAJUS",
+        "HORIZONTE",
+        "CASCAVEL",
+        "MARANGUAPE",
+        "PACATUBA",
+        "ITAITINGA",
+        "TRAIRI",
+        "SAO GONCALO DO AMARANTE"
+      ],
+      "gt_sample": [
+        "CAUCAIA",
+        "MARACANAU",
+        "CASCAVEL",
+        "PACAJUS",
+        "HORIZONTE",
+        "TRAIRI",
+        "ITAITINGA"
+      ],
+      "p5": 1.0,
+      "recall5": 0.7143,
+      "hits5": [
+        "CAUCAIA",
+        "MARACANAU",
+        "PACAJUS",
+        "HORIZONTE",
+        "CASCAVEL"
+      ],
+      "p10": 0.7,
+      "recall10": 1.0,
+      "hits10": [
+        "CAUCAIA",
+        "MARACANAU",
+        "PACAJUS",
+        "HORIZONTE",
+        "CASCAVEL",
+        "ITAITINGA",
+        "TRAIRI"
+      ],
+      "p20": 0.3684,
+      "recall20": 1.0,
+      "hits20": [
+        "CAUCAIA",
+        "MARACANAU",
+        "PACAJUS",
+        "HORIZONTE",
+        "CASCAVEL",
+        "ITAITINGA",
+        "TRAIRI"
+      ]
+    },
+    "interior": {
+      "total_nodes": 20,
+      "active_locations": 14,
+      "total_events": 30,
+      "ranking_top10": [
+        "JUAZEIRO DO NORTE",
+        "SOBRAL",
+        "ITAPIPOCA",
+        "MORADA NOVA",
+        "BOA VIAGEM",
+        "ITAPAJE",
+        "RUSSAS",
+        "IGUATU",
+        "BARBALHA",
+        "CRATO"
+      ],
+      "gt_sample": [
+        "SOBRAL",
+        "JUAZEIRO DO NORTE",
+        "ITAPIPOCA",
+        "CRATO",
+        "QUIXADA",
+        "MORADA NOVA",
+        "CANINDE",
+        "TIANGUA",
+        "ITAPAJE",
+        "BOA VIAGEM",
+        "RUSSAS",
+        "IGUATU",
+        "SAO BENEDITO",
+        "BARBALHA"
+      ],
+      "p5": 1.0,
+      "recall5": 0.3571,
+      "hits5": [
+        "JUAZEIRO DO NORTE",
+        "SOBRAL",
+        "ITAPIPOCA",
+        "MORADA NOVA",
+        "BOA VIAGEM"
+      ],
+      "p10": 1.0,
+      "recall10": 0.7143,
+      "hits10": [
+        "JUAZEIRO DO NORTE",
+        "SOBRAL",
+        "ITAPIPOCA",
+        "MORADA NOVA",
+        "BOA VIAGEM",
+        "ITAPAJE",
+        "RUSSAS",
+        "IGUATU",
+        "BARBALHA",
+        "CRATO"
+      ],
+      "p20": 0.7,
+      "recall20": 1.0,
+      "hits20": [
+        "JUAZEIRO DO NORTE",
+        "SOBRAL",
+        "ITAPIPOCA",
+        "MORADA NOVA",
+        "BOA VIAGEM",
+        "ITAPAJE",
+        "RUSSAS",
+        "IGUATU",
+        "BARBALHA",
+        "CRATO",
+        "CANINDE",
+        "TIANGUA",
+        "QUIXADA",
+        "SAO BENEDITO"
+      ]
+    }
+  },
+  {
+    "date": "2026-07-17 00:00:00",
+    "total_events": 45,
+    "brute_cvli": 45,
+    "exogenous": 0,
+    "exogenous_conflict": 0,
+    "police_qualified_actions_7d": 0,
+    "police_administrative_events_7d": 0,
+    "assigned_total_events": 45,
+    "unmapped_total_events": 0,
+    "assigned_brute_cvli": 45,
+    "assigned_exogenous": 0,
+    "unmapped_exogenous": 0,
+    "assigned_police_qualified_actions": 0,
+    "unmapped_police_qualified_actions": 0,
+    "unmapped_exogenous_sample": [],
+    "global": {
+      "total_nodes": 79,
+      "active_locations": 25,
+      "total_events": 45,
+      "ranking_top10": [
+        "MARACANAU",
+        "BOA VIAGEM",
+        "JUAZEIRO DO NORTE",
+        "IGUATU",
+        "GRANJA LISBOA",
+        "ITAPAJE",
+        "SOBRAL",
+        "CAUCAIA",
+        "MESSEJANA",
+        "CRATO"
+      ],
+      "gt_sample": [
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "CONJUNTO PALMEIRAS",
+        "EDSON QUEIROZ",
+        "JOSE DE ALENCAR",
+        "CAUCAIA",
+        "MARACANAU",
+        "CASCAVEL",
+        "PACAJUS",
+        "HORIZONTE",
+        "TRAIRI",
+        "ITAITINGA",
+        "SOBRAL",
+        "JUAZEIRO DO NORTE",
+        "ITAPIPOCA"
+      ],
+      "p5": 1.0,
+      "recall5": 0.2,
+      "hits5": [
+        "MARACANAU",
+        "BOA VIAGEM",
+        "JUAZEIRO DO NORTE",
+        "IGUATU",
+        "GRANJA LISBOA"
+      ],
+      "p10": 1.0,
+      "recall10": 0.4,
+      "hits10": [
+        "MARACANAU",
+        "BOA VIAGEM",
+        "JUAZEIRO DO NORTE",
+        "IGUATU",
+        "GRANJA LISBOA",
+        "ITAPAJE",
+        "SOBRAL",
+        "CAUCAIA",
+        "MESSEJANA",
+        "CRATO"
+      ],
+      "p20": 0.8,
+      "recall20": 0.64,
+      "hits20": [
+        "MARACANAU",
+        "BOA VIAGEM",
+        "JUAZEIRO DO NORTE",
+        "IGUATU",
+        "GRANJA LISBOA",
+        "ITAPAJE",
+        "SOBRAL",
+        "CAUCAIA",
+        "MESSEJANA",
+        "CRATO",
+        "BARBALHA",
+        "ITAPIPOCA",
+        "JOSE DE ALENCAR",
+        "AMONTADA",
+        "SAO BENEDITO",
+        "CONJUNTO PALMEIRAS"
+      ]
+    },
+    "fortaleza": {
+      "total_nodes": 40,
+      "active_locations": 5,
+      "total_events": 6,
+      "ranking_top10": [
+        "GRANJA LISBOA",
+        "MESSEJANA",
+        "VARJOTA",
+        "FLORESTA",
+        "CAJAZEIRAS",
+        "ANCURI",
+        "JOSE DE ALENCAR",
+        "CONJUNTO PALMEIRAS",
+        "EDSON QUEIROZ",
+        "BARRA DO CEARA"
+      ],
+      "gt_sample": [
+        "MESSEJANA",
+        "GRANJA LISBOA",
+        "CONJUNTO PALMEIRAS",
+        "EDSON QUEIROZ",
+        "JOSE DE ALENCAR"
+      ],
+      "p5": 0.4,
+      "recall5": 0.4,
+      "hits5": [
+        "GRANJA LISBOA",
+        "MESSEJANA"
+      ],
+      "p10": 0.5,
+      "recall10": 1.0,
+      "hits10": [
+        "GRANJA LISBOA",
+        "MESSEJANA",
+        "JOSE DE ALENCAR",
+        "CONJUNTO PALMEIRAS",
+        "EDSON QUEIROZ"
+      ],
+      "p20": 0.25,
+      "recall20": 1.0,
+      "hits20": [
+        "GRANJA LISBOA",
+        "MESSEJANA",
+        "JOSE DE ALENCAR",
+        "CONJUNTO PALMEIRAS",
+        "EDSON QUEIROZ"
+      ]
+    },
+    "rmf": {
+      "total_nodes": 19,
+      "active_locations": 7,
+      "total_events": 12,
+      "ranking_top10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "ITAITINGA",
+        "CASCAVEL",
+        "TRAIRI",
+        "SAO LUIS DO CURU",
+        "MARANGUAPE",
+        "AQUIRAZ"
+      ],
+      "gt_sample": [
+        "CAUCAIA",
+        "MARACANAU",
+        "CASCAVEL",
+        "PACAJUS",
+        "HORIZONTE",
+        "TRAIRI",
+        "ITAITINGA"
+      ],
+      "p5": 1.0,
+      "recall5": 0.7143,
+      "hits5": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "ITAITINGA"
+      ],
+      "p10": 0.7,
+      "recall10": 1.0,
+      "hits10": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "ITAITINGA",
+        "CASCAVEL",
+        "TRAIRI"
+      ],
+      "p20": 0.3684,
+      "recall20": 1.0,
+      "hits20": [
+        "MARACANAU",
+        "CAUCAIA",
+        "HORIZONTE",
+        "PACAJUS",
+        "ITAITINGA",
+        "CASCAVEL",
+        "TRAIRI"
+      ]
+    },
+    "interior": {
+      "total_nodes": 20,
+      "active_locations": 13,
+      "total_events": 27,
+      "ranking_top10": [
+        "BOA VIAGEM",
+        "JUAZEIRO DO NORTE",
+        "IGUATU",
+        "ITAPAJE",
+        "SOBRAL",
+        "CRATO",
+        "BARBALHA",
+        "ITAPIPOCA",
+        "AMONTADA",
+        "SAO BENEDITO"
+      ],
+      "gt_sample": [
+        "SOBRAL",
+        "JUAZEIRO DO NORTE",
+        "ITAPIPOCA",
+        "CRATO",
+        "AMONTADA",
+        "MORADA NOVA",
+        "CANINDE",
+        "ITAPAJE",
+        "BOA VIAGEM",
+        "RUSSAS",
+        "IGUATU",
+        "SAO BENEDITO",
+        "BARBALHA"
+      ],
+      "p5": 1.0,
+      "recall5": 0.3846,
+      "hits5": [
+        "BOA VIAGEM",
+        "JUAZEIRO DO NORTE",
+        "IGUATU",
+        "ITAPAJE",
+        "SOBRAL"
+      ],
+      "p10": 1.0,
+      "recall10": 0.7692,
+      "hits10": [
+        "BOA VIAGEM",
+        "JUAZEIRO DO NORTE",
+        "IGUATU",
+        "ITAPAJE",
+        "SOBRAL",
+        "CRATO",
+        "BARBALHA",
+        "ITAPIPOCA",
+        "AMONTADA",
+        "SAO BENEDITO"
+      ],
+      "p20": 0.65,
+      "recall20": 1.0,
+      "hits20": [
+        "BOA VIAGEM",
+        "JUAZEIRO DO NORTE",
+        "IGUATU",
+        "ITAPAJE",
+        "SOBRAL",
+        "CRATO",
+        "BARBALHA",
+        "ITAPIPOCA",
+        "AMONTADA",
+        "SAO BENEDITO",
+        "RUSSAS",
+        "MORADA NOVA",
+        "CANINDE"
       ]
     }
   }

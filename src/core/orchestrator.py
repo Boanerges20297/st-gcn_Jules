@@ -81,6 +81,29 @@ class StateOrchestrator:
             }
             for reg in self.configs
         }
+
+        # --- ST-GAT v5 specialists (DeepSTGAT_v5, modelos retreinados 07/07/2026) ---
+        self.stgat_v5_configs = {
+            'fortaleza': {
+                'model_path': os.path.join(self.root, 'models', 'active', 'legacy_torch', 'fortaleza_model_active.pth'),
+                'data_path': os.path.join(self.root, 'data', 'processed', 'processed_fortaleza.pkl'),
+                'backend_type': 'torch_graph',
+                'window': 120,
+            },
+            'rmf': {
+                'model_path': os.path.join(self.root, 'models', 'active', 'legacy_torch', 'rmf_model.pth'),
+                'data_path': os.path.join(self.root, 'data', 'processed', 'processed_rmf.pkl'),
+                'backend_type': 'torch_graph',
+                'window': 14,
+            },
+            'interior': {
+                'model_path': os.path.join(self.root, 'models', 'active', 'legacy_torch', 'interior_model.pth'),
+                'data_path': os.path.join(self.root, 'data', 'processed', 'processed_interior.pkl'),
+                'backend_type': 'torch_graph',
+                'window': 14,
+            },
+        }
+        self.stgat_v5_specialists = {}
         
         self._window_state_path = os.path.join(self.root, 'data', 'window_state.json')
         self._hermes_export_lock = threading.Lock()
@@ -269,6 +292,44 @@ class StateOrchestrator:
                 except Exception as e:
                     print(f"❌ Erro ao carregar {region}: {e}")
         self._node_owners = {normalize_name(str(r['name'])): reg for reg, spec in self.specialists.items() for _, r in spec['data']['nodes_gdf'].iterrows()}
+        self._initialize_stgat_v5_models()
+
+    def _initialize_stgat_v5_models(self):
+        """Carrega os especialistas ST-GAT v5 (DeepSTGAT_v5 + NegBinom) para o modo stgat_v5."""
+        for region, cfg in self.stgat_v5_configs.items():
+            if not os.path.exists(cfg['model_path']) or not os.path.exists(cfg['data_path']):
+                continue
+            try:
+                data = self._load_pickle_safe(cfg['data_path'])
+                if not data:
+                    continue
+                num_nodes = len(data['nodes_gdf'])
+                ckpt = torch.load(cfg['model_path'], map_location=self.device, weights_only=False)
+                ckpt_meta = ckpt if isinstance(ckpt, dict) else {}
+                resolved_arch = (
+                    ckpt_meta.get('model_class')
+                    or ckpt_meta.get('architecture')
+                    or 'DeepSTGAT_v5'
+                )
+                model_class = get_model_class(resolved_arch)
+                in_channels = int(ckpt_meta.get('in_channels') or 41)
+                window = int(ckpt_meta.get('window') or cfg['window'])
+                model = model_class(
+                    num_nodes=num_nodes, in_channels=in_channels, time_steps=window
+                ).to(self.device)
+                state_dict = ckpt['model_state_dict'] if 'model_state_dict' in ckpt else ckpt
+                model.load_state_dict(state_dict, strict=False)
+                model.eval()
+                self.stgat_v5_specialists[region] = {
+                    'model': model,
+                    'data': data,
+                    'window': window,
+                    'channels': in_channels,
+                    'backend_type': 'torch_graph',
+                }
+                print(f"✅ [ST-GAT v5] Especialista {region.upper()} carregado ({in_channels}ch, window={window}d, {model_class.__name__}).")
+            except Exception as e:
+                print(f"⚠️ [ST-GAT v5] Falha ao carregar {region}: {e}")
 
     def _load_pickle_safe(self, path):
         """Carregamento robusto para evitar falhas de StringDtype (NotImplementedError)."""
@@ -1055,6 +1116,129 @@ class StateOrchestrator:
                 self._last_hermes_export_fingerprint = export_fingerprint
         except Exception as e:
             print(f"❌ [Hermes] Erro ao exportar artefatos para o Telegram Bot: {e}")
+
+    def get_combined_risk_stgat_v5(self, exogenous_shocks=None, return_trends=False):
+        """Predição usando especialistas ST-GAT v5 (DeepSTGAT_v5 + NegBinom, retreinados 07/07/2026).
+        Usa a mesma pipeline de inferência do get_combined_risk mas com stgat_v5_specialists.
+        Fallback para get_combined_risk se nenhum especialista v5 estiver carregado.
+        """
+        if not self.stgat_v5_specialists:
+            print("⚠️ [ST-GAT v5] Especialistas não carregados, usando fallback Poisson.")
+            return self.get_combined_risk(exogenous_shocks, return_trends)
+
+        combined_scores = {}
+        trends = {}
+
+        for region, spec in self.stgat_v5_specialists.items():
+            model, data, window = spec['model'], spec['data'], spec['window']
+            channels = spec.get('channels', 41)
+            cp = self.calib_params.get(region, next(iter(self.calib_params.values())))
+            num_nodes = len(data['nodes_gdf'])
+
+            extra_history = 60
+            total_window = window + extra_history
+            x_raw_extended = data['node_features'][:, -total_window:, :].copy()
+
+            sim_impact, sim_relief = np.zeros(num_nodes), np.zeros(num_nodes)
+            if exogenous_shocks:
+                for loc_name, info in exogenous_shocks.items():
+                    norm_target = normalize_name(loc_name)
+                    if isinstance(info, dict):
+                        intensity = float(info.get('intensity', 0.0))
+                        suppression = float(info.get('suppression_intensity', 0.0))
+                        for i, row in data['nodes_gdf'].iterrows():
+                            if normalize_name(row['name']) == norm_target:
+                                if intensity > 0:
+                                    sim_impact[i] = 2.5 * intensity
+                                if suppression > 0:
+                                    sim_relief[i] = 1.3 * suppression
+
+            momentum_feat = np.zeros((num_nodes, total_window, 4))
+            cold_streak = np.zeros(num_nodes)
+            for t in range(60, total_window):
+                r7 = x_raw_extended[:, t-7:t, 0].sum(axis=1)
+                p7 = x_raw_extended[:, t-14:t-7, 0].sum(axis=1)
+                momentum_feat[:, t, 0] = r7 - p7
+                momentum_feat[:, t, 1] = x_raw_extended[:, t-14:t, 0].sum(axis=1) - x_raw_extended[:, t-28:t-14, 0].sum(axis=1)
+                momentum_feat[:, t, 2] = x_raw_extended[:, t-30:t, 0].sum(axis=1) - x_raw_extended[:, t-60:t-30, 0].sum(axis=1)
+                cold_streak = np.where(x_raw_extended[:, t, 0] > 0, 0, cold_streak + 1)
+                momentum_feat[:, t, 3] = -np.clip(cold_streak, 0, 30)
+
+            if channels >= 37:
+                x_raw_extended[:, :, 33:37] = momentum_feat[:, :, :4]
+
+            x_final = x_raw_extended[:, -window:, :channels].copy()
+            for c in [0, 1, 2, 24, 27, 28, 31, 33, 34, 35, 36]:
+                if c < channels:
+                    m_c = x_final[:, :, c].mean()
+                    s_c = x_final[:, :, c].std() + 1e-6
+                    x_final[:, :, c] = (x_final[:, :, c] - m_c) / s_c
+
+            # Pad para garantir in_channels do modelo (41)
+            if x_final.shape[2] < channels:
+                pad_width = channels - x_final.shape[2]
+                x_final = np.pad(x_final, ((0, 0), (0, 0), (0, pad_width)), mode='constant')
+
+            x = torch.from_numpy(x_final).float().permute(2, 0, 1).unsqueeze(0).to(self.device)
+            adj = self._norm_adj(data['adj_geo'], data['adj_conflict'])
+
+            with torch.no_grad():
+                raw_out = model(x, adj).squeeze().cpu().numpy()
+
+            # softplus output (NegBinom treina com softplus(pred) como mu)
+            import torch.nn.functional as F_torch
+            mu = F_torch.softplus(torch.from_numpy(raw_out)).numpy()
+
+            norm_neural = (mu - mu.min()) / (mu.max() - mu.min() + 1e-6)
+            tension_vec = data['nodes_gdf']['tension_index'].values.astype(float)
+            norm_tension = (tension_vec - tension_vec.min()) / (tension_vec.max() - tension_vec.min() + 1e-6)
+            current_cvli_30d = x_raw_extended[:, -30:, 0].sum(axis=1)
+            historical_col = 'total_cvli' if 'total_cvli' in data['nodes_gdf'].columns else 'recent_cvli'
+            historical_cvli = data['nodes_gdf'][historical_col].fillna(0).values.astype(float)
+            live_support = np.clip(current_cvli_30d / 2.0, 0, 1)
+
+            neural_weight = max(0.50, cp.get('norm_neural_weight', 0.20))
+            support_weight = 0.25
+            tension_weight = max(0.0, 1.0 - neural_weight - support_weight)
+            score_raw = (
+                (neural_weight * norm_neural)
+                + (support_weight * live_support)
+                + (tension_weight * norm_tension * live_support)
+            ) * 100.0
+
+            if sim_impact.any():
+                score_raw += sim_impact * 8.0
+            if sim_relief.any():
+                score_raw -= sim_relief * 5.0
+
+            if cp.get('use_historical_fallback') and cp.get('historical_top10'):
+                hist_top10 = [normalize_name(n) for n in cp['historical_top10']]
+                for i, row in data['nodes_gdf'].iterrows():
+                    if normalize_name(row['name']) in hist_top10:
+                        score_raw[i] = max(score_raw[i], cp.get('min_risk', 30.0) + 15.0)
+
+            score_raw = np.clip(score_raw, 0.0, 100.0)
+
+            for i, row in data['nodes_gdf'].iterrows():
+                name_key = normalize_name(str(row['name']))
+                combined_scores[name_key] = float(score_raw[i])
+                if return_trends:
+                    trends[name_key] = 'stable'
+
+        # Regiões sem specialist v5 fazem fallback para Poisson
+        for region in self.specialists:
+            if region not in self.stgat_v5_specialists:
+                spec = self.specialists[region]
+                if spec.get('backend_type') == 'classical_poisson':
+                    fallback_scores, fallback_details = spec['model'].predict_scores(exogenous_shocks)
+                    for name_key, score_value in fallback_scores.items():
+                        combined_scores.setdefault(name_key, float(score_value))
+                        if return_trends:
+                            trends.setdefault(name_key, 'stable')
+
+        if return_trends:
+            return combined_scores, trends
+        return combined_scores
 
     def get_combined_risk(self, exogenous_shocks=None, return_trends=False):
         # Generate cache key based on exogenous shocks

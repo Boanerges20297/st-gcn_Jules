@@ -508,26 +508,25 @@ def process_ism_data():
     
     df_pool = pd.DataFrame(pre_records).drop_duplicates(subset=['name'])
     
-    # Seleção Top-K por Região baseada no ranking de 2 ANOS
+    # Seleção Top-K por Região baseada no ranking de CVLI recente (2 anos)
     final_records = []
     
-    # 1. Fortaleza: Todos os bairros com CVLI >= 1 (Solicitação do Usuário)
-    f_all = df_pool[(df_pool['regiao'] == 'fortaleza') & (df_pool['recent_cvli'] >= 1)]
+    # 1. Fortaleza: Top 40 bairros por CVLI recente
+    f_all = df_pool[df_pool['regiao'] == 'fortaleza'].sort_values('recent_cvli', ascending=False).head(40)
     final_records.extend(f_all.to_dict('records'))
     
-    # 2. RMF: Todos os 18 Oficiais (Ordenados por criticidade recente)
-    rmf = df_pool[df_pool['regiao'] == 'rmf'].sort_values('recent_cvli', ascending=False)
+    # 2. RMF: Top 40 municípios/bairros por CVLI recente (todas as cidades)
+    rmf = df_pool[df_pool['regiao'] == 'rmf'].sort_values('recent_cvli', ascending=False).head(40)
     final_records.extend(rmf.to_dict('records'))
     
-    # 3. Interior: Top 50 (Dinâmico 2 anos - Expandido)
-    i50 = df_pool[df_pool['regiao'] == 'interior'].sort_values('recent_cvli', ascending=False).head(50)
+    # 3. Interior: Top 20 por CVLI recente
+    i50 = df_pool[df_pool['regiao'] == 'interior'].sort_values('recent_cvli', ascending=False).head(20)
     final_records.extend(i50.to_dict('records'))
     
     nodes_df = pd.DataFrame(final_records).reset_index(drop=True)
     nodes_gdf = gpd.GeoDataFrame(nodes_df, geometry=gpd.points_from_xy(nodes_df.long, nodes_df.lat), crs="EPSG:4326")
     
     logging.info(f"📊 Malha Final: Fortaleza({len(f_all)}), RMF({len(rmf)}), Interior({len(i50)})")
-    nodes_gdf = gpd.GeoDataFrame(nodes_df, geometry=gpd.points_from_xy(nodes_df.long, nodes_df.lat), crs="EPSG:4326")
 
     # 4. Construir Tensores (Otimizado)
     # Janela Dinâmica: 01/01/2022 até a última data disponível (Maio/2026+)

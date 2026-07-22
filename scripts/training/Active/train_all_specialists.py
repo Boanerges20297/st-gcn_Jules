@@ -4,6 +4,7 @@ Versao 2026-05-21: Janela 14d, MemPalace Universal, Honesty Constraint.
 """
 import gc
 import logging
+import math
 import os
 import pickle
 import random
@@ -25,10 +26,10 @@ sys.path.append(ROOT_DIR)
 sys.path.append(os.path.join(ROOT_DIR, 'src', 'core'))
 
 try:
-    from architectures import DeepSTGAT_64, DeepSTGAT_80, FortalezaHeteroSTGAT, PureSTGCN_64, ShallowGAT
+    from architectures import DeepSTGAT_64, DeepSTGAT_80, DeepSTGAT_v5, FortalezaHeteroSTGAT, PureSTGCN_64, ShallowGAT
     from training_vault import TrainingVault
 except ImportError:
-    from src.core.architectures import DeepSTGAT_64, DeepSTGAT_80, FortalezaHeteroSTGAT, PureSTGCN_64, ShallowGAT
+    from src.core.architectures import DeepSTGAT_64, DeepSTGAT_80, DeepSTGAT_v5, FortalezaHeteroSTGAT, PureSTGCN_64, ShallowGAT
     from src.core.training_vault import TrainingVault
 
 # Configuracao de Log
@@ -57,23 +58,25 @@ TEMPORAL_SPLIT = {
 
 REGION_CONFIGS = {
     'fortaleza': dict(
-        window=90,
-        lr=0.0001,          # T123: LR baixo para combater overfitting (loss cai, P@10 val cai)
-        epochs=40,          # T123: mais epocas com LR lento = convergencia mais suave
-        patience=12,
-        dropout=0.40,       # T123: dropout maior para regularizacao
+        window=120,             # +contexto histórico (era 90)
+        lr=0.00005,             # LR modelo ligeiramente maior
+        epochs=100,
+        patience=25,
+        dropout=0.40,
         margin=1.0,
         k_eval=10,
         use_momentum=True,
-        grad_accum=1,
+        grad_accum=4,           # 249 passos/época (era 125) — mais atualizações
         output_name=os.path.join('legacy_torch', 'fortaleza_model_active.pth'),
-        model_class='FortalezaHeteroSTGAT',  # T123: arquitetura com separacao dinamico/contextual
-        focal_alpha=0.55,
-        focal_gamma=2.0,
-        ranking_weight=12.0,
-        indecision_weight=0.8,
-        weight_decay=0.02,  # T123: weight_decay alto para L2 regularization forte
+        model_class='DeepSTGAT_v5',
+        loss_type='negbinom',
+        nb_r_init=5.0,          # começa em r=5, converge para r real (~1.5) rapidamente
+        nb_r_lr=0.005,          # LR dedicado para log_r — 100x maior que o modelo
+        ranking_weight=3.0,     # mais ênfase no ListMLE
+        indecision_weight=0.2,
+        weight_decay=0.01,
         scheduler='onecycle',
+        bimestral_filter=True,
     ),
     'rmf': dict(
         window=14,
@@ -86,10 +89,12 @@ REGION_CONFIGS = {
         use_momentum=True,
         grad_accum=8,
         output_name=os.path.join('legacy_torch', 'rmf_model.pth'),
+        model_class='DeepSTGAT_v5',
         focal_alpha=0.50,
         focal_gamma=2.0,
         ranking_weight=10.0,
         scheduler='onecycle',
+        bimestral_filter=True,
     ),
     'interior': dict(
         window=14,
@@ -102,12 +107,47 @@ REGION_CONFIGS = {
         use_momentum=True,
         grad_accum=4,
         output_name=os.path.join('legacy_torch', 'interior_model.pth'),
+        model_class='DeepSTGAT_v5',
         focal_alpha=0.40,
         focal_gamma=2.0,
         ranking_weight=15.0,
         scheduler='onecycle',
+        bimestral_filter=True,
     ),
 }
+
+
+def normalize_adj(adj):
+    adj = adj + np.eye(adj.shape[0])
+    rowsum = np.array(adj.sum(1))
+    r_inv = np.power(rowsum, -1).flatten()
+    r_inv[np.isinf(r_inv)] = 0.0
+    r_mat_inv = np.diag(r_inv)
+    return r_mat_inv.dot(adj)
+
+
+def get_active_nodes_bimestral(nf, t, window, bimester_days=60, min_bimesters=1):
+    """
+    Retorna máscara booleana (N,) de nós ativos:
+    bairros com >= 1 CVLI em pelo menos `min_bimesters` bimestres da janela.
+
+    Filtra bairros perpetuamente inativos para evitar gradientes zerados que
+    poluem o treinamento e reduzem a discriminação nos hotspots reais.
+
+    nf:            (N, T, C) — node features; canal 0 = CVLI total (contagem)
+    t:             índice do fim da janela histórica (exclusive)
+    window:        tamanho da janela em dias
+    bimester_days: tamanho do bimestre (padrão 60 dias)
+    min_bimesters: mínimo de bimestres com atividade para o nó ser considerado ativo
+    """
+    cvli = nf[:, t - window:t, 0]          # (N, window)
+    n_bimesters = max(1, window // bimester_days)
+    bimester_active = np.zeros((nf.shape[0], n_bimesters), dtype=bool)
+    for b in range(n_bimesters):
+        start_b = b * bimester_days
+        end_b = min((b + 1) * bimester_days, window)
+        bimester_active[:, b] = cvli[:, start_b:end_b].sum(axis=1) >= 1
+    return bimester_active.sum(axis=1) >= min_bimesters
 
 
 def normalize_adj(adj):
@@ -149,6 +189,63 @@ def build_temporal_split_config():
     }
 
 
+class NegBinomRankingLoss(nn.Module):
+    """
+    Loss para contagem de CVLI com distribuição Binomial Negativa + ListMLE.
+
+    Vantagens sobre MSE/Focal para dados de crime:
+    - Modela overdispersão (variância > média) naturalmente presente no CVLI
+    - Zero-inflation implícita: P(y=0 | mu_baixo) alta sem penalização extra
+    - Gradientes menores para bairros quietos (honesty embutido)
+    - ListMLE alinha diretamente com P@K em vez de minimizar erro de magnitude
+
+    Parâmetros:
+        log_r: dispersão aprendível (r = exp(log_r), clamp [0.1, 50])
+                Começa em r=nb_r_init. Converge para a overdispersão real dos dados.
+        ranking_weight: peso do componente ListMLE
+        indecision_weight: peso do gap penalty (top-K vs média)
+    """
+
+    def __init__(self, nb_r_init=2.0, ranking_weight=2.0, indecision_weight=0.2):
+        super().__init__()
+        self.log_r = nn.Parameter(torch.tensor(math.log(nb_r_init)))
+        self.ranking_weight = ranking_weight
+        self.indecision_weight = indecision_weight
+
+    def forward(self, pred, target, active_mask=None, cold_streak_signal=None):
+        # Filtro de nós ativos
+        if active_mask is not None and active_mask.sum() > 0:
+            pred = pred[active_mask]
+            target = target[active_mask]
+            if cold_streak_signal is not None:
+                cold_streak_signal = cold_streak_signal[active_mask]
+
+        mu = F.softplus(pred.squeeze())                              # pred → μ positivo
+        r = self.log_r.exp().clamp(min=0.1, max=50.0)               # dispersão aprendível
+
+        # Binomial Negativa NLL: -log P(y | μ, r)
+        p = (r / (r + mu)).clamp(1e-6, 1.0 - 1e-6)
+        dist = torch.distributions.NegativeBinomial(total_count=r, probs=p)
+        nb_loss = -dist.log_prob(target.float()).mean()
+
+        # ListMLE: maximiza P(ranking previsto = ranking real)
+        # Alinha diretamente com P@K sem memorizar magnitudes absolutas
+        rank_loss = -(F.softmax(target.float(), dim=0) * F.log_softmax(mu, dim=0)).sum()
+
+        # Gap penalty: top-K deve ter μ bem separado do restante
+        top_vals, _ = torch.topk(mu, min(10, len(mu)))
+        gap = top_vals.mean() - mu.mean()
+        indecision_penalty = torch.exp(-gap)
+
+        # Honesty: bairros com cold streak não devem ter μ alto
+        honesty_penalty = 0.0
+        if cold_streak_signal is not None:
+            calmness = torch.clamp(-cold_streak_signal / 30.0, 0, 1)
+            honesty_penalty = (calmness * mu).mean()
+
+        return nb_loss + self.ranking_weight * rank_loss + self.indecision_weight * indecision_penalty + honesty_penalty
+
+
 class BinaryFocalRankingLoss(nn.Module):
     def __init__(
         self,
@@ -167,7 +264,19 @@ class BinaryFocalRankingLoss(nn.Module):
         self.indecision_weight = indecision_weight
         self.l2_weight = l2_weight
 
-    def forward(self, pred, target, cold_streak_signal=None):
+    def forward(self, pred, target, active_mask=None, cold_streak_signal=None):
+        """
+        active_mask: tensor booleano (N,) — se fornecido, calcula o loss apenas nos nós
+                     com atividade CVLI bimestral consistente, eliminando gradientes
+                     de bairros perpetuamente inativos que poluem o treinamento.
+        """
+        # Aplicar filtro de nós ativos antes de qualquer cálculo preditivo
+        if active_mask is not None and active_mask.sum() > 0:
+            pred = pred[active_mask]
+            target = target[active_mask]
+            if cold_streak_signal is not None:
+                cold_streak_signal = cold_streak_signal[active_mask]
+
         target_bin = (target > 0).float()
         probs = torch.sigmoid(pred)
         bce_loss = F.binary_cross_entropy_with_logits(pred, target_bin, reduction='none')
@@ -252,9 +361,18 @@ class SpecialistTrainer:
             elif x.shape[1] > 41:
                 x = x[:, :41, :, :]
 
+            # Filtro bimestral: máscara de nós com >= 1 CVLI por bimestre
+            if self.cfg.get('bimestral_filter', False):
+                active_mask = torch.from_numpy(
+                    get_active_nodes_bimestral(nf, t, window)
+                )
+            else:
+                active_mask = None
+
             sample = {
                 'x': x,
                 'y': y,
+                'active_mask': active_mask,
                 'history_start': history_start,
                 'target_start': target_start,
                 'target_end': target_end,
@@ -285,8 +403,18 @@ class SpecialistTrainer:
 
         train_x = [sample['x'] for sample in train_samples]
         train_y = [sample['y'] for sample in train_samples]
+        train_masks = [sample['active_mask'] for sample in train_samples]
         val_x = [sample['x'] for sample in val_samples]
         val_y = [sample['y'] for sample in val_samples]
+        val_masks = [sample['active_mask'] for sample in val_samples]
+
+        if train_masks[0] is not None:
+            active_ratio = np.mean([m.float().mean().item() for m in train_masks])
+            logging.info(
+                "Filtro bimestral | nós ativos médio: %.1f%% do total (%d)",
+                active_ratio * 100,
+                n_nodes,
+            )
         if not train_x or not val_x:
             raise RuntimeError(
                 f"Janela insuficiente para treino/validacao em {self.region_key}: "
@@ -308,17 +436,55 @@ class SpecialistTrainer:
         )
 
         model = self._build_model(n_nodes=n_nodes, in_channels=41, window=window).to(DEVICE)
-        optimizer = torch.optim.AdamW(
-            model.parameters(),
-            lr=self.cfg['lr'],
-            weight_decay=self.cfg.get('weight_decay', 0.005),
-        )
-        criterion = BinaryFocalRankingLoss(
-            alpha=self.cfg['focal_alpha'],
-            gamma=self.cfg['focal_gamma'],
-            ranking_weight=self.cfg['ranking_weight'],
-            indecision_weight=self.cfg.get('indecision_weight', 1.5),
-        )
+
+        # Construir criterion antes do optimizer para incluir log_r se NegBinom
+        if self.cfg.get('loss_type') == 'negbinom':
+            criterion = NegBinomRankingLoss(
+                nb_r_init=self.cfg.get('nb_r_init', 2.0),
+                ranking_weight=self.cfg.get('ranking_weight', 2.0),
+                indecision_weight=self.cfg.get('indecision_weight', 0.2),
+            ).to(DEVICE)
+            logging.info(
+                "Loss: NegBinomRankingLoss | r_init=%.2f | ranking_w=%.2f | indecision_w=%.2f",
+                self.cfg.get('nb_r_init', 2.0),
+                self.cfg.get('ranking_weight', 2.0),
+                self.cfg.get('indecision_weight', 0.2),
+            )
+        else:
+            criterion = BinaryFocalRankingLoss(
+                alpha=self.cfg['focal_alpha'],
+                gamma=self.cfg['focal_gamma'],
+                ranking_weight=self.cfg['ranking_weight'],
+                indecision_weight=self.cfg.get('indecision_weight', 1.5),
+            )
+
+        # Optimizer com grupos de parâmetros separados:
+        # log_r recebe LR muito maior para convergir para dispersão real rápido
+        if hasattr(criterion, 'log_r') and self.cfg.get('nb_r_lr'):
+            param_groups = [
+                {
+                    'params': model.parameters(),
+                    'lr': self.cfg['lr'],
+                    'weight_decay': self.cfg.get('weight_decay', 0.005),
+                },
+                {
+                    'params': [criterion.log_r],
+                    'lr': self.cfg['nb_r_lr'],
+                    'weight_decay': 0.0,  # sem decay no escalar de dispersão
+                },
+            ]
+            optimizer = torch.optim.AdamW(param_groups)
+            logging.info(
+                "Optimizer param_groups: modelo lr=%.2e | log_r lr=%.2e",
+                self.cfg['lr'], self.cfg['nb_r_lr'],
+            )
+        else:
+            all_params = list(model.parameters()) + list(criterion.parameters())
+            optimizer = torch.optim.AdamW(
+                all_params,
+                lr=self.cfg['lr'],
+                weight_decay=self.cfg.get('weight_decay', 0.005),
+            )
 
         if self.cfg.get('scheduler') == 'cosine_restarts':
             scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
@@ -330,9 +496,14 @@ class SpecialistTrainer:
         elif self.cfg.get('scheduler') == 'static':
             scheduler = None
         else:
+            # max_lr por grupo de parâmetros se houver múltiplos grupos
+            if len(optimizer.param_groups) > 1:
+                max_lrs = [pg['lr'] for pg in optimizer.param_groups]
+            else:
+                max_lrs = self.cfg['lr']
             scheduler = torch.optim.lr_scheduler.OneCycleLR(
                 optimizer,
-                max_lr=self.cfg['lr'],
+                max_lr=max_lrs,
                 steps_per_epoch=len(train_x) // self.cfg['grad_accum'] + 1,
                 epochs=self.cfg['epochs'],
             )
@@ -374,10 +545,12 @@ class SpecialistTrainer:
                     xi[:, 37, :, :] = memory_vector.view(1, 1, n_nodes, 1).expand(-1, -1, -1, window)
 
                 cold_streak = xi[0, 36, :, -1]
+                active_mask_t = train_masks[idx].to(DEVICE) if train_masks[idx] is not None else None
                 pred = model(xi, [adj_geo, adj_conf]).squeeze()
                 loss = criterion(
                     pred,
                     train_y[idx].to(DEVICE),
+                    active_mask=active_mask_t,
                     cold_streak_signal=cold_streak,
                 ) / self.cfg['grad_accum']
                 loss.backward()
@@ -469,14 +642,20 @@ class SpecialistTrainer:
 
             avg_p10 = np.mean(pk10) if pk10 else 0.0
             avg_p20 = np.mean(pk20) if pk20 else 0.0
+            # Log do parâmetro r aprendido (apenas para NegBinom)
+            r_str = ""
+            if hasattr(criterion, 'log_r'):
+                r_val = criterion.log_r.exp().item()
+                r_str = f" | r={r_val:.3f}"
             logging.info(
-                "E%03d done | Val P@10: %.2f%% | Val P@20: %.2f%% | Loss: %.4f | opt_steps=%s | elapsed=%.1fs",
+                "E%03d done | Val P@10: %.2f%% | Val P@20: %.2f%% | Loss: %.4f | opt_steps=%s | elapsed=%.1fs%s",
                 epoch + 1,
                 avg_p10 * 100,
                 avg_p20 * 100,
                 epoch_loss / len(train_x),
                 optimizer_step_count,
                 time.time() - epoch_start,
+                r_str,
             )
             if avg_p10 > best_pk:
                 best_pk = avg_p10
@@ -508,6 +687,14 @@ class SpecialistTrainer:
 
     def _build_model(self, n_nodes, in_channels, window):
         model_name = self.cfg.get('model_class', 'ShallowGAT')
+        if model_name == 'DeepSTGAT_v5':
+            return DeepSTGAT_v5(
+                num_nodes=n_nodes,
+                in_channels=in_channels,
+                time_steps=window,
+                num_graphs=2,
+                dropout=self.cfg['dropout'],
+            )
         if model_name == 'FortalezaHeteroSTGAT':
             return FortalezaHeteroSTGAT(
                 num_nodes=n_nodes,
@@ -545,11 +732,21 @@ class SpecialistTrainer:
 
 
 def main():
-    for region in REGION_CONFIGS.keys():
+    import argparse
+    parser = argparse.ArgumentParser(description='Retreino de especialistas regionais')
+    parser.add_argument(
+        '--region', nargs='+',
+        default=list(REGION_CONFIGS.keys()),
+        choices=list(REGION_CONFIGS.keys()),
+        help='Regiões a treinar (default: todas)',
+    )
+    args, _ = parser.parse_known_args()
+    logging.info("Regiões selecionadas: %s", args.region)
+    for region in args.region:
         try:
             SpecialistTrainer(region).train()
         except Exception as e:
-            logging.error(f"Erro em {region}: {e}")
+            logging.error(f"Erro em {region}: {e}", exc_info=True)
 
 
 if __name__ == "__main__":

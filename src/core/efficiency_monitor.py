@@ -45,10 +45,11 @@ class EfficiencyMonitor:
     Monitor de Eficiência Report Preview: Avalia o poder preditivo global do modelo.
     Compara o ranking consolidado de todas as 299 localidades monitoradas com os eventos reais.
     """
-    def __init__(self, project_root, orchestrator, nodes_gdf):
+    def __init__(self, project_root, orchestrator, nodes_gdf, model_mode="stgat"):
         self.root = project_root
         self.orchestrator = orchestrator
         self.nodes_gdf = nodes_gdf
+        self.model_mode = model_mode
         self.history_path = os.path.join(self.root, "logs", "efficiency_history.json")
         os.makedirs(os.path.dirname(self.history_path), exist_ok=True)
 
@@ -64,7 +65,10 @@ class EfficiencyMonitor:
         try:
             print("🧠 [Monitor] Iniciando avaliação de eficiência...")
             # 1. Obter Predições Consolidadas
-            scores_map = self.orchestrator.get_combined_risk(None)
+            if self.model_mode == "stgat_v5" and hasattr(self.orchestrator, "get_combined_risk_stgat_v5"):
+                scores_map = self.orchestrator.get_combined_risk_stgat_v5(None)
+            else:
+                scores_map = self.orchestrator.get_combined_risk(None)
             print(f"🧠 [Monitor] Scores gerados para {len(scores_map)} localidades.")
             monitored_nodes = set(scores_map.keys())
             
