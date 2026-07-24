@@ -28,7 +28,7 @@ from src.core.architectures import ShallowGAT, get_model_class  # noqa: E402
 
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-HORIZON_DAYS = 14
+HORIZON_DAYS = 30
 K_VALUES = (5, 10, 20)
 
 

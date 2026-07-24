@@ -19,7 +19,6 @@ def safe_print(*args, **kwargs):
     try:
         _original_print(*args, **kwargs)
     except UnicodeEncodeError:
-        # Se falhar, remove caracteres não-ascii e tenta novamente
         new_args = []
         for arg in args:
             if isinstance(arg, str):
@@ -28,7 +27,6 @@ def safe_print(*args, **kwargs):
                 new_args.append(arg)
         _original_print(*new_args, **kwargs)
 builtins.print = safe_print
-
 import geopandas as gpd
 import pandas as pd
 import numpy as np
@@ -984,6 +982,7 @@ def generate_daily_ranking_report():
 def load_data_and_models():
     global nodes_gdf, orchestrator, efficiency_monitor, health_monitor, confidence_tracker
     global _EXOGENOUS_EVENTS_CACHE, _RUAS_CRITICAS_FORTALEZA_CACHE, _STREETS_BY_MUNICIPIO_CACHE
+    export_worker = os.environ.get('REPORT_PREVIEW_EXPORT_MODE') == '1'
     
     # Invalida caches de explicabilidade para garantir recarga de novos dados
     _EXOGENOUS_EVENTS_CACHE = None
@@ -991,7 +990,8 @@ def load_data_and_models():
     _STREETS_BY_MUNICIPIO_CACHE = None
 
     # Limpeza de eventos exógenos antigos
-    archive_old_exogenous_events()
+    if not export_worker:
+        archive_old_exogenous_events()
 
     # --- ATUALIZAÇÃO OFICIAL DO ORCRIMS NO STARTUP (background) ---
     def _refresh_orcrim_background():
@@ -1003,10 +1003,13 @@ def load_data_and_models():
             print(f"⚠️ [ORCRIMS] Falha ao atualizar ORCRIMS em background: {e}")
 
     import threading
-    threading.Thread(target=_refresh_orcrim_background, daemon=True, name="orcrims-refresh").start()
+    if not export_worker:
+        threading.Thread(target=_refresh_orcrim_background, daemon=True, name="orcrims-refresh").start()
 
     # --- ATUALIZAÇÃO DINÂMICA DE RUAS CRÍTICAS (CACHE GEO) ---
     try:
+        if export_worker:
+            raise RuntimeError('export worker skips street cache refresh')
         from scripts.gerar_geo_ruas_criticas import generate_geo_streets_dynamic
         print("🌐 Atualizando Cache de Ruas Críticas (Dinâmico 30 dias)...")
         generate_geo_streets_dynamic()
@@ -1034,7 +1037,8 @@ def load_data_and_models():
         except Exception as _e:
             print(f"⚠️ Erro ao gerar localidades por município: {_e}")
 
-    threading.Thread(target=_build_municipio_streets_bg, daemon=True).start()
+    if not export_worker:
+        threading.Thread(target=_build_municipio_streets_bg, daemon=True).start()
 
     # Load all regional metadata (auto-discovery via glob)
     import glob as _glob
@@ -1107,7 +1111,8 @@ def load_data_and_models():
     try:
         invalidate_api_risk_cache()
         orchestrator = StateOrchestrator(BASE_DIR)
-        start_stgcn_street_warmup()
+        if not export_worker:
+            start_stgcn_street_warmup()
         print(f"✅ Motor de Inteligência Ativo: {RISK_MODEL_NAME}.")
 
         # Champion/Challenger — inicializa após o orchestrator
@@ -1135,16 +1140,19 @@ def load_data_and_models():
         
         # Iniciar Monitor de Eficiência e Relatórios
         efficiency_monitor = EfficiencyMonitor(BASE_DIR, orchestrator, nodes_gdf, model_mode=DEFAULT_MODEL_MODE)
-        generate_daily_ranking_report()
+        if not export_worker:
+            generate_daily_ranking_report()
 
         try:
+            if export_worker:
+                raise RuntimeError('export worker skips startup validation')
             enriched_path = os.path.join(BASE_DIR, 'data', 'raw', 'dados_status_ocorrencias_gerais_ENRIQUECIDO.csv')
             if os.path.exists(enriched_path):
                 df_validation = pd.read_csv(enriched_path, low_memory=False)
                 append_validation_log(
                     df_eval=df_validation,
                     project_root=BASE_DIR,
-                    window_days=14,
+                    window_days=30,
                     source_label='startup',
                     orchestrator=orchestrator,
                     model_label=DEFAULT_MODEL_LABEL,
@@ -1153,8 +1161,9 @@ def load_data_and_models():
         except Exception as validation_exc:
             print(f"⚠️ Falha ao registrar VALIDATION_LOG no startup: {validation_exc}")
 
-        # Calcular cache de horários de pico em background (não bloqueia startup)
-        threading.Thread(target=_compute_peak_hours_cache, daemon=True).start()
+        # Validar perfis temporais em background; /api/risk recalcula na chamada.
+        if not export_worker:
+            threading.Thread(target=_compute_peak_hours_cache, daemon=True).start()
 
         # Exportar base para o projeto Crime-Predict em background (não bloqueia startup)
         def _run_crime_predict_export():
@@ -1179,15 +1188,17 @@ def load_data_and_models():
             except Exception as e:
                 print(f"--- [EXPORT] Erro inesperado ao rodar exportação em background: {e}")
 
-        threading.Thread(target=_run_crime_predict_export, daemon=True, name="crime-predict-export").start()
+        if not export_worker:
+            threading.Thread(target=_run_crime_predict_export, daemon=True, name="crime-predict-export").start()
 
         # Regenerar micronodos dinâmicos no startup para alinhar a camada ao mapa.
-        rebuild_dynamic_micronode_exports(force=True)
+        if not export_worker:
+            rebuild_dynamic_micronode_exports(force=True)
         
         # Disparar Monitor em Segundo Plano (Thread Paralela)
         # Guard: não iniciar no processo filho do Flask reloader
         import os as _os
-        if _os.environ.get('WERKZEUG_RUN_MAIN') != 'true' or not app.debug:
+        if not export_worker and (_os.environ.get('WERKZEUG_RUN_MAIN') != 'true' or not app.debug):
             threading.Thread(target=run_background_efficiency_monitor, daemon=True).start()
     except Exception as e:
         print(f"❌ Erro Motor: {e}")
@@ -1434,74 +1445,119 @@ def _load_top_micronode_faction_cache():
 
     return _TOP_MICRONODE_FACTION_CACHE
 
-def _compute_peak_hours_cache():
-    """
-    Calcula a janela horária de maior risco por bairro usando CVLI dos últimos 365 dias.
-    Pattern-based: normaliza por total de eventos do bairro para refletir padrão
-    criminal relativo, não volume global histórico.
-    Retorna dict {bairro_norm: "Entre XHs e YHs"}.
-    """
-    global _PEAK_HOURS_CACHE
-    if _PEAK_HOURS_CACHE is not None:
-        return _PEAK_HOURS_CACHE
+def _temporal_profile_key(region, name):
+    region_key = str(region or 'interior').lower()
+    if region_key == 'capital':
+        region_key = 'fortaleza'
+    return f"{region_key}:{normalize_name(name)}"
 
+
+def _build_predictive_temporal_profiles(reference_date=None, horizon_days=30):
+    """
+    Calcula dia da semana e faixa horaria de pico a partir do CSV bruto.
+    Nao usa cache: deve refletir a chamada atual de previsao de risco.
+    """
     csv_path = os.path.join(BASE_DIR, 'data', 'raw', 'dados_status_ocorrencias_gerais_ENRIQUECIDO.csv')
     if not os.path.exists(csv_path):
-        _PEAK_HOURS_CACHE = {}
-        return _PEAK_HOURS_CACHE
+        return {}
+
+    weekday_labels = {
+        0: 'Segunda-feira',
+        1: 'Terca-feira',
+        2: 'Quarta-feira',
+        3: 'Quinta-feira',
+        4: 'Sexta-feira',
+        5: 'Sabado',
+        6: 'Domingo',
+    }
+
+    def _extract_hour(value):
+        match = re.search(r'(\d{1,2})', str(value or ''))
+        if not match:
+            return None
+        hour = int(match.group(1))
+        return hour if 0 <= hour <= 23 else None
 
     try:
-        df = pd.read_csv(csv_path, usecols=['bairro', 'hora', 'tipo'], low_memory=False)
-        df = df[df['tipo'].str.lower() == 'cvli'].copy()
-        df = df.dropna(subset=['hora', 'bairro'])
+        df = pd.read_csv(csv_path, usecols=['bairro', 'cidade', 'hora', 'tipo', 'data'], low_memory=False)
+        df = df[df['tipo'].astype(str).str.lower().eq('cvli')].copy()
+        df = df.dropna(subset=['hora', 'data'])
+        df['hour'] = df['hora'].map(_extract_hour)
+        df['date'] = pd.to_datetime(df['data'], errors='coerce', dayfirst=True)
+        df = df.dropna(subset=['hour', 'date'])
+        if df.empty:
+            return {}
 
-        def _extract_hour(h):
-            try:
-                return int(str(h).split(':')[0])
-            except Exception:
-                return None
+        ref = pd.to_datetime(reference_date, errors='coerce') if reference_date is not None else pd.NaT
+        if pd.isna(ref):
+            ref = df['date'].max()
+        ref = pd.Timestamp(ref).normalize()
+        future_weekdays = {
+            int((ref + pd.Timedelta(days=offset)).weekday())
+            for offset in range(1, int(horizon_days) + 1)
+        }
+        df = df[df['date'] <= ref]
+        if df.empty:
+            return {}
 
-        df['hour'] = df['hora'].apply(_extract_hour)
-        df = df.dropna(subset=['hour'])
         df['hour'] = df['hour'].astype(int)
-        df['bairro_norm'] = df['bairro'].apply(normalize_name)
+        df['weekday'] = df['date'].dt.weekday.astype(int)
+        df['cidade_norm'] = df['cidade'].map(normalize_name)
+        df['bairro_norm'] = df['bairro'].map(normalize_name)
+        df['region_type'] = np.where(
+            df['cidade_norm'].eq('FORTALEZA'),
+            'fortaleza',
+            np.where(df['cidade_norm'].isin(_RMF_NODES), 'rmf', 'interior'),
+        )
+        df['local_norm'] = np.where(df['region_type'].eq('fortaleza'), df['bairro_norm'], df['cidade_norm'])
+        df = df[df['local_norm'].astype(bool)]
 
-        result = {}
-        WINDOW = 5   # janela de 5 horas consecutivas
-        MIN_EVENTS = 3
+        profiles = {}
+        window = 5
+        for (region_type, local_norm), grp in df.groupby(['region_type', 'local_norm']):
 
-        for bairro, grp in df.groupby('bairro_norm'):
-            if len(grp) < MIN_EVENTS:
-                continue
-            # Histograma 24h normalizado (padrão relativo, não volume bruto)
-            counts = [0] * 24
-            for h in grp['hour']:
-                counts[int(h) % 24] += 1
-            total = sum(counts)
-            if total == 0:
-                continue
-            props = [c / total for c in counts]
-
-            # Janela deslizante circular — encontra o bloco de WINDOW horas mais denso
-            best_sum = -1.0
+            total = len(grp)
+            best_weekday = None
             best_start = 0
-            for start in range(24):
-                w_sum = sum(props[(start + i) % 24] for i in range(WINDOW))
-                if w_sum > best_sum:
-                    best_sum = w_sum
-                    best_start = start
+            best_count = -1
+            weekday_counts = grp['weekday'].value_counts()
+            for weekday in future_weekdays:
+                hour_counts = [0] * 24
+                for hour in grp.loc[grp['weekday'].eq(weekday), 'hour']:
+                    hour_counts[int(hour) % 24] += 1
+                for start in range(24):
+                    count = sum(hour_counts[(start + i) % 24] for i in range(window))
+                    if count > best_count:
+                        best_weekday = weekday
+                        best_start = start
+                        best_count = count
+            if best_weekday is None or best_count <= 0:
+                continue
 
-            end_hour = (best_start + WINDOW) % 24
-            result[bairro] = f"Entre {best_start:02d}hs e {end_hour:02d}hs"
-
-        _PEAK_HOURS_CACHE = result
-        print(f"✅ Cache de horários de pico calculado: {len(result)} bairros.")
+            end_hour = (best_start + window) % 24
+            peak_hours = f"Entre {best_start:02d}hs e {end_hour:02d}hs"
+            peak_weekday = weekday_labels.get(best_weekday, '')
+            profiles[_temporal_profile_key(region_type, local_norm)] = {
+                'peak_hours': peak_hours,
+                'peak_weekday': peak_weekday,
+                'peak_time_label': f"{peak_weekday}, {peak_hours.lower()}" if peak_weekday else peak_hours,
+                'peak_hour_start': best_start,
+                'peak_hour_end': end_hour,
+                'peak_hour_share': round(best_count / total, 4),
+                'peak_weekday_share': round(int(weekday_counts.max()) / len(grp), 4),
+                'temporal_sample_size': int(len(grp)),
+                'temporal_horizon_days': int(horizon_days),
+                'temporal_reference_date': ref.strftime('%Y-%m-%d'),
+            }
+        return profiles
     except Exception as e:
-        print(f"⚠️ Erro ao calcular horários de pico: {e}")
-        _PEAK_HOURS_CACHE = {}
+        print(f"Erro ao calcular perfis temporais preditivos: {e}")
+        return {}
 
-    return _PEAK_HOURS_CACHE
 
+def _compute_peak_hours_cache():
+    profiles = _build_predictive_temporal_profiles()
+    return {name: data.get('peak_hours', '') for name, data in profiles.items()}
 
 def build_current_exogenous_shocks():
     """Builds the live exogenous shock map used by risk and micronode overlays."""
@@ -1940,26 +1996,45 @@ def _street_region_from_point(street):
     if -4.25 <= lat <= -3.45 and -39.05 <= lng <= -38.05:
         return 'rmf'
     return 'interior'
-def _haversine_meters(lng1, lat1, lng2, lat2):
-    lng1, lat1, lng2, lat2 = map(math.radians, [lng1, lat1, lng2, lat2])
-    dlng = lng2 - lng1
-    dlat = lat2 - lat1
-    a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlng / 2) ** 2
-    return 6371000 * (2 * math.atan2(math.sqrt(a), math.sqrt(1 - a)))
-
-def _hexagon_geometry(lng, lat, radius_m):
+def _hexagon_grid_geometry(center_x, center_y, radius_m, origin_lat):
+    """Hexagonos de uma mesma grade plana compartilham exatamente as bordas."""
     coords = []
-    cos_lat = max(0.15, math.cos(math.radians(lat)))
     for i in range(6):
         angle = math.radians(60 * i + 30)
-        dy = math.sin(angle) * radius_m
-        dx = math.cos(angle) * radius_m
+        x = center_x + math.cos(angle) * radius_m
+        y = center_y + math.sin(angle) * radius_m
         coords.append([
-            lng + (dx / (111320.0 * cos_lat)),
-            lat + (dy / 110540.0),
+            x / (111320.0 * max(0.15, math.cos(math.radians(origin_lat)))),
+            y / 110540.0,
         ])
     coords.append(coords[0])
     return {'type': 'Polygon', 'coordinates': [coords]}
+
+
+def _round_hex_axial(q, r):
+    x, z = q, r
+    y = -x - z
+    rx, ry, rz = round(x), round(y), round(z)
+    dx, dy, dz = abs(rx - x), abs(ry - y), abs(rz - z)
+    if dx > dy and dx > dz:
+        rx = -ry - rz
+    elif dy > dz:
+        ry = -rx - rz
+    else:
+        rz = -rx - ry
+    return int(rx), int(rz)
+
+
+def _ga_honeycomb_radius_m():
+    path = os.path.join(BASE_DIR, 'outputs', 'experiments', 'fortaleza_hybrid_capture_h30_latest_spatial_ga_summary.csv')
+    try:
+        summary = pd.read_csv(path)
+        radius_km = float(summary.iloc[0]['radius_km'])
+        if 0.1 <= radius_km <= 2.0:
+            return round(radius_km * 1000)
+    except Exception:
+        logging.warning('Resumo GA indisponivel; usando a malha operacional de 500m.')
+    return 500
 
 def _load_micronode_geometries():
     """Carrega geometrias dos micronodos para evitar sobreposição com focos ST-GCN."""
@@ -2076,8 +2151,8 @@ def _is_point_in_requested_street_region(lng, lat, region_norm, item_region):
         return municipality_region == region_norm
     return item_region == region_norm
 
-def _build_street_foci_payload(region='all', radius_m=1000, shape_kind='hex', min_points=2, limit=50):
-    cache_key = ('street-foci-v3-grid', region, radius_m, shape_kind, min_points)
+def _build_street_foci_payload(region='all', radius_m=1000, shape_kind='hex', min_points=2, limit=100):
+    cache_key = ('street-foci-v4-ga-honeycomb', region, radius_m, shape_kind, min_points)
     with _STREET_FOCI_CACHE_LOCK:
         cached = _STREET_FOCI_CACHE.get(cache_key)
     if cached:
@@ -2119,24 +2194,29 @@ def _build_street_foci_payload(region='all', radius_m=1000, shape_kind='hex', mi
             'ocorrencias': max(1, int(float(item.get('ocorrencias') or item.get('occurrences') or 1))),
         })
 
-    lat_cell = radius_m / 110540.0
+    # O raio vem do melhor gene GA do experimento h30; a malha inteira usa a
+    # mesma origem e o mesmo tamanho, portanto as celulas nao se sobrepoem.
+    honeycomb_radius_m = _ga_honeycomb_radius_m() if shape_kind == 'hex' else radius_m
+    origin_lat = sum(p['lat'] for p in points) / len(points) if points else 0.0
+    meters_per_lon = 111320.0 * max(0.15, math.cos(math.radians(origin_lat)))
     groups = {}
     for p in points:
-        lon_cell = radius_m / (111320.0 * max(0.15, math.cos(math.radians(p['lat']))))
-        key = (int(math.floor(p['lat'] / lat_cell)), int(math.floor(p['lng'] / lon_cell)))
+        x, y = p['lng'] * meters_per_lon, p['lat'] * 110540.0
+        if shape_kind == 'hex':
+            q = (math.sqrt(3) * x / 3 - y / 3) / honeycomb_radius_m
+            r = (2 * y / 3) / honeycomb_radius_m
+            key = _round_hex_axial(q, r)
+        else:
+            key = (int(math.floor(y / radius_m)), int(math.floor(x / radius_m)))
         groups.setdefault(key, []).append(p)
 
     features = []
-    for group in groups.values():
+    for key, group in groups.items():
         if len(group) < min_points:
             continue
 
         total_occ = sum(p['ocorrencias'] for p in group)
-        weight_sum = max(1, total_occ)
-        lat = sum(p['lat'] * p['ocorrencias'] for p in group) / weight_sum
-        lng = sum(p['lng'] * p['ocorrencias'] for p in group) / weight_sum
         streets_rank, bairros_rank, cities_rank, region_rank = {}, {}, {}, {}
-        max_distance = 0.0
         for p in group:
             streets_rank[p['rua']] = streets_rank.get(p['rua'], 0) + p['ocorrencias']
             if p['bairro']:
@@ -2144,29 +2224,34 @@ def _build_street_foci_payload(region='all', radius_m=1000, shape_kind='hex', mi
             if p['cidade']:
                 cities_rank[p['cidade']] = cities_rank.get(p['cidade'], 0) + p['ocorrencias']
             region_rank[p['region']] = region_rank.get(p['region'], 0) + p['ocorrencias']
-            max_distance = max(max_distance, _haversine_meters(lng, lat, p['lng'], p['lat']))
 
         top_streets = [name for name, _ in sorted(streets_rank.items(), key=lambda item: item[1], reverse=True)[:6]]
         bairro = next(iter(sorted(bairros_rank.items(), key=lambda item: item[1], reverse=True)), ('', 0))[0]
         cidade = next(iter(sorted(cities_rank.items(), key=lambda item: item[1], reverse=True)), ('', 0))[0]
         focus_region = next(iter(sorted(region_rank.items(), key=lambda item: item[1], reverse=True)), ('interior', 0))[0]
-        # Keep the drawn hexagon inside the requested operational radius.
-        focus_radius = max(250, min(radius_m, max_distance + 120))
-        geometry = _hexagon_geometry(lng, lat, focus_radius) if shape_kind == 'hex' else {
+        if shape_kind == 'hex':
+            q, r = key
+            center_x = honeycomb_radius_m * math.sqrt(3) * (q + r / 2)
+            center_y = honeycomb_radius_m * 1.5 * r
+            geometry = _hexagon_grid_geometry(center_x, center_y, honeycomb_radius_m, origin_lat)
+        else:
+            lng = sum(p['lng'] * p['ocorrencias'] for p in group) / total_occ
+            lat = sum(p['lat'] * p['ocorrencias'] for p in group) / total_occ
+            geometry = {
             'type': 'Point',
             'coordinates': [lng, lat],
-        }
+            }
 
         features.append({
             'type': 'Feature',
             'properties': {
-                'name': f"Foco 1km - {bairro or cidade or 'CE'}",
+                'name': f"Celula GA - {bairro or cidade or 'CE'}",
                 'focus_id': '',
                 'region': focus_region,
                 'bairro': bairro,
                 'cidade': cidade,
-                'radius_m': round(focus_radius, 1),
-                'cluster_distance_m': radius_m,
+                'radius_m': honeycomb_radius_m,
+                'cluster_distance_m': honeycomb_radius_m,
                 'street_count': len(group),
                 'total_occurrences': total_occ,
                 'top_streets': top_streets,
@@ -2184,7 +2269,7 @@ def _build_street_foci_payload(region='all', radius_m=1000, shape_kind='hex', mi
         ),
         reverse=True,
     )
-    max_candidates = max(300, min(1600, max(limit, 1200)))
+    max_candidates = 300
     features = features[:max_candidates]
     features = _apply_stgcn_street_predictions(features)
 
@@ -2207,12 +2292,7 @@ def _build_street_foci_payload(region='all', radius_m=1000, shape_kind='hex', mi
         key=lambda feat: float((feat.get('properties') or {}).get('predicted_cvli_probability') or 0),
         reverse=True
     )
-    tactical_risk = [
-        f for f in sorted_non_overlapping
-        if float((f.get('properties') or {}).get('predicted_cvli_probability') or 0) >= 31.0
-    ]
-    target_count = min(max(limit, 1), 50)
-    features = tactical_risk[:target_count]
+    features = sorted_non_overlapping[:100]
     max_occ = max((feat['properties']['total_occurrences'] for feat in features), default=1)
     for rank, feat in enumerate(features, 1):
         props = feat['properties']
@@ -2226,9 +2306,11 @@ def _build_street_foci_payload(region='all', radius_m=1000, shape_kind='hex', mi
         'metadata': {
             'total': len(features),
             'total_available': len(features),
-            'source': 'geo_streets_cache bucketed into 1km tactical foci',
-            'model': 'ST-GCN Rua/Foco 1km',
-            'radius_m': radius_m,
+            'source': 'GA h30 honeycomb over geo_streets_cache',
+            'model': 'ST-GCN Rua/Foco GA',
+            'radius_m': honeycomb_radius_m,
+            'ga_honeycomb_radius_m': honeycomb_radius_m,
+            'selection': 'top_100_predicted_stgcn',
             'shape': shape_kind,
             'min_points': min_points,
             'region': region_norm,
@@ -2289,9 +2371,9 @@ def get_street_foci():
     except Exception:
         min_points = 2
     try:
-        limit = max(1, min(50, int(float(request.args.get('limit', 50)))))
+        limit = max(1, min(100, int(float(request.args.get('limit', 100)))))
     except Exception:
-        limit = 50
+        limit = 100
 
     try:
         return jsonify(_build_street_foci_payload(region, radius_m, shape_kind, min_points, limit))
@@ -2304,12 +2386,12 @@ def get_street_foci():
 def get_visible_micronodes():
     region = request.args.get('region', 'fortaleza').lower()
     limit_raw = request.args.get('limit')
-    limit = None
+    limit = 40
     if limit_raw not in (None, ''):
         try:
-            limit = max(1, min(int(limit_raw), 2000))
+            limit = max(1, min(int(limit_raw), 40))
         except Exception:
-            limit = None
+            pass
     force_refresh = request.args.get('refresh', '0').lower() in ('1', 'true', 'yes')
     # Mapear regiao para o arquivo correspondente na pasta outputs
     filename_map = {
@@ -2334,15 +2416,33 @@ def get_visible_micronodes():
     def _decorate_top_features(payload):
         polygon_cache = _load_micronode_polygon_cache()
         faction_cache = _load_top_micronode_faction_cache()
-        features = payload.get('features', [])
+        # Perfil preditivo calculado uma vez para a resposta inteira, nao por micronodo.
+        peak_cache = _build_predictive_temporal_profiles() or {}
+        features = sorted(
+            payload.get('features', []),
+            key=lambda feature: float((feature.get('properties') or {}).get('score') or (feature.get('properties') or {}).get('risk_score') or 0),
+            reverse=True,
+        )
         
         # --- FILTRO DE DEDUP POR MICRONODO (SENTINELA CLEAN MODE) ---
         # Cada micronodo tem rank unico - nao eliminar pontos taticos distintos.
         decorated = []
         seen_areas = set()
+        rmf_municipalities = {normalize_name(city) for city in _RMF_CITIES}
         
         for feature in features:
             props = dict(feature.get('properties') or {})
+            try:
+                point = shape(feature.get('geometry') or {}).centroid
+                municipality_norm = _municipality_from_lnglat(point.x, point.y)
+            except Exception:
+                municipality_norm = ''
+            if region == 'fortaleza' and municipality_norm != 'FORTALEZA':
+                continue
+            if region == 'rmf' and municipality_norm not in rmf_municipalities:
+                continue
+            if region == 'interior' and (not municipality_norm or municipality_norm == 'FORTALEZA' or municipality_norm in rmf_municipalities):
+                continue
             
             # Usar regiao + rank + nome como chave unica (micronodos distintos podem compartilhar nome)
             rank = props.get('rank', '')
@@ -2372,16 +2472,16 @@ def get_visible_micronodes():
                 props['is_centroid'] = False
             if faction:
                 props['faction'] = faction
-            # Inject peak hours pattern
-            peak_cache = _compute_peak_hours_cache() or {}
+            # Inject temporal prediction pattern
             bairro_lookup = _normalize_polygon_lookup_name(props.get('bairro') or props.get('name') or props.get('micronodo') or '')
-            if bairro_lookup and bairro_lookup in peak_cache:
-                props['peak_hours'] = peak_cache[bairro_lookup]
+            profile_key = _temporal_profile_key(props.get('region_type') or props.get('region'), bairro_lookup)
+            if bairro_lookup and profile_key in peak_cache:
+                props.update(peak_cache[profile_key])
             feature['properties'] = props
             decorated.append(feature)
             
             # Respeitar o limite apos a filtragem por area
-            if limit is not None and len(decorated) >= limit:
+            if len(decorated) >= limit:
                 break
                 
         payload['features'] = decorated
@@ -2423,25 +2523,35 @@ def get_visible_micronodes():
 get_top20_micro_nodes = get_visible_micronodes
 
 
-@app.route('/api/ga_operational_zones')
-def get_ga_operational_zones():
-    path = os.path.join(app.root_path, 'outputs', 'experiments', 'fortaleza_hybrid_capture_h30_latest_ga_zones.geojson')
-    if not os.path.exists(path):
-        return jsonify({"type": "FeatureCollection", "features": []})
-    with open(path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-    features = sorted(
-        data.get('features', []),
-        key=lambda feature: int((feature.get('properties') or {}).get('rank') or 999),
-    )
-    limit_raw = request.args.get('limit')
-    if limit_raw:
-        try:
-            features = features[:max(1, min(50, int(limit_raw)))]
-        except Exception:
-            pass
-    data['features'] = features
-    return jsonify(data)
+def _apply_temporal_profiles_to_risk_payload(results, meta, profiles):
+    if not profiles:
+        return
+    by_name = {}
+    for row in results:
+        name_key = normalize_name(row.get('clean_name') or row.get('name') or '')
+        profile_key = _temporal_profile_key(row.get('region_type') or row.get('region'), name_key)
+        profile = profiles.get(profile_key)
+        if not profile:
+            continue
+        metrics = row.setdefault('metrics', {})
+        metrics.update(profile)
+        row.update({
+            'peak_hours': profile.get('peak_hours', ''),
+            'peak_weekday': profile.get('peak_weekday', ''),
+            'peak_time_label': profile.get('peak_time_label', ''),
+        })
+        by_name[profile_key] = profile
+
+    for bucket in list((meta or {}).get('top10_by_region', {}).values()) + [(meta or {}).get('top10', [])]:
+        for item in bucket or []:
+            profile_key = _temporal_profile_key(item.get('region_type') or item.get('region'), item.get('name') or '')
+            profile = by_name.get(profile_key) or profiles.get(profile_key)
+            if profile:
+                item.update({
+                    'peak_hours': profile.get('peak_hours', ''),
+                    'peak_weekday': profile.get('peak_weekday', ''),
+                    'peak_time_label': profile.get('peak_time_label', ''),
+                })
 
 
 @app.route('/api/risk')
@@ -2460,6 +2570,11 @@ def get_risk():
             import copy
             meta = copy.deepcopy(cache_entry['meta'])
             results = copy.deepcopy(cache_entry['data'])
+            temporal_profiles = _build_predictive_temporal_profiles(
+                reference_date=orchestrator.dates[-1] if getattr(orchestrator, 'dates', None) is not None else None,
+                horizon_days=30,
+            )
+            _apply_temporal_profiles_to_risk_payload(results, meta, temporal_profiles)
             if target_region != 'global' and target_region in meta.get('counts_by_region', {}):
                 meta['counts'] = meta['counts_by_region'][target_region]
                 results = [r for r in results if r.get('region_type') == target_region]
@@ -2467,6 +2582,10 @@ def get_risk():
 
     try:
         exogenous_shocks, exogenous_shocks_map = build_current_exogenous_shocks()
+        temporal_profiles = _build_predictive_temporal_profiles(
+            reference_date=orchestrator.dates[-1] if getattr(orchestrator, 'dates', None) is not None else None,
+            horizon_days=30,
+        )
 
         scores_map, trends_map = _score_map_for_model_mode(selected_model_mode, exogenous_shocks, return_trends=True)
             
@@ -2639,8 +2758,7 @@ def get_risk():
                 ev_types = list(events_info.get('event_types', set()))
 
                 # Horário de pico padrão-baseado para este bairro
-                peak_hours_cache = _compute_peak_hours_cache() or {}
-                peak_hours = peak_hours_cache.get(name_norm, '')
+                temporal_profile = temporal_profiles.get(_temporal_profile_key(reg, name_norm), {})
 
                 node_metrics = {
                     'cvli_7d': 0,
@@ -2649,8 +2767,8 @@ def get_risk():
                     'event_types': ev_types[:3],
                     'critical_streets': critical_streets_info,
                     'spatial_influence': score >= 80,
-                    'peak_hours': peak_hours,
                 }
+                node_metrics.update(temporal_profile)
                 
                 # Crimes Reais
                 current_spec = orchestrator.specialists.get(reg)
@@ -2670,6 +2788,9 @@ def get_risk():
                     'status_label': status, 'css_class': css,
                     'color': color, 'trend': trend, 
                     'metrics': node_metrics,
+                    'peak_hours': temporal_profile.get('peak_hours', ''),
+                    'peak_weekday': temporal_profile.get('peak_weekday', ''),
+                    'peak_time_label': temporal_profile.get('peak_time_label', ''),
                     'faction': str(row.get('faction', 'N/A')), 'region_type': reg,
                     'cidade': str(row_cidade)
                 }
@@ -2823,6 +2944,8 @@ def get_risk():
                     'name': r.get('name'), 'node_id': r.get('node_id'), 'risk_score': r.get('risk_score'),
                     'status_label': r.get('status_label'), 'region_type': r.get('region_type'),
                     'peak_hours': (r.get('metrics') or {}).get('peak_hours', ''),
+                    'peak_weekday': (r.get('metrics') or {}).get('peak_weekday', ''),
+                    'peak_time_label': (r.get('metrics') or {}).get('peak_time_label', ''),
                     'cidade': r.get('cidade')
                 } for r in deduped_region[:10]]
         except Exception:
@@ -2845,6 +2968,8 @@ def get_risk():
                         'status_label': r.get('status_label'),
                         'region_type': r.get('region_type'),
                         'peak_hours': (r.get('metrics') or {}).get('peak_hours', ''),
+                        'peak_weekday': (r.get('metrics') or {}).get('peak_weekday', ''),
+                        'peak_time_label': (r.get('metrics') or {}).get('peak_time_label', ''),
                         'cidade': r.get('cidade')
                     })
                     if len(meta['top10']) >= 10:
@@ -2852,7 +2977,7 @@ def get_risk():
         except Exception:
             meta['top10'] = []
 
-            # --- CORREÇÃO: Adicionar Datas da Janela de Inteligência (Projeção 14 dias conforme TRAINING_LOG) ---
+            # --- CORREÇÃO: Adicionar Datas da Janela de Inteligência (Projeção 30 dias) ---
         try:
             if orchestrator is not None and hasattr(orchestrator, 'dates') and orchestrator.dates is not None:
                 last_db_date = orchestrator.dates[-1]
@@ -2861,9 +2986,9 @@ def get_risk():
                 else:
                     last_db_dt = last_db_date
                 
-                # Início e Fim da Projeção (14 dias à frente da base conforme TRAINING_LOG Tentativa 47+)
+                # Início e fim da projeção de 30 dias à frente da base.
                 start_pred = last_db_dt + timedelta(days=1)
-                end_pred = last_db_dt + timedelta(days=14)
+                end_pred = last_db_dt + timedelta(days=30)
                 
                 meta['start_cvli'] = str(orchestrator.dates[0])
                 meta['last_date_base'] = last_db_dt.strftime('%d/%m/%Y')
@@ -2874,7 +2999,7 @@ def get_risk():
                 meta['model_window_cvli'] = 120 # Nova janela de 120 dias para todos
                 
             else:
-                meta['intelligence_label'] = "Janela de Inteligência: Projeção 14 dias (Tempo Real)"
+                meta['intelligence_label'] = "Janela de Inteligência: Projeção 30 dias (Tempo Real)"
                 meta['last_date_base'] = 'N/A'
                 meta['model_architecture'] = RISK_MODEL_NAME
                 meta['model_window_cvli'] = 120
@@ -3246,22 +3371,11 @@ def _sync_static_snapshot_to_screenshot_app(target_data_dir: str):
     logging.info('[SCREENSHOT EXPORT] Target repo: %s', target_repo_dir)
     logging.info('[SCREENSHOT EXPORT] Target data dir: %s', target_data_dir)
 
-    completed = subprocess.run(
-        [sys.executable, STATIC_EXPORT_SCRIPT, '--output-dir', STATIC_EXPORT_OUTPUT_DIR],
-        cwd=BASE_DIR,
-        capture_output=True,
-        text=True,
-        encoding='utf-8',
-        errors='replace',
-        timeout=600,
-        check=False,
-        env=_subprocess_env(),
-    )
-    if completed.returncode != 0:
-        raise RuntimeError(
-            'Falha ao exportar snapshot estático. '
-            f'stdout={completed.stdout.strip()} stderr={completed.stderr.strip()}'
-        )
+    # Reutiliza os modelos ja carregados pelo Flask em vez de abrir outro processo.
+    from pathlib import Path
+    sys.modules.setdefault('app', sys.modules[__name__])
+    from scripts.export_static_snapshot import export_snapshot
+    export_snapshot(Path(STATIC_EXPORT_OUTPUT_DIR))
     logging.info('[SCREENSHOT EXPORT] Exportação concluída com sucesso')
 
     copied_files = []
@@ -3283,7 +3397,7 @@ def _sync_static_snapshot_to_screenshot_app(target_data_dir: str):
         'export_output_dir': STATIC_EXPORT_OUTPUT_DIR,
         'target_data_dir': target_data_dir,
         'copied_files': copied_files,
-        'stdout': completed.stdout.strip(),
+        'stdout': '',
     }
 
 
@@ -3350,7 +3464,7 @@ def _bg_export_thread(target_data_dir, publish_repo):
             _SNAPSHOT_EXPORT_STATUS['status'] = 'error'
             _SNAPSHOT_EXPORT_STATUS['error'] = str(e)
             _SNAPSHOT_EXPORT_STATUS['last_run'] = datetime.now().isoformat()
-            logging.error(f'[SCREENSHOT EXPORT] Erro na exportação assíncrona: {e}')
+            logging.exception('[SCREENSHOT EXPORT] Erro na exportação assíncrona: %s', e)
 
 
 @app.route('/api/export_static_snapshot', methods=['POST'])
@@ -3635,7 +3749,7 @@ def anomaly_status():
 
 
 @app.route('/api/explain/<int:node_id>')
-def explain_node(node_id):
+def explain_node(node_id, scores_map_override=None, temporal_profile_override=None):
     """Retorna uma explicação resumida dos motivos de criticidade para um nó (região/localidade).
     Implementação leve que responde mesmo sem o gerador de explicações completo disponível.
     """
@@ -3653,7 +3767,7 @@ def explain_node(node_id):
         # ... (mantendo lógica de scores e ranking) ...
         selected_model_mode = normalize_model_mode(request.args.get('model_mode', DEFAULT_MODEL_MODE))
         selected_model_meta, _ = _get_model_selection_meta(selected_model_mode)
-        scores_map = _score_map_for_model_mode(selected_model_mode)
+        scores_map = scores_map_override if scores_map_override is not None else _score_map_for_model_mode(selected_model_mode)
         if selected_model_mode != 'stgat':
             fortaleza_override_scores = selected_model_meta.get('fortaleza_scores') or {}
             if fortaleza_override_scores:
@@ -3829,6 +3943,7 @@ def explain_node(node_id):
         cvli_recent = 0
         cvli_prev = 0
         cvli_recent_30 = 0
+        cvli_prev_30 = 0
         vehicles_recent_14 = 0.0
         intel_recent_14 = 0.0
         rolling_cvli_7d = 0.0
@@ -3865,6 +3980,7 @@ def explain_node(node_id):
                     cvli_recent = int(features[spec_idx, -14:, 0].sum())
                     cvli_prev = int(features[spec_idx, -28:-14, 0].sum())
                     cvli_recent_30 = int(features[spec_idx, -30:, 0].sum()) if features.shape[1] >= 30 else cvli_recent
+                    cvli_prev_30 = int(features[spec_idx, -60:-30, 0].sum()) if features.shape[1] >= 60 else 0
                     vehicles_recent_14 = float(features[spec_idx, -14:, 1].sum()) if features.shape[2] > 1 else 0.0
                     intel_recent_14 = float(features[spec_idx, -14:, 27].sum()) if features.shape[2] > 27 else 0.0
                     rolling_cvli_7d = float(features[spec_idx, -1, 24]) if features.shape[2] > 24 else 0.0
@@ -3902,6 +4018,19 @@ def explain_node(node_id):
                     logging.info(f"📊 EXPLAIN [{name}]: recent={cvli_recent}, prev={cvli_prev}, neighbors={nearby_names}")
         except Exception as e:
             logging.warning(f"Erro ao extrair métricas reais para {name}: {e}")
+
+        temporal_profile = {}
+        if temporal_profile_override is not None:
+            temporal_profile = temporal_profile_override
+        elif request.args.get('include_temporal', '1') != '0':
+            try:
+                temporal_profiles = _build_predictive_temporal_profiles(
+                    reference_date=orchestrator.dates[-1] if getattr(orchestrator, 'dates', None) is not None else None,
+                    horizon_days=30,
+                )
+                temporal_profile = temporal_profiles.get(_temporal_profile_key(region_type, name_norm), {})
+            except Exception as e:
+                logging.warning(f"Erro ao extrair perfil temporal preditivo para {name}: {e}")
 
         # Criar contexto esperado por ExplanationGenerator
         try:
@@ -3966,7 +4095,13 @@ def explain_node(node_id):
                 'territorial_support_pct': float(component_meta.get('territorial_support_pct', 0.0) or 0.0),
                 'historical_support_pct': float(component_meta.get('historical_support_pct', 0.0) or 0.0),
                 'live_support_pct': float(component_meta.get('live_support_pct', 0.0) or 0.0),
-                'expected_cvli_14d': float(component_meta.get('expected_cvli_14d', 0.0) or 0.0),
+                'expected_cvli_30d': float(component_meta.get('expected_cvli_30d', 0.0) or 0.0),
+                'peak_hours': temporal_profile.get('peak_hours', ''),
+                'peak_weekday': temporal_profile.get('peak_weekday', ''),
+                'peak_time_label': temporal_profile.get('peak_time_label', ''),
+                'peak_hour_share': temporal_profile.get('peak_hour_share', 0.0),
+                'peak_weekday_share': temporal_profile.get('peak_weekday_share', 0.0),
+                'temporal_sample_size': temporal_profile.get('temporal_sample_size', 0),
             }
 
             explanation = gen.explain_node_ranking(int(node_id), int(rank_pos), context)
@@ -3975,7 +4110,8 @@ def explain_node(node_id):
             explanation['model_architecture'] = context['model_architecture']
             explanation['primary_signal_label'] = context['primary_signal_label']
             explanation['model_signal_score'] = context['model_signal_score']
-            explanation['expected_cvli_14d'] = context['expected_cvli_14d']
+            explanation['expected_cvli_30d'] = context['expected_cvli_30d']
+            explanation.update(temporal_profile)
             explanation['territorial_support_pct'] = context['territorial_support_pct']
             explanation['historical_support_pct'] = context['historical_support_pct']
             explanation['live_support_pct'] = context['live_support_pct']
@@ -3994,13 +4130,13 @@ def explain_node(node_id):
                 },
             ]
 
-            # Indicador executivo de tendência futura (14 dias)
-            delta_7d = int(cvli_recent_7 - cvli_prev_7)
-            if delta_7d >= 2:
+            # Indicador executivo de tendência futura para o horizonte de 30 dias.
+            delta_30d = int(cvli_recent_30 - cvli_prev_30)
+            if delta_30d >= 2:
                 trend_direction = 'up'
                 trend_label = 'Alta de Risco'
                 trend_message = 'Pressão criminal em aceleração nas últimas janelas comparáveis.'
-            elif delta_7d <= -2:
+            elif delta_30d <= -2:
                 trend_direction = 'down'
                 trend_label = 'Queda de Risco'
                 trend_message = 'Sinal de arrefecimento recente, mantendo monitoramento ativo.'
@@ -4012,11 +4148,11 @@ def explain_node(node_id):
             explanation['future_trend'] = {
                 'direction': trend_direction,
                 'label': trend_label,
-                'delta_7d': delta_7d,
-                'cvli_recent_7': int(cvli_recent_7),
-                'cvli_prev_7': int(cvli_prev_7),
+                'delta_30d': delta_30d,
+                'cvli_recent_30': int(cvli_recent_30),
+                'cvli_prev_30': int(cvli_prev_30),
                 'message': trend_message,
-                'horizon_days': 14,
+                'horizon_days': 30,
             }
 
             # Percentil de confiança na previsão

@@ -1,6 +1,6 @@
 """
 train_all_specialists.py - Script oficial de retreino (FOCO CVLI - HONESTY PARADIGM).
-Versao 2026-05-21: Janela 14d, MemPalace Universal, Honesty Constraint.
+Versao 2026-07-24: Horizonte 30d, MemPalace Universal, Honesty Constraint.
 """
 import gc
 import logging
@@ -47,7 +47,7 @@ logging.basicConfig(
 )
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-PREDICT_HORIZON = 14
+PREDICT_HORIZON = 30
 TRAIN_BATCH_LOG_EVERY = int(os.environ.get("TRAIN_BATCH_LOG_EVERY", "30"))
 TEMPORAL_SPLIT = {
     'train_start': '2022-01-01',
@@ -667,6 +667,7 @@ class SpecialistTrainer:
                         'model_state_dict': model.state_dict(),
                         'model_class': model.__class__.__name__,
                         'window': window,
+                        'predict_horizon': PREDICT_HORIZON,
                         'in_channels': 41,
                         'region': self.region_key,
                         'train_start': str(split_cfg['train_start'].date()),

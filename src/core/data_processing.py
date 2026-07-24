@@ -105,14 +105,14 @@ def update_geo_streets_cache(df):
                 cache_coords = {(round(float(c['lat']), 3), round(float(c['lng']), 3)): c for c in streets_data}
         except: pass
 
-    # Filtrar CVLIs na janela de 14 dias
+    # Filtrar CVLIs na janela de 30 dias
     df_cvli = df[df['tipo'].str.lower() == 'cvli'].copy()
     if 'latitude' not in df_cvli.columns or 'longitude' not in df_cvli.columns:
         return
     if not df_cvli.empty and 'data' in df_cvli.columns:
-        cutoff = df_cvli['data'].max() - pd.Timedelta(days=14)
+        cutoff = df_cvli['data'].max() - pd.Timedelta(days=30)
         df_cvli = df_cvli[df_cvli['data'] >= cutoff]
-        logging.info(f"⏱️ Cache de ruas: janela 14 dias ({cutoff.date()} a {df_cvli['data'].max().date()}) — {len(df_cvli)} CVLIs.")
+        logging.info(f"⏱️ Cache de ruas: janela 30 dias ({cutoff.date()} a {df_cvli['data'].max().date()}) — {len(df_cvli)} CVLIs.")
         
     df_cvli['lat_r'] = pd.to_numeric(df_cvli['latitude'], errors='coerce').round(3)
     df_cvli['lng_r'] = pd.to_numeric(df_cvli['longitude'], errors='coerce').round(3)
@@ -410,6 +410,7 @@ def process_ism_data():
             except: continue
     
     occ_df = pd.DataFrame(clean_records).dropna(subset=['data'])
+    occ_df['cidade_clean'] = occ_df['cidade'].apply(normalize_text)
     
     # --- NOVO: Atualizar Cache de Ruas Geolocalizadas ---
     update_geo_streets_cache(occ_df)
@@ -466,9 +467,18 @@ def process_ism_data():
         (occ_df['data'] >= two_years_ago) &
         (occ_df['data'] <= selection_cutoff)
     ].groupby('loc_clean').size()
+    fortaleza_cvli_ranking_recent = occ_df[
+        (occ_df['tipo'] == 'cvli') &
+        (occ_df['cidade_clean'] == 'FORTALEZA') &
+        (occ_df['data'] >= two_years_ago) &
+        (occ_df['data'] <= selection_cutoff)
+    ].groupby('loc_clean').size()
     
     # Ranking histórico total apenas para metadados (não afeta seleção)
     cvli_counts_total = occ_df[occ_df['tipo'] == 'cvli'].groupby('loc_clean').size()
+    fortaleza_cvli_counts_total = occ_df[
+        (occ_df['tipo'] == 'cvli') & (occ_df['cidade_clean'] == 'FORTALEZA')
+    ].groupby('loc_clean').size()
 
     # 3. Carregar e Filtrar Nós (Malha Dinâmica)
     with open(BAIRROS_FILE, 'r', encoding='utf-8') as f:
@@ -489,8 +499,10 @@ def process_ism_data():
             reg = 'rmf'
         
         # Usamos o ranking recente para a decisão de seleção, mas o total para metadados
-        recent_count = cvli_ranking_recent.get(c_name, 0)
-        total_count = cvli_counts_total.get(c_name, 0)
+        ranking_recent = fortaleza_cvli_ranking_recent if reg == 'fortaleza' else cvli_ranking_recent
+        ranking_total = fortaleza_cvli_counts_total if reg == 'fortaleza' else cvli_counts_total
+        recent_count = ranking_recent.get(c_name, 0)
+        total_count = ranking_total.get(c_name, 0)
         
         # Inteligência de Facções
         intel = faccoes_dict.get(c_name, {})
@@ -556,7 +568,12 @@ def process_ism_data():
         node_map = {row['name']: i for i, row in reg_nodes.iterrows()}
         
         # Filtrar ocorrências da região ou que pertençam a cidades desta região (colapsando para a sede)
-        if reg == 'rmf':
+        if reg == 'fortaleza':
+            # Evita que um municipio homonimo (ex.: Varjota) alimente um bairro da capital.
+            reg_occ = occ_df[(occ_df['cidade_clean'] == 'FORTALEZA') & occ_df['loc_clean'].isin(node_map)].copy()
+            if not reg_occ.empty:
+                reg_occ['n_idx'] = reg_occ['loc_clean'].map(node_map)
+        elif reg == 'rmf':
             # Na RMF, colapsamos todos os bairros para suas respectivas cidades-sede
             reg_occ = occ_df[occ_df['cidade'].str.upper().isin(node_map)].copy()
             reg_occ['n_idx'] = reg_occ['cidade'].str.upper().map(node_map)

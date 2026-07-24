@@ -152,13 +152,13 @@ class ExplanationGenerator:
 
         model_family = str(context.get('model_family') or 'modelo operacional')
         primary_signal_label = str(context.get('primary_signal_label') or 'sinal principal do ranking')
-        expected_cvli_14d = self._safe_float(context.get('expected_cvli_14d'))
+        expected_cvli_30d = self._safe_float(context.get('expected_cvli_30d'))
         signal_text = (
             f"🎯 **Leitura do {model_family}**: A confiança de {confidence * 100.0:.1f}% indica que a criticidade "
             f"não está apoiada em um único evento isolado, mas em um padrão recorrente no {primary_signal_label.lower()}."
         )
-        if expected_cvli_14d > 0:
-            signal_text += f" A projeção operacional para 14 dias está em {expected_cvli_14d:.2f}."
+        if expected_cvli_30d > 0:
+            signal_text += f" A projeção operacional para 30 dias está em {expected_cvli_30d:.2f}."
         factors.append({
             'name': 'Consistência do Modelo',
             'explanation': signal_text,
@@ -495,6 +495,13 @@ class ExplanationGenerator:
         holiday_days_14 = self._safe_int(context.get('holiday_days_14'))
         hot_days_14 = self._safe_int(context.get('hot_days_14'))
         weekend_days_14 = self._safe_int(context.get('weekend_days_14'))
+        peak_hours = str(context.get('peak_hours') or '')
+        peak_weekday = str(context.get('peak_weekday') or '')
+        peak_time_label = str(context.get('peak_time_label') or '')
+        peak_time_label = str(context.get('peak_time_label') or '')
+        peak_hour_share = self._safe_float(context.get('peak_hour_share'))
+        peak_weekday_share = self._safe_float(context.get('peak_weekday_share'))
+        temporal_sample_size = self._safe_int(context.get('temporal_sample_size'))
         nearby_names = self._as_list(context.get('nearby_impact_names'))
         critical_streets_text, critical_streets_count = self._format_street_reference(context.get('critical_streets'))
         feature_channels_latest = dict(context.get('feature_channels_latest') or {})
@@ -673,6 +680,11 @@ class ExplanationGenerator:
         geo_neighbor_count = self._safe_int(context.get('geo_neighbor_count'))
         high_risk_neighbor_count = self._safe_int(context.get('high_risk_neighbor_count'))
         conflict_neighbor_count = self._safe_int(context.get('conflict_neighbor_count'))
+        peak_hours = str(context.get('peak_hours') or '')
+        peak_time_label = str(context.get('peak_time_label') or '')
+        peak_hour_share = self._safe_float(context.get('peak_hour_share'))
+        peak_weekday_share = self._safe_float(context.get('peak_weekday_share'))
+        temporal_sample_size = self._safe_int(context.get('temporal_sample_size'))
         neighbor_mean_score = self._safe_float(context.get('neighbor_mean_score'))
         neighbor_max_score = self._safe_float(context.get('neighbor_max_score'))
         event_count = self._safe_int(context.get('events_count_total'))
@@ -713,12 +725,14 @@ class ExplanationGenerator:
             self._make_factor('nearby_names', 'Vizinhos que sustentam a leitura', ', '.join(nearby_names[:3]) if nearby_names else 'Sem destaque espacial', f"📡 **Vizinhos que sustentam a leitura**: {', '.join(nearby_names[:3]) if nearby_names else 'não houve destaque espacial nominal nesta leitura'}.", 'medium' if nearby_names else 'low', 20),
             self._make_factor('region', 'Região analítica', region_type or 'N/D', f"🗺️ **Região analítica**: a comparação foi feita dentro do recorte {region_type or 'N/D'}.", 'low', 21),
             self._make_factor('cvli_30d', 'Acumulado CVLI 30 dias', str(cvli_recent_30), f"🗓️ **Acumulado de 30 dias**: {cvli_recent_30} ocorrência(s) ajudam a medir persistência do padrão.", 'low' if cvli_recent_30 <= 0 else 'medium', 22),
+            self._make_factor('temporal_peak', 'Pico temporal provavel', peak_time_label or peak_hours, f"**Pico temporal provavel**: {peak_time_label or peak_hours}. Suporte historico local: {self._pt_number(peak_hour_share * 100.0)}% na faixa horaria, {self._pt_number(peak_weekday_share * 100.0)}% no dia dominante, n={temporal_sample_size}.", 'medium', 23) if (peak_time_label or peak_hours) else None,
             self._make_factor('rain', 'Chuva recente', f"{self._pt_number(recent_rain_acc, 1)} mm", f"🌧️ **Clima recente**: acumulado de {self._pt_number(recent_rain_acc, 1)} mm e {rainy_days} dia(s) com chuva significativa na janela observada.", 'low', 23),
             self._make_factor('calendar', 'Calendário sensível', f"fds={weekend_days}, fer={holiday_days}, quentes={hot_days}", f"📅 **Calendário sensível**: {weekend_days} dia(s) de fim de semana, {holiday_days} feriado(s) e {hot_days} dia(s) quentes CVP no período recente.", 'low', 24),
             self._make_factor('global_cvli', 'Contexto global CVLI', self._pt_number(global_cvli_latest, 1), f"🌐 **Contexto global**: o nível global de CVLI encerra a janela em {self._pt_number(global_cvli_latest, 1)}.", 'low', 25),
             self._make_factor('geo_neighbors', 'Vizinhos geográficos', str(geo_neighbor_count), f"📍 **Vizinhos geográficos**: há {geo_neighbor_count} território(s) adjacente(s) na malha espacial imediata.", 'low', 26),
         ]
 
+        candidates = [item for item in candidates if item]
         selected = sorted(candidates, key=lambda item: item['priority'])[:15]
         selected = sorted(selected, key=lambda item: (0 if item['importance'] == 'high' else 1 if item['importance'] == 'medium' else 2, item['priority']))
 

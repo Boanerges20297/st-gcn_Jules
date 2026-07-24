@@ -157,6 +157,12 @@ def _resolve_parent_area(area_raw, micronodo_raw, risk_scores):
 
 
 def _classify_region(city_norm, lon, lat):
+    if city_norm:
+        if city_norm == 'FORTALEZA':
+            return 'capital'
+        if city_norm in {normalize_name(city) for city in getattr(app, '_RMF_CITIES', set())}:
+            return 'rmf'
+
     # Mesma lógica-base do app: capital por bbox, depois município explícito,
     # depois RMF por bbox. Evita vazamento por homônimos como BARROSO/CANINDEZINHO.
     if -3.86 <= lat <= -3.69 and -38.64 <= lon <= -38.40:

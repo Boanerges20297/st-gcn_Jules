@@ -1,25 +1,33 @@
 {
-  "generated_at": "2026-07-22T19:37:48",
-  "reference_date": "2026-07-17",
+  "generated_at": "2026-07-24T16:52:08",
+  "reference_date": "2026-07-24",
   "window_days": 14,
-  "total_rows": 192,
-  "date_min": "2026-07-04",
-  "date_max": "2026-07-17",
+  "total_rows": 193,
+  "date_min": "2026-07-11",
+  "date_max": "2026-07-24",
   "top_cities": [
     {
       "cidade": "FORTALEZA",
-      "count": 113
-    },
-    {
-      "cidade": "CAUCAIA",
-      "count": 9
+      "count": 108
     },
     {
       "cidade": "MARACANAU",
-      "count": 9
+      "count": 12
     },
     {
-      "cidade": "PARAMBU",
+      "cidade": "ARACATI",
+      "count": 5
+    },
+    {
+      "cidade": "CAUCAIA",
+      "count": 5
+    },
+    {
+      "cidade": "PACAJUS",
+      "count": 4
+    },
+    {
+      "cidade": "LIMOEIRO DO NORTE",
       "count": 4
     },
     {
@@ -27,57 +35,37 @@
       "count": 3
     },
     {
-      "cidade": "ITAPAJE",
-      "count": 3
-    },
-    {
       "cidade": "BOA VIAGEM",
       "count": 3
     },
     {
-      "cidade": "SOBRAL",
+      "cidade": "AMONTADA",
       "count": 3
     },
     {
-      "cidade": "ARACATI",
-      "count": 2
-    },
-    {
-      "cidade": "LIMOEIRO DO NORTE",
-      "count": 2
+      "cidade": "IGUATU",
+      "count": 3
     }
   ],
   "top_bairros_fortaleza": [
     {
-      "bairro": "CENTRO",
+      "bairro": "ALDEOTA",
       "count": 11
     },
     {
-      "bairro": "CONJUNTO CEARA I",
-      "count": 10
-    },
-    {
-      "bairro": "PASSARE",
-      "count": 6
-    },
-    {
-      "bairro": "MEIRELES",
+      "bairro": "JANGURURSSU",
       "count": 5
     },
     {
-      "bairro": "JOAQUIM TAVORA",
+      "bairro": "VILA VELHA",
       "count": 4
     },
     {
-      "bairro": "FATIMA",
+      "bairro": "PARANGABA",
       "count": 4
     },
     {
-      "bairro": "MARAPONGA",
-      "count": 4
-    },
-    {
-      "bairro": "JANGURURSSU",
+      "bairro": "VILA PERY",
       "count": 4
     },
     {
@@ -85,105 +73,105 @@
       "count": 4
     },
     {
+      "bairro": "CENTRO",
+      "count": 4
+    },
+    {
+      "bairro": "MESSEJANA",
+      "count": 3
+    },
+    {
+      "bairro": "FATIMA",
+      "count": 3
+    },
+    {
+      "bairro": "MEIRELES",
+      "count": 3
+    },
+    {
+      "bairro": "PRAIA DO FUTURO I",
+      "count": 3
+    },
+    {
       "bairro": "SAO GERARDO",
       "count": 3
     },
     {
-      "bairro": "PARANGABA",
+      "bairro": "SERRINHA",
       "count": 3
     },
     {
       "bairro": "MANOEL SATIRO",
-      "count": 3
+      "count": 2
     },
     {
-      "bairro": "ALDEOTA",
-      "count": 3
-    },
-    {
-      "bairro": "DIONISIO TORRES",
-      "count": 3
-    },
-    {
-      "bairro": "BARROSO",
-      "count": 3
+      "bairro": "PARQUE ARAXA",
+      "count": 2
     }
   ],
   "top_tipos_evento": [
     {
       "tipo_evento": "ROUBO A PESSOA",
-      "count": 117
+      "count": 108
     },
     {
       "tipo_evento": "HOMICIDIO DOLOSO",
-      "count": 47
+      "count": 35
     },
     {
       "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
-      "count": 9
+      "count": 17
     },
     {
       "tipo_evento": "ROUBO A RESIDÊNCIA",
-      "count": 5
+      "count": 14
     },
     {
       "tipo_evento": "ROUBO A COLETIVO",
       "count": 4
     },
     {
-      "tipo_evento": "FEMINICÍDIO",
-      "count": 3
-    },
-    {
-      "tipo_evento": "ROUBO A MOTEL",
-      "count": 2
-    },
-    {
-      "tipo_evento": "ROUBO SAIDINHA BANCÁRIA",
-      "count": 2
+      "tipo_evento": "ROUBO A PESSOA C/ CONSTRANGIMENTO DA LIBERDADE",
+      "count": 4
     },
     {
       "tipo_evento": "ROUBO A POSTO DE GASOLINA",
-      "count": 1
+      "count": 3
+    },
+    {
+      "tipo_evento": "ROUBO A FARMÁCIA",
+      "count": 2
     },
     {
       "tipo_evento": "ROUBO APLICATIVO DE ENTREGAS",
-      "count": 1
+      "count": 2
+    },
+    {
+      "tipo_evento": "ROUBO DE CARGA",
+      "count": 2
     }
   ],
   "fortaleza": {
-    "row_count": 113,
+    "row_count": 108,
     "top_bairros": [
       {
-        "bairro": "CENTRO",
+        "bairro": "ALDEOTA",
         "count": 11
       },
       {
-        "bairro": "CONJUNTO CEARA I",
-        "count": 10
-      },
-      {
-        "bairro": "PASSARE",
-        "count": 6
-      },
-      {
-        "bairro": "MEIRELES",
+        "bairro": "JANGURURSSU",
         "count": 5
       },
       {
-        "bairro": "JOAQUIM TAVORA",
+        "bairro": "VILA VELHA",
         "count": 4
       },
       {
-        "bairro": "FATIMA",
+        "bairro": "PARANGABA",
         "count": 4
       },
       {
-        "bairro": "MARAPONGA",
-        "count": 4
-      },
-      {
-        "bairro": "JANGURURSSU",
+        "bairro": "VILA PERY",
         "count": 4
       },
       {
@@ -191,98 +179,118 @@
         "count": 4
       },
       {
+        "bairro": "CENTRO",
+        "count": 4
+      },
+      {
+        "bairro": "MESSEJANA",
+        "count": 3
+      },
+      {
+        "bairro": "FATIMA",
+        "count": 3
+      },
+      {
+        "bairro": "MEIRELES",
+        "count": 3
+      },
+      {
+        "bairro": "PRAIA DO FUTURO I",
+        "count": 3
+      },
+      {
         "bairro": "SAO GERARDO",
         "count": 3
       },
       {
-        "bairro": "PARANGABA",
+        "bairro": "SERRINHA",
         "count": 3
       },
       {
         "bairro": "MANOEL SATIRO",
-        "count": 3
+        "count": 2
       },
       {
-        "bairro": "ALDEOTA",
-        "count": 3
-      },
-      {
-        "bairro": "DIONISIO TORRES",
-        "count": 3
-      },
-      {
-        "bairro": "BARROSO",
-        "count": 3
+        "bairro": "PARQUE ARAXA",
+        "count": 2
       }
     ],
     "top_tipos_evento": [
       {
         "tipo_evento": "ROUBO A PESSOA",
-        "count": 89
-      },
-      {
-        "tipo_evento": "HOMICIDIO DOLOSO",
-        "count": 7
+        "count": 80
       },
       {
         "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
+        "count": 9
+      },
+      {
+        "tipo_evento": "ROUBO A RESIDÊNCIA",
         "count": 5
+      },
+      {
+        "tipo_evento": "HOMICIDIO DOLOSO",
+        "count": 4
       },
       {
         "tipo_evento": "ROUBO A COLETIVO",
         "count": 4
       },
       {
-        "tipo_evento": "ROUBO A RESIDÊNCIA",
+        "tipo_evento": "ROUBO A PESSOA C/ CONSTRANGIMENTO DA LIBERDADE",
         "count": 3
       },
       {
-        "tipo_evento": "ROUBO A MOTEL",
-        "count": 2
-      },
-      {
-        "tipo_evento": "ROUBO SAIDINHA BANCÁRIA",
-        "count": 2
-      },
-      {
         "tipo_evento": "ROUBO APLICATIVO DE ENTREGAS",
+        "count": 2
+      },
+      {
+        "tipo_evento": "ROUBO A FARMÁCIA",
         "count": 1
       }
     ]
   },
   "rmf": {
-    "row_count": 28,
+    "row_count": 29,
     "top_cidades": [
       {
-        "cidade": "CAUCAIA",
-        "count": 9
+        "cidade": "MARACANAU",
+        "count": 12
       },
       {
-        "cidade": "MARACANAU",
-        "count": 9
+        "cidade": "CAUCAIA",
+        "count": 5
       },
       {
         "cidade": "PACAJUS",
+        "count": 4
+      },
+      {
+        "cidade": "TRAIRI",
         "count": 2
       },
       {
-        "cidade": "PACATUBA",
-        "count": 2
-      },
-      {
-        "cidade": "PARAIPABA",
-        "count": 2
-      },
-      {
-        "cidade": "PINDORETAMA",
-        "count": 2
+        "cidade": "EUSEBIO",
+        "count": 1
       },
       {
         "cidade": "HORIZONTE",
         "count": 1
       },
       {
-        "cidade": "MARANGUAPE",
+        "cidade": "ITAITINGA",
+        "count": 1
+      },
+      {
+        "cidade": "PACATUBA",
+        "count": 1
+      },
+      {
+        "cidade": "PARACURU",
+        "count": 1
+      },
+      {
+        "cidade": "SAO GONCALO DO AMARANTE",
         "count": 1
       }
     ],
@@ -292,44 +300,44 @@
         "count": 15
       },
       {
-        "tipo_evento": "HOMICIDIO DOLOSO",
-        "count": 5
-      },
-      {
         "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
-        "count": 3
-      },
-      {
-        "tipo_evento": "FEMINICÍDIO",
-        "count": 2
-      },
-      {
-        "tipo_evento": "ROUBO A POSTO DE GASOLINA",
-        "count": 1
+        "count": 4
       },
       {
         "tipo_evento": "ROUBO A RESIDÊNCIA",
-        "count": 1
+        "count": 4
+      },
+      {
+        "tipo_evento": "ROUBO A POSTO DE GASOLINA",
+        "count": 2
       },
       {
         "tipo_evento": "ROUBO DE CARGA",
+        "count": 2
+      },
+      {
+        "tipo_evento": "FEMINICÍDIO",
+        "count": 1
+      },
+      {
+        "tipo_evento": "ROUBO A PESSOA C/ CONSTRANGIMENTO DA LIBERDADE",
         "count": 1
       }
     ]
   },
   "interior": {
-    "row_count": 51,
+    "row_count": 56,
     "top_cidades": [
       {
-        "cidade": "PARAMBU",
+        "cidade": "ARACATI",
+        "count": 5
+      },
+      {
+        "cidade": "LIMOEIRO DO NORTE",
         "count": 4
       },
       {
-        "cidade": "JUAZEIRO DO NORTE",
-        "count": 3
-      },
-      {
-        "cidade": "ITAPAJE",
+        "cidade": "AMONTADA",
         "count": 3
       },
       {
@@ -337,49 +345,57 @@
         "count": 3
       },
       {
-        "cidade": "SOBRAL",
+        "cidade": "JUAZEIRO DO NORTE",
         "count": 3
       },
       {
-        "cidade": "UMIRIM",
-        "count": 2
+        "cidade": "IGUATU",
+        "count": 3
       },
       {
-        "cidade": "ARACATI",
-        "count": 2
-      },
-      {
-        "cidade": "LIMOEIRO DO NORTE",
-        "count": 2
-      },
-      {
-        "cidade": "TAUA",
+        "cidade": "ACARAU",
         "count": 2
       },
       {
         "cidade": "IPAUMIRIM",
+        "count": 2
+      },
+      {
+        "cidade": "VARJOTA",
+        "count": 2
+      },
+      {
+        "cidade": "SAO BENEDITO",
         "count": 2
       }
     ],
     "top_tipos_evento": [
       {
         "tipo_evento": "HOMICIDIO DOLOSO",
-        "count": 35
+        "count": 31
       },
       {
         "tipo_evento": "ROUBO A PESSOA",
         "count": 13
       },
       {
-        "tipo_evento": "FEMINICÍDIO",
-        "count": 1
+        "tipo_evento": "ROUBO A RESIDÊNCIA",
+        "count": 5
       },
       {
         "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
+        "count": 4
+      },
+      {
+        "tipo_evento": "ROUBO A FARMÁCIA",
         "count": 1
       },
       {
-        "tipo_evento": "ROUBO A RESIDÊNCIA",
+        "tipo_evento": "ROUBO A POSTO DE GASOLINA",
+        "count": 1
+      },
+      {
+        "tipo_evento": "ROUBO A SUPERMERCADO/MERCANTIL",
         "count": 1
       }
     ]

@@ -361,7 +361,7 @@
                 <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                     <span><i class="fas fa-map-marked-alt"></i> Mapa Tático Operacional</span>
                     <div class="rp-map-badges">
-                        <span class="badge bg-info me-2">⏱️ Janela 14 Dias</span>
+                        <span class="badge bg-info me-2">⏱️ Janela 30 Dias</span>
                         <span class="badge bg-success">Motor REPORT PREVIEW Ativo</span>
                     </div>
                 </div>
@@ -401,14 +401,14 @@
                 <div class="card-header">
                     <strong>Fatores de Tensão</strong>
                     <div class="alert alert-warning alert-sm mt-2 mb-0 p-2 small">
-                        <i class="fas fa-info-circle"></i> <strong>Nota:</strong> Projeção de tensão territorial para os <strong>próximos 14 dias</strong>, não apenas amanhã
+                        <i class="fas fa-info-circle"></i> <strong>Nota:</strong> Projeção de tensão territorial para os <strong>próximos 30 dias</strong>, não apenas amanhã
                     </div>
                 </div>
                 <div class="card-body sidebar-card-body" style="overflow-y: auto; flex: 1; padding: 12px; font-size: 0.9rem;">
                     <div id="window-info" class="mb-1" style="font-size: 0.8rem;">
                         <small class="text-muted d-block" id="base-historica-info">Base Histórica: 19/11/2025 → 19/03/2026 (120 dias)</small>
-                        <small class="text-primary fw-bold" id="horizon-info">Horizonte de Predição: 14 dias</small>
-                        <small class="text-success d-block" id="validity-info">📅 Janela de Inteligência: Projeção 14 dias (Tempo Real)</small>
+                        <small class="text-primary fw-bold" id="horizon-info">Horizonte de Predição: 30 dias</small>
+                        <small class="text-success d-block" id="validity-info">📅 Janela de Inteligência: Projeção 30 dias (Tempo Real)</small>
                         <small class="text-secondary d-block" id="model-window-info">Modelo: Poisson Ranker Estadual (Janela: 120d)</small>
                         <small class="text-warning d-none" id="model-validation-info"></small>
                     </div>
@@ -581,17 +581,11 @@
                                     <i class="fas fa-map-pin"></i> Pinpoints CVLI (90 dias)
                                 </label>
                             </div>
-                            <div class="form-check mt-1">
-                                <input class="form-check-input" type="checkbox" id="toggle-ga-zones">
-                                <label class="form-check-label small fw-bold text-warning" for="toggle-ga-zones">
-                                    <i class="fas fa-draw-polygon"></i> Áreas de maior risco CVLI
-                                </label>
-                            </div>
                         </div>
                         <div class="form-check mt-1">
                             <input class="form-check-input" type="checkbox" id="toggle-all-streets">
                             <label class="form-check-label small fw-bold text-success" for="toggle-all-streets">
-                                <i class="fas fa-project-diagram"></i> Focos ST-GCN (Ruas 500m)
+                                <i class="fas fa-project-diagram"></i> Colmeia ST-GCN GA (Top 100)
                             </label>
                         </div>
                         <h6 class="mb-2 fw-bold text-dark" id="top-list-title" style="font-size: 0.9rem;">🌡️ Top 10 Territórios em Tensão</h6>
@@ -652,10 +646,6 @@
     map.createPane('topMicronodesPane');
     map.getPane('topMicronodesPane').style.zIndex = 640;
 
-    map.createPane('gaZonesPane');
-    map.getPane('gaZonesPane').style.zIndex = 635;
-    map.getPane('gaZonesPane').style.pointerEvents = 'auto';
-
     map.createPane('micronodesPane');
     map.getPane('micronodesPane').style.zIndex = 650;
 
@@ -679,8 +669,6 @@
     var streetFocusMode = false;
     var cvliPoints90dLayer = L.layerGroup();
     var cvliPoints90dLoadedRegion = null;
-    var gaZonesLayer = L.layerGroup();
-    var gaZonesLoaded = false;
 
     function normalizeCvliPointsRegion(region) {
         var r = String(region || 'all').toLowerCase();
@@ -906,9 +894,9 @@
 
     function loadStreetFoci(region) {
         var selectedRegion = normalizeStreetFocusRegion(region || $('#region-filter').val() || 'all');
-        showLoading("Agrupando ruas em focos hexagonais de 1km...");
+        showLoading("Calculando a colmeia GA e os 100 focos ST-GCN...");
 
-        fetch('/api/street_foci?region=' + encodeURIComponent(selectedRegion) + '&radius_m=1000&shape=hex&min_points=2&limit=220')
+        fetch('/api/street_foci?region=' + encodeURIComponent(selectedRegion) + '&shape=hex&min_points=2&limit=100')
             .then(r => r.json())
             .then(data => {
                 allStreetsData = data;
@@ -1058,7 +1046,7 @@
         div.innerHTML += '<i style="background:' + getColor(60) + '"></i> Alto (51–70)<br>';
         div.innerHTML += '<i style="background:' + getColor(40) + '"></i> Moderado (31–50)<br>';
         div.innerHTML += '<i style="background:' + getColor(20) + '"></i> Baixo (0–30)<br>';
-        div.innerHTML += '<hr style="margin: 5px 0; opacity: 0.5;"><small style="color: #666;">🕐 <strong>Janela:</strong> Próximos 14 dias<br/><strong>📊 Ranking:</strong> Cobertura Territorial (Cov@K)</small>';
+        div.innerHTML += '<hr style="margin: 5px 0; opacity: 0.5;"><small style="color: #666;">🕐 <strong>Janela:</strong> Próximos 30 dias<br/><strong>📊 Ranking:</strong> Cobertura Territorial (Cov@K)</small>';
         return div;
     };
     legend.addTo(map);
@@ -1124,67 +1112,6 @@
         return L.divIcon({html: html, className: '', iconSize: [18,22], iconAnchor: [9,20]});
     }
 
-    function cvliFocusColor(score) {
-        if (score >= 0.85) return '#8B0000';
-        if (score >= 0.70) return '#E63946';
-        return '#F4A261';
-    }
-
-    function loadGaZones(){
-        return fetch('/api/ga_operational_zones')
-            .then(function(resp){ if (!resp.ok) throw new Error('GA zones ' + resp.status); return resp.json(); })
-            .then(function(data){
-                gaZonesLayer.clearLayers();
-                (data.features || []).forEach(function(feature) {
-                    var p = feature.properties || {};
-                    var coords = feature.geometry && feature.geometry.coordinates;
-                    if (!coords || coords.length < 2) return;
-                    var color = cvliFocusColor(Number(p.score || 0));
-                    var layer = L.circle([coords[1], coords[0]], {
-                        pane: 'gaZonesPane',
-                        radius: Math.max(250, Number(p.radius_km || 0.75) * 1000),
-                        color: color,
-                        weight: 0,
-                        opacity: 0,
-                        fillColor: color,
-                        fillOpacity: 0.16
-                    });
-                    layer.bindTooltip(
-                        'Evidencia historica local #' + (p.rank || '-') + ' - ' + (p.bairro || 'Fortaleza') + ' - raio ' + (p.radius_km || '-') + ' km',
-                        { sticky: true, direction: 'top', opacity: 0.92 }
-                    );
-                    gaZonesLayer.addLayer(layer);
-                });
-                gaZonesLoaded = true;
-                if ($('#toggle-ga-zones').prop('checked')) map.addLayer(gaZonesLayer);
-                return;
-                L.geoJson(data, {
-                    pane: 'gaZonesPane',
-                    pointToLayer: function(feature, latlng) {
-                        var p = feature.properties || {};
-                        var color = cvliFocusColor(Number(p.score || 0));
-                        return L.circle(latlng, {
-                            radius: Math.max(250, Number(p.radius_km || 0.75) * 1000),
-                            color: color,
-                            weight: 1,
-                            opacity: 0.35,
-                            fillColor: color,
-                            fillOpacity: 0.13
-                        });
-                    },
-                    onEachFeature: function(feature, layer) {
-                        var p = feature.properties || {};
-                        layer.bindTooltip(
-                            'Evidência histórica local #' + (p.rank || '-') + ' - ' + (p.bairro || 'Fortaleza') + ' - raio ' + (p.radius_km || '-') + ' km',
-                            { sticky: true, direction: 'top', opacity: 0.92 }
-                        );
-                    }
-                }).eachLayer(function(layer){ gaZonesLayer.addLayer(layer); });
-                gaZonesLoaded = true;
-                if ($('#toggle-ga-zones').prop('checked')) map.addLayer(gaZonesLayer);
-            });
-    }
-
     function loadVisibleMicronodes(region, cb, options){
         // region optional: capital|rmf|interior
         var url = '/api/visible_micronodes';
@@ -1248,8 +1175,8 @@
                             var faccao = faccaoMap[f.properties.source] || (f.properties.faction || 'Não identificado');
                             var scoreRaw = f.properties.score;
                             var scoreText = scoreRaw !== undefined && scoreRaw !== null ? Math.round(scoreRaw) + '%' : 'N/A';
-                            var peakHrs = f.properties.peak_hours || '';
-                            var peakHtml = peakHrs ? '<div style="font-size:0.82rem; color:#ffd166; margin-bottom:6px; background:rgba(255,209,102,0.08); padding:4px 6px; border-radius:4px; border-left:3px solid #ffd166;"><b>⏱ Horário de Risco:</b> ' + peakHrs + '</div>' : '';
+                            var peakHrs = f.properties.peak_time_label || f.properties.peak_hours || '';
+                            var peakHtml = peakHrs ? '<div style="font-size:0.82rem; color:#ffd166; margin-bottom:6px; background:rgba(255,209,102,0.08); padding:4px 6px; border-radius:4px; border-left:3px solid #ffd166;"><b>Pico temporal:</b> ' + peakHrs + '</div>' : '';
                             var popupContent = '<div id="popup-' + rank + '" style="width:300px; padding:8px;">' +
                                               '<div style="text-align:center; margin-bottom:8px;"><strong>' + rank + '. ' + displayName + '</strong></div>' +
                                               '<div style="font-size:0.85rem;"><b>Bairro:</b> ' + (f.properties.bairro || 'N/A') + '</div>' +
@@ -1585,8 +1512,8 @@
             : (typeof data.confidence === 'number' ? (data.confidence * 100).toFixed(1) + '%' : 'N/D');
         var modelFamily = data.model_family || data.model_architecture || 'Poisson Ranker Estadual';
         var primarySignalLabel = data.primary_signal_label || 'Sinal Poisson do ranking operacional';
-        var expectedCvli14d = (typeof data.expected_cvli_14d === 'number')
-            ? data.expected_cvli_14d.toFixed(2)
+        var expectedCvli30d = (typeof data.expected_cvli_30d === 'number')
+            ? data.expected_cvli_30d.toFixed(2)
             : 'N/D';
         var reportMoment = formatTimestampForReport(state.capturedAt);
         var argumentBullets = [];
@@ -1620,7 +1547,10 @@
         var modelSection = '';
         modelSection += '<p><strong>Modelo ativo:</strong> ' + escapeHtml(modelFamily) + '</p>';
         modelSection += '<p><strong>Sinal principal:</strong> ' + escapeHtml(primarySignalLabel) + '</p>';
-        modelSection += '<p><strong>CVLI esperado no horizonte de 14 dias:</strong> ' + escapeHtml(expectedCvli14d) + '</p>';
+        if (data.peak_time_label || data.peak_hours) {
+            modelSection += '<p><strong>Pico temporal provavel:</strong> ' + escapeHtml(data.peak_time_label || data.peak_hours) + '</p>';
+        }
+        modelSection += '<p><strong>CVLI esperado no horizonte de 30 dias:</strong> ' + escapeHtml(expectedCvli30d) + '</p>';
         modelSection += buildExplainabilityList(data.model_drivers || [], function(driver) {
             if (!driver || !driver.label) return '';
             var valueText = (typeof driver.value_pct === 'number') ? driver.value_pct.toFixed(1) + '%' : 'N/D';
@@ -1901,8 +1831,8 @@
             $('#base-historica-info').text('Base Histórica: ' + dateText + ' (' + days + ' dias)');
         }
 
-        // Horizonte fixo: 14 dias (predict_horizon_days=14, TRAINING_LOG Tentativa 47+)
-        $('#horizon-info').text('Horizonte de Predição: 14 dias');
+        // Horizonte fixo: 30 dias.
+        $('#horizon-info').text('Horizonte de Predição: 30 dias');
         if (metaDataGlobal && metaDataGlobal.intelligence_label) {
             $('#validity-info').html('<i class="fas fa-brain"></i> ' + metaDataGlobal.intelligence_label);
         }
@@ -2182,8 +2112,6 @@
                         var nameKey = item.clean_name || normalizeName(item.name || '');
                         var composite = nameKey + '|' + regionKey;
                         riskByName[composite] = item;
-                        // also keep simple name as fallback (but composite preferred)
-                        if (nameKey) riskByName[nameKey] = item;
                     } catch (e) {
                         // ignore malformed items
                     }
@@ -2194,7 +2122,7 @@
                     var normName = normalizeName(rawName);
                     var regionType = normalizeDashboardRegion(feature.properties.region_type, 'unknown');
                     var compositeKey = normName + '|' + regionType;
-                    var r = riskByName[compositeKey] || riskByName[normName] || {};
+                    var r = riskByName[compositeKey] || {};
                     
                     // Use apenas o `risk_score` fornecido pelo backend quando disponível.
                     // NÃO criar/fabricar valores locais (remover suavização/fallback no front).
@@ -2208,6 +2136,8 @@
                     feature.properties.node_id = (r.node_id !== undefined && r.node_id !== null) ? r.node_id : null;
                     feature.properties.metrics = r.metrics || {};
                         feature.properties.peak_hours = (r.peak_hours || ((r.metrics || {}).peak_hours) || feature.properties.peak_hours || '');
+                        feature.properties.peak_weekday = (r.peak_weekday || ((r.metrics || {}).peak_weekday) || feature.properties.peak_weekday || '');
+                        feature.properties.peak_time_label = (r.peak_time_label || ((r.metrics || {}).peak_time_label) || feature.properties.peak_time_label || '');
                     // Copy server-provided labels (status, textual risk) so front apenas apresenta o que vem do back
                     if (r.status_label) feature.properties.status_label = r.status_label;
                     if (r.risk_text) feature.properties.risk_text = r.risk_text;
@@ -2311,7 +2241,6 @@
             var nameKey = item.clean_name || normalizeName(item.name || '');
             var composite = nameKey + '|' + regionKey;
             riskByName[composite] = item;
-            if (nameKey) riskByName[nameKey] = item;
         });
 
         // 3. Atualizar as propriedades de cada feature na fonte completa
@@ -2321,7 +2250,7 @@
             var regionType = normalizeDashboardRegion(feature.properties.region_type, 'unknown');
             var compositeKey = normName + '|' + regionType;
             
-            var r = riskByName[compositeKey] || riskByName[normName];
+            var r = riskByName[compositeKey];
             if (r) {
                 // Atualizar scores e labels vindos da simulação
                 feature.properties.risk_score = (typeof r.risk_score === 'number') ? r.risk_score : null;
@@ -2330,6 +2259,8 @@
                 if (r.risk_text) feature.properties.risk_text = r.risk_text;
                 if (r.metrics) feature.properties.metrics = r.metrics;
                 feature.properties.peak_hours = (r.peak_hours || ((r.metrics || {}).peak_hours) || feature.properties.peak_hours || '');
+                feature.properties.peak_weekday = (r.peak_weekday || ((r.metrics || {}).peak_weekday) || feature.properties.peak_weekday || '');
+                feature.properties.peak_time_label = (r.peak_time_label || ((r.metrics || {}).peak_time_label) || feature.properties.peak_time_label || '');
                 if (r.faction) feature.properties.faction = r.faction;
             }
         });
@@ -2375,7 +2306,6 @@
                 var nameKey = item.clean_name || normalizeName(item.name || '');
                 var composite = nameKey + '|' + regionKey;
                 riskByName[composite] = item;
-                if (nameKey) riskByName[nameKey] = item; // fallback
             } catch(e) {}
         });
 
@@ -2384,7 +2314,7 @@
             var normName = normalizeName(rawName);
             var regionType = (feature.properties.region_type || '').toString().toLowerCase() || 'unknown';
             var compositeKey = normName + '|' + regionType;
-            var r = riskByName[compositeKey] || riskByName[normName] || {};
+            var r = riskByName[compositeKey] || {};
             
             // Use apenas valores numéricos vindos do backend; não inventar fallback no front.
             feature.properties.risk_score = (typeof r.risk_score === 'number') ? r.risk_score : (typeof r.risk_score_cvli === 'number' ? r.risk_score_cvli : null);
@@ -2397,6 +2327,8 @@
             feature.properties.node_id = (r.node_id !== undefined && r.node_id !== null) ? r.node_id : null;
             feature.properties.metrics = r.metrics || {};
             feature.properties.peak_hours = (r.peak_hours || ((r.metrics || {}).peak_hours) || feature.properties.peak_hours || '');
+            feature.properties.peak_weekday = (r.peak_weekday || ((r.metrics || {}).peak_weekday) || feature.properties.peak_weekday || '');
+            feature.properties.peak_time_label = (r.peak_time_label || ((r.metrics || {}).peak_time_label) || feature.properties.peak_time_label || '');
             if (!feature.properties.region_type) {
                 feature.properties.region_type = 'unknown';
             }
@@ -2864,7 +2796,7 @@
             // Prefer final backend `risk_score` (post-ranking). Fallback to CVLI raw percentiles.
             var score = typeof feature.properties.risk_score !== 'undefined' && feature.properties.risk_score !== null ? feature.properties.risk_score : (feature.properties.risk_score_cvli || 0);
             var predVal = feature.properties.cvli_pred;
-            var peakHoursText = feature.properties.peak_hours || ((feature.properties.metrics || {}).peak_hours) || '';
+            var peakHoursText = feature.properties.peak_time_label || ((feature.properties.metrics || {}).peak_time_label) || feature.properties.peak_hours || ((feature.properties.metrics || {}).peak_hours) || '';
             var typeLabel = 'Inteligência';
             var status = getStatus(score, typeLabel);
             // Prefer server-provided normalized region if present, else CIDADE
@@ -2874,7 +2806,7 @@
             var friendlyLabel = feature.properties.status_label || status.label;
             var level = getRiskLevel(score);
             var riskText = feature.properties.risk_text || (Math.round(score) + '% — ' + friendlyLabel);
-            var predText = feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('Estimativa: ~' + predVal.toFixed(1) + ' ocorrências/14d') : 'Sem eventos recentes na janela');
+            var predText = feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('Estimativa: ~' + predVal.toFixed(1) + ' ocorrências/30d') : 'Sem eventos recentes na janela');
             
             // BUSCAR RUAS CRÍTICAS GEOLOCALIZADAS VIA API
             var bairroParam = feature.properties.name || '';
@@ -2931,7 +2863,7 @@
                                         <strong>Previsão:</strong> ${predText}
                                     </div>
                                 </div>
-                                ${peakHoursText ? '<div style="margin-top:8px; font-size:0.8rem; background:rgba(255,209,102,0.08); padding:8px 10px; border-radius:6px; border-left:4px solid #ffd166;"><span style="color:#ffd166; font-weight:700;">⏱ Horário de Risco Padrão:</span> <span style="color:#fff;">' + peakHoursText + '</span><div style="font-size:0.68rem; color:#6c757d; margin-top:2px;">Janela com maior concentração histórica de CVLI (padrão relativo)</div></div>' : ''}
+                                ${peakHoursText ? '<div style="margin-top:8px; font-size:0.8rem; background:rgba(255,209,102,0.08); padding:8px 10px; border-radius:6px; border-left:4px solid #ffd166;"><span style="color:#ffd166; font-weight:700;">Pico temporal provavel:</span> <span style="color:#fff;">' + peakHoursText + '</span><div style="font-size:0.68rem; color:#6c757d; margin-top:2px;">Calculado com dia da semana e hora reais do historico CVLI na chamada da previsao.</div></div>' : ''}
 
                                 <div style="margin-top: 10px; font-size: 0.8rem; background: rgba(255, 193, 7, 0.05); padding: 8px; border-radius: 4px; border: 1px solid rgba(255, 193, 7, 0.2);">
                                     <strong style="color: #ffc107; display: block; margin-bottom: 4px;"><i class="fas fa-map-marker-alt"></i> Logradouros Críticos:</strong>
@@ -3009,7 +2941,7 @@
         var reasonsHtml = '<h5>' + feature.properties.name + '</h5>';
         reasonsHtml += '<p><strong>Facção:</strong> ' + (feature.properties.faction || 'N/A') + '</p>';
         var sideStatus = feature.properties.status_label || status.label;
-        var sidePred = feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('~' + predVal.toFixed(1) + ' eventos/14d') : 'Sem eventos recentes na janela');
+        var sidePred = feature.properties.cvli_prediction_text || (predVal && predVal > 0 ? ('~' + predVal.toFixed(1) + ' eventos/30d') : 'Sem eventos recentes na janela');
         reasonsHtml += '<p><strong>Status:</strong> ' + sideStatus + '</p>';
         reasonsHtml += '<p><strong>Previsão (' + typeLabel + '):</strong> ' + sidePred + '</p>';
         (feature.properties.reasons || []).forEach(function(r) { reasonsHtml += '<li>' + r + '</li>'; });
@@ -3052,14 +2984,14 @@
                             direction: legacyTrend.indexOf('increas') >= 0 || legacyTrend.indexOf('alta') >= 0 ? 'up' : (legacyTrend.indexOf('queda') >= 0 || legacyTrend.indexOf('down') >= 0 ? 'down' : 'stable'),
                             label: legacyTrend.indexOf('increas') >= 0 || legacyTrend.indexOf('alta') >= 0 ? 'Alta de Risco' : (legacyTrend.indexOf('queda') >= 0 || legacyTrend.indexOf('down') >= 0 ? 'Queda de Risco' : 'Estável'),
                             message: 'Tendência inferida a partir do padrão temporal recente.',
-                            horizon_days: 14
+                            horizon_days: 30
                         };
                     }
                 }
                 if (trend) {
                     var trendColor = trend.direction === 'up' ? '#dc3545' : (trend.direction === 'down' ? '#198754' : '#0d6efd');
                     var trendIcon = trend.direction === 'up' ? '↗' : (trend.direction === 'down' ? '↘' : '→');
-                    var horizon = trend.horizon_days || 14;
+                    var horizon = trend.horizon_days || 30;
                     html += '<div style="background:#f8fbff; border:1px solid #dbe7ff; border-left:4px solid ' + trendColor + '; padding:10px 12px; margin:8px 0; border-radius:6px;">'
                           + '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">'
                           + '<strong style="font-size:0.9rem; color:#1f2937;">Tendência Futura (' + horizon + 'd)</strong>'
@@ -3075,8 +3007,8 @@
                     html += '<div style="background:#eef6ff; border:1px solid #d7e6ff; border-radius:6px; padding:10px 12px; margin:8px 0;">'
                           + '<div style="font-size:0.82rem; font-weight:700; color:#315ea8; margin-bottom:4px;">Leitura do modelo ativo</div>'
                           + '<div style="font-size:0.9rem; color:#1f2937;"><strong>' + escapeHtml(modelFamily) + '</strong> usando <strong>' + escapeHtml(primarySignalLabel) + '</strong>.</div>';
-                    if (typeof data.expected_cvli_14d === 'number') {
-                        html += '<div style="font-size:0.85rem; color:#475569; margin-top:4px;">CVLI esperado no horizonte de 14 dias: <strong>' + data.expected_cvli_14d.toFixed(2) + '</strong>.</div>';
+                    if (typeof data.expected_cvli_30d === 'number') {
+                        html += '<div style="font-size:0.85rem; color:#475569; margin-top:4px;">CVLI esperado no horizonte de 30 dias: <strong>' + data.expected_cvli_30d.toFixed(2) + '</strong>.</div>';
                     }
                     html += '</div>';
                 }
@@ -3207,7 +3139,7 @@
                 // Update active events
                 var eventsHtml = '';
                 if (data.active_events && data.active_events.length > 0) {
-                    eventsHtml = '<strong class="small">Eventos Territoriais Ativos (14d):</strong>';
+                    eventsHtml = '<strong class="small">Eventos Territoriais Ativos:</strong>';
                     data.active_events.forEach(function(evt) {
                         var sev = (typeof evt.severity === 'number') ? (evt.severity * 100).toFixed(0) : 0;
                         eventsHtml += '<div class="small text-muted mt-1">' +
@@ -3216,7 +3148,7 @@
                             '</div>';
                     });
                 } else {
-                    eventsHtml = '<p class="text-muted small">Nenhum evento ativo nos últimos 14 dias</p>';
+                    eventsHtml = '<p class="text-muted small">Nenhum evento territorial ativo</p>';
                 }
                 $('#active-events-list').html(eventsHtml);
                 
@@ -3297,8 +3229,9 @@
                 else if (label.toUpperCase().indexOf('ALERT') !== -1 || label.toUpperCase().indexOf('ALTO') !== -1) cls = 'text-warning';
                 else if (label.toUpperCase().indexOf('MODER') !== -1) cls = 'text-info';
 
-                var peakHtml = item.peak_hours
-                    ? `<small class="d-block" style="font-size:0.65rem; color:#aaa; line-height:1.1;">⏱ ${item.peak_hours}</small>`
+                var peakText = item.peak_time_label || item.peak_hours || '';
+                var peakHtml = peakText
+                    ? `<small class="d-block" style="font-size:0.65rem; color:#aaa; line-height:1.1;">${peakText}</small>`
                     : '';
 
                 htmlSrv += `<a href="#" class="list-group-item list-group-item-action py-2 ps-2 pe-1" data-nodeid="${item.node_id}" data-name="${item.name}">
@@ -3404,7 +3337,7 @@
             }
 
             // Peak hours from layer properties
-            var peakHoursVal = (item.layer && item.layer.feature && item.layer.feature.properties.peak_hours) || '';
+            var peakHoursVal = (item.layer && item.layer.feature && (item.layer.feature.properties.peak_time_label || item.layer.feature.properties.peak_hours)) || '';
             var peakHoursHtml = peakHoursVal
                 ? `<small style="font-size:0.65rem; color:#aaa; line-height:1.1; display:block;">⏱ ${peakHoursVal}</small>`
                 : '';
@@ -3581,18 +3514,6 @@
             try { cvliPoints90dLayer.clearLayers(); } catch (e) {}
             if (map.hasLayer(cvliPoints90dLayer)) map.removeLayer(cvliPoints90dLayer);
             cvliPoints90dLoadedRegion = null;
-        }
-    });
-
-    $('#toggle-ga-zones').on('change', function() {
-        if ($(this).prop('checked')) {
-            if (gaZonesLoaded) {
-                map.addLayer(gaZonesLayer);
-            } else {
-                loadGaZones().catch(function(err) { console.warn('[GA Zones] load error', err); });
-            }
-        } else if (map.hasLayer(gaZonesLayer)) {
-            map.removeLayer(gaZonesLayer);
         }
     });
 

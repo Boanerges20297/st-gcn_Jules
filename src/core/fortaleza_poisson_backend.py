@@ -80,7 +80,7 @@ def build_training_frame(
     data: dict,
     train_start: str = "2022-01-01",
     train_end: str = "2024-12-31",
-    horizon_days: int = 14,
+    horizon_days: int = 30,
     window: int = 90,
 ) -> pd.DataFrame:
     nf = np.asarray(data["node_features"], dtype=np.float32)
@@ -221,7 +221,7 @@ def train_poisson_payload(
     region: str = "fortaleza",
     train_start: str = "2022-01-01",
     train_end: str = "2024-12-31",
-    horizon_days: int = 14,
+    horizon_days: int = 30,
     window: int = 90,
     benchmark_metrics: dict | None = None,
 ) -> dict:
@@ -392,7 +392,7 @@ class FortalezaPoissonRuntime:
                 "base_window": self.window,
                 "historical_fallback": False,
                 "trend": "stable",
-                "expected_cvli_14d": float(raw_pred[idx]),
+                "expected_cvli_30d": float(raw_pred[idx]),
                 "primary_signal_label": "Sinal Poisson do ranking operacional",
                 "model_family": "Poisson Ranker",
             }

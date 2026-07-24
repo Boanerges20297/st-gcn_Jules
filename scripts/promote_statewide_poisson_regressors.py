@@ -42,7 +42,7 @@ def evaluate_poisson_region(region: str) -> dict:
         train_end=pd.Timestamp("2024-12-31"),
         val_start=pd.Timestamp("2025-01-01"),
         val_end=pd.Timestamp("2025-12-31"),
-        horizon_days=14,
+        horizon_days=30,
     )
     train_df = datasets["classical_train"]
     val_df = datasets["classical_val"]
@@ -64,7 +64,7 @@ def evaluate_poisson_region(region: str) -> dict:
         region=region,
         train_start="2022-01-01",
         train_end="2024-12-31",
-        horizon_days=14,
+        horizon_days=30,
         window=REGION_WINDOWS[region],
         benchmark_metrics={
             "validation_split": {

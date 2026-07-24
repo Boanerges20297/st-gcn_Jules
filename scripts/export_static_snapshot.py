@@ -4,6 +4,8 @@ import math
 import os
 import subprocess
 import sys
+import tempfile
+import time
 from collections import Counter
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -13,6 +15,7 @@ import numpy as np
 
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
+os.environ.setdefault('REPORT_PREVIEW_EXPORT_MODE', '1')
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
@@ -27,6 +30,7 @@ REGION_EXPORTS = (
 )
 MOMENTUM_WINDOW_DAYS = 14
 RECENT_EXOGENOUS_WINDOW_DAYS = 14
+MAX_EXPLANATION_EXPORT = 30
 
 _CRITICAL_STREETS_FORTALEZA_CACHE = None
 _STREETS_BY_MUNICIPIO_CACHE = None
@@ -41,10 +45,31 @@ def _ensure_dir(path: Path) -> None:
 
 
 def _write_json(path: Path, payload: Any) -> None:
-    path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    _ensure_dir(path.parent)
+    temp_path = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as temp_file:
+            json.dump(payload, temp_file, ensure_ascii=False, indent=2)
+            temp_path = Path(temp_file.name)
+
+        for attempt in range(20):
+            try:
+                os.replace(temp_path, path)
+                break
+            except OSError as exc:
+                if exc.errno not in (13, 22) or attempt == 19:
+                    raise
+                time.sleep(0.25)
+    finally:
+        if temp_path is not None and temp_path.exists():
+            temp_path.unlink()
 
 
 def _extract_flask_json(response: Any) -> Tuple[Dict[str, Any], int]:
@@ -73,6 +98,10 @@ def _request_json(path: str, handler) -> Dict[str, Any]:
     if status_code != 200:
         raise RuntimeError(f"Falha ao carregar {path}: HTTP {status_code} -> {payload}")
     return payload
+
+
+def _export_stage(name: str) -> None:
+    print(f"[STATIC EXPORT] {name}", flush=True)
 
 
 def _safe_float(value: Any, default: float = 0.0) -> float:
@@ -523,15 +552,30 @@ def _summarize_item(item: Dict[str, Any], metrics: Dict[str, Any], manager_cache
 
 def _build_explainability(risk_items: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
     explainability: Dict[str, Dict[str, Any]] = {}
+    scores_map = {
+        report_app.normalize_name(str(item.get("name") or "")): _safe_float(item.get("risk_score"))
+        for item in risk_items
+    }
     # Priorização: Gerar explicabilidade profunda apenas para o Top 100 para evitar timeout
     # O restante usará o fallback leve já mapeado no loop principal
-    for item in risk_items[:100]:
+    for item in risk_items[:MAX_EXPLANATION_EXPORT]:
         node_id = item.get("node_id")
         if node_id is None:
             continue
         try:
+            temporal_profile = {
+                key: item[key]
+                for key in ('peak_hours', 'peak_weekday', 'peak_time_label', 'peak_hour_share', 'peak_weekday_share', 'temporal_sample_size', 'temporal_horizon_days', 'temporal_reference_date')
+                if item.get(key) not in (None, '')
+            }
             with report_app.app.test_request_context(f"/api/explain/{node_id}"):
-                payload, status_code = _extract_flask_json(report_app.explain_node(int(node_id)))
+                payload, status_code = _extract_flask_json(
+                    report_app.explain_node(
+                        int(node_id),
+                        scores_map_override=scores_map,
+                        temporal_profile_override=temporal_profile,
+                    )
+                )
             if status_code == 200:
                 explainability[_snapshot_item_id(item["region_type"], item["clean_name"])] = payload
         except Exception:
@@ -1026,6 +1070,7 @@ def _git_commit_sha() -> str:
 
 def export_snapshot(output_dir: Path) -> Path:
     if report_app.nodes_gdf is None or report_app.orchestrator is None:
+        _export_stage("carregando modelos")
         report_app.load_data_and_models()
 
     if report_app.nodes_gdf is None or report_app.orchestrator is None:
@@ -1035,7 +1080,9 @@ def export_snapshot(output_dir: Path) -> Path:
     generated_at = datetime.now().astimezone().isoformat(timespec="seconds")
     snapshot_id = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
 
+    _export_stage("calculando risco preditivo")
     risk_payload = _request_json("/api/risk", report_app.get_risk)
+    _export_stage("coletando camadas geograficas")
     polygons_payload = _request_json("/api/polygons", report_app.get_polygons)
     micronodes_payload = _request_json("/api/micronodes", report_app.get_micronodes)
     cvli_points_payload = _sanitize_cvli_points_payload(
@@ -1049,6 +1096,7 @@ def export_snapshot(output_dir: Path) -> Path:
     momentum_index = _build_momentum_index()
     exogenous_index = _count_recent_exogenous_by_node(risk_items)
     manager_cache = _load_manager_cache()
+    _export_stage("gerando explicacoes")
     explainability_index = _build_explainability(risk_items)
 
     territory_details: Dict[str, Any] = {}
@@ -1139,6 +1187,7 @@ def export_snapshot(output_dir: Path) -> Path:
         layer_payload = _copy_top_layer(region, output_dir / filename, peak_hours_cache)
         top_layers[region] = layer_payload
 
+    _export_stage("gravando artefatos")
     _write_json(output_dir / "manifest.json", _build_manifest(snapshot_id, generated_at))
     _write_json(output_dir / "dashboard_summary.json", _build_dashboard_summary(risk_items))
     _write_json(

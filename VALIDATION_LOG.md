@@ -380,3 +380,54 @@ Este arquivo registra a performance das predições do sistema (Champion + Chall
 | INTERIOR  |      1       |     1      | 10.0% | 5.0%  | 100.0% | 100.0% |   🚨    |
 
 ---
+
+<!-- validation-session: startup|2026-06-17|2026-07-16|ST-GAT v5 (DeepSTGAT_v5 Ativo) -->
+
+### 🔄 Sessão de Validação: 2026-07-24 11:06
+**Período Gabarito:** 2026-06-17 a 2026-07-16
+
+**Origem:** startup
+
+**Arquitetura:** ST-GAT v5 (DeepSTGAT_v5 Ativo)
+
+| Região    | N_CVLI Bruto | Hits Bruto | P@10  |  P@20 |  R@10  |  R@20  | Status |
+|:----------|:------------:|:----------:|:-----:|:-----:|:------:|:------:|:------:|
+| FORTALEZA |      18      |     9      | 90.0% | 55.0% | 50.0%  | 61.1%  |   ✅    |
+| RMF       |      2       |     2      | 20.0% | 10.0% | 100.0% | 100.0% |   ⚠️   |
+| INTERIOR  |      3       |     1      | 10.0% | 10.0% | 33.3%  | 66.7%  |   🚨    |
+
+---
+
+<!-- validation-session: merge_new_data|2026-07-10|2026-07-23|Poisson Ranker Estadual -->
+
+### 🔄 Sessão de Validação: 2026-07-24 11:18
+**Período Gabarito:** 2026-07-10 a 2026-07-23
+
+**Origem:** merge_new_data
+
+**Arquitetura:** Poisson Ranker Estadual
+
+| Região    | N_CVLI Bruto | Hits Bruto | P@10  |  P@20 |  R@10  |  R@20  | Status |
+|:----------|:------------:|:----------:|:-----:|:-----:|:------:|:------:|:------:|
+| FORTALEZA |      2       |     2      | 20.0% | 10.0% | 100.0% | 100.0% |   ⚠️   |
+| RMF       |      1       |     1      | 10.0% | 5.0%  | 100.0% | 100.0% |   🚨    |
+| INTERIOR  |      2       |     2      | 20.0% | 10.0% | 100.0% | 100.0% |   ⚠️   |
+
+---
+
+<!-- validation-session: startup|2026-06-24|2026-07-23|ST-GAT v5 (DeepSTGAT_v5 Ativo) -->
+
+### 🔄 Sessão de Validação: 2026-07-24 11:18
+**Período Gabarito:** 2026-06-24 a 2026-07-23
+
+**Origem:** startup
+
+**Arquitetura:** ST-GAT v5 (DeepSTGAT_v5 Ativo)
+
+| Região    | N_CVLI Bruto | Hits Bruto | P@10  |  P@20 |  R@10  |  R@20  | Status |
+|:----------|:------------:|:----------:|:-----:|:-----:|:------:|:------:|:------:|
+| FORTALEZA |      13      |     8      | 80.0% | 40.0% | 61.5%  | 61.5%  |   ✅    |
+| RMF       |      2       |     2      | 20.0% | 10.0% | 100.0% | 100.0% |   ⚠️   |
+| INTERIOR  |      4       |     2      | 20.0% | 10.0% | 50.0%  | 50.0%  |   ⚠️   |
+
+---

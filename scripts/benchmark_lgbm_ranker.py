@@ -253,7 +253,7 @@ def run_benchmark(
         train_end=pd.Timestamp(train_end),
         val_start=pd.Timestamp(val_start),
         val_end=pd.Timestamp(val_end),
-        horizon_days=14,
+        horizon_days=30,
     )
 
     train_df = datasets["classical_train"]

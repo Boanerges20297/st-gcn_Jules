@@ -39,7 +39,7 @@ def main() -> None:
         train_end=pd.Timestamp("2024-12-31"),
         val_start=pd.Timestamp("2025-01-01"),
         val_end=pd.Timestamp("2025-12-31"),
-        horizon_days=14,
+        horizon_days=30,
     )
 
     train_df = datasets["classical_train"]
@@ -75,7 +75,7 @@ def main() -> None:
         data=data,
         train_start="2022-01-01",
         train_end="2024-12-31",
-        horizon_days=14,
+        horizon_days=30,
         window=90,
         benchmark_metrics=benchmark_metrics,
     )
