@@ -1,29 +1,41 @@
 {
-  "generated_at": "2026-07-24T16:52:08",
-  "reference_date": "2026-07-24",
+  "generated_at": "2026-07-31T16:30:51",
+  "reference_date": "2026-07-31",
   "window_days": 14,
-  "total_rows": 193,
-  "date_min": "2026-07-11",
-  "date_max": "2026-07-24",
+  "total_rows": 335,
+  "date_min": "2026-07-18",
+  "date_max": "2026-07-31",
   "top_cities": [
     {
       "cidade": "FORTALEZA",
-      "count": 108
+      "count": 194
     },
     {
       "cidade": "MARACANAU",
-      "count": 12
-    },
-    {
-      "cidade": "ARACATI",
-      "count": 5
+      "count": 21
     },
     {
       "cidade": "CAUCAIA",
+      "count": 13
+    },
+    {
+      "cidade": "IGUATU",
+      "count": 9
+    },
+    {
+      "cidade": "AMONTADA",
       "count": 5
     },
     {
-      "cidade": "PACAJUS",
+      "cidade": "QUIXADA",
+      "count": 5
+    },
+    {
+      "cidade": "PACATUBA",
+      "count": 4
+    },
+    {
+      "cidade": "JUAZEIRO DO NORTE",
       "count": 4
     },
     {
@@ -31,107 +43,99 @@
       "count": 4
     },
     {
-      "cidade": "JUAZEIRO DO NORTE",
-      "count": 3
-    },
-    {
-      "cidade": "BOA VIAGEM",
-      "count": 3
-    },
-    {
-      "cidade": "AMONTADA",
-      "count": 3
-    },
-    {
-      "cidade": "IGUATU",
-      "count": 3
+      "cidade": "ITAPAJE",
+      "count": 4
     }
   ],
   "top_bairros_fortaleza": [
     {
-      "bairro": "ALDEOTA",
-      "count": 11
-    },
-    {
-      "bairro": "JANGURURSSU",
-      "count": 5
-    },
-    {
-      "bairro": "VILA VELHA",
-      "count": 4
-    },
-    {
-      "bairro": "PARANGABA",
-      "count": 4
-    },
-    {
-      "bairro": "VILA PERY",
-      "count": 4
-    },
-    {
-      "bairro": "HENRIQUE JORGE",
-      "count": 4
-    },
-    {
-      "bairro": "CENTRO",
-      "count": 4
+      "bairro": "FATIMA",
+      "count": 14
     },
     {
       "bairro": "MESSEJANA",
-      "count": 3
+      "count": 9
     },
     {
-      "bairro": "FATIMA",
-      "count": 3
+      "bairro": "PARANGABA",
+      "count": 8
     },
     {
-      "bairro": "MEIRELES",
-      "count": 3
+      "bairro": "PARQUE DOIS IRMAOS",
+      "count": 8
     },
     {
-      "bairro": "PRAIA DO FUTURO I",
-      "count": 3
+      "bairro": "CONJUNTO ESPERANCA",
+      "count": 7
     },
     {
-      "bairro": "SAO GERARDO",
-      "count": 3
+      "bairro": "EDSON QUEIROZ",
+      "count": 6
     },
     {
-      "bairro": "SERRINHA",
-      "count": 3
+      "bairro": "ALDEOTA",
+      "count": 6
     },
     {
-      "bairro": "MANOEL SATIRO",
-      "count": 2
+      "bairro": "MANUEL DIAS BRANCO",
+      "count": 6
     },
     {
-      "bairro": "PARQUE ARAXA",
-      "count": 2
+      "bairro": "RODOLFO TEOFILO",
+      "count": 6
+    },
+    {
+      "bairro": "PRESIDENTE KENNEDY",
+      "count": 6
+    },
+    {
+      "bairro": "MONDUBIM",
+      "count": 5
+    },
+    {
+      "bairro": "AMADEU FURTADO",
+      "count": 5
+    },
+    {
+      "bairro": "VARJOTA",
+      "count": 5
+    },
+    {
+      "bairro": "PARQUE MANIBURA",
+      "count": 5
+    },
+    {
+      "bairro": "PREFEITO JOSE WALTER",
+      "count": 5
     }
   ],
   "top_tipos_evento": [
     {
       "tipo_evento": "ROUBO A PESSOA",
-      "count": 108
+      "count": 190
     },
     {
       "tipo_evento": "HOMICIDIO DOLOSO",
-      "count": 35
-    },
-    {
-      "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
-      "count": 17
+      "count": 51
     },
     {
       "tipo_evento": "ROUBO A RESIDÊNCIA",
-      "count": 14
+      "count": 32
     },
     {
-      "tipo_evento": "ROUBO A COLETIVO",
-      "count": 4
+      "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
+      "count": 26
     },
     {
       "tipo_evento": "ROUBO A PESSOA C/ CONSTRANGIMENTO DA LIBERDADE",
+      "count": 12
+    },
+    {
+      "tipo_evento": "ROUBO A FARMÁCIA",
+      "count": 10
+    },
+    {
+      "tipo_evento": "ROUBO A MOTEL",
       "count": 4
     },
     {
@@ -139,264 +143,260 @@
       "count": 3
     },
     {
-      "tipo_evento": "ROUBO A FARMÁCIA",
-      "count": 2
+      "tipo_evento": "ROUBO A SUPERMERCADO/MERCANTIL",
+      "count": 3
     },
     {
-      "tipo_evento": "ROUBO APLICATIVO DE ENTREGAS",
-      "count": 2
-    },
-    {
-      "tipo_evento": "ROUBO DE CARGA",
+      "tipo_evento": "ROUBO APLICATIVO DE TRANSPORTE",
       "count": 2
     }
   ],
   "fortaleza": {
-    "row_count": 108,
+    "row_count": 194,
     "top_bairros": [
       {
-        "bairro": "ALDEOTA",
-        "count": 11
-      },
-      {
-        "bairro": "JANGURURSSU",
-        "count": 5
-      },
-      {
-        "bairro": "VILA VELHA",
-        "count": 4
-      },
-      {
-        "bairro": "PARANGABA",
-        "count": 4
-      },
-      {
-        "bairro": "VILA PERY",
-        "count": 4
-      },
-      {
-        "bairro": "HENRIQUE JORGE",
-        "count": 4
-      },
-      {
-        "bairro": "CENTRO",
-        "count": 4
+        "bairro": "FATIMA",
+        "count": 14
       },
       {
         "bairro": "MESSEJANA",
-        "count": 3
+        "count": 9
       },
       {
-        "bairro": "FATIMA",
-        "count": 3
+        "bairro": "PARANGABA",
+        "count": 8
       },
       {
-        "bairro": "MEIRELES",
-        "count": 3
+        "bairro": "PARQUE DOIS IRMAOS",
+        "count": 8
       },
       {
-        "bairro": "PRAIA DO FUTURO I",
-        "count": 3
+        "bairro": "CONJUNTO ESPERANCA",
+        "count": 7
       },
       {
-        "bairro": "SAO GERARDO",
-        "count": 3
+        "bairro": "EDSON QUEIROZ",
+        "count": 6
       },
       {
-        "bairro": "SERRINHA",
-        "count": 3
+        "bairro": "ALDEOTA",
+        "count": 6
       },
       {
-        "bairro": "MANOEL SATIRO",
-        "count": 2
+        "bairro": "MANUEL DIAS BRANCO",
+        "count": 6
       },
       {
-        "bairro": "PARQUE ARAXA",
-        "count": 2
+        "bairro": "RODOLFO TEOFILO",
+        "count": 6
+      },
+      {
+        "bairro": "PRESIDENTE KENNEDY",
+        "count": 6
+      },
+      {
+        "bairro": "MONDUBIM",
+        "count": 5
+      },
+      {
+        "bairro": "AMADEU FURTADO",
+        "count": 5
+      },
+      {
+        "bairro": "VARJOTA",
+        "count": 5
+      },
+      {
+        "bairro": "PARQUE MANIBURA",
+        "count": 5
+      },
+      {
+        "bairro": "PREFEITO JOSE WALTER",
+        "count": 5
       }
     ],
     "top_tipos_evento": [
       {
         "tipo_evento": "ROUBO A PESSOA",
-        "count": 80
+        "count": 138
       },
       {
         "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
-        "count": 9
+        "count": 12
       },
       {
         "tipo_evento": "ROUBO A RESIDÊNCIA",
-        "count": 5
+        "count": 12
       },
       {
         "tipo_evento": "HOMICIDIO DOLOSO",
-        "count": 4
-      },
-      {
-        "tipo_evento": "ROUBO A COLETIVO",
-        "count": 4
+        "count": 9
       },
       {
         "tipo_evento": "ROUBO A PESSOA C/ CONSTRANGIMENTO DA LIBERDADE",
-        "count": 3
-      },
-      {
-        "tipo_evento": "ROUBO APLICATIVO DE ENTREGAS",
-        "count": 2
+        "count": 9
       },
       {
         "tipo_evento": "ROUBO A FARMÁCIA",
+        "count": 7
+      },
+      {
+        "tipo_evento": "ROUBO A MOTEL",
+        "count": 4
+      },
+      {
+        "tipo_evento": "ROUBO APLICATIVO DE TRANSPORTE",
+        "count": 2
+      },
+      {
+        "tipo_evento": "ROUBO A COLETIVO",
         "count": 1
       }
     ]
   },
   "rmf": {
-    "row_count": 29,
+    "row_count": 60,
     "top_cidades": [
       {
         "cidade": "MARACANAU",
-        "count": 12
+        "count": 21
       },
       {
         "cidade": "CAUCAIA",
-        "count": 5
-      },
-      {
-        "cidade": "PACAJUS",
-        "count": 4
-      },
-      {
-        "cidade": "TRAIRI",
-        "count": 2
-      },
-      {
-        "cidade": "EUSEBIO",
-        "count": 1
-      },
-      {
-        "cidade": "HORIZONTE",
-        "count": 1
-      },
-      {
-        "cidade": "ITAITINGA",
-        "count": 1
+        "count": 13
       },
       {
         "cidade": "PACATUBA",
-        "count": 1
+        "count": 4
+      },
+      {
+        "cidade": "EUSEBIO",
+        "count": 3
+      },
+      {
+        "cidade": "HORIZONTE",
+        "count": 3
+      },
+      {
+        "cidade": "ITAITINGA",
+        "count": 3
       },
       {
         "cidade": "PARACURU",
-        "count": 1
+        "count": 3
       },
       {
         "cidade": "SAO GONCALO DO AMARANTE",
+        "count": 3
+      },
+      {
+        "cidade": "TRAIRI",
+        "count": 3
+      },
+      {
+        "cidade": "AQUIRAZ",
         "count": 1
       }
     ],
     "top_tipos_evento": [
       {
         "tipo_evento": "ROUBO A PESSOA",
-        "count": 15
+        "count": 36
       },
       {
-        "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
-        "count": 4
+        "tipo_evento": "HOMICIDIO DOLOSO",
+        "count": 7
       },
       {
         "tipo_evento": "ROUBO A RESIDÊNCIA",
-        "count": 4
+        "count": 7
       },
       {
-        "tipo_evento": "ROUBO A POSTO DE GASOLINA",
-        "count": 2
-      },
-      {
-        "tipo_evento": "ROUBO DE CARGA",
-        "count": 2
-      },
-      {
-        "tipo_evento": "FEMINICÍDIO",
-        "count": 1
+        "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
+        "count": 6
       },
       {
         "tipo_evento": "ROUBO A PESSOA C/ CONSTRANGIMENTO DA LIBERDADE",
+        "count": 3
+      },
+      {
+        "tipo_evento": "LESAO CORPORAL SEGUIDA DE MORTE",
         "count": 1
       }
     ]
   },
   "interior": {
-    "row_count": 56,
+    "row_count": 81,
     "top_cidades": [
       {
-        "cidade": "ARACATI",
+        "cidade": "IGUATU",
+        "count": 9
+      },
+      {
+        "cidade": "QUIXADA",
         "count": 5
+      },
+      {
+        "cidade": "AMONTADA",
+        "count": 5
+      },
+      {
+        "cidade": "PENTECOSTE",
+        "count": 4
       },
       {
         "cidade": "LIMOEIRO DO NORTE",
         "count": 4
       },
       {
-        "cidade": "AMONTADA",
-        "count": 3
+        "cidade": "JUAZEIRO DO NORTE",
+        "count": 4
       },
       {
         "cidade": "BOA VIAGEM",
-        "count": 3
+        "count": 4
       },
       {
-        "cidade": "JUAZEIRO DO NORTE",
-        "count": 3
-      },
-      {
-        "cidade": "IGUATU",
-        "count": 3
-      },
-      {
-        "cidade": "ACARAU",
-        "count": 2
-      },
-      {
-        "cidade": "IPAUMIRIM",
-        "count": 2
-      },
-      {
-        "cidade": "VARJOTA",
-        "count": 2
+        "cidade": "ITAPAJE",
+        "count": 4
       },
       {
         "cidade": "SAO BENEDITO",
-        "count": 2
+        "count": 3
+      },
+      {
+        "cidade": "REDENCAO",
+        "count": 3
       }
     ],
     "top_tipos_evento": [
       {
         "tipo_evento": "HOMICIDIO DOLOSO",
-        "count": 31
+        "count": 35
       },
       {
         "tipo_evento": "ROUBO A PESSOA",
-        "count": 13
+        "count": 16
       },
       {
         "tipo_evento": "ROUBO A RESIDÊNCIA",
-        "count": 5
+        "count": 13
       },
       {
         "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
-        "count": 4
+        "count": 8
       },
       {
         "tipo_evento": "ROUBO A FARMÁCIA",
-        "count": 1
+        "count": 3
       },
       {
         "tipo_evento": "ROUBO A POSTO DE GASOLINA",
-        "count": 1
+        "count": 3
       },
       {
         "tipo_evento": "ROUBO A SUPERMERCADO/MERCANTIL",
-        "count": 1
+        "count": 3
       }
     ]
   }

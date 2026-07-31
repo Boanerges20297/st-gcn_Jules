@@ -431,3 +431,71 @@ Este arquivo registra a performance das predições do sistema (Champion + Chall
 | INTERIOR  |      4       |     2      | 20.0% | 10.0% | 50.0%  | 50.0%  |   ⚠️   |
 
 ---
+
+<!-- validation-session: merge_new_data|2026-07-13|2026-07-26|Poisson Ranker Estadual -->
+
+### 🔄 Sessão de Validação: 2026-07-27 20:37
+**Período Gabarito:** 2026-07-13 a 2026-07-26
+
+**Origem:** merge_new_data
+
+**Arquitetura:** Poisson Ranker Estadual
+
+| Região    | N_CVLI Bruto | Hits Bruto | P@10  |  P@20 |  R@10  |  R@20  | Status |
+|:----------|:------------:|:----------:|:-----:|:-----:|:------:|:------:|:------:|
+| FORTALEZA |      4       |     3      | 30.0% | 15.0% | 75.0%  | 75.0%  |   ⚠️   |
+| RMF       |      1       |     1      | 10.0% | 5.0%  | 100.0% | 100.0% |   🚨    |
+| INTERIOR  |      3       |     2      | 20.0% | 10.0% | 66.7%  | 66.7%  |   ⚠️   |
+
+---
+
+<!-- validation-session: startup|2026-06-27|2026-07-26|ST-GAT v5 (DeepSTGAT_v5 Ativo) -->
+
+### 🔄 Sessão de Validação: 2026-07-27 20:38
+**Período Gabarito:** 2026-06-27 a 2026-07-26
+
+**Origem:** startup
+
+**Arquitetura:** ST-GAT v5 (DeepSTGAT_v5 Ativo)
+
+| Região    | N_CVLI Bruto | Hits Bruto | P@10  |  P@20 |  R@10  |  R@20  | Status |
+|:----------|:------------:|:----------:|:-----:|:-----:|:------:|:------:|:------:|
+| FORTALEZA |      12      |     6      | 60.0% | 35.0% | 50.0%  | 58.3%  |   ✅    |
+| RMF       |      3       |     2      | 20.0% | 10.0% | 66.7%  | 66.7%  |   ⚠️   |
+| INTERIOR  |      4       |     2      | 20.0% | 10.0% | 50.0%  | 50.0%  |   ⚠️   |
+
+---
+
+<!-- validation-session: merge_new_data|2026-07-17|2026-07-30|Poisson Ranker Estadual -->
+
+### 🔄 Sessão de Validação: 2026-07-31 16:29
+**Período Gabarito:** 2026-07-17 a 2026-07-30
+
+**Origem:** merge_new_data
+
+**Arquitetura:** Poisson Ranker Estadual
+
+| Região    | N_CVLI Bruto | Hits Bruto | P@10  |  P@20 |  R@10  |  R@20  | Status |
+|:----------|:------------:|:----------:|:-----:|:-----:|:------:|:------:|:------:|
+| FORTALEZA |      7       |     4      | 40.0% | 20.0% | 57.1%  | 57.1%  |   ✅    |
+| RMF       |      2       |     2      | 20.0% | 10.0% | 100.0% | 100.0% |   ⚠️   |
+| INTERIOR  |      3       |     1      | 10.0% | 10.0% | 33.3%  | 66.7%  |   🚨    |
+
+---
+
+<!-- validation-session: startup|2026-07-01|2026-07-30|ST-GAT v5 (DeepSTGAT_v5 Ativo) -->
+
+### 🔄 Sessão de Validação: 2026-07-31 16:30
+**Período Gabarito:** 2026-07-01 a 2026-07-30
+
+**Origem:** startup
+
+**Arquitetura:** ST-GAT v5 (DeepSTGAT_v5 Ativo)
+
+| Região    | N_CVLI Bruto | Hits Bruto | P@10  |  P@20 |  R@10  |  R@20  | Status |
+|:----------|:------------:|:----------:|:-----:|:-----:|:------:|:------:|:------:|
+| FORTALEZA |      16      |     7      | 70.0% | 35.0% | 43.8%  | 43.8%  |   ✅    |
+| RMF       |      4       |     3      | 30.0% | 15.0% | 75.0%  | 75.0%  |   ⚠️   |
+| INTERIOR  |      4       |     2      | 20.0% | 10.0% | 50.0%  | 50.0%  |   ⚠️   |
+
+---

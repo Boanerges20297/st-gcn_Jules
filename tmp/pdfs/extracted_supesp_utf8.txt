@@ -1,0 +1,167 @@
+Report Preview
+Proposta de cooperação técnica e acesso a dados da SUPESP
+DECISÃO SOLICITADA: autorizar um fluxo institucional de dados oficiais, com atualização
+recorrente e focal técnico, para validação prospectiva de inteligência territorial de CVLI em
+horizonte de 30 dias.
+Por que este acesso e necessário
+O projeto já executa modelos, integra escalas territoriais e produz artefatos auditaveis. O limite atual não é a ausencia
+de tecnologia: e a falta de um fluxo oficial que assegure atualidade, completude, estabilidade semântica e validação
+institucional dos resultados.
+Capacidade O que já funciona O que os dados SUPESP destravam
+existente
+ST-GAT v5 Ranking estrategico de Fortaleza, RMF e Treino e validação com eventos oficiais, cortes temporais e
+Interior. revisões.
+Perfis temporais Dia e janela de 5 horas de maior pressao. Estabilidade horaria por território e atualização recorrente.
+GA espacial Otimizacao de captura, área e sobreposição. Sinal local suficiente para microterritorios defensaveis.
+ST-GCN Focos de rua, propagacao espacial e rotas Calibração microterritorial e avaliação de utilidade em campo.
+provaveis.
+Hermes Briefings, snapshots e histórico de respostas. Produtos gerenciais com fonte oficial e data de corte verificavel.
+Report Preview | Cooperação técnica e acesso a dados SUPESP 1
+1. Capacidade instalada
+A estrutura já cobre o ciclo completo: ingestao, enriquecimento, construção de grafos, inferência, explicabilidade,
+exportação, monitoramento e consumo gerencial.
+Escala Componente Entrega
+Estrategica ST-GAT v5 Prioriza bairros e municípios a partir de dependências espaciais e temporais.
+Regional 3 especialistas Fortaleza, Região Metropolitana e Interior com processamento separado.
+Temporal Perfis preditivos Calcula dia da semana e faixa crítica de 5 horas no horizonte de 30 dias.
+Tática GA multiobjetivo Compara captura futura, área coberta, sobreposição e legibilidade operacional.
+Micro ST-GCN rua/foco Propaga sinal entre focos vizinhos e combina risco da área, histórico local e densidade
+viaria.
+Resposta ST-GCN rotas Estima eixos provaveis, malha de alcance e perimetro de contenção a partir de um
+evento.
+Territorial Micronodos/ORCRIMS Integra polígonos, tensao territorial, facções e camadas oficiais ou de referência.
+Gestao Hermes Gera ranking, drivers, recortes regionais, briefings e histórico auditável.
+Governanca Validação/monitoramento Registra métricas, snapshots, versão de modelo e comportamento recente.
+Fluxo já implementado
+1 Dados brutos e territoriais
+2 Padronizacao, georreferenciamento e construção dos grafos
+3 ST-GAT v5 para prioridade estrategica em 30 dias
+4 GA e ST-GCN para refinamento tático e microterritorial
+5 Hermes, dashboard e exportações para leitura gerencial
+6 Validação prospectiva, monitoramento e recalibração
+Report Preview | Cooperação técnica e acesso a dados SUPESP 2
+2. O limite atual é de dados
+A base local comprova capacidade de processamento em escala, mas tambem revela lacunas que afetam a precisão
+territorial e a validade institucional.
+Indicador observado Situação atual Implicação
+Registros processados 143.617 ocorrências Volume suficiente para pipeline, testes e operação experimental.
+Eventos CVLI 12.633 eventos em 182 Cobertura estadual relevante para modelos regionais.
+municípios
+Data, hora e coordenadas Preenchimento integral nos Sustenta series temporais e georreferenciamento inicial.
+CVLI locais
+Bairro nos CVLI 53,6% preenchido Limita a análise intramunicipal e aumenta dependência de inferência
+geográfica.
+Natureza detalhada 48,4% preenchido Reduz separação entre dinâmicas criminais distintas.
+Área territorial de facção 0% no campo da base Impede usar essa dimensao como dado histórico versionado e rastreavel.
+principal
+Por que a granularidade muda o resultado
+O bairro e hoje a unidade estrategica mais defensavel. Experimentos com microterritorios produziram resultados
+distintos conforme o sinal local e a restrição de área. Sem dado oficial granular, uma geometria limpa pode parecer
+precisa sem melhorar a captura futura. O acesso solicitado permite testar essa hipótese corretamente e interromper
+abordagens que não agreguem valor.
+Evidência experimental Resultado Leitura pragmática
+Ranking por bairro Até 89,04% de captura em uma Baseline estrategico forte; permanece como referência.
+configuração avaliada.
+GA espacial amplo Até 83,6% em 109 janelas, com Captura melhora, mas custo territorial precisa ser limitado.
+área operacional elevada.
+Colmeia local Entre 13,8% e 34,37% em Sem sinal local robusto, o hexagono não justifica uso operacional.
+configurações recentes.
+Report Preview | Cooperação técnica e acesso a dados SUPESP 3
+3. Dados solicitados e finalidade
+O pedido segue minimização: somente campos necessários ao objetivo analítico, preferencialmente sem nomes,
+documentos pessoais ou narrativas identificáveis.
+Priori Conjunto minimo Campos essenciais Uso direto
+dade
+1 CVLI histórico por ID pseudonimo, data/hora, município, bairro, Treino ST-GAT, perfis temporais, validação
+evento AIS/RISP, latitude/longitude, natureza, meio, mortes, e correção de rotulos.
+status.
+2 Atualização incremental Novos eventos, alterações, exclusões, data de Ranking de 30 dias atualizado, controle de
+consolidação e data de corte. atraso e avaliação prospectiva.
+3 Malhas territoriais Município, bairro, AIS, RISP, micronodos e vigência Grafo espacial, joins corretos, comparação
+oficiais de cada polígono. entre escalas e mapas auditaveis.
+4 Atividade operacional Ações, apreensões, armas, drogas, veículos e Distinguir pressao criminal, resposta estatal
+agregada mandados por território/data. e mudanca de exposição.
+5 Inteligência territorial Áreas de influência, disputa, mudanca de dominio, Calibrar tensao territorial sem transformar
+fonte, confiança e vigência. dado desatualizado em verdade fixa.
+6 Dicionário e qualidade Definições, códigos, regras de consolidação, Reprodutibilidade, comparabilidade e
+cobertura, atrasos e revisões. governanca do modelo.
+Formato e periodicidade
+Carga histórica Série integral disponível, preferencialmente cinco anos ou mais.
+Incremental Diário ou semanal, sempre com identificador estavel e registros corrigidos.
+Formato CSV/Parquet e GeoJSON/KML, com dicionário de dados e codificação definida.
+Canal Transferência institucional controlada, com registro de recebimento e integridade.
+Focal técnico Um responsavel por semântica, mudancas de esquema e calendário de atualização.
+Report Preview | Cooperação técnica e acesso a dados SUPESP 4
+4. O que a SUPESP recebe
+A cooperação produz entregas recorrentes para gestao, avaliação e planejamento, com separação clara entre
+previsao, evidência histórica e decisão humana.
+Entrega Conteudo Valor para a SUPESP
+Boletim de 30 dias Top territórios ST-GAT, variação, confiança, drivers Prioridade comparavel entre ciclos, com data de
+e horário de pico. corte explicita.
+Mapa estrategico Bairros e municípios de maior risco estimado. Visao estadual e regional sem falsa precisão
+pontual.
+Camada Microterritorios GA e focos ST-GCN com área, Teste controlado antes de qualquer incorporação
+tático-experimental captura e limitações. operacional.
+Avaliação prospectiva P@10, P@20, recall, cobertura, captura por área e Saber onde o modelo ajuda, onde falha e quando
+estabilidade regional. deve ser recalibrado.
+Briefing Hermes Leitura executiva, fonte, justificativa e próxima Consumo gerencial rapido com rastreabilidade.
+verificação.
+Relatório de qualidade Completude, atraso, duplicidade, mudanca de Melhoria do ativo de dados, além do modelo.
+esquema e impacto.
+Pacote de auditoria Versão da base, corte temporal, modelo, Reprodução de cada resultado apresentado.
+parâmetros e artefatos publicados.
+Critérios de sucesso do piloto
+Validade Desempenho prospectivo superior ou complementar aos baselines por região.
+Utilidade Alertas compreensíveis e avaliaveis pela equipe técnica da SUPESP.
+Território Ganho de captura compatível com área operacional e sem sobreposição excessiva.
+Tempo Estabilidade dos horários de pico com suporte amostral informado.
+Governanca Todo resultado vinculado a dado, versão, corte e modelo.
+Decisão Nenhuma recomendação automatica de emprego policial; apoio analítico documentado.
+Report Preview | Cooperação técnica e acesso a dados SUPESP 5
+5. Governanca e proteção
+O uso proposto preserva controle institucional, minimiza dados pessoais e mantem a decisão operacional sob
+responsabilidade humana.
+Controle Compromisso operacional
+Finalidade definida Uso restrito a pesquisa aplicada, validação e apoio analítico de CVLI.
+Minimização Recebimento apenas dos campos necessários; exclusão de identificadores pessoais diretos.
+Acesso restrito Usuários autorizados, credenciais individuais e trilha de acesso.
+Ambiente controlado Processamento local ou em infraestrutura acordada, sem exposição publica da base bruta.
+Versionamento Registro da carga, esquema, data de corte, revisões e artefatos derivados.
+Retencao e descarte Prazo acordado, copia controlada e eliminacao verificavel ao encerramento.
+Publicação Somente resultados agregados e previamente enquadrados pela cooperação.
+Supervisao humana Modelos indicam prioridade para avaliação; não determinam emprego operacional.
+Revisão conjunta Resultados sensíveis e mudancas metodologicas avaliados com focal técnico da SUPESP.
+Riscos e mitigações
+Risco Mitigação
+Falsa precisão territorial Bairro como baseline; microterritorio somente com evidência superior e área controlada.
+Defasagem ou revisão tardia Carga incremental com status, consolidação, exclusões e data de corte.
+Mudanca de padrão regional Métricas separadas para Fortaleza, RMF e Interior.
+Vies de atividade policial Incluir atividade operacional agregada e separar ocorrência de resposta estatal.
+Uso indevido do score Linguagem probabilistica, confiança, drivers, limitações e decisão humana.
+Vazamento de informação Minimização, segregação de acesso, auditoria e publicação agregada.
+Report Preview | Cooperação técnica e acesso a dados SUPESP 6
+6. Piloto conjunto em 30 dias
+Periodo Atividade conjunta Entrega verificavel
+Dias 1 a 5 Formalizar finalidade, focal técnico, dicionário, canal e recorte Termo operacional, esquema validado e checklist de
+inicial. seguranca.
+Dias 6 a 10 Receber carga histórica, medir qualidade e reconciliar Relatório de completude, cobertura, duplicidade e
+territórios. consistência geográfica.
+Dias 11 a 17 Reconstruir grafos e executar ST-GAT v5 e baselines. Ranking inicial por região e protocolo de validação
+prospectiva.
+Dias 18 a 23 Calcular horários de pico e testar GA/ST-GCN em recorte Camadas experimentais com captura, área, suporte
+controlado. e limitações.
+Dias 24 a 27 Revisar resultados com analistas da SUPESP e incorporar Registro de confirmações, divergências e ajustes.
+retorno.
+Dias 28 a 30 Consolidar desempenho, governanca e continuidade. Boletim executivo, pacote de auditoria e decisão
+sobre o proximo ciclo.
+Decisões necessárias nesta etapa
+1 Autorizar o compartilhamento institucional do conjunto minimo descrito.
+2 Designar focal técnico para dados, semântica e validação.
+3 Definir recorte inicial: Fortaleza, RMF ou cobertura estadual.
+4 Aprovar periodicidade e canal seguro de atualização.
+5 Iniciar o piloto de 30 dias com critérios de sucesso acordados.
+Resultado esperado: ao final do primeiro ciclo, a SUPESP tera evidências para decidir se a capacidade
+agrega valor operacional, em quais regiões, com qual granularidade e sob quais limites.
+Base desta proposta: código, APIs, pipeline de dados, artefatos Hermes, monitoramento, experimentos espaciais e perfil da base local
+verificados em 27/07/2026.
+Report Preview | Cooperação técnica e acesso a dados SUPESP 7

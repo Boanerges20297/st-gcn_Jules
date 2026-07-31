@@ -2386,10 +2386,10 @@ def get_street_foci():
 def get_visible_micronodes():
     region = request.args.get('region', 'fortaleza').lower()
     limit_raw = request.args.get('limit')
-    limit = 40
+    limit = None
     if limit_raw not in (None, ''):
         try:
-            limit = max(1, min(int(limit_raw), 40))
+            limit = max(1, int(limit_raw))
         except Exception:
             pass
     force_refresh = request.args.get('refresh', '0').lower() in ('1', 'true', 'yes')
@@ -2480,8 +2480,8 @@ def get_visible_micronodes():
             feature['properties'] = props
             decorated.append(feature)
             
-            # Respeitar o limite apos a filtragem por area
-            if len(decorated) >= limit:
+            # A camada do mapa precisa cobrir todas as areas plotadas.
+            if limit is not None and len(decorated) >= limit:
                 break
                 
         payload['features'] = decorated

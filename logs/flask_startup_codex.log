@@ -1,180 +1,80 @@
 ✅ Admin Dashboard Registrado em /api/admin/health
+Auto-ajuste deterministico ativo; agente Ollama desativado.
 🚀 API Sentinela V4 (500m) Registrada em /api/v4
-🔄 [ORCRIMS] Iniciando atualização no startup...
-🧭 [ORCRIMS] Estado anterior detectado:
-   - KMZ local: 2026-03-15T19:40:18 | 359 bytes | sha256=5b2bf4777ed9...
-   - KML de trabalho: 2026-05-21T21:23:07 | 12663600 bytes | sha256=692147b8f45b...
-   - KML estático: 2026-05-21T21:23:07 | 12663600 bytes | sha256=692147b8f45b...
-   - CSV inteligência: 2026-05-21T21:23:07 | 7075 bytes | sha256=19c2ef48826a...
-   - Última atualização registrada: checked_at=2026-05-23T21:55:25 | updated_at=2026-05-21T16:03:27 | source_url=https://www.google.com/maps/d/u/0/kml?mid=1lI0FmNXDPrezPhzeryZTCEP0rl8BDuE | status=no_change
-⏱️ [ORCRIMS] Cooldown ativo. Última checagem foi recente (2026-05-23T21:55:25). Pulando download.
-🧭 [ORCRIMS] Resultado do refresh no startup: {'updated': False, 'reason': 'cooldown_active'}
 🌐 Atualizando Cache de Ruas Críticas (Dinâmico 30 dias)...
 📖 Lendo base ENRIQUECIDA para extração dinâmica (30 dias)...
-⏱️ Janela Dinâmica: 2026-04-19 até 2026-05-19 (Últimos 30 dias)
-✅ 4123 ruas históricas processadas (86 com crimes recentes).
+⏱️ Janela Dinâmica: 2026-06-23 até 2026-07-23 (Últimos 30 dias)
+✅ 4275 ruas históricas processadas (96 com crimes recentes).
 🔍 Sincronizando micronodos de inteligência...
-🚀 Mapeamento Dinâmico (30 dias) concluído: 6506 registros salvos.
+🔄 [ORCRIMS] Iniciando atualização no startup...
+🧭 [ORCRIMS] Estado anterior detectado:
+   - KMZ local: inexistente
+   - KML de trabalho: 2026-06-26T15:17:35 | 12353294 bytes | sha256=43395b052d5c...
+   - KML estático: 2026-06-26T15:17:35 | 12353294 bytes | sha256=43395b052d5c...
+   - CSV inteligência: 2026-06-26T15:17:40 | 7013 bytes | sha256=9be82abfd0ec...
+   - Última atualização registrada: checked_at=2026-07-27T19:59:41 | updated_at=2026-06-04T21:38:49 | source_url=https://www.google.com/maps/d/u/0/kml?mid=1lI0FmNXDPrezPhzeryZTCEP0rl8BDuE | status=no_official_link_found
+⏱️ [ORCRIMS] Cooldown ativo. Última checagem foi recente (2026-07-27T19:59:41). Pulando download.
+🧭 [ORCRIMS] Resultado do refresh em background: {'updated': False, 'reason': 'cooldown_active'}
+🚀 Mapeamento Dinâmico (30 dias) concluído: 6659 registros salvos.
 ✅ Cache Geográfico de Ruas Atualizado com Sucesso.
 🌐 Enriquecendo localidades com geocoding (background, 30 dias)...
 ============================================================
 🏙️  GERAÇÃO DE LOCALIDADES CRÍTICAS POR MUNICÍPIO
    Modo: completo (com geocoding)
    Janela: últimos 30 dias
-   Data: 2026-05-23 22:17
+   Data: 2026-07-27 20:24
 ============================================================
 📖 Lendo CSV oficial (últimos 30 dias)...
-   📅 Registros após filtro de 30 dias: 2,579
-   ✅ 146 registros com bairro processados.
-   🗺️  211 clusters sem bairro a geocodificar...
-   🌐 0 clusters a geocodificar (já em cache: 211)...
-   ✅ Geocoding concluído: 211 clusters.
+   📅 Registros após filtro de 30 dias: 2,363
+   ✅ 159 registros com bairro processados.
+   🗺️  202 clusters sem bairro a geocodificar...
+   🌐 0 clusters a geocodificar (já em cache: 202)...
+   ✅ Geocoding concluído: 202 clusters.
 📖 Indexando eventos exógenos...
-   ✅ 15 eventos exógenos indexados.
-   🗺️  ORCRIMS 2026.kml: 511 localidades indexadas.
-✅ Metadados Regionais Unificados: 3252 localidades.
-✅ Facções carregadas: 214/3252 nós com facção ativa.
-   🗺️  COMANDO VERMELHO.kml: 401 localidades indexadas.
-   🗺️  TCP  GDE - TERCEIRO COMANDO PURO E GUARDIÕES DO ESTADO.kml: 50 localidades indexadas.
-   ✅ KML de facções: 962 localidades não-Fortaleza indexadas.
-✅ Orquestrador: Especialista FORTALEZA carregado (41 Canais).
-✅ Orquestrador: Especialista RMF carregado (41 Canais).
-
-✅ Concluído: 225 municípios → C:\Users\Boanerges\Desktop\Projetos\Report Preview\data\streets_by_municipio.json
-   Caucaia                  : ['GUADALAJARA(cvli=2)', 'ANTONIO BEZERRA(cvli=1)', 'IPARANA(cvli=1)', 'RUA ACAPULCO(cvli=1)']
-   Maracanau                : ['CONJUNTO PALMEIRAS(cvli=1)', 'JARI(cvli=0)', 'AVENIDA EDSON MAGALHÃES(cvli=0)', 'BOM JARDIM(cvli=0)']
-   Sobral                   : ['RUA SANCHO CANAFÍSTULA(cvli=1)', 'BR-222;BR-403(cvli=1)', 'RUA JOSÉ MARIA ALVERNE(cvli=1)', 'AVENIDA SENADOR FERNANDES TÁVORA(cvli=1)']
-   Juazeiro Do Norte        : ['JUAZEIRO DO NORTE(cvli=4)', 'RUA SENHOR DO BOMFIM(cvli=2)', 'RUA SETE DE SETEMBRO(cvli=2)', 'LEANDRO BEZERRA DE MENEZES(cvli=1)']
-✅ Localidades por município enriquecidas com geocoding.
-✅ Orquestrador: Especialista INTERIOR carregado (41 Canais).
-✅ [CC] Estado restaurado: challenger=0%
-✅ [CC] Challenger Sentinela V4 carregado (40 bairros Fortaleza)
-✅ [Sentinela V3] Refinamento LGBM integrado ao Orquestrador.
-✅ Motor de Inteligência ST-GAT Ativo.
-✅ [CC] Estado restaurado: challenger=0%
-✅ [CC] Challenger Sentinela V4 carregado (40 bairros Fortaleza)
-✅ RMF nodes sincronizados: 19 municípios.
-✅ [CC] Estado restaurado: challenger=0%
-🧠 ST-GCN ruas/focos: aquecimento em paralelo iniciado.
-✅ Admin Dashboard Registrado em /api/admin/health
-🚀 API Sentinela V4 (500m) Registrada em /api/v4
-🧠 Inicializando Motor de Inteligência Sentinela...
-🔄 [ORCRIMS] Iniciando atualização no startup...
-🧭 [ORCRIMS] Estado anterior detectado:
-   - KMZ local: 2026-03-15T19:40:18 | 359 bytes | sha256=5b2bf4777ed9...
-   - KML de trabalho: 2026-05-21T21:23:07 | 12663600 bytes | sha256=692147b8f45b...
-   - KML estático: 2026-05-21T21:23:07 | 12663600 bytes | sha256=692147b8f45b...
-   - CSV inteligência: 2026-05-21T21:23:07 | 7075 bytes | sha256=19c2ef48826a...
-   - Última atualização registrada: checked_at=2026-05-23T21:55:25 | updated_at=2026-05-21T16:03:27 | source_url=https://www.google.com/maps/d/u/0/kml?mid=1lI0FmNXDPrezPhzeryZTCEP0rl8BDuE | status=no_change
-⏱️ [ORCRIMS] Cooldown ativo. Última checagem foi recente (2026-05-23T21:55:25). Pulando download.
-🧭 [ORCRIMS] Resultado do refresh no startup: {'updated': False, 'reason': 'cooldown_active'}
-🌐 Atualizando Cache de Ruas Críticas (Dinâmico 30 dias)...
-📖 Lendo base ENRIQUECIDA para extração dinâmica (30 dias)...
-✅ Cache de horários de pico calculado: 236 bairros.
-⏱️ Janela Dinâmica: 2026-04-19 até 2026-05-19 (Últimos 30 dias)
-✅ 4123 ruas históricas processadas (86 com crimes recentes).
-🔍 Sincronizando micronodos de inteligência...
-🚀 Mapeamento Dinâmico (30 dias) concluído: 6506 registros salvos.
-✅ Cache Geográfico de Ruas Atualizado com Sucesso.
-🌐 Enriquecendo localidades com geocoding (background, 30 dias)...
-============================================================
-🏙️  GERAÇÃO DE LOCALIDADES CRÍTICAS POR MUNICÍPIO
-   Modo: completo (com geocoding)
-   Janela: últimos 30 dias
-   Data: 2026-05-23 22:17
-============================================================
-📖 Lendo CSV oficial (últimos 30 dias)...
-   📅 Registros após filtro de 30 dias: 2,579
-   ✅ 146 registros com bairro processados.
-   🗺️  211 clusters sem bairro a geocodificar...
-   🌐 0 clusters a geocodificar (já em cache: 211)...
-   ✅ Geocoding concluído: 211 clusters.
-📖 Indexando eventos exógenos...
-   ✅ 15 eventos exógenos indexados.
-✅ Metadados Regionais Unificados: 3252 localidades.
-✅ Facções carregadas: 214/3252 nós com facção ativa.
+   ✅ 4 eventos exógenos indexados.
    🗺️  ORCRIMS 2026.kml: 511 localidades indexadas.
    🗺️  COMANDO VERMELHO.kml: 401 localidades indexadas.
+✅ Metadados Regionais Unificados: 3714 localidades.
    🗺️  TCP  GDE - TERCEIRO COMANDO PURO E GUARDIÕES DO ESTADO.kml: 50 localidades indexadas.
    ✅ KML de facções: 962 localidades não-Fortaleza indexadas.
+✅ Facções carregadas: 678/3714 nós com facção ativa.
 
-✅ Concluído: 225 municípios → C:\Users\Boanerges\Desktop\Projetos\Report Preview\data\streets_by_municipio.json
-   Caucaia                  : ['GUADALAJARA(cvli=2)', 'ANTONIO BEZERRA(cvli=1)', 'IPARANA(cvli=1)', 'RUA ACAPULCO(cvli=1)']
-   Maracanau                : ['CONJUNTO PALMEIRAS(cvli=1)', 'JARI(cvli=0)', 'AVENIDA EDSON MAGALHÃES(cvli=0)', 'BOM JARDIM(cvli=0)']
-   Sobral                   : ['RUA SANCHO CANAFÍSTULA(cvli=1)', 'BR-222;BR-403(cvli=1)', 'RUA JOSÉ MARIA ALVERNE(cvli=1)', 'AVENIDA SENADOR FERNANDES TÁVORA(cvli=1)']
-   Juazeiro Do Norte        : ['JUAZEIRO DO NORTE(cvli=4)', 'RUA SENHOR DO BOMFIM(cvli=2)', 'RUA SETE DE SETEMBRO(cvli=2)', 'LEANDRO BEZERRA DE MENEZES(cvli=1)']
+✅ Concluído: 224 municípios → C:\Users\Boanerges\Desktop\Projetos\Report Preview\data\streets_by_municipio.json
+   Caucaia                  : ['GUADALAJARA(cvli=2)', 'ANTONIO BEZERRA(cvli=1)', 'RUA ACAPULCO(cvli=1)', 'LAGOA DO BANANA(cvli=1)']
+   Maracanau                : ['CANINDEZINHO(cvli=2)', 'CONJUNTO PALMEIRAS(cvli=1)', 'MARACANAU(cvli=1)', 'JARI(cvli=0)']
+   Sobral                   : ['RUA SANCHO CANAFÍSTULA(cvli=1)', 'BR-222;BR-403(cvli=1)', 'AVENIDA SENADOR FERNANDES TÁVORA(cvli=1)', 'RUA OTHON DE ALENCAR(cvli=1)']
+   Juazeiro Do Norte        : ['JUAZEIRO DO NORTE(cvli=4)', 'RUA PEDRO FERREIRA NUNES(cvli=2)', 'RUA SETE DE SETEMBRO(cvli=1)', 'RUA MANOEL PIRACA DE SOUZA(cvli=1)']
 ✅ Localidades por município enriquecidas com geocoding.
-✅ Orquestrador: Especialista FORTALEZA carregado (41 Canais).
-✅ Orquestrador: Especialista RMF carregado (41 Canais).
-✅ Orquestrador: Especialista INTERIOR carregado (41 Canais).
-✅ [CC] Estado restaurado: challenger=0%
-✅ [CC] Challenger Sentinela V4 carregado (40 bairros Fortaleza)
-✅ [Sentinela V3] Refinamento LGBM integrado ao Orquestrador.
-✅ Motor de Inteligência ST-GAT Ativo.
-✅ [CC] Estado restaurado: challenger=0%
-✅ [CC] Challenger Sentinela V4 carregado (40 bairros Fortaleza)
+✅ Orquestrador: Especialista FORTALEZA carregado (Poisson Ranker, janela=90d).
+✅ Orquestrador: Especialista RMF carregado (Poisson Ranker, janela=14d).
+✅ Orquestrador: Especialista INTERIOR carregado (Poisson Ranker, janela=14d).
+✅ [ST-GAT v5] Especialista FORTALEZA carregado (41ch, window=120d, DeepSTGAT_v5).
+✅ [ST-GAT v5] Especialista RMF carregado (41ch, window=14d, DeepSTGAT_v5).
+✅ [ST-GAT v5] Especialista INTERIOR carregado (41ch, window=14d, DeepSTGAT_v5).
+ℹ️ [Champion/Challenger] Desativado: Fortaleza agora opera com backend Poisson promovido.
+✅ Motor de Inteligência Ativo: Poisson Ranker Estadual.
 ✅ RMF nodes sincronizados: 19 municípios.
+🔄 [Hermes] Iniciando exportação de artefatos analíticos para o Telegram Bot...
+✅ [Hermes] Ruas críticas exportadas: 712 logradouros em 2 bairros.
+✅ [Hermes] Artefatos analíticos exportados com sucesso para o Telegram Bot (99 registros).
+🔄 [Hostinger] Publicação automática agendada em background; inicialização liberada.
+🔄 [Hostinger] Publicação automática em background iniciada para a VPS...
 🧠 ST-GCN ruas/focos: aquecimento em paralelo iniciado.
-✅ [CC] Estado restaurado: challenger=0%
-✅ Cache de horários de pico calculado: 236 bairros.
+
+📊 Iniciando Validação Regional Detalhada (startup - últimos 30 dias)...
+  - Validação já registrada para startup|2026-06-24|2026-07-23|ST-GAT v5 (DeepSTGAT_v5 Ativo).
+--- [EXPORT] Iniciando sincronização em background com o Crime-Predict...
+--- [EXPORT] Sincronização com o Crime-Predict concluída com sucesso.
+🔄 [Hermes] Iniciando exportação de artefatos analíticos para o Telegram Bot...
+✅ [Hermes] Ruas críticas exportadas: 712 logradouros em 2 bairros.
+✅ [Hermes] Artefatos analíticos exportados com sucesso para o Telegram Bot (99 registros).
+🔄 [Hostinger] Publicação automática agendada em background; inicialização liberada.
+🔄 [Hostinger] Publicação automática em background iniciada para a VPS...
 📂 Lendo micronodos de micronodos_faccoes_2026.geojson...
-✅ Exportados 332 micronodos dinâmicos para visible_micronodes_capital.geojson
-✅ Exportados 96 micronodos dinâmicos para visible_micronodes_rmf.geojson
-✅ Exportados 126 micronodos dinâmicos para visible_micronodes_interior.geojson
-✅ Exportados 554 micronodos dinâmicos para visible_micronodes.geojson
-✅ Exportado CSV com sucesso para: C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\visible_micronodes.csv
-✅ Exportado CSV com sucesso para: C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\top_30_micronodes.csv
-✅ Exportado CSV com sucesso para: C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\hermes\visible_micronodes.csv
-✅ Exportado CSV com sucesso para: C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\hermes\top_30_micronodes.csv
-✅ Exportado CSV com sucesso para: C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\top_30_micronodes_capital.csv
-✅ Exportado CSV com sucesso para: C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\hermes\top_30_micronodes_capital.csv
-✅ Exportado CSV com sucesso para: C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\top_30_micronodes_rmf.csv
-✅ Exportado CSV com sucesso para: C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\hermes\top_30_micronodes_rmf.csv
-✅ Exportado CSV com sucesso para: C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\top_30_micronodes_interior.csv
-✅ Exportado CSV com sucesso para: C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\hermes\top_30_micronodes_interior.csv
-✅ Micronodos dinâmicos regenerados.
-📂 Lendo micronodos de micronodos_faccoes_2026.geojson...
-
-============================================================
-🛡️  [MONITOR DE EFICIÊNCIA] Iniciando Avaliação (3252 localidades)
-============================================================
-🧠 [Monitor] Iniciando avaliação de eficiência...
-🧠 [Monitor] Scores gerados para 178 localidades.
-📊 [Monitor] Avaliando eficácia com base na data: 2026-05-20 00:00:00
-📊 [Monitor] Ground Truth Final: 11 localidades com eventos ativos (18 CVLI + 0 Exógena)
-🧾 [Monitor] Eventos mapeados ao ranking: 18/18 (CVLI=18, Exógena=0, Não mapeados=0)
-🔗 [Monitor] Match de nomes: 11/178 (6.2% coverage)
-✅ [Monitor] Região GLOBAL: P@10=50.0% | P@20=35.0% | GT=11 zonas
-✅ [Monitor] Região FORTALEZA: P@10=20.0% | P@20=15.0% | GT=3 zonas
-✅ [Monitor] Região RMF: P@10=20.0% | P@20=10.5% | GT=2 zonas
-✅ [Monitor] Região INTERIOR: P@10=60.0% | P@20=30.0% | GT=6 zonas
-📅 Data da Avaliação: 2026-05-20 00:00:00
-📊 Eventos Detectados: 18 (18 Brutos + 0 Exógenos)
-✅ [Auto-Tune] P10=60.0% em INTERIOR. Janela base restaurada.
-📅 Data da Avaliação: 2026-05-20 00:00:00
-📊 Eventos Detectados: 18 (18 Brutos + 0 Exógenos)
-
-🌍 REGIONALIZAÇÃO: GLOBAL
-   P5:  60.0% | Hits: ITAPAJE, CAJAZEIRAS, ENGENHEIRO LUCIANO CAVALCANTE
-   P10: 50.0% | Hits: ITAPAJE, CAJAZEIRAS, ENGENHEIRO LUCIANO CAVALCANTE, VARZEA ALEGRE, TIANGUA
-   P20: 35.0% | R20: 63.6% | Hits: ITAPAJE, CAJAZEIRAS, ENGENHEIRO LUCIANO CAVALCANTE, VARZEA ALEGRE, TIANGUA, ALTO SANTO, JUAZEIRO DO NORTE
-
-🏙️  REGIONALIZAÇÃO: FORTALEZA
-   P10: 20.0% | Hits: CAJAZEIRAS, ENGENHEIRO LUCIANO CAVALCANTE
-   P20: 15.0% | R20: 100.0% | Hits: CAJAZEIRAS, ENGENHEIRO LUCIANO CAVALCANTE, CONJUNTO PALMEIRAS
-
-📍 REGIONALIZAÇÃO: REGIÃO METROPOLITANA
-   P10: 20.0% | Hits: TRAIRI, ITAITINGA
-
-📍 REGIONALIZAÇÃO: INTERIOR DO ESTADO
-   P10: 60.0% | Hits: ITAPAJE, VARZEA ALEGRE, TIANGUA, ALTO SANTO, JUAZEIRO DO NORTE, CARIRE
-
-============================================================
-
-✅ Exportados 332 micronodos dinâmicos para visible_micronodes_capital.geojson
-✅ Exportados 96 micronodos dinâmicos para visible_micronodes_rmf.geojson
-✅ Exportados 126 micronodos dinâmicos para visible_micronodes_interior.geojson
-✅ Exportados 554 micronodos dinâmicos para visible_micronodes.geojson
+✅ Exportados 71 micronodos dinâmicos para visible_micronodes_capital.geojson
+✅ Exportados 95 micronodos dinâmicos para visible_micronodes_rmf.geojson
+✅ Exportados 142 micronodos dinâmicos para visible_micronodes_interior.geojson
+✅ Exportados 308 micronodos dinâmicos para visible_micronodes.geojson
 ✅ Exportado CSV com sucesso para: C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\visible_micronodes.csv
 ✅ Exportado CSV com sucesso para: C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\top_30_micronodes.csv
 ✅ Exportado CSV com sucesso para: C:\Users\Boanerges\Desktop\Projetos\Report Preview\outputs\hermes\visible_micronodes.csv
@@ -194,3 +94,183 @@ ACESSE: http://localhost:5050
 
  * Serving Flask app 'app'
  * Debug mode: off
+
+============================================================
+🛡️  [MONITOR DE EFICIÊNCIA] Iniciando Avaliação (3714 localidades)
+============================================================
+🧠 [Monitor] Iniciando avaliação de eficiência...
+🧠 [Monitor] Scores gerados para 79 localidades.
+📊 [Monitor] Avaliando eficácia com base na data: 2026-07-24 00:00:00
+📊 [Monitor] Ground Truth Final: 21 localidades com eventos ativos (41 CVLI + 0 Exógena)
+🧾 [Monitor] Eventos mapeados ao ranking: 41/41 (CVLI=41, Exógena=0, Não mapeados=0)
+🔗 [Monitor] Match de nomes: 21/79 (26.6% coverage)
+✅ [Monitor] Região GLOBAL: P@10=90.0% | P@20=80.0% | GT=21 zonas
+✅ [Monitor] Região FORTALEZA: P@10=20.0% | P@20=10.0% | GT=2 zonas
+✅ [Monitor] Região RMF: P@10=50.0% | P@20=26.3% | GT=5 zonas
+✅ [Monitor] Região INTERIOR: P@10=100.0% | P@20=70.0% | GT=14 zonas
+📅 Data da Avaliação: 2026-07-24 00:00:00
+📊 Eventos Detectados: 41 (41 Brutos + 0 Exógenos)
+📉 [Auto-Tune] P10=20.0% em FORTALEZA. Fallback histórico permanece desativado (somente ativação manual).
+✅ [Auto-Tune] P10=100.0% em INTERIOR. Janela base restaurada.
+📅 Data da Avaliação: 2026-07-24 00:00:00
+📊 Eventos Detectados: 41 (41 Brutos + 0 Exógenos)
+
+🌍 REGIONALIZAÇÃO: GLOBAL
+   P5:  100.0% | Hits: MARACANAU, CRATO, JUAZEIRO DO NORTE, ITAPAJE, BARBALHA
+   P10: 90.0% | Hits: MARACANAU, CRATO, JUAZEIRO DO NORTE, ITAPAJE, BARBALHA, BOA VIAGEM, AMONTADA, CAUCAIA, SOBRAL
+   P20: 80.0% | R20: 76.2% | Hits: MARACANAU, CRATO, JUAZEIRO DO NORTE, ITAPAJE, BARBALHA, BOA VIAGEM, AMONTADA, CAUCAIA, SOBRAL, JOSE DE ALENCAR, ITAPIPOCA, SAO BENEDITO, PENTECOSTE, MESSEJANA, IGUATU, CANINDE
+
+🏙️  REGIONALIZAÇÃO: FORTALEZA
+   P10: 20.0% | Hits: JOSE DE ALENCAR, MESSEJANA
+   P20: 10.0% | R20: 100.0% | Hits: JOSE DE ALENCAR, MESSEJANA
+
+📍 REGIONALIZAÇÃO: REGIÃO METROPOLITANA
+   P10: 50.0% | Hits: MARACANAU, CAUCAIA, HORIZONTE, CASCAVEL, PACAJUS
+
+📍 REGIONALIZAÇÃO: INTERIOR DO ESTADO
+   P10: 100.0% | Hits: CRATO, JUAZEIRO DO NORTE, ITAPAJE, BARBALHA, BOA VIAGEM, AMONTADA, SOBRAL, ITAPIPOCA, SAO BENEDITO, PENTECOSTE
+
+============================================================
+
+🔄 [Hermes] Iniciando exportação de artefatos analíticos para o Telegram Bot...
+✅ [Hermes] Ruas críticas exportadas: 712 logradouros em 2 bairros.
+✅ [Hermes] Artefatos analíticos exportados com sucesso para o Telegram Bot (99 registros).
+🔄 [Hostinger] Publicação automática agendada em background; inicialização liberada.
+🔄 [Hostinger] Publicação automática em background iniciada para a VPS...
+✅ ST-GCN ruas/focos aquecido: fortaleza
+✅ [Hostinger] Publicação em background concluída! 14 arquivo(s) atualizados na VPS:
+  - outputs/hermes/risk_snapshot_latest.json
+  - outputs/hermes/risk_snapshot_latest.md
+  - outputs/hermes/risk_brief_latest.md
+  - outputs/hermes/risk_snapshot_latest.csv
+  - outputs/hermes/risk_fortaleza_latest.csv
+  - outputs/hermes/risk_rmf_latest.csv
+  - outputs/hermes/risk_interior_latest.csv
+  - outputs/hermes/dados_status_enriquecido_14d_latest.csv
+  - outputs/hermes/ruas_criticas_latest.csv
+  - outputs/hermes/visible_micronodes.csv
+  - outputs/hermes/top_30_micronodes.csv
+  - outputs/hermes/top_30_micronodes_capital.csv
+  - outputs/hermes/top_30_micronodes_rmf.csv
+  - outputs/hermes/top_30_micronodes_interior.csv
+✅ [Hostinger] Publicação em background concluída! 12 arquivo(s) atualizados na VPS:
+  - outputs/hermes/risk_snapshot_latest.json
+  - outputs/hermes/risk_snapshot_latest.md
+  - outputs/hermes/risk_fortaleza_latest.csv
+  - outputs/hermes/risk_rmf_latest.csv
+  - outputs/hermes/risk_interior_latest.csv
+  - outputs/hermes/dados_status_enriquecido_14d_latest.csv
+  - outputs/hermes/ruas_criticas_latest.csv
+  - outputs/hermes/visible_micronodes.csv
+  - outputs/hermes/top_30_micronodes.csv
+  - outputs/hermes/top_30_micronodes_capital.csv
+  - outputs/hermes/top_30_micronodes_rmf.csv
+  - outputs/hermes/top_30_micronodes_interior.csv
+✅ [Hostinger] Publicação em background concluída! 8 arquivo(s) atualizados na VPS:
+  - outputs/hermes/risk_snapshot_latest.json
+  - outputs/hermes/risk_snapshot_latest.md
+  - outputs/hermes/risk_brief_latest.md
+  - outputs/hermes/risk_snapshot_latest.csv
+  - outputs/hermes/risk_fortaleza_latest.csv
+  - outputs/hermes/risk_rmf_latest.csv
+  - outputs/hermes/risk_interior_latest.csv
+  - outputs/hermes/dados_status_enriquecido_14d_latest.csv
+🔄 [Hermes] Iniciando exportação de artefatos analíticos para o Telegram Bot...
+✅ [Hermes] Ruas críticas exportadas: 712 logradouros em 2 bairros.
+✅ [Hermes] Artefatos analíticos exportados com sucesso para o Telegram Bot (99 registros).
+🔄 [Hostinger] Publicação automática agendada em background; inicialização liberada.
+🔄 [Hostinger] Publicação automática em background iniciada para a VPS...
+✅ ST-GCN ruas/focos aquecido: rmf
+✅ Inteligência de ruas (via bairro.json): 305 bairros.
+✅ Localidades por município: 224 municípios carregados.
+✅ [Hostinger] Publicação em background concluída! 9 arquivo(s) atualizados na VPS:
+  - outputs/hermes/risk_snapshot_latest.json
+  - outputs/hermes/risk_snapshot_latest.md
+  - outputs/hermes/risk_brief_latest.md
+  - outputs/hermes/risk_snapshot_latest.csv
+  - outputs/hermes/risk_fortaleza_latest.csv
+  - outputs/hermes/risk_rmf_latest.csv
+  - outputs/hermes/risk_interior_latest.csv
+  - outputs/hermes/dados_status_enriquecido_14d_latest.csv
+  - outputs/hermes/ruas_criticas_latest.csv
+🔄 [Hermes] Iniciando exportação de artefatos analíticos para o Telegram Bot...
+🔄 [Hermes] Iniciando exportação de artefatos analíticos para o Telegram Bot...
+✅ [Hermes] Ruas críticas exportadas: 712 logradouros em 2 bairros.
+✅ [Hermes] Artefatos analíticos exportados com sucesso para o Telegram Bot (99 registros).
+🔄 [Hostinger] Publicação automática agendada em background; inicialização liberada.
+🔄 [Hostinger] Publicação automática em background iniciada para a VPS...
+✅ Inteligência de ruas (via bairro.json): 305 bairros.
+✅ Localidades por município: 224 municípios carregados.
+✅ [Hermes] Ruas críticas exportadas: 712 logradouros em 2 bairros.
+✅ [Hermes] Artefatos analíticos exportados com sucesso para o Telegram Bot (99 registros).
+🔄 [Hostinger] Publicação automática agendada em background; inicialização liberada.
+🔄 [Hostinger] Publicação automática em background iniciada para a VPS...
+✅ ST-GCN ruas/focos aquecido: interior
+✅ [Hostinger] Publicação em background concluída! 9 arquivo(s) atualizados na VPS:
+  - outputs/hermes/risk_snapshot_latest.json
+  - outputs/hermes/risk_snapshot_latest.md
+  - outputs/hermes/risk_brief_latest.md
+  - outputs/hermes/risk_snapshot_latest.csv
+  - outputs/hermes/risk_fortaleza_latest.csv
+  - outputs/hermes/risk_rmf_latest.csv
+  - outputs/hermes/risk_interior_latest.csv
+  - outputs/hermes/dados_status_enriquecido_14d_latest.csv
+  - outputs/hermes/ruas_criticas_latest.csv
+✅ [Hostinger] Publicação em background concluída! 7 arquivo(s) atualizados na VPS:
+  - outputs/hermes/risk_snapshot_latest.json
+  - outputs/hermes/risk_snapshot_latest.csv
+  - outputs/hermes/risk_fortaleza_latest.csv
+  - outputs/hermes/risk_rmf_latest.csv
+  - outputs/hermes/risk_interior_latest.csv
+  - outputs/hermes/dados_status_enriquecido_14d_latest.csv
+  - outputs/hermes/ruas_criticas_latest.csv
+🔄 [Hermes] Iniciando exportação de artefatos analíticos para o Telegram Bot...
+✅ [Hermes] Ruas críticas exportadas: 712 logradouros em 2 bairros.
+✅ [Hermes] Artefatos analíticos exportados com sucesso para o Telegram Bot (99 registros).
+🔄 [Hostinger] Publicação automática agendada em background; inicialização liberada.
+🔄 [Hostinger] Publicação automática em background iniciada para a VPS...
+✅ Inteligência de ruas (via bairro.json): 305 bairros.
+✅ Localidades por município: 224 municípios carregados.
+✅ [Hostinger] Publicação em background concluída! 9 arquivo(s) atualizados na VPS:
+  - outputs/hermes/risk_snapshot_latest.json
+  - outputs/hermes/risk_snapshot_latest.md
+  - outputs/hermes/risk_brief_latest.md
+  - outputs/hermes/risk_snapshot_latest.csv
+  - outputs/hermes/risk_fortaleza_latest.csv
+  - outputs/hermes/risk_rmf_latest.csv
+  - outputs/hermes/risk_interior_latest.csv
+  - outputs/hermes/dados_status_enriquecido_14d_latest.csv
+  - outputs/hermes/ruas_criticas_latest.csv
+🔄 [Hermes] Iniciando exportação de artefatos analíticos para o Telegram Bot...
+🔄 [Hermes] Iniciando exportação de artefatos analíticos para o Telegram Bot...
+✅ [Hermes] Ruas críticas exportadas: 712 logradouros em 2 bairros.
+✅ [Hermes] Artefatos analíticos exportados com sucesso para o Telegram Bot (99 registros).
+🔄 [Hostinger] Publicação automática agendada em background; inicialização liberada.
+🔄 [Hostinger] Publicação automática em background iniciada para a VPS...
+✅ Inteligência de ruas (via bairro.json): 305 bairros.
+✅ Localidades por município: 224 municípios carregados.
+✅ [Hermes] Ruas críticas exportadas: 712 logradouros em 2 bairros.
+✅ [Hermes] Artefatos analíticos exportados com sucesso para o Telegram Bot (99 registros).
+🔄 [Hostinger] Publicação automática agendada em background; inicialização liberada.
+🔄 [Hostinger] Publicação automática em background iniciada para a VPS...
+✅ ST-GCN ruas/focos aquecido: all
+✅ [Hostinger] Publicação em background concluída! 9 arquivo(s) atualizados na VPS:
+  - outputs/hermes/risk_snapshot_latest.json
+  - outputs/hermes/risk_snapshot_latest.md
+  - outputs/hermes/risk_brief_latest.md
+  - outputs/hermes/risk_snapshot_latest.csv
+  - outputs/hermes/risk_fortaleza_latest.csv
+  - outputs/hermes/risk_rmf_latest.csv
+  - outputs/hermes/risk_interior_latest.csv
+  - outputs/hermes/dados_status_enriquecido_14d_latest.csv
+  - outputs/hermes/ruas_criticas_latest.csv
+✅ [Hostinger] Publicação em background concluída! 9 arquivo(s) atualizados na VPS:
+  - outputs/hermes/risk_snapshot_latest.json
+  - outputs/hermes/risk_snapshot_latest.md
+  - outputs/hermes/risk_brief_latest.md
+  - outputs/hermes/risk_snapshot_latest.csv
+  - outputs/hermes/risk_fortaleza_latest.csv
+  - outputs/hermes/risk_rmf_latest.csv
+  - outputs/hermes/risk_interior_latest.csv
+  - outputs/hermes/dados_status_enriquecido_14d_latest.csv
+  - outputs/hermes/ruas_criticas_latest.csv

@@ -1,283 +1,129 @@
 INFO:src.core.health_monitor:✅ HealthMonitor inicializado
-INFO:src.core.health_monitor:✅ ConfidenceTracker populado com 11 registros do efficiency history
-INFO:src.core.health_monitor:✅ HealthMonitor inicializado
-INFO:src.core.health_monitor:✅ ConfidenceTracker populado com 11 registros do efficiency history
+INFO:src.core.health_monitor:✅ ConfidenceTracker populado com 12 registros do efficiency history
+INFO:paramiko.transport:Connected (version 2.0, client OpenSSH_9.6p1)
+INFO:paramiko.transport:Authentication (password) successful!
+INFO:paramiko.transport.sftp:[chan 0] Opened sftp connection (server version 3)
+INFO:paramiko.transport:Connected (version 2.0, client OpenSSH_9.6p1)
+INFO:paramiko.transport:Authentication (password) successful!
+INFO:paramiko.transport.sftp:[chan 0] Opened sftp connection (server version 3)
 INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
  * Running on all addresses (0.0.0.0)
  * Running on http://127.0.0.1:5050
  * Running on http://192.168.0.48:5050
 INFO:werkzeug:[33mPress CTRL+C to quit[0m
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:19:15] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:19:18] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:20:15] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:20:19] "GET / HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:20:20] "GET / HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:20:21] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:20:21] "GET /api/model-update-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:20:22] "GET /api/exogenous/pending-count HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:20:24] "GET /api/polygons?_=1779585620962 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:20:31] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:20:36] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:20:36] "GET /api/street_foci?region=fortaleza&radius_m=500&shape=hex&min_points=2&limit=220 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:20:44] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:20:50] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:20:51] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:21:00] "GET /api/risk?_=1779585620961 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:21:06] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:21:12] "GET / HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:21:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:21:15] "GET /api/model-update-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:21:16] "GET /api/polygons?_=1779585673879 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:21:16] "GET /api/exogenous/pending-count HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:21:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:21:35] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:21:44] "GET /api/risk?_=1779585673878 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:21:45] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:21:53] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:21:57] "GET /api/street_foci?region=fortaleza&radius_m=500&shape=hex&min_points=2&limit=220 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:21:59] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:21:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:src.core.stgcn_escape_engine:Recortando malha viaria local para -3.7822258823529418, -38.505510588235296 (raio 1000m)...
-INFO:src.core.stgcn_escape_engine:Carregando grafo topo de C:\Users\Boanerges\Desktop\Projetos\Report Preview\data\static\malha_viaria.graphml para ST-GCN...
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:22:06] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:22:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:22:21] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:22:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:src.core.stgcn_escape_engine:Grafo carregado (ST-GCN Matrix): 52481 nós e 138972 fluxos.
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:22:31] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:22:31] "GET /api/stgcn/escape-routes?lat=-3.7822258823529418&lon=-38.505510588235296&max_distance=1000&bairro=JARDIM%20DAS%20OLIVEIRAS HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:22:37] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:22:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:22:45] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:22:51] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:22:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:23:06] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:23:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:23:19] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:23:21] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:23:26] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:23:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:23:36] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:src.core.stgcn_escape_engine:Recortando malha viaria local para -3.7711349999999997, -38.49823833333333 (raio 1000m)...
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:23:41] "GET /api/stgcn/escape-routes?lat=-3.7711349999999997&lon=-38.49823833333333&max_distance=1000&bairro=SALINAS HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:23:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:23:51] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:23:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:24:06] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:24:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:24:19] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:24:21] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:24:25] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:24:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:24:36] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:24:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:24:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:25:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:25:15] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:25:20] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:25:21] "GET /api/model-update-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:25:27] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:25:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:25:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:25:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:26:14] "GET /api/model-update-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:26:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:26:17] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:26:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:26:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:26:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:15] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:18] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:19] "GET / HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:19] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:19] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:20] "GET /api/model-update-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:21] "GET /api/exogenous/pending-count HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:21] "GET /api/polygons?_=1779586039623 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:29] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:33] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:34] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:37] "GET /api/risk?_=1779586039622 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:43] "GET /api/street_foci?region=fortaleza&radius_m=500&shape=hex&min_points=2&limit=220 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:src.core.stgcn_escape_engine:Recortando malha viaria local para -3.8219338666666665, -38.47896520000001 (raio 1000m)...
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:47] "GET /api/stgcn/escape-routes?lat=-3.8219338666666665&lon=-38.47896520000001&max_distance=1000&bairro=LAGOA%20REDONDA HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:49] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:27:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:28:04] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:28:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:28:16] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:28:19] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:28:21] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:28:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:28:31] "GET /api/street_foci?region=rmf&radius_m=500&shape=hex&min_points=2&limit=220 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:28:34] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:28:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:28:49] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:28:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:29:04] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:29:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:29:17] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:29:19] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:29:21] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:29:22] "GET /api/streets/critical?bairro=ENGENHEIRO%20LUCIANO%20CAVALCANTE&cidade=fortaleza HTTP/1.1" 200 -
-INFO:src.core.stgcn_escape_engine:Recortando malha viaria local para -3.77655605, -38.49132605 (raio 1000m)...
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:29:27] "GET /api/stgcn/escape-routes?lat=-3.77655605&lon=-38.49132605&max_distance=1000&bairro=ENGENHEIRO%20LUCIANO%20CAVALCANTE HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:29:27] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:root:📊 EXPLAIN [ENGENHEIRO LUCIANO CAVALCANTE]: recent=1, prev=0, neighbors=['JARDIM DAS OLIVEIRAS', 'AEROLANDIA', 'CIDADE DOS FUNCIONARIOS']
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:29:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:29:35] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:29:36] "GET /api/explain/33?t=1779586161799 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:29:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:29:49] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:29:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:30:05] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:30:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:30:15] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:30:20] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:30:23] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:30:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:30:34] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:30:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:30:45] "GET /api/visible_micronodes?region=fortaleza HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:30:49] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:30:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:31:04] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:31:05] "GET /api/street_foci?region=fortaleza&radius_m=500&shape=hex&min_points=2&limit=220 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:31:14] "GET /api/model-update-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:31:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:31:17] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:31:19] "GET /api/stgcn/escape-routes?lat=-3.7822258823529418&lon=-38.505510588235296&max_distance=1000&bairro=JARDIM%20DAS%20OLIVEIRAS HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:31:19] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:31:22] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:31:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:31:30] "GET /api/visible_micronodes?region=fortaleza HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:31:35] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:31:40] "GET /api/visible_micronodes?region=fortaleza HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:31:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:31:49] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:31:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:04] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:15] "GET /api/admin/health HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:17] "GET /api/admin/health/summary HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:17] "GET /api/admin/health/api-stats HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:17] "GET /api/admin/health/confidence-history?region=global&days=14 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:17] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:17] "GET /api/admin/health/data-quality HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:18] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:20] "GET /api/model-update-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:20] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:23] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:30] "GET /api/admin/health/confidence-history?region=fortaleza&days=14 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:35] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:38] "GET /api/admin/health/confidence-history?region=rmf&days=14 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:42] "GET /api/admin/health/confidence-history?region=interior&days=14 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:47] "GET /api/admin/health/summary HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:47] "GET /api/admin/health/api-stats HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:47] "GET /api/admin/health/confidence-history?region=interior&days=14 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:47] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:47] "GET /api/admin/health/data-quality HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:49] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:32:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:33:01] "GET /connections HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:33:11] "GET /api/risk?region=fortaleza HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:33:11] "GET /api/exogenous-events HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:33:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:33:16] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:33:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:33:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:33:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:34:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:34:19] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:34:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:34:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:34:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:35:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:35:27] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:35:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:35:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:35:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:36:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:36:14] "GET /api/model-update-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:36:19] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:36:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:36:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:36:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:37:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:37:19] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:37:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:37:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:37:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:38:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:38:16] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:38:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:38:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:38:45] "GET /api/risk?region=fortaleza HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:38:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:39:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:39:18] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:39:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:39:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:39:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:40:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:40:17] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:40:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:40:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:40:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:41:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:41:14] "GET /api/model-update-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:41:17] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:41:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:41:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:41:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:42:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:42:17] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:42:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:42:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:42:54] "GET /connections HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:42:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:43:04] "GET /api/risk?region=fortaleza HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:43:04] "GET /api/exogenous-events HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:43:14] "GET /connections HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:43:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:43:23] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:43:25] "GET /api/risk?region=fortaleza HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:43:25] "GET /api/exogenous-events HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:43:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:43:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:43:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:44:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:44:17] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:44:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:44:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:44:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:45:14] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:45:16] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:45:29] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:45:44] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:45:59] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:46:10] "GET /connections HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:46:15] "GET /api/risk?region=fortaleza HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:46:15] "GET /api/exogenous-events HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:46:49] "GET /connections HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:46:58] "GET /api/risk?region=fortaleza HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:46:58] "GET /api/exogenous-events HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:47:05] "GET /connections HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:47:06] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:47:13] "GET /api/risk?region=fortaleza HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:47:13] "GET /api/exogenous-events HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:47:36] "GET / HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:47:37] "GET /api/model-update-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:47:37] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:47:39] "GET /api/exogenous/pending-count HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:47:39] "GET /api/polygons?_=1779587257520 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:47:51] "GET /api/anomaly_status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:47:53] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:47:53] "GET /api/risk?_=1779587257519 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:48:07] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2026 22:48:08] "GET /connections HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:24:54] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:24:55] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:25:09] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:25:09] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:paramiko.transport:Connected (version 2.0, client OpenSSH_9.6p1)
+INFO:paramiko.transport:Authentication (password) successful!
+INFO:paramiko.transport.sftp:[chan 0] Opened sftp connection (server version 3)
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:25:24] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:25:24] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:25:25] "GET /api/anomaly_status HTTP/1.1" 200 -
+INFO:paramiko.transport.sftp:[chan 0] sftp session closed.
+INFO:paramiko.transport.sftp:[chan 0] sftp session closed.
+INFO:paramiko.transport.sftp:[chan 0] sftp session closed.
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:25:40] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:25:40] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:25:44] "GET /api/visible_micronodes?region=fortaleza HTTP/1.1" 200 -
+INFO:paramiko.transport:Connected (version 2.0, client OpenSSH_9.6p1)
+INFO:paramiko.transport:Authentication (password) successful!
+INFO:paramiko.transport.sftp:[chan 0] Opened sftp connection (server version 3)
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:03] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:03] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:05] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:05] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:06] "GET /api/model-update-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:09] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:09] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:09] "GET /api/anomaly_status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:13] "GET /api/polygons?_=1785194766018 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:16] "GET /api/exogenous/pending-count HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:21] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:21] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:paramiko.transport.sftp:[chan 0] sftp session closed.
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:33] "GET /api/risk?model_mode=stgat_v5&_=1785194766017 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:36] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:36] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:51] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:51] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:26:59] "GET /api/polygons?_=1785194766019 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:27:06] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:27:06] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:27:06] "GET /api/anomaly_status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:27:21] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:27:21] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:paramiko.transport:Connected (version 2.0, client OpenSSH_9.6p1)
+INFO:paramiko.transport:Authentication (password) successful!
+INFO:paramiko.transport.sftp:[chan 0] Opened sftp connection (server version 3)
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:27:36] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:27:36] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:paramiko.transport:Connected (version 2.0, client OpenSSH_9.6p1)
+INFO:paramiko.transport:Authentication (password) successful!
+INFO:paramiko.transport.sftp:[chan 0] Opened sftp connection (server version 3)
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:27:43] "GET /api/risk?model_mode=stgat&_=1785194766020 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:27:51] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:27:51] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:28:01] "GET /api/polygons?_=1785194766021 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:28:06] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:28:06] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:28:06] "GET /api/anomaly_status HTTP/1.1" 200 -
+INFO:paramiko.transport.sftp:[chan 0] sftp session closed.
+INFO:paramiko.transport.sftp:[chan 0] sftp session closed.
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:28:21] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:28:21] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:28:36] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:28:36] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:paramiko.transport:Connected (version 2.0, client OpenSSH_9.6p1)
+INFO:paramiko.transport:Authentication (password) successful!
+INFO:paramiko.transport.sftp:[chan 0] Opened sftp connection (server version 3)
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:28:54] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:28:55] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:28:55] "GET /api/risk?model_mode=cvli_tactical&_=1785194766022 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:29:06] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:29:06] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:29:06] "GET /api/anomaly_status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:29:14] "GET /api/polygons?_=1785194766023 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:29:21] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:29:21] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:paramiko.transport.sftp:[chan 0] sftp session closed.
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:29:36] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:29:36] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:paramiko.transport:Connected (version 2.0, client OpenSSH_9.6p1)
+INFO:paramiko.transport:Authentication (password) successful!
+INFO:paramiko.transport:Connected (version 2.0, client OpenSSH_9.6p1)
+INFO:paramiko.transport.sftp:[chan 0] Opened sftp connection (server version 3)
+INFO:paramiko.transport:Authentication (password) successful!
+INFO:paramiko.transport.sftp:[chan 0] Opened sftp connection (server version 3)
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:29:51] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:29:51] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:29:52] "GET /api/risk?model_mode=short20_mix&_=1785194766024 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:30:07] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:30:07] "GET /api/polygons?_=1785194766025 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:30:07] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:30:07] "GET /api/anomaly_status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:30:10] "GET /api/risk?model_mode=stgat_v5&_=1785194766026 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:30:21] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:30:21] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:paramiko.transport.sftp:[chan 0] sftp session closed.
+INFO:paramiko.transport.sftp:[chan 0] sftp session closed.
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:30:36] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:30:36] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:30:51] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:30:51] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:31:06] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:31:06] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:31:06] "GET /api/model-update-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:31:06] "GET /api/anomaly_status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:31:21] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:31:21] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:31:36] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:31:36] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:31:51] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:31:51] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:32:06] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:32:06] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:32:06] "GET /api/anomaly_status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:32:21] "GET /api/agent/calibration-status HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [27/Jul/2026 20:32:21] "GET /api/admin/health/calibration-status HTTP/1.1" 200 -

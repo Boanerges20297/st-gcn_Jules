@@ -6,153 +6,17 @@
       "properties": {
         "node_id": 1,
         "rank": 1,
-        "name": "Rodoviária - Maranguape",
-        "bairro": "MARACANAÚ",
-        "municipality": "Maranguape",
-        "faction": "CV",
-        "risk_score": 59.389,
-        "score": 59.389,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 8.882,
-        "nearby_streets_count": 28,
-        "nearby_streets": [
-          "RODOVIÁRIA - MARANGUAPE",
-          "RUA CHICÓ ANÍSIO",
-          "TANGUEIRA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.658806"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.680890857142856,
-          -3.8962617857142847
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 2,
-        "rank": 2,
-        "name": "Guabiraba",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 58.736,
-        "score": 58.736,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 8.46,
-        "nearby_streets_count": 22,
-        "nearby_streets": [
-          "GUABIRABA",
-          "RUA ENÓI DE ABREU BRAGA",
-          "BECO DO BURACO - VILA SÃO JOSÉ - ALTO DO CAJUEIRO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.688817368421056,
-          -3.8961198947368425
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 3,
-        "rank": 3,
-        "name": "Mororó",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 58.647,
-        "score": 58.647,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 8.553,
-        "nearby_streets_count": 22,
-        "nearby_streets": [
-          "MORORÓ",
-          "RUA RAIMUNDO JUSTINI DE MORAIS",
-          "RUA MARIA ESTRELA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.67521514285715,
-          -3.886540071428571
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 4,
-        "rank": 4,
-        "name": "Alto Cemitério",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 58.524,
-        "score": 58.524,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 8.466,
-        "nearby_streets_count": 27,
-        "nearby_streets": [
-          "ALTO CEMITÉRIO",
-          "RUA CHICÓ AMADOR",
-          "RUA RAIMUNDO HERBSTER"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.685423351351346,
-          -3.887221891891892
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 5,
-        "rank": 5,
         "name": "Sítios Novos- Caucaia",
         "bairro": "CAUCAIA",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 57.462,
-        "score": 57.462,
+        "risk_score": 81.366,
+        "score": 81.366,
         "region": "rmf",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 2.021,
         "nearby_streets_count": 4,
         "nearby_streets": [
@@ -161,7 +25,7 @@
           "ESTRADA PARÁ AGRIVILA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -174,53 +38,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 6,
-        "rank": 6,
-        "name": "Outra Banda",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 57.426,
-        "score": 57.426,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 7.747,
-        "nearby_streets_count": 24,
-        "nearby_streets": [
-          "OUTRA BANDA",
-          "RUA GONTRAN NASCIMENTO",
-          "RUA DOUTOR ARGEU BRAGA HERBSTER"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.679789529411764,
-          -3.8816516960784324
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 7,
-        "rank": 7,
+        "node_id": 2,
+        "rank": 2,
         "name": "Coité Pedreira",
         "bairro": "CAUCAIA",
         "municipality": "CAUCAIA",
         "faction": "CV",
-        "risk_score": 57.415,
-        "score": 57.415,
+        "risk_score": 81.319,
+        "score": 81.319,
         "region": "rmf",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 3.092,
         "nearby_streets_count": 5,
         "nearby_streets": [
@@ -229,7 +59,7 @@
           "RUA MARIA DO PATROCÍNIO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -242,19 +72,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 8,
-        "rank": 8,
+        "node_id": 3,
+        "rank": 3,
         "name": "Comunidade dos Cariocas - Caucaia",
         "bairro": "MARECHAL RONDON",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 57.299,
-        "score": 57.299,
+        "risk_score": 81.203,
+        "score": 81.203,
         "region": "rmf",
         "parent_area": "MARECHAL RONDON",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 3.429,
         "nearby_streets_count": 8,
         "nearby_streets": [
@@ -263,7 +93,7 @@
           "CAJUEIROS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -276,19 +106,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 9,
-        "rank": 9,
+        "node_id": 4,
+        "rank": 4,
         "name": "Japuara- Caucaia",
         "bairro": "PARQUE SOLEDADE",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 56.994,
-        "score": 56.994,
+        "risk_score": 80.898,
+        "score": 80.898,
         "region": "rmf",
         "parent_area": "PARQUE SOLEDADE",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 1.572,
         "nearby_streets_count": 4,
         "nearby_streets": [
@@ -297,7 +127,7 @@
           "RUA MARIA LUIZA SOARES"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -310,121 +140,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 10,
-        "rank": 10,
-        "name": "Jereissati Setor D - Maracanaú",
-        "bairro": "MARACANAÚ",
-        "municipality": "Maracanaú",
-        "faction": "CV",
-        "risk_score": 56.64,
-        "score": 56.64,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.899,
-        "nearby_streets_count": 25,
-        "nearby_streets": [
-          "JEREISSATI SETOR D - MARACANAÚ",
-          "JEREISSATI SETOR E - MARACANAÚ",
-          "JEREISSATI SETOR A - MARACANAÚ"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.618326520000004,
-          -3.8813451199999998
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 11,
-        "rank": 11,
-        "name": "Parque São João",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 56.63,
-        "score": 56.63,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 7.502,
-        "nearby_streets_count": 22,
-        "nearby_streets": [
-          "PARQUE SÃO JOÃO",
-          "RUA CÔNEGO HEITOR VIÊIRA CAVALCANTE",
-          "TANGUEIRA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.67814661111111,
-          -3.9002411666666665
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 12,
-        "rank": 12,
-        "name": "Parque Santa Fé",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 56.618,
-        "score": 56.618,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 7.324,
-        "nearby_streets_count": 21,
-        "nearby_streets": [
-          "PARQUE SANTA FÉ",
-          "TRAVESSA VALTER PIMENTA LÍRA",
-          "RUA AGOSTINHO FERNANDES"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.685771823529414,
-          -3.899302823529411
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 13,
-        "rank": 13,
+        "node_id": 5,
+        "rank": 5,
         "name": "Primavera",
         "bairro": "CAUCAIA",
         "municipality": "CAUCAIA",
         "faction": "CV",
-        "risk_score": 56.56,
-        "score": 56.56,
+        "risk_score": 80.464,
+        "score": 80.464,
         "region": "rmf",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 2.793,
         "nearby_streets_count": 4,
         "nearby_streets": [
@@ -433,7 +161,7 @@
           "RUA ANTÔNIO BRASILEIRO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -446,19 +174,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 14,
-        "rank": 14,
+        "node_id": 6,
+        "rank": 6,
         "name": "Tanubapa",
         "bairro": "CAUCAIA",
         "municipality": "CAUCAIA",
         "faction": "CV",
-        "risk_score": 56.52,
-        "score": 56.52,
+        "risk_score": 80.424,
+        "score": 80.424,
         "region": "rmf",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 2.3,
         "nearby_streets_count": 3,
         "nearby_streets": [
@@ -467,7 +195,7 @@
           "RUA FCO. JEOVÁ DA MOTA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -480,53 +208,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 15,
-        "rank": 15,
-        "name": "Rua do trilho",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 56.316,
-        "score": 56.316,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 7.421,
-        "nearby_streets_count": 24,
-        "nearby_streets": [
-          "RUA DO TRILHO",
-          "PASSARELA",
-          "FAVELA DA LAGOA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.62686676923076,
-          -3.881599692307692
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 16,
-        "rank": 16,
+        "node_id": 7,
+        "rank": 7,
         "name": "Taquara - Caucaia",
         "bairro": "URUCUTUBA",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 56.27,
-        "score": 56.27,
+        "risk_score": 80.174,
+        "score": 80.174,
         "region": "rmf",
         "parent_area": "URUCUTUBA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 0.964,
         "nearby_streets_count": 2,
         "nearby_streets": [
@@ -534,7 +228,7 @@
           "TAQUARA - CAUCAIA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -547,87 +241,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 17,
-        "rank": 17,
-        "name": "Jereissati Setor H - Pacatuba",
-        "bairro": "MARACANAÚ",
-        "municipality": "Pacatuba",
-        "faction": "CV",
-        "risk_score": 56.245,
-        "score": 56.245,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.626,
-        "nearby_streets_count": 21,
-        "nearby_streets": [
-          "JEREISSATI SETOR H - PACATUBA",
-          "AVENIDA XVII",
-          "JEREISSATI SETOR E - MARACANAÚ"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.614602777777776,
-          -3.8890546296296313
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 18,
-        "rank": 18,
-        "name": "Coité",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 56.212,
-        "score": 56.212,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 7.316,
-        "nearby_streets_count": 18,
-        "nearby_streets": [
-          "COITÉ",
-          "RUA MANOEL QUEIRÓS DE OLIVEIRA",
-          "RUA OLÍMPIO MIGUEL DOS SANTOS"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.67582890625,
-          -3.907433
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 19,
-        "rank": 19,
+        "node_id": 8,
+        "rank": 8,
         "name": "Planalto Caucaia",
         "bairro": "PARQUE SOLEDADE",
         "municipality": "CAUCAIA",
         "faction": "CV",
-        "risk_score": 56.185,
-        "score": 56.185,
+        "risk_score": 80.089,
+        "score": 80.089,
         "region": "rmf",
         "parent_area": "PARQUE SOLEDADE",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 2.71,
         "nearby_streets_count": 7,
         "nearby_streets": [
@@ -636,7 +262,7 @@
           "NOVA CIGANA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -649,53 +275,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 20,
-        "rank": 20,
-        "name": "Tangueira",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 56.085,
-        "score": 56.085,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 7.215,
-        "nearby_streets_count": 22,
-        "nearby_streets": [
-          "TANGUEIRA",
-          "PARQUE SÃO JOÃO",
-          "RUA RAIMUNDO BONIFÁCIO DA SILVA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.677139933333336,
-          -3.896820333333333
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 21,
-        "rank": 21,
+        "node_id": 9,
+        "rank": 9,
         "name": "Planalto Caucaia",
         "bairro": "PARQUE SOLEDADE",
         "municipality": "CAUCAIA",
         "faction": "CV",
-        "risk_score": 55.666,
-        "score": 55.666,
+        "risk_score": 79.57,
+        "score": 79.57,
         "region": "rmf",
         "parent_area": "PARQUE SOLEDADE",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 2.516,
         "nearby_streets_count": 7,
         "nearby_streets": [
@@ -704,7 +296,7 @@
           "RUA 107"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -717,53 +309,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 22,
-        "rank": 22,
-        "name": "Jereissati Setor C - Maracanaú",
-        "bairro": "MARACANAÚ",
-        "municipality": "Maracanaú",
-        "faction": "CV",
-        "risk_score": 55.571,
-        "score": 55.571,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.716,
-        "nearby_streets_count": 24,
-        "nearby_streets": [
-          "JEREISSATI SETOR C - MARACANAÚ",
-          "RUA 31",
-          "JEREISSATI SETOR B - MARACANAÚ"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.610529,
-          -3.880414538461539
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 23,
-        "rank": 23,
+        "node_id": 10,
+        "rank": 10,
         "name": "Mingau - Caucaia",
         "bairro": "CAUCAIA",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 55.502,
-        "score": 55.502,
+        "risk_score": 79.406,
+        "score": 79.406,
         "region": "rmf",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 2.447,
         "nearby_streets_count": 4,
         "nearby_streets": [
@@ -772,7 +330,7 @@
           "RUA ALTO DAS CAMPINAS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -785,189 +343,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 24,
-        "rank": 24,
-        "name": "Jereissati Setor E - Maracanaú",
-        "bairro": "MARACANAÚ",
-        "municipality": "Maracanaú",
-        "faction": "CV",
-        "risk_score": 55.497,
-        "score": 55.497,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.828,
-        "nearby_streets_count": 23,
-        "nearby_streets": [
-          "JEREISSATI SETOR E - MARACANAÚ",
-          "BOA VISTA - MARACANAÚ",
-          "JEREISSATI SETOR H - PACATUBA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.619134352941174,
-          -3.887311470588235
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 25,
-        "rank": 25,
-        "name": "Passarela",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 55.163,
-        "score": 55.163,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.599,
-        "nearby_streets_count": 22,
-        "nearby_streets": [
-          "PASSARELA",
-          "RUA DO TRILHO",
-          "FAVELA DA LAGOA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.62390864516128,
-          -3.8811986774193548
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 26,
-        "rank": 26,
-        "name": "Comunidade do Prourb",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 55.162,
-        "score": 55.162,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.742,
-        "nearby_streets_count": 21,
-        "nearby_streets": [
-          "COMUNIDADE DO PROURB",
-          "CONDOMÍNIO DA PALMEIRINHA",
-          "MORORÓ"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.67169216666666,
-          -3.885003133333333
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 27,
-        "rank": 27,
-        "name": "Jereissati Setor G - Pacatuba",
-        "bairro": "MARACANAÚ",
-        "municipality": "Pacatuba",
-        "faction": "CV",
-        "risk_score": 54.952,
-        "score": 54.952,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.406,
-        "nearby_streets_count": 23,
-        "nearby_streets": [
-          "JEREISSATI SETOR G - PACATUBA",
-          "RESIDENCIAL PACATUBA 2",
-          "CAMPOS DO JORDÃO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.60721523529413,
-          -3.8852174117647063
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 28,
-        "rank": 28,
-        "name": "Piratininga",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 54.89,
-        "score": 54.89,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.229,
-        "nearby_streets_count": 20,
-        "nearby_streets": [
-          "PIRATININGA",
-          "COQUEIRAL - MARACANAÚ",
-          "RUA ARI LOBO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.62739308333334,
-          -3.869460666666667
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 29,
-        "rank": 29,
+        "node_id": 11,
+        "rank": 11,
         "name": "Boqueirão- Caucaia",
         "bairro": "CAUCAIA",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 54.868,
-        "score": 54.868,
+        "risk_score": 78.772,
+        "score": 78.772,
         "region": "rmf",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 1.964,
         "nearby_streets_count": 3,
         "nearby_streets": [
@@ -976,7 +364,7 @@
           "RUA MANOEL RODRIGUES DE LIMA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -989,19 +377,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 30,
-        "rank": 30,
+        "node_id": 12,
+        "rank": 12,
         "name": "Cipó - Caucaia",
         "bairro": "PARQUE SOLEDADE",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 54.764,
-        "score": 54.764,
+        "risk_score": 78.668,
+        "score": 78.668,
         "region": "rmf",
         "parent_area": "PARQUE SOLEDADE",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 1.993,
         "nearby_streets_count": 4,
         "nearby_streets": [
@@ -1010,7 +398,7 @@
           "RUA JOSÉ ALVES BEZERRA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -1023,189 +411,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 31,
-        "rank": 31,
-        "name": "Residencial Pacatuba 1",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 54.709,
-        "score": 54.709,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.628,
-        "nearby_streets_count": 19,
-        "nearby_streets": [
-          "RESIDENCIAL PACATUBA 1",
-          "RESIDENCIAL PACATUBA 2",
-          "JEREISSATI SETOR F - PACATUBA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.60664216666667,
-          -3.8910968333333336
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 32,
-        "rank": 32,
-        "name": "Alta Delta",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 54.671,
-        "score": 54.671,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.36,
-        "nearby_streets_count": 15,
-        "nearby_streets": [
-          "ALTA DELTA",
-          "RUA MANOEL NUNES DO NASCIMENTO",
-          "RUA MUNDINHO CARLOS"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.691858624999995,
-          -3.920908125
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 33,
-        "rank": 33,
-        "name": "Residencial Pacatuba 2",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 54.548,
-        "score": 54.548,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.544,
-        "nearby_streets_count": 18,
-        "nearby_streets": [
-          "RESIDENCIAL PACATUBA 2",
-          "RESIDENCIAL PACATUBA 1",
-          "JEREISSATI SETOR G - PACATUBA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.606330428571425,
-          -3.890242
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 34,
-        "rank": 34,
-        "name": "Santos Dumont",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 54.488,
-        "score": 54.488,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.217,
-        "nearby_streets_count": 19,
-        "nearby_streets": [
-          "SANTOS DUMONT",
-          "RUA GUIOMAR CÂMARA",
-          "RUA VALDECY SOUSA DE OLIVEIRA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.687354595238105,
-          -3.9059278095238095
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 35,
-        "rank": 35,
-        "name": "Planalto Benjamin",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 54.275,
-        "score": 54.275,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.191,
-        "nearby_streets_count": 21,
-        "nearby_streets": [
-          "PLANALTO BENJAMIN",
-          "VILA DAS FLORES",
-          "AVENIDA XVII"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.61897728571429,
-          -3.893911428571429
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 36,
-        "rank": 36,
+        "node_id": 13,
+        "rank": 13,
         "name": "Alto da Raposa",
         "bairro": "CAUCAIA",
         "municipality": "CAUCAIA",
         "faction": "CV",
-        "risk_score": 54.22,
-        "score": 54.22,
+        "risk_score": 78.124,
+        "score": 78.124,
         "region": "rmf",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 1.9,
         "nearby_streets_count": 3,
         "nearby_streets": [
@@ -1214,7 +432,7 @@
           "CAMARÁ"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -1227,19 +445,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 37,
-        "rank": 37,
+        "node_id": 14,
+        "rank": 14,
         "name": "Alto do Garrote - Caucaia",
         "bairro": "PARQUE SOLEDADE",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 54.212,
-        "score": 54.212,
+        "risk_score": 78.116,
+        "score": 78.116,
         "region": "rmf",
         "parent_area": "PARQUE SOLEDADE",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 1.715,
         "nearby_streets_count": 3,
         "nearby_streets": [
@@ -1248,7 +466,7 @@
           "RUA ZEZITO PONTES"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -1261,19 +479,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 38,
-        "rank": 38,
+        "node_id": 15,
+        "rank": 15,
         "name": "JARANDRAGOEIRA",
         "bairro": "CAUCAIA",
         "municipality": "CAUCAIA",
         "faction": "CV",
-        "risk_score": 54.191,
-        "score": 54.191,
+        "risk_score": 78.095,
+        "score": 78.095,
         "region": "rmf",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 1.683,
         "nearby_streets_count": 2,
         "nearby_streets": [
@@ -1281,7 +499,7 @@
           "POVOADO JARANDRAGOEIRA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -1294,19 +512,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 39,
-        "rank": 39,
+        "node_id": 16,
+        "rank": 16,
         "name": "Arianópolis - Caucaia",
         "bairro": "URUCUTUBA",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 54.172,
-        "score": 54.172,
+        "risk_score": 78.076,
+        "score": 78.076,
         "region": "rmf",
         "parent_area": "URUCUTUBA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 0.707,
         "nearby_streets_count": 2,
         "nearby_streets": [
@@ -1314,7 +532,7 @@
           "COMUNIDADE DA VACARIA - ARATURI"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -1327,128 +545,26 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 40,
-        "rank": 40,
-        "name": "Coqueiral - Maracanaú",
-        "bairro": "MARACANAÚ",
-        "municipality": "Maracanaú",
-        "faction": "CV",
-        "risk_score": 54.169,
-        "score": 54.169,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.09,
-        "nearby_streets_count": 17,
-        "nearby_streets": [
-          "COQUEIRAL - MARACANAÚ",
-          "RUA CINCO",
-          "RUA ARI LOBO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.626063411764704,
-          -3.8662988235294127
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 41,
-        "rank": 41,
-        "name": "Boa Vista - Maracanaú",
-        "bairro": "MARACANAÚ",
-        "municipality": "Maracanaú",
-        "faction": "CV",
-        "risk_score": 54.105,
-        "score": 54.105,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.239,
-        "nearby_streets_count": 21,
-        "nearby_streets": [
-          "BOA VISTA - MARACANAÚ",
-          "ESTAÇÃO - BOA VISTA",
-          "JEREISSATI SETOR E - MARACANAÚ"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.623106285714286,
-          -3.8887884285714276
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 42,
-        "rank": 42,
-        "name": "Favela Da Lagoa",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 54.083,
-        "score": 54.083,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.284,
-        "nearby_streets_count": 20,
-        "nearby_streets": [
-          "FAVELA DA LAGOA",
-          "RUA DO TRILHO",
-          "AREA SEM NOME"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.626757722222216,
-          -3.876714611111111
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 43,
-        "rank": 43,
+        "node_id": 17,
+        "rank": 17,
         "name": "Mangabeira- Caucaia",
         "bairro": "CAUCAIA",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 54.081,
-        "score": 54.081,
+        "risk_score": 77.985,
+        "score": 77.985,
         "region": "rmf",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 0.488,
         "nearby_streets_count": 1,
         "nearby_streets": [
           "MANGABEIRA- CAUCAIA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -1461,19 +577,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 44,
-        "rank": 44,
+        "node_id": 18,
+        "rank": 18,
         "name": "Campo do Urubu - Caucaia",
         "bairro": "PARQUE SOLEDADE",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 54.066,
-        "score": 54.066,
+        "risk_score": 77.97,
+        "score": 77.97,
         "region": "rmf",
         "parent_area": "PARQUE SOLEDADE",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 1.789,
         "nearby_streets_count": 4,
         "nearby_streets": [
@@ -1482,7 +598,7 @@
           "RUA JOAO DE SALES FILHO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -1495,53 +611,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 45,
-        "rank": 45,
-        "name": "Ouro preto",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 54.017,
-        "score": 54.017,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 6.235,
-        "nearby_streets_count": 20,
-        "nearby_streets": [
-          "OURO PRETO",
-          "JEREISSATI SETOR A - MARACANAÚ",
-          "NOVO MARACANAÚ"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.621796791666675,
-          -3.8714770416666666
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 46,
-        "rank": 46,
+        "node_id": 19,
+        "rank": 19,
         "name": "Camará",
         "bairro": "CAUCAIA",
         "municipality": "CAUCAIA",
         "faction": "CV",
-        "risk_score": 53.976,
-        "score": 53.976,
+        "risk_score": 77.88,
+        "score": 77.88,
         "region": "rmf",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 0.825,
         "nearby_streets_count": 2,
         "nearby_streets": [
@@ -1549,7 +631,7 @@
           "ALTO DA RAPOSA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -1562,121 +644,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 47,
-        "rank": 47,
-        "name": "Jereissati Setor F - Pacatuba",
-        "bairro": "MARACANAÚ",
-        "municipality": "Pacatuba",
-        "faction": "CV",
-        "risk_score": 53.962,
-        "score": 53.962,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 5.807,
-        "nearby_streets_count": 19,
-        "nearby_streets": [
-          "JEREISSATI SETOR F - PACATUBA",
-          "RESIDENCIAL PACATUBA 1",
-          "RESIDENCIAL PACATUBA 2"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.609832,
-          -3.8931822857142855
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 48,
-        "rank": 48,
-        "name": "Timbó",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 53.836,
-        "score": 53.836,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 5.473,
-        "nearby_streets_count": 19,
-        "nearby_streets": [
-          "RUA 125",
-          "TIMBÓ",
-          "JEREISSATI SETOR C - MARACANAÚ"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.60467241176471,
-          -3.8787646764705888
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 49,
-        "rank": 49,
-        "name": "Jereissati Setor A - Maracanaú",
-        "bairro": "MARACANAÚ",
-        "municipality": "Maracanaú",
-        "faction": "CV",
-        "risk_score": 53.782,
-        "score": 53.782,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 5.721,
-        "nearby_streets_count": 20,
-        "nearby_streets": [
-          "JEREISSATI SETOR A - MARACANAÚ",
-          "OURO PRETO",
-          "FAVELA DA LAGOA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.620903479999996,
-          -3.87406864
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 50,
-        "rank": 50,
+        "node_id": 20,
+        "rank": 20,
         "name": "Comunidade Madureira - Caucaia",
         "bairro": "PARQUE SOLEDADE",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 53.499,
-        "score": 53.499,
+        "risk_score": 77.403,
+        "score": 77.403,
         "region": "rmf",
         "parent_area": "PARQUE SOLEDADE",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 1.548,
         "nearby_streets_count": 3,
         "nearby_streets": [
@@ -1685,7 +665,7 @@
           "RUA ITAMBE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -1698,53 +678,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 51,
-        "rank": 51,
-        "name": "Alto da Mangueira - Maracanaú",
-        "bairro": "MARACANAÚ",
-        "municipality": "Maracanaú",
-        "faction": "CV",
-        "risk_score": 53.474,
-        "score": 53.474,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 5.501,
-        "nearby_streets_count": 18,
-        "nearby_streets": [
-          "ALTO DA MANGUEIRA - MARACANAÚ",
-          "RUA LUIS GIRÃO",
-          "COLÔNIA - (EM DISPUTA)"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.62994783333333,
-          -3.8872123333333337
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 52,
-        "rank": 52,
+        "node_id": 21,
+        "rank": 21,
         "name": "Mingau ll",
         "bairro": "CAUCAIA",
         "municipality": "CAUCAIA",
         "faction": "CV",
-        "risk_score": 53.363,
-        "score": 53.363,
+        "risk_score": 77.267,
+        "score": 77.267,
         "region": "rmf",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 1.211,
         "nearby_streets_count": 2,
         "nearby_streets": [
@@ -1752,7 +698,7 @@
           "MINGAU - CAUCAIA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -1765,26 +711,26 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 53,
-        "rank": 53,
+        "node_id": 22,
+        "rank": 22,
         "name": "Santa Rosa- Caucaia",
         "bairro": "CAUCAIA",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 53.352,
-        "score": 53.352,
+        "risk_score": 77.256,
+        "score": 77.256,
         "region": "rmf",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 1.161,
         "nearby_streets_count": 1,
         "nearby_streets": [
           "SANTA ROSA- CAUCAIA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -1797,53 +743,19 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 54,
-        "rank": 54,
-        "name": "Campo do Palmeiras",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 53.189,
-        "score": 53.189,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 5.544,
-        "nearby_streets_count": 15,
-        "nearby_streets": [
-          "CAMPO DO PALMEIRAS",
-          "CONDOMÍNIO DA PALMEIRINHA",
-          "ILHA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.6711151,
-          -3.88047445
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 55,
-        "rank": 55,
+        "node_id": 23,
+        "rank": 23,
         "name": "Parque Veraneio - Caucaia",
         "bairro": "IPARANA",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 53.108,
-        "score": 53.108,
+        "risk_score": 77.012,
+        "score": 77.012,
         "region": "rmf",
         "parent_area": "IPARANA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 1.314,
         "nearby_streets_count": 2,
         "nearby_streets": [
@@ -1851,7 +763,7 @@
           "CONDOMÍNIO SÃO PAULO E SÃO PEDRO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -1864,94 +776,26 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 56,
-        "rank": 56,
-        "name": "Condomínio da Santa",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 53.096,
-        "score": 53.096,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 5.821,
-        "nearby_streets_count": 17,
-        "nearby_streets": [
-          "CONDOMÍNIO DA SANTA",
-          "RUA GONÇALO CÂNDIDO",
-          "RUA LOTEAMENTO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.67920781818182,
-          -3.874911727272728
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 57,
-        "rank": 57,
-        "name": "Residencial Dummar 1",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 52.925,
-        "score": 52.925,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 5.743,
-        "nearby_streets_count": 15,
-        "nearby_streets": [
-          "RESIDENCIAL DUMMAR 1",
-          "RESIDENCIAL DUMMAR 2",
-          "RESIDENCIAL DUMMAR 3"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.598757000000006,
-          -3.8808097777777775
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 58,
-        "rank": 58,
+        "node_id": 24,
+        "rank": 24,
         "name": "Boqueirão - Caucaia",
         "bairro": "CAUCAIA",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 52.921,
-        "score": 52.921,
+        "risk_score": 76.825,
+        "score": 76.825,
         "region": "rmf",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 1.226,
         "nearby_streets_count": 1,
         "nearby_streets": [
           "BOQUEIRÃO - CAUCAIA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -1964,94 +808,26 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 59,
-        "rank": 59,
-        "name": "Condomínio da Palmeirinha",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 52.701,
-        "score": 52.701,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 5.585,
-        "nearby_streets_count": 14,
-        "nearby_streets": [
-          "CONDOMÍNIO DA PALMEIRINHA",
-          "ILHA",
-          "COMUNIDADE DO PROURB"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.669548500000005,
-          -3.8824635
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 60,
-        "rank": 60,
-        "name": "Vila das Flores",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 52.654,
-        "score": 52.654,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 5.333,
-        "nearby_streets_count": 18,
-        "nearby_streets": [
-          "VILA DAS FLORES",
-          "PLANALTO BENJAMIN",
-          "PLANALTO VERDE"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.62182189285715,
-          -3.8962576428571425
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 61,
-        "rank": 61,
+        "node_id": 25,
+        "rank": 25,
         "name": "Tucunduba",
         "bairro": "CAUCAIA",
         "municipality": "CAUCAIA",
         "faction": "CV",
-        "risk_score": 52.643,
-        "score": 52.643,
+        "risk_score": 76.547,
+        "score": 76.547,
         "region": "rmf",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 0.984,
         "nearby_streets_count": 1,
         "nearby_streets": [
           "TUCUNDUBA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -2064,26 +840,26 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 62,
-        "rank": 62,
+        "node_id": 26,
+        "rank": 26,
         "name": "Distrito de Bolso",
         "bairro": "CAUCAIA",
         "municipality": "CAUCAIA",
         "faction": "CV",
-        "risk_score": 52.64,
-        "score": 52.64,
+        "risk_score": 76.544,
+        "score": 76.544,
         "region": "rmf",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 0.554,
         "nearby_streets_count": 1,
         "nearby_streets": [
           "DISTRITO DE BOLSO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -2096,60 +872,26 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 63,
-        "rank": 63,
-        "name": "Jereissati Setor B - Maracanaú",
-        "bairro": "MARACANAÚ",
-        "municipality": "Maracanaú",
-        "faction": "CV",
-        "risk_score": 52.62,
-        "score": 52.62,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 5.35,
-        "nearby_streets_count": 21,
-        "nearby_streets": [
-          "JEREISSATI SETOR B - MARACANAÚ",
-          "JEREISSATI SETOR C - MARACANAÚ",
-          "JEREISSATI SETOR A - MARACANAÚ"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.613721125,
-          -3.876170125
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 64,
-        "rank": 64,
+        "node_id": 27,
+        "rank": 27,
         "name": "Toco- Caucaia",
         "bairro": "URUCUTUBA",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 52.525,
-        "score": 52.525,
+        "risk_score": 76.429,
+        "score": 76.429,
         "region": "rmf",
         "parent_area": "URUCUTUBA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 0.308,
         "nearby_streets_count": 1,
         "nearby_streets": [
           "TOCO- CAUCAIA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -2162,26 +904,26 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 65,
-        "rank": 65,
+        "node_id": 28,
+        "rank": 28,
         "name": "Língua da Cobra",
         "bairro": "CAUCAIA",
         "municipality": "CAUCAIA",
         "faction": "CV",
-        "risk_score": 52.299,
-        "score": 52.299,
+        "risk_score": 76.203,
+        "score": 76.203,
         "region": "rmf",
         "parent_area": "CAUCAIA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 0.766,
         "nearby_streets_count": 1,
         "nearby_streets": [
           "LÍNGUA DA COBRA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -2194,26 +936,26 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 66,
-        "rank": 66,
+        "node_id": 29,
+        "rank": 29,
         "name": "Carrapicho- Caucaia",
         "bairro": "URUCUTUBA",
         "municipality": "Caucaia",
         "faction": "CV",
-        "risk_score": 52.292,
-        "score": 52.292,
+        "risk_score": 76.196,
+        "score": 76.196,
         "region": "rmf",
         "parent_area": "URUCUTUBA",
-        "parent_risk_score": 65.3,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
         "local_street_pressure": 0.625,
         "nearby_streets_count": 1,
         "nearby_streets": [
           "CARRAPICHO- CAUCAIA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.901924"
       },
       "geometry": {
         "type": "Point",
@@ -2226,17 +968,1307 @@
     {
       "type": "Feature",
       "properties": {
+        "node_id": 30,
+        "rank": 30,
+        "name": "Bom Jesus - Caucaia",
+        "bairro": "PARQUE SOLEDADE",
+        "municipality": "Caucaia",
+        "faction": "CV",
+        "risk_score": 75.567,
+        "score": 75.567,
+        "region": "rmf",
+        "parent_area": "PARQUE SOLEDADE",
+        "parent_risk_score": 98.5,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 0.522,
+        "nearby_streets_count": 1,
+        "nearby_streets": [
+          "BOM JESUS - CAUCAIA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.67954290909092,
+          -3.714925909090909
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 31,
+        "rank": 31,
+        "name": "Rodoviária - Maranguape",
+        "bairro": "MARACANAÚ",
+        "municipality": "Maranguape",
+        "faction": "CV",
+        "risk_score": 62.125,
+        "score": 62.125,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 8.882,
+        "nearby_streets_count": 28,
+        "nearby_streets": [
+          "RODOVIÁRIA - MARANGUAPE",
+          "RUA CHICÓ ANÍSIO",
+          "TANGUEIRA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.680890857142856,
+          -3.8962617857142847
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 32,
+        "rank": 32,
+        "name": "Guabiraba",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 61.472,
+        "score": 61.472,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 8.46,
+        "nearby_streets_count": 22,
+        "nearby_streets": [
+          "GUABIRABA",
+          "RUA ENÓI DE ABREU BRAGA",
+          "BECO DO BURACO - VILA SÃO JOSÉ - ALTO DO CAJUEIRO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.688817368421056,
+          -3.8961198947368425
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 33,
+        "rank": 33,
+        "name": "Mororó",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 61.383,
+        "score": 61.383,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 8.553,
+        "nearby_streets_count": 22,
+        "nearby_streets": [
+          "MORORÓ",
+          "RUA RAIMUNDO JUSTINI DE MORAIS",
+          "RUA MARIA ESTRELA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.67521514285715,
+          -3.886540071428571
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 34,
+        "rank": 34,
+        "name": "Alto Cemitério",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 61.26,
+        "score": 61.26,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 8.466,
+        "nearby_streets_count": 27,
+        "nearby_streets": [
+          "ALTO CEMITÉRIO",
+          "RUA CHICÓ AMADOR",
+          "RUA RAIMUNDO HERBSTER"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.685423351351346,
+          -3.887221891891892
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 35,
+        "rank": 35,
+        "name": "Outra Banda",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 60.162,
+        "score": 60.162,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 7.747,
+        "nearby_streets_count": 24,
+        "nearby_streets": [
+          "OUTRA BANDA",
+          "RUA GONTRAN NASCIMENTO",
+          "RUA DOUTOR ARGEU BRAGA HERBSTER"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.679789529411764,
+          -3.8816516960784324
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 36,
+        "rank": 36,
+        "name": "Jereissati Setor D - Maracanaú",
+        "bairro": "MARACANAÚ",
+        "municipality": "Maracanaú",
+        "faction": "CV",
+        "risk_score": 59.824,
+        "score": 59.824,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 7.12,
+        "nearby_streets_count": 26,
+        "nearby_streets": [
+          "JEREISSATI SETOR D - MARACANAÚ",
+          "JEREISSATI SETOR E - MARACANAÚ",
+          "JEREISSATI SETOR A - MARACANAÚ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.618326520000004,
+          -3.8813451199999998
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 37,
+        "rank": 37,
+        "name": "Rua do trilho",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 59.579,
+        "score": 59.579,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 7.681,
+        "nearby_streets_count": 25,
+        "nearby_streets": [
+          "RUA DO TRILHO",
+          "PASSARELA",
+          "FAVELA DA LAGOA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.62686676923076,
+          -3.881599692307692
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 38,
+        "rank": 38,
+        "name": "Parque São João",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 59.366,
+        "score": 59.366,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 7.502,
+        "nearby_streets_count": 22,
+        "nearby_streets": [
+          "PARQUE SÃO JOÃO",
+          "RUA CÔNEGO HEITOR VIÊIRA CAVALCANTE",
+          "TANGUEIRA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.67814661111111,
+          -3.9002411666666665
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 39,
+        "rank": 39,
+        "name": "Parque Santa Fé",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 59.354,
+        "score": 59.354,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 7.324,
+        "nearby_streets_count": 21,
+        "nearby_streets": [
+          "PARQUE SANTA FÉ",
+          "TRAVESSA VALTER PIMENTA LÍRA",
+          "RUA AGOSTINHO FERNANDES"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.685771823529414,
+          -3.899302823529411
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 40,
+        "rank": 40,
+        "name": "Jereissati Setor H - Pacatuba",
+        "bairro": "MARACANAÚ",
+        "municipality": "Pacatuba",
+        "faction": "CV",
+        "risk_score": 58.981,
+        "score": 58.981,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 6.626,
+        "nearby_streets_count": 21,
+        "nearby_streets": [
+          "JEREISSATI SETOR H - PACATUBA",
+          "AVENIDA XVII",
+          "JEREISSATI SETOR E - MARACANAÚ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.614602777777776,
+          -3.8890546296296313
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 41,
+        "rank": 41,
+        "name": "Coité",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 58.948,
+        "score": 58.948,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 7.316,
+        "nearby_streets_count": 18,
+        "nearby_streets": [
+          "COITÉ",
+          "RUA MANOEL QUEIRÓS DE OLIVEIRA",
+          "RUA OLÍMPIO MIGUEL DOS SANTOS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.67582890625,
+          -3.907433
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 42,
+        "rank": 42,
+        "name": "Tangueira",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 58.821,
+        "score": 58.821,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 7.215,
+        "nearby_streets_count": 22,
+        "nearby_streets": [
+          "TANGUEIRA",
+          "PARQUE SÃO JOÃO",
+          "RUA RAIMUNDO BONIFÁCIO DA SILVA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.677139933333336,
+          -3.896820333333333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 43,
+        "rank": 43,
+        "name": "Passarela",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 58.445,
+        "score": 58.445,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 6.868,
+        "nearby_streets_count": 23,
+        "nearby_streets": [
+          "PASSARELA",
+          "RUA DO TRILHO",
+          "FAVELA DA LAGOA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.62390864516128,
+          -3.8811986774193548
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 44,
+        "rank": 44,
+        "name": "Jereissati Setor C - Maracanaú",
+        "bairro": "MARACANAÚ",
+        "municipality": "Maracanaú",
+        "faction": "CV",
+        "risk_score": 58.307,
+        "score": 58.307,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 6.716,
+        "nearby_streets_count": 24,
+        "nearby_streets": [
+          "JEREISSATI SETOR C - MARACANAÚ",
+          "RUA 31",
+          "JEREISSATI SETOR B - MARACANAÚ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.610529,
+          -3.880414538461539
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 45,
+        "rank": 45,
+        "name": "Jereissati Setor E - Maracanaú",
+        "bairro": "MARACANAÚ",
+        "municipality": "Maracanaú",
+        "faction": "CV",
+        "risk_score": 58.233,
+        "score": 58.233,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 6.828,
+        "nearby_streets_count": 23,
+        "nearby_streets": [
+          "JEREISSATI SETOR E - MARACANAÚ",
+          "BOA VISTA - MARACANAÚ",
+          "JEREISSATI SETOR H - PACATUBA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.619134352941174,
+          -3.887311470588235
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 46,
+        "rank": 46,
+        "name": "Piratininga",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 58.109,
+        "score": 58.109,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 6.467,
+        "nearby_streets_count": 20,
+        "nearby_streets": [
+          "PIRATININGA",
+          "COQUEIRAL - MARACANAÚ",
+          "RUA 15"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.62739308333334,
+          -3.869460666666667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 47,
+        "rank": 47,
+        "name": "Comunidade do Prourb",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 57.898,
+        "score": 57.898,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 6.742,
+        "nearby_streets_count": 21,
+        "nearby_streets": [
+          "COMUNIDADE DO PROURB",
+          "CONDOMÍNIO DA PALMEIRINHA",
+          "MORORÓ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.67169216666666,
+          -3.885003133333333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 48,
+        "rank": 48,
+        "name": "Jereissati Setor G - Pacatuba",
+        "bairro": "MARACANAÚ",
+        "municipality": "Pacatuba",
+        "faction": "CV",
+        "risk_score": 57.688,
+        "score": 57.688,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 6.406,
+        "nearby_streets_count": 23,
+        "nearby_streets": [
+          "JEREISSATI SETOR G - PACATUBA",
+          "RESIDENCIAL PACATUBA 2",
+          "CAMPOS DO JORDÃO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.60721523529413,
+          -3.8852174117647063
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 49,
+        "rank": 49,
+        "name": "Residencial Pacatuba 1",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 57.445,
+        "score": 57.445,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 6.628,
+        "nearby_streets_count": 19,
+        "nearby_streets": [
+          "RESIDENCIAL PACATUBA 1",
+          "RESIDENCIAL PACATUBA 2",
+          "JEREISSATI SETOR F - PACATUBA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.60664216666667,
+          -3.8910968333333336
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 50,
+        "rank": 50,
+        "name": "Favela Da Lagoa",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 57.365,
+        "score": 57.365,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 6.553,
+        "nearby_streets_count": 20,
+        "nearby_streets": [
+          "FAVELA DA LAGOA",
+          "RUA 15",
+          "RUA DO TRILHO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.626757722222216,
+          -3.876714611111111
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 51,
+        "rank": 51,
+        "name": "Alta Delta",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 57.351,
+        "score": 57.351,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 6.333,
+        "nearby_streets_count": 15,
+        "nearby_streets": [
+          "ALTA DELTA",
+          "RUA MANOEL NUNES DO NASCIMENTO",
+          "RUA MUNDINHO CARLOS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.691858624999995,
+          -3.920908125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 52,
+        "rank": 52,
+        "name": "Ouro preto",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 57.344,
+        "score": 57.344,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 6.527,
+        "nearby_streets_count": 20,
+        "nearby_streets": [
+          "OURO PRETO",
+          "RUA 15",
+          "JEREISSATI SETOR A - MARACANAÚ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.621796791666675,
+          -3.8714770416666666
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 53,
+        "rank": 53,
+        "name": "Residencial Pacatuba 2",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 57.284,
+        "score": 57.284,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 6.544,
+        "nearby_streets_count": 18,
+        "nearby_streets": [
+          "RESIDENCIAL PACATUBA 2",
+          "RESIDENCIAL PACATUBA 1",
+          "JEREISSATI SETOR G - PACATUBA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.901924"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.606330428571425,
+          -3.890242
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 54,
+        "rank": 54,
+        "name": "Santos Dumont",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 57.224,
+        "score": 57.224,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 6.217,
+        "nearby_streets_count": 19,
+        "nearby_streets": [
+          "SANTOS DUMONT",
+          "RUA GUIOMAR CÂMARA",
+          "RUA VALDECY SOUSA DE OLIVEIRA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.687354595238105,
+          -3.9059278095238095
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 55,
+        "rank": 55,
+        "name": "Jereissati Setor A - Maracanaú",
+        "bairro": "MARACANAÚ",
+        "municipality": "Maracanaú",
+        "faction": "CV",
+        "risk_score": 57.015,
+        "score": 57.015,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 5.966,
+        "nearby_streets_count": 20,
+        "nearby_streets": [
+          "JEREISSATI SETOR A - MARACANAÚ",
+          "OURO PRETO",
+          "RUA 15"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.620903479999996,
+          -3.87406864
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 56,
+        "rank": 56,
+        "name": "Planalto Benjamin",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 57.011,
+        "score": 57.011,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 6.191,
+        "nearby_streets_count": 21,
+        "nearby_streets": [
+          "PLANALTO BENJAMIN",
+          "VILA DAS FLORES",
+          "AVENIDA XVII"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.61897728571429,
+          -3.893911428571429
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 57,
+        "rank": 57,
+        "name": "Boa Vista - Maracanaú",
+        "bairro": "MARACANAÚ",
+        "municipality": "Maracanaú",
+        "faction": "CV",
+        "risk_score": 56.841,
+        "score": 56.841,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 6.239,
+        "nearby_streets_count": 21,
+        "nearby_streets": [
+          "BOA VISTA - MARACANAÚ",
+          "ESTAÇÃO - BOA VISTA",
+          "JEREISSATI SETOR E - MARACANAÚ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.623106285714286,
+          -3.8887884285714276
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 58,
+        "rank": 58,
+        "name": "Coqueiral - Maracanaú",
+        "bairro": "MARACANAÚ",
+        "municipality": "Maracanaú",
+        "faction": "CV",
+        "risk_score": 56.81,
+        "score": 56.81,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 6.043,
+        "nearby_streets_count": 17,
+        "nearby_streets": [
+          "COQUEIRAL - MARACANAÚ",
+          "RUA CINCO",
+          "RUA ARI LOBO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.626063411764704,
+          -3.8662988235294127
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 59,
+        "rank": 59,
+        "name": "Jereissati Setor F - Pacatuba",
+        "bairro": "MARACANAÚ",
+        "municipality": "Pacatuba",
+        "faction": "CV",
+        "risk_score": 56.698,
+        "score": 56.698,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 5.807,
+        "nearby_streets_count": 19,
+        "nearby_streets": [
+          "JEREISSATI SETOR F - PACATUBA",
+          "RESIDENCIAL PACATUBA 1",
+          "RESIDENCIAL PACATUBA 2"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.609832,
+          -3.8931822857142855
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 60,
+        "rank": 60,
+        "name": "Timbó",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 56.572,
+        "score": 56.572,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 5.473,
+        "nearby_streets_count": 19,
+        "nearby_streets": [
+          "RUA 125",
+          "TIMBÓ",
+          "JEREISSATI SETOR C - MARACANAÚ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.60467241176471,
+          -3.8787646764705888
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 61,
+        "rank": 61,
+        "name": "Alto da Mangueira - Maracanaú",
+        "bairro": "MARACANAÚ",
+        "municipality": "Maracanaú",
+        "faction": "CV",
+        "risk_score": 56.554,
+        "score": 56.554,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 5.671,
+        "nearby_streets_count": 19,
+        "nearby_streets": [
+          "ALTO DA MANGUEIRA - MARACANAÚ",
+          "RUA LUIS GIRÃO",
+          "COLÔNIA - (EM DISPUTA)"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.62994783333333,
+          -3.8872123333333337
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 62,
+        "rank": 62,
+        "name": "Campo do Palmeiras",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 55.925,
+        "score": 55.925,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 5.544,
+        "nearby_streets_count": 15,
+        "nearby_streets": [
+          "CAMPO DO PALMEIRAS",
+          "CONDOMÍNIO DA PALMEIRINHA",
+          "ILHA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.6711151,
+          -3.88047445
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 63,
+        "rank": 63,
+        "name": "Condomínio da Santa",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 55.832,
+        "score": 55.832,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 5.821,
+        "nearby_streets_count": 17,
+        "nearby_streets": [
+          "CONDOMÍNIO DA SANTA",
+          "RUA GONÇALO CÂNDIDO",
+          "RUA LOTEAMENTO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.67920781818182,
+          -3.874911727272728
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 64,
+        "rank": 64,
+        "name": "Jereissati Setor B - Maracanaú",
+        "bairro": "MARACANAÚ",
+        "municipality": "Maracanaú",
+        "faction": "CV",
+        "risk_score": 55.78,
+        "score": 55.78,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 5.559,
+        "nearby_streets_count": 22,
+        "nearby_streets": [
+          "JEREISSATI SETOR B - MARACANAÚ",
+          "JEREISSATI SETOR C - MARACANAÚ",
+          "JEREISSATI SETOR A - MARACANAÚ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.613721125,
+          -3.876170125
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 65,
+        "rank": 65,
+        "name": "Residencial Dummar 1",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 55.661,
+        "score": 55.661,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 5.743,
+        "nearby_streets_count": 15,
+        "nearby_streets": [
+          "RESIDENCIAL DUMMAR 1",
+          "RESIDENCIAL DUMMAR 2",
+          "RESIDENCIAL DUMMAR 3"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.598757000000006,
+          -3.8808097777777775
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 66,
+        "rank": 66,
+        "name": "Condomínio da Palmeirinha",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 55.437,
+        "score": 55.437,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 5.585,
+        "nearby_streets_count": 14,
+        "nearby_streets": [
+          "CONDOMÍNIO DA PALMEIRINHA",
+          "ILHA",
+          "COMUNIDADE DO PROURB"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.669548500000005,
+          -3.8824635
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "node_id": 67,
         "rank": 67,
+        "name": "Vila das Flores",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
+        "faction": "CV",
+        "risk_score": 55.39,
+        "score": 55.39,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 5.333,
+        "nearby_streets_count": 18,
+        "nearby_streets": [
+          "VILA DAS FLORES",
+          "PLANALTO BENJAMIN",
+          "PLANALTO VERDE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.62182189285715,
+          -3.8962576428571425
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 68,
+        "rank": 68,
         "name": "Ilha",
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 52.28,
-        "score": 52.28,
+        "risk_score": 55.016,
+        "score": 55.016,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 5.401,
@@ -2247,7 +2279,7 @@
           "CAMPO DO PALMEIRAS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2260,17 +2292,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 68,
-        "rank": 68,
+        "node_id": 69,
+        "rank": 69,
         "name": "Área Seca",
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 52.257,
-        "score": 52.257,
+        "risk_score": 54.993,
+        "score": 54.993,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 5.075,
@@ -2281,7 +2313,7 @@
           "CIDADE DE DEUS - ÁREA SECA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2294,17 +2326,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 69,
-        "rank": 69,
+        "node_id": 70,
+        "rank": 70,
         "name": "Campos do Jordão",
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 52.171,
-        "score": 52.171,
+        "risk_score": 54.907,
+        "score": 54.907,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 5.196,
@@ -2315,7 +2347,7 @@
           "RESIDENCIAL PACATUBA 1"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2328,17 +2360,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 70,
-        "rank": 70,
+        "node_id": 71,
+        "rank": 71,
         "name": "Residencial Dummar 2",
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 52.017,
-        "score": 52.017,
+        "risk_score": 54.753,
+        "score": 54.753,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 5.297,
@@ -2349,7 +2381,7 @@
           "RESIDENCIAL DUMMAR 3"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2362,51 +2394,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 71,
-        "rank": 71,
-        "name": "Novo Maracanaú",
-        "bairro": "MARACANAÚ",
-        "municipality": "MARACANAU",
-        "faction": "CV",
-        "risk_score": 51.913,
-        "score": 51.913,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 4.845,
-        "nearby_streets_count": 15,
-        "nearby_streets": [
-          "NOVO MARACANAÚ",
-          "COQUEIRAL - MARACANAÚ",
-          "RUA CINCO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.62261466666667,
-          -3.8651738333333334
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "node_id": 72,
         "rank": 72,
         "name": "Pato Selvagem",
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 51.892,
-        "score": 51.892,
+        "risk_score": 54.628,
+        "score": 54.628,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 4.959,
@@ -2417,7 +2415,7 @@
           "RUA FLÔR DA ACÁCIA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2432,30 +2430,32 @@
       "properties": {
         "node_id": 73,
         "rank": 73,
-        "name": "Bom Jesus - Caucaia",
-        "bairro": "PARQUE SOLEDADE",
-        "municipality": "Caucaia",
+        "name": "Novo Maracanaú",
+        "bairro": "MARACANAÚ",
+        "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 51.663,
-        "score": 51.663,
+        "risk_score": 54.525,
+        "score": 54.525,
         "region": "rmf",
-        "parent_area": "PARQUE SOLEDADE",
-        "parent_risk_score": 65.3,
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
-        "local_street_pressure": 0.522,
-        "nearby_streets_count": 1,
+        "local_street_pressure": 4.784,
+        "nearby_streets_count": 15,
         "nearby_streets": [
-          "BOM JESUS - CAUCAIA"
+          "NOVO MARACANAÚ",
+          "COQUEIRAL - MARACANAÚ",
+          "RUA CINCO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.67954290909092,
-          -3.714925909090909
+          -38.62261466666667,
+          -3.8651738333333334
         ]
       }
     },
@@ -2468,11 +2468,11 @@
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 51.647,
-        "score": 51.647,
+        "risk_score": 54.383,
+        "score": 54.383,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 5.117,
@@ -2483,7 +2483,7 @@
           "RESIDENCIAL DUMMAR 1"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2502,11 +2502,11 @@
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 50.691,
-        "score": 50.691,
+        "risk_score": 53.427,
+        "score": 53.427,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 3.462,
@@ -2517,7 +2517,7 @@
           "COMUNIDADE DO PAU SERRADO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2536,11 +2536,11 @@
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 50.536,
-        "score": 50.536,
+        "risk_score": 53.272,
+        "score": 53.272,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 3.25,
@@ -2551,7 +2551,7 @@
           "RUA PADRE CÍCERO ROMÃO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2570,11 +2570,11 @@
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 49.645,
-        "score": 49.645,
+        "risk_score": 52.381,
+        "score": 52.381,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 3.891,
@@ -2585,7 +2585,7 @@
           "VILA DAS FLORES"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2604,14 +2604,14 @@
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 49.127,
-        "score": 49.127,
+        "risk_score": 51.775,
+        "score": 51.775,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
-        "local_street_pressure": 3.823,
+        "local_street_pressure": 3.779,
         "nearby_streets_count": 13,
         "nearby_streets": [
           "MARACANANZINHO",
@@ -2619,7 +2619,7 @@
           "PIRATININGA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2638,11 +2638,11 @@
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 49.031,
-        "score": 49.031,
+        "risk_score": 51.767,
+        "score": 51.767,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 3.787,
@@ -2653,7 +2653,7 @@
           "ALTA DELTA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2672,11 +2672,11 @@
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 48.956,
-        "score": 48.956,
+        "risk_score": 51.692,
+        "score": 51.692,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 3.603,
@@ -2687,7 +2687,7 @@
           "RUA PEDRO ALVES DA CUNHA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2706,11 +2706,11 @@
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 48.953,
-        "score": 48.953,
+        "risk_score": 51.689,
+        "score": 51.689,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 3.706,
@@ -2721,7 +2721,7 @@
           "LUZARDO VIANA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2736,49 +2736,15 @@
       "properties": {
         "node_id": 82,
         "rank": 82,
-        "name": "Residencial/Jabuti - Maracanaú",
-        "bairro": "MARACANAÚ",
-        "municipality": "Maracanaú",
-        "faction": "CV",
-        "risk_score": 48.636,
-        "score": 48.636,
-        "region": "rmf",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 2.862,
-        "nearby_streets_count": 9,
-        "nearby_streets": [
-          "RESIDENCIAL/JABUTI - MARACANAÚ",
-          "RESIDENCIAL LL",
-          "RUA 15"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.631274937499995,
-          -3.8572706875
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 83,
-        "rank": 83,
         "name": "Multirão - Maracanaú",
         "bairro": "MARACANAÚ",
         "municipality": "Maracanaú",
         "faction": "CV",
-        "risk_score": 48.592,
-        "score": 48.592,
+        "risk_score": 51.328,
+        "score": 51.328,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 3.583,
@@ -2789,7 +2755,7 @@
           "GRUTA - COLÔNIA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2802,17 +2768,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 84,
-        "rank": 84,
+        "node_id": 83,
+        "rank": 83,
         "name": "Quadras do Luzardo Viana",
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 48.564,
-        "score": 48.564,
+        "risk_score": 51.3,
+        "score": 51.3,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 3.546,
@@ -2823,7 +2789,7 @@
           "COMUNIDADE DO PAU SERRADO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2836,17 +2802,17 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 85,
-        "rank": 85,
+        "node_id": 84,
+        "rank": 84,
         "name": "Portelinha",
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 48.343,
-        "score": 48.343,
+        "risk_score": 51.079,
+        "score": 51.079,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 3.493,
@@ -2857,7 +2823,7 @@
           "RUA RAIMUNDO PACHÊCO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2870,17 +2836,51 @@
     {
       "type": "Feature",
       "properties": {
+        "node_id": 85,
+        "rank": 85,
+        "name": "Residencial/Jabuti - Maracanaú",
+        "bairro": "MARACANAÚ",
+        "municipality": "Maracanaú",
+        "faction": "CV",
+        "risk_score": 50.935,
+        "score": 50.935,
+        "region": "rmf",
+        "parent_area": "MARACANAÚ",
+        "parent_risk_score": 56.5,
+        "parent_risk_level": "alto",
+        "parent_status": "ALTO",
+        "local_street_pressure": 2.647,
+        "nearby_streets_count": 9,
+        "nearby_streets": [
+          "RESIDENCIAL/JABUTI - MARACANAÚ",
+          "RESIDENCIAL LL",
+          "RUA VINTE E UM"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.631274937499995,
+          -3.8572706875
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
         "node_id": 86,
         "rank": 86,
         "name": "Piraporã",
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 48.075,
-        "score": 48.075,
+        "risk_score": 50.811,
+        "score": 50.811,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 3.35,
@@ -2891,7 +2891,7 @@
           "VILA SÃO JOSÉ"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2910,11 +2910,11 @@
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 47.712,
-        "score": 47.712,
+        "risk_score": 50.448,
+        "score": 50.448,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 2.705,
@@ -2925,7 +2925,7 @@
           "PLANALTO VERDE"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2944,14 +2944,14 @@
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 47.688,
-        "score": 47.688,
+        "risk_score": 50.392,
+        "score": 50.392,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
-        "local_street_pressure": 3.161,
+        "local_street_pressure": 3.145,
         "nearby_streets_count": 8,
         "nearby_streets": [
           "SERRA PELADA",
@@ -2959,7 +2959,7 @@
           "ALTA DELTA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -2978,11 +2978,11 @@
         "bairro": "MARACANAÚ",
         "municipality": "Maracanaú",
         "faction": "CV",
-        "risk_score": 46.9,
-        "score": 46.9,
+        "risk_score": 49.636,
+        "score": 49.636,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 2.35,
@@ -2993,7 +2993,7 @@
           "PAPOCO - MUCUNÃ"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -3012,11 +3012,11 @@
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 45.946,
-        "score": 45.946,
+        "risk_score": 48.682,
+        "score": 48.682,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 1.362,
@@ -3027,7 +3027,7 @@
           "AVENIDA B"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -3046,11 +3046,11 @@
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 45.262,
-        "score": 45.262,
+        "risk_score": 47.998,
+        "score": 47.998,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 1.546,
@@ -3061,7 +3061,7 @@
           "HORTO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -3080,11 +3080,11 @@
         "bairro": "ALTO ALEGRE II",
         "municipality": "Maracanaú",
         "faction": "CV",
-        "risk_score": 44.67,
-        "score": 44.67,
+        "risk_score": 47.406,
+        "score": 47.406,
         "region": "rmf",
         "parent_area": "ALTO ALEGRE II",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 1.546,
@@ -3095,7 +3095,7 @@
           "AREA SEM NOME"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -3114,11 +3114,11 @@
         "bairro": "ALTO ALEGRE II",
         "municipality": "Maracanaú",
         "faction": "CV",
-        "risk_score": 44.153,
-        "score": 44.153,
+        "risk_score": 46.889,
+        "score": 46.889,
         "region": "rmf",
         "parent_area": "ALTO ALEGRE II",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 1.39,
@@ -3129,7 +3129,7 @@
           "FAVELA DO MAGALHÃES - JAÇANAÚ"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -3148,11 +3148,11 @@
         "bairro": "MARACANAÚ",
         "municipality": "MARACANAU",
         "faction": "CV",
-        "risk_score": 43.93,
-        "score": 43.93,
+        "risk_score": 46.666,
+        "score": 46.666,
         "region": "rmf",
         "parent_area": "MARACANAÚ",
-        "parent_risk_score": 52.7,
+        "parent_risk_score": 56.5,
         "parent_risk_level": "alto",
         "parent_status": "ALTO",
         "local_street_pressure": 1.17,
@@ -3163,7 +3163,7 @@
           "TV JOÃO FERREIRA DE ALENCAR 2"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -3178,15 +3178,151 @@
       "properties": {
         "node_id": 95,
         "rank": 95,
+        "name": "Jari - Maracanaú",
+        "bairro": "SIQUEIRA",
+        "municipality": "Maracanaú",
+        "faction": "CV",
+        "risk_score": 44.425,
+        "score": 44.425,
+        "region": "rmf",
+        "parent_area": "SIQUEIRA",
+        "parent_risk_score": 45.4,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 4.148,
+        "nearby_streets_count": 13,
+        "nearby_streets": [
+          "JARI - MARACANAÚ",
+          "JARI",
+          "PARQUE SÃO JOÃO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.630870125,
+          -3.8192313750000007
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 96,
+        "rank": 96,
+        "name": "Jari - Maracanaú",
+        "bairro": "SIQUEIRA",
+        "municipality": "Maracanaú",
+        "faction": "CV",
+        "risk_score": 42.846,
+        "score": 42.846,
+        "region": "rmf",
+        "parent_area": "SIQUEIRA",
+        "parent_risk_score": 45.4,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 3.033,
+        "nearby_streets_count": 11,
+        "nearby_streets": [
+          "BOM JESUS - MARACANAÚ",
+          "JARI - MARACANAÚ",
+          "JATOBÁ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.63578075757576,
+          -3.816102818181818
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 97,
+        "rank": 97,
+        "name": "Bom Jesus - Maracanaú",
+        "bairro": "SIQUEIRA",
+        "municipality": "Maracanaú",
+        "faction": "CV",
+        "risk_score": 42.749,
+        "score": 42.749,
+        "region": "rmf",
+        "parent_area": "SIQUEIRA",
+        "parent_risk_score": 45.4,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 3.286,
+        "nearby_streets_count": 11,
+        "nearby_streets": [
+          "BOM JESUS - MARACANAÚ",
+          "JATOBÁ",
+          "JARI - MARACANAÚ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.6372686875,
+          -3.814628625
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 98,
+        "rank": 98,
+        "name": "Amanari",
+        "bairro": "MARANGUAPE",
+        "municipality": "MARANGUAPE",
+        "faction": "CV",
+        "risk_score": 35.433,
+        "score": 35.433,
+        "region": "rmf",
+        "parent_area": "MARANGUAPE",
+        "parent_risk_score": 31.1,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 4.306,
+        "nearby_streets_count": 10,
+        "nearby_streets": [
+          "AMANARI",
+          "R. TEIXEIRA DE SOUSA",
+          "RUA ALZIRA SAMPAIO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.86824336842105,
+          -4.024119605263158
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 99,
+        "rank": 99,
         "name": "Granja",
         "bairro": "GRANJA",
         "municipality": "GRANJA LISBOA",
         "faction": "CV",
-        "risk_score": 38.983,
-        "score": 38.983,
+        "risk_score": 34.447,
+        "score": 34.447,
         "region": "rmf",
         "parent_area": "GRANJA",
-        "parent_risk_score": 44.3,
+        "parent_risk_score": 38.0,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
         "local_street_pressure": 1.292,
@@ -3197,7 +3333,7 @@
           "BANGUÊ I"
         ],
         "is_tactical": true,
-        "generated_at": "2026-07-24T16:50:20.660819"
+        "generated_at": "2026-07-31T16:30:54.903470"
       },
       "geometry": {
         "type": "Point",
@@ -3206,13 +3342,416 @@
           -4.190890470588236
         ]
       }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 100,
+        "rank": 100,
+        "name": "Ladeira Grande",
+        "bairro": "MARANGUAPE",
+        "municipality": "MARANGUAPE",
+        "faction": "CV",
+        "risk_score": 31.64,
+        "score": 31.64,
+        "region": "rmf",
+        "parent_area": "MARANGUAPE",
+        "parent_risk_score": 31.1,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.811,
+        "nearby_streets_count": 5,
+        "nearby_streets": [
+          "LADEIRA GRANDE",
+          "RUA RAIMUNDA XAVIER DE SOUSA",
+          "CE-065"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.707464363636355,
+          -3.9743006818181827
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 101,
+        "rank": 101,
+        "name": "São João do Amanari",
+        "bairro": "MARANGUAPE",
+        "municipality": "MARANGUAPE",
+        "faction": "CV",
+        "risk_score": 31.542,
+        "score": 31.542,
+        "region": "rmf",
+        "parent_area": "MARANGUAPE",
+        "parent_risk_score": 31.1,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.352,
+        "nearby_streets_count": 5,
+        "nearby_streets": [
+          "SÃO JOÃO DO AMANARI",
+          "RUA JOÃO TEIXEIRA JOCA",
+          "RUA CHAGAS VITORIANO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.88725178378378,
+          -4.019513148648647
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 102,
+        "rank": 102,
+        "name": "Papara",
+        "bairro": "MARANGUAPE",
+        "municipality": "MARANGUAPE",
+        "faction": "CV",
+        "risk_score": 31.441,
+        "score": 31.441,
+        "region": "rmf",
+        "parent_area": "MARANGUAPE",
+        "parent_risk_score": 31.1,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.022,
+        "nearby_streets_count": 4,
+        "nearby_streets": [
+          "PAPARA",
+          "RUA LEÔNCIO LEITE DE SOUSA",
+          "RUA VICENTINA HONÓRIO DE ABREU"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.72677949999999,
+          -3.990343493333333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 103,
+        "rank": 103,
+        "name": "Lagoa do Juvenal - Maranguape",
+        "bairro": "MARANGUAPE",
+        "municipality": "Maranguape",
+        "faction": "CV",
+        "risk_score": 30.632,
+        "score": 30.632,
+        "region": "rmf",
+        "parent_area": "MARANGUAPE",
+        "parent_risk_score": 31.1,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.085,
+        "nearby_streets_count": 4,
+        "nearby_streets": [
+          "LAGOA DO JUVENAL - MARANGUAPE",
+          "AVENIDA NOSSA SENHORA DO CARMO",
+          "RUA JOSÉ DE SOUSA ALBUQUERQUE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.97327075925927,
+          -4.026686407407407
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 104,
+        "rank": 104,
+        "name": "Comunidade da Babilônia",
+        "bairro": "MARANGUAPE",
+        "municipality": "MARANGUAPE",
+        "faction": "CV",
+        "risk_score": 30.309,
+        "score": 30.309,
+        "region": "rmf",
+        "parent_area": "MARANGUAPE",
+        "parent_risk_score": 31.1,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 2.209,
+        "nearby_streets_count": 4,
+        "nearby_streets": [
+          "COMUNIDADE DA BABILÔNIA",
+          "TRAVESSA ALTO DOS SANTOS REZES",
+          "AMANARI"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.87344256249999,
+          -4.0297299375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 105,
+        "rank": 105,
+        "name": "Papara - Maranguape",
+        "bairro": "MARANGUAPE",
+        "municipality": "Maranguape",
+        "faction": "CV",
+        "risk_score": 29.783,
+        "score": 29.783,
+        "region": "rmf",
+        "parent_area": "MARANGUAPE",
+        "parent_risk_score": 31.1,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.659,
+        "nearby_streets_count": 3,
+        "nearby_streets": [
+          "PAPARA - MARANGUAPE",
+          "RUA FRANCISCO ANTÔNIO DE LIMA",
+          "JOÃO LEITE - PAPARA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.745229679245284,
+          -4.024548735849057
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 106,
+        "rank": 106,
+        "name": "Vila Nova de Maranguape",
+        "bairro": "MARANGUAPE",
+        "municipality": "MARANGUAPE",
+        "faction": "CV",
+        "risk_score": 29.479,
+        "score": 29.479,
+        "region": "rmf",
+        "parent_area": "MARANGUAPE",
+        "parent_risk_score": 31.1,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.745,
+        "nearby_streets_count": 4,
+        "nearby_streets": [
+          "VILA NOVA DE MARANGUAPE",
+          "RUA JOSÉ SIMÃO DE ABREU",
+          "PAPARA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.71594311627906,
+          -3.987047162790698
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 107,
+        "rank": 107,
+        "name": "Boa Vista dos Vieiras",
+        "bairro": "MARANGUAPE",
+        "municipality": "MARANGUAPE",
+        "faction": "CV",
+        "risk_score": 29.161,
+        "score": 29.161,
+        "region": "rmf",
+        "parent_area": "MARANGUAPE",
+        "parent_risk_score": 31.1,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.668,
+        "nearby_streets_count": 2,
+        "nearby_streets": [
+          "BOA VISTA DOS VIEIRAS",
+          "RUA ESTRADA LAGES BOA VISTA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.718682,
+          -4.0214645
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 108,
+        "rank": 108,
+        "name": "Penedo de Maranguape",
+        "bairro": "MARANGUAPE",
+        "municipality": "MARANGUAPE",
+        "faction": "CV",
+        "risk_score": 28.656,
+        "score": 28.656,
+        "region": "rmf",
+        "parent_area": "MARANGUAPE",
+        "parent_risk_score": 31.1,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.335,
+        "nearby_streets_count": 2,
+        "nearby_streets": [
+          "PENEDO DE MARANGUAPE",
+          "AREA SEM NOME"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.8156963,
+          -3.9997619
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 109,
+        "rank": 109,
+        "name": "Cachoeira- Maranguape",
+        "bairro": "MARANGUAPE",
+        "municipality": "Maranguape",
+        "faction": "CV",
+        "risk_score": 28.409,
+        "score": 28.409,
+        "region": "rmf",
+        "parent_area": "MARANGUAPE",
+        "parent_risk_score": 31.1,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.019,
+        "nearby_streets_count": 3,
+        "nearby_streets": [
+          "CACHOEIRA- MARANGUAPE",
+          "RODOVIA CARLOS JEREISSATI",
+          "RUA FRANCISCO ANTÔNIO DA SILVA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.753266666666676,
+          -4.068459600000001
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 110,
+        "rank": 110,
+        "name": "Umarizeiras",
+        "bairro": "MARANGUAPE",
+        "municipality": "MARANGUAPE",
+        "faction": "CV",
+        "risk_score": 28.37,
+        "score": 28.37,
+        "region": "rmf",
+        "parent_area": "MARANGUAPE",
+        "parent_risk_score": 31.1,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.099,
+        "nearby_streets_count": 2,
+        "nearby_streets": [
+          "UMARIZEIRAS",
+          "ESTRADA UMARIZEIRAS LAGES"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.72651875,
+          -4.0066249
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 111,
+        "rank": 111,
+        "name": "Boa Vista - Maranguape",
+        "bairro": "MARANGUAPE",
+        "municipality": "Maranguape",
+        "faction": "CV",
+        "risk_score": 28.312,
+        "score": 28.312,
+        "region": "rmf",
+        "parent_area": "MARANGUAPE",
+        "parent_risk_score": 31.1,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 1.142,
+        "nearby_streets_count": 1,
+        "nearby_streets": [
+          "BOA VISTA - MARANGUAPE"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-07-31T16:30:54.903470"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.736982250000004,
+          -4.04983021875
+        ]
+      }
     }
   ],
   "metadata": {
-    "total": 95,
+    "total": 111,
     "source": "Sentinela Micronodes Dynamic Overlay",
     "threshold_min_score": 31.0,
-    "generated_at": "2026-07-24T16:50:20.660819",
+    "generated_at": "2026-07-31T16:30:54.903470",
     "region": "rmf"
   }
 }
