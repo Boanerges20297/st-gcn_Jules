@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-08T11:32:08",
+  "generated_at": "2026-08-14T15:03:03",
   "data_limit": "2026-08-05",
   "source": "src/core/orchestrator.py:get_combined_risk",
   "model": {
@@ -18,7 +18,7 @@
         "risk_level": "crítico",
         "confidence_pct": 99.0,
         "confidence_label": "alta",
-        "expressiveness_pct": 94.2,
+        "expressiveness_pct": 93.6,
         "expressiveness_label": "muito alta",
         "data_limit": "2026-08-05",
         "metrics": {
@@ -32,7 +32,7 @@
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 2.97,
+          "score_z": 2.84,
           "peer_percentile": 100.0,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -75,25 +75,25 @@
         "name_normalized": "CAUCAIA",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 82.19,
+        "risk_score": 96.21,
         "risk_level": "crítico",
-        "confidence_pct": 92.9,
+        "confidence_pct": 99.0,
         "confidence_label": "alta",
-        "expressiveness_pct": 89.7,
+        "expressiveness_pct": 91.7,
         "expressiveness_label": "muito alta",
         "data_limit": "2026-08-05",
         "metrics": {
-          "recent_cvli_14d": 1,
-          "recent_cvli_30d": 4,
-          "historical_cvli": 952.0,
+          "recent_cvli_14d": 2,
+          "recent_cvli_30d": 5,
+          "historical_cvli": 956.0,
           "neural_score": 100.0,
           "tension_score": 100.0,
-          "inclusion_score": 50.0,
-          "calm_penalty": 23.3,
+          "inclusion_score": 100.0,
+          "calm_penalty": 16.7,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 2.35,
+          "score_z": 2.75,
           "peer_percentile": 97.4,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -111,16 +111,16 @@
               "strength_pct": 100.0
             },
             {
-              "key": "cvli_recente",
-              "label": "CVLI recente na janela de 30 dias",
-              "strength_pct": 80.0
+              "key": "inclusao_recente",
+              "label": "Atividade recente e vizinhança",
+              "strength_pct": 100.0
             }
           ],
-          "summary": "Sinal Poisson do ranking operacional: 100.0% | Tensão territorial: 100.0% | CVLI recente na janela de 30 dias: 80.0%"
+          "summary": "Sinal Poisson do ranking operacional: 100.0% | Tensão territorial: 100.0% | Atividade recente e vizinhança: 100.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "CAUCAIA aparece na posição 2 de 39, com risco 82.2 e nível crítico; é prioridade imediata de acompanhamento.",
-          "por_que_importa": "O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 100.0% e 4 registros recentes na janela de 30 dias.",
+          "leitura_rapida": "CAUCAIA aparece na posição 2 de 39, com risco 96.2 e nível crítico; é prioridade imediata de acompanhamento.",
+          "por_que_importa": "O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 100.0% e 5 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura com boa sustentação dos sinais atuais.",
           "expressividade_previsao": "O território está bem destacado no ranking frente aos pares.",
           "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
@@ -136,25 +136,25 @@
         "name_normalized": "SOBRAL",
         "region": "interior",
         "territorial_level": "cidade",
-        "risk_score": 79.69,
+        "risk_score": 80.26,
         "risk_level": "crítico",
-        "confidence_pct": 93.6,
+        "confidence_pct": 93.5,
         "confidence_label": "alta",
-        "expressiveness_pct": 87.6,
+        "expressiveness_pct": 87.2,
         "expressiveness_label": "muito alta",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 1,
           "recent_cvli_30d": 4,
-          "historical_cvli": 391.0,
-          "neural_score": 89.0,
+          "historical_cvli": 392.0,
+          "neural_score": 89.9,
           "tension_score": 100.0,
           "inclusion_score": 50.0,
           "calm_penalty": 3.3,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 2.25,
+          "score_z": 2.17,
           "peer_percentile": 94.7,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -169,7 +169,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 89.0
+              "strength_pct": 89.9
             },
             {
               "key": "cvli_recente",
@@ -177,10 +177,10 @@
               "strength_pct": 80.0
             }
           ],
-          "summary": "Tensão territorial: 100.0% | Sinal Poisson do ranking operacional: 89.0% | CVLI recente na janela de 30 dias: 80.0%"
+          "summary": "Tensão territorial: 100.0% | Sinal Poisson do ranking operacional: 89.9% | CVLI recente na janela de 30 dias: 80.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "SOBRAL aparece na posição 3 de 39, com risco 79.7 e nível crítico; é prioridade imediata de acompanhamento.",
+          "leitura_rapida": "SOBRAL aparece na posição 3 de 39, com risco 80.3 e nível crítico; é prioridade imediata de acompanhamento.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 4 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura com boa sustentação dos sinais atuais.",
           "expressividade_previsao": "O território está bem destacado no ranking frente aos pares.",
@@ -197,25 +197,25 @@
         "name_normalized": "MARACANAU",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 73.21,
+        "risk_score": 72.08,
         "risk_level": "crítico",
-        "confidence_pct": 94.5,
+        "confidence_pct": 94.2,
         "confidence_label": "alta",
-        "expressiveness_pct": 84.9,
+        "expressiveness_pct": 84.2,
         "expressiveness_label": "alta",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 2,
           "recent_cvli_30d": 5,
-          "historical_cvli": 663.0,
-          "neural_score": 60.9,
+          "historical_cvli": 664.0,
+          "neural_score": 59.1,
           "tension_score": 100.0,
           "inclusion_score": 100.0,
           "calm_penalty": 10.0,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 2.0,
+          "score_z": 1.87,
           "peer_percentile": 92.1,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -241,7 +241,7 @@
           "summary": "Tensão territorial: 100.0% | Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 100.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "MARACANAU aparece na posição 4 de 39, com risco 73.2 e nível crítico; é prioridade imediata de acompanhamento.",
+          "leitura_rapida": "MARACANAU aparece na posição 4 de 39, com risco 72.1 e nível crítico; é prioridade imediata de acompanhamento.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 5 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura com boa sustentação dos sinais atuais.",
           "expressividade_previsao": "O território se diferencia do bloco intermediário, mas sem isolamento absoluto.",
@@ -258,25 +258,25 @@
         "name_normalized": "CRATO",
         "region": "interior",
         "territorial_level": "cidade",
-        "risk_score": 52.84,
+        "risk_score": 53.27,
         "risk_level": "alto",
-        "confidence_pct": 89.8,
+        "confidence_pct": 89.9,
         "confidence_label": "alta",
-        "expressiveness_pct": 79.6,
+        "expressiveness_pct": 79.3,
         "expressiveness_label": "alta",
         "data_limit": "2026-08-05",
         "metrics": {
-          "recent_cvli_14d": 4,
-          "recent_cvli_30d": 6,
-          "historical_cvli": 188.0,
-          "neural_score": 28.1,
+          "recent_cvli_14d": 5,
+          "recent_cvli_30d": 7,
+          "historical_cvli": 189.0,
+          "neural_score": 28.8,
           "tension_score": 100.0,
           "inclusion_score": 100.0,
           "calm_penalty": 6.7,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 1.23,
+          "score_z": 1.18,
           "peer_percentile": 89.5,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -302,8 +302,8 @@
           "summary": "Tensão territorial: 100.0% | Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 100.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "CRATO aparece na posição 5 de 39, com risco 52.8 e nível alto; é prioridade imediata de acompanhamento.",
-          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 6 registros recentes na janela de 30 dias.",
+          "leitura_rapida": "CRATO aparece na posição 5 de 39, com risco 53.3 e nível alto; é prioridade imediata de acompanhamento.",
+          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 7 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura com boa sustentação dos sinais atuais.",
           "expressividade_previsao": "O território se diferencia do bloco intermediário, mas sem isolamento absoluto.",
           "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
@@ -319,25 +319,25 @@
         "name_normalized": "MARANGUAPE",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 49.05,
+        "risk_score": 48.13,
         "risk_level": "moderado",
         "confidence_pct": 77.6,
         "confidence_label": "moderada",
-        "expressiveness_pct": 77.3,
+        "expressiveness_pct": 76.8,
         "expressiveness_label": "alta",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 2,
           "recent_cvli_30d": 2,
           "historical_cvli": 295.0,
-          "neural_score": 37.4,
+          "neural_score": 36.0,
           "tension_score": 0.0,
           "inclusion_score": 100.0,
           "calm_penalty": 3.3,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 1.08,
+          "score_z": 0.99,
           "peer_percentile": 86.8,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -357,13 +357,13 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 37.4
+              "strength_pct": 36.0
             }
           ],
-          "summary": "Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 40.0% | Sinal Poisson do ranking operacional: 37.4%"
+          "summary": "Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 40.0% | Sinal Poisson do ranking operacional: 36.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "MARANGUAPE aparece na posição 6 de 39, com risco 49.0 e nível moderado; é prioridade alta de acompanhamento.",
+          "leitura_rapida": "MARANGUAPE aparece na posição 6 de 39, com risco 48.1 e nível moderado; é prioridade alta de acompanhamento.",
           "por_que_importa": "O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
           "expressividade_previsao": "O território se diferencia do bloco intermediário, mas sem isolamento absoluto.",
@@ -380,25 +380,25 @@
         "name_normalized": "BOA VIAGEM",
         "region": "interior",
         "territorial_level": "cidade",
-        "risk_score": 47.78,
+        "risk_score": 48.12,
         "risk_level": "moderado",
-        "confidence_pct": 88.8,
+        "confidence_pct": 88.9,
         "confidence_label": "alta",
-        "expressiveness_pct": 75.5,
+        "expressiveness_pct": 75.3,
         "expressiveness_label": "alta",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 4,
           "recent_cvli_30d": 6,
-          "historical_cvli": 126.0,
-          "neural_score": 21.1,
+          "historical_cvli": 128.0,
+          "neural_score": 21.7,
           "tension_score": 100.0,
           "inclusion_score": 100.0,
           "calm_penalty": 20.0,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 1.04,
+          "score_z": 0.99,
           "peer_percentile": 84.2,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -424,7 +424,7 @@
           "summary": "Tensão territorial: 100.0% | Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 100.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "BOA VIAGEM aparece na posição 7 de 39, com risco 47.8 e nível moderado; é prioridade alta de acompanhamento.",
+          "leitura_rapida": "BOA VIAGEM aparece na posição 7 de 39, com risco 48.1 e nível moderado; é prioridade alta de acompanhamento.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 6 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura com boa sustentação dos sinais atuais.",
           "expressividade_previsao": "O território se diferencia do bloco intermediário, mas sem isolamento absoluto.",
@@ -445,7 +445,7 @@
         "risk_level": "moderado",
         "confidence_pct": 87.6,
         "confidence_label": "alta",
-        "expressiveness_pct": 72.9,
+        "expressiveness_pct": 72.7,
         "expressiveness_label": "alta",
         "data_limit": "2026-08-05",
         "metrics": {
@@ -459,7 +459,7 @@
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 0.82,
+          "score_z": 0.77,
           "peer_percentile": 81.6,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -498,29 +498,29 @@
       },
       {
         "rank": 9,
-        "name": "CASCAVEL",
-        "name_normalized": "CASCAVEL",
+        "name": "PACATUBA",
+        "name_normalized": "PACATUBA",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 31.6,
+        "risk_score": 32.17,
         "risk_level": "moderado",
-        "confidence_pct": 76.5,
+        "confidence_pct": 76.7,
         "confidence_label": "moderada",
-        "expressiveness_pct": 69.4,
+        "expressiveness_pct": 69.3,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 2,
           "recent_cvli_30d": 2,
-          "historical_cvli": 176.0,
-          "neural_score": 10.4,
+          "historical_cvli": 198.0,
+          "neural_score": 12.7,
           "tension_score": 0.0,
           "inclusion_score": 100.0,
-          "calm_penalty": 6.7,
+          "calm_penalty": 36.7,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 0.42,
+          "score_z": 0.4,
           "peer_percentile": 78.9,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -540,13 +540,13 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 10.4
+              "strength_pct": 12.7
             }
           ],
-          "summary": "Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 40.0% | Sinal Poisson do ranking operacional: 10.4%"
+          "summary": "Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 40.0% | Sinal Poisson do ranking operacional: 12.7%"
         },
         "manager_feedback": {
-          "leitura_rapida": "CASCAVEL aparece na posição 9 de 39, com risco 31.6 e nível moderado; é prioridade alta de acompanhamento.",
+          "leitura_rapida": "PACATUBA aparece na posição 9 de 39, com risco 32.2 e nível moderado; é prioridade alta de acompanhamento.",
           "por_que_importa": "O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -559,91 +559,30 @@
       },
       {
         "rank": 10,
-        "name": "AMONTADA",
-        "name_normalized": "AMONTADA",
-        "region": "interior",
-        "territorial_level": "cidade",
-        "risk_score": 31.53,
-        "risk_level": "moderado",
-        "confidence_pct": 84.6,
-        "confidence_label": "moderada",
-        "expressiveness_pct": 67.8,
-        "expressiveness_label": "moderada",
-        "data_limit": "2026-08-05",
-        "metrics": {
-          "recent_cvli_14d": 1,
-          "recent_cvli_30d": 3,
-          "historical_cvli": 144.0,
-          "neural_score": 15.5,
-          "tension_score": 100.0,
-          "inclusion_score": 50.0,
-          "calm_penalty": 30.0,
-          "territorial_support_pct": 100.0,
-          "historical_support_pct": 100.0,
-          "live_support_pct": 100.0,
-          "score_z": 0.42,
-          "peer_percentile": 76.3,
-          "dynamic_window_days": 14,
-          "base_window_days": 14
-        },
-        "explainability": {
-          "top_drivers": [
-            {
-              "key": "tensao_territorial",
-              "label": "Tensão territorial",
-              "strength_pct": 100.0
-            },
-            {
-              "key": "cvli_recente",
-              "label": "CVLI recente na janela de 30 dias",
-              "strength_pct": 60.0
-            },
-            {
-              "key": "inclusao_recente",
-              "label": "Atividade recente e vizinhança",
-              "strength_pct": 50.0
-            }
-          ],
-          "summary": "Tensão territorial: 100.0% | CVLI recente na janela de 30 dias: 60.0% | Atividade recente e vizinhança: 50.0%"
-        },
-        "manager_feedback": {
-          "leitura_rapida": "AMONTADA aparece na posição 10 de 39, com risco 31.5 e nível moderado; é prioridade alta de acompanhamento.",
-          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 3 registros recentes na janela de 30 dias.",
-          "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
-          "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
-          "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
-        },
-        "prediction_details": {
-          "historical_fallback": false,
-          "trend": "stable"
-        }
-      },
-      {
-        "rank": 11,
         "name": "TIANGUA",
         "name_normalized": "TIANGUA",
         "region": "interior",
         "territorial_level": "cidade",
-        "risk_score": 31.48,
+        "risk_score": 31.78,
         "risk_level": "moderado",
-        "confidence_pct": 74.5,
+        "confidence_pct": 74.6,
         "confidence_label": "moderada",
-        "expressiveness_pct": 66.2,
+        "expressiveness_pct": 67.6,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 1,
           "recent_cvli_30d": 1,
-          "historical_cvli": 129.0,
-          "neural_score": 14.9,
+          "historical_cvli": 132.0,
+          "neural_score": 15.3,
           "tension_score": 100.0,
           "inclusion_score": 50.0,
           "calm_penalty": 20.0,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 0.41,
-          "peer_percentile": 73.7,
+          "score_z": 0.39,
+          "peer_percentile": 76.3,
           "dynamic_window_days": 14,
           "base_window_days": 14
         },
@@ -668,7 +607,7 @@
           "summary": "Tensão territorial: 100.0% | Atividade recente e vizinhança: 50.0% | CVLI recente na janela de 30 dias: 20.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "TIANGUA aparece na posição 11 de 39, com risco 31.5 e nível moderado; é território de atenção tática.",
+          "leitura_rapida": "TIANGUA aparece na posição 10 de 39, com risco 31.8 e nível moderado; é prioridade alta de acompanhamento.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 1 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -680,14 +619,75 @@
         }
       },
       {
+        "rank": 11,
+        "name": "AMONTADA",
+        "name_normalized": "AMONTADA",
+        "region": "interior",
+        "territorial_level": "cidade",
+        "risk_score": 31.53,
+        "risk_level": "moderado",
+        "confidence_pct": 84.6,
+        "confidence_label": "moderada",
+        "expressiveness_pct": 66.0,
+        "expressiveness_label": "moderada",
+        "data_limit": "2026-08-05",
+        "metrics": {
+          "recent_cvli_14d": 1,
+          "recent_cvli_30d": 3,
+          "historical_cvli": 144.0,
+          "neural_score": 15.5,
+          "tension_score": 100.0,
+          "inclusion_score": 50.0,
+          "calm_penalty": 30.0,
+          "territorial_support_pct": 100.0,
+          "historical_support_pct": 100.0,
+          "live_support_pct": 100.0,
+          "score_z": 0.38,
+          "peer_percentile": 73.7,
+          "dynamic_window_days": 14,
+          "base_window_days": 14
+        },
+        "explainability": {
+          "top_drivers": [
+            {
+              "key": "tensao_territorial",
+              "label": "Tensão territorial",
+              "strength_pct": 100.0
+            },
+            {
+              "key": "cvli_recente",
+              "label": "CVLI recente na janela de 30 dias",
+              "strength_pct": 60.0
+            },
+            {
+              "key": "inclusao_recente",
+              "label": "Atividade recente e vizinhança",
+              "strength_pct": 50.0
+            }
+          ],
+          "summary": "Tensão territorial: 100.0% | CVLI recente na janela de 30 dias: 60.0% | Atividade recente e vizinhança: 50.0%"
+        },
+        "manager_feedback": {
+          "leitura_rapida": "AMONTADA aparece na posição 11 de 39, com risco 31.5 e nível moderado; é território de atenção tática.",
+          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 3 registros recentes na janela de 30 dias.",
+          "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
+          "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
+          "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+        },
+        "prediction_details": {
+          "historical_fallback": false,
+          "trend": "stable"
+        }
+      },
+      {
         "rank": 12,
-        "name": "HORIZONTE",
-        "name_normalized": "HORIZONTE",
+        "name": "CASCAVEL",
+        "name_normalized": "CASCAVEL",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 30.19,
-        "risk_level": "baixo",
-        "confidence_pct": 76.4,
+        "risk_score": 31.34,
+        "risk_level": "moderado",
+        "confidence_pct": 76.5,
         "confidence_label": "moderada",
         "expressiveness_pct": 64.4,
         "expressiveness_label": "moderada",
@@ -695,8 +695,8 @@
         "metrics": {
           "recent_cvli_14d": 2,
           "recent_cvli_30d": 2,
-          "historical_cvli": 150.0,
-          "neural_score": 8.2,
+          "historical_cvli": 176.0,
+          "neural_score": 10.0,
           "tension_score": 0.0,
           "inclusion_score": 100.0,
           "calm_penalty": 6.7,
@@ -723,13 +723,13 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 8.2
+              "strength_pct": 10.0
             }
           ],
-          "summary": "Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 40.0% | Sinal Poisson do ranking operacional: 8.2%"
+          "summary": "Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 40.0% | Sinal Poisson do ranking operacional: 10.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "HORIZONTE aparece na posição 12 de 39, com risco 30.2 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "CASCAVEL aparece na posição 12 de 39, com risco 31.3 e nível moderado; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -742,6 +742,67 @@
       },
       {
         "rank": 13,
+        "name": "HORIZONTE",
+        "name_normalized": "HORIZONTE",
+        "region": "rmf",
+        "territorial_level": "cidade",
+        "risk_score": 29.99,
+        "risk_level": "baixo",
+        "confidence_pct": 76.4,
+        "confidence_label": "moderada",
+        "expressiveness_pct": 62.6,
+        "expressiveness_label": "moderada",
+        "data_limit": "2026-08-05",
+        "metrics": {
+          "recent_cvli_14d": 2,
+          "recent_cvli_30d": 2,
+          "historical_cvli": 150.0,
+          "neural_score": 7.9,
+          "tension_score": 0.0,
+          "inclusion_score": 100.0,
+          "calm_penalty": 6.7,
+          "territorial_support_pct": 100.0,
+          "historical_support_pct": 100.0,
+          "live_support_pct": 100.0,
+          "score_z": 0.32,
+          "peer_percentile": 68.4,
+          "dynamic_window_days": 14,
+          "base_window_days": 14
+        },
+        "explainability": {
+          "top_drivers": [
+            {
+              "key": "inclusao_recente",
+              "label": "Atividade recente e vizinhança",
+              "strength_pct": 100.0
+            },
+            {
+              "key": "cvli_recente",
+              "label": "CVLI recente na janela de 30 dias",
+              "strength_pct": 40.0
+            },
+            {
+              "key": "sinal_modelo",
+              "label": "Sinal Poisson do ranking operacional",
+              "strength_pct": 7.9
+            }
+          ],
+          "summary": "Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 40.0% | Sinal Poisson do ranking operacional: 7.9%"
+        },
+        "manager_feedback": {
+          "leitura_rapida": "HORIZONTE aparece na posição 13 de 39, com risco 30.0 e nível baixo; é território de atenção tática.",
+          "por_que_importa": "O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.",
+          "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
+          "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
+          "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+        },
+        "prediction_details": {
+          "historical_fallback": false,
+          "trend": "stable"
+        }
+      },
+      {
+        "rank": 14,
         "name": "PENTECOSTE",
         "name_normalized": "PENTECOSTE",
         "region": "interior",
@@ -750,7 +811,7 @@
         "risk_level": "baixo",
         "confidence_pct": 78.6,
         "confidence_label": "moderada",
-        "expressiveness_pct": 62.2,
+        "expressiveness_pct": 60.5,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
@@ -764,8 +825,8 @@
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 0.25,
-          "peer_percentile": 68.4,
+          "score_z": 0.22,
+          "peer_percentile": 65.8,
           "dynamic_window_days": 14,
           "base_window_days": 14
         },
@@ -790,70 +851,9 @@
           "summary": "Tensão territorial: 100.0% | Atividade recente e vizinhança: 50.0% | CVLI recente na janela de 30 dias: 40.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "PENTECOSTE aparece na posição 13 de 39, com risco 27.1 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "PENTECOSTE aparece na posição 14 de 39, com risco 27.1 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
-          "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
-          "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
-        },
-        "prediction_details": {
-          "historical_fallback": false,
-          "trend": "stable"
-        }
-      },
-      {
-        "rank": 14,
-        "name": "PACATUBA",
-        "name_normalized": "PACATUBA",
-        "region": "rmf",
-        "territorial_level": "cidade",
-        "risk_score": 19.63,
-        "risk_level": "baixo",
-        "confidence_pct": 66.1,
-        "confidence_label": "baixa",
-        "expressiveness_pct": 59.3,
-        "expressiveness_label": "moderada",
-        "data_limit": "2026-08-05",
-        "metrics": {
-          "recent_cvli_14d": 1,
-          "recent_cvli_30d": 1,
-          "historical_cvli": 196.0,
-          "neural_score": 12.7,
-          "tension_score": 0.0,
-          "inclusion_score": 50.0,
-          "calm_penalty": 40.0,
-          "territorial_support_pct": 100.0,
-          "historical_support_pct": 100.0,
-          "live_support_pct": 100.0,
-          "score_z": -0.04,
-          "peer_percentile": 65.8,
-          "dynamic_window_days": 14,
-          "base_window_days": 14
-        },
-        "explainability": {
-          "top_drivers": [
-            {
-              "key": "inclusao_recente",
-              "label": "Atividade recente e vizinhança",
-              "strength_pct": 50.0
-            },
-            {
-              "key": "cvli_recente",
-              "label": "CVLI recente na janela de 30 dias",
-              "strength_pct": 20.0
-            },
-            {
-              "key": "sinal_modelo",
-              "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 12.7
-            }
-          ],
-          "summary": "Atividade recente e vizinhança: 50.0% | CVLI recente na janela de 30 dias: 20.0% | Sinal Poisson do ranking operacional: 12.7%"
-        },
-        "manager_feedback": {
-          "leitura_rapida": "PACATUBA aparece na posição 14 de 39, com risco 19.6 e nível baixo; é território de atenção tática.",
-          "por_que_importa": "O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 1 registros recentes na janela de 30 dias.",
-          "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
           "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
         },
@@ -868,25 +868,25 @@
         "name_normalized": "AQUIRAZ",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 15.41,
+        "risk_score": 15.3,
         "risk_level": "baixo",
         "confidence_pct": 65.8,
         "confidence_label": "baixa",
-        "expressiveness_pct": 57.0,
+        "expressiveness_pct": 56.9,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 1,
           "recent_cvli_30d": 1,
           "historical_cvli": 158.0,
-          "neural_score": 5.1,
+          "neural_score": 4.9,
           "tension_score": 0.0,
           "inclusion_score": 50.0,
           "calm_penalty": 36.7,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": -0.2,
+          "score_z": -0.22,
           "peer_percentile": 63.2,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -906,13 +906,13 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 5.1
+              "strength_pct": 4.9
             }
           ],
-          "summary": "Atividade recente e vizinhança: 50.0% | CVLI recente na janela de 30 dias: 20.0% | Sinal Poisson do ranking operacional: 5.1%"
+          "summary": "Atividade recente e vizinhança: 50.0% | CVLI recente na janela de 30 dias: 20.0% | Sinal Poisson do ranking operacional: 4.9%"
         },
         "manager_feedback": {
-          "leitura_rapida": "AQUIRAZ aparece na posição 15 de 39, com risco 15.4 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "AQUIRAZ aparece na posição 15 de 39, com risco 15.3 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 1 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -929,25 +929,25 @@
         "name_normalized": "CHOROZINHO",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 14.97,
+        "risk_score": 14.87,
         "risk_level": "baixo",
         "confidence_pct": 65.7,
         "confidence_label": "baixa",
-        "expressiveness_pct": 55.3,
+        "expressiveness_pct": 55.2,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 1,
           "recent_cvli_30d": 1,
           "historical_cvli": 36.0,
-          "neural_score": 4.2,
+          "neural_score": 4.1,
           "tension_score": 0.0,
           "inclusion_score": 50.0,
           "calm_penalty": 30.0,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 40.0,
           "live_support_pct": 100.0,
-          "score_z": -0.21,
+          "score_z": -0.23,
           "peer_percentile": 60.5,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -967,13 +967,13 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 4.2
+              "strength_pct": 4.1
             }
           ],
-          "summary": "Atividade recente e vizinhança: 50.0% | CVLI recente na janela de 30 dias: 20.0% | Sinal Poisson do ranking operacional: 4.2%"
+          "summary": "Atividade recente e vizinhança: 50.0% | CVLI recente na janela de 30 dias: 20.0% | Sinal Poisson do ranking operacional: 4.1%"
         },
         "manager_feedback": {
-          "leitura_rapida": "CHOROZINHO aparece na posição 16 de 39, com risco 15.0 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "CHOROZINHO aparece na posição 16 de 39, com risco 14.9 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 1 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -990,25 +990,25 @@
         "name_normalized": "BARBALHA",
         "region": "interior",
         "territorial_level": "cidade",
-        "risk_score": 13.59,
+        "risk_score": 13.67,
         "risk_level": "baixo",
         "confidence_pct": 81.3,
         "confidence_label": "moderada",
-        "expressiveness_pct": 53.5,
+        "expressiveness_pct": 53.4,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 3,
-          "historical_cvli": 74.0,
-          "neural_score": 6.6,
+          "historical_cvli": 75.0,
+          "neural_score": 6.7,
           "tension_score": 100.0,
           "inclusion_score": 0.0,
           "calm_penalty": 46.7,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": -0.27,
+          "score_z": -0.28,
           "peer_percentile": 57.9,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -1028,13 +1028,13 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 6.6
+              "strength_pct": 6.7
             }
           ],
-          "summary": "Tensão territorial: 100.0% | CVLI recente na janela de 30 dias: 60.0% | Sinal Poisson do ranking operacional: 6.6%"
+          "summary": "Tensão territorial: 100.0% | CVLI recente na janela de 30 dias: 60.0% | Sinal Poisson do ranking operacional: 6.7%"
         },
         "manager_feedback": {
-          "leitura_rapida": "BARBALHA aparece na posição 17 de 39, com risco 13.6 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "BARBALHA aparece na posição 17 de 39, com risco 13.7 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 3 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -1069,7 +1069,7 @@
           "territorial_support_pct": 50.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 50.0,
-          "score_z": -0.45,
+          "score_z": -0.46,
           "peer_percentile": 55.3,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -1112,17 +1112,17 @@
         "name_normalized": "ITAPIPOCA",
         "region": "interior",
         "territorial_level": "cidade",
-        "risk_score": 8.54,
+        "risk_score": 8.56,
         "risk_level": "baixo",
         "confidence_pct": 37.4,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 49.4,
+        "expressiveness_pct": 49.3,
         "expressiveness_label": "baixa",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
-          "historical_cvli": 199.0,
+          "historical_cvli": 200.0,
           "neural_score": 15.5,
           "tension_score": 20.0,
           "inclusion_score": 0.0,
@@ -1130,7 +1130,7 @@
           "territorial_support_pct": 20.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 0.0,
-          "score_z": -0.46,
+          "score_z": -0.47,
           "peer_percentile": 52.6,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -1156,7 +1156,7 @@
           "summary": "Tensão territorial: 20.0% | Sinal Poisson do ranking operacional: 15.5% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "ITAPIPOCA aparece na posição 19 de 39, com risco 8.5 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "ITAPIPOCA aparece na posição 19 de 39, com risco 8.6 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 20.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -1191,7 +1191,7 @@
           "territorial_support_pct": 20.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 0.0,
-          "score_z": -0.52,
+          "score_z": -0.53,
           "peer_percentile": 50.0,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -1374,7 +1374,7 @@
           "territorial_support_pct": 20.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 0.0,
-          "score_z": -0.62,
+          "score_z": -0.63,
           "peer_percentile": 42.1,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -1722,7 +1722,7 @@
         "name_normalized": "PACAJUS",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 1.36,
+        "risk_score": 1.29,
         "risk_level": "baixo",
         "confidence_pct": 35.3,
         "confidence_label": "muito baixa",
@@ -1732,8 +1732,8 @@
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
-          "historical_cvli": 137.0,
-          "neural_score": 3.2,
+          "historical_cvli": 138.0,
+          "neural_score": 3.1,
           "tension_score": 0.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
@@ -1750,7 +1750,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 3.2
+              "strength_pct": 3.1
             },
             {
               "key": "tensao_territorial",
@@ -1763,10 +1763,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Sinal Poisson do ranking operacional: 3.2% | Tensão territorial: 0.0% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Sinal Poisson do ranking operacional: 3.1% | Tensão territorial: 0.0% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "PACAJUS aparece na posição 29 de 39, com risco 1.4 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "PACAJUS aparece na posição 29 de 39, com risco 1.3 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 20.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -1783,7 +1783,7 @@
         "name_normalized": "PARACURU",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 1.11,
+        "risk_score": 1.06,
         "risk_level": "baixo",
         "confidence_pct": 35.3,
         "confidence_label": "muito baixa",
@@ -1794,7 +1794,7 @@
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 81.0,
-          "neural_score": 2.6,
+          "neural_score": 2.5,
           "tension_score": 0.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
@@ -1811,7 +1811,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 2.6
+              "strength_pct": 2.5
             },
             {
               "key": "tensao_territorial",
@@ -1824,7 +1824,7 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Sinal Poisson do ranking operacional: 2.6% | Tensão territorial: 0.0% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Sinal Poisson do ranking operacional: 2.5% | Tensão territorial: 0.0% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
           "leitura_rapida": "PARACURU aparece na posição 30 de 39, com risco 1.1 e nível baixo; é território de atenção tática.",
@@ -1846,25 +1846,25 @@
         "name_normalized": "CAUCAIA",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 82.19,
+        "risk_score": 96.21,
         "risk_level": "crítico",
-        "confidence_pct": 92.9,
+        "confidence_pct": 99.0,
         "confidence_label": "alta",
-        "expressiveness_pct": 92.6,
+        "expressiveness_pct": 93.9,
         "expressiveness_label": "muito alta",
         "data_limit": "2026-08-05",
         "metrics": {
-          "recent_cvli_14d": 1,
-          "recent_cvli_30d": 4,
-          "historical_cvli": 952.0,
+          "recent_cvli_14d": 2,
+          "recent_cvli_30d": 5,
+          "historical_cvli": 956.0,
           "neural_score": 100.0,
           "tension_score": 100.0,
-          "inclusion_score": 50.0,
-          "calm_penalty": 23.3,
+          "inclusion_score": 100.0,
+          "calm_penalty": 16.7,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 2.62,
+          "score_z": 2.89,
           "peer_percentile": 100.0,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -1882,16 +1882,16 @@
               "strength_pct": 100.0
             },
             {
-              "key": "cvli_recente",
-              "label": "CVLI recente na janela de 30 dias",
-              "strength_pct": 80.0
+              "key": "inclusao_recente",
+              "label": "Atividade recente e vizinhança",
+              "strength_pct": 100.0
             }
           ],
-          "summary": "Sinal Poisson do ranking operacional: 100.0% | Tensão territorial: 100.0% | CVLI recente na janela de 30 dias: 80.0%"
+          "summary": "Sinal Poisson do ranking operacional: 100.0% | Tensão territorial: 100.0% | Atividade recente e vizinhança: 100.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "CAUCAIA aparece na posição 1 de 19, com risco 82.2 e nível crítico; é prioridade imediata de acompanhamento.",
-          "por_que_importa": "O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 100.0% e 4 registros recentes na janela de 30 dias.",
+          "leitura_rapida": "CAUCAIA aparece na posição 1 de 19, com risco 96.2 e nível crítico; é prioridade imediata de acompanhamento.",
+          "por_que_importa": "O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 100.0% e 5 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura com boa sustentação dos sinais atuais.",
           "expressividade_previsao": "O território está bem destacado no ranking frente aos pares.",
           "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
@@ -1907,25 +1907,25 @@
         "name_normalized": "MARACANAU",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 73.21,
+        "risk_score": 72.08,
         "risk_level": "crítico",
-        "confidence_pct": 94.5,
+        "confidence_pct": 94.2,
         "confidence_label": "alta",
-        "expressiveness_pct": 87.5,
+        "expressiveness_pct": 86.2,
         "expressiveness_label": "muito alta",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 2,
           "recent_cvli_30d": 5,
-          "historical_cvli": 663.0,
-          "neural_score": 60.9,
+          "historical_cvli": 664.0,
+          "neural_score": 59.1,
           "tension_score": 100.0,
           "inclusion_score": 100.0,
           "calm_penalty": 10.0,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 2.26,
+          "score_z": 2.0,
           "peer_percentile": 94.4,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -1951,7 +1951,7 @@
           "summary": "Tensão territorial: 100.0% | Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 100.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "MARACANAU aparece na posição 2 de 19, com risco 73.2 e nível crítico; é prioridade imediata de acompanhamento.",
+          "leitura_rapida": "MARACANAU aparece na posição 2 de 19, com risco 72.1 e nível crítico; é prioridade imediata de acompanhamento.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 5 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura com boa sustentação dos sinais atuais.",
           "expressividade_previsao": "O território está bem destacado no ranking frente aos pares.",
@@ -1968,25 +1968,25 @@
         "name_normalized": "MARANGUAPE",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 49.05,
+        "risk_score": 48.13,
         "risk_level": "moderado",
         "confidence_pct": 77.6,
         "confidence_label": "moderada",
-        "expressiveness_pct": 79.5,
+        "expressiveness_pct": 78.7,
         "expressiveness_label": "alta",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 2,
           "recent_cvli_30d": 2,
           "historical_cvli": 295.0,
-          "neural_score": 37.4,
+          "neural_score": 36.0,
           "tension_score": 0.0,
           "inclusion_score": 100.0,
           "calm_penalty": 3.3,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 1.29,
+          "score_z": 1.11,
           "peer_percentile": 88.9,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -2006,13 +2006,13 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 37.4
+              "strength_pct": 36.0
             }
           ],
-          "summary": "Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 40.0% | Sinal Poisson do ranking operacional: 37.4%"
+          "summary": "Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 40.0% | Sinal Poisson do ranking operacional: 36.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "MARANGUAPE aparece na posição 3 de 19, com risco 49.0 e nível moderado; é prioridade imediata de acompanhamento.",
+          "leitura_rapida": "MARANGUAPE aparece na posição 3 de 19, com risco 48.1 e nível moderado; é prioridade imediata de acompanhamento.",
           "por_que_importa": "O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
           "expressividade_previsao": "O território se diferencia do bloco intermediário, mas sem isolamento absoluto.",
@@ -2025,29 +2025,29 @@
       },
       {
         "rank": 4,
-        "name": "CASCAVEL",
-        "name_normalized": "CASCAVEL",
+        "name": "PACATUBA",
+        "name_normalized": "PACATUBA",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 31.6,
+        "risk_score": 32.17,
         "risk_level": "moderado",
-        "confidence_pct": 76.5,
+        "confidence_pct": 76.7,
         "confidence_label": "moderada",
-        "expressiveness_pct": 72.8,
+        "expressiveness_pct": 72.5,
         "expressiveness_label": "alta",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 2,
           "recent_cvli_30d": 2,
-          "historical_cvli": 176.0,
-          "neural_score": 10.4,
+          "historical_cvli": 198.0,
+          "neural_score": 12.7,
           "tension_score": 0.0,
           "inclusion_score": 100.0,
-          "calm_penalty": 6.7,
+          "calm_penalty": 36.7,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 0.59,
+          "score_z": 0.52,
           "peer_percentile": 83.3,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -2067,13 +2067,13 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 10.4
+              "strength_pct": 12.7
             }
           ],
-          "summary": "Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 40.0% | Sinal Poisson do ranking operacional: 10.4%"
+          "summary": "Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 40.0% | Sinal Poisson do ranking operacional: 12.7%"
         },
         "manager_feedback": {
-          "leitura_rapida": "CASCAVEL aparece na posição 4 de 19, com risco 31.6 e nível moderado; é prioridade imediata de acompanhamento.",
+          "leitura_rapida": "PACATUBA aparece na posição 4 de 19, com risco 32.2 e nível moderado; é prioridade imediata de acompanhamento.",
           "por_que_importa": "O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
           "expressividade_previsao": "O território se diferencia do bloco intermediário, mas sem isolamento absoluto.",
@@ -2086,29 +2086,29 @@
       },
       {
         "rank": 5,
-        "name": "HORIZONTE",
-        "name_normalized": "HORIZONTE",
+        "name": "CASCAVEL",
+        "name_normalized": "CASCAVEL",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 30.19,
-        "risk_level": "baixo",
-        "confidence_pct": 76.4,
+        "risk_score": 31.34,
+        "risk_level": "moderado",
+        "confidence_pct": 76.5,
         "confidence_label": "moderada",
-        "expressiveness_pct": 69.2,
+        "expressiveness_pct": 69.0,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 2,
           "recent_cvli_30d": 2,
-          "historical_cvli": 150.0,
-          "neural_score": 8.2,
+          "historical_cvli": 176.0,
+          "neural_score": 10.0,
           "tension_score": 0.0,
           "inclusion_score": 100.0,
           "calm_penalty": 6.7,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 0.53,
+          "score_z": 0.49,
           "peer_percentile": 77.8,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -2128,13 +2128,13 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 8.2
+              "strength_pct": 10.0
             }
           ],
-          "summary": "Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 40.0% | Sinal Poisson do ranking operacional: 8.2%"
+          "summary": "Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 40.0% | Sinal Poisson do ranking operacional: 10.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "HORIZONTE aparece na posição 5 de 19, com risco 30.2 e nível baixo; é prioridade imediata de acompanhamento.",
+          "leitura_rapida": "CASCAVEL aparece na posição 5 de 19, com risco 31.3 e nível moderado; é prioridade imediata de acompanhamento.",
           "por_que_importa": "O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -2147,29 +2147,29 @@
       },
       {
         "rank": 6,
-        "name": "PACATUBA",
-        "name_normalized": "PACATUBA",
+        "name": "HORIZONTE",
+        "name_normalized": "HORIZONTE",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 19.63,
+        "risk_score": 29.99,
         "risk_level": "baixo",
-        "confidence_pct": 66.1,
-        "confidence_label": "baixa",
-        "expressiveness_pct": 63.8,
+        "confidence_pct": 76.4,
+        "confidence_label": "moderada",
+        "expressiveness_pct": 65.4,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
-          "recent_cvli_14d": 1,
-          "recent_cvli_30d": 1,
-          "historical_cvli": 196.0,
-          "neural_score": 12.7,
+          "recent_cvli_14d": 2,
+          "recent_cvli_30d": 2,
+          "historical_cvli": 150.0,
+          "neural_score": 7.9,
           "tension_score": 0.0,
-          "inclusion_score": 50.0,
-          "calm_penalty": 40.0,
+          "inclusion_score": 100.0,
+          "calm_penalty": 6.7,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 0.1,
+          "score_z": 0.43,
           "peer_percentile": 72.2,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -2179,25 +2179,25 @@
             {
               "key": "inclusao_recente",
               "label": "Atividade recente e vizinhança",
-              "strength_pct": 50.0
+              "strength_pct": 100.0
             },
             {
               "key": "cvli_recente",
               "label": "CVLI recente na janela de 30 dias",
-              "strength_pct": 20.0
+              "strength_pct": 40.0
             },
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 12.7
+              "strength_pct": 7.9
             }
           ],
-          "summary": "Atividade recente e vizinhança: 50.0% | CVLI recente na janela de 30 dias: 20.0% | Sinal Poisson do ranking operacional: 12.7%"
+          "summary": "Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 40.0% | Sinal Poisson do ranking operacional: 7.9%"
         },
         "manager_feedback": {
-          "leitura_rapida": "PACATUBA aparece na posição 6 de 19, com risco 19.6 e nível baixo; é prioridade alta de acompanhamento.",
-          "por_que_importa": "O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 1 registros recentes na janela de 30 dias.",
-          "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
+          "leitura_rapida": "HORIZONTE aparece na posição 6 de 19, com risco 30.0 e nível baixo; é prioridade alta de acompanhamento.",
+          "por_que_importa": "O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 2 registros recentes na janela de 30 dias.",
+          "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
           "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
         },
@@ -2212,25 +2212,25 @@
         "name_normalized": "AQUIRAZ",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 15.41,
+        "risk_score": 15.3,
         "risk_level": "baixo",
         "confidence_pct": 65.8,
         "confidence_label": "baixa",
-        "expressiveness_pct": 59.7,
+        "expressiveness_pct": 59.5,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 1,
           "recent_cvli_30d": 1,
           "historical_cvli": 158.0,
-          "neural_score": 5.1,
+          "neural_score": 4.9,
           "tension_score": 0.0,
           "inclusion_score": 50.0,
           "calm_penalty": 36.7,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": -0.06,
+          "score_z": -0.11,
           "peer_percentile": 66.7,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -2250,13 +2250,13 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 5.1
+              "strength_pct": 4.9
             }
           ],
-          "summary": "Atividade recente e vizinhança: 50.0% | CVLI recente na janela de 30 dias: 20.0% | Sinal Poisson do ranking operacional: 5.1%"
+          "summary": "Atividade recente e vizinhança: 50.0% | CVLI recente na janela de 30 dias: 20.0% | Sinal Poisson do ranking operacional: 4.9%"
         },
         "manager_feedback": {
-          "leitura_rapida": "AQUIRAZ aparece na posição 7 de 19, com risco 15.4 e nível baixo; é prioridade alta de acompanhamento.",
+          "leitura_rapida": "AQUIRAZ aparece na posição 7 de 19, com risco 15.3 e nível baixo; é prioridade alta de acompanhamento.",
           "por_que_importa": "O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 1 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -2273,25 +2273,25 @@
         "name_normalized": "CHOROZINHO",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 14.97,
+        "risk_score": 14.87,
         "risk_level": "baixo",
         "confidence_pct": 65.7,
         "confidence_label": "baixa",
-        "expressiveness_pct": 56.3,
+        "expressiveness_pct": 56.1,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 1,
           "recent_cvli_30d": 1,
           "historical_cvli": 36.0,
-          "neural_score": 4.2,
+          "neural_score": 4.1,
           "tension_score": 0.0,
           "inclusion_score": 50.0,
           "calm_penalty": 30.0,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 40.0,
           "live_support_pct": 100.0,
-          "score_z": -0.08,
+          "score_z": -0.13,
           "peer_percentile": 61.1,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -2311,13 +2311,13 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 4.2
+              "strength_pct": 4.1
             }
           ],
-          "summary": "Atividade recente e vizinhança: 50.0% | CVLI recente na janela de 30 dias: 20.0% | Sinal Poisson do ranking operacional: 4.2%"
+          "summary": "Atividade recente e vizinhança: 50.0% | CVLI recente na janela de 30 dias: 20.0% | Sinal Poisson do ranking operacional: 4.1%"
         },
         "manager_feedback": {
-          "leitura_rapida": "CHOROZINHO aparece na posição 8 de 19, com risco 15.0 e nível baixo; é prioridade alta de acompanhamento.",
+          "leitura_rapida": "CHOROZINHO aparece na posição 8 de 19, com risco 14.9 e nível baixo; é prioridade alta de acompanhamento.",
           "por_que_importa": "O peso principal vem de atividade recente e vizinhança, com suporte territorial de 100.0% e 1 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -2334,7 +2334,7 @@
         "name_normalized": "PACAJUS",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 1.36,
+        "risk_score": 1.29,
         "risk_level": "baixo",
         "confidence_pct": 35.3,
         "confidence_label": "muito baixa",
@@ -2344,8 +2344,8 @@
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
-          "historical_cvli": 137.0,
-          "neural_score": 3.2,
+          "historical_cvli": 138.0,
+          "neural_score": 3.1,
           "tension_score": 0.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
@@ -2362,7 +2362,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 3.2
+              "strength_pct": 3.1
             },
             {
               "key": "tensao_territorial",
@@ -2375,10 +2375,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Sinal Poisson do ranking operacional: 3.2% | Tensão territorial: 0.0% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Sinal Poisson do ranking operacional: 3.1% | Tensão territorial: 0.0% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "PACAJUS aparece na posição 9 de 19, com risco 1.4 e nível baixo; é prioridade alta de acompanhamento.",
+          "leitura_rapida": "PACAJUS aparece na posição 9 de 19, com risco 1.3 e nível baixo; é prioridade alta de acompanhamento.",
           "por_que_importa": "O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 20.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -2395,7 +2395,7 @@
         "name_normalized": "PARACURU",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 1.11,
+        "risk_score": 1.06,
         "risk_level": "baixo",
         "confidence_pct": 35.3,
         "confidence_label": "muito baixa",
@@ -2406,7 +2406,7 @@
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 81.0,
-          "neural_score": 2.6,
+          "neural_score": 2.5,
           "tension_score": 0.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
@@ -2423,7 +2423,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 2.6
+              "strength_pct": 2.5
             },
             {
               "key": "tensao_territorial",
@@ -2436,7 +2436,7 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Sinal Poisson do ranking operacional: 2.6% | Tensão territorial: 0.0% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Sinal Poisson do ranking operacional: 2.5% | Tensão territorial: 0.0% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
           "leitura_rapida": "PARACURU aparece na posição 10 de 19, com risco 1.1 e nível baixo; é prioridade alta de acompanhamento.",
@@ -2456,7 +2456,7 @@
         "name_normalized": "SAO GONCALO DO AMARANTE",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 1.07,
+        "risk_score": 1.06,
         "risk_level": "baixo",
         "confidence_pct": 35.3,
         "confidence_label": "muito baixa",
@@ -2466,7 +2466,7 @@
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
-          "historical_cvli": 127.0,
+          "historical_cvli": 128.0,
           "neural_score": 2.5,
           "tension_score": 0.0,
           "inclusion_score": 0.0,
@@ -2517,7 +2517,7 @@
         "name_normalized": "EUSEBIO",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 0.76,
+        "risk_score": 0.73,
         "risk_level": "baixo",
         "confidence_pct": 35.2,
         "confidence_label": "muito baixa",
@@ -2528,7 +2528,7 @@
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 77.0,
-          "neural_score": 1.8,
+          "neural_score": 1.7,
           "tension_score": 0.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
@@ -2545,7 +2545,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 1.8
+              "strength_pct": 1.7
             },
             {
               "key": "tensao_territorial",
@@ -2558,10 +2558,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Sinal Poisson do ranking operacional: 1.8% | Tensão territorial: 0.0% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Sinal Poisson do ranking operacional: 1.7% | Tensão territorial: 0.0% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "EUSEBIO aparece na posição 12 de 19, com risco 0.8 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "EUSEBIO aparece na posição 12 de 19, com risco 0.7 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 20.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -2578,7 +2578,7 @@
         "name_normalized": "ITAITINGA",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 0.65,
+        "risk_score": 0.62,
         "risk_level": "baixo",
         "confidence_pct": 35.2,
         "confidence_label": "muito baixa",
@@ -2596,7 +2596,7 @@
           "territorial_support_pct": 20.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 0.0,
-          "score_z": -0.66,
+          "score_z": -0.65,
           "peer_percentile": 33.3,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -2622,7 +2622,7 @@
           "summary": "Sinal Poisson do ranking operacional: 1.5% | Tensão territorial: 0.0% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "ITAITINGA aparece na posição 13 de 19, com risco 0.7 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "ITAITINGA aparece na posição 13 de 19, com risco 0.6 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 20.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -2639,7 +2639,7 @@
         "name_normalized": "BEBERIBE",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 0.63,
+        "risk_score": 0.6,
         "risk_level": "baixo",
         "confidence_pct": 35.2,
         "confidence_label": "muito baixa",
@@ -2650,7 +2650,7 @@
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 72.0,
-          "neural_score": 1.5,
+          "neural_score": 1.4,
           "tension_score": 0.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
@@ -2667,7 +2667,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 1.5
+              "strength_pct": 1.4
             },
             {
               "key": "tensao_territorial",
@@ -2680,7 +2680,7 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Sinal Poisson do ranking operacional: 1.5% | Tensão territorial: 0.0% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Sinal Poisson do ranking operacional: 1.4% | Tensão territorial: 0.0% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
           "leitura_rapida": "BEBERIBE aparece na posição 14 de 19, com risco 0.6 e nível baixo; é território de atenção tática.",
@@ -2700,7 +2700,7 @@
         "name_normalized": "PARAIPABA",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 0.47,
+        "risk_score": 0.45,
         "risk_level": "baixo",
         "confidence_pct": 33.7,
         "confidence_label": "muito baixa",
@@ -2761,7 +2761,7 @@
         "name_normalized": "TRAIRI",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 0.47,
+        "risk_score": 0.45,
         "risk_level": "baixo",
         "confidence_pct": 35.1,
         "confidence_label": "muito baixa",
@@ -2822,11 +2822,11 @@
         "name_normalized": "GUAIUBA",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 0.34,
+        "risk_score": 0.33,
         "risk_level": "baixo",
         "confidence_pct": 35.1,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 23.4,
+        "expressiveness_pct": 23.5,
         "expressiveness_label": "baixa",
         "data_limit": "2026-08-05",
         "metrics": {
@@ -2883,11 +2883,11 @@
         "name_normalized": "PINDORETAMA",
         "region": "rmf",
         "territorial_level": "cidade",
-        "risk_score": 0.3,
+        "risk_score": 0.29,
         "risk_level": "baixo",
         "confidence_pct": 32.1,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 20.1,
+        "expressiveness_pct": 20.2,
         "expressiveness_label": "baixa",
         "data_limit": "2026-08-05",
         "metrics": {
@@ -3025,7 +3025,7 @@
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 2.75,
+          "score_z": 2.74,
           "peer_percentile": 100.0,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -3068,25 +3068,25 @@
         "name_normalized": "SOBRAL",
         "region": "interior",
         "territorial_level": "cidade",
-        "risk_score": 79.69,
+        "risk_score": 80.26,
         "risk_level": "crítico",
-        "confidence_pct": 93.6,
+        "confidence_pct": 93.5,
         "confidence_label": "alta",
-        "expressiveness_pct": 86.7,
+        "expressiveness_pct": 86.8,
         "expressiveness_label": "muito alta",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 1,
           "recent_cvli_30d": 4,
-          "historical_cvli": 391.0,
-          "neural_score": 89.0,
+          "historical_cvli": 392.0,
+          "neural_score": 89.9,
           "tension_score": 100.0,
           "inclusion_score": 50.0,
           "calm_penalty": 3.3,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 2.06,
+          "score_z": 2.07,
           "peer_percentile": 94.7,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -3101,7 +3101,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 89.0
+              "strength_pct": 89.9
             },
             {
               "key": "cvli_recente",
@@ -3109,10 +3109,10 @@
               "strength_pct": 80.0
             }
           ],
-          "summary": "Tensão territorial: 100.0% | Sinal Poisson do ranking operacional: 89.0% | CVLI recente na janela de 30 dias: 80.0%"
+          "summary": "Tensão territorial: 100.0% | Sinal Poisson do ranking operacional: 89.9% | CVLI recente na janela de 30 dias: 80.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "SOBRAL aparece na posição 2 de 20, com risco 79.7 e nível crítico; é prioridade imediata de acompanhamento.",
+          "leitura_rapida": "SOBRAL aparece na posição 2 de 20, com risco 80.3 e nível crítico; é prioridade imediata de acompanhamento.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 4 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura com boa sustentação dos sinais atuais.",
           "expressividade_previsao": "O território está bem destacado no ranking frente aos pares.",
@@ -3129,25 +3129,25 @@
         "name_normalized": "CRATO",
         "region": "interior",
         "territorial_level": "cidade",
-        "risk_score": 52.84,
+        "risk_score": 53.27,
         "risk_level": "alto",
-        "confidence_pct": 89.8,
+        "confidence_pct": 89.9,
         "confidence_label": "alta",
-        "expressiveness_pct": 78.8,
+        "expressiveness_pct": 78.9,
         "expressiveness_label": "alta",
         "data_limit": "2026-08-05",
         "metrics": {
-          "recent_cvli_14d": 4,
-          "recent_cvli_30d": 6,
-          "historical_cvli": 188.0,
-          "neural_score": 28.1,
+          "recent_cvli_14d": 5,
+          "recent_cvli_30d": 7,
+          "historical_cvli": 189.0,
+          "neural_score": 28.8,
           "tension_score": 100.0,
           "inclusion_score": 100.0,
           "calm_penalty": 6.7,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 1.07,
+          "score_z": 1.08,
           "peer_percentile": 89.5,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -3173,8 +3173,8 @@
           "summary": "Tensão territorial: 100.0% | Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 100.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "CRATO aparece na posição 3 de 20, com risco 52.8 e nível alto; é prioridade imediata de acompanhamento.",
-          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 6 registros recentes na janela de 30 dias.",
+          "leitura_rapida": "CRATO aparece na posição 3 de 20, com risco 53.3 e nível alto; é prioridade imediata de acompanhamento.",
+          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 7 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura com boa sustentação dos sinais atuais.",
           "expressividade_previsao": "O território se diferencia do bloco intermediário, mas sem isolamento absoluto.",
           "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
@@ -3190,25 +3190,25 @@
         "name_normalized": "BOA VIAGEM",
         "region": "interior",
         "territorial_level": "cidade",
-        "risk_score": 47.78,
+        "risk_score": 48.12,
         "risk_level": "moderado",
-        "confidence_pct": 88.8,
+        "confidence_pct": 88.9,
         "confidence_label": "alta",
-        "expressiveness_pct": 74.7,
+        "expressiveness_pct": 74.8,
         "expressiveness_label": "alta",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 4,
           "recent_cvli_30d": 6,
-          "historical_cvli": 126.0,
-          "neural_score": 21.1,
+          "historical_cvli": 128.0,
+          "neural_score": 21.7,
           "tension_score": 100.0,
           "inclusion_score": 100.0,
           "calm_penalty": 20.0,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 0.88,
+          "score_z": 0.89,
           "peer_percentile": 84.2,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -3234,7 +3234,7 @@
           "summary": "Tensão territorial: 100.0% | Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 100.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "BOA VIAGEM aparece na posição 4 de 20, com risco 47.8 e nível moderado; é prioridade imediata de acompanhamento.",
+          "leitura_rapida": "BOA VIAGEM aparece na posição 4 de 20, com risco 48.1 e nível moderado; é prioridade imediata de acompanhamento.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 6 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura com boa sustentação dos sinais atuais.",
           "expressividade_previsao": "O território se diferencia do bloco intermediário, mas sem isolamento absoluto.",
@@ -3255,7 +3255,7 @@
         "risk_level": "moderado",
         "confidence_pct": 87.6,
         "confidence_label": "alta",
-        "expressiveness_pct": 70.6,
+        "expressiveness_pct": 70.5,
         "expressiveness_label": "alta",
         "data_limit": "2026-08-05",
         "metrics": {
@@ -3308,83 +3308,22 @@
       },
       {
         "rank": 6,
-        "name": "AMONTADA",
-        "name_normalized": "AMONTADA",
+        "name": "TIANGUA",
+        "name_normalized": "TIANGUA",
         "region": "interior",
         "territorial_level": "cidade",
-        "risk_score": 31.53,
+        "risk_score": 31.78,
         "risk_level": "moderado",
-        "confidence_pct": 84.6,
+        "confidence_pct": 74.6,
         "confidence_label": "moderada",
         "expressiveness_pct": 65.6,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 1,
-          "recent_cvli_30d": 3,
-          "historical_cvli": 144.0,
-          "neural_score": 15.5,
-          "tension_score": 100.0,
-          "inclusion_score": 50.0,
-          "calm_penalty": 30.0,
-          "territorial_support_pct": 100.0,
-          "historical_support_pct": 100.0,
-          "live_support_pct": 100.0,
-          "score_z": 0.28,
-          "peer_percentile": 73.7,
-          "dynamic_window_days": 14,
-          "base_window_days": 14
-        },
-        "explainability": {
-          "top_drivers": [
-            {
-              "key": "tensao_territorial",
-              "label": "Tensão territorial",
-              "strength_pct": 100.0
-            },
-            {
-              "key": "cvli_recente",
-              "label": "CVLI recente na janela de 30 dias",
-              "strength_pct": 60.0
-            },
-            {
-              "key": "inclusao_recente",
-              "label": "Atividade recente e vizinhança",
-              "strength_pct": 50.0
-            }
-          ],
-          "summary": "Tensão territorial: 100.0% | CVLI recente na janela de 30 dias: 60.0% | Atividade recente e vizinhança: 50.0%"
-        },
-        "manager_feedback": {
-          "leitura_rapida": "AMONTADA aparece na posição 6 de 20, com risco 31.5 e nível moderado; é prioridade alta de acompanhamento.",
-          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 3 registros recentes na janela de 30 dias.",
-          "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
-          "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
-          "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
-        },
-        "prediction_details": {
-          "historical_fallback": false,
-          "trend": "stable"
-        }
-      },
-      {
-        "rank": 7,
-        "name": "TIANGUA",
-        "name_normalized": "TIANGUA",
-        "region": "interior",
-        "territorial_level": "cidade",
-        "risk_score": 31.48,
-        "risk_level": "moderado",
-        "confidence_pct": 74.5,
-        "confidence_label": "moderada",
-        "expressiveness_pct": 62.4,
-        "expressiveness_label": "moderada",
-        "data_limit": "2026-08-05",
-        "metrics": {
-          "recent_cvli_14d": 1,
           "recent_cvli_30d": 1,
-          "historical_cvli": 129.0,
-          "neural_score": 14.9,
+          "historical_cvli": 132.0,
+          "neural_score": 15.3,
           "tension_score": 100.0,
           "inclusion_score": 50.0,
           "calm_penalty": 20.0,
@@ -3392,7 +3331,7 @@
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
           "score_z": 0.28,
-          "peer_percentile": 68.4,
+          "peer_percentile": 73.7,
           "dynamic_window_days": 14,
           "base_window_days": 14
         },
@@ -3417,8 +3356,69 @@
           "summary": "Tensão territorial: 100.0% | Atividade recente e vizinhança: 50.0% | CVLI recente na janela de 30 dias: 20.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "TIANGUA aparece na posição 7 de 20, com risco 31.5 e nível moderado; é prioridade alta de acompanhamento.",
+          "leitura_rapida": "TIANGUA aparece na posição 6 de 20, com risco 31.8 e nível moderado; é prioridade alta de acompanhamento.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 1 registros recentes na janela de 30 dias.",
+          "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
+          "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
+          "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+        },
+        "prediction_details": {
+          "historical_fallback": false,
+          "trend": "stable"
+        }
+      },
+      {
+        "rank": 7,
+        "name": "AMONTADA",
+        "name_normalized": "AMONTADA",
+        "region": "interior",
+        "territorial_level": "cidade",
+        "risk_score": 31.53,
+        "risk_level": "moderado",
+        "confidence_pct": 84.6,
+        "confidence_label": "moderada",
+        "expressiveness_pct": 62.4,
+        "expressiveness_label": "moderada",
+        "data_limit": "2026-08-05",
+        "metrics": {
+          "recent_cvli_14d": 1,
+          "recent_cvli_30d": 3,
+          "historical_cvli": 144.0,
+          "neural_score": 15.5,
+          "tension_score": 100.0,
+          "inclusion_score": 50.0,
+          "calm_penalty": 30.0,
+          "territorial_support_pct": 100.0,
+          "historical_support_pct": 100.0,
+          "live_support_pct": 100.0,
+          "score_z": 0.28,
+          "peer_percentile": 68.4,
+          "dynamic_window_days": 14,
+          "base_window_days": 14
+        },
+        "explainability": {
+          "top_drivers": [
+            {
+              "key": "tensao_territorial",
+              "label": "Tensão territorial",
+              "strength_pct": 100.0
+            },
+            {
+              "key": "cvli_recente",
+              "label": "CVLI recente na janela de 30 dias",
+              "strength_pct": 60.0
+            },
+            {
+              "key": "inclusao_recente",
+              "label": "Atividade recente e vizinhança",
+              "strength_pct": 50.0
+            }
+          ],
+          "summary": "Tensão territorial: 100.0% | CVLI recente na janela de 30 dias: 60.0% | Atividade recente e vizinhança: 50.0%"
+        },
+        "manager_feedback": {
+          "leitura_rapida": "AMONTADA aparece na posição 7 de 20, com risco 31.5 e nível moderado; é prioridade alta de acompanhamento.",
+          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 3 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
           "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
@@ -3452,7 +3452,7 @@
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 0.12,
+          "score_z": 0.11,
           "peer_percentile": 63.2,
           "dynamic_window_days": 14,
           "base_window_days": 14
@@ -3495,7 +3495,7 @@
         "name_normalized": "BARBALHA",
         "region": "interior",
         "territorial_level": "cidade",
-        "risk_score": 13.59,
+        "risk_score": 13.67,
         "risk_level": "baixo",
         "confidence_pct": 81.3,
         "confidence_label": "moderada",
@@ -3505,8 +3505,8 @@
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 3,
-          "historical_cvli": 74.0,
-          "neural_score": 6.6,
+          "historical_cvli": 75.0,
+          "neural_score": 6.7,
           "tension_score": 100.0,
           "inclusion_score": 0.0,
           "calm_penalty": 46.7,
@@ -3533,13 +3533,13 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 6.6
+              "strength_pct": 6.7
             }
           ],
-          "summary": "Tensão territorial: 100.0% | CVLI recente na janela de 30 dias: 60.0% | Sinal Poisson do ranking operacional: 6.6%"
+          "summary": "Tensão territorial: 100.0% | CVLI recente na janela de 30 dias: 60.0% | Sinal Poisson do ranking operacional: 6.7%"
         },
         "manager_feedback": {
-          "leitura_rapida": "BARBALHA aparece na posição 9 de 20, com risco 13.6 e nível baixo; é prioridade alta de acompanhamento.",
+          "leitura_rapida": "BARBALHA aparece na posição 9 de 20, com risco 13.7 e nível baixo; é prioridade alta de acompanhamento.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 3 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -3617,7 +3617,7 @@
         "name_normalized": "ITAPIPOCA",
         "region": "interior",
         "territorial_level": "cidade",
-        "risk_score": 8.54,
+        "risk_score": 8.56,
         "risk_level": "baixo",
         "confidence_pct": 37.4,
         "confidence_label": "muito baixa",
@@ -3627,7 +3627,7 @@
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
-          "historical_cvli": 199.0,
+          "historical_cvli": 200.0,
           "neural_score": 15.5,
           "tension_score": 20.0,
           "inclusion_score": 0.0,
@@ -3661,7 +3661,7 @@
           "summary": "Tensão territorial: 20.0% | Sinal Poisson do ranking operacional: 15.5% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "ITAPIPOCA aparece na posição 11 de 20, com risco 8.5 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "ITAPIPOCA aparece na posição 11 de 20, com risco 8.6 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 20.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -4290,25 +4290,25 @@
         "name_normalized": "JOSE DE ALENCAR",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 46.66,
+        "risk_score": 46.36,
         "risk_level": "moderado",
-        "confidence_pct": 83.7,
+        "confidence_pct": 83.6,
         "confidence_label": "moderada",
-        "expressiveness_pct": 87.5,
+        "expressiveness_pct": 87.4,
         "expressiveness_label": "muito alta",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 2,
           "recent_cvli_30d": 3,
           "historical_cvli": 48.0,
-          "neural_score": 19.8,
+          "neural_score": 19.3,
           "tension_score": 100.0,
           "inclusion_score": 100.0,
           "calm_penalty": 26.7,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 70.0,
           "live_support_pct": 100.0,
-          "score_z": 1.88,
+          "score_z": 1.86,
           "peer_percentile": 97.4,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -4334,7 +4334,7 @@
           "summary": "Tensão territorial: 100.0% | Atividade recente e vizinhança: 100.0% | CVLI recente na janela de 30 dias: 60.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "JOSE DE ALENCAR aparece na posição 2 de 40, com risco 46.7 e nível moderado; é prioridade imediata de acompanhamento.",
+          "leitura_rapida": "JOSE DE ALENCAR aparece na posição 2 de 40, com risco 46.4 e nível moderado; é prioridade imediata de acompanhamento.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 3 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
           "expressividade_previsao": "O território está bem destacado no ranking frente aos pares.",
@@ -4351,9 +4351,9 @@
         "name_normalized": "SIQUEIRA",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 40.91,
+        "risk_score": 40.67,
         "risk_level": "moderado",
-        "confidence_pct": 76.5,
+        "confidence_pct": 76.4,
         "confidence_label": "moderada",
         "expressiveness_pct": 84.4,
         "expressiveness_label": "alta",
@@ -4362,14 +4362,14 @@
           "recent_cvli_14d": 1,
           "recent_cvli_30d": 1,
           "historical_cvli": 79.0,
-          "neural_score": 32.9,
+          "neural_score": 32.5,
           "tension_score": 100.0,
           "inclusion_score": 50.0,
           "calm_penalty": 40.0,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 1.56,
+          "score_z": 1.55,
           "peer_percentile": 94.9,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -4389,13 +4389,13 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 32.9
+              "strength_pct": 32.5
             }
           ],
-          "summary": "Tensão territorial: 100.0% | Atividade recente e vizinhança: 50.0% | Sinal Poisson do ranking operacional: 32.9%"
+          "summary": "Tensão territorial: 100.0% | Atividade recente e vizinhança: 50.0% | Sinal Poisson do ranking operacional: 32.5%"
         },
         "manager_feedback": {
-          "leitura_rapida": "SIQUEIRA aparece na posição 3 de 40, com risco 40.9 e nível moderado; é prioridade imediata de acompanhamento.",
+          "leitura_rapida": "SIQUEIRA aparece na posição 3 de 40, com risco 40.7 e nível moderado; é prioridade imediata de acompanhamento.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 1 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
           "expressividade_previsao": "O território se diferencia do bloco intermediário, mas sem isolamento absoluto.",
@@ -4412,9 +4412,9 @@
         "name_normalized": "BARROSO",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 39.99,
+        "risk_score": 39.73,
         "risk_level": "moderado",
-        "confidence_pct": 76.2,
+        "confidence_pct": 76.1,
         "confidence_label": "moderada",
         "expressiveness_pct": 82.6,
         "expressiveness_label": "alta",
@@ -4423,14 +4423,14 @@
           "recent_cvli_14d": 1,
           "recent_cvli_30d": 1,
           "historical_cvli": 73.0,
-          "neural_score": 30.1,
+          "neural_score": 29.6,
           "tension_score": 100.0,
           "inclusion_score": 50.0,
           "calm_penalty": 30.0,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 100.0,
-          "score_z": 1.51,
+          "score_z": 1.49,
           "peer_percentile": 92.3,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -4450,13 +4450,13 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 30.1
+              "strength_pct": 29.6
             }
           ],
-          "summary": "Tensão territorial: 100.0% | Atividade recente e vizinhança: 50.0% | Sinal Poisson do ranking operacional: 30.1%"
+          "summary": "Tensão territorial: 100.0% | Atividade recente e vizinhança: 50.0% | Sinal Poisson do ranking operacional: 29.6%"
         },
         "manager_feedback": {
-          "leitura_rapida": "BARROSO aparece na posição 4 de 40, com risco 40.0 e nível moderado; é prioridade imediata de acompanhamento.",
+          "leitura_rapida": "BARROSO aparece na posição 4 de 40, com risco 39.7 e nível moderado; é prioridade imediata de acompanhamento.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 1 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
           "expressividade_previsao": "O território se diferencia do bloco intermediário, mas sem isolamento absoluto.",
@@ -4473,25 +4473,25 @@
         "name_normalized": "BARRA DO CEARA",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 37.01,
+        "risk_score": 37.65,
         "risk_level": "moderado",
-        "confidence_pct": 45.1,
+        "confidence_pct": 45.3,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 80.3,
+        "expressiveness_pct": 80.4,
         "expressiveness_label": "alta",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
-          "historical_cvli": 135.0,
-          "neural_score": 82.9,
+          "historical_cvli": 136.0,
+          "neural_score": 84.4,
           "tension_score": 20.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
           "territorial_support_pct": 20.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 0.0,
-          "score_z": 1.35,
+          "score_z": 1.38,
           "peer_percentile": 89.7,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -4501,7 +4501,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 82.9
+              "strength_pct": 84.4
             },
             {
               "key": "tensao_territorial",
@@ -4514,10 +4514,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Sinal Poisson do ranking operacional: 82.9% | Tensão territorial: 20.0% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Sinal Poisson do ranking operacional: 84.4% | Tensão territorial: 20.0% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "BARRA DO CEARA aparece na posição 5 de 40, com risco 37.0 e nível moderado; é prioridade imediata de acompanhamento.",
+          "leitura_rapida": "BARRA DO CEARA aparece na posição 5 de 40, com risco 37.6 e nível moderado; é prioridade imediata de acompanhamento.",
           "por_que_importa": "O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 20.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território se diferencia do bloco intermediário, mas sem isolamento absoluto.",
@@ -4534,25 +4534,25 @@
         "name_normalized": "LAGOA REDONDA",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 35.63,
+        "risk_score": 35.32,
         "risk_level": "moderado",
         "confidence_pct": 75.2,
         "confidence_label": "moderada",
-        "expressiveness_pct": 78.4,
+        "expressiveness_pct": 78.3,
         "expressiveness_label": "alta",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 1,
           "recent_cvli_30d": 1,
           "historical_cvli": 57.0,
-          "neural_score": 21.2,
+          "neural_score": 20.7,
           "tension_score": 100.0,
           "inclusion_score": 50.0,
           "calm_penalty": 13.3,
           "territorial_support_pct": 100.0,
           "historical_support_pct": 92.5,
           "live_support_pct": 100.0,
-          "score_z": 1.27,
+          "score_z": 1.25,
           "peer_percentile": 87.2,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -4572,13 +4572,13 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 21.2
+              "strength_pct": 20.7
             }
           ],
-          "summary": "Tensão territorial: 100.0% | Atividade recente e vizinhança: 50.0% | Sinal Poisson do ranking operacional: 21.2%"
+          "summary": "Tensão territorial: 100.0% | Atividade recente e vizinhança: 50.0% | Sinal Poisson do ranking operacional: 20.7%"
         },
         "manager_feedback": {
-          "leitura_rapida": "LAGOA REDONDA aparece na posição 6 de 40, com risco 35.6 e nível moderado; é prioridade alta de acompanhamento.",
+          "leitura_rapida": "LAGOA REDONDA aparece na posição 6 de 40, com risco 35.3 e nível moderado; é prioridade alta de acompanhamento.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 100.0% e 1 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura consistente, mas ainda pede validação operacional pontual.",
           "expressividade_previsao": "O território se diferencia do bloco intermediário, mas sem isolamento absoluto.",
@@ -4595,7 +4595,7 @@
         "name_normalized": "GRANJA LISBOA",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 31.26,
+        "risk_score": 31.15,
         "risk_level": "moderado",
         "confidence_pct": 54.6,
         "confidence_label": "muito baixa",
@@ -4606,14 +4606,14 @@
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 1,
           "historical_cvli": 112.0,
-          "neural_score": 60.0,
+          "neural_score": 59.7,
           "tension_score": 50.0,
           "inclusion_score": 0.0,
           "calm_penalty": 93.3,
           "territorial_support_pct": 50.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 50.0,
-          "score_z": 1.03,
+          "score_z": 1.02,
           "peer_percentile": 84.6,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -4623,7 +4623,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 60.0
+              "strength_pct": 59.7
             },
             {
               "key": "tensao_territorial",
@@ -4636,10 +4636,10 @@
               "strength_pct": 20.0
             }
           ],
-          "summary": "Sinal Poisson do ranking operacional: 60.0% | Tensão territorial: 50.0% | CVLI recente na janela de 30 dias: 20.0%"
+          "summary": "Sinal Poisson do ranking operacional: 59.7% | Tensão territorial: 50.0% | CVLI recente na janela de 30 dias: 20.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "GRANJA LISBOA aparece na posição 7 de 40, com risco 31.3 e nível moderado; é prioridade alta de acompanhamento.",
+          "leitura_rapida": "GRANJA LISBOA aparece na posição 7 de 40, com risco 31.1 e nível moderado; é prioridade alta de acompanhamento.",
           "por_que_importa": "O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 50.0% e 1 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território se diferencia do bloco intermediário, mas sem isolamento absoluto.",
@@ -4656,25 +4656,25 @@
         "name_normalized": "JOSE WALTER",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 21.24,
+        "risk_score": 21.09,
         "risk_level": "baixo",
         "confidence_pct": 40.8,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 71.6,
+        "expressiveness_pct": 71.5,
         "expressiveness_label": "alta",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 103.0,
-          "neural_score": 45.5,
+          "neural_score": 45.2,
           "tension_score": 20.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
           "territorial_support_pct": 20.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 0.0,
-          "score_z": 0.48,
+          "score_z": 0.47,
           "peer_percentile": 82.1,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -4684,7 +4684,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 45.5
+              "strength_pct": 45.2
             },
             {
               "key": "tensao_territorial",
@@ -4697,10 +4697,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Sinal Poisson do ranking operacional: 45.5% | Tensão territorial: 20.0% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Sinal Poisson do ranking operacional: 45.2% | Tensão territorial: 20.0% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "JOSE WALTER aparece na posição 8 de 40, com risco 21.2 e nível baixo; é prioridade alta de acompanhamento.",
+          "leitura_rapida": "JOSE WALTER aparece na posição 8 de 40, com risco 21.1 e nível baixo; é prioridade alta de acompanhamento.",
           "por_que_importa": "O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 20.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território se diferencia do bloco intermediário, mas sem isolamento absoluto.",
@@ -4717,25 +4717,25 @@
         "name_normalized": "PLANALTO AYRTON SENNA",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 18.82,
+        "risk_score": 18.66,
         "risk_level": "baixo",
-        "confidence_pct": 40.1,
+        "confidence_pct": 40.0,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 69.4,
+        "expressiveness_pct": 69.3,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 95.0,
-          "neural_score": 39.8,
+          "neural_score": 39.4,
           "tension_score": 20.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
           "territorial_support_pct": 20.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 0.0,
-          "score_z": 0.35,
+          "score_z": 0.34,
           "peer_percentile": 79.5,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -4745,7 +4745,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 39.8
+              "strength_pct": 39.4
             },
             {
               "key": "tensao_territorial",
@@ -4758,10 +4758,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Sinal Poisson do ranking operacional: 39.8% | Tensão territorial: 20.0% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Sinal Poisson do ranking operacional: 39.4% | Tensão territorial: 20.0% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "PLANALTO AYRTON SENNA aparece na posição 9 de 40, com risco 18.8 e nível baixo; é prioridade alta de acompanhamento.",
+          "leitura_rapida": "PLANALTO AYRTON SENNA aparece na posição 9 de 40, com risco 18.7 e nível baixo; é prioridade alta de acompanhamento.",
           "por_que_importa": "O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 20.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -4778,9 +4778,9 @@
         "name_normalized": "MONDUBIM",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 15.12,
+        "risk_score": 14.94,
         "risk_level": "baixo",
-        "confidence_pct": 38.9,
+        "confidence_pct": 38.8,
         "confidence_label": "muito baixa",
         "expressiveness_pct": 66.8,
         "expressiveness_label": "moderada",
@@ -4789,14 +4789,14 @@
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 92.0,
-          "neural_score": 31.1,
+          "neural_score": 30.6,
           "tension_score": 20.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
           "territorial_support_pct": 20.0,
           "historical_support_pct": 100.0,
           "live_support_pct": 0.0,
-          "score_z": 0.15,
+          "score_z": 0.13,
           "peer_percentile": 76.9,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -4806,7 +4806,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 31.1
+              "strength_pct": 30.6
             },
             {
               "key": "tensao_territorial",
@@ -4819,10 +4819,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Sinal Poisson do ranking operacional: 31.1% | Tensão territorial: 20.0% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Sinal Poisson do ranking operacional: 30.6% | Tensão territorial: 20.0% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "MONDUBIM aparece na posição 10 de 40, com risco 15.1 e nível baixo; é prioridade alta de acompanhamento.",
+          "leitura_rapida": "MONDUBIM aparece na posição 10 de 40, com risco 14.9 e nível baixo; é prioridade alta de acompanhamento.",
           "por_que_importa": "O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 20.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -4835,29 +4835,29 @@
       },
       {
         "rank": 11,
-        "name": "PASSARE",
-        "name_normalized": "PASSARE",
+        "name": "PICI",
+        "name_normalized": "PICI",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 9.54,
+        "risk_score": 14.22,
         "risk_level": "baixo",
-        "confidence_pct": 37.3,
+        "confidence_pct": 53.8,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 63.9,
+        "expressiveness_pct": 65.1,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
-          "recent_cvli_30d": 0,
-          "historical_cvli": 66.0,
-          "neural_score": 17.9,
-          "tension_score": 20.0,
+          "recent_cvli_30d": 1,
+          "historical_cvli": 55.0,
+          "neural_score": 17.0,
+          "tension_score": 50.0,
           "inclusion_score": 0.0,
-          "calm_penalty": 100.0,
-          "territorial_support_pct": 20.0,
-          "historical_support_pct": 100.0,
-          "live_support_pct": 0.0,
-          "score_z": -0.16,
+          "calm_penalty": 46.7,
+          "territorial_support_pct": 50.0,
+          "historical_support_pct": 87.5,
+          "live_support_pct": 50.0,
+          "score_z": 0.09,
           "peer_percentile": 74.4,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -4867,24 +4867,24 @@
             {
               "key": "tensao_territorial",
               "label": "Tensão territorial",
+              "strength_pct": 50.0
+            },
+            {
+              "key": "cvli_recente",
+              "label": "CVLI recente na janela de 30 dias",
               "strength_pct": 20.0
             },
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 17.9
-            },
-            {
-              "key": "inclusao_recente",
-              "label": "Atividade recente e vizinhança",
-              "strength_pct": 0.0
+              "strength_pct": 17.0
             }
           ],
-          "summary": "Tensão territorial: 20.0% | Sinal Poisson do ranking operacional: 17.9% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Tensão territorial: 50.0% | CVLI recente na janela de 30 dias: 20.0% | Sinal Poisson do ranking operacional: 17.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "PASSARE aparece na posição 11 de 40, com risco 9.5 e nível baixo; é território de atenção tática.",
-          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 20.0% e 0 registros recentes na janela de 30 dias.",
+          "leitura_rapida": "PICI aparece na posição 11 de 40, com risco 14.2 e nível baixo; é território de atenção tática.",
+          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 50.0% e 1 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
           "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
@@ -4896,29 +4896,29 @@
       },
       {
         "rank": 12,
-        "name": "CONJUNTO PALMEIRAS",
-        "name_normalized": "CONJUNTO PALMEIRAS",
+        "name": "PASSARE",
+        "name_normalized": "PASSARE",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 9.01,
+        "risk_score": 9.33,
         "risk_level": "baixo",
-        "confidence_pct": 53.5,
+        "confidence_pct": 37.3,
         "confidence_label": "muito baixa",
         "expressiveness_pct": 62.2,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
-          "recent_cvli_30d": 1,
-          "historical_cvli": 48.0,
-          "neural_score": 9.3,
-          "tension_score": 50.0,
+          "recent_cvli_30d": 0,
+          "historical_cvli": 66.0,
+          "neural_score": 17.3,
+          "tension_score": 20.0,
           "inclusion_score": 0.0,
-          "calm_penalty": 96.7,
-          "territorial_support_pct": 50.0,
-          "historical_support_pct": 70.0,
-          "live_support_pct": 50.0,
-          "score_z": -0.19,
+          "calm_penalty": 100.0,
+          "territorial_support_pct": 20.0,
+          "historical_support_pct": 100.0,
+          "live_support_pct": 0.0,
+          "score_z": -0.17,
           "peer_percentile": 71.8,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -4928,73 +4928,12 @@
             {
               "key": "tensao_territorial",
               "label": "Tensão territorial",
-              "strength_pct": 50.0
-            },
-            {
-              "key": "cvli_recente",
-              "label": "CVLI recente na janela de 30 dias",
               "strength_pct": 20.0
             },
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 9.3
-            }
-          ],
-          "summary": "Tensão territorial: 50.0% | CVLI recente na janela de 30 dias: 20.0% | Sinal Poisson do ranking operacional: 9.3%"
-        },
-        "manager_feedback": {
-          "leitura_rapida": "CONJUNTO PALMEIRAS aparece na posição 12 de 40, com risco 9.0 e nível baixo; é território de atenção tática.",
-          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 50.0% e 1 registros recentes na janela de 30 dias.",
-          "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
-          "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
-          "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
-        },
-        "prediction_details": {
-          "historical_fallback": false,
-          "trend": "stable"
-        }
-      },
-      {
-        "rank": 13,
-        "name": "QUINTINO CUNHA",
-        "name_normalized": "QUINTINO CUNHA",
-        "region": "fortaleza",
-        "territorial_level": "bairro",
-        "risk_score": 8.7,
-        "risk_level": "baixo",
-        "confidence_pct": 37.4,
-        "confidence_label": "muito baixa",
-        "expressiveness_pct": 60.5,
-        "expressiveness_label": "moderada",
-        "data_limit": "2026-08-05",
-        "metrics": {
-          "recent_cvli_14d": 0,
-          "recent_cvli_30d": 0,
-          "historical_cvli": 67.0,
-          "neural_score": 15.9,
-          "tension_score": 20.0,
-          "inclusion_score": 0.0,
-          "calm_penalty": 100.0,
-          "territorial_support_pct": 20.0,
-          "historical_support_pct": 100.0,
-          "live_support_pct": 0.0,
-          "score_z": -0.2,
-          "peer_percentile": 69.2,
-          "dynamic_window_days": 90,
-          "base_window_days": 90
-        },
-        "explainability": {
-          "top_drivers": [
-            {
-              "key": "tensao_territorial",
-              "label": "Tensão territorial",
-              "strength_pct": 20.0
-            },
-            {
-              "key": "sinal_modelo",
-              "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 15.9
+              "strength_pct": 17.3
             },
             {
               "key": "inclusao_recente",
@@ -5002,10 +4941,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Tensão territorial: 20.0% | Sinal Poisson do ranking operacional: 15.9% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Tensão territorial: 20.0% | Sinal Poisson do ranking operacional: 17.3% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "QUINTINO CUNHA aparece na posição 13 de 40, com risco 8.7 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "PASSARE aparece na posição 12 de 40, com risco 9.3 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 20.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -5017,31 +4956,31 @@
         }
       },
       {
-        "rank": 14,
-        "name": "EDSON QUEIROZ",
-        "name_normalized": "EDSON QUEIROZ",
+        "rank": 13,
+        "name": "CONJUNTO PALMEIRAS",
+        "name_normalized": "CONJUNTO PALMEIRAS",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 8.48,
+        "risk_score": 8.92,
         "risk_level": "baixo",
-        "confidence_pct": 53.4,
+        "confidence_pct": 53.5,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 59.0,
+        "expressiveness_pct": 60.6,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 1,
-          "historical_cvli": 44.0,
-          "neural_score": 8.0,
+          "historical_cvli": 49.0,
+          "neural_score": 9.1,
           "tension_score": 50.0,
           "inclusion_score": 0.0,
-          "calm_penalty": 93.3,
+          "calm_penalty": 96.7,
           "territorial_support_pct": 50.0,
-          "historical_support_pct": 60.0,
+          "historical_support_pct": 72.5,
           "live_support_pct": 50.0,
-          "score_z": -0.22,
-          "peer_percentile": 66.7,
+          "score_z": -0.2,
+          "peer_percentile": 69.2,
           "dynamic_window_days": 90,
           "base_window_days": 90
         },
@@ -5060,13 +4999,13 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 8.0
+              "strength_pct": 9.1
             }
           ],
-          "summary": "Tensão territorial: 50.0% | CVLI recente na janela de 30 dias: 20.0% | Sinal Poisson do ranking operacional: 8.0%"
+          "summary": "Tensão territorial: 50.0% | CVLI recente na janela de 30 dias: 20.0% | Sinal Poisson do ranking operacional: 9.1%"
         },
         "manager_feedback": {
-          "leitura_rapida": "EDSON QUEIROZ aparece na posição 14 de 40, com risco 8.5 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "CONJUNTO PALMEIRAS aparece na posição 13 de 40, com risco 8.9 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 50.0% e 1 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -5078,31 +5017,214 @@
         }
       },
       {
+        "rank": 14,
+        "name": "QUINTINO CUNHA",
+        "name_normalized": "QUINTINO CUNHA",
+        "region": "fortaleza",
+        "territorial_level": "bairro",
+        "risk_score": 8.48,
+        "risk_level": "baixo",
+        "confidence_pct": 37.4,
+        "confidence_label": "muito baixa",
+        "expressiveness_pct": 59.0,
+        "expressiveness_label": "moderada",
+        "data_limit": "2026-08-05",
+        "metrics": {
+          "recent_cvli_14d": 0,
+          "recent_cvli_30d": 0,
+          "historical_cvli": 67.0,
+          "neural_score": 15.3,
+          "tension_score": 20.0,
+          "inclusion_score": 0.0,
+          "calm_penalty": 100.0,
+          "territorial_support_pct": 20.0,
+          "historical_support_pct": 100.0,
+          "live_support_pct": 0.0,
+          "score_z": -0.22,
+          "peer_percentile": 66.7,
+          "dynamic_window_days": 90,
+          "base_window_days": 90
+        },
+        "explainability": {
+          "top_drivers": [
+            {
+              "key": "tensao_territorial",
+              "label": "Tensão territorial",
+              "strength_pct": 20.0
+            },
+            {
+              "key": "sinal_modelo",
+              "label": "Sinal Poisson do ranking operacional",
+              "strength_pct": 15.3
+            },
+            {
+              "key": "inclusao_recente",
+              "label": "Atividade recente e vizinhança",
+              "strength_pct": 0.0
+            }
+          ],
+          "summary": "Tensão territorial: 20.0% | Sinal Poisson do ranking operacional: 15.3% | Atividade recente e vizinhança: 0.0%"
+        },
+        "manager_feedback": {
+          "leitura_rapida": "QUINTINO CUNHA aparece na posição 14 de 40, com risco 8.5 e nível baixo; é território de atenção tática.",
+          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 20.0% e 0 registros recentes na janela de 30 dias.",
+          "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
+          "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
+          "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+        },
+        "prediction_details": {
+          "historical_fallback": false,
+          "trend": "stable"
+        }
+      },
+      {
         "rank": 15,
+        "name": "EDSON QUEIROZ",
+        "name_normalized": "EDSON QUEIROZ",
+        "region": "fortaleza",
+        "territorial_level": "bairro",
+        "risk_score": 8.23,
+        "risk_level": "baixo",
+        "confidence_pct": 53.4,
+        "confidence_label": "muito baixa",
+        "expressiveness_pct": 57.3,
+        "expressiveness_label": "moderada",
+        "data_limit": "2026-08-05",
+        "metrics": {
+          "recent_cvli_14d": 0,
+          "recent_cvli_30d": 1,
+          "historical_cvli": 44.0,
+          "neural_score": 7.4,
+          "tension_score": 50.0,
+          "inclusion_score": 0.0,
+          "calm_penalty": 93.3,
+          "territorial_support_pct": 50.0,
+          "historical_support_pct": 60.0,
+          "live_support_pct": 50.0,
+          "score_z": -0.23,
+          "peer_percentile": 64.1,
+          "dynamic_window_days": 90,
+          "base_window_days": 90
+        },
+        "explainability": {
+          "top_drivers": [
+            {
+              "key": "tensao_territorial",
+              "label": "Tensão territorial",
+              "strength_pct": 50.0
+            },
+            {
+              "key": "cvli_recente",
+              "label": "CVLI recente na janela de 30 dias",
+              "strength_pct": 20.0
+            },
+            {
+              "key": "sinal_modelo",
+              "label": "Sinal Poisson do ranking operacional",
+              "strength_pct": 7.4
+            }
+          ],
+          "summary": "Tensão territorial: 50.0% | CVLI recente na janela de 30 dias: 20.0% | Sinal Poisson do ranking operacional: 7.4%"
+        },
+        "manager_feedback": {
+          "leitura_rapida": "EDSON QUEIROZ aparece na posição 15 de 40, com risco 8.2 e nível baixo; é território de atenção tática.",
+          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 50.0% e 1 registros recentes na janela de 30 dias.",
+          "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
+          "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
+          "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+        },
+        "prediction_details": {
+          "historical_fallback": false,
+          "trend": "stable"
+        }
+      },
+      {
+        "rank": 16,
         "name": "VICENTE PINZON",
         "name_normalized": "VICENTE PINZON",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 7.44,
+        "risk_score": 7.46,
+        "risk_level": "baixo",
+        "confidence_pct": 37.3,
+        "confidence_label": "muito baixa",
+        "expressiveness_pct": 55.6,
+        "expressiveness_label": "moderada",
+        "data_limit": "2026-08-05",
+        "metrics": {
+          "recent_cvli_14d": 0,
+          "recent_cvli_30d": 0,
+          "historical_cvli": 59.0,
+          "neural_score": 13.0,
+          "tension_score": 19.5,
+          "inclusion_score": 0.0,
+          "calm_penalty": 100.0,
+          "territorial_support_pct": 19.5,
+          "historical_support_pct": 97.5,
+          "live_support_pct": 0.0,
+          "score_z": -0.28,
+          "peer_percentile": 61.5,
+          "dynamic_window_days": 90,
+          "base_window_days": 90
+        },
+        "explainability": {
+          "top_drivers": [
+            {
+              "key": "tensao_territorial",
+              "label": "Tensão territorial",
+              "strength_pct": 19.5
+            },
+            {
+              "key": "sinal_modelo",
+              "label": "Sinal Poisson do ranking operacional",
+              "strength_pct": 13.0
+            },
+            {
+              "key": "inclusao_recente",
+              "label": "Atividade recente e vizinhança",
+              "strength_pct": 0.0
+            }
+          ],
+          "summary": "Tensão territorial: 19.5% | Sinal Poisson do ranking operacional: 13.0% | Atividade recente e vizinhança: 0.0%"
+        },
+        "manager_feedback": {
+          "leitura_rapida": "VICENTE PINZON aparece na posição 16 de 40, com risco 7.5 e nível baixo; é território de atenção tática.",
+          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 19.5% e 0 registros recentes na janela de 30 dias.",
+          "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
+          "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
+          "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
+        },
+        "prediction_details": {
+          "historical_fallback": false,
+          "trend": "stable"
+        }
+      },
+      {
+        "rank": 17,
+        "name": "GRANJA PORTUGAL",
+        "name_normalized": "GRANJA PORTUGAL",
+        "region": "fortaleza",
+        "territorial_level": "bairro",
+        "risk_score": 7.03,
         "risk_level": "baixo",
         "confidence_pct": 37.1,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 57.1,
+        "expressiveness_pct": 54.0,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 58.0,
-          "neural_score": 13.1,
+          "neural_score": 12.1,
           "tension_score": 19.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
           "territorial_support_pct": 19.0,
           "historical_support_pct": 95.0,
           "live_support_pct": 0.0,
-          "score_z": -0.27,
-          "peer_percentile": 64.1,
+          "score_z": -0.3,
+          "peer_percentile": 59.0,
           "dynamic_window_days": 90,
           "base_window_days": 90
         },
@@ -5116,7 +5238,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 13.1
+              "strength_pct": 12.1
             },
             {
               "key": "inclusao_recente",
@@ -5124,133 +5246,11 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Tensão territorial: 19.0% | Sinal Poisson do ranking operacional: 13.1% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Tensão territorial: 19.0% | Sinal Poisson do ranking operacional: 12.1% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "VICENTE PINZON aparece na posição 15 de 40, com risco 7.4 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "GRANJA PORTUGAL aparece na posição 17 de 40, com risco 7.0 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 19.0% e 0 registros recentes na janela de 30 dias.",
-          "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
-          "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
-          "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
-        },
-        "prediction_details": {
-          "historical_fallback": false,
-          "trend": "stable"
-        }
-      },
-      {
-        "rank": 16,
-        "name": "GRANJA PORTUGAL",
-        "name_normalized": "GRANJA PORTUGAL",
-        "region": "fortaleza",
-        "territorial_level": "bairro",
-        "risk_score": 7.02,
-        "risk_level": "baixo",
-        "confidence_pct": 36.9,
-        "confidence_label": "muito baixa",
-        "expressiveness_pct": 55.5,
-        "expressiveness_label": "moderada",
-        "data_limit": "2026-08-05",
-        "metrics": {
-          "recent_cvli_14d": 0,
-          "recent_cvli_30d": 0,
-          "historical_cvli": 57.0,
-          "neural_score": 12.2,
-          "tension_score": 18.5,
-          "inclusion_score": 0.0,
-          "calm_penalty": 100.0,
-          "territorial_support_pct": 18.5,
-          "historical_support_pct": 92.5,
-          "live_support_pct": 0.0,
-          "score_z": -0.3,
-          "peer_percentile": 61.5,
-          "dynamic_window_days": 90,
-          "base_window_days": 90
-        },
-        "explainability": {
-          "top_drivers": [
-            {
-              "key": "tensao_territorial",
-              "label": "Tensão territorial",
-              "strength_pct": 18.5
-            },
-            {
-              "key": "sinal_modelo",
-              "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 12.2
-            },
-            {
-              "key": "inclusao_recente",
-              "label": "Atividade recente e vizinhança",
-              "strength_pct": 0.0
-            }
-          ],
-          "summary": "Tensão territorial: 18.5% | Sinal Poisson do ranking operacional: 12.2% | Atividade recente e vizinhança: 0.0%"
-        },
-        "manager_feedback": {
-          "leitura_rapida": "GRANJA PORTUGAL aparece na posição 16 de 40, com risco 7.0 e nível baixo; é território de atenção tática.",
-          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 18.5% e 0 registros recentes na janela de 30 dias.",
-          "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
-          "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
-          "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
-        },
-        "prediction_details": {
-          "historical_fallback": false,
-          "trend": "stable"
-        }
-      },
-      {
-        "rank": 17,
-        "name": "PICI",
-        "name_normalized": "PICI",
-        "region": "fortaleza",
-        "territorial_level": "bairro",
-        "risk_score": 6.24,
-        "risk_level": "baixo",
-        "confidence_pct": 36.4,
-        "confidence_label": "muito baixa",
-        "expressiveness_pct": 53.8,
-        "expressiveness_label": "moderada",
-        "data_limit": "2026-08-05",
-        "metrics": {
-          "recent_cvli_14d": 0,
-          "recent_cvli_30d": 0,
-          "historical_cvli": 54.0,
-          "neural_score": 10.8,
-          "tension_score": 17.0,
-          "inclusion_score": 0.0,
-          "calm_penalty": 100.0,
-          "territorial_support_pct": 17.0,
-          "historical_support_pct": 85.0,
-          "live_support_pct": 0.0,
-          "score_z": -0.34,
-          "peer_percentile": 59.0,
-          "dynamic_window_days": 90,
-          "base_window_days": 90
-        },
-        "explainability": {
-          "top_drivers": [
-            {
-              "key": "tensao_territorial",
-              "label": "Tensão territorial",
-              "strength_pct": 17.0
-            },
-            {
-              "key": "sinal_modelo",
-              "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 10.8
-            },
-            {
-              "key": "inclusao_recente",
-              "label": "Atividade recente e vizinhança",
-              "strength_pct": 0.0
-            }
-          ],
-          "summary": "Tensão territorial: 17.0% | Sinal Poisson do ranking operacional: 10.8% | Atividade recente e vizinhança: 0.0%"
-        },
-        "manager_feedback": {
-          "leitura_rapida": "PICI aparece na posição 17 de 40, com risco 6.2 e nível baixo; é território de atenção tática.",
-          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 17.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
           "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
@@ -5266,25 +5266,25 @@
         "name_normalized": "BOM JARDIM",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 5.34,
+        "risk_score": 5.1,
         "risk_level": "baixo",
-        "confidence_pct": 35.6,
+        "confidence_pct": 35.7,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 52.0,
+        "expressiveness_pct": 51.9,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 50.0,
-          "neural_score": 9.1,
+          "neural_score": 8.5,
           "tension_score": 15.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
           "territorial_support_pct": 15.0,
           "historical_support_pct": 75.0,
           "live_support_pct": 0.0,
-          "score_z": -0.39,
+          "score_z": -0.41,
           "peer_percentile": 56.4,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -5299,7 +5299,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 9.1
+              "strength_pct": 8.5
             },
             {
               "key": "inclusao_recente",
@@ -5307,10 +5307,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Tensão territorial: 15.0% | Sinal Poisson do ranking operacional: 9.1% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Tensão territorial: 15.0% | Sinal Poisson do ranking operacional: 8.5% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "BOM JARDIM aparece na posição 18 de 40, com risco 5.3 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "BOM JARDIM aparece na posição 18 de 40, com risco 5.1 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 15.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -5327,25 +5327,25 @@
         "name_normalized": "JARDIM DAS OLIVEIRAS",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 5.21,
+        "risk_score": 4.97,
         "risk_level": "baixo",
         "confidence_pct": 35.7,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 50.4,
+        "expressiveness_pct": 50.3,
         "expressiveness_label": "moderada",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 50.0,
-          "neural_score": 8.8,
+          "neural_score": 8.2,
           "tension_score": 15.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
           "territorial_support_pct": 15.0,
           "historical_support_pct": 75.0,
           "live_support_pct": 0.0,
-          "score_z": -0.4,
+          "score_z": -0.41,
           "peer_percentile": 53.8,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -5360,7 +5360,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 8.8
+              "strength_pct": 8.2
             },
             {
               "key": "inclusao_recente",
@@ -5368,10 +5368,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Tensão territorial: 15.0% | Sinal Poisson do ranking operacional: 8.8% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Tensão territorial: 15.0% | Sinal Poisson do ranking operacional: 8.2% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "JARDIM DAS OLIVEIRAS aparece na posição 19 de 40, com risco 5.2 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "JARDIM DAS OLIVEIRAS aparece na posição 19 de 40, com risco 5.0 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 15.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -5388,9 +5388,9 @@
         "name_normalized": "BONSUCESSO",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 5.0,
+        "risk_score": 4.96,
         "risk_level": "baixo",
-        "confidence_pct": 35.3,
+        "confidence_pct": 35.5,
         "confidence_label": "muito baixa",
         "expressiveness_pct": 48.8,
         "expressiveness_label": "baixa",
@@ -5398,13 +5398,13 @@
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
-          "historical_cvli": 48.0,
-          "neural_score": 8.5,
-          "tension_score": 14.0,
+          "historical_cvli": 49.0,
+          "neural_score": 8.3,
+          "tension_score": 14.5,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
-          "territorial_support_pct": 14.0,
-          "historical_support_pct": 70.0,
+          "territorial_support_pct": 14.5,
+          "historical_support_pct": 72.5,
           "live_support_pct": 0.0,
           "score_z": -0.41,
           "peer_percentile": 51.3,
@@ -5416,12 +5416,12 @@
             {
               "key": "tensao_territorial",
               "label": "Tensão territorial",
-              "strength_pct": 14.0
+              "strength_pct": 14.5
             },
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 8.5
+              "strength_pct": 8.3
             },
             {
               "key": "inclusao_recente",
@@ -5429,11 +5429,11 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Tensão territorial: 14.0% | Sinal Poisson do ranking operacional: 8.5% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Tensão territorial: 14.5% | Sinal Poisson do ranking operacional: 8.3% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
           "leitura_rapida": "BONSUCESSO aparece na posição 20 de 40, com risco 5.0 e nível baixo; é território de atenção tática.",
-          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 14.0% e 0 registros recentes na janela de 30 dias.",
+          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 14.5% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
           "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
@@ -5449,25 +5449,25 @@
         "name_normalized": "CARLITO PAMPLONA",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 4.84,
+        "risk_score": 4.59,
         "risk_level": "baixo",
         "confidence_pct": 35.3,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 47.2,
+        "expressiveness_pct": 47.1,
         "expressiveness_label": "baixa",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 48.0,
-          "neural_score": 8.1,
+          "neural_score": 7.6,
           "tension_score": 14.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
           "territorial_support_pct": 14.0,
           "historical_support_pct": 70.0,
           "live_support_pct": 0.0,
-          "score_z": -0.42,
+          "score_z": -0.43,
           "peer_percentile": 48.7,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -5482,7 +5482,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 8.1
+              "strength_pct": 7.6
             },
             {
               "key": "inclusao_recente",
@@ -5490,10 +5490,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Tensão territorial: 14.0% | Sinal Poisson do ranking operacional: 8.1% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Tensão territorial: 14.0% | Sinal Poisson do ranking operacional: 7.6% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "CARLITO PAMPLONA aparece na posição 21 de 40, com risco 4.8 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "CARLITO PAMPLONA aparece na posição 21 de 40, com risco 4.6 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 14.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -5510,25 +5510,25 @@
         "name_normalized": "CANINDEZINHO",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 4.69,
+        "risk_score": 4.45,
         "risk_level": "baixo",
         "confidence_pct": 34.7,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 45.7,
+        "expressiveness_pct": 45.6,
         "expressiveness_label": "baixa",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 45.0,
-          "neural_score": 8.2,
+          "neural_score": 7.6,
           "tension_score": 12.5,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
           "territorial_support_pct": 12.5,
           "historical_support_pct": 62.5,
           "live_support_pct": 0.0,
-          "score_z": -0.43,
+          "score_z": -0.44,
           "peer_percentile": 46.2,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -5543,7 +5543,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 8.2
+              "strength_pct": 7.6
             },
             {
               "key": "inclusao_recente",
@@ -5551,10 +5551,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Tensão territorial: 12.5% | Sinal Poisson do ranking operacional: 8.2% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Tensão territorial: 12.5% | Sinal Poisson do ranking operacional: 7.6% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "CANINDEZINHO aparece na posição 22 de 40, com risco 4.7 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "CANINDEZINHO aparece na posição 22 de 40, com risco 4.5 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 12.5% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -5571,25 +5571,25 @@
         "name_normalized": "CENTRO",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 3.85,
+        "risk_score": 3.61,
         "risk_level": "baixo",
         "confidence_pct": 33.8,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 43.9,
+        "expressiveness_pct": 43.8,
         "expressiveness_label": "baixa",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 40.0,
-          "neural_score": 6.8,
+          "neural_score": 6.2,
           "tension_score": 10.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
           "territorial_support_pct": 10.0,
           "historical_support_pct": 50.0,
           "live_support_pct": 0.0,
-          "score_z": -0.47,
+          "score_z": -0.49,
           "peer_percentile": 43.6,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -5604,7 +5604,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 6.8
+              "strength_pct": 6.2
             },
             {
               "key": "inclusao_recente",
@@ -5612,10 +5612,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Tensão territorial: 10.0% | Sinal Poisson do ranking operacional: 6.8% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Tensão territorial: 10.0% | Sinal Poisson do ranking operacional: 6.2% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "CENTRO aparece na posição 23 de 40, com risco 3.9 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "CENTRO aparece na posição 23 de 40, com risco 3.6 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 10.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -5632,7 +5632,7 @@
         "name_normalized": "VILA VELHA",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 3.84,
+        "risk_score": 3.6,
         "risk_level": "baixo",
         "confidence_pct": 34.3,
         "confidence_label": "muito baixa",
@@ -5643,14 +5643,14 @@
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 43.0,
-          "neural_score": 6.4,
+          "neural_score": 5.8,
           "tension_score": 11.5,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
           "territorial_support_pct": 11.5,
           "historical_support_pct": 57.5,
           "live_support_pct": 0.0,
-          "score_z": -0.47,
+          "score_z": -0.49,
           "peer_percentile": 41.0,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -5665,7 +5665,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 6.4
+              "strength_pct": 5.8
             },
             {
               "key": "inclusao_recente",
@@ -5673,10 +5673,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Tensão territorial: 11.5% | Sinal Poisson do ranking operacional: 6.4% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Tensão territorial: 11.5% | Sinal Poisson do ranking operacional: 5.8% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "VILA VELHA aparece na posição 24 de 40, com risco 3.8 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "VILA VELHA aparece na posição 24 de 40, com risco 3.6 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 11.5% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -5693,25 +5693,25 @@
         "name_normalized": "MANOEL SATIRO",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 3.78,
+        "risk_score": 3.53,
         "risk_level": "baixo",
         "confidence_pct": 34.3,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 40.8,
+        "expressiveness_pct": 40.7,
         "expressiveness_label": "baixa",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 43.0,
-          "neural_score": 6.2,
+          "neural_score": 5.6,
           "tension_score": 11.5,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
           "territorial_support_pct": 11.5,
           "historical_support_pct": 57.5,
           "live_support_pct": 0.0,
-          "score_z": -0.47,
+          "score_z": -0.49,
           "peer_percentile": 38.5,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -5726,7 +5726,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 6.2
+              "strength_pct": 5.6
             },
             {
               "key": "inclusao_recente",
@@ -5734,10 +5734,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Tensão territorial: 11.5% | Sinal Poisson do ranking operacional: 6.2% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Tensão territorial: 11.5% | Sinal Poisson do ranking operacional: 5.6% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "MANOEL SATIRO aparece na posição 25 de 40, com risco 3.8 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "MANOEL SATIRO aparece na posição 25 de 40, com risco 3.5 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 11.5% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -5750,29 +5750,29 @@
       },
       {
         "rank": 26,
-        "name": "ANTONIO BEZERRA",
-        "name_normalized": "ANTONIO BEZERRA",
+        "name": "CAJAZEIRAS",
+        "name_normalized": "CAJAZEIRAS",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 3.41,
+        "risk_score": 3.22,
         "risk_level": "baixo",
-        "confidence_pct": 33.8,
+        "confidence_pct": 33.4,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 39.2,
+        "expressiveness_pct": 39.1,
         "expressiveness_label": "baixa",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
-          "historical_cvli": 40.0,
-          "neural_score": 5.7,
-          "tension_score": 10.0,
+          "historical_cvli": 38.0,
+          "neural_score": 5.5,
+          "tension_score": 9.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
-          "territorial_support_pct": 10.0,
-          "historical_support_pct": 50.0,
+          "territorial_support_pct": 9.0,
+          "historical_support_pct": 45.0,
           "live_support_pct": 0.0,
-          "score_z": -0.5,
+          "score_z": -0.51,
           "peer_percentile": 35.9,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -5782,12 +5782,12 @@
             {
               "key": "tensao_territorial",
               "label": "Tensão territorial",
-              "strength_pct": 10.0
+              "strength_pct": 9.0
             },
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 5.7
+              "strength_pct": 5.5
             },
             {
               "key": "inclusao_recente",
@@ -5795,11 +5795,11 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Tensão territorial: 10.0% | Sinal Poisson do ranking operacional: 5.7% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Tensão territorial: 9.0% | Sinal Poisson do ranking operacional: 5.5% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "ANTONIO BEZERRA aparece na posição 26 de 40, com risco 3.4 e nível baixo; é território de atenção tática.",
-          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 10.0% e 0 registros recentes na janela de 30 dias.",
+          "leitura_rapida": "CAJAZEIRAS aparece na posição 26 de 40, com risco 3.2 e nível baixo; é território de atenção tática.",
+          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 9.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
           "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
@@ -5811,29 +5811,29 @@
       },
       {
         "rank": 27,
-        "name": "PAUPINA",
-        "name_normalized": "PAUPINA",
+        "name": "ANTONIO BEZERRA",
+        "name_normalized": "ANTONIO BEZERRA",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 3.4,
+        "risk_score": 3.16,
         "risk_level": "baixo",
         "confidence_pct": 33.8,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 37.6,
+        "expressiveness_pct": 37.5,
         "expressiveness_label": "baixa",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 40.0,
-          "neural_score": 5.7,
+          "neural_score": 5.1,
           "tension_score": 10.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
           "territorial_support_pct": 10.0,
           "historical_support_pct": 50.0,
           "live_support_pct": 0.0,
-          "score_z": -0.5,
+          "score_z": -0.51,
           "peer_percentile": 33.3,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -5848,7 +5848,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 5.7
+              "strength_pct": 5.1
             },
             {
               "key": "inclusao_recente",
@@ -5856,10 +5856,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Tensão territorial: 10.0% | Sinal Poisson do ranking operacional: 5.7% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Tensão territorial: 10.0% | Sinal Poisson do ranking operacional: 5.1% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "PAUPINA aparece na posição 27 de 40, com risco 3.4 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "ANTONIO BEZERRA aparece na posição 27 de 40, com risco 3.2 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 10.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -5872,13 +5872,13 @@
       },
       {
         "rank": 28,
-        "name": "CAJAZEIRAS",
-        "name_normalized": "CAJAZEIRAS",
+        "name": "PAUPINA",
+        "name_normalized": "PAUPINA",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 3.12,
+        "risk_score": 3.15,
         "risk_level": "baixo",
-        "confidence_pct": 33.0,
+        "confidence_pct": 33.8,
         "confidence_label": "muito baixa",
         "expressiveness_pct": 36.0,
         "expressiveness_label": "baixa",
@@ -5886,13 +5886,13 @@
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
-          "historical_cvli": 36.0,
-          "neural_score": 5.5,
-          "tension_score": 8.0,
+          "historical_cvli": 40.0,
+          "neural_score": 5.1,
+          "tension_score": 10.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
-          "territorial_support_pct": 8.0,
-          "historical_support_pct": 40.0,
+          "territorial_support_pct": 10.0,
+          "historical_support_pct": 50.0,
           "live_support_pct": 0.0,
           "score_z": -0.51,
           "peer_percentile": 30.8,
@@ -5904,12 +5904,12 @@
             {
               "key": "tensao_territorial",
               "label": "Tensão territorial",
-              "strength_pct": 8.0
+              "strength_pct": 10.0
             },
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 5.5
+              "strength_pct": 5.1
             },
             {
               "key": "inclusao_recente",
@@ -5917,11 +5917,11 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Tensão territorial: 8.0% | Sinal Poisson do ranking operacional: 5.5% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Tensão territorial: 10.0% | Sinal Poisson do ranking operacional: 5.1% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "CAJAZEIRAS aparece na posição 28 de 40, com risco 3.1 e nível baixo; é território de atenção tática.",
-          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 8.0% e 0 registros recentes na janela de 30 dias.",
+          "leitura_rapida": "PAUPINA aparece na posição 28 de 40, com risco 3.1 e nível baixo; é território de atenção tática.",
+          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 10.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
           "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
@@ -5937,25 +5937,25 @@
         "name_normalized": "ANCURI",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 2.39,
+        "risk_score": 2.14,
         "risk_level": "baixo",
-        "confidence_pct": 32.2,
+        "confidence_pct": 32.3,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 34.3,
+        "expressiveness_pct": 34.2,
         "expressiveness_label": "baixa",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 32.0,
-          "neural_score": 4.2,
+          "neural_score": 3.6,
           "tension_score": 6.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
           "territorial_support_pct": 6.0,
           "historical_support_pct": 30.0,
           "live_support_pct": 0.0,
-          "score_z": -0.55,
+          "score_z": -0.57,
           "peer_percentile": 28.2,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -5970,7 +5970,7 @@
             {
               "key": "sinal_modelo",
               "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 4.2
+              "strength_pct": 3.6
             },
             {
               "key": "inclusao_recente",
@@ -5978,10 +5978,10 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Tensão territorial: 6.0% | Sinal Poisson do ranking operacional: 4.2% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Tensão territorial: 6.0% | Sinal Poisson do ranking operacional: 3.6% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "ANCURI aparece na posição 29 de 40, com risco 2.4 e nível baixo; é território de atenção tática.",
+          "leitura_rapida": "ANCURI aparece na posição 29 de 40, com risco 2.1 e nível baixo; é território de atenção tática.",
           "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 6.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
@@ -5998,25 +5998,25 @@
         "name_normalized": "FLORESTA",
         "region": "fortaleza",
         "territorial_level": "bairro",
-        "risk_score": 2.19,
+        "risk_score": 1.93,
         "risk_level": "baixo",
         "confidence_pct": 31.5,
         "confidence_label": "muito baixa",
-        "expressiveness_pct": 32.7,
+        "expressiveness_pct": 32.6,
         "expressiveness_label": "baixa",
         "data_limit": "2026-08-05",
         "metrics": {
           "recent_cvli_14d": 0,
           "recent_cvli_30d": 0,
           "historical_cvli": 28.0,
-          "neural_score": 4.2,
+          "neural_score": 3.6,
           "tension_score": 4.0,
           "inclusion_score": 0.0,
           "calm_penalty": 100.0,
           "territorial_support_pct": 4.0,
           "historical_support_pct": 20.0,
           "live_support_pct": 0.0,
-          "score_z": -0.56,
+          "score_z": -0.58,
           "peer_percentile": 25.6,
           "dynamic_window_days": 90,
           "base_window_days": 90
@@ -6024,14 +6024,14 @@
         "explainability": {
           "top_drivers": [
             {
-              "key": "sinal_modelo",
-              "label": "Sinal Poisson do ranking operacional",
-              "strength_pct": 4.2
-            },
-            {
               "key": "tensao_territorial",
               "label": "Tensão territorial",
               "strength_pct": 4.0
+            },
+            {
+              "key": "sinal_modelo",
+              "label": "Sinal Poisson do ranking operacional",
+              "strength_pct": 3.6
             },
             {
               "key": "inclusao_recente",
@@ -6039,11 +6039,11 @@
               "strength_pct": 0.0
             }
           ],
-          "summary": "Sinal Poisson do ranking operacional: 4.2% | Tensão territorial: 4.0% | Atividade recente e vizinhança: 0.0%"
+          "summary": "Tensão territorial: 4.0% | Sinal Poisson do ranking operacional: 3.6% | Atividade recente e vizinhança: 0.0%"
         },
         "manager_feedback": {
-          "leitura_rapida": "FLORESTA aparece na posição 30 de 40, com risco 2.2 e nível baixo; é território de atenção tática.",
-          "por_que_importa": "O peso principal vem de sinal poisson do ranking operacional, com suporte territorial de 4.0% e 0 registros recentes na janela de 30 dias.",
+          "leitura_rapida": "FLORESTA aparece na posição 30 de 40, com risco 1.9 e nível baixo; é território de atenção tática.",
+          "por_que_importa": "O peso principal vem de tensão territorial, com suporte territorial de 4.0% e 0 registros recentes na janela de 30 dias.",
           "confianca_limites": "Leitura sensível a ruído; requer conferência adicional antes de decisão forte.",
           "expressividade_previsao": "O território está próximo de pares vizinhos e pode oscilar no próximo ciclo.",
           "proxima_acao": "Verificar eventos recentes, pressão territorial e coerência com inteligência local antes da próxima atualização do ranking."
@@ -6060,26 +6060,26 @@
     "latest_md": "outputs/hermes/risk_snapshot_latest.md",
     "latest_brief": "outputs/hermes/risk_brief_latest.md",
     "latest_csv": "outputs/hermes/risk_snapshot_latest.csv",
-    "history_json": "outputs/hermes/history/risk_snapshot_20260808_113208.json",
-    "history_md": "outputs/hermes/history/risk_snapshot_20260808_113208.md",
-    "history_brief": "outputs/hermes/history/risk_brief_20260808_113208.md",
-    "history_csv": "outputs/hermes/history/risk_snapshot_20260808_113208.csv",
+    "history_json": "outputs/hermes/history/risk_snapshot_20260814_150303.json",
+    "history_md": "outputs/hermes/history/risk_snapshot_20260814_150303.md",
+    "history_brief": "outputs/hermes/history/risk_brief_20260814_150303.md",
+    "history_csv": "outputs/hermes/history/risk_snapshot_20260814_150303.csv",
     "latest_status_enriquecido_14d_csv": "outputs/hermes/dados_status_enriquecido_14d_latest.csv",
-    "history_status_enriquecido_14d_csv": "outputs/hermes/history/dados_status_enriquecido_14d_20260808_113208.csv",
+    "history_status_enriquecido_14d_csv": "outputs/hermes/history/dados_status_enriquecido_14d_20260814_150303.csv",
     "status_enriquecido_14d_source": "data/raw/dados_status_ocorrencias_gerais_ENRIQUECIDO.csv",
     "latest_csv_fortaleza": "outputs/hermes/risk_fortaleza_latest.csv",
     "latest_csv_rmf": "outputs/hermes/risk_rmf_latest.csv",
     "latest_csv_interior": "outputs/hermes/risk_interior_latest.csv",
-    "history_csv_fortaleza": "outputs/hermes/history/risk_fortaleza_20260808_113208.csv",
-    "history_csv_rmf": "outputs/hermes/history/risk_rmf_20260808_113208.csv",
-    "history_csv_interior": "outputs/hermes/history/risk_interior_20260808_113208.csv",
+    "history_csv_fortaleza": "outputs/hermes/history/risk_fortaleza_20260814_150303.csv",
+    "history_csv_rmf": "outputs/hermes/history/risk_rmf_20260814_150303.csv",
+    "history_csv_interior": "outputs/hermes/history/risk_interior_20260814_150303.csv",
     "latest_ruas_criticas_csv": "outputs/hermes/ruas_criticas_latest.csv",
-    "history_ruas_criticas_csv": "outputs/hermes/history/ruas_criticas_20260808_113208.csv"
+    "history_ruas_criticas_csv": "outputs/hermes/history/ruas_criticas_20260814_150303.csv"
   },
   "status_enriquecido_14d": {
     "source": "data/raw/dados_status_ocorrencias_gerais_ENRIQUECIDO.csv",
     "reference_date": "2026-08-05",
     "window_days": 14,
-    "row_count": 223
+    "row_count": 229
   }
 }

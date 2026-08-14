@@ -516,3 +516,20 @@ Este arquivo registra a performance das predições do sistema (Champion + Chall
 | INTERIOR  |      2       |     2      | 20.0% | 10.0% | 100.0% | 100.0% |   ⚠️   |
 
 ---
+
+<!-- validation-session: startup|2026-07-06|2026-08-04|ST-GAT v5 (DeepSTGAT_v5 Ativo) -->
+
+### 🔄 Sessão de Validação: 2026-08-08 12:19
+**Período Gabarito:** 2026-07-06 a 2026-08-04
+
+**Origem:** startup
+
+**Arquitetura:** ST-GAT v5 (DeepSTGAT_v5 Ativo)
+
+| Região    | N_CVLI Bruto | Hits Bruto | P@10  |  P@20 |  R@10  |  R@20  | Status |
+|:----------|:------------:|:----------:|:-----:|:-----:|:------:|:------:|:------:|
+| FORTALEZA |      15      |     8      | 80.0% | 40.0% | 53.3%  | 53.3%  |   ✅    |
+| RMF       |      5       |     3      | 30.0% | 15.0% | 60.0%  | 60.0%  |   ⚠️   |
+| INTERIOR  |      5       |     3      | 30.0% | 15.0% | 60.0%  | 60.0%  |   ⚠️   |
+
+---
