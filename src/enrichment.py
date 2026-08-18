@@ -24,6 +24,8 @@ def get_weather_label(precip):
 
 _weather_cache = {}
 CACHE_FILE = 'data/weather_archive_cache.json'
+WEATHER_START_DATE = datetime(2022, 1, 1).date()
+WEATHER_END_DATE = datetime(2026, 12, 31).date()
 
 def fetch_weather_from_api(lat, lon, start_date, end_date):
     """Busca dados reais da Open-Meteo API."""
@@ -50,6 +52,12 @@ def fetch_weather_from_api(lat, lon, start_date, end_date):
 
 def get_real_weather(date_obj, lat=-3.717, lon=-38.543):
     global _weather_cache
+    request_date = date_obj.date() if hasattr(date_obj, 'date') else date_obj
+
+    # Não consulta nem enriquece clima fora da janela histórica suportada.
+    if request_date < WEATHER_START_DATE or request_date > WEATHER_END_DATE:
+        return 0.0
+
     date_str = date_obj.strftime('%Y-%m-%d')
     
     if date_str in _weather_cache:
@@ -59,7 +67,11 @@ def get_real_weather(date_obj, lat=-3.717, lon=-38.543):
     if not _weather_cache and os.path.exists(CACHE_FILE):
         try:
             with open(CACHE_FILE, 'r') as f:
-                _weather_cache.update(json.load(f))
+                cached = json.load(f)
+                _weather_cache.update({
+                    str(key): value for key, value in cached.items()
+                    if WEATHER_START_DATE <= datetime.strptime(str(key), '%Y-%m-%d').date() <= WEATHER_END_DATE
+                })
         except: pass
     
     if date_str in _weather_cache:
@@ -68,8 +80,10 @@ def get_real_weather(date_obj, lat=-3.717, lon=-38.543):
     # Se não está no cache, buscamos um range (para eficiência)
     print(f"Buscando clima real para o período de {date_str}...")
     # Busca 30 dias ao redor para popular o cache
-    start = (date_obj - timedelta(days=15)).strftime('%Y-%m-%d')
-    end = (date_obj + timedelta(days=15)).strftime('%Y-%m-%d')
+    start_date = max(request_date - timedelta(days=15), WEATHER_START_DATE)
+    end_date = min(request_date + timedelta(days=15), WEATHER_END_DATE)
+    start = start_date.strftime('%Y-%m-%d')
+    end = end_date.strftime('%Y-%m-%d')
     
     # Limite pro futuro (não pode ser maior q hoje - 2 dias para archive)
     today = datetime.now().date()

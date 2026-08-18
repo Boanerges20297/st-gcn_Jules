@@ -345,6 +345,8 @@ class StateOrchestrator:
         # 2. Fallback: Unpickler customizado para interceptar StringDtype problemáticos
         class RobustUnpickler(pickle.Unpickler):
             def find_class(self, module, name):
+                if module.startswith('numpy._core'):
+                    module = module.replace('numpy._core', 'numpy.core', 1)
                 # Se for StringDtype do pandas (python ou arrow), redirecionamos para algo seguro
                 if 'pandas' in module and 'StringDtype' in name:
                     try:

@@ -1,6 +1,6 @@
 # Resumo Tatico Independente - Ultimos 14 Dias
 
-- Gerado em: 2026-07-31T16:30:51
+- Gerado em: 2026-08-18T15:41:07
 - Janela: 2026-07-18 ate 2026-07-31
 - Data de referencia: 2026-07-31
 - Total de registros: 335

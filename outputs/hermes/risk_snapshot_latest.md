@@ -1,14 +1,14 @@
 # Artefato Hermes de Risco
 
-- Gerado em: 2026-07-31T16:30:50
+- Gerado em: 2026-08-18T15:41:06
 - Base de dados ate: 2026-07-31
 - Base de dados formatada: 31/07/2026
 - Origem: src/core/orchestrator.py:get_combined_risk
 - Fonte oficial para o Hermes: outputs/hermes/
-- Snapshot historico JSON: outputs/hermes/history/risk_snapshot_20260731_163050.json
-- Snapshot historico Markdown: outputs/hermes/history/risk_snapshot_20260731_163050.md
+- Snapshot historico JSON: outputs/hermes/history/risk_snapshot_20260818_154106.json
+- Snapshot historico Markdown: outputs/hermes/history/risk_snapshot_20260818_154106.md
 - CSV enriquecido (ultimos 14 dias): outputs/hermes/dados_status_enriquecido_14d_latest.csv
-- Snapshot historico do CSV enriquecido: outputs/hermes/history/dados_status_enriquecido_14d_20260731_163050.csv
+- Snapshot historico do CSV enriquecido: outputs/hermes/history/dados_status_enriquecido_14d_20260818_154106.csv
 
 ## Leitura operacional
 
@@ -20,32 +20,32 @@
 
 | Rank | Localidade | Risco | Nivel | Confianca | Expressividade | Drivers | Base ate |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | CAUCAIA | 98.5 | crítico | 99.0% (alta) | 94.3% (muito alta) | Sinal Poisson do ranking operacional; Tensão territorial; Atividade recente e vizinhança | 2026-07-31 |
-| 2 | JUAZEIRO DO NORTE | 95.5 | crítico | 99.0% (alta) | 92.2% (muito alta) | Sinal Poisson do ranking operacional; Tensão territorial; Atividade recente e vizinhança | 2026-07-31 |
-| 3 | SOBRAL | 71.1 | crítico | 88.6% (alta) | 86.1% (muito alta) | Tensão territorial; Sinal Poisson do ranking operacional; CVLI recente na janela de 30 dias | 2026-07-31 |
-| 4 | MARACANAU | 56.5 | alto | 93.2% (alta) | 81.9% (alta) | Tensão territorial; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
-| 5 | CRATO | 54.3 | alto | 90.2% (alta) | 79.9% (alta) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
-| 6 | BOA VIAGEM | 51.6 | alto | 89.5% (alta) | 77.8% (alta) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
-| 7 | AMONTADA | 46.1 | moderado | 83.4% (moderada) | 75.2% (alta) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
-| 8 | ITAPAJE | 43.3 | moderado | 87.7% (alta) | 73.1% (alta) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
-| 9 | BARBALHA | 39.5 | moderado | 81.9% (moderada) | 70.8% (alta) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
-| 10 | TIANGUA | 34.4 | moderado | 74.9% (moderada) | 68.3% (moderada) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
+| 1 | CAUCAIA | 98.5 | crítico | 99.0% (alta) | 94.4% (muito alta) | Sinal Poisson do ranking operacional; Tensão territorial; Atividade recente e vizinhança | 2026-07-31 |
+| 2 | JUAZEIRO DO NORTE | 95.5 | crítico | 99.0% (alta) | 92.3% (muito alta) | Sinal Poisson do ranking operacional; Tensão territorial; Atividade recente e vizinhança | 2026-07-31 |
+| 3 | SOBRAL | 70.2 | alto | 88.7% (alta) | 86.0% (muito alta) | Tensão territorial; Sinal Poisson do ranking operacional; CVLI recente na janela de 30 dias | 2026-07-31 |
+| 4 | MARACANAU | 56.5 | alto | 93.3% (alta) | 81.9% (alta) | Tensão territorial; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
+| 5 | CRATO | 54.1 | alto | 90.1% (alta) | 79.9% (alta) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
+| 6 | BOA VIAGEM | 51.5 | alto | 89.5% (alta) | 77.8% (alta) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
+| 7 | AMONTADA | 45.9 | moderado | 83.3% (moderada) | 75.2% (alta) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
+| 8 | ITAPAJE | 43.2 | moderado | 87.7% (alta) | 73.1% (alta) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
+| 9 | BARBALHA | 39.4 | moderado | 81.9% (moderada) | 70.8% (alta) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
+| 10 | TIANGUA | 34.3 | moderado | 74.9% (moderada) | 68.3% (moderada) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
 | 11 | MARANGUAPE | 31.1 | moderado | 66.3% (baixa) | 66.2% (moderada) | Atividade recente e vizinhança; Sinal Poisson do ranking operacional; CVLI recente na janela de 30 dias | 2026-07-31 |
-| 12 | PENTECOSTE | 26.1 | baixo | 73.5% (moderada) | 63.7% (moderada) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
-| 13 | PACATUBA | 20.7 | baixo | 66.2% (baixa) | 61.0% (moderada) | Atividade recente e vizinhança; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
+| 12 | PENTECOSTE | 26.0 | baixo | 73.5% (moderada) | 63.7% (moderada) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
+| 13 | PACATUBA | 20.7 | baixo | 66.2% (baixa) | 61.1% (moderada) | Atividade recente e vizinhança; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
 | 14 | CASCAVEL | 18.6 | baixo | 66.0% (baixa) | 59.1% (moderada) | Atividade recente e vizinhança; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
 | 15 | AQUIRAZ | 16.1 | baixo | 65.8% (baixa) | 57.1% (moderada) | Atividade recente e vizinhança; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
 | 16 | CANINDE | 15.7 | baixo | 70.8% (moderada) | 55.4% (moderada) | Atividade recente e vizinhança; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
 | 17 | CHOROZINHO | 15.6 | baixo | 65.8% (baixa) | 53.8% (moderada) | Atividade recente e vizinhança; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
 | 18 | SAO BENEDITO | 9.9 | baixo | 53.5% (muito baixa) | 51.2% (moderada) | Tensão territorial; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
-| 19 | ITAPIPOCA | 9.8 | baixo | 37.3% (muito baixa) | 49.6% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
+| 19 | ITAPIPOCA | 9.7 | baixo | 37.3% (muito baixa) | 49.6% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
 | 20 | IGUATU | 8.3 | baixo | 53.4% (muito baixa) | 47.7% (baixa) | Tensão territorial; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
 | 21 | MORADA NOVA | 7.9 | baixo | 37.5% (muito baixa) | 46.1% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
 | 22 | QUIXADA | 6.5 | baixo | 37.5% (muito baixa) | 44.2% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
 | 23 | RUSSAS | 5.6 | baixo | 37.5% (muito baixa) | 42.5% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
 | 24 | FORQUILHA | 4.2 | baixo | 37.5% (muito baixa) | 40.7% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
-| 25 | ITAREMA | 3.9 | baixo | 37.4% (muito baixa) | 39.0% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
-| 26 | ARACATI | 3.9 | baixo | 37.4% (muito baixa) | 37.4% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
+| 25 | ARACATI | 3.9 | baixo | 37.4% (muito baixa) | 39.0% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
+| 26 | ITAREMA | 3.9 | baixo | 37.4% (muito baixa) | 37.4% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
 | 27 | GROAIRAS | 1.4 | baixo | 35.0% (muito baixa) | 35.4% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
 | 28 | PACAJUS | 1.2 | baixo | 35.3% (muito baixa) | 33.8% (baixa) | Sinal Poisson do ranking operacional; Tensão territorial; Atividade recente e vizinhança | 2026-07-31 |
 | 29 | SAO GONCALO DO AMARANTE | 1.1 | baixo | 35.3% (muito baixa) | 32.2% (baixa) | Sinal Poisson do ranking operacional; Tensão territorial; Atividade recente e vizinhança | 2026-07-31 |
@@ -56,7 +56,7 @@
 | Rank | Localidade | Risco | Nivel | Confianca | Expressividade | Drivers | Base ate |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | CAUCAIA | 98.5 | crítico | 99.0% (alta) | 96.5% (muito alta) | Sinal Poisson do ranking operacional; Tensão territorial; Atividade recente e vizinhança | 2026-07-31 |
-| 2 | MARACANAU | 56.5 | alto | 93.2% (alta) | 85.0% (muito alta) | Tensão territorial; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
+| 2 | MARACANAU | 56.5 | alto | 93.3% (alta) | 85.0% (muito alta) | Tensão territorial; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
 | 3 | MARANGUAPE | 31.1 | moderado | 66.3% (baixa) | 76.7% (alta) | Atividade recente e vizinhança; Sinal Poisson do ranking operacional; CVLI recente na janela de 30 dias | 2026-07-31 |
 | 4 | PACATUBA | 20.7 | baixo | 66.2% (baixa) | 71.3% (alta) | Atividade recente e vizinhança; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
 | 5 | CASCAVEL | 18.6 | baixo | 66.0% (baixa) | 67.6% (moderada) | Atividade recente e vizinhança; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
@@ -79,25 +79,25 @@
 
 | Rank | Localidade | Risco | Nivel | Confianca | Expressividade | Drivers | Base ate |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | JUAZEIRO DO NORTE | 95.5 | crítico | 99.0% (alta) | 92.7% (muito alta) | Sinal Poisson do ranking operacional; Tensão territorial; Atividade recente e vizinhança | 2026-07-31 |
-| 2 | SOBRAL | 71.1 | crítico | 88.6% (alta) | 85.0% (muito alta) | Tensão territorial; Sinal Poisson do ranking operacional; CVLI recente na janela de 30 dias | 2026-07-31 |
-| 3 | CRATO | 54.3 | alto | 90.2% (alta) | 78.8% (alta) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
-| 4 | BOA VIAGEM | 51.6 | alto | 89.5% (alta) | 75.1% (alta) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
-| 5 | AMONTADA | 46.1 | moderado | 83.4% (moderada) | 70.9% (alta) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
-| 6 | ITAPAJE | 43.3 | moderado | 87.7% (alta) | 67.3% (moderada) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
-| 7 | BARBALHA | 39.5 | moderado | 81.9% (moderada) | 63.4% (moderada) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
-| 8 | TIANGUA | 34.4 | moderado | 74.9% (moderada) | 59.3% (moderada) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
-| 9 | PENTECOSTE | 26.1 | baixo | 73.5% (moderada) | 54.6% (moderada) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
+| 1 | JUAZEIRO DO NORTE | 95.5 | crítico | 99.0% (alta) | 92.8% (muito alta) | Sinal Poisson do ranking operacional; Tensão territorial; Atividade recente e vizinhança | 2026-07-31 |
+| 2 | SOBRAL | 70.2 | alto | 88.7% (alta) | 84.9% (alta) | Tensão territorial; Sinal Poisson do ranking operacional; CVLI recente na janela de 30 dias | 2026-07-31 |
+| 3 | CRATO | 54.1 | alto | 90.1% (alta) | 78.8% (alta) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
+| 4 | BOA VIAGEM | 51.5 | alto | 89.5% (alta) | 75.1% (alta) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
+| 5 | AMONTADA | 45.9 | moderado | 83.3% (moderada) | 70.9% (alta) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
+| 6 | ITAPAJE | 43.2 | moderado | 87.7% (alta) | 67.3% (moderada) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
+| 7 | BARBALHA | 39.4 | moderado | 81.9% (moderada) | 63.4% (moderada) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
+| 8 | TIANGUA | 34.3 | moderado | 74.9% (moderada) | 59.3% (moderada) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
+| 9 | PENTECOSTE | 26.0 | baixo | 73.5% (moderada) | 54.6% (moderada) | Tensão territorial; Atividade recente e vizinhança; CVLI recente na janela de 30 dias | 2026-07-31 |
 | 10 | CANINDE | 15.7 | baixo | 70.8% (moderada) | 49.5% (baixa) | Atividade recente e vizinhança; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
 | 11 | SAO BENEDITO | 9.9 | baixo | 53.5% (muito baixa) | 45.3% (baixa) | Tensão territorial; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
-| 12 | ITAPIPOCA | 9.8 | baixo | 37.3% (muito baixa) | 42.1% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
+| 12 | ITAPIPOCA | 9.7 | baixo | 37.3% (muito baixa) | 42.1% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
 | 13 | IGUATU | 8.3 | baixo | 53.4% (muito baixa) | 38.6% (baixa) | Tensão territorial; CVLI recente na janela de 30 dias; Sinal Poisson do ranking operacional | 2026-07-31 |
 | 14 | MORADA NOVA | 7.9 | baixo | 37.5% (muito baixa) | 35.4% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
 | 15 | QUIXADA | 6.5 | baixo | 37.5% (muito baixa) | 32.0% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
 | 16 | RUSSAS | 5.6 | baixo | 37.5% (muito baixa) | 28.7% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
 | 17 | FORQUILHA | 4.2 | baixo | 37.5% (muito baixa) | 25.3% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
-| 18 | ITAREMA | 3.9 | baixo | 37.4% (muito baixa) | 22.0% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
-| 19 | ARACATI | 3.9 | baixo | 37.4% (muito baixa) | 18.9% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
+| 18 | ARACATI | 3.9 | baixo | 37.4% (muito baixa) | 22.0% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
+| 19 | ITAREMA | 3.9 | baixo | 37.4% (muito baixa) | 18.9% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
 | 20 | GROAIRAS | 1.4 | baixo | 35.0% (muito baixa) | 15.3% (baixa) | Tensão territorial; Sinal Poisson do ranking operacional; Atividade recente e vizinhança | 2026-07-31 |
 
 ## Ranking dos bairros - Top 30 (Fortaleza)

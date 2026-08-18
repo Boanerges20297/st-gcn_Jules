@@ -257,8 +257,15 @@ def save_payload(payload: dict, path: str | Path) -> None:
 
 def load_payload(path: str | Path) -> dict:
     path = Path(path)
+
+    class NumpyCompatUnpickler(pickle.Unpickler):
+        def find_class(self, module, name):
+            if module.startswith("numpy._core"):
+                module = module.replace("numpy._core", "numpy.core", 1)
+            return super().find_class(module, name)
+
     with path.open("rb") as fh:
-        return pickle.load(fh)
+        return NumpyCompatUnpickler(fh).load()
 
 
 @dataclass

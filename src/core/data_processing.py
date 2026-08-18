@@ -30,6 +30,11 @@ if not os.path.exists(OCORRENCIAS_FILE):
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
+# O enriquecimento climático histórico fica restrito ao período suportado pela
+# base/modelo. Datas fora da janela continuam no tensor, mas sem clima.
+CLIMATE_START_DATE = pd.Timestamp('2022-01-01')
+CLIMATE_END_DATE = pd.Timestamp('2026-12-31')
+
 RMF_OFFICIAL = [
     'AQUIRAZ', 'BEBERIBE', 'CASCAVEL', 'CAUCAIA', 'CHOROZINHO', 'EUSEBIO', 
     'GUAIUBA', 'HORIZONTE', 'ITAITINGA', 'MARACANAU', 'MARANGUAPE', 'PACAJUS', 
@@ -623,8 +628,14 @@ def process_ism_data():
         from src.enrichment import is_brazil_holiday, is_cvp_hot_day, CACHE_FILE
         weather_cache = {}
         if os.path.exists(CACHE_FILE):
-            with open(CACHE_FILE, 'r') as f:
-                weather_cache = json.load(f)
+            with open(CACHE_FILE, 'r', encoding='utf-8') as f:
+                raw_weather_cache = json.load(f)
+            # Evita carregar/processar dados climáticos fora da janela válida.
+            weather_cache = {
+                str(key): value
+                for key, value in raw_weather_cache.items()
+                if CLIMATE_START_DATE <= pd.Timestamp(str(key)) <= CLIMATE_END_DATE
+            }
 
         
         for d_idx, date in enumerate(date_range):
@@ -645,10 +656,12 @@ def process_ism_data():
             # 30: Dias Quentes CVP (01-10, 30, 31)
             if is_cvp_hot_day(date): features[:, d_idx, 30] = 1.0
             
-            # 31 & 32: Clima Real (API Open-Meteo Cache)
-            precip = weather_cache.get(date.date(), 0.0)
-            features[:, d_idx, 31] = float(precip)
-            if precip > 5.0: features[:, d_idx, 32] = 1.0 # Chuva significativa
+            # 31 & 32: Clima Real (API Open-Meteo Cache), somente 2022-2026.
+            if CLIMATE_START_DATE <= date <= CLIMATE_END_DATE:
+                precip = weather_cache.get(date.strftime('%Y-%m-%d'), 0.0)
+                precip = float(precip or 0.0)
+                features[:, d_idx, 31] = precip
+                if precip > 5.0: features[:, d_idx, 32] = 1.0 # Chuva significativa
             
         for n in range(N):
             features[n, :, 24] = pd.Series(features[n, :, 0]).rolling(window=7, min_periods=1).sum().values

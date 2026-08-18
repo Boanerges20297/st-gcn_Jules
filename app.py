@@ -1057,6 +1057,8 @@ def load_data_and_models():
                     except:
                         class RobustUnpickler(pickle.Unpickler):
                             def find_class(self, module, name):
+                                if module.startswith('numpy._core'):
+                                    module = module.replace('numpy._core', 'numpy.core', 1)
                                 if 'pandas' in module and 'StringDtype' in name:
                                     try:
                                         from pandas import StringDtype
