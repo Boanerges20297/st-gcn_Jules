@@ -1,9 +1,11 @@
+import argparse
 import csv
 import json
 import re
 import os
 import unicodedata
 from datetime import datetime
+from urllib.request import urlopen
 
 # --- GESTÃO DE CAMINHOS ---
 # Garante que aponta para a raiz do repositório, saindo de tests/
@@ -318,6 +320,40 @@ def extrair_qtd_veiculos(sections):
     return max(count_vehicle_mentions(block) for block in blocks)
 
 
+def ensure_input_file(target_path=None, force_download=False):
+    target_path = os.path.abspath(target_path or ARQUIVO_ENTRADA)
+
+    should_force_download = force_download or os.getenv('TROPA_FORCE_DOWNLOAD', '').strip().lower() in {'1', 'true', 'yes', 'on'}
+    if os.path.exists(target_path) and not should_force_download:
+        return False
+
+    source_url = os.getenv('TROPA_SOURCE_URL', '').strip()
+    if not source_url:
+        return False
+
+    limit_value = os.getenv('TROPA_DOWNLOAD_LIMIT', '0').strip()
+    try:
+        max_bytes = int(limit_value) if limit_value else 0
+    except ValueError:
+        max_bytes = 0
+
+    try:
+        with urlopen(source_url, timeout=60) as response:
+            payload = response.read()
+            if max_bytes and len(payload) > max_bytes:
+                raise RuntimeError(
+                    f"Download abortado: payload de {len(payload)} bytes excede o limite de {max_bytes} bytes."
+                )
+
+            os.makedirs(os.path.dirname(target_path), exist_ok=True)
+            with open(target_path, 'wb') as output_file:
+                output_file.write(payload)
+    except Exception as exc:
+        raise RuntimeError(f"Falha ao baixar o arquivo de {source_url}: {exc}") from exc
+
+    return True
+
+
 def carregar_registros(arquivo):
     with open(arquivo, 'r', encoding='utf-8') as json_file:
         conteudo = json_file.read()
@@ -348,29 +384,57 @@ def carregar_registros(arquivo):
     raise RuntimeError(f"Formato JSON inesperado em '{arquivo}'.")
 
 
-def processar_granular():
+def parse_datetime_candidates(row):
+    candidates = [
+        row.get('data_registro', ''),
+        row.get('data', ''),
+        row.get('data_ocorrencia', ''),
+        row.get('data_hora', ''),
+        row.get('created_at', ''),
+    ]
+    for candidate in candidates:
+        if not candidate:
+            continue
+        value = str(candidate).strip()
+        for pattern in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M', '%Y-%m-%d', '%d/%m/%Y %H:%M:%S', '%d/%m/%Y %H:%M', '%d/%m/%Y'):
+            try:
+                return datetime.strptime(value, pattern)
+            except ValueError:
+                continue
+    return None
+
+
+def processar_granular(force_download=False):
     resumo_final = []
+
+    if not os.path.exists(ARQUIVO_ENTRADA) or force_download or os.getenv('TROPA_FORCE_DOWNLOAD', '').strip().lower() in {'1', 'true', 'yes', 'on'}:
+        if not ensure_input_file(ARQUIVO_ENTRADA, force_download=force_download):
+            if not os.path.exists(ARQUIVO_ENTRADA):
+                raise FileNotFoundError(f"Arquivo de entrada não encontrado: {ARQUIVO_ENTRADA}")
 
     registros = carregar_registros(ARQUIVO_ENTRADA)
 
     for row in registros:
-        ocorrencia = str(row.get('ocorrencia', ''))
+        ocorrencia = str(row.get('ocorrencia', '') or row.get('texto', '') or row.get('descricao', '') or '')
         sections = extract_sections(ocorrencia)
         cidade = extract_city(sections, ocorrencia)
-        if cidade != 'FORTALEZA':
+        cidade_raw = str(row.get('cidade', '') or row.get('municipio', '') or '').strip().upper()
+        if cidade and cidade.upper() != 'FORTALEZA' and cidade_raw not in {'', 'FORTALEZA'}:
+            continue
+        if not cidade and cidade_raw and cidade_raw != 'FORTALEZA':
             continue
 
-        try:
-            dt = datetime.strptime(str(row.get('data_registro', '')).strip(), '%Y-%m-%d %H:%M:%S')
-        except ValueError:
+        dt = parse_datetime_candidates(row)
+        if not dt:
             continue
 
         qtd_drogas_gramas, qtd_drogas_itens = extrair_qtd_drogas(sections)
 
+        bairro = extract_bairro(sections, ocorrencia) or str(row.get('bairro', '') or row.get('local', '') or '').strip().upper() or 'DESCONHECIDO'
         resumo_final.append({
             'data': dt.strftime('%Y-%m-%d'),
             'hora': dt.strftime('%H:%M:%S'),
-            'bairro': extract_bairro(sections, ocorrencia),
+            'bairro': bairro,
             'cidade': 'FORTALEZA',
             'natureza': extract_natureza(sections, ocorrencia),
             'qtd_armas': extrair_qtd_armas(sections, ocorrencia),
@@ -393,11 +457,11 @@ def processar_granular():
 
     # Combinar e remover duplicatas baseadas em (data, hora, bairro)
     # Usamos um dicionário indexado pela tupla única para garantir unicidade
-    combinados = { (r['data'], r['hora'], r.get('bairro', '')): r for r in registros_existentes }
+    combinados = { (r['data'], r['hora'], (r.get('bairro', '') or 'DESCONHECIDO').upper()): r for r in registros_existentes }
     
     novos_adicionados = 0
     for r in resumo_final:
-        chave = (r['data'], r['hora'], r['bairro'])
+        chave = (r['data'], r['hora'], (r['bairro'] or 'DESCONHECIDO').upper())
         if chave not in combinados:
             combinados[chave] = r
             novos_adicionados += 1
@@ -421,5 +485,13 @@ def processar_granular():
     for registro in resumo_final[:10]:
         print(registro)
 
+
+def main():
+    parser = argparse.ArgumentParser(description='Extrai ocorrências da TROPA para o CSV consolidado de Fortaleza.')
+    parser.add_argument('--force-download', action='store_true', help='Força o re-download do arquivo remoto mesmo se ele já existir localmente.')
+    args = parser.parse_args()
+    processar_granular(force_download=args.force_download)
+
+
 if __name__ == "__main__":
-    processar_granular()
+    main()
