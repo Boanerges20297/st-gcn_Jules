@@ -3403,45 +3403,114 @@ def _sync_static_snapshot_to_screenshot_app(target_data_dir: str):
     }
 
 
+def _pull_and_merge_remote(repo_dir: str, data_subdir: str = 'public/data') -> None:
+    """
+    Executa git pull integrando alterações remotas. Em caso de conflito,
+    preserva a versão local dos arquivos de snapshot (public/data).
+    """
+    logging.info('[SCREENSHOT EXPORT] Executando git pull origin main...')
+    pull_result = _run_git_command(repo_dir, ['pull', 'origin', 'main', '--no-rebase', '-X', 'ours', '--no-edit'])
+    if pull_result.returncode == 0:
+        logging.info('[SCREENSHOT EXPORT] Git pull/merge concluído com sucesso.')
+        return
+
+    pull_err = (pull_result.stderr or pull_result.stdout or '').strip()
+    logging.warning('[SCREENSHOT EXPORT] Git pull retornou aviso/erro: %s', pull_err)
+
+    # Verifica se o repositório ficou em estado de conflito não resolvido
+    status_result = _run_git_command(repo_dir, ['status', '--porcelain'])
+    unmerged = [
+        line for line in status_result.stdout.splitlines()
+        if line.startswith(('UU', 'AA', 'DD', 'DU', 'UD', 'AU', 'UA'))
+    ]
+
+    if unmerged:
+        logging.warning('[SCREENSHOT EXPORT] Conflitos de merge detectados em %d arquivos. Resolvendo com a versão local...', len(unmerged))
+        # Força checkout da versão local (--ours) para os arquivos de dados
+        _run_git_command(repo_dir, ['checkout', '--ours', data_subdir])
+        _run_git_command(repo_dir, ['add', data_subdir])
+        commit_res = _run_git_command(
+            repo_dir,
+            ['commit', '-m', f'chore: resolve merge conflicts in {data_subdir} using local snapshot'],
+        )
+        if commit_res.returncode == 0 or 'nothing to commit' in (commit_res.stderr or commit_res.stdout or '').lower():
+            logging.info('[SCREENSHOT EXPORT] Conflitos resolvidos e commit de merge finalizado com sucesso.')
+            return
+
+    # Caso o pull falhe por razões graves ou não resolvidas, aborta o merge para manter a WC limpa
+    logging.error('[SCREENSHOT EXPORT] Abortando merge devido a falha no git pull.')
+    _run_git_command(repo_dir, ['merge', '--abort'])
+    raise RuntimeError(f'Falha ao integrar alterações remotas via git pull: {pull_err}')
+
+
 def _publish_screenshot_repo(repo_dir: str, data_subdir: str = 'public/data') -> dict[str, any]:
     logging.info('[SCREENSHOT EXPORT] Iniciando publicação git do repositório screenshot')
     _ensure_screenshot_git_identity(repo_dir)
-    # Verifica mudanças apenas na subpasta de dados exportados
+
+    # 1. Verificar se há alterações no working tree da subpasta
     status_result = _run_git_command(repo_dir, ['status', '--porcelain', data_subdir])
     if status_result.returncode != 0:
         raise RuntimeError(f'Falha ao consultar status git: {status_result.stderr.strip() or status_result.stdout.strip()}')
 
     changed_entries = [line for line in status_result.stdout.splitlines() if line.strip()]
-    if not changed_entries:
-        logging.info('[SCREENSHOT EXPORT] Nenhuma alteração em %s para publicar', data_subdir)
-        return {
-            'published': False,
-            'commit_created': False,
-            'push_executed': False,
-            'message': f'Nenhuma alteração detectada em {data_subdir} no repositório screenshot.',
-        }
-
-    # Adiciona APENAS a subpasta de dados, não o repo inteiro
-    add_result = _run_git_command(repo_dir, ['add', data_subdir])
-    if add_result.returncode != 0:
-        raise RuntimeError(f'Falha no git add: {add_result.stderr.strip() or add_result.stdout.strip()}')
-
+    commit_created = False
     commit_message = f'chore: sync static snapshot {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
-    commit_result = _run_git_command(repo_dir, ['commit', '-m', commit_message])
-    if commit_result.returncode != 0:
-        combined_output = (commit_result.stderr or commit_result.stdout or '').strip()
-        if 'nothing to commit' not in combined_output.lower():
-            raise RuntimeError(f'Falha no git commit: {combined_output}')
 
-    push_result = _run_git_command(repo_dir, ['push', 'origin', 'main'])
-    if push_result.returncode != 0:
-        raise RuntimeError(f'Falha no git push: {push_result.stderr.strip() or push_result.stdout.strip()}')
+    if changed_entries:
+        # Adiciona e realiza o commit das alterações locais
+        add_result = _run_git_command(repo_dir, ['add', data_subdir])
+        if add_result.returncode != 0:
+            raise RuntimeError(f'Falha no git add: {add_result.stderr.strip() or add_result.stdout.strip()}')
+
+        commit_result = _run_git_command(repo_dir, ['commit', '-m', commit_message])
+        if commit_result.returncode != 0:
+            combined_output = (commit_result.stderr or commit_result.stdout or '').strip()
+            if 'nothing to commit' not in combined_output.lower():
+                raise RuntimeError(f'Falha no git commit: {combined_output}')
+            logging.info('[SCREENSHOT EXPORT] Nenhum commit novo gerado (nothing to commit)')
+        else:
+            commit_created = True
+            logging.info('[SCREENSHOT EXPORT] Commit local criado com sucesso: %s', commit_message)
+
+    # 2. Tentar realizar o push com retentativas integrando git pull em caso de divergência/rejeição
+    max_push_attempts = 3
+    push_executed = False
+
+    for attempt in range(1, max_push_attempts + 1):
+        push_result = _run_git_command(repo_dir, ['push', 'origin', 'main'])
+        if push_result.returncode == 0:
+            push_executed = True
+            stdout_lower = (push_result.stdout or '').lower()
+            if 'everything up-to-date' in stdout_lower and not commit_created:
+                logging.info('[SCREENSHOT EXPORT] Repositório já está atualizado (Everything up-to-date)')
+                return {
+                    'published': False,
+                    'commit_created': False,
+                    'push_executed': True,
+                    'message': f'Nenhuma alteração detectada em {data_subdir} no repositório screenshot.',
+                }
+            logging.info('[SCREENSHOT EXPORT] Push para origin/main realizado com sucesso (tentativa %d)', attempt)
+            break
+
+        push_err = (push_result.stderr or push_result.stdout or '').strip()
+        logging.warning(
+            '[SCREENSHOT EXPORT] Falha no git push (tentativa %d/%d): %s',
+            attempt,
+            max_push_attempts,
+            push_err,
+        )
+
+        if attempt < max_push_attempts:
+            logging.info('[SCREENSHOT EXPORT] Executando git pull para integrar alterações remotas antes de tentar push novamente...')
+            _pull_and_merge_remote(repo_dir, data_subdir)
+        else:
+            raise RuntimeError(f'Falha no git push após {max_push_attempts} tentativas: {push_err}')
 
     logging.info('[SCREENSHOT EXPORT] Publicação git concluída com sucesso')
     return {
         'published': True,
-        'commit_created': True,
-        'push_executed': True,
+        'commit_created': commit_created,
+        'push_executed': push_executed,
         'commit_message': commit_message,
         'message': f'Snapshot de {data_subdir} sincronizado e publicado no repositório screenshot.',
     }
