@@ -39,6 +39,40 @@ class HealthMonitorCompatibilityTests(unittest.TestCase):
 
 
 class OrcrimAuthHandlingTests(unittest.TestCase):
+    def test_normalize_google_mymaps_viewer_url_to_kml_export(self):
+        url = (
+            "https://www.google.com/maps/d/u/0/viewer?"
+            "mid=1lI0FmNXDPrezPhzeryZTCEP0rl8BDuE&femb=1&ll=-2.71%2C-38.47&z=8"
+        )
+
+        result = orcrim_module._normalize_google_mymaps_kml_url(url)
+
+        self.assertEqual(
+            result,
+            "https://www.google.com/maps/d/u/0/kml?mid=1lI0FmNXDPrezPhzeryZTCEP0rl8BDuE&forcekml=1",
+        )
+
+    def test_resolve_official_url_uses_configured_orcrims_map_url(self):
+        with patch.dict(
+            orcrim_module.os.environ,
+            {"ORCRIMS_OFFICIAL_MAP_URL": "https://www.google.com/maps/d/u/0/viewer?mid=test-map&femb=1"},
+            clear=False,
+        ), patch.object(orcrim_module, "_load_env_for_cookies", return_value={}):
+            result = orcrim_module._resolve_official_url()
+
+        self.assertEqual(
+            result,
+            "https://www.google.com/maps/d/u/0/kml?mid=test-map&forcekml=1",
+        )
+
+    def test_completed_tmp_download_can_be_recognized_as_kml(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_path = f"{temp_dir}/download.tmp"
+            with open(temp_path, "wb") as temp_file:
+                temp_file.write(b'<?xml version="1.0"?><kml></kml>')
+
+            self.assertTrue(orcrim_module._is_completed_chrome_kml_download(temp_path))
+
     def test_raise_for_google_auth_failure_on_cookie_mismatch(self):
         response = DummyResponse(
             url="https://accounts.google.com/CookieMismatch",
@@ -56,7 +90,7 @@ class OrcrimAuthHandlingTests(unittest.TestCase):
                 "https://www.google.com/maps/d/u/0/kml?mid=test",
             )
 
-    def test_refresh_uses_old_local_base_only_as_last_resort(self):
+    def test_refresh_fails_without_chrome_download_instead_of_using_local_fallback(self):
         written_status = {}
 
         def fake_exists(path):
@@ -77,11 +111,10 @@ class OrcrimAuthHandlingTests(unittest.TestCase):
             result = orcrim_module.refresh_orcrim_from_official(force=True)
 
         self.assertFalse(result["updated"])
-        self.assertEqual(result["reason"], "fallback_active")
-        self.assertTrue(result["fallback_used"])
-        self.assertEqual(written_status["status"], "fallback_active")
-        self.assertIn("cookie invalido", written_status["last_error"])
-        self.assertIn("chrome_profile: chrome sem download", written_status["last_error"])
+        self.assertEqual(result["reason"], "chrome_download_failed")
+        self.assertFalse(result["fallback_used"])
+        self.assertEqual(written_status["status"], "chrome_download_failed")
+        self.assertIn("chrome_profile:Default: chrome sem download", written_status["last_error"])
 
     def test_refresh_uses_logged_in_chrome_recovery_by_default(self):
         with patch.object(orcrim_module, "_log_existing_state"), \

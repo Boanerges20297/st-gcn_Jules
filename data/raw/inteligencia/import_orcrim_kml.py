@@ -18,6 +18,7 @@ import zipfile
 from datetime import datetime
 from math import radians, cos, sin, asin, sqrt
 from xml.etree import ElementTree as ET
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import pandas as pd
 import requests
@@ -34,12 +35,15 @@ except Exception:
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 INTEL_DIR = os.path.join(BASE_DIR, 'data', 'raw', 'inteligencia')
 DICT_PATH = os.path.join(BASE_DIR, 'data', 'raw', 'bairros_centros_latlong.json')
-DOWNLOADS_DIR = r'C:\Users\Boanerges\Downloads'
+DOWNLOADS_DIR = os.environ.get('ORCRIMS_DOWNLOADS_DIR') or os.path.join(os.path.expanduser('~'), 'Downloads')
 CURRENT_KML_PATH = os.path.join(INTEL_DIR, 'current_orcrim.kml')
 STATIC_KML_PATH = os.path.join(BASE_DIR, 'data', 'static', 'ORCRIMS 2026.kml')
 LOCAL_KMZ_PATH = os.path.join(INTEL_DIR, 'ORCRIMS 2026.kmz')
 LOCAL_KML_PATH = os.path.join(INTEL_DIR, 'ORCRIMS 2026.kml')
 UPDATE_STATUS_PATH = os.path.join(INTEL_DIR, 'orcrim_update_status.json')
+DEFAULT_ORCRIMS_MAP_URL = 'https://www.google.com/maps/d/u/0/viewer?mid=1lI0FmNXDPrezPhzeryZTCEP0rl8BDuE&femb=1'
+DEFAULT_ORCRIMS_CHROME_PROFILE = 'Default'
+DEFAULT_ORCRIMS_CHROME_EMAIL = 'boanergesteixeiraalmeida@gmail.com'
 REQUEST_TIMEOUT = 60
 CHROME_DOWNLOAD_TIMEOUT = 45
 CHROME_PATH_CANDIDATES = [
@@ -310,7 +314,38 @@ def _extract_network_link_from_kmz(kmz_path: str) -> str:
     return _extract_network_link_from_kml(kml_content)
 
 
+def _normalize_google_mymaps_kml_url(source_url: str) -> str:
+    source_url = (source_url or '').strip()
+    if not source_url:
+        return ''
+
+    parsed = urlparse(source_url)
+    query = parse_qs(parsed.query, keep_blank_values=True)
+    mid = (query.get('mid') or [''])[0].strip()
+    if not mid:
+        match = re.search(r'(?:[?&]mid=|/maps/d/(?:u/\d+/)?)([^&#?/]+)', source_url)
+        mid = match.group(1).strip() if match else ''
+    if not mid:
+        return source_url
+
+    export_query = {'mid': mid, 'forcekml': '1'}
+    return urlunparse((parsed.scheme or 'https', parsed.netloc or 'www.google.com', '/maps/d/u/0/kml', '', urlencode(export_query), ''))
+
+
 def _resolve_official_url():
+    env = _load_env_for_cookies()
+    configured_url = (
+        os.environ.get('ORCRIMS_OFFICIAL_MAP_URL')
+        or env.get('ORCRIMS_OFFICIAL_MAP_URL')
+        or os.environ.get('ORCRIMS_OFFICIAL_KML_URL')
+        or env.get('ORCRIMS_OFFICIAL_KML_URL')
+        or DEFAULT_ORCRIMS_MAP_URL
+    )
+    normalized_configured_url = _normalize_google_mymaps_kml_url(configured_url)
+    if normalized_configured_url:
+        print(f'🌐 [ORCRIMS] Link oficial configurado: {normalized_configured_url}')
+        return normalized_configured_url
+
     candidates = [LOCAL_KMZ_PATH]
     if os.path.exists(DOWNLOADS_DIR):
         download_candidates = sorted(
@@ -354,6 +389,15 @@ def _env_flag(name: str, default: bool = False) -> bool:
     if value is None:
         return default
     return str(value).strip().lower() in {'1', 'true', 'yes', 'on'}
+
+
+def _orcrims_chrome_profile_name() -> str:
+    env = _load_env_for_cookies()
+    return (
+        os.environ.get('ORCRIMS_CHROME_PROFILE')
+        or env.get('ORCRIMS_CHROME_PROFILE')
+        or DEFAULT_ORCRIMS_CHROME_PROFILE
+    )
 
 
 def _find_chrome_executable() -> str:
@@ -440,17 +484,27 @@ def _chrome_download_candidates():
     candidates = []
     for name in os.listdir(DOWNLOADS_DIR):
         lower_name = name.lower()
-        if lower_name.endswith(('.kmz', '.kml', '.crdownload')):
+        if lower_name.endswith(('.kmz', '.kml', '.tmp', '.crdownload')):
             candidates.append(os.path.join(DOWNLOADS_DIR, name))
     return candidates
+
+
+def _is_completed_chrome_kml_download(path: str) -> bool:
+    lower_path = path.lower()
+    if lower_path.endswith('.crdownload'):
+        return False
+    try:
+        with open(path, 'rb') as file_obj:
+            prefix = file_obj.read(128).lstrip()
+    except OSError:
+        return False
+    return prefix.startswith(b'PK') or prefix.startswith(b'<?xml') or prefix.startswith(b'<kml')
 
 
 def _wait_for_downloaded_kml_via_chrome(started_at: float):
     deadline = time.time() + CHROME_DOWNLOAD_TIMEOUT
     while time.time() < deadline:
         for path in sorted(_chrome_download_candidates(), key=lambda item: os.path.getmtime(item), reverse=True):
-            if path.lower().endswith('.crdownload'):
-                continue
             try:
                 stat = os.stat(path)
             except FileNotFoundError:
@@ -458,6 +512,8 @@ def _wait_for_downloaded_kml_via_chrome(started_at: float):
             if stat.st_mtime + 1 < started_at:
                 continue
             if stat.st_size <= 0:
+                continue
+            if not _is_completed_chrome_kml_download(path):
                 continue
             return path
         time.sleep(1)
@@ -1060,7 +1116,7 @@ def _download_official_payload_with_session(source_url: str, session: requests.S
 
 
 def _download_payload_via_chrome_profile_cookies(source_url: str):
-    profile_name = os.environ.get('ORCRIMS_CHROME_PROFILE') or _load_env_for_cookies().get('ORCRIMS_CHROME_PROFILE') or 'Default'
+    profile_name = _orcrims_chrome_profile_name()
     session = _build_google_session_from_chrome_profile(source_url, profile_name)
     payload, headers = _download_official_payload_with_session(source_url, session, f'chrome_profile_cookies:{profile_name}')
     headers['profile'] = profile_name
@@ -1072,7 +1128,7 @@ def _download_payload_via_logged_in_chrome(source_url: str):
     if not chrome_executable:
         raise RuntimeError('Google Chrome não encontrado para fallback autenticado.')
 
-    profile_name = os.environ.get('ORCRIMS_CHROME_PROFILE') or _load_env_for_cookies().get('ORCRIMS_CHROME_PROFILE') or 'Default'
+    profile_name = _orcrims_chrome_profile_name()
     user_data_dir = _find_chrome_user_data_dir()
     _prepare_chrome_profile_for_auto_download(profile_name)
     started_at = time.time()
@@ -1444,7 +1500,23 @@ def refresh_orcrim_from_official(force: bool = False):
     download_failures = []
     saw_auth_error = False
 
-    if _env_flag('ORCRIMS_USE_CHROME_FALLBACK', default=True):
+    try:
+        payload_bytes, headers = _download_payload_via_logged_in_chrome(source_url)
+        kml_bytes = _extract_kml_bytes_from_payload(payload_bytes)
+    except Exception as chrome_error:
+        combined_error = f'chrome_profile:{_orcrims_chrome_profile_name()}: {chrome_error}'
+        print(f'❌ [ORCRIMS] Falha ao baixar KML oficial via Chrome logado: {combined_error}')
+        current_status.update({
+            'last_checked_at': _iso_now(),
+            'last_error': combined_error,
+            'source_url': source_url,
+            'status': 'chrome_download_failed',
+            'fallback_used': False,
+        })
+        _write_update_status(current_status)
+        return {'updated': False, 'reason': 'chrome_download_failed', 'fallback_used': False, 'error': combined_error}
+
+    if kml_bytes is None and _env_flag('ORCRIMS_USE_CHROME_FALLBACK', default=True):
         try:
             payload_bytes, headers = _download_payload_via_chrome_profile_cookies(source_url)
             kml_bytes = _extract_kml_bytes_from_payload(payload_bytes)
@@ -1461,13 +1533,13 @@ def refresh_orcrim_from_official(force: bool = False):
             saw_auth_error = saw_auth_error or isinstance(env_error, GoogleMapsAuthError)
             download_failures.append(f'env_cookie: {env_error}')
 
-    if kml_bytes is None and _env_flag('ORCRIMS_USE_CHROME_UI_FALLBACK', default=False):
+    if kml_bytes is None and _env_flag('ORCRIMS_USE_CHROME_UI_FALLBACK', default=True):
         print('⚠️ [ORCRIMS] Cookies não resolveram. Último recurso: abrir Chrome logado para download visual.')
         try:
             payload_bytes, headers = _download_payload_via_logged_in_chrome(source_url)
             kml_bytes = _extract_kml_bytes_from_payload(payload_bytes)
         except Exception as ui_error:
-            download_failures.append(f'chrome_profile_ui: {ui_error}')
+            download_failures.append(f'chrome_profile: {ui_error}')
 
     if kml_bytes is None:
         combined_error = ' | '.join(download_failures)

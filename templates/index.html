@@ -633,12 +633,14 @@
     // the user sees the city-level view (Fortaleza) first.
     var initialMapLoad = true;
     var map = L.map('map').setView(initialView.center, initialView.zoom);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-        subdomains: 'abcd',
-        maxZoom: 19
-    }).addTo(map);
-
+    // Use CARTO basemap tiles with the project API key to avoid the watermark.
+    L.tileLayer(
+    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_27gr_1_6a076fcc009e0db2eb9af909',
+    {
+        maxZoom: 20,
+        attribution: '&copy; OpenStreetMap &copy; CARTO'
+    }
+    ).addTo(map);
     map.createPane('areaPolygonsPane');
     map.getPane('areaPolygonsPane').style.zIndex = 410;
     map.getPane('areaPolygonsPane').style.pointerEvents = 'auto'; // Bairros ativos por padrão
