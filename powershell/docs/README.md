@@ -192,11 +192,17 @@ powershell -ExecutionPolicy Bypass -File "C:\Users\Boanerges\Desktop\Projetos\Re
 powershell -ExecutionPolicy Bypass -File "C:\Users\Boanerges\Desktop\Projetos\Report Preview\powershell\reset_hermes_telegram.ps1" -HermesWorkspace "E:\Hermes_Workspace" -TelegramUserId "80086019"
 ```
 
-### Criar ou atualizar credenciais do bot
+### Recuperar ou atualizar a senha do bot
+
+Se você perdeu o acesso administrativo ao Telegram, execute este comando na máquina (ou no servidor) que contém o banco `data/users/telegram_auth.sqlite3`. Ele pede a nova senha e a confirmação sem exibí-las no terminal; para um usuário existente, apenas a senha é alterada. A senha deve ter ao menos 4 caracteres.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File "C:\Users\Boanerges\Desktop\Projetos\Report Preview\powershell\upsert_telegram_user.ps1" -Username "operador1"
 ```
+
+Com uma sessão administrativa válida no Telegram, também há a opção **🔑 Redefinir Senha** no Painel Administrativo. A nova senha precisa ter pelo menos 4 caracteres e a mensagem enviada ao bot é apagada após o processamento.
+
+Para recuperação diretamente pelo Telegram, configure no `.env` do servidor um valor longo e exclusivo para `TELEGRAM_AUTH_RECOVERY_CODE`, reinicie o gateway e envie `/reset` ao bot. O bot pedirá o usuário, o código de recuperação e a nova senha; as mensagens com dados sensíveis são apagadas após o uso.
 
 ## Diagnóstico rápido
 

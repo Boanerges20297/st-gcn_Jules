@@ -53,12 +53,14 @@ def fetch_weather_from_api(lat, lon, start_date, end_date):
 def get_real_weather(date_obj, lat=-3.717, lon=-38.543):
     global _weather_cache
     request_date = date_obj.date() if hasattr(date_obj, 'date') else date_obj
+    if isinstance(request_date, datetime):
+        request_date = request_date.date()
 
     # Não consulta nem enriquece clima fora da janela histórica suportada.
     if request_date < WEATHER_START_DATE or request_date > WEATHER_END_DATE:
         return 0.0
 
-    date_str = date_obj.strftime('%Y-%m-%d')
+    date_str = request_date.strftime('%Y-%m-%d')
     
     if date_str in _weather_cache:
         return _weather_cache[date_str]
@@ -87,7 +89,7 @@ def get_real_weather(date_obj, lat=-3.717, lon=-38.543):
     
     # Limite pro futuro (não pode ser maior q hoje - 2 dias para archive)
     today = datetime.now().date()
-    if date_obj >= today:
+    if request_date >= today:
         # Para HOJE usamos forecast api
         forecast_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&daily=precipitation_sum&timezone=America/Sao_Paulo"
         try:
@@ -98,6 +100,10 @@ def get_real_weather(date_obj, lat=-3.717, lon=-38.543):
     else:
         new_data = fetch_weather_from_api(lat, lon, start, end)
         _weather_cache.update(new_data)
+
+    # Cache a neutral fallback after an unavailable API response so every
+    # record on the same date does not repeat the external request.
+    _weather_cache.setdefault(date_str, 0.0)
     
     # Salva cache atualizado
     os.makedirs(os.path.dirname(CACHE_FILE), exist_ok=True)

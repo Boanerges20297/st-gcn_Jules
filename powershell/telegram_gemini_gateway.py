@@ -12,7 +12,9 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime
 from pathlib import Path
+from secrets import token_bytes
 
 
 DEFAULT_SESSION_TTL_SECONDS = 15 * 60
@@ -107,6 +109,7 @@ class TelegramGeminiGateway:
         self.session_ttl_seconds = parse_int_env(self.project_env_data, "TELEGRAM_AUTH_SESSION_TTL_SECONDS", DEFAULT_SESSION_TTL_SECONDS)
         self.max_failed_attempts = parse_int_env(self.project_env_data, "TELEGRAM_AUTH_MAX_FAILED_ATTEMPTS", DEFAULT_MAX_FAILED_ATTEMPTS)
         self.lockout_seconds = parse_int_env(self.project_env_data, "TELEGRAM_AUTH_LOCKOUT_SECONDS", DEFAULT_LOCKOUT_SECONDS)
+        self.recovery_code = (self.project_env_data.get("TELEGRAM_AUTH_RECOVERY_CODE") or "").strip()
         self._ensure_auth_db()
         self.token = self.env_data.get("TELEGRAM_BOT_TOKEN", "")
         if not self.token:
@@ -480,7 +483,7 @@ class TelegramGeminiGateway:
             "lock_until": int(current.get("lock_until", 0) or 0),
         }
         self._set_session(chat_id, next_session)
-        self._send_message(chat_id, message or "Informe seu usuario para liberar o acesso.")
+        self._send_message(chat_id, message or "Informe seu usuario para liberar o acesso. Se esqueceu a senha, use /reset.")
 
     def _set_authenticated_session(self, chat_id: int, username: str) -> None:
         acesso = "user"
@@ -553,6 +556,64 @@ class TelegramGeminiGateway:
             return True
 
         awaiting = session.get("awaiting")
+
+        if text.startswith("/reset"):
+            if not self.recovery_code:
+                self._send_message(chat_id, "Recuperação não configurada. Solicite o reset ao administrador do servidor.")
+                return True
+            self._set_session(chat_id, {"authenticated": False, "awaiting": "recovery_username", "failed_attempts": 0, "lock_until": 0})
+            self._send_message(chat_id, "Recuperação de senha: informe seu usuário.")
+            return True
+
+        if awaiting == "recovery_username":
+            username = text.strip()
+            if not username or username.startswith("/"):
+                self._send_message(chat_id, "Usuário inválido. Informe seu usuário ou use /start para cancelar.")
+                return True
+            self._set_session(chat_id, {"authenticated": False, "awaiting": "recovery_code", "recovery_username": username, "failed_attempts": 0, "lock_until": 0, "recovery_username_message_id": message_id})
+            self._send_message(chat_id, "Informe o código de recuperação configurado pelo administrador.")
+            return True
+
+        if awaiting == "recovery_code":
+            code = text.strip()
+            username = str(session.get("recovery_username") or "")
+            if message_id:
+                self._delete_message(chat_id, message_id)
+            username_message_id = session.get("recovery_username_message_id")
+            if username_message_id:
+                self._delete_message(chat_id, int(username_message_id))
+            if not hmac.compare_digest(code, self.recovery_code):
+                self._audit_auth_event("password_recovery_failure", chat_id, user_id=user_id, username=username)
+                self._set_session(chat_id, {"authenticated": False, "awaiting": None, "failed_attempts": 0, "lock_until": 0})
+                self._send_message(chat_id, "Código de recuperação inválido. Use /reset para tentar novamente.")
+                return True
+            self._set_session(chat_id, {"authenticated": False, "awaiting": "recovery_password", "recovery_username": username, "failed_attempts": 0, "lock_until": 0})
+            self._send_message(chat_id, "Código confirmado. Envie a nova senha (mínimo de 4 caracteres).")
+            return True
+
+        if awaiting == "recovery_password":
+            username = str(session.get("recovery_username") or "")
+            password = text.strip()
+            if message_id:
+                self._delete_message(chat_id, message_id)
+            if len(password) < 4:
+                self._send_message(chat_id, "Senha muito curta. Use ao menos 4 caracteres.")
+                return True
+            salt_hex = token_bytes(16).hex()
+            with sqlite3.connect(self.auth_db_path) as conn:
+                cursor = conn.execute(
+                    "UPDATE users SET password_salt = ?, password_hash = ?, updated_at = ? WHERE lower(username) = lower(?)",
+                    (salt_hex, self._hash_password(password, salt_hex), datetime.now().isoformat(timespec="seconds"), username),
+                )
+                conn.commit()
+            if cursor.rowcount == 0:
+                self._set_session(chat_id, {"authenticated": False, "awaiting": None, "failed_attempts": 0, "lock_until": 0})
+                self._send_message(chat_id, "Usuário não encontrado. Nenhuma senha foi alterada.")
+                return True
+            self._audit_auth_event("password_recovery_success", chat_id, user_id=user_id, username=username)
+            self._set_session(chat_id, {"authenticated": False, "awaiting": None, "failed_attempts": 0, "lock_until": 0})
+            self._send_message(chat_id, "Senha redefinida. Use /start para entrar com a nova senha.")
+            return True
 
         if text.startswith("/logout") or text.startswith("/exit") or text.lower() == "exit":
             self._logout_session(chat_id, user_id, trigger_source=text, trigger_msg_id=message_id)
@@ -886,6 +947,7 @@ class TelegramGeminiGateway:
         keyboard = [
             [{"text": "📋 Listar Usuários", "callback_data": "admin_list"}],
             [{"text": "➕ Adicionar Usuário", "callback_data": "admin_add"}],
+            [{"text": "🔑 Redefinir Senha", "callback_data": "admin_reset_password"}],
             [{"text": "✅ Ativar Usuário", "callback_data": "admin_activate"}, {"text": "🚫 Desativar Usuário", "callback_data": "admin_deactivate"}],
             [{"text": "🗑️ Excluir Usuário", "callback_data": "admin_delete"}],
             [{"text": "↩️ Voltar", "callback_data": "menu_main"}]
@@ -922,6 +984,7 @@ class TelegramGeminiGateway:
             "activate": "ativar",
             "deactivate": "desativar",
             "delete": "excluir",
+            "reset_password": "redefinir a senha de",
         }
         label = labels.get(action, action)
         session = self._get_session(chat_id)
@@ -1014,6 +1077,18 @@ class TelegramGeminiGateway:
                         keyboard
                     )
 
+                elif action == "reset_password":
+                    session = self._get_session(chat_id)
+                    session["awaiting_admin_password_reset"] = {"username": real_username}
+                    session.pop("awaiting_admin_target", None)
+                    self._set_session(chat_id, session)
+                    keyboard = [[{"text": "↩️ Cancelar", "callback_data": "menu_admin"}]]
+                    self._send_inline_keyboard(
+                        chat_id,
+                        f"🔑 *REDEFINIR SENHA*\n\nUsuário: `{real_username}`\n\nEnvie a nova senha (mínimo de 4 caracteres). A mensagem será apagada após o processamento.",
+                        keyboard,
+                    )
+
         except Exception as e:
             logging.exception("Erro ao executar acao admin '%s' para '%s'", action, target_username)
             keyboard = [[{"text": "↩️ Painel Admin", "callback_data": "menu_admin"}]]
@@ -1051,6 +1126,49 @@ class TelegramGeminiGateway:
                 f"❌ *Erro ao excluir usuário:* {e}",
                 keyboard
             )
+
+    def _admin_handle_password_reset_input(self, chat_id: int, text: str, message_id: int | None = None) -> None:
+        """Store a new password requested by an authenticated administrator."""
+        if not self._is_admin_session(chat_id):
+            self._send_message(chat_id, "⛔ Acesso negado.")
+            return
+
+        session = self._get_session(chat_id)
+        state = session.get("awaiting_admin_password_reset") or {}
+        username = str(state.get("username") or "").strip()
+        password = text.strip()
+        if message_id:
+            self._delete_message(chat_id, message_id)
+
+        keyboard = [[{"text": "↩️ Painel Admin", "callback_data": "menu_admin"}]]
+        if not username:
+            session.pop("awaiting_admin_password_reset", None)
+            self._set_session(chat_id, session)
+            self._send_inline_keyboard(chat_id, "⚠️ A solicitação de redefinição expirou. Inicie novamente pelo painel.", keyboard)
+            return
+        if len(password) < 4:
+            self._send_inline_keyboard(chat_id, "⚠️ Senha muito curta. Use pelo menos 4 caracteres e envie novamente.", [[{"text": "↩️ Cancelar", "callback_data": "menu_admin"}]])
+            return
+
+        salt_hex = token_bytes(16).hex()
+        password_hash = self._hash_password(password, salt_hex)
+        now = datetime.now().isoformat(timespec="seconds")
+        with sqlite3.connect(self.auth_db_path) as conn:
+            cursor = conn.execute(
+                "UPDATE users SET password_salt = ?, password_hash = ?, updated_at = ? WHERE lower(username) = lower(?)",
+                (salt_hex, password_hash, now, username),
+            )
+            conn.commit()
+
+        session.pop("awaiting_admin_password_reset", None)
+        self._set_session(chat_id, session)
+        if cursor.rowcount == 0:
+            self._send_inline_keyboard(chat_id, "⚠️ Usuário não encontrado. Nenhuma senha foi alterada.", keyboard)
+            return
+
+        self._audit_auth_event("admin_password_reset", chat_id, username=username)
+        logging.info("Admin redefiniu a senha do usuario '%s'.", username)
+        self._send_inline_keyboard(chat_id, f"✅ Senha de `{username}` redefinida com sucesso.", keyboard)
 
     def _admin_prompt_new_user(self, chat_id: int, message_id: int) -> None:
         """Step 1: ask admin to type the new username."""
@@ -1227,7 +1345,7 @@ class TelegramGeminiGateway:
         # Clear admin waiting states if user navigates away via inline button
         if not data.startswith("admin_"):
             changed = False
-            for key in ("awaiting_admin_target", "awaiting_admin_confirm", "awaiting_admin_new_user"):
+            for key in ("awaiting_admin_target", "awaiting_admin_confirm", "awaiting_admin_new_user", "awaiting_admin_password_reset"):
                 if key in session:
                     session.pop(key, None)
                     changed = True
@@ -1538,6 +1656,9 @@ class TelegramGeminiGateway:
 
         elif data == "admin_delete":
             self._admin_prompt_target(chat_id, message_id, "delete")
+
+        elif data == "admin_reset_password":
+            self._admin_prompt_target(chat_id, message_id, "reset_password")
 
         elif data.startswith("admin_confirm_delete:"):
             target_username = data.split(":", 1)[1]
@@ -2416,6 +2537,11 @@ class TelegramGeminiGateway:
         # Admin: multi-step new user creation (username → password)
         if isinstance(session, dict) and session.get("awaiting_admin_new_user"):
             self._admin_handle_new_user_input(chat_id, text)
+            return
+
+        # Admin: password reset for an existing user.
+        if isinstance(session, dict) and session.get("awaiting_admin_password_reset"):
+            self._admin_handle_password_reset_input(chat_id, text, msg_id)
             return
 
         # Check if awaiting location input

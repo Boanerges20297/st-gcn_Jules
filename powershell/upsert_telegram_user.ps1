@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$ProjectRoot = 'C:\Users\Boanerges\Desktop\Projetos\Report Preview',
+    [string]$ProjectRoot = (Split-Path -Parent $PSScriptRoot),
     [string]$Username
 )
 
@@ -38,6 +38,8 @@ if ([string]::IsNullOrWhiteSpace($Username)) {
 
 $existsCheck = @"
 import sys
+from pathlib import Path
+sys.path.insert(0, str(Path.cwd() / 'powershell'))
 from manage_telegram_users import ensure_db, user_exists
 ensure_db()
 print('1' if user_exists(sys.argv[1]) else '0')
@@ -63,8 +65,8 @@ try {
     $passwordPlain = Convert-SecureStringToPlainText -SecureValue $passwordSecure
     $confirmPlain = Convert-SecureStringToPlainText -SecureValue $confirmSecure
 
-    if ([string]::IsNullOrWhiteSpace($passwordPlain)) {
-        throw 'Senha vazia nao e permitida.'
+    if ([string]::IsNullOrWhiteSpace($passwordPlain) -or $passwordPlain.Length -lt 4) {
+        throw 'Use uma senha com pelo menos 4 caracteres.'
     }
 
     if ($passwordPlain -ne $confirmPlain) {
@@ -80,6 +82,9 @@ try {
     $upsertCode = @"
 import os
 import json
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path.cwd() / 'powershell'))
 from manage_telegram_users import ensure_db, add_user, set_password
 payload = json.loads(os.environ['TELEGRAM_UPSERT_PAYLOAD'])
 ensure_db()

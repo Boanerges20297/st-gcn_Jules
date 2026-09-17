@@ -98,9 +98,15 @@ if os.path.exists(cache_path):
         with open(cache_path, 'r', encoding='utf-8') as f:
             data_c = json.load(f)
             for item in data_c:
-                k = f"{round(float(item['lat']), 3)}_{round(float(item['lng']), 3)}"
-                GEO_CACHE[k] = item['rua']
-    except: pass
+                lat_value = item.get('lat', item.get('latitude'))
+                lon_value = item.get('lng', item.get('longitude'))
+                street_value = item.get('rua', item.get('name', item.get('street')))
+                if lat_value is None or lon_value is None or not street_value:
+                    continue
+                k = f"{round(float(lat_value), 3)}_{round(float(lon_value), 3)}"
+                GEO_CACHE[k] = str(street_value).upper()
+    except Exception as e:
+        print(f"Aviso: Falha ao carregar cache de ruas: {e}", flush=True)
 
 # 2. MINERAR CSV OFICIAL (Enriquecimento Histórico Local)
 # Com 147k registros, temos quase todas as ruas mapeadas
@@ -119,19 +125,101 @@ if os.path.exists(OFFICIAL_CSV):
     except Exception as e:
         print(f"Aviso: Falha ao minerar CSV historico: {e}", flush=True)
 
-LAST_GEO_REQUEST = [0]
+LAST_GEO_REQUEST = [0.0]
+LAST_GEO_SOURCE = [""]
+OSM_GEOCODER = [None]
+GEO_STATS = {"osm": 0, "google": 0}
+
+def _env_bool(name, default=False):
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return str(value).strip().lower() in ("1", "true", "yes", "sim", "on")
+
+def _env_float(name, default):
+    try:
+        return float(str(os.getenv(name, default)).replace(",", "."))
+    except Exception:
+        return default
+
+def _env_int(name, default):
+    try:
+        return int(os.getenv(name, default))
+    except Exception:
+        return default
+
+OSM_GEOCODE_ENABLED = _env_bool("OSM_GEOCODE_ENABLED", True)
+OSM_MIN_DELAY_SECONDS = _env_float("OSM_MIN_DELAY_SECONDS", 1.2)
+GOOGLE_GEOCODE_ENABLED = _env_bool("GOOGLE_GEOCODE_ENABLED", False)
+GOOGLE_GEOCODE_MAX_CALLS = _env_int("GOOGLE_GEOCODE_MAX_CALLS", 0)
 
 # --- CONFIGURAÇÃO GOOGLE MAPS API ---
 GOOGLE_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "").replace('"', '')
 
+def _street_from_address(address):
+    if not isinstance(address, dict):
+        return None
+    for key in ("road", "pedestrian", "residential", "footway", "path", "cycleway"):
+        value = address.get(key)
+        if value:
+            return str(value).upper().strip()
+    return None
+
+def _get_osm_geocoder():
+    if OSM_GEOCODER[0] is None:
+        OSM_GEOCODER[0] = Nominatim(user_agent="report_preview_merge_new_data", timeout=12)
+    return OSM_GEOCODER[0]
+
 def get_street_from_coords(lat, lon):
-    """Busca rua via Google Maps API com alta velocidade."""
+    """Busca rua com cache local, OSM/Nominatim e Google opcional como ultimo recurso."""
+    LAST_GEO_SOURCE[0] = ""
+    if pd.isna(lat) or pd.isna(lon):
+        LAST_GEO_SOURCE[0] = "coord_invalida"
+        return None
+
     # 1. Tenta cache local primeiro (3 casas decimais)
     key_cache = f"{round(lat, 3)}_{round(lon, 3)}"
     if key_cache in GEO_CACHE:
+        LAST_GEO_SOURCE[0] = "cache"
         return GEO_CACHE[key_cache]
-    
-    # 2. Consulta Google Maps (Sem rate limit de 1.5s)
+
+    # 2. Consulta OSM/Nominatim com rate limit para evitar uso indevido.
+    if OSM_GEOCODE_ENABLED:
+        try:
+            elapsed = time.time() - LAST_GEO_REQUEST[0]
+            if elapsed < OSM_MIN_DELAY_SECONDS:
+                time.sleep(OSM_MIN_DELAY_SECONDS - elapsed)
+            GEO_STATS["osm"] += 1
+            print(f"  [OSM #{GEO_STATS['osm']}] Consultando Nominatim...", flush=True)
+            LAST_GEO_REQUEST[0] = time.time()
+            location = _get_osm_geocoder().reverse(
+                (lat, lon),
+                exactly_one=True,
+                language='pt',
+                addressdetails=True,
+            )
+            street = _street_from_address(getattr(location, "raw", {}).get("address", {}))
+            if street:
+                GEO_CACHE[key_cache] = street
+                LAST_GEO_SOURCE[0] = "osm"
+                return street
+        except Exception as e:
+            print(f"  Aviso OSM/Nominatim: {e}", flush=True)
+
+    # 3. Google Maps fica desligado por padrao; use GOOGLE_GEOCODE_ENABLED=true
+    # e GOOGLE_GEOCODE_MAX_CALLS para liberar um fallback controlado.
+    if not GOOGLE_GEOCODE_ENABLED:
+        LAST_GEO_SOURCE[0] = "google_desligado"
+        return None
+    if not GOOGLE_API_KEY:
+        LAST_GEO_SOURCE[0] = "google_sem_chave"
+        return None
+    if GOOGLE_GEOCODE_MAX_CALLS <= 0 or GEO_STATS["google"] >= GOOGLE_GEOCODE_MAX_CALLS:
+        LAST_GEO_SOURCE[0] = "google_limite"
+        return None
+
+    GEO_STATS["google"] += 1
+    print(f"  [GOOGLE #{GEO_STATS['google']}/{GOOGLE_GEOCODE_MAX_CALLS}] Consultando Maps fallback...", flush=True)
     try:
         import requests
         url = f"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&key={GOOGLE_API_KEY}&language=pt-BR"
@@ -147,6 +235,7 @@ def get_street_from_coords(lat, lon):
                         if "route" in comp.get("types", []):
                             street = comp.get("long_name").upper()
                             GEO_CACHE[key_cache] = street
+                            LAST_GEO_SOURCE[0] = "google"
                             return street
                 
                 # Fallback: Usar o formatted_address se não achar 'route' específico
@@ -154,13 +243,16 @@ def get_street_from_coords(lat, lon):
                 street = full_addr.split(',')[0].split('-')[0].strip().upper()
                 if street:
                     GEO_CACHE[key_cache] = street
+                    LAST_GEO_SOURCE[0] = "google"
                     return street
         elif data.get("status") == "REQUEST_DENIED":
             print(f"  ❌ Erro Google API: {data.get('error_message')}", flush=True)
+            LAST_GEO_SOURCE[0] = "google_erro"
             return "ERRO_API_KEY"
     except Exception as e:
         print(f"  ⚠️ Erro na conexão com Google: {e}", flush=True)
     
+    LAST_GEO_SOURCE[0] = "nao_encontrado"
     return None
 
 def resolve_precise_bairro(lat, lon, polygons, nodes_coords, node_names):
@@ -413,17 +505,14 @@ def merge(new_data_path):
                     if (i+1) % 100 == 0 or i < 10:
                         print(f"  [CACHE HISTORICO]: {street_found}", flush=True)
                 else:
-                    # 2. Rua Inédita: Chama Google Maps
-                    # Incrementa contador de cota
-                    merge.google_calls = getattr(merge, 'google_calls', 0) + 1
-                    
-                    print(f"  [GOOGLE #{merge.google_calls}] Consultando internet...", flush=True)
+                    # 2. Rua inedita: usa OSM/Nominatim com rate limit; Google
+                    # fica apenas como fallback opcional e limitado por ambiente.
                     street_found = get_street_from_coords(lat, lon)
                     if street_found and street_found not in ["TIMEOUT_API", "FALHA"]:
                         df_new.at[idx, 'name'] = street_found
-                        print(f"  [GOOGLE OK]: {street_found}", flush=True)
+                        print(f"  [{LAST_GEO_SOURCE[0].upper()} OK]: {street_found}", flush=True)
                     else:
-                        print(f"  [GOOGLE FALHA]: Rua não encontrada.", flush=True)
+                        print(f"  [GEO FALHA]: Rua nao encontrada ({LAST_GEO_SOURCE[0]}).", flush=True)
             
             # Lógica de Qualidade Total para o Bairro:
             # 1. Se for Fortaleza, forçamos o cálculo baseado em lat/long se as coordenadas forem válidas

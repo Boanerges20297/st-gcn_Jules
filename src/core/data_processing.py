@@ -1,4 +1,5 @@
 import sys
+import argparse
 import os
 sys.path.append(os.getcwd())
 import json
@@ -303,24 +304,27 @@ def check_and_download_mysql_data():
         logging.error(f"Erro ao consultar banco de dados MySQL: {e}")
     return False
 
-def process_ism_data():
+def process_ism_data(sync_mysql: bool = False, update_geo_cache: bool = False):
+    """Rebuild local dos tensores, com sincronizações caras somente por opt-in."""
     logging.info("🚀 Iniciando Rebuild ISM com Inteligência Territorial Atualizada...")
     
-    # Executa a verificação e download do banco MySQL
-    try:
-        if check_and_download_mysql_data():
-            logging.info("Disparando scripts/merge_new_data.py para mesclar os novos dados...")
-            import subprocess
-            merge_script = os.path.join('scripts', 'merge_new_data.py')
-            if os.path.exists(merge_script):
-                # Passa o arquivo dados_status.json para mesclagem
-                subprocess.run([sys.executable, merge_script, os.path.join('data', 'raw', 'dados_status.json')], check=False)
-                logging.info("Merge finalizado. O script de merge disparou a execução subsequente de data_processing.py.")
-                sys.exit(0)
-            else:
+    # Sincronização e merge podem processar milhares de registros e usar APIs
+    # externas. Um rebuild normal só usa os dados já consolidados localmente.
+    if sync_mysql:
+        try:
+            if check_and_download_mysql_data():
+                logging.info("Disparando scripts/merge_new_data.py para mesclar os novos dados...")
+                import subprocess
+                merge_script = os.path.join('scripts', 'merge_new_data.py')
+                if os.path.exists(merge_script):
+                    subprocess.run([sys.executable, merge_script, os.path.join('data', 'raw', 'dados_status.json')], check=False)
+                    logging.info("Merge finalizado. O script de merge disparou a execução subsequente de data_processing.py.")
+                    return
                 logging.warning("Script scripts/merge_new_data.py não encontrado.")
-    except Exception as e:
-        logging.error(f"Erro na extração MySQL automática: {e}")
+        except Exception as e:
+            logging.error(f"Erro na extração MySQL automática: {e}")
+    else:
+        logging.info("⏭️ Sincronização MySQL ignorada (use --sync-mysql para executá-la).")
 
 
     
@@ -417,8 +421,12 @@ def process_ism_data():
     occ_df = pd.DataFrame(clean_records).dropna(subset=['data'])
     occ_df['cidade_clean'] = occ_df['cidade'].apply(normalize_text)
     
-    # --- NOVO: Atualizar Cache de Ruas Geolocalizadas ---
-    update_geo_streets_cache(occ_df)
+    # Geocodificação chama serviços externos ponto a ponto; ela não é necessária
+    # para gerar os tensores a partir da base já consolidada.
+    if update_geo_cache:
+        update_geo_streets_cache(occ_df)
+    else:
+        logging.info("⏭️ Atualização do cache de ruas ignorada (use --update-geo-cache para executá-la).")
 
     # --- FILTRAGEM DE MORTES AO ACASO (ANOMALIAS NÃO-TÁTICAS) ---
     def is_random_death(row, fac_dict):
@@ -714,4 +722,18 @@ def process_ism_data():
         logging.info(f"✅ {reg.upper()} Concluído (V33 Features).")
 
 if __name__ == "__main__":
-    process_ism_data()
+    parser = argparse.ArgumentParser(
+        description="Reconstrói tensores locais; sincronizações externas são opcionais."
+    )
+    parser.add_argument(
+        "--sync-mysql",
+        action="store_true",
+        help="Verifica o MySQL e executa o merge de novos dados antes do rebuild.",
+    )
+    parser.add_argument(
+        "--update-geo-cache",
+        action="store_true",
+        help="Atualiza o cache de ruas por geocodificação externa.",
+    )
+    args = parser.parse_args()
+    process_ism_data(sync_mysql=args.sync_mysql, update_geo_cache=args.update_geo_cache)
