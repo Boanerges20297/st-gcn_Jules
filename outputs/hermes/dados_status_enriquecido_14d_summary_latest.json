@@ -1,87 +1,103 @@
 {
-  "generated_at": "2026-08-26T15:54:52",
-  "reference_date": "2026-08-24",
+  "generated_at": "2026-09-24T14:42:44",
+  "reference_date": "2026-09-21",
   "window_days": 14,
-  "total_rows": 136,
-  "date_min": "2026-08-11",
-  "date_max": "2026-08-24",
+  "total_rows": 161,
+  "date_min": "2026-09-08",
+  "date_max": "2026-09-21",
   "top_cities": [
     {
       "cidade": "FORTALEZA",
-      "count": 81
-    },
-    {
-      "cidade": "SOBRAL",
-      "count": 10
-    },
-    {
-      "cidade": "BOA VIAGEM",
-      "count": 3
-    },
-    {
-      "cidade": "LIMOEIRO DO NORTE",
-      "count": 3
-    },
-    {
-      "cidade": "ITAITINGA",
-      "count": 3
+      "count": 84
     },
     {
       "cidade": "CAUCAIA",
-      "count": 3
+      "count": 17
     },
     {
-      "cidade": "GUARACIABA DO NORTE",
-      "count": 2
-    },
-    {
-      "cidade": "TIANGUA",
-      "count": 2
-    },
-    {
-      "cidade": "SANTANA DO ACARAU",
-      "count": 2
+      "cidade": "SOBRAL",
+      "count": 9
     },
     {
       "cidade": "MARACANAU",
+      "count": 5
+    },
+    {
+      "cidade": "TIANGUA",
+      "count": 4
+    },
+    {
+      "cidade": "PIQUET CARNEIRO",
+      "count": 3
+    },
+    {
+      "cidade": "JUAZEIRO DO NORTE",
+      "count": 3
+    },
+    {
+      "cidade": "EUSEBIO",
+      "count": 2
+    },
+    {
+      "cidade": "MIRAIMA",
+      "count": 2
+    },
+    {
+      "cidade": "RUSSAS",
       "count": 2
     }
   ],
   "top_bairros_fortaleza": [
     {
-      "bairro": "PASSARE",
-      "count": 5
+      "bairro": "ALDEOTA",
+      "count": 4
     },
     {
-      "bairro": "CENTRO",
-      "count": 5
-    },
-    {
-      "bairro": "PREFEITO JOSE WALTER",
-      "count": 5
+      "bairro": "PARANGABA",
+      "count": 4
     },
     {
       "bairro": "MESSEJANA",
-      "count": 4
+      "count": 3
+    },
+    {
+      "bairro": "JOQUEI CLUBE",
+      "count": 3
+    },
+    {
+      "bairro": "BONSUCESSO",
+      "count": 3
+    },
+    {
+      "bairro": "MANOEL SATIRO",
+      "count": 3
     },
     {
       "bairro": "MEIRELES",
       "count": 3
     },
     {
-      "bairro": "FATIMA",
+      "bairro": "CIDADE DOS FUNCIONARIOS",
       "count": 3
     },
     {
-      "bairro": "PRAIA DO FURUTO II",
-      "count": 3
-    },
-    {
-      "bairro": "PRAIA DO FUTURO I",
+      "bairro": "JOAQUIM TAVORA",
       "count": 2
     },
     {
-      "bairro": "LAGOA REDONDA",
+      "bairro": "ANTONIO BEZERRA",
+      "count": 2
+    },
+    {
+      "bairro": "MONDUBIM",
+      "count": 2
+    },
+    {
+      "bairro": "FATIMA",
+      "count": 2
+    },
+    {
+      "bairro": "PAPICU",
       "count": 2
     },
     {
@@ -89,105 +105,105 @@
       "count": 2
     },
     {
-      "bairro": "JOAQUIM TAVORA",
-      "count": 2
-    },
-    {
-      "bairro": "ENGENHEIRO LUCIANO CAVALCANTE",
-      "count": 2
-    },
-    {
-      "bairro": "VILA VELHA",
-      "count": 2
-    },
-    {
-      "bairro": "SIQUEIRA",
-      "count": 2
-    },
-    {
-      "bairro": "VILA PERY",
+      "bairro": "PATRIOLINO RIBEIRO",
       "count": 2
     }
   ],
   "top_tipos_evento": [
     {
       "tipo_evento": "ROUBO A PESSOA",
-      "count": 74
+      "count": 79
     },
     {
       "tipo_evento": "HOMICIDIO DOLOSO",
-      "count": 31
+      "count": 47
     },
     {
       "tipo_evento": "ROUBO A RESIDÊNCIA",
-      "count": 9
+      "count": 10
     },
     {
       "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
-      "count": 7
+      "count": 8
     },
     {
       "tipo_evento": "ROUBO A FARMÁCIA",
-      "count": 4
+      "count": 7
+    },
+    {
+      "tipo_evento": "ROUBO A PESSOA C/ CONSTRANGIMENTO DA LIBERDADE",
+      "count": 3
+    },
+    {
+      "tipo_evento": "FEMINICÍDIO",
+      "count": 2
     },
     {
       "tipo_evento": "ROUBO A COLETIVO",
       "count": 2
     },
     {
-      "tipo_evento": "ROUBO A SUPERMERCADO/MERCANTIL",
-      "count": 2
-    },
-    {
-      "tipo_evento": "ROUBO DE CARGA",
-      "count": 2
-    },
-    {
-      "tipo_evento": "FEMINICÍDIO",
+      "tipo_evento": "ROUBO A CONDOMÍNIO",
       "count": 1
     },
     {
-      "tipo_evento": "ROUBO A MERCEARIA/MERCADINHO",
+      "tipo_evento": "ROUBO A POSTO DE GASOLINA",
       "count": 1
     }
   ],
   "fortaleza": {
-    "row_count": 81,
+    "row_count": 84,
     "top_bairros": [
       {
-        "bairro": "PASSARE",
-        "count": 5
+        "bairro": "ALDEOTA",
+        "count": 4
       },
       {
-        "bairro": "CENTRO",
-        "count": 5
-      },
-      {
-        "bairro": "PREFEITO JOSE WALTER",
-        "count": 5
+        "bairro": "PARANGABA",
+        "count": 4
       },
       {
         "bairro": "MESSEJANA",
-        "count": 4
+        "count": 3
+      },
+      {
+        "bairro": "JOQUEI CLUBE",
+        "count": 3
+      },
+      {
+        "bairro": "BONSUCESSO",
+        "count": 3
+      },
+      {
+        "bairro": "MANOEL SATIRO",
+        "count": 3
       },
       {
         "bairro": "MEIRELES",
         "count": 3
       },
       {
-        "bairro": "FATIMA",
+        "bairro": "CIDADE DOS FUNCIONARIOS",
         "count": 3
       },
       {
-        "bairro": "PRAIA DO FURUTO II",
-        "count": 3
-      },
-      {
-        "bairro": "PRAIA DO FUTURO I",
+        "bairro": "JOAQUIM TAVORA",
         "count": 2
       },
       {
-        "bairro": "LAGOA REDONDA",
+        "bairro": "ANTONIO BEZERRA",
+        "count": 2
+      },
+      {
+        "bairro": "MONDUBIM",
+        "count": 2
+      },
+      {
+        "bairro": "FATIMA",
+        "count": 2
+      },
+      {
+        "bairro": "PAPICU",
         "count": 2
       },
       {
@@ -195,125 +211,121 @@
         "count": 2
       },
       {
-        "bairro": "JOAQUIM TAVORA",
-        "count": 2
-      },
-      {
-        "bairro": "ENGENHEIRO LUCIANO CAVALCANTE",
-        "count": 2
-      },
-      {
-        "bairro": "VILA VELHA",
-        "count": 2
-      },
-      {
-        "bairro": "SIQUEIRA",
-        "count": 2
-      },
-      {
-        "bairro": "VILA PERY",
+        "bairro": "PATRIOLINO RIBEIRO",
         "count": 2
       }
     ],
     "top_tipos_evento": [
       {
         "tipo_evento": "ROUBO A PESSOA",
-        "count": 52
+        "count": 54
       },
       {
         "tipo_evento": "HOMICIDIO DOLOSO",
-        "count": 9
+        "count": 10
       },
       {
-        "tipo_evento": "ROUBO A RESIDÊNCIA",
-        "count": 6
+        "tipo_evento": "ROUBO A FARMÁCIA",
+        "count": 7
       },
       {
         "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
         "count": 4
       },
       {
-        "tipo_evento": "ROUBO A FARMÁCIA",
-        "count": 4
+        "tipo_evento": "ROUBO A RESIDÊNCIA",
+        "count": 3
       },
       {
-        "tipo_evento": "ROUBO A SUPERMERCADO/MERCANTIL",
+        "tipo_evento": "ROUBO A PESSOA C/ CONSTRANGIMENTO DA LIBERDADE",
         "count": 2
       },
       {
-        "tipo_evento": "ROUBO DE CARGA",
-        "count": 2
-      },
-      {
-        "tipo_evento": "ROUBO A MERCEARIA/MERCADINHO",
+        "tipo_evento": "ROUBO A COLETIVO",
         "count": 1
       },
       {
-        "tipo_evento": "ROUBO APLICATIVO DE TRANSPORTE",
+        "tipo_evento": "ROUBO A CONDOMÍNIO",
+        "count": 1
+      },
+      {
+        "tipo_evento": "ROUBO A POSTO DE GASOLINA",
+        "count": 1
+      },
+      {
+        "tipo_evento": "ROUBO DE CARGA",
         "count": 1
       }
     ]
   },
   "rmf": {
-    "row_count": 12,
+    "row_count": 27,
     "top_cidades": [
       {
         "cidade": "CAUCAIA",
-        "count": 3
-      },
-      {
-        "cidade": "ITAITINGA",
-        "count": 3
+        "count": 17
       },
       {
         "cidade": "MARACANAU",
+        "count": 5
+      },
+      {
+        "cidade": "EUSEBIO",
         "count": 2
       },
       {
-        "cidade": "AQUIRAZ",
+        "cidade": "HORIZONTE",
         "count": 1
       },
       {
-        "cidade": "CASCAVEL",
+        "cidade": "PACATUBA",
         "count": 1
       },
       {
         "cidade": "SAO GONCALO DO AMARANTE",
-        "count": 1
-      },
-      {
-        "cidade": "TRAIRI",
         "count": 1
       }
     ],
     "top_tipos_evento": [
       {
         "tipo_evento": "ROUBO A PESSOA",
-        "count": 6
+        "count": 19
       },
       {
         "tipo_evento": "HOMICIDIO DOLOSO",
-        "count": 4
+        "count": 5
       },
       {
-        "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
-        "count": 2
+        "tipo_evento": "FEMINICÍDIO",
+        "count": 1
+      },
+      {
+        "tipo_evento": "ROUBO A COLETIVO",
+        "count": 1
+      },
+      {
+        "tipo_evento": "ROUBO A PESSOA C/ CONSTRANGIMENTO DA LIBERDADE",
+        "count": 1
       }
     ]
   },
   "interior": {
-    "row_count": 43,
+    "row_count": 50,
     "top_cidades": [
       {
         "cidade": "SOBRAL",
-        "count": 10
+        "count": 9
       },
       {
-        "cidade": "BOA VIAGEM",
+        "cidade": "TIANGUA",
+        "count": 4
+      },
+      {
+        "cidade": "JUAZEIRO DO NORTE",
         "count": 3
       },
       {
-        "cidade": "LIMOEIRO DO NORTE",
+        "cidade": "PIQUET CARNEIRO",
         "count": 3
       },
       {
@@ -321,61 +333,45 @@
         "count": 2
       },
       {
-        "cidade": "AMONTADA",
+        "cidade": "CRATEUS",
         "count": 2
       },
       {
-        "cidade": "TIANGUA",
+        "cidade": "ITAPIPOCA",
         "count": 2
       },
       {
-        "cidade": "SANTANA DO ACARAU",
+        "cidade": "CAMOCIM",
         "count": 2
       },
       {
-        "cidade": "ITAPAJE",
+        "cidade": "RUSSAS",
         "count": 2
       },
       {
-        "cidade": "IGUATU",
-        "count": 2
-      },
-      {
-        "cidade": "UBAJARA",
+        "cidade": "MIRAIMA",
         "count": 2
       }
     ],
     "top_tipos_evento": [
       {
         "tipo_evento": "HOMICIDIO DOLOSO",
-        "count": 18
-      },
-      {
-        "tipo_evento": "ROUBO A PESSOA",
-        "count": 16
+        "count": 32
       },
       {
         "tipo_evento": "ROUBO A RESIDÊNCIA",
-        "count": 3
+        "count": 7
       },
       {
-        "tipo_evento": "ROUBO A COLETIVO",
-        "count": 2
-      },
-      {
-        "tipo_evento": "FEMINICÍDIO",
-        "count": 1
+        "tipo_evento": "ROUBO A PESSOA",
+        "count": 6
       },
       {
         "tipo_evento": "ROUBO A ESTABELECIMENTO COMERCIAL",
-        "count": 1
+        "count": 4
       },
       {
-        "tipo_evento": "ROUBO A RESTAURANTE/BAR/LANCHONETE",
-        "count": 1
-      },
-      {
-        "tipo_evento": "ROUBO SEGUIDO DE MORTE (LATROCINIO)",
+        "tipo_evento": "FEMINICÍDIO",
         "count": 1
       }
     ]

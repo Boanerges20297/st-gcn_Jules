@@ -430,6 +430,12 @@ def merge(new_data_path):
             df_new['bairro'] = df_new['bairro'].apply(normalize_text)
         if 'cidade' in df_new.columns:
             df_new['cidade'] = df_new['cidade'].apply(normalize_text)
+        for bool_col in ('eh_feriado', 'dia_quente_cvp'):
+            if bool_col in df_new.columns:
+                df_new[bool_col] = df_new[bool_col].astype('boolean')
+        for text_col in ('dia_semana', 'clima'):
+            if text_col in df_new.columns:
+                df_new[text_col] = df_new[text_col].astype('string')
     if df_new.empty: 
         print("Erro: Arquivo de entrada vazio!")
         return
@@ -495,7 +501,7 @@ def merge(new_data_path):
             has_bairro = not pd.isna(b_at) and len(str(b_at)) > 2
             has_street = not pd.isna(street_at) and len(street_at) > 5 and not any(t in street_at for t in invalid_street_terms)
 
-            # Lógica de Qualidade Total: Tenta Cache Histórico, senão vai para Google API
+            # Logica de Qualidade Total: tenta cache historico, depois OSM/Nominatim.
             if not has_street:
                 # 1. Tenta o Mega-Cache Histórico (Instantâneo)
                 key_cache = f"{round(lat, 3)}_{round(lon, 3)}"

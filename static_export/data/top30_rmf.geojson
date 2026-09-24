@@ -139,7 +139,7 @@
       "properties": {
         "bairro": "CAUCAIA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -155,23 +155,23 @@
         "node_id": 1,
         "parent_area": "CAUCAIA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "peak_hour_end": 23,
-        "peak_hour_share": 0.0566,
+        "peak_hour_share": 0.0584,
         "peak_hour_start": 18,
         "peak_hours": "Entre 18hs e 23hs",
         "peak_time_label": "Segunda-feira, entre 18hs e 23hs",
         "peak_weekday": "Segunda-feira",
-        "peak_weekday_share": 0.1645,
+        "peak_weekday_share": 0.1624,
         "rank": 1,
         "region": "rmf",
-        "risk_score": 67.643,
-        "score": 67.643,
+        "risk_score": 79.379,
+        "score": 79.379,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
-        "temporal_sample_size": 389
+        "temporal_reference_date": "2026-12-09",
+        "temporal_sample_size": 394
       },
       "type": "Feature"
     },
@@ -450,7 +450,7 @@
       "properties": {
         "bairro": "CAUCAIA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -466,23 +466,100 @@
         "node_id": 2,
         "parent_area": "CAUCAIA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "peak_hour_end": 23,
-        "peak_hour_share": 0.0566,
+        "peak_hour_share": 0.0584,
         "peak_hour_start": 18,
         "peak_hours": "Entre 18hs e 23hs",
         "peak_time_label": "Segunda-feira, entre 18hs e 23hs",
         "peak_weekday": "Segunda-feira",
-        "peak_weekday_share": 0.1645,
+        "peak_weekday_share": 0.1624,
         "rank": 2,
         "region": "rmf",
-        "risk_score": 67.422,
-        "score": 67.422,
+        "risk_score": 79.158,
+        "score": 79.158,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
-        "temporal_sample_size": 389
+        "temporal_reference_date": "2026-12-09",
+        "temporal_sample_size": 394
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -38.667567,
+              -3.742208
+            ],
+            [
+              -38.667691,
+              -3.742198
+            ],
+            [
+              -38.667441,
+              -3.74644
+            ],
+            [
+              -38.666075,
+              -3.74648
+            ],
+            [
+              -38.666053,
+              -3.74662
+            ],
+            [
+              -38.665141,
+              -3.746577
+            ],
+            [
+              -38.665248,
+              -3.744844
+            ],
+            [
+              -38.665646,
+              -3.744876
+            ],
+            [
+              -38.665817,
+              -3.742114
+            ],
+            [
+              -38.667567,
+              -3.742208
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "bairro": "PARQUE SOLEDADE",
+        "faction": "CV",
+        "generated_at": "2026-09-24T14:42:50.046626",
+        "geometry_type": "Polygon",
+        "is_centroid": false,
+        "is_tactical": true,
+        "local_street_pressure": 3.343,
+        "municipality": "CAUCAIA",
+        "name": "Planalto Caucaia",
+        "nearby_streets": [
+          "RUA 114",
+          "AVENIDA CONTÔRNO NORTE",
+          "CONDOMÍNIO PABUSSU"
+        ],
+        "nearby_streets_count": 8,
+        "node_id": 3,
+        "parent_area": "PARQUE SOLEDADE",
+        "parent_risk_level": "crítico",
+        "parent_risk_score": 96.2,
+        "parent_status": "CRÍTICO",
+        "rank": 3,
+        "region": "rmf",
+        "risk_score": 79.044,
+        "score": 79.044,
+        "source_geometry_type": "Polygon"
       },
       "type": "Feature"
     },
@@ -533,7 +610,7 @@
       "properties": {
         "bairro": "MARECHAL RONDON",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -546,15 +623,15 @@
           "CAJUEIROS"
         ],
         "nearby_streets_count": 8,
-        "node_id": 3,
+        "node_id": 4,
         "parent_area": "MARECHAL RONDON",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
-        "rank": 3,
+        "rank": 4,
         "region": "rmf",
-        "risk_score": 67.251,
-        "score": 67.251,
+        "risk_score": 78.987,
+        "score": 78.987,
         "source_geometry_type": "Polygon"
       },
       "type": "Feature"
@@ -606,7 +683,7 @@
       "properties": {
         "bairro": "PARQUE SOLEDADE",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -619,15 +696,92 @@
           "RUA MARIA LUIZA SOARES"
         ],
         "nearby_streets_count": 4,
-        "node_id": 4,
+        "node_id": 5,
         "parent_area": "PARQUE SOLEDADE",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
-        "rank": 4,
+        "rank": 5,
         "region": "rmf",
-        "risk_score": 67.249,
-        "score": 67.249,
+        "risk_score": 78.985,
+        "score": 78.985,
+        "source_geometry_type": "Polygon"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -38.667567,
+              -3.742208
+            ],
+            [
+              -38.667691,
+              -3.742198
+            ],
+            [
+              -38.667441,
+              -3.74644
+            ],
+            [
+              -38.666075,
+              -3.74648
+            ],
+            [
+              -38.666053,
+              -3.74662
+            ],
+            [
+              -38.665141,
+              -3.746577
+            ],
+            [
+              -38.665248,
+              -3.744844
+            ],
+            [
+              -38.665646,
+              -3.744876
+            ],
+            [
+              -38.665817,
+              -3.742114
+            ],
+            [
+              -38.667567,
+              -3.742208
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "bairro": "PARQUE SOLEDADE",
+        "faction": "CV",
+        "generated_at": "2026-09-24T14:42:50.046626",
+        "geometry_type": "Polygon",
+        "is_centroid": false,
+        "is_tactical": true,
+        "local_street_pressure": 3.089,
+        "municipality": "CAUCAIA",
+        "name": "Planalto Caucaia",
+        "nearby_streets": [
+          "PLANALTO CAUCAIA",
+          "RUA 107",
+          "RUA 114"
+        ],
+        "nearby_streets_count": 8,
+        "node_id": 6,
+        "parent_area": "PARQUE SOLEDADE",
+        "parent_risk_level": "crítico",
+        "parent_risk_score": 96.2,
+        "parent_status": "CRÍTICO",
+        "rank": 6,
+        "region": "rmf",
+        "risk_score": 78.697,
+        "score": 78.697,
         "source_geometry_type": "Polygon"
       },
       "type": "Feature"
@@ -907,7 +1061,7 @@
       "properties": {
         "bairro": "CAUCAIA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -920,26 +1074,26 @@
           "RUA FCO. JEOVÁ DA MOTA"
         ],
         "nearby_streets_count": 3,
-        "node_id": 5,
+        "node_id": 7,
         "parent_area": "CAUCAIA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "peak_hour_end": 23,
-        "peak_hour_share": 0.0566,
+        "peak_hour_share": 0.0584,
         "peak_hour_start": 18,
         "peak_hours": "Entre 18hs e 23hs",
         "peak_time_label": "Segunda-feira, entre 18hs e 23hs",
         "peak_weekday": "Segunda-feira",
-        "peak_weekday_share": 0.1645,
-        "rank": 5,
+        "peak_weekday_share": 0.1624,
+        "rank": 7,
         "region": "rmf",
-        "risk_score": 66.656,
-        "score": 66.656,
+        "risk_score": 78.392,
+        "score": 78.392,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
-        "temporal_sample_size": 389
+        "temporal_reference_date": "2026-12-09",
+        "temporal_sample_size": 394
       },
       "type": "Feature"
     },
@@ -1374,7 +1528,7 @@
       "properties": {
         "bairro": "URUCUTUBA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -1386,15 +1540,15 @@
           "TAQUARA - CAUCAIA"
         ],
         "nearby_streets_count": 2,
-        "node_id": 6,
+        "node_id": 8,
         "parent_area": "URUCUTUBA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
-        "rank": 6,
+        "rank": 8,
         "region": "rmf",
-        "risk_score": 66.625,
-        "score": 66.625,
+        "risk_score": 78.361,
+        "score": 78.361,
         "source_geometry_type": "Polygon"
       },
       "type": "Feature"
@@ -1674,7 +1828,7 @@
       "properties": {
         "bairro": "CAUCAIA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -1687,180 +1841,26 @@
           "RUA ANTÔNIO BRASILEIRO"
         ],
         "nearby_streets_count": 4,
-        "node_id": 7,
+        "node_id": 9,
         "parent_area": "CAUCAIA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "peak_hour_end": 23,
-        "peak_hour_share": 0.0566,
+        "peak_hour_share": 0.0584,
         "peak_hour_start": 18,
         "peak_hours": "Entre 18hs e 23hs",
         "peak_time_label": "Segunda-feira, entre 18hs e 23hs",
         "peak_weekday": "Segunda-feira",
-        "peak_weekday_share": 0.1645,
-        "rank": 7,
-        "region": "rmf",
-        "risk_score": 66.616,
-        "score": 66.616,
-        "source_geometry_type": "Polygon",
-        "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
-        "temporal_sample_size": 389
-      },
-      "type": "Feature"
-    },
-    {
-      "geometry": {
-        "coordinates": [
-          [
-            [
-              -38.667567,
-              -3.742208
-            ],
-            [
-              -38.667691,
-              -3.742198
-            ],
-            [
-              -38.667441,
-              -3.74644
-            ],
-            [
-              -38.666075,
-              -3.74648
-            ],
-            [
-              -38.666053,
-              -3.74662
-            ],
-            [
-              -38.665141,
-              -3.746577
-            ],
-            [
-              -38.665248,
-              -3.744844
-            ],
-            [
-              -38.665646,
-              -3.744876
-            ],
-            [
-              -38.665817,
-              -3.742114
-            ],
-            [
-              -38.667567,
-              -3.742208
-            ]
-          ]
-        ],
-        "type": "Polygon"
-      },
-      "properties": {
-        "bairro": "PARQUE SOLEDADE",
-        "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
-        "geometry_type": "Polygon",
-        "is_centroid": false,
-        "is_tactical": true,
-        "local_street_pressure": 2.71,
-        "municipality": "CAUCAIA",
-        "name": "Planalto Caucaia",
-        "nearby_streets": [
-          "PLANALTO CAUCAIA",
-          "RUA 107",
-          "NOVA CIGANA"
-        ],
-        "nearby_streets_count": 7,
-        "node_id": 8,
-        "parent_area": "PARQUE SOLEDADE",
-        "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
-        "parent_status": "CRÍTICO",
-        "rank": 8,
-        "region": "rmf",
-        "risk_score": 66.254,
-        "score": 66.254,
-        "source_geometry_type": "Polygon"
-      },
-      "type": "Feature"
-    },
-    {
-      "geometry": {
-        "coordinates": [
-          [
-            [
-              -38.667567,
-              -3.742208
-            ],
-            [
-              -38.667691,
-              -3.742198
-            ],
-            [
-              -38.667441,
-              -3.74644
-            ],
-            [
-              -38.666075,
-              -3.74648
-            ],
-            [
-              -38.666053,
-              -3.74662
-            ],
-            [
-              -38.665141,
-              -3.746577
-            ],
-            [
-              -38.665248,
-              -3.744844
-            ],
-            [
-              -38.665646,
-              -3.744876
-            ],
-            [
-              -38.665817,
-              -3.742114
-            ],
-            [
-              -38.667567,
-              -3.742208
-            ]
-          ]
-        ],
-        "type": "Polygon"
-      },
-      "properties": {
-        "bairro": "PARQUE SOLEDADE",
-        "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
-        "geometry_type": "Polygon",
-        "is_centroid": false,
-        "is_tactical": true,
-        "local_street_pressure": 2.516,
-        "municipality": "CAUCAIA",
-        "name": "Planalto Caucaia",
-        "nearby_streets": [
-          "AVENIDA CONTÔRNO NORTE",
-          "CONDOMÍNIO PABUSSU",
-          "RUA 107"
-        ],
-        "nearby_streets_count": 7,
-        "node_id": 9,
-        "parent_area": "PARQUE SOLEDADE",
-        "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
-        "parent_status": "CRÍTICO",
+        "peak_weekday_share": 0.1624,
         "rank": 9,
         "region": "rmf",
-        "risk_score": 65.766,
-        "score": 65.766,
-        "source_geometry_type": "Polygon"
+        "risk_score": 78.352,
+        "score": 78.352,
+        "source_geometry_type": "Polygon",
+        "temporal_horizon_days": 30,
+        "temporal_reference_date": "2026-12-09",
+        "temporal_sample_size": 394
       },
       "type": "Feature"
     },
@@ -2139,7 +2139,7 @@
       "properties": {
         "bairro": "CAUCAIA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -2155,23 +2155,23 @@
         "node_id": 10,
         "parent_area": "CAUCAIA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "peak_hour_end": 23,
-        "peak_hour_share": 0.0566,
+        "peak_hour_share": 0.0584,
         "peak_hour_start": 18,
         "peak_hours": "Entre 18hs e 23hs",
         "peak_time_label": "Segunda-feira, entre 18hs e 23hs",
         "peak_weekday": "Segunda-feira",
-        "peak_weekday_share": 0.1645,
+        "peak_weekday_share": 0.1624,
         "rank": 10,
         "region": "rmf",
-        "risk_score": 65.614,
-        "score": 65.614,
+        "risk_score": 77.35,
+        "score": 77.35,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
-        "temporal_sample_size": 389
+        "temporal_reference_date": "2026-12-09",
+        "temporal_sample_size": 394
       },
       "type": "Feature"
     },
@@ -2450,11 +2450,11 @@
       "properties": {
         "bairro": "CAUCAIA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
-        "local_street_pressure": 1.964,
+        "local_street_pressure": 2.068,
         "municipality": "Caucaia",
         "name": "Boqueirão- Caucaia",
         "nearby_streets": [
@@ -2466,23 +2466,23 @@
         "node_id": 11,
         "parent_area": "CAUCAIA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "peak_hour_end": 23,
-        "peak_hour_share": 0.0566,
+        "peak_hour_share": 0.0584,
         "peak_hour_start": 18,
         "peak_hours": "Entre 18hs e 23hs",
         "peak_time_label": "Segunda-feira, entre 18hs e 23hs",
         "peak_weekday": "Segunda-feira",
-        "peak_weekday_share": 0.1645,
+        "peak_weekday_share": 0.1624,
         "rank": 11,
         "region": "rmf",
-        "risk_score": 65.059,
-        "score": 65.059,
+        "risk_score": 76.988,
+        "score": 76.988,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
-        "temporal_sample_size": 389
+        "temporal_reference_date": "2026-12-09",
+        "temporal_sample_size": 394
       },
       "type": "Feature"
     },
@@ -2613,7 +2613,7 @@
       "properties": {
         "bairro": "PARQUE SOLEDADE",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -2629,12 +2629,12 @@
         "node_id": 12,
         "parent_area": "PARQUE SOLEDADE",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "rank": 12,
         "region": "rmf",
-        "risk_score": 64.95,
-        "score": 64.95,
+        "risk_score": 76.686,
+        "score": 76.686,
         "source_geometry_type": "Polygon"
       },
       "type": "Feature"
@@ -2734,7 +2734,7 @@
       "properties": {
         "bairro": "URUCUTUBA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -2749,12 +2749,12 @@
         "node_id": 13,
         "parent_area": "URUCUTUBA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "rank": 13,
         "region": "rmf",
-        "risk_score": 64.568,
-        "score": 64.568,
+        "risk_score": 76.304,
+        "score": 76.304,
         "source_geometry_type": "Polygon"
       },
       "type": "Feature"
@@ -3034,7 +3034,7 @@
       "properties": {
         "bairro": "CAUCAIA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -3048,23 +3048,23 @@
         "node_id": 14,
         "parent_area": "CAUCAIA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "peak_hour_end": 23,
-        "peak_hour_share": 0.0566,
+        "peak_hour_share": 0.0584,
         "peak_hour_start": 18,
         "peak_hours": "Entre 18hs e 23hs",
         "peak_time_label": "Segunda-feira, entre 18hs e 23hs",
         "peak_weekday": "Segunda-feira",
-        "peak_weekday_share": 0.1645,
+        "peak_weekday_share": 0.1624,
         "rank": 14,
         "region": "rmf",
-        "risk_score": 64.513,
-        "score": 64.513,
+        "risk_score": 76.249,
+        "score": 76.249,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
-        "temporal_sample_size": 389
+        "temporal_reference_date": "2026-12-09",
+        "temporal_sample_size": 394
       },
       "type": "Feature"
     },
@@ -3135,7 +3135,7 @@
       "properties": {
         "bairro": "PARQUE SOLEDADE",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -3151,12 +3151,12 @@
         "node_id": 15,
         "parent_area": "PARQUE SOLEDADE",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "rank": 15,
         "region": "rmf",
-        "risk_score": 64.444,
-        "score": 64.444,
+        "risk_score": 76.18,
+        "score": 76.18,
         "source_geometry_type": "Polygon"
       },
       "type": "Feature"
@@ -3436,7 +3436,7 @@
       "properties": {
         "bairro": "CAUCAIA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -3451,23 +3451,23 @@
         "node_id": 16,
         "parent_area": "CAUCAIA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "peak_hour_end": 23,
-        "peak_hour_share": 0.0566,
+        "peak_hour_share": 0.0584,
         "peak_hour_start": 18,
         "peak_hours": "Entre 18hs e 23hs",
         "peak_time_label": "Segunda-feira, entre 18hs e 23hs",
         "peak_weekday": "Segunda-feira",
-        "peak_weekday_share": 0.1645,
+        "peak_weekday_share": 0.1624,
         "rank": 16,
         "region": "rmf",
-        "risk_score": 64.428,
-        "score": 64.428,
+        "risk_score": 76.164,
+        "score": 76.164,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
-        "temporal_sample_size": 389
+        "temporal_reference_date": "2026-12-09",
+        "temporal_sample_size": 394
       },
       "type": "Feature"
     },
@@ -3746,7 +3746,7 @@
       "properties": {
         "bairro": "CAUCAIA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -3762,23 +3762,23 @@
         "node_id": 17,
         "parent_area": "CAUCAIA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "peak_hour_end": 23,
-        "peak_hour_share": 0.0566,
+        "peak_hour_share": 0.0584,
         "peak_hour_start": 18,
         "peak_hours": "Entre 18hs e 23hs",
         "peak_time_label": "Segunda-feira, entre 18hs e 23hs",
         "peak_weekday": "Segunda-feira",
-        "peak_weekday_share": 0.1645,
+        "peak_weekday_share": 0.1624,
         "rank": 17,
         "region": "rmf",
-        "risk_score": 64.421,
-        "score": 64.421,
+        "risk_score": 76.157,
+        "score": 76.157,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
-        "temporal_sample_size": 389
+        "temporal_reference_date": "2026-12-09",
+        "temporal_sample_size": 394
       },
       "type": "Feature"
     },
@@ -4057,7 +4057,7 @@
       "properties": {
         "bairro": "CAUCAIA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -4072,23 +4072,23 @@
         "node_id": 18,
         "parent_area": "CAUCAIA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "peak_hour_end": 23,
-        "peak_hour_share": 0.0566,
+        "peak_hour_share": 0.0584,
         "peak_hour_start": 18,
         "peak_hours": "Entre 18hs e 23hs",
         "peak_time_label": "Segunda-feira, entre 18hs e 23hs",
         "peak_weekday": "Segunda-feira",
-        "peak_weekday_share": 0.1645,
+        "peak_weekday_share": 0.1624,
         "rank": 18,
         "region": "rmf",
-        "risk_score": 64.353,
-        "score": 64.353,
+        "risk_score": 76.089,
+        "score": 76.089,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
-        "temporal_sample_size": 389
+        "temporal_reference_date": "2026-12-09",
+        "temporal_sample_size": 394
       },
       "type": "Feature"
     },
@@ -4123,7 +4123,7 @@
       "properties": {
         "bairro": "PARQUE SOLEDADE",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -4139,12 +4139,12 @@
         "node_id": 19,
         "parent_area": "PARQUE SOLEDADE",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "rank": 19,
         "region": "rmf",
-        "risk_score": 64.285,
-        "score": 64.285,
+        "risk_score": 76.021,
+        "score": 76.021,
         "source_geometry_type": "Polygon"
       },
       "type": "Feature"
@@ -4192,7 +4192,7 @@
       "properties": {
         "bairro": "PARQUE SOLEDADE",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -4208,12 +4208,12 @@
         "node_id": 20,
         "parent_area": "PARQUE SOLEDADE",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "rank": 20,
         "region": "rmf",
-        "risk_score": 63.758,
-        "score": 63.758,
+        "risk_score": 75.494,
+        "score": 75.494,
         "source_geometry_type": "Polygon"
       },
       "type": "Feature"
@@ -4493,7 +4493,7 @@
       "properties": {
         "bairro": "CAUCAIA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -4508,23 +4508,23 @@
         "node_id": 21,
         "parent_area": "CAUCAIA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "peak_hour_end": 23,
-        "peak_hour_share": 0.0566,
+        "peak_hour_share": 0.0584,
         "peak_hour_start": 18,
         "peak_hours": "Entre 18hs e 23hs",
         "peak_time_label": "Segunda-feira, entre 18hs e 23hs",
         "peak_weekday": "Segunda-feira",
-        "peak_weekday_share": 0.1645,
+        "peak_weekday_share": 0.1624,
         "rank": 21,
         "region": "rmf",
-        "risk_score": 63.677,
-        "score": 63.677,
+        "risk_score": 75.413,
+        "score": 75.413,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
-        "temporal_sample_size": 389
+        "temporal_reference_date": "2026-12-09",
+        "temporal_sample_size": 394
       },
       "type": "Feature"
     },
@@ -4803,7 +4803,7 @@
       "properties": {
         "bairro": "CAUCAIA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -4817,23 +4817,23 @@
         "node_id": 22,
         "parent_area": "CAUCAIA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "peak_hour_end": 23,
-        "peak_hour_share": 0.0566,
+        "peak_hour_share": 0.0584,
         "peak_hour_start": 18,
         "peak_hours": "Entre 18hs e 23hs",
         "peak_time_label": "Segunda-feira, entre 18hs e 23hs",
         "peak_weekday": "Segunda-feira",
-        "peak_weekday_share": 0.1645,
+        "peak_weekday_share": 0.1624,
         "rank": 22,
         "region": "rmf",
-        "risk_score": 63.675,
-        "score": 63.675,
+        "risk_score": 75.411,
+        "score": 75.411,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
-        "temporal_sample_size": 389
+        "temporal_reference_date": "2026-12-09",
+        "temporal_sample_size": 394
       },
       "type": "Feature"
     },
@@ -4876,7 +4876,7 @@
       "properties": {
         "bairro": "IPARANA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.190135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -4891,12 +4891,12 @@
         "node_id": 23,
         "parent_area": "IPARANA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "rank": 23,
         "region": "rmf",
-        "risk_score": 63.405,
-        "score": 63.405,
+        "risk_score": 75.141,
+        "score": 75.141,
         "source_geometry_type": "Polygon"
       },
       "type": "Feature"
@@ -4980,7 +4980,7 @@
       "properties": {
         "bairro": "CAUCAIA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -4994,23 +4994,23 @@
         "node_id": 24,
         "parent_area": "CAUCAIA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "peak_hour_end": 23,
-        "peak_hour_share": 0.0566,
+        "peak_hour_share": 0.0584,
         "peak_hour_start": 18,
         "peak_hours": "Entre 18hs e 23hs",
         "peak_time_label": "Segunda-feira, entre 18hs e 23hs",
         "peak_weekday": "Segunda-feira",
-        "peak_weekday_share": 0.1645,
+        "peak_weekday_share": 0.1624,
         "rank": 24,
         "region": "rmf",
-        "risk_score": 63.233,
-        "score": 63.233,
+        "risk_score": 74.969,
+        "score": 74.969,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
-        "temporal_sample_size": 389
+        "temporal_reference_date": "2026-12-09",
+        "temporal_sample_size": 394
       },
       "type": "Feature"
     },
@@ -5289,7 +5289,7 @@
       "properties": {
         "bairro": "CAUCAIA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -5303,23 +5303,23 @@
         "node_id": 25,
         "parent_area": "CAUCAIA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "peak_hour_end": 23,
-        "peak_hour_share": 0.0566,
+        "peak_hour_share": 0.0584,
         "peak_hour_start": 18,
         "peak_hours": "Entre 18hs e 23hs",
         "peak_time_label": "Segunda-feira, entre 18hs e 23hs",
         "peak_weekday": "Segunda-feira",
-        "peak_weekday_share": 0.1645,
+        "peak_weekday_share": 0.1624,
         "rank": 25,
         "region": "rmf",
-        "risk_score": 63.061,
-        "score": 63.061,
+        "risk_score": 74.797,
+        "score": 74.797,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
-        "temporal_sample_size": 389
+        "temporal_reference_date": "2026-12-09",
+        "temporal_sample_size": 394
       },
       "type": "Feature"
     },
@@ -5598,7 +5598,7 @@
       "properties": {
         "bairro": "CAUCAIA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -5612,23 +5612,23 @@
         "node_id": 26,
         "parent_area": "CAUCAIA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "peak_hour_end": 23,
-        "peak_hour_share": 0.0566,
+        "peak_hour_share": 0.0584,
         "peak_hour_start": 18,
         "peak_hours": "Entre 18hs e 23hs",
         "peak_time_label": "Segunda-feira, entre 18hs e 23hs",
         "peak_weekday": "Segunda-feira",
-        "peak_weekday_share": 0.1645,
+        "peak_weekday_share": 0.1624,
         "rank": 26,
         "region": "rmf",
-        "risk_score": 62.994,
-        "score": 62.994,
+        "risk_score": 74.73,
+        "score": 74.73,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
-        "temporal_sample_size": 389
+        "temporal_reference_date": "2026-12-09",
+        "temporal_sample_size": 394
       },
       "type": "Feature"
     },
@@ -5835,7 +5835,7 @@
       "properties": {
         "bairro": "URUCUTUBA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -5849,12 +5849,12 @@
         "node_id": 27,
         "parent_area": "URUCUTUBA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "rank": 27,
         "region": "rmf",
-        "risk_score": 62.987,
-        "score": 62.987,
+        "risk_score": 74.723,
+        "score": 74.723,
         "source_geometry_type": "Polygon"
       },
       "type": "Feature"
@@ -5986,7 +5986,7 @@
       "properties": {
         "bairro": "URUCUTUBA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -6000,12 +6000,12 @@
         "node_id": 28,
         "parent_area": "URUCUTUBA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "rank": 28,
         "region": "rmf",
-        "risk_score": 62.702,
-        "score": 62.702,
+        "risk_score": 74.438,
+        "score": 74.438,
         "source_geometry_type": "Polygon"
       },
       "type": "Feature"
@@ -6285,7 +6285,7 @@
       "properties": {
         "bairro": "CAUCAIA",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -6299,23 +6299,23 @@
         "node_id": 29,
         "parent_area": "CAUCAIA",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "peak_hour_end": 23,
-        "peak_hour_share": 0.0566,
+        "peak_hour_share": 0.0584,
         "peak_hour_start": 18,
         "peak_hours": "Entre 18hs e 23hs",
         "peak_time_label": "Segunda-feira, entre 18hs e 23hs",
         "peak_weekday": "Segunda-feira",
-        "peak_weekday_share": 0.1645,
+        "peak_weekday_share": 0.1624,
         "rank": 29,
         "region": "rmf",
-        "risk_score": 62.685,
-        "score": 62.685,
+        "risk_score": 74.421,
+        "score": 74.421,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
-        "temporal_sample_size": 389
+        "temporal_reference_date": "2026-12-09",
+        "temporal_sample_size": 394
       },
       "type": "Feature"
     },
@@ -6374,7 +6374,7 @@
       "properties": {
         "bairro": "PARQUE SOLEDADE",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -6388,12 +6388,12 @@
         "node_id": 30,
         "parent_area": "PARQUE SOLEDADE",
         "parent_risk_level": "crítico",
-        "parent_risk_score": 79.9,
+        "parent_risk_score": 96.2,
         "parent_status": "CRÍTICO",
         "rank": 30,
         "region": "rmf",
-        "risk_score": 62.09,
-        "score": 62.09,
+        "risk_score": 73.826,
+        "score": 73.826,
         "source_geometry_type": "Polygon"
       },
       "type": "Feature"
@@ -6485,7 +6485,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -6500,9 +6500,9 @@
         "nearby_streets_count": 24,
         "node_id": 31,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -6512,11 +6512,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 31,
         "region": "rmf",
-        "risk_score": 45.553,
-        "score": 45.553,
+        "risk_score": 66.145,
+        "score": 66.145,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -6588,7 +6588,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -6603,9 +6603,9 @@
         "nearby_streets_count": 22,
         "node_id": 32,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -6615,11 +6615,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 32,
         "region": "rmf",
-        "risk_score": 45.24,
-        "score": 45.24,
+        "risk_score": 65.832,
+        "score": 65.832,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -6691,7 +6691,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -6706,9 +6706,9 @@
         "nearby_streets_count": 30,
         "node_id": 33,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -6718,11 +6718,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 33,
         "region": "rmf",
-        "risk_score": 44.86,
-        "score": 44.86,
+        "risk_score": 65.452,
+        "score": 65.452,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -6886,7 +6886,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -6901,9 +6901,9 @@
         "nearby_streets_count": 29,
         "node_id": 34,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -6913,11 +6913,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 34,
         "region": "rmf",
-        "risk_score": 44.155,
-        "score": 44.155,
+        "risk_score": 64.747,
+        "score": 64.747,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -7061,7 +7061,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -7076,9 +7076,9 @@
         "nearby_streets_count": 18,
         "node_id": 35,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -7088,11 +7088,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 35,
         "region": "rmf",
-        "risk_score": 43.879,
-        "score": 43.879,
+        "risk_score": 64.471,
+        "score": 64.471,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -7516,7 +7516,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -7531,9 +7531,9 @@
         "nearby_streets_count": 24,
         "node_id": 36,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -7543,11 +7543,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 36,
         "region": "rmf",
-        "risk_score": 43.854,
-        "score": 43.854,
+        "risk_score": 64.446,
+        "score": 64.446,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -7671,7 +7671,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -7686,9 +7686,9 @@
         "nearby_streets_count": 22,
         "node_id": 37,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -7698,11 +7698,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 37,
         "region": "rmf",
-        "risk_score": 42.844,
-        "score": 42.844,
+        "risk_score": 63.436,
+        "score": 63.436,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -7790,7 +7790,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -7805,9 +7805,9 @@
         "nearby_streets_count": 23,
         "node_id": 38,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -7817,11 +7817,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 38,
         "region": "rmf",
-        "risk_score": 42.45,
-        "score": 42.45,
+        "risk_score": 63.042,
+        "score": 63.042,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -7937,7 +7937,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -7952,9 +7952,9 @@
         "nearby_streets_count": 25,
         "node_id": 39,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -7964,11 +7964,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 39,
         "region": "rmf",
-        "risk_score": 42.446,
-        "score": 42.446,
+        "risk_score": 63.038,
+        "score": 63.038,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -8036,7 +8036,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -8051,9 +8051,9 @@
         "nearby_streets_count": 25,
         "node_id": 40,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -8063,11 +8063,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 40,
         "region": "rmf",
-        "risk_score": 42.032,
-        "score": 42.032,
+        "risk_score": 62.624,
+        "score": 62.624,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -8287,7 +8287,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -8302,9 +8302,9 @@
         "nearby_streets_count": 21,
         "node_id": 41,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -8314,11 +8314,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 41,
         "region": "rmf",
-        "risk_score": 41.942,
-        "score": 41.942,
+        "risk_score": 62.534,
+        "score": 62.534,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -8454,7 +8454,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -8469,9 +8469,9 @@
         "nearby_streets_count": 21,
         "node_id": 42,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -8481,11 +8481,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 42,
         "region": "rmf",
-        "risk_score": 41.933,
-        "score": 41.933,
+        "risk_score": 62.525,
+        "score": 62.525,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -8621,7 +8621,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -8636,9 +8636,9 @@
         "nearby_streets_count": 23,
         "node_id": 43,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -8648,11 +8648,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 43,
         "region": "rmf",
-        "risk_score": 41.81,
-        "score": 41.81,
+        "risk_score": 62.402,
+        "score": 62.402,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -8696,7 +8696,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -8711,9 +8711,9 @@
         "nearby_streets_count": 19,
         "node_id": 44,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -8723,11 +8723,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 44,
         "region": "rmf",
-        "risk_score": 41.587,
-        "score": 41.587,
+        "risk_score": 62.179,
+        "score": 62.179,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -8811,7 +8811,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -8826,9 +8826,9 @@
         "nearby_streets_count": 23,
         "node_id": 45,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -8838,11 +8838,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 45,
         "region": "rmf",
-        "risk_score": 41.521,
-        "score": 41.521,
+        "risk_score": 62.113,
+        "score": 62.113,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -8942,7 +8942,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -8957,9 +8957,9 @@
         "nearby_streets_count": 21,
         "node_id": 46,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -8969,11 +8969,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 46,
         "region": "rmf",
-        "risk_score": 41.491,
-        "score": 41.491,
+        "risk_score": 62.083,
+        "score": 62.083,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -9041,7 +9041,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -9056,9 +9056,9 @@
         "nearby_streets_count": 25,
         "node_id": 47,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -9068,11 +9068,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 47,
         "region": "rmf",
-        "risk_score": 41.475,
-        "score": 41.475,
+        "risk_score": 62.067,
+        "score": 62.067,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -9152,7 +9152,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -9167,9 +9167,9 @@
         "nearby_streets_count": 15,
         "node_id": 48,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -9179,11 +9179,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 48,
         "region": "rmf",
-        "risk_score": 41.405,
-        "score": 41.405,
+        "risk_score": 61.997,
+        "score": 61.997,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -9323,7 +9323,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -9338,9 +9338,9 @@
         "nearby_streets_count": 23,
         "node_id": 49,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -9350,11 +9350,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 49,
         "region": "rmf",
-        "risk_score": 41.242,
-        "score": 41.242,
+        "risk_score": 61.834,
+        "score": 61.834,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -9394,7 +9394,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -9409,9 +9409,9 @@
         "nearby_streets_count": 19,
         "node_id": 50,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -9421,11 +9421,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 50,
         "region": "rmf",
-        "risk_score": 40.871,
-        "score": 40.871,
+        "risk_score": 61.463,
+        "score": 61.463,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -9485,7 +9485,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -9500,9 +9500,9 @@
         "nearby_streets_count": 19,
         "node_id": 51,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -9512,11 +9512,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 51,
         "region": "rmf",
-        "risk_score": 40.771,
-        "score": 40.771,
+        "risk_score": 61.363,
+        "score": 61.363,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -9600,7 +9600,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -9615,9 +9615,9 @@
         "nearby_streets_count": 23,
         "node_id": 52,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -9627,11 +9627,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 52,
         "region": "rmf",
-        "risk_score": 40.744,
-        "score": 40.744,
+        "risk_score": 61.336,
+        "score": 61.336,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -9675,7 +9675,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -9690,9 +9690,9 @@
         "nearby_streets_count": 18,
         "node_id": 53,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -9702,11 +9702,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 53,
         "region": "rmf",
-        "risk_score": 40.62,
-        "score": 40.62,
+        "risk_score": 61.212,
+        "score": 61.212,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -9778,7 +9778,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -9793,9 +9793,9 @@
         "nearby_streets_count": 22,
         "node_id": 54,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -9805,11 +9805,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 54,
         "region": "rmf",
-        "risk_score": 40.377,
-        "score": 40.377,
+        "risk_score": 60.969,
+        "score": 60.969,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -9905,7 +9905,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -9920,9 +9920,9 @@
         "nearby_streets_count": 16,
         "node_id": 55,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -9932,11 +9932,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 55,
         "region": "rmf",
-        "risk_score": 40.172,
-        "score": 40.172,
+        "risk_score": 60.764,
+        "score": 60.764,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -10044,7 +10044,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -10059,9 +10059,9 @@
         "nearby_streets_count": 16,
         "node_id": 56,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -10071,11 +10071,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 56,
         "region": "rmf",
-        "risk_score": 40.082,
-        "score": 40.082,
+        "risk_score": 60.674,
+        "score": 60.674,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -10139,7 +10139,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -10154,9 +10154,9 @@
         "nearby_streets_count": 20,
         "node_id": 57,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -10166,11 +10166,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 57,
         "region": "rmf",
-        "risk_score": 39.704,
-        "score": 39.704,
+        "risk_score": 60.296,
+        "score": 60.296,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -10258,7 +10258,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -10273,9 +10273,9 @@
         "nearby_streets_count": 20,
         "node_id": 58,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -10285,11 +10285,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 58,
         "region": "rmf",
-        "risk_score": 39.626,
-        "score": 39.626,
+        "risk_score": 60.218,
+        "score": 60.218,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -10337,7 +10337,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -10352,9 +10352,9 @@
         "nearby_streets_count": 16,
         "node_id": 59,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -10364,11 +10364,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 59,
         "region": "rmf",
-        "risk_score": 39.582,
-        "score": 39.582,
+        "risk_score": 60.174,
+        "score": 60.174,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -10552,7 +10552,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -10567,9 +10567,9 @@
         "nearby_streets_count": 19,
         "node_id": 60,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -10579,11 +10579,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 60,
         "region": "rmf",
-        "risk_score": 39.433,
-        "score": 39.433,
+        "risk_score": 60.025,
+        "score": 60.025,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -10671,7 +10671,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -10686,9 +10686,9 @@
         "nearby_streets_count": 19,
         "node_id": 61,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -10698,11 +10698,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 61,
         "region": "rmf",
-        "risk_score": 39.295,
-        "score": 39.295,
+        "risk_score": 59.887,
+        "score": 59.887,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -10774,7 +10774,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -10789,9 +10789,9 @@
         "nearby_streets_count": 16,
         "node_id": 62,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -10801,11 +10801,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 62,
         "region": "rmf",
-        "risk_score": 39.277,
-        "score": 39.277,
+        "risk_score": 59.869,
+        "score": 59.869,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -10957,7 +10957,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -10972,9 +10972,9 @@
         "nearby_streets_count": 19,
         "node_id": 63,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -10984,11 +10984,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 63,
         "region": "rmf",
-        "risk_score": 39.224,
-        "score": 39.224,
+        "risk_score": 59.816,
+        "score": 59.816,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -11104,7 +11104,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -11119,9 +11119,9 @@
         "nearby_streets_count": 20,
         "node_id": 64,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -11131,11 +11131,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 64,
         "region": "rmf",
-        "risk_score": 39.139,
-        "score": 39.139,
+        "risk_score": 59.731,
+        "score": 59.731,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -11247,7 +11247,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -11262,9 +11262,9 @@
         "nearby_streets_count": 20,
         "node_id": 65,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -11274,11 +11274,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 65,
         "region": "rmf",
-        "risk_score": 39.086,
-        "score": 39.086,
+        "risk_score": 59.678,
+        "score": 59.678,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -11406,7 +11406,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -11421,9 +11421,9 @@
         "nearby_streets_count": 18,
         "node_id": 66,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -11433,11 +11433,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 66,
         "region": "rmf",
-        "risk_score": 38.999,
-        "score": 38.999,
+        "risk_score": 59.591,
+        "score": 59.591,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -11557,7 +11557,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -11572,9 +11572,9 @@
         "nearby_streets_count": 12,
         "node_id": 67,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -11584,11 +11584,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 67,
         "region": "rmf",
-        "risk_score": 38.872,
-        "score": 38.872,
+        "risk_score": 59.464,
+        "score": 59.464,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -11672,7 +11672,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -11687,9 +11687,9 @@
         "nearby_streets_count": 17,
         "node_id": 68,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -11699,11 +11699,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 68,
         "region": "rmf",
-        "risk_score": 38.714,
-        "score": 38.714,
+        "risk_score": 59.306,
+        "score": 59.306,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -11751,7 +11751,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -11766,9 +11766,9 @@
         "nearby_streets_count": 22,
         "node_id": 69,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -11778,11 +11778,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 69,
         "region": "rmf",
-        "risk_score": 38.14,
-        "score": 38.14,
+        "risk_score": 58.732,
+        "score": 58.732,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -11858,7 +11858,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -11873,9 +11873,9 @@
         "nearby_streets_count": 16,
         "node_id": 70,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -11885,11 +11885,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 70,
         "region": "rmf",
-        "risk_score": 38.115,
-        "score": 38.115,
+        "risk_score": 58.707,
+        "score": 58.707,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -11941,7 +11941,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -11956,9 +11956,9 @@
         "nearby_streets_count": 15,
         "node_id": 71,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -11968,11 +11968,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 71,
         "region": "rmf",
-        "risk_score": 37.947,
-        "score": 37.947,
+        "risk_score": 58.539,
+        "score": 58.539,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -12008,7 +12008,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -12023,9 +12023,9 @@
         "nearby_streets_count": 12,
         "node_id": 72,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -12035,11 +12035,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 72,
         "region": "rmf",
-        "risk_score": 37.11,
-        "score": 37.11,
+        "risk_score": 57.702,
+        "score": 57.702,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -12191,7 +12191,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -12206,9 +12206,9 @@
         "nearby_streets_count": 10,
         "node_id": 73,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -12218,11 +12218,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 73,
         "region": "rmf",
-        "risk_score": 37.044,
-        "score": 37.044,
+        "risk_score": 57.636,
+        "score": 57.636,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -12262,7 +12262,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -12277,9 +12277,9 @@
         "nearby_streets_count": 14,
         "node_id": 74,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -12289,11 +12289,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 74,
         "region": "rmf",
-        "risk_score": 36.461,
-        "score": 36.461,
+        "risk_score": 57.053,
+        "score": 57.053,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -12329,7 +12329,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -12344,9 +12344,9 @@
         "nearby_streets_count": 12,
         "node_id": 75,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -12356,11 +12356,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 75,
         "region": "rmf",
-        "risk_score": 36.325,
-        "score": 36.325,
+        "risk_score": 56.917,
+        "score": 56.917,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -12452,7 +12452,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -12467,9 +12467,9 @@
         "nearby_streets_count": 12,
         "node_id": 76,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -12479,11 +12479,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 76,
         "region": "rmf",
-        "risk_score": 35.989,
-        "score": 35.989,
+        "risk_score": 56.581,
+        "score": 56.581,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -12547,7 +12547,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -12562,9 +12562,9 @@
         "nearby_streets_count": 12,
         "node_id": 77,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -12574,11 +12574,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 77,
         "region": "rmf",
-        "risk_score": 35.895,
-        "score": 35.895,
+        "risk_score": 56.487,
+        "score": 56.487,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -12682,7 +12682,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -12697,9 +12697,9 @@
         "nearby_streets_count": 12,
         "node_id": 78,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -12709,11 +12709,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 78,
         "region": "rmf",
-        "risk_score": 35.804,
-        "score": 35.804,
+        "risk_score": 56.396,
+        "score": 56.396,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -12833,7 +12833,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -12848,9 +12848,9 @@
         "nearby_streets_count": 12,
         "node_id": 79,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -12860,11 +12860,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 79,
         "region": "rmf",
-        "risk_score": 35.657,
-        "score": 35.657,
+        "risk_score": 56.249,
+        "score": 56.249,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -12972,7 +12972,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -12987,9 +12987,9 @@
         "nearby_streets_count": 9,
         "node_id": 80,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -12999,11 +12999,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 80,
         "region": "rmf",
-        "risk_score": 35.36,
-        "score": 35.36,
+        "risk_score": 55.952,
+        "score": 55.952,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -13191,7 +13191,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -13206,9 +13206,9 @@
         "nearby_streets_count": 9,
         "node_id": 81,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -13218,11 +13218,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 81,
         "region": "rmf",
-        "risk_score": 34.914,
-        "score": 34.914,
+        "risk_score": 55.506,
+        "score": 55.506,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -13326,7 +13326,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -13341,9 +13341,9 @@
         "nearby_streets_count": 9,
         "node_id": 82,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -13353,11 +13353,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 82,
         "region": "rmf",
-        "risk_score": 34.826,
-        "score": 34.826,
+        "risk_score": 55.418,
+        "score": 55.418,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -13473,7 +13473,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -13488,9 +13488,9 @@
         "nearby_streets_count": 11,
         "node_id": 83,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -13500,11 +13500,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 83,
         "region": "rmf",
-        "risk_score": 34.448,
-        "score": 34.448,
+        "risk_score": 55.04,
+        "score": 55.04,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -13552,7 +13552,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -13567,9 +13567,9 @@
         "nearby_streets_count": 13,
         "node_id": 84,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -13579,11 +13579,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 84,
         "region": "rmf",
-        "risk_score": 34.264,
-        "score": 34.264,
+        "risk_score": 54.856,
+        "score": 54.856,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -13619,7 +13619,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -13634,9 +13634,9 @@
         "nearby_streets_count": 11,
         "node_id": 85,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -13646,11 +13646,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 85,
         "region": "rmf",
-        "risk_score": 34.036,
-        "score": 34.036,
+        "risk_score": 54.628,
+        "score": 54.628,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -13734,7 +13734,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -13749,9 +13749,9 @@
         "nearby_streets_count": 7,
         "node_id": 86,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -13761,11 +13761,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 86,
         "region": "rmf",
-        "risk_score": 33.582,
-        "score": 33.582,
+        "risk_score": 54.174,
+        "score": 54.174,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -13845,7 +13845,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -13860,9 +13860,9 @@
         "nearby_streets_count": 8,
         "node_id": 87,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -13872,11 +13872,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 87,
         "region": "rmf",
-        "risk_score": 33.419,
-        "score": 33.419,
+        "risk_score": 54.011,
+        "score": 54.011,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -14020,7 +14020,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -14035,9 +14035,9 @@
         "nearby_streets_count": 8,
         "node_id": 88,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -14047,11 +14047,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 88,
         "region": "rmf",
-        "risk_score": 33.098,
-        "score": 33.098,
+        "risk_score": 53.69,
+        "score": 53.69,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -14271,7 +14271,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -14286,9 +14286,9 @@
         "nearby_streets_count": 8,
         "node_id": 89,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -14298,11 +14298,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 89,
         "region": "rmf",
-        "risk_score": 32.837,
-        "score": 32.837,
+        "risk_score": 53.429,
+        "score": 53.429,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -14370,7 +14370,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -14385,9 +14385,9 @@
         "nearby_streets_count": 4,
         "node_id": 90,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -14397,11 +14397,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 90,
         "region": "rmf",
-        "risk_score": 31.683,
-        "score": 31.683,
+        "risk_score": 52.275,
+        "score": 52.275,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -14545,7 +14545,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -14560,9 +14560,9 @@
         "nearby_streets_count": 5,
         "node_id": 91,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -14572,11 +14572,11 @@
         "peak_weekday_share": 0.1804,
         "rank": 91,
         "region": "rmf",
-        "risk_score": 30.969,
-        "score": 30.969,
+        "risk_score": 51.561,
+        "score": 51.561,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
       },
       "type": "Feature"
@@ -14688,7 +14688,7 @@
       "properties": {
         "bairro": "ALTO ALEGRE II",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -14703,13 +14703,13 @@
         "nearby_streets_count": 4,
         "node_id": 92,
         "parent_area": "ALTO ALEGRE II",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "rank": 92,
         "region": "rmf",
-        "risk_score": 30.377,
-        "score": 30.377,
+        "risk_score": 50.969,
+        "score": 50.969,
         "source_geometry_type": "Polygon"
       },
       "type": "Feature"
@@ -14789,7 +14789,7 @@
       "properties": {
         "bairro": "ALTO ALEGRE II",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -14804,13 +14804,13 @@
         "nearby_streets_count": 3,
         "node_id": 93,
         "parent_area": "ALTO ALEGRE II",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "rank": 93,
         "region": "rmf",
-        "risk_score": 29.886,
-        "score": 29.886,
+        "risk_score": 50.478,
+        "score": 50.478,
         "source_geometry_type": "Polygon"
       },
       "type": "Feature"
@@ -14902,7 +14902,7 @@
       "properties": {
         "bairro": "MARACANAÚ",
         "faction": "CV",
-        "generated_at": "2026-08-26T14:16:40.191135",
+        "generated_at": "2026-09-24T14:42:50.046626",
         "geometry_type": "Polygon",
         "is_centroid": false,
         "is_tactical": true,
@@ -14917,9 +14917,9 @@
         "nearby_streets_count": 4,
         "node_id": 94,
         "parent_area": "MARACANAÚ",
-        "parent_risk_level": "moderado",
-        "parent_risk_score": 33.2,
-        "parent_status": "MODERADO",
+        "parent_risk_level": "alto",
+        "parent_risk_score": 61.8,
+        "parent_status": "ALTO",
         "peak_hour_end": 23,
         "peak_hour_share": 0.0784,
         "peak_hour_start": 18,
@@ -14929,22 +14929,1982 @@
         "peak_weekday_share": 0.1804,
         "rank": 94,
         "region": "rmf",
-        "risk_score": 29.699,
-        "score": 29.699,
+        "risk_score": 50.291,
+        "score": 50.291,
         "source_geometry_type": "Polygon",
         "temporal_horizon_days": 30,
-        "temporal_reference_date": "2026-12-07",
+        "temporal_reference_date": "2026-12-09",
         "temporal_sample_size": 255
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -39.575633,
+              -3.487334
+            ],
+            [
+              -39.577305,
+              -3.48659
+            ],
+            [
+              -39.577127,
+              -3.48605
+            ],
+            [
+              -39.577773,
+              -3.485806
+            ],
+            [
+              -39.577705,
+              -3.485437
+            ],
+            [
+              -39.578242,
+              -3.485246
+            ],
+            [
+              -39.578263,
+              -3.485379
+            ],
+            [
+              -39.578704,
+              -3.48531
+            ],
+            [
+              -39.578764,
+              -3.486268
+            ],
+            [
+              -39.580488,
+              -3.486102
+            ],
+            [
+              -39.581293,
+              -3.488467
+            ],
+            [
+              -39.58123,
+              -3.489523
+            ],
+            [
+              -39.580228,
+              -3.490033
+            ],
+            [
+              -39.580225,
+              -3.490123
+            ],
+            [
+              -39.578943,
+              -3.490611
+            ],
+            [
+              -39.578477,
+              -3.489375
+            ],
+            [
+              -39.576499,
+              -3.490149
+            ],
+            [
+              -39.575633,
+              -3.487334
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "bairro": "ITAPIPOCA",
+        "faction": "PCC",
+        "generated_at": "2026-09-24T14:42:50.046626",
+        "geometry_type": "Polygon",
+        "is_centroid": false,
+        "is_tactical": true,
+        "local_street_pressure": 9.406,
+        "municipality": "Itapipoca",
+        "name": "Cruzeiro - Itapipoca",
+        "nearby_streets": [
+          "CRUZEIRO - ITAPIPOCA",
+          "RUA FRANCISCO DOMINGOS BRAGA FILHO",
+          "RUA OSVALDO CRUZ"
+        ],
+        "nearby_streets_count": 25,
+        "node_id": 95,
+        "parent_area": "ITAPIPOCA",
+        "parent_risk_level": "moderado",
+        "parent_risk_score": 32.7,
+        "parent_status": "MODERADO",
+        "rank": 95,
+        "region": "rmf",
+        "risk_score": 44.908,
+        "score": 44.908,
+        "source_geometry_type": "Polygon"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -39.579054,
+              -3.482269
+            ],
+            [
+              -39.579724,
+              -3.482175
+            ],
+            [
+              -39.579765,
+              -3.481968
+            ],
+            [
+              -39.582047,
+              -3.481738
+            ],
+            [
+              -39.582025,
+              -3.481022
+            ],
+            [
+              -39.583319,
+              -3.480912
+            ],
+            [
+              -39.585855,
+              -3.480684
+            ],
+            [
+              -39.585939,
+              -3.480433
+            ],
+            [
+              -39.586174,
+              -3.480442
+            ],
+            [
+              -39.58618,
+              -3.48127
+            ],
+            [
+              -39.586149,
+              -3.481376
+            ],
+            [
+              -39.586101,
+              -3.481476
+            ],
+            [
+              -39.586026,
+              -3.481587
+            ],
+            [
+              -39.585871,
+              -3.481814
+            ],
+            [
+              -39.585753,
+              -3.482065
+            ],
+            [
+              -39.585675,
+              -3.482355
+            ],
+            [
+              -39.585096,
+              -3.484541
+            ],
+            [
+              -39.583864,
+              -3.484399
+            ],
+            [
+              -39.583143,
+              -3.485728
+            ],
+            [
+              -39.582371,
+              -3.485546
+            ],
+            [
+              -39.58049,
+              -3.485759
+            ],
+            [
+              -39.580442,
+              -3.485535
+            ],
+            [
+              -39.580427,
+              -3.48515
+            ],
+            [
+              -39.579363,
+              -3.485229
+            ],
+            [
+              -39.579198,
+              -3.483653
+            ],
+            [
+              -39.579054,
+              -3.482269
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "bairro": "ITAPIPOCA",
+        "faction": "PCC",
+        "generated_at": "2026-09-24T14:42:50.046626",
+        "geometry_type": "Polygon",
+        "is_centroid": false,
+        "is_tactical": true,
+        "local_street_pressure": 8.268,
+        "municipality": "Itapipoca",
+        "name": "Maranhão - Itapipoca",
+        "nearby_streets": [
+          "MARANHÃO - ITAPIPOCA",
+          "RUA JOAO BATISTA BARROSO",
+          "RUA SEBASTIÃO GONÇALVES"
+        ],
+        "nearby_streets_count": 22,
+        "node_id": 96,
+        "parent_area": "ITAPIPOCA",
+        "parent_risk_level": "moderado",
+        "parent_risk_score": 32.7,
+        "parent_status": "MODERADO",
+        "rank": 96,
+        "region": "rmf",
+        "risk_score": 42.953,
+        "score": 42.953,
+        "source_geometry_type": "Polygon"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -39.595733,
+              -3.495182
+            ],
+            [
+              -39.597252,
+              -3.497992
+            ],
+            [
+              -39.598001,
+              -3.497541
+            ],
+            [
+              -39.598327,
+              -3.498142
+            ],
+            [
+              -39.598353,
+              -3.498386
+            ],
+            [
+              -39.598372,
+              -3.498533
+            ],
+            [
+              -39.598348,
+              -3.498673
+            ],
+            [
+              -39.598264,
+              -3.498809
+            ],
+            [
+              -39.598153,
+              -3.498961
+            ],
+            [
+              -39.598177,
+              -3.499023
+            ],
+            [
+              -39.598176,
+              -3.499702
+            ],
+            [
+              -39.597186,
+              -3.49961
+            ],
+            [
+              -39.597155,
+              -3.499792
+            ],
+            [
+              -39.594357,
+              -3.499627
+            ],
+            [
+              -39.594442,
+              -3.499264
+            ],
+            [
+              -39.592631,
+              -3.498958
+            ],
+            [
+              -39.592586,
+              -3.49785
+            ],
+            [
+              -39.594005,
+              -3.497345
+            ],
+            [
+              -39.593565,
+              -3.496316
+            ],
+            [
+              -39.595733,
+              -3.495182
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "bairro": "ITAPIPOCA",
+        "faction": "PCC",
+        "generated_at": "2026-09-24T14:42:50.046626",
+        "geometry_type": "Polygon",
+        "is_centroid": false,
+        "is_tactical": true,
+        "local_street_pressure": 8.355,
+        "municipality": "Itapipoca",
+        "name": "São Francisco - Itapipoca",
+        "nearby_streets": [
+          "SÃO FRANCISCO - ITAPIPOCA",
+          "RUA DOM ORIONE",
+          "RUA JOAQUIM RODRIGUES TEIXEIRA DE MENEZES"
+        ],
+        "nearby_streets_count": 21,
+        "node_id": 97,
+        "parent_area": "ITAPIPOCA",
+        "parent_risk_level": "moderado",
+        "parent_risk_score": 32.7,
+        "parent_status": "MODERADO",
+        "rank": 97,
+        "region": "rmf",
+        "risk_score": 42.858,
+        "score": 42.858,
+        "source_geometry_type": "Polygon"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -39.58444,
+              -3.497403
+            ],
+            [
+              -39.584324,
+              -3.497194
+            ],
+            [
+              -39.584236,
+              -3.496269
+            ],
+            [
+              -39.583725,
+              -3.496447
+            ],
+            [
+              -39.583641,
+              -3.496161
+            ],
+            [
+              -39.583489,
+              -3.496282
+            ],
+            [
+              -39.583325,
+              -3.496389
+            ],
+            [
+              -39.583204,
+              -3.496406
+            ],
+            [
+              -39.58315,
+              -3.496153
+            ],
+            [
+              -39.583016,
+              -3.496126
+            ],
+            [
+              -39.582862,
+              -3.496325
+            ],
+            [
+              -39.582485,
+              -3.496102
+            ],
+            [
+              -39.582331,
+              -3.495958
+            ],
+            [
+              -39.582125,
+              -3.4953
+            ],
+            [
+              -39.581975,
+              -3.495331
+            ],
+            [
+              -39.581649,
+              -3.494367
+            ],
+            [
+              -39.582263,
+              -3.494099
+            ],
+            [
+              -39.582327,
+              -3.494254
+            ],
+            [
+              -39.582513,
+              -3.4942
+            ],
+            [
+              -39.582646,
+              -3.494557
+            ],
+            [
+              -39.582756,
+              -3.494522
+            ],
+            [
+              -39.58279,
+              -3.494595
+            ],
+            [
+              -39.583038,
+              -3.494509
+            ],
+            [
+              -39.583091,
+              -3.494644
+            ],
+            [
+              -39.583956,
+              -3.494347
+            ],
+            [
+              -39.583734,
+              -3.493566
+            ],
+            [
+              -39.583999,
+              -3.493477
+            ],
+            [
+              -39.584295,
+              -3.494489
+            ],
+            [
+              -39.584755,
+              -3.494347
+            ],
+            [
+              -39.584869,
+              -3.494875
+            ],
+            [
+              -39.58465,
+              -3.494944
+            ],
+            [
+              -39.584855,
+              -3.496208
+            ],
+            [
+              -39.584551,
+              -3.496276
+            ],
+            [
+              -39.584617,
+              -3.496578
+            ],
+            [
+              -39.584893,
+              -3.49651
+            ],
+            [
+              -39.584999,
+              -3.497109
+            ],
+            [
+              -39.58444,
+              -3.497403
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "bairro": "ITAPIPOCA",
+        "faction": "PCC",
+        "generated_at": "2026-09-24T14:42:50.046626",
+        "geometry_type": "Polygon",
+        "is_centroid": false,
+        "is_tactical": true,
+        "local_street_pressure": 8.369,
+        "municipality": "Itapipoca",
+        "name": "Estação - Itapipoca",
+        "nearby_streets": [
+          "ESTAÇÃO - ITAPIPOCA",
+          "RUA JOSÉ ROMERO",
+          "RUA JOSÉ AIRTON TEIXEIRA"
+        ],
+        "nearby_streets_count": 24,
+        "node_id": 98,
+        "parent_area": "ITAPIPOCA",
+        "parent_risk_level": "moderado",
+        "parent_risk_score": 32.7,
+        "parent_status": "MODERADO",
+        "rank": 98,
+        "region": "rmf",
+        "risk_score": 42.604,
+        "score": 42.604,
+        "source_geometry_type": "Polygon"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -39.589445,
+              -3.49978
+            ],
+            [
+              -39.590007,
+              -3.499851
+            ],
+            [
+              -39.593078,
+              -3.49991
+            ],
+            [
+              -39.593082,
+              -3.500328
+            ],
+            [
+              -39.592664,
+              -3.500324
+            ],
+            [
+              -39.592696,
+              -3.500936
+            ],
+            [
+              -39.592633,
+              -3.501228
+            ],
+            [
+              -39.592491,
+              -3.501498
+            ],
+            [
+              -39.592146,
+              -3.501718
+            ],
+            [
+              -39.59175,
+              -3.501865
+            ],
+            [
+              -39.591238,
+              -3.502047
+            ],
+            [
+              -39.590959,
+              -3.502127
+            ],
+            [
+              -39.590657,
+              -3.502161
+            ],
+            [
+              -39.590361,
+              -3.502096
+            ],
+            [
+              -39.590121,
+              -3.501946
+            ],
+            [
+              -39.589936,
+              -3.500531
+            ],
+            [
+              -39.589417,
+              -3.500521
+            ],
+            [
+              -39.589539,
+              -3.50105
+            ],
+            [
+              -39.589278,
+              -3.50113
+            ],
+            [
+              -39.588939,
+              -3.501063
+            ],
+            [
+              -39.588895,
+              -3.500528
+            ],
+            [
+              -39.589513,
+              -3.500134
+            ],
+            [
+              -39.589445,
+              -3.49978
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "bairro": "ITAPIPOCA",
+        "faction": "PCC",
+        "generated_at": "2026-09-24T14:42:50.046626",
+        "geometry_type": "Polygon",
+        "is_centroid": false,
+        "is_tactical": true,
+        "local_street_pressure": 8.313,
+        "municipality": "Itapipoca",
+        "name": "Alto Alegre - Itapipoca",
+        "nearby_streets": [
+          "ALTO ALEGRE - ITAPIPOCA",
+          "RUA CAPITÃO MANOEL ALVES",
+          "RUA MANOEL MOURA NEGRÃO"
+        ],
+        "nearby_streets_count": 23,
+        "node_id": 99,
+        "parent_area": "ITAPIPOCA",
+        "parent_risk_level": "moderado",
+        "parent_risk_score": 32.7,
+        "parent_status": "MODERADO",
+        "rank": 99,
+        "region": "rmf",
+        "risk_score": 42.512,
+        "score": 42.512,
+        "source_geometry_type": "Polygon"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -39.59384,
+              -3.493124
+            ],
+            [
+              -39.593954,
+              -3.493109
+            ],
+            [
+              -39.593948,
+              -3.492962
+            ],
+            [
+              -39.593568,
+              -3.492909
+            ],
+            [
+              -39.593554,
+              -3.492624
+            ],
+            [
+              -39.595572,
+              -3.49261
+            ],
+            [
+              -39.596028,
+              -3.492562
+            ],
+            [
+              -39.596013,
+              -3.49171
+            ],
+            [
+              -39.596698,
+              -3.491701
+            ],
+            [
+              -39.596752,
+              -3.492903
+            ],
+            [
+              -39.595981,
+              -3.493224
+            ],
+            [
+              -39.596215,
+              -3.494287
+            ],
+            [
+              -39.596807,
+              -3.494077
+            ],
+            [
+              -39.596942,
+              -3.494339
+            ],
+            [
+              -39.593241,
+              -3.496249
+            ],
+            [
+              -39.593111,
+              -3.495147
+            ],
+            [
+              -39.593308,
+              -3.495113
+            ],
+            [
+              -39.593261,
+              -3.494222
+            ],
+            [
+              -39.593405,
+              -3.494189
+            ],
+            [
+              -39.593506,
+              -3.49413
+            ],
+            [
+              -39.593526,
+              -3.494031
+            ],
+            [
+              -39.593696,
+              -3.49396
+            ],
+            [
+              -39.593656,
+              -3.493784
+            ],
+            [
+              -39.593958,
+              -3.493721
+            ],
+            [
+              -39.59384,
+              -3.493124
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "bairro": "ITAPIPOCA",
+        "faction": "PCC",
+        "generated_at": "2026-09-24T14:42:50.046626",
+        "geometry_type": "Polygon",
+        "is_centroid": false,
+        "is_tactical": true,
+        "local_street_pressure": 7.873,
+        "municipality": "Itapipoca",
+        "name": "Novo Horizonte - Itapipoca",
+        "nearby_streets": [
+          "NOVO HORIZONTE - ITAPIPOCA",
+          "RUA GUSTAVO H DE OLIVEIRA",
+          "SÃO FRANCISCO - ITAPIPOCA"
+        ],
+        "nearby_streets_count": 20,
+        "node_id": 100,
+        "parent_area": "ITAPIPOCA",
+        "parent_risk_level": "moderado",
+        "parent_risk_score": 32.7,
+        "parent_status": "MODERADO",
+        "rank": 100,
+        "region": "rmf",
+        "risk_score": 41.758,
+        "score": 41.758,
+        "source_geometry_type": "Polygon"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -39.584733,
+              -3.500778
+            ],
+            [
+              -39.5855,
+              -3.502873
+            ],
+            [
+              -39.585733,
+              -3.502645
+            ],
+            [
+              -39.586012,
+              -3.502429
+            ],
+            [
+              -39.586448,
+              -3.503343
+            ],
+            [
+              -39.586691,
+              -3.503786
+            ],
+            [
+              -39.586644,
+              -3.50391
+            ],
+            [
+              -39.586686,
+              -3.504034
+            ],
+            [
+              -39.586805,
+              -3.504339
+            ],
+            [
+              -39.586352,
+              -3.504479
+            ],
+            [
+              -39.586168,
+              -3.504182
+            ],
+            [
+              -39.584474,
+              -3.505198
+            ],
+            [
+              -39.58464,
+              -3.505482
+            ],
+            [
+              -39.585062,
+              -3.505462
+            ],
+            [
+              -39.584833,
+              -3.50562
+            ],
+            [
+              -39.584669,
+              -3.505853
+            ],
+            [
+              -39.584754,
+              -3.505952
+            ],
+            [
+              -39.584624,
+              -3.506087
+            ],
+            [
+              -39.584535,
+              -3.506005
+            ],
+            [
+              -39.584351,
+              -3.50573
+            ],
+            [
+              -39.584145,
+              -3.505815
+            ],
+            [
+              -39.582842,
+              -3.506453
+            ],
+            [
+              -39.582141,
+              -3.505402
+            ],
+            [
+              -39.582593,
+              -3.50513
+            ],
+            [
+              -39.582333,
+              -3.504753
+            ],
+            [
+              -39.58295,
+              -3.504346
+            ],
+            [
+              -39.582724,
+              -3.503876
+            ],
+            [
+              -39.58263,
+              -3.503401
+            ],
+            [
+              -39.583191,
+              -3.503149
+            ],
+            [
+              -39.583827,
+              -3.504313
+            ],
+            [
+              -39.584301,
+              -3.504059
+            ],
+            [
+              -39.584217,
+              -3.503896
+            ],
+            [
+              -39.58444,
+              -3.503732
+            ],
+            [
+              -39.584168,
+              -3.502935
+            ],
+            [
+              -39.584846,
+              -3.502594
+            ],
+            [
+              -39.584277,
+              -3.500983
+            ],
+            [
+              -39.584733,
+              -3.500778
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "bairro": "ITAPIPOCA",
+        "faction": "PCC",
+        "generated_at": "2026-09-24T14:42:50.046626",
+        "geometry_type": "Polygon",
+        "is_centroid": false,
+        "is_tactical": true,
+        "local_street_pressure": 7.609,
+        "municipality": "Itapipoca",
+        "name": "Sanharão - Itapipoca",
+        "nearby_streets": [
+          "SANHARÃO - ITAPIPOCA",
+          "TRAVESSA MARECHAL HERMES",
+          "BOA VISTA - ITAPIPOCA"
+        ],
+        "nearby_streets_count": 22,
+        "node_id": 101,
+        "parent_area": "ITAPIPOCA",
+        "parent_risk_level": "moderado",
+        "parent_risk_score": 32.7,
+        "parent_status": "MODERADO",
+        "rank": 101,
+        "region": "rmf",
+        "risk_score": 41.301,
+        "score": 41.301,
+        "source_geometry_type": "Polygon"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -39.577579,
+              -3.489746
+            ],
+            [
+              -39.57788,
+              -3.490651
+            ],
+            [
+              -39.578351,
+              -3.490479
+            ],
+            [
+              -39.578482,
+              -3.490852
+            ],
+            [
+              -39.578898,
+              -3.490705
+            ],
+            [
+              -39.579685,
+              -3.492915
+            ],
+            [
+              -39.579164,
+              -3.493038
+            ],
+            [
+              -39.578678,
+              -3.493092
+            ],
+            [
+              -39.578238,
+              -3.493281
+            ],
+            [
+              -39.576678,
+              -3.492254
+            ],
+            [
+              -39.576881,
+              -3.492191
+            ],
+            [
+              -39.576613,
+              -3.491477
+            ],
+            [
+              -39.575925,
+              -3.491744
+            ],
+            [
+              -39.574543,
+              -3.490752
+            ],
+            [
+              -39.577579,
+              -3.489746
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "bairro": "ITAPIPOCA",
+        "faction": "PCC",
+        "generated_at": "2026-09-24T14:42:50.046626",
+        "geometry_type": "Polygon",
+        "is_centroid": false,
+        "is_tactical": true,
+        "local_street_pressure": 7.333,
+        "municipality": "Itapipoca",
+        "name": "Amontada - Itapipoca",
+        "nearby_streets": [
+          "AMONTADA - ITAPIPOCA",
+          "CRUZEIRO - ITAPIPOCA",
+          "RUA FIRMINO MARTINS"
+        ],
+        "nearby_streets_count": 21,
+        "node_id": 102,
+        "parent_area": "ITAPIPOCA",
+        "parent_risk_level": "moderado",
+        "parent_risk_score": 32.7,
+        "parent_status": "MODERADO",
+        "rank": 102,
+        "region": "rmf",
+        "risk_score": 40.753,
+        "score": 40.753,
+        "source_geometry_type": "Polygon"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -39.597828,
+              -3.494228
+            ],
+            [
+              -39.599661,
+              -3.493304
+            ],
+            [
+              -39.600382,
+              -3.494926
+            ],
+            [
+              -39.601074,
+              -3.494671
+            ],
+            [
+              -39.601302,
+              -3.49531
+            ],
+            [
+              -39.601662,
+              -3.495374
+            ],
+            [
+              -39.600859,
+              -3.49629
+            ],
+            [
+              -39.601155,
+              -3.496973
+            ],
+            [
+              -39.601066,
+              -3.49735
+            ],
+            [
+              -39.601002,
+              -3.498027
+            ],
+            [
+              -39.60045,
+              -3.498773
+            ],
+            [
+              -39.600331,
+              -3.499856
+            ],
+            [
+              -39.598195,
+              -3.499702
+            ],
+            [
+              -39.598177,
+              -3.499023
+            ],
+            [
+              -39.598153,
+              -3.498961
+            ],
+            [
+              -39.598264,
+              -3.498809
+            ],
+            [
+              -39.598348,
+              -3.498673
+            ],
+            [
+              -39.598372,
+              -3.498533
+            ],
+            [
+              -39.598327,
+              -3.498142
+            ],
+            [
+              -39.598035,
+              -3.497568
+            ],
+            [
+              -39.599082,
+              -3.496899
+            ],
+            [
+              -39.597828,
+              -3.494228
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "bairro": "ITAPIPOCA",
+        "faction": "PCC",
+        "generated_at": "2026-09-24T14:42:50.046626",
+        "geometry_type": "Polygon",
+        "is_centroid": false,
+        "is_tactical": true,
+        "local_street_pressure": 6.886,
+        "municipality": "Itapipoca",
+        "name": "Conj. Geraldo G. Azavedo - Itapipoca",
+        "nearby_streets": [
+          "CONJ. GERALDO G. AZAVEDO - ITAPIPOCA",
+          "RUA ANTÔNIO CARVALHO",
+          "SÃO FRANCISCO - ITAPIPOCA"
+        ],
+        "nearby_streets_count": 18,
+        "node_id": 103,
+        "parent_area": "ITAPIPOCA",
+        "parent_risk_level": "moderado",
+        "parent_risk_score": 32.7,
+        "parent_status": "MODERADO",
+        "rank": 103,
+        "region": "rmf",
+        "risk_score": 40.091,
+        "score": 40.091,
+        "source_geometry_type": "Polygon"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -39.580318,
+              -3.506844
+            ],
+            [
+              -39.579962,
+              -3.505838
+            ],
+            [
+              -39.580496,
+              -3.505621
+            ],
+            [
+              -39.58019,
+              -3.50485
+            ],
+            [
+              -39.579708,
+              -3.503373
+            ],
+            [
+              -39.581124,
+              -3.502871
+            ],
+            [
+              -39.58125,
+              -3.503286
+            ],
+            [
+              -39.581867,
+              -3.503071
+            ],
+            [
+              -39.582051,
+              -3.503513
+            ],
+            [
+              -39.581679,
+              -3.503645
+            ],
+            [
+              -39.581723,
+              -3.504248
+            ],
+            [
+              -39.582333,
+              -3.504753
+            ],
+            [
+              -39.582593,
+              -3.50513
+            ],
+            [
+              -39.582141,
+              -3.505402
+            ],
+            [
+              -39.582784,
+              -3.506437
+            ],
+            [
+              -39.58279,
+              -3.506504
+            ],
+            [
+              -39.582451,
+              -3.506679
+            ],
+            [
+              -39.582024,
+              -3.506613
+            ],
+            [
+              -39.581415,
+              -3.506636
+            ],
+            [
+              -39.580852,
+              -3.506726
+            ],
+            [
+              -39.580318,
+              -3.506844
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "bairro": "ITAPIPOCA",
+        "faction": "PCC",
+        "generated_at": "2026-09-24T14:42:50.046626",
+        "geometry_type": "Polygon",
+        "is_centroid": false,
+        "is_tactical": true,
+        "local_street_pressure": 6.964,
+        "municipality": "Itapipoca",
+        "name": "Boa Vista - Itapipoca",
+        "nearby_streets": [
+          "BOA VISTA - ITAPIPOCA",
+          "RUA MARECHAL HERMES DA FONSECA",
+          "RUA CHICO DE SOUSA"
+        ],
+        "nearby_streets_count": 19,
+        "node_id": 104,
+        "parent_area": "ITAPIPOCA",
+        "parent_risk_level": "moderado",
+        "parent_risk_score": 32.7,
+        "parent_status": "MODERADO",
+        "rank": 104,
+        "region": "rmf",
+        "risk_score": 40.032,
+        "score": 40.032,
+        "source_geometry_type": "Polygon"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -39.575454,
+              -3.48235
+            ],
+            [
+              -39.575984,
+              -3.484567
+            ],
+            [
+              -39.576756,
+              -3.484318
+            ],
+            [
+              -39.577222,
+              -3.486484
+            ],
+            [
+              -39.575633,
+              -3.487334
+            ],
+            [
+              -39.573033,
+              -3.488156
+            ],
+            [
+              -39.57171,
+              -3.485395
+            ],
+            [
+              -39.570754,
+              -3.483291
+            ],
+            [
+              -39.572008,
+              -3.482996
+            ],
+            [
+              -39.57194,
+              -3.4827
+            ],
+            [
+              -39.573875,
+              -3.482279
+            ],
+            [
+              -39.574027,
+              -3.482792
+            ],
+            [
+              -39.5745,
+              -3.482703
+            ],
+            [
+              -39.5745,
+              -3.482668
+            ],
+            [
+              -39.574927,
+              -3.482641
+            ],
+            [
+              -39.574893,
+              -3.482312
+            ],
+            [
+              -39.575454,
+              -3.48235
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "bairro": "ITAPIPOCA",
+        "faction": "PCC",
+        "generated_at": "2026-09-24T14:42:50.046626",
+        "geometry_type": "Polygon",
+        "is_centroid": false,
+        "is_tactical": true,
+        "local_street_pressure": 6.683,
+        "municipality": "Itapipoca",
+        "name": "Violete - Itapipoca",
+        "nearby_streets": [
+          "VIOLETE - ITAPIPOCA",
+          "RUA SEVERIANO MOREIRA",
+          "NOVO AMERICA"
+        ],
+        "nearby_streets_count": 19,
+        "node_id": 105,
+        "parent_area": "ITAPIPOCA",
+        "parent_risk_level": "moderado",
+        "parent_risk_score": 32.7,
+        "parent_status": "MODERADO",
+        "rank": 105,
+        "region": "rmf",
+        "risk_score": 39.971,
+        "score": 39.971,
+        "source_geometry_type": "Polygon"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -39.593105,
+              -3.499885
+            ],
+            [
+              -39.59634,
+              -3.49996
+            ],
+            [
+              -39.599076,
+              -3.500114
+            ],
+            [
+              -39.59894,
+              -3.501498
+            ],
+            [
+              -39.59893,
+              -3.501825
+            ],
+            [
+              -39.599018,
+              -3.502542
+            ],
+            [
+              -39.598286,
+              -3.502666
+            ],
+            [
+              -39.598398,
+              -3.503264
+            ],
+            [
+              -39.597836,
+              -3.503261
+            ],
+            [
+              -39.597704,
+              -3.502896
+            ],
+            [
+              -39.597706,
+              -3.502202
+            ],
+            [
+              -39.597382,
+              -3.502143
+            ],
+            [
+              -39.596985,
+              -3.502005
+            ],
+            [
+              -39.59643,
+              -3.501787
+            ],
+            [
+              -39.595819,
+              -3.501602
+            ],
+            [
+              -39.595381,
+              -3.501341
+            ],
+            [
+              -39.594944,
+              -3.501022
+            ],
+            [
+              -39.593966,
+              -3.50034
+            ],
+            [
+              -39.593129,
+              -3.50032
+            ],
+            [
+              -39.593105,
+              -3.499885
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "bairro": "ITAPIPOCA",
+        "faction": "PCC",
+        "generated_at": "2026-09-24T14:42:50.046626",
+        "geometry_type": "Polygon",
+        "is_centroid": false,
+        "is_tactical": true,
+        "local_street_pressure": 6.262,
+        "municipality": "Itapipoca",
+        "name": "Mourão - Itapipoca",
+        "nearby_streets": [
+          "MOURÃO - ITAPIPOCA",
+          "RUA JOAQUIM RODRIGUES TEIXEIRA DE MENEZES",
+          "SÃO FRANCISCO - ITAPIPOCA"
+        ],
+        "nearby_streets_count": 18,
+        "node_id": 106,
+        "parent_area": "ITAPIPOCA",
+        "parent_risk_level": "moderado",
+        "parent_risk_score": 32.7,
+        "parent_status": "MODERADO",
+        "rank": 106,
+        "region": "rmf",
+        "risk_score": 38.784,
+        "score": 38.784,
+        "source_geometry_type": "Polygon"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -39.597916,
+              -3.49016
+            ],
+            [
+              -39.598222,
+              -3.490064
+            ],
+            [
+              -39.598047,
+              -3.488994
+            ],
+            [
+              -39.598617,
+              -3.488897
+            ],
+            [
+              -39.598474,
+              -3.488159
+            ],
+            [
+              -39.599368,
+              -3.487975
+            ],
+            [
+              -39.599612,
+              -3.489335
+            ],
+            [
+              -39.599918,
+              -3.48893
+            ],
+            [
+              -39.600533,
+              -3.488627
+            ],
+            [
+              -39.600818,
+              -3.488578
+            ],
+            [
+              -39.601382,
+              -3.491548
+            ],
+            [
+              -39.601582,
+              -3.491945
+            ],
+            [
+              -39.599986,
+              -3.492757
+            ],
+            [
+              -39.599808,
+              -3.492333
+            ],
+            [
+              -39.60032,
+              -3.492107
+            ],
+            [
+              -39.60014,
+              -3.491711
+            ],
+            [
+              -39.600097,
+              -3.491297
+            ],
+            [
+              -39.598672,
+              -3.491552
+            ],
+            [
+              -39.598049,
+              -3.490248
+            ],
+            [
+              -39.597943,
+              -3.490274
+            ],
+            [
+              -39.597916,
+              -3.49016
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "bairro": "ITAPIPOCA",
+        "faction": "PCC",
+        "generated_at": "2026-09-24T14:42:50.046626",
+        "geometry_type": "Polygon",
+        "is_centroid": false,
+        "is_tactical": true,
+        "local_street_pressure": 4.336,
+        "municipality": "Itapipoca",
+        "name": "Urbano Teixeira - Itapipoca",
+        "nearby_streets": [
+          "URBANO TEIXEIRA - ITAPIPOCA",
+          "RUA CENTO E DOIS",
+          "RUA VICENTE MOURA VIANA"
+        ],
+        "nearby_streets_count": 11,
+        "node_id": 107,
+        "parent_area": "ITAPIPOCA",
+        "parent_risk_level": "moderado",
+        "parent_risk_score": 32.7,
+        "parent_status": "MODERADO",
+        "rank": 107,
+        "region": "rmf",
+        "risk_score": 35.191,
+        "score": 35.191,
+        "source_geometry_type": "Polygon"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -39.516607,
+              -3.619629
+            ],
+            [
+              -39.516049,
+              -3.622756
+            ],
+            [
+              -39.515062,
+              -3.622927
+            ],
+            [
+              -39.514761,
+              -3.623912
+            ],
+            [
+              -39.512058,
+              -3.623527
+            ],
+            [
+              -39.510298,
+              -3.624126
+            ],
+            [
+              -39.509998,
+              -3.62584
+            ],
+            [
+              -39.509225,
+              -3.628324
+            ],
+            [
+              -39.508582,
+              -3.627638
+            ],
+            [
+              -39.508195,
+              -3.626568
+            ],
+            [
+              -39.506608,
+              -3.626011
+            ],
+            [
+              -39.505578,
+              -3.62524
+            ],
+            [
+              -39.505148,
+              -3.625797
+            ],
+            [
+              -39.501629,
+              -3.625111
+            ],
+            [
+              -39.501286,
+              -3.62434
+            ],
+            [
+              -39.499441,
+              -3.62434
+            ],
+            [
+              -39.499054,
+              -3.628238
+            ],
+            [
+              -39.500041,
+              -3.629437
+            ],
+            [
+              -39.499011,
+              -3.633377
+            ],
+            [
+              -39.498153,
+              -3.633035
+            ],
+            [
+              -39.498968,
+              -3.629309
+            ],
+            [
+              -39.498411,
+              -3.628195
+            ],
+            [
+              -39.496394,
+              -3.627767
+            ],
+            [
+              -39.496479,
+              -3.626739
+            ],
+            [
+              -39.498196,
+              -3.625925
+            ],
+            [
+              -39.498539,
+              -3.623955
+            ],
+            [
+              -39.499183,
+              -3.622456
+            ],
+            [
+              -39.497853,
+              -3.621942
+            ],
+            [
+              -39.495578,
+              -3.622713
+            ],
+            [
+              -39.494634,
+              -3.622156
+            ],
+            [
+              -39.497595,
+              -3.618773
+            ],
+            [
+              -39.499526,
+              -3.617745
+            ],
+            [
+              -39.50017,
+              -3.616032
+            ],
+            [
+              -39.501586,
+              -3.614018
+            ],
+            [
+              -39.500642,
+              -3.613076
+            ],
+            [
+              -39.504762,
+              -3.612819
+            ],
+            [
+              -39.504075,
+              -3.614532
+            ],
+            [
+              -39.502831,
+              -3.61556
+            ],
+            [
+              -39.503732,
+              -3.61616
+            ],
+            [
+              -39.503088,
+              -3.617573
+            ],
+            [
+              -39.505234,
+              -3.619072
+            ],
+            [
+              -39.508152,
+              -3.620357
+            ],
+            [
+              -39.50841,
+              -3.619672
+            ],
+            [
+              -39.508024,
+              -3.619115
+            ],
+            [
+              -39.50871,
+              -3.618987
+            ],
+            [
+              -39.509654,
+              -3.617445
+            ],
+            [
+              -39.507594,
+              -3.61676
+            ],
+            [
+              -39.509011,
+              -3.614275
+            ],
+            [
+              -39.510084,
+              -3.614233
+            ],
+            [
+              -39.511886,
+              -3.615646
+            ],
+            [
+              -39.51047,
+              -3.616331
+            ],
+            [
+              -39.509612,
+              -3.618344
+            ],
+            [
+              -39.511757,
+              -3.618259
+            ],
+            [
+              -39.512744,
+              -3.616974
+            ],
+            [
+              -39.513603,
+              -3.616931
+            ],
+            [
+              -39.513174,
+              -3.618387
+            ],
+            [
+              -39.514633,
+              -3.617616
+            ],
+            [
+              -39.514976,
+              -3.618901
+            ],
+            [
+              -39.516607,
+              -3.619629
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "bairro": "URUBURETAMA",
+        "faction": "PCC",
+        "generated_at": "2026-09-24T14:42:50.046626",
+        "geometry_type": "Polygon",
+        "is_centroid": false,
+        "is_tactical": true,
+        "local_street_pressure": 0.528,
+        "municipality": "Itapipoca",
+        "name": "Dos Pico - Itapipoca",
+        "nearby_streets": [
+          "DOS PICO - ITAPIPOCA"
+        ],
+        "nearby_streets_count": 1,
+        "node_id": 108,
+        "parent_area": "URUBURETAMA",
+        "parent_risk_level": "moderado",
+        "parent_risk_score": 32.7,
+        "parent_status": "MODERADO",
+        "rank": 108,
+        "region": "rmf",
+        "risk_score": 29.506,
+        "score": 29.506,
+        "source_geometry_type": "Polygon"
       },
       "type": "Feature"
     }
   ],
   "metadata": {
-    "generated_at": "2026-08-26T14:16:40.191135",
+    "generated_at": "2026-09-24T14:42:50.046626",
     "region": "rmf",
     "source": "Sentinela Micronodes Dynamic Overlay",
     "threshold_min_score": 31.0,
-    "total": 94
+    "total": 108
   },
   "type": "FeatureCollection"
 }
