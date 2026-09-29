@@ -49,12 +49,7 @@ logging.basicConfig(
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 PREDICT_HORIZON = 30
 TRAIN_BATCH_LOG_EVERY = int(os.environ.get("TRAIN_BATCH_LOG_EVERY", "30"))
-TEMPORAL_SPLIT = {
-    'train_start': '2022-01-01',
-    'train_end': '2024-12-31',
-    'val_start': '2025-01-01',
-    'val_end': '2025-12-31',
-}
+VALIDATION_DAYS = 60
 
 REGION_CONFIGS = {
     'fortaleza': dict(
@@ -182,10 +177,28 @@ def inject_momentum_channels(features):
     return enriched
 
 
-def build_temporal_split_config():
+def build_temporal_split_config(dates):
+    """Cria um corte temporal recente sem usar alvos ainda desconhecidos.
+
+    Cada alvo cobre ``PREDICT_HORIZON`` dias. Portanto, os últimos 30 dias da
+    série servem apenas como contexto de inferência; a validação termina no
+    último dia que já possui seu horizonte completamente observado.
+    """
+    series_start = pd.Timestamp(dates[0]).normalize()
+    series_end = pd.Timestamp(dates[-1]).normalize()
+    last_observed_target_end = series_end - pd.Timedelta(days=PREDICT_HORIZON)
+    val_start = last_observed_target_end - pd.Timedelta(days=VALIDATION_DAYS - 1)
+    train_end = val_start - pd.Timedelta(days=1)
+    if train_end <= series_start:
+        raise RuntimeError(
+            "Série insuficiente para split temporal: "
+            f"{series_start.date()}..{series_end.date()}"
+        )
     return {
-        key: pd.Timestamp(value)
-        for key, value in TEMPORAL_SPLIT.items()
+        'train_start': series_start,
+        'train_end': train_end,
+        'val_start': val_start,
+        'val_end': last_observed_target_end,
     }
 
 
@@ -331,7 +344,7 @@ class SpecialistTrainer:
         train_samples, val_samples = [], []
         window = self.cfg['window']
         total_windows = max(0, total_steps - PREDICT_HORIZON - window)
-        split_cfg = build_temporal_split_config()
+        split_cfg = build_temporal_split_config(dates)
         build_start = time.time()
         logging.info(
             (

@@ -618,3 +618,20 @@ Este arquivo registra a performance das predições do sistema (Champion + Chall
 | INTERIOR  |      13      |     4      | 40.0% | 25.0% | 30.8%  | 38.5%  |   ✅    |
 
 ---
+
+<!-- validation-session: merge_new_data|2026-09-14|2026-09-27|Poisson Ranker Estadual -->
+
+### 🔄 Sessão de Validação: 2026-09-28 16:10
+**Período Gabarito:** 2026-09-14 a 2026-09-27
+
+**Origem:** merge_new_data
+
+**Arquitetura:** Poisson Ranker Estadual
+
+| Região    | N_CVLI Bruto | Hits Bruto | P@10  |  P@20 |  R@10  |  R@20  | Status |
+|:----------|:------------:|:----------:|:-----:|:-----:|:------:|:------:|:------:|
+| FORTALEZA |      9       |     5      | 50.0% | 25.0% | 55.6%  | 55.6%  |   ✅    |
+| RMF       |      1       |     1      | 10.0% | 5.0%  | 100.0% | 100.0% |   🚨    |
+| INTERIOR  |      2       |     2      | 20.0% | 10.0% | 100.0% | 100.0% |   ⚠️   |
+
+---

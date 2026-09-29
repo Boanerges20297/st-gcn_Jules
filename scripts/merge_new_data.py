@@ -430,12 +430,19 @@ def merge(new_data_path):
             df_new['bairro'] = df_new['bairro'].apply(normalize_text)
         if 'cidade' in df_new.columns:
             df_new['cidade'] = df_new['cidade'].apply(normalize_text)
+        # As fontes novas normalmente ainda não possuem os campos calculados
+        # abaixo. Criá-los com dtypes explícitos evita que pandas infira
+        # ``float64`` para uma coluna toda vazia e depois rejeite bools em .at.
         for bool_col in ('eh_feriado', 'dia_quente_cvp'):
             if bool_col in df_new.columns:
                 df_new[bool_col] = df_new[bool_col].astype('boolean')
+            else:
+                df_new[bool_col] = pd.Series(pd.NA, index=df_new.index, dtype='boolean')
         for text_col in ('dia_semana', 'clima'):
             if text_col in df_new.columns:
                 df_new[text_col] = df_new[text_col].astype('string')
+            else:
+                df_new[text_col] = pd.Series(pd.NA, index=df_new.index, dtype='string')
     if df_new.empty: 
         print("Erro: Arquivo de entrada vazio!")
         return
