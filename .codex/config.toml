@@ -1,0 +1,14 @@
+[sandbox_workspace_write]
+network_access = true
+
+[mcp_servers.code-review-graph]
+command = "C:/Users/Boanerges/AppData/Local/Programs/Python/Python313/Scripts/code-review-graph.exe"
+args = ["serve", "--repo", "C:/Users/Boanerges/Desktop/Projetos/Report Preview", "--auto-watch"]
+cwd = "C:/Users/Boanerges/Desktop/Projetos/Report Preview"
+startup_timeout_sec = 60
+tool_timeout_sec = 120
+enabled = true
+
+[mcp_servers.codegraph]
+command = "codegraph"
+args = ["serve", "--mcp"]

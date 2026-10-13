@@ -1242,6 +1242,38 @@ class StateOrchestrator:
             return combined_scores, trends
         return combined_scores
 
+    HYBRID_STGAT_WEIGHT = 0.20
+
+    def get_combined_risk_hybrid(self, exogenous_shocks=None, return_trends=False):
+        """Modelo oficial: Poisson (80%) + ST-GAT v5 (20%) por ranking percentil.
+
+        A ordem de Fortaleza vem do blend de percentis; os valores de score são
+        reatribuídos a partir da distribuição do Poisson para preservar as faixas de risco.
+        """
+        poisson_scores, trends = self.get_combined_risk(exogenous_shocks, return_trends=True)
+        poisson_scores = dict(poisson_scores)
+        spec = self.stgat_v5_specialists.get('fortaleza')
+        if spec is not None:
+            try:
+                stgat_scores = self.get_combined_risk_stgat_v5(exogenous_shocks)
+                names = [normalize_name(str(n)) for n in spec['data']['nodes_gdf']['name']]
+                names = [n for n in names if n in poisson_scores and n in stgat_scores]
+                if len(names) > 1:
+                    p = pd.Series([poisson_scores[n] for n in names])
+                    s = pd.Series([stgat_scores[n] for n in names])
+                    w = self.HYBRID_STGAT_WEIGHT
+                    blend = (1.0 - w) * p.rank(pct=True) + w * s.rank(pct=True)
+                    # Desempate pelo próprio Poisson
+                    order = pd.DataFrame({'b': blend, 'p': p}).sort_values(['b', 'p'], ascending=False).index
+                    sorted_vals = sorted(p.tolist(), reverse=True)
+                    for rank_pos, idx in enumerate(order):
+                        poisson_scores[names[idx]] = float(sorted_vals[rank_pos])
+            except Exception as e:
+                print(f"⚠️ [Hybrid] Falha no blend ST-GAT; usando Poisson puro: {e}")
+        if return_trends:
+            return poisson_scores, trends
+        return poisson_scores
+
     def get_combined_risk(self, exogenous_shocks=None, return_trends=False):
         # Generate cache key based on exogenous shocks
         if exogenous_shocks is None:

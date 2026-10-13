@@ -12,6 +12,19 @@ from math import radians, cos, sin, asin, sqrt
 import re
 import unicodedata
 import logging
+import tempfile
+import time
+
+from src.core.occurrence_integrity import (
+    collect_mysql_ids,
+    deduplicate_mysql_rows,
+    normalize_mysql_id,
+    sanitize_death_count,
+)
+from src.core.fortaleza_bairros import (
+    canonicalize_fortaleza_bairro,
+    load_official_fortaleza_bairros,
+)
 
 def haversine(lon1, lat1, lon2, lat2):
     lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
@@ -67,14 +80,7 @@ def clean_name(n):
 
 def sanitize_qtd_mortes(value, event_type):
     """CVLI sem qtd_mortes explícita ainda representa pelo menos uma morte."""
-    try:
-        qty = float(value)
-    except Exception:
-        qty = np.nan
-
-    if not np.isfinite(qty) or qty <= 0:
-        return 1.0 if str(event_type or '').lower() == 'cvli' else 0.0
-    return qty
+    return sanitize_death_count(value, event_type)
 
 
 def resolve_occurrence_location(bairro, cidade):
@@ -83,7 +89,9 @@ def resolve_occurrence_location(bairro, cidade):
     cidade_clean = clean_name(cidade)
 
     if cidade_clean == 'FORTALEZA':
-        return bairro_clean or cidade_clean
+        # Mantém os 121 bairros oficiais como domínio fechado.  A tentativa
+        # ocorre antes de clean_name, que historicamente colapsava I/II.
+        return canonicalize_fortaleza_bairro(bairro) or bairro_clean or cidade_clean
     if cidade_clean:
         return cidade_clean
     return bairro_clean
@@ -172,54 +180,54 @@ def update_geo_streets_cache(df):
             json.dump(streets_data, f, ensure_ascii=False, indent=4)
         logging.info(f"✅ Cache de ruas atualizado: {len(streets_data)} logradouros mapeados.")
 
+def _committed_mysql_ids(enriched_csv_path):
+    """Somente o CSV consolidado comprova incorporação; o JSON é um lote pendente."""
+    if not os.path.exists(enriched_csv_path):
+        return set()
+    frame = pd.read_csv(
+        enriched_csv_path, dtype={'id': 'string', 'id_evento': 'string'},
+        low_memory=False,
+    )
+    if 'id' not in frame.columns:
+        raise ValueError("CSV consolidado sem coluna id; reconciliação MySQL interrompida.")
+    frame = deduplicate_mysql_rows(frame)
+    return collect_mysql_ids(frame['id'])
+
+
+def _write_mysql_batch(json_path, json_data):
+    """Troca o lote apenas depois de serializá-lo integralmente."""
+    directory = os.path.dirname(json_path)
+    os.makedirs(directory, exist_ok=True)
+    temporary_path = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode='w', encoding='utf-8', dir=directory, suffix='.tmp', delete=False,
+        ) as stream:
+            temporary_path = stream.name
+            json.dump(json_data, stream, ensure_ascii=False, indent=4)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary_path, json_path)
+    finally:
+        if temporary_path and os.path.exists(temporary_path):
+            os.remove(temporary_path)
+
+
 def check_and_download_mysql_data():
     """
-    Verifica se há novos dados no banco de dados MySQL e baixa apenas os novos registros.
+    Reconcilia IDs com o CSV consolidado e baixa linhas ainda não incorporadas.
     """
     import pymysql
     import decimal
+    import datetime
     from dotenv import load_dotenv
     load_dotenv()
 
     json_path = os.path.join('data', 'raw', 'dados_status.json')
     enriched_csv_path = os.path.join('data', 'raw', 'dados_status_ocorrencias_gerais_ENRIQUECIDO.csv')
-    max_local_id = 0
-    local_data_exists = False
-    
-    # 1. Obter o maior ID do CSV Enriquecido Oficial para evitar reprocessar registros antigos
-    if os.path.exists(enriched_csv_path):
-        try:
-            df_enr = pd.read_csv(enriched_csv_path, usecols=['id'], low_memory=False)
-            if not df_enr.empty and 'id' in df_enr.columns:
-                max_local_id = int(pd.to_numeric(df_enr['id'], errors='coerce').max())
-                local_data_exists = True
-                logging.info(f"ID máximo local no ENRIQUECIDO.csv: {max_local_id}")
-        except Exception as e:
-            logging.warning(f"Não foi possível ler ENRIQUECIDO.csv: {e}")
-
-    # Fallback pro dados_status.json se o CSV não estiver presente
-    if not local_data_exists and os.path.exists(json_path):
-        try:
-            with open(json_path, 'r', encoding='utf-8') as f:
-                content = json.load(f)
-            for item in content:
-                if isinstance(item, dict) and item.get('type') == 'table' and 'data' in item:
-                    data_rows = item['data']
-                    if data_rows:
-                        ids = []
-                        for row in data_rows:
-                            val = row.get('id')
-                            if val is not None:
-                                try:
-                                    ids.append(int(float(val)))
-                                except ValueError:
-                                    pass
-                        if ids:
-                            max_local_id = max(ids)
-                            local_data_exists = True
-                            logging.info(f"ID máximo local no dados_status.json: {max_local_id}")
-        except Exception as e:
-            logging.warning(f"Não foi possível ler dados_status.json local: {e}")
+    committed_ids = _committed_mysql_ids(enriched_csv_path)
+    max_local_id = max((int(value) for value in committed_ids), default=0)
+    logging.info(f"ID máximo incorporado no ENRIQUECIDO.csv: {max_local_id}")
             
     host = os.getenv('MYSQL_HOST', '').replace('"', '')
     port = int(os.getenv('MYSQL_PORT', '3306').replace('"', ''))
@@ -228,8 +236,7 @@ def check_and_download_mysql_data():
     database = os.getenv('MYSQL_DATABASE', '').replace('"', '')
     
     if not host or not user or not database:
-        logging.warning("Configurações de conexão MySQL incompletas no arquivo .env. Pulando verificação do banco.")
-        return
+        raise RuntimeError("Configurações de conexão MySQL incompletas; sincronização interrompida.")
         
     try:
         conn = pymysql.connect(
@@ -243,15 +250,35 @@ def check_and_download_mysql_data():
         )
         try:
             with conn.cursor() as cursor:
-                cursor.execute("SELECT MAX(id) as max_id FROM dados_status")
-                res = cursor.fetchone()
-                max_db_id = res['max_id'] if res and res['max_id'] is not None else 0
+                # Não inferir lacunas pela sequência numérica: IDs ausentes no
+                # próprio banco (exclusões/auto_increment) não são dados a baixar.
+                cursor.execute("SELECT id FROM dados_status ORDER BY id")
+                db_ids = set()
+                for row in cursor.fetchall():
+                    row_id = normalize_mysql_id(row['id'])
+                    if row_id is None:
+                        raise ValueError("MySQL retornou uma linha sem id.")
+                    db_ids.add(row_id)
+                max_db_id = max((int(value) for value in db_ids), default=0)
                 logging.info(f"ID máximo no banco de dados MySQL: {max_db_id}")
                 
-                if max_db_id > max_local_id or not local_data_exists:
-                    logging.info(f"Novos dados detectados no MySQL. Baixando registros com id > {max_local_id}...")
-                    cursor.execute("SELECT * FROM dados_status WHERE id > %s ORDER BY id DESC", (max_local_id,))
-                    rows = cursor.fetchall()
+                missing_ids = sorted(db_ids - committed_ids, key=int, reverse=True)
+                if missing_ids:
+                    gaps = sum(int(value) <= max_local_id for value in missing_ids)
+                    logging.info(f"Baixando {len(missing_ids)} IDs não incorporados ({gaps} lacunas históricas).")
+                    rows = []
+                    for offset in range(0, len(missing_ids), 1000):
+                        batch_ids = missing_ids[offset:offset + 1000]
+                        placeholders = ', '.join(['%s'] * len(batch_ids))
+                        cursor.execute(
+                            f"SELECT * FROM dados_status WHERE id IN ({placeholders}) ORDER BY id DESC",
+                            tuple(int(value) for value in batch_ids),
+                        )
+                        rows.extend(cursor.fetchall())
+                    downloaded = deduplicate_mysql_rows(pd.DataFrame(rows, dtype=object))
+                    if 'id' not in downloaded or collect_mysql_ids(downloaded['id']) != set(missing_ids):
+                        raise RuntimeError("Download MySQL incompleto; lote anterior preservado.")
+                    rows = downloaded.to_dict('records')
                     
                     formatted_rows = []
                     for row in rows:
@@ -261,19 +288,18 @@ def check_and_download_mysql_data():
                                 formatted_row[k] = None
                             elif isinstance(v, (int, float, decimal.Decimal)):
                                 formatted_row[k] = str(v)
-                            elif hasattr(v, 'strftime'):
-                                if hasattr(v, 'hour'):
-                                    import datetime
-                                    if isinstance(v, datetime.timedelta):
-                                        total_seconds = int(v.total_seconds())
-                                        hours = total_seconds // 3600
-                                        minutes = (total_seconds % 3600) // 60
-                                        seconds = total_seconds % 60
-                                        formatted_row[k] = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
-                                    else:
-                                        formatted_row[k] = v.strftime('%H:%M:%S')
-                                else:
-                                    formatted_row[k] = v.strftime('%Y-%m-%d')
+                            elif isinstance(v, datetime.timedelta):
+                                total_seconds = int(v.total_seconds())
+                                hours = total_seconds // 3600
+                                minutes = (total_seconds % 3600) // 60
+                                seconds = total_seconds % 60
+                                formatted_row[k] = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+                            elif isinstance(v, datetime.datetime):
+                                formatted_row[k] = v.isoformat(sep=' ')
+                            elif isinstance(v, datetime.date):
+                                formatted_row[k] = v.strftime('%Y-%m-%d')
+                            elif isinstance(v, datetime.time):
+                                formatted_row[k] = v.strftime('%H:%M:%S')
                             elif isinstance(v, bytes):
                                 formatted_row[k] = v.decode('utf-8', errors='ignore')
                             else:
@@ -291,9 +317,7 @@ def check_and_download_mysql_data():
                         }
                     ]
                     
-                    os.makedirs(os.path.dirname(json_path), exist_ok=True)
-                    with open(json_path, 'w', encoding='utf-8') as f:
-                        json.dump(json_data, f, ensure_ascii=False, indent=4)
+                    _write_mysql_batch(json_path, json_data)
                     logging.info(f"Sucesso! {len(formatted_rows)} registros salvos em {json_path}")
                     return True
                 else:
@@ -302,11 +326,26 @@ def check_and_download_mysql_data():
             conn.close()
     except Exception as e:
         logging.error(f"Erro ao consultar banco de dados MySQL: {e}")
+        raise
     return False
 
-def process_ism_data(sync_mysql: bool = False, update_geo_cache: bool = False):
+def process_ism_data(
+    sync_mysql: bool = False,
+    update_geo_cache: bool = False,
+    fortaleza_node_mode: str = 'top40',
+    processed_dir: str | None = None,
+):
     """Rebuild local dos tensores, com sincronizações caras somente por opt-in."""
     logging.info("🚀 Iniciando Rebuild ISM com Inteligência Territorial Atualizada...")
+    mode_sizes = {'top40': 40, 'top60': 60, 'top40_plus20_recent': 60, 'all_official': 121}
+    if fortaleza_node_mode not in mode_sizes:
+        raise ValueError(f"Modo Fortaleza inválido: {fortaleza_node_mode}. Use um de {sorted(mode_sizes)}.")
+    # Qualquer malha experimental fica isolada do tensor promovido em produção.
+    if processed_dir is None:
+        processed_dir = (
+            'data/processed' if fortaleza_node_mode == 'top40'
+            else os.path.join('data', 'processed', 'experiments', fortaleza_node_mode)
+        )
     
     # Sincronização e merge podem processar milhares de registros e usar APIs
     # externas. Um rebuild normal só usa os dados já consolidados localmente.
@@ -317,12 +356,13 @@ def process_ism_data(sync_mysql: bool = False, update_geo_cache: bool = False):
                 import subprocess
                 merge_script = os.path.join('scripts', 'merge_new_data.py')
                 if os.path.exists(merge_script):
-                    subprocess.run([sys.executable, merge_script, os.path.join('data', 'raw', 'dados_status.json')], check=False)
+                    subprocess.run([sys.executable, merge_script, os.path.join('data', 'raw', 'dados_status.json')], check=True)
                     logging.info("Merge finalizado. O script de merge disparou a execução subsequente de data_processing.py.")
                     return
-                logging.warning("Script scripts/merge_new_data.py não encontrado.")
+                raise FileNotFoundError("Script scripts/merge_new_data.py não encontrado.")
         except Exception as e:
             logging.error(f"Erro na extração MySQL automática: {e}")
+            raise
     else:
         logging.info("⏭️ Sincronização MySQL ignorada (use --sync-mysql para executá-la).")
 
@@ -370,20 +410,48 @@ def process_ism_data(sync_mysql: bool = False, update_geo_cache: bool = False):
     # 1. Carregar Ocorrências
     clean_records = []
     if OCORRENCIAS_FILE.endswith('.csv'):
-        occ_raw = pd.read_csv(OCORRENCIAS_FILE)
-        for _, row in occ_raw.iterrows():
-            clean_records.append({
-                'data': pd.to_datetime(str(row.get('data')), errors='coerce'),
-                'tipo': str(row.get('tipo', '')).lower(),
-                'bairro': row.get('bairro'),
-                'cidade': row.get('cidade'),
-                'loc_clean': resolve_occurrence_location(row.get('bairro'), row.get('cidade')),
-                'tipo_evento': str(row.get('tipo_evento', '')).upper(),
-                'arma': str(row.get('arma', '')).upper(),
-                'latitude': row.get('latitude'),
-                'longitude': row.get('longitude'),
-                'qtd_mortes': sanitize_qtd_mortes(row.get('qtd_mortes', 1), row.get('tipo', '')) # Nova coluna de anomalias
-            })
+        occ_raw = pd.read_csv(
+            OCORRENCIAS_FILE, dtype={'id': 'string', 'id_evento': 'string'}, low_memory=False,
+        )
+        original_count = len(occ_raw)
+        occ_raw = deduplicate_mysql_rows(occ_raw)
+        logging.info(f"Integridade MySQL: {original_count - len(occ_raw)} cópias equivalentes removidas da leitura.")
+        logging.info("Normalizando %s ocorrências CSV (vetorizado)...", len(occ_raw))
+
+        def source_column(name, default=None):
+            if name in occ_raw:
+                return occ_raw[name]
+            return pd.Series(default, index=occ_raw.index)
+
+        bairros = source_column('bairro')
+        cidades = source_column('cidade')
+        location_cache = {}
+
+        def location_key(value):
+            return '' if pd.isna(value) else str(value)
+
+        def resolve_cached(bairro, cidade):
+            key = (location_key(bairro), location_key(cidade))
+            if key not in location_cache:
+                location_cache[key] = resolve_occurrence_location(bairro, cidade)
+            return location_cache[key]
+
+        tipos = source_column('tipo', '').astype(str).str.lower()
+        counts = pd.to_numeric(source_column('qtd_mortes', 1), errors='coerce')
+        clean_records = pd.DataFrame({
+            'data': pd.to_datetime(source_column('data'), errors='coerce'),
+            'tipo': tipos,
+            'bairro': bairros,
+            'cidade': cidades,
+            'loc_clean': [resolve_cached(bairro, cidade) for bairro, cidade in zip(bairros, cidades)],
+            'tipo_evento': source_column('tipo_evento', '').astype(str).str.upper(),
+            'arma': source_column('arma', '').astype(str).str.upper(),
+            'latitude': source_column('latitude'),
+            'longitude': source_column('longitude'),
+            # CVLI sem total explícito continua representando uma vítima.
+            'qtd_mortes': counts.where(counts.gt(0), np.where(tipos.eq('cvli'), 1.0, 0.0)),
+        }).to_dict('records')
+        logging.info("Normalização concluída (%s combinações territoriais únicas).", len(location_cache))
     else:
         with open(OCORRENCIAS_FILE, 'r', encoding='utf-8') as f:
             occ_raw = json.load(f)
@@ -402,6 +470,9 @@ def process_ism_data(sync_mysql: bool = False, update_geo_cache: bool = False):
             
             try:
                 clean_records.append({
+                    'id': extract_scalar('id'),
+                    'id_evento': extract_scalar('id_evento'),
+                    'hora': extract_scalar('hora'),
                     'data': pd.to_datetime(str(dt_val), errors='coerce'),
                     'tipo': str(extract_scalar('tipo') or '').lower(),
                     'bairro': extract_scalar('bairro'),
@@ -418,7 +489,7 @@ def process_ism_data(sync_mysql: bool = False, update_geo_cache: bool = False):
                 })
             except: continue
     
-    occ_df = pd.DataFrame(clean_records).dropna(subset=['data'])
+    occ_df = deduplicate_mysql_rows(pd.DataFrame(clean_records)).dropna(subset=['data'])
     occ_df['cidade_clean'] = occ_df['cidade'].apply(normalize_text)
     
     # Geocodificação chama serviços externos ponto a ponto; ela não é necessária
@@ -429,34 +500,26 @@ def process_ism_data(sync_mysql: bool = False, update_geo_cache: bool = False):
         logging.info("⏭️ Atualização do cache de ruas ignorada (use --update-geo-cache para executá-la).")
 
     # --- FILTRAGEM DE MORTES AO ACASO (ANOMALIAS NÃO-TÁTICAS) ---
-    def is_random_death(row, fac_dict):
-        if row['tipo'] != 'cvli': return False
-        
-        # Indicadores de Ação Violenta (Tática)
-        is_firearm = 'FOGO' in str(row.get('arma', '')).upper()
-        is_multi = float(row.get('qtd_mortes', 1)) > 1
-        
-        # Indicadores de Acaso (Outliers)
-        event = str(row.get('tipo_evento', '')).upper()
-        is_domestic = any(t in event for t in ['FEMINICIDIO', 'PARENTE', 'BRIGA', 'VIZINHO', 'PASSIONAL', 'CULPOSO'])
-        is_cold_weapon = any(t in str(row.get('arma', '')).upper() for t in ['BRANCA', 'FACA', 'PAULADA', 'ESPANCAMENTO', 'PEDRADA'])
-        
-        # Inteligência de Área
-        loc = row['loc_clean']
-        faction = fac_dict.get(loc, {}).get('faction', 'NEUTRO').upper()
-        is_neutral_area = faction == 'NEUTRO'
-        
-        # Regra de Exclusão (Refinada): 
-        # O "Tribunal do Crime" usa meios brutais (pedradas/pauladas) em áreas dominadas.
-        # Só excluímos se for área NEUTRA E (Arma Branca/Doméstico/Briga) E (Apenas 1 vítima)
-        if is_neutral_area and not is_firearm and not is_multi:
-            if is_domestic or is_cold_weapon:
-                return True
-        
-        return False
-
+    # Vetorizado: o apply por linha tornava o rebuild aparentemente travado em
+    # bases grandes. A expressão preserva exatamente a regra anterior.
+    filter_started = time.perf_counter()
     initial_cvli = len(occ_df[occ_df['tipo'] == 'cvli'])
-    occ_df['acaso'] = occ_df.apply(lambda r: is_random_death(r, faccoes_dict), axis=1)
+    faction_by_location = {name: intel.get('faction', 'NEUTRO').upper() for name, intel in faccoes_dict.items()}
+    factions = occ_df['loc_clean'].map(faction_by_location).fillna('NEUTRO')
+    is_cvli = occ_df['tipo'].eq('cvli')
+    is_firearm = occ_df['arma'].str.contains('FOGO', regex=False, na=False)
+    is_multi = pd.to_numeric(occ_df['qtd_mortes'], errors='coerce').fillna(1).gt(1)
+    is_domestic = occ_df['tipo_evento'].str.contains(
+        'FEMINICIDIO|PARENTE|BRIGA|VIZINHO|PASSIONAL|CULPOSO', regex=True, na=False,
+    )
+    is_cold_weapon = occ_df['arma'].str.contains(
+        'BRANCA|FACA|PAULADA|ESPANCAMENTO|PEDRADA', regex=True, na=False,
+    )
+    occ_df['acaso'] = is_cvli & factions.eq('NEUTRO') & ~is_firearm & ~is_multi & (is_domestic | is_cold_weapon)
+    logging.info(
+        "Filtro tático avaliado para %s ocorrências em %.2fs.",
+        len(occ_df), time.perf_counter() - filter_started,
+    )
     
     # Excluir mortes ao acaso para limpar o sinal preditivo
     acaso_count = len(occ_df[occ_df['acaso'] == True])
@@ -532,12 +595,35 @@ def process_ism_data(sync_mysql: bool = False, update_geo_cache: bool = False):
         })
     
     df_pool = pd.DataFrame(pre_records).drop_duplicates(subset=['name'])
+
+    # A malha da capital não vem mais do cache legado de centros. Ela é
+    # reconstruída integralmente a partir dos 121 bairros oficiais. Metadados
+    # auxiliares são aproveitados somente quando o nome já foi reconciliado.
+    official_fortaleza = load_official_fortaleza_bairros()
+    legacy_fortaleza = df_pool[df_pool['regiao'] == 'fortaleza'].set_index('name')
+    official_fortaleza['regiao'] = 'fortaleza'
+    official_fortaleza['faction'] = official_fortaleza['name'].map(
+        legacy_fortaleza['faction'] if not legacy_fortaleza.empty else pd.Series(dtype='object')
+    ).fillna('NEUTRO')
+    official_fortaleza['tension_index'] = official_fortaleza['faction'].map(
+        lambda value: 1.0 if value == 'DISPUTA' else (0.5 if value != 'NEUTRO' else 0.0)
+    )
+    official_fortaleza['recent_cvli'] = official_fortaleza['name'].map(fortaleza_cvli_ranking_recent).fillna(0)
+    official_fortaleza['total_cvli'] = official_fortaleza['name'].map(fortaleza_cvli_counts_total).fillna(0)
+    official_fortaleza['structural_top40'] = (
+        official_fortaleza['recent_cvli'].rank(method='first', ascending=False) <= 40
+    )
+    df_pool = pd.concat([
+        df_pool[df_pool['regiao'] != 'fortaleza'],
+        official_fortaleza.drop(columns=['official_name']),
+    ], ignore_index=True)
     
     # Seleção Top-K por Região baseada no ranking de CVLI recente (2 anos)
     final_records = []
     
-    # 1. Fortaleza: Top 40 bairros por CVLI recente
-    f_all = df_pool[df_pool['regiao'] == 'fortaleza'].sort_values('recent_cvli', ascending=False).head(40)
+    # 1. Fortaleza: variantes experimentais, todas sobre a mesma malha oficial.
+    f_pool = df_pool[df_pool['regiao'] == 'fortaleza'].sort_values('recent_cvli', ascending=False)
+    f_all = f_pool.head(mode_sizes[fortaleza_node_mode])
     final_records.extend(f_all.to_dict('records'))
     
     # 2. RMF: Top 40 municípios/bairros por CVLI recente (todas as cidades)
@@ -551,7 +637,10 @@ def process_ism_data(sync_mysql: bool = False, update_geo_cache: bool = False):
     nodes_df = pd.DataFrame(final_records).reset_index(drop=True)
     nodes_gdf = gpd.GeoDataFrame(nodes_df, geometry=gpd.points_from_xy(nodes_df.long, nodes_df.lat), crs="EPSG:4326")
     
-    logging.info(f"📊 Malha Final: Fortaleza({len(f_all)}), RMF({len(rmf)}), Interior({len(i50)})")
+    logging.info(
+        f"📊 Malha Final: Fortaleza({len(f_all)}, modo={fortaleza_node_mode}), "
+        f"RMF({len(rmf)}), Interior({len(i50)})"
+    )
 
     # 4. Construir Tensores (Otimizado)
     # Janela Dinâmica: 01/01/2022 até a última data disponível (Maio/2026+)
@@ -716,8 +805,8 @@ def process_ism_data(sync_mysql: bool = False, update_geo_cache: bool = False):
                     if dist < 6.0 and factions[i] != 'NEUTRO' and factions[j] != 'NEUTRO' and factions[i] != factions[j]:
                         adj_conflict[i, j] = 1.0
         
-        os.makedirs('data/processed', exist_ok=True)
-        with open(f'data/processed/processed_{reg}.pkl', 'wb') as f:
+        os.makedirs(processed_dir, exist_ok=True)
+        with open(os.path.join(processed_dir, f'processed_{reg}.pkl'), 'wb') as f:
             pickle.dump({'node_features': features, 'adj_geo': adj_geo, 'adj_conflict': adj_conflict, 'nodes_gdf': reg_nodes, 'dates': date_range}, f)
         logging.info(f"✅ {reg.upper()} Concluído (V33 Features).")
 
@@ -731,9 +820,25 @@ if __name__ == "__main__":
         help="Verifica o MySQL e executa o merge de novos dados antes do rebuild.",
     )
     parser.add_argument(
+        "--fortaleza-node-mode",
+        choices=['top40', 'top60', 'top40_plus20_recent', 'all_official'],
+        default='top40',
+        help="Malha Fortaleza; modos diferentes de top40 são salvos em data/processed/experiments/.",
+    )
+    parser.add_argument(
+        "--processed-dir",
+        default=None,
+        help="Diretório de saída dos tensores; use apenas para artefatos explicitamente isolados.",
+    )
+    parser.add_argument(
         "--update-geo-cache",
         action="store_true",
         help="Atualiza o cache de ruas por geocodificação externa.",
     )
     args = parser.parse_args()
-    process_ism_data(sync_mysql=args.sync_mysql, update_geo_cache=args.update_geo_cache)
+    process_ism_data(
+        sync_mysql=args.sync_mysql,
+        update_geo_cache=args.update_geo_cache,
+        fortaleza_node_mode=args.fortaleza_node_mode,
+        processed_dir=args.processed_dir,
+    )

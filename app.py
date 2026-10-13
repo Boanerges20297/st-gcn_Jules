@@ -85,9 +85,9 @@ logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-RISK_MODEL_NAME = "Poisson Ranker Estadual"
-DEFAULT_MODEL_MODE = "stgat_v5"
-DEFAULT_MODEL_LABEL = "ST-GAT v5 (DeepSTGAT_v5 Ativo)"
+RISK_MODEL_NAME = "Híbrido Poisson 80% + ST-GAT v5 20%"
+DEFAULT_MODEL_MODE = "hybrid"
+DEFAULT_MODEL_LABEL = "Híbrido Poisson 80% + ST-GAT v5 20%"
 STATIC_EXPORT_SCRIPT = os.path.join(BASE_DIR, 'scripts', 'export_static_snapshot.py')
 STATIC_EXPORT_OUTPUT_DIR = os.path.normpath(
     os.environ.get('STATIC_EXPORT_OUTPUT_DIR', os.path.join(BASE_DIR, 'static_export', 'data'))
@@ -280,21 +280,8 @@ def invalidate_api_risk_cache():
 
 
 def normalize_model_mode(value) -> str:
-    mode = str(value or DEFAULT_MODEL_MODE).strip().lower()
-    aliases = {
-        'stgat': 'stgat',
-        'default': DEFAULT_MODEL_MODE,
-        'stgat_v5': DEFAULT_MODEL_MODE,
-        'deepstgat_v5': DEFAULT_MODEL_MODE,
-        'v5': DEFAULT_MODEL_MODE,
-        'cvli_tactical': 'cvli_tactical',
-        'cvli_tactical_only': 'cvli_tactical',
-        'tactical': 'cvli_tactical',
-        'short20_mix': 'short20_mix',
-        'short20': 'short20_mix',
-        'shortlist20': 'short20_mix',
-    }
-    return aliases.get(mode, DEFAULT_MODEL_MODE)
+    # Modelo híbrido é o único oficial; parâmetros legados são ignorados.
+    return DEFAULT_MODEL_MODE
 
 
 def _load_optional_cvli_models():
@@ -308,10 +295,10 @@ def _load_optional_cvli_models():
     shortlist_summary_path = os.path.join(BASE_DIR, 'outputs', 'cvli_shortlist_rerank_summary.json')
 
     optional_models = {
-        'stgat_v5': {
-            'mode': 'stgat_v5',
+        'hybrid': {
+            'mode': 'hybrid',
             'label': DEFAULT_MODEL_LABEL,
-            'description': 'Modelo padrão DeepSTGAT_v5 retreinado, com atenção por aresta e Binomial Negativa.',
+            'description': 'Modelo oficial: blend por ranking percentil com 80% Poisson Ranker + 20% ST-GAT v5.',
             'kind': 'champion',
             'fortaleza_scores': {},
             'metrics': None,
@@ -431,7 +418,7 @@ def _get_model_selection_meta(selected_mode: str):
     optional_models = _load_optional_cvli_models()
     selected = optional_models.get(selected_mode) or optional_models[DEFAULT_MODEL_MODE]
     available = []
-    for mode in (DEFAULT_MODEL_MODE, 'stgat', 'cvli_tactical', 'short20_mix'):
+    for mode in (DEFAULT_MODEL_MODE,):
         model = optional_models.get(mode)
         if not model:
             continue
@@ -458,8 +445,8 @@ def _resolve_optional_model_score(name_norm: str, fortaleza_scores: dict):
 
 
 def _score_map_for_model_mode(model_mode: str, exogenous_shocks=None, return_trends=False):
-    if model_mode == 'stgat_v5' and hasattr(orchestrator, 'get_combined_risk_stgat_v5'):
-        return orchestrator.get_combined_risk_stgat_v5(exogenous_shocks, return_trends=return_trends)
+    if hasattr(orchestrator, 'get_combined_risk_hybrid'):
+        return orchestrator.get_combined_risk_hybrid(exogenous_shocks, return_trends=return_trends)
     return orchestrator.get_combined_risk(exogenous_shocks, return_trends=return_trends)
 
 
@@ -2562,7 +2549,7 @@ def get_risk():
         return jsonify({'error': 'Inicializando...'}), 503
         
     target_region = request.args.get('region', 'global').lower()
-    selected_model_mode = normalize_model_mode(request.args.get('model_mode', 'stgat_v5'))
+    selected_model_mode = normalize_model_mode(request.args.get('model_mode', DEFAULT_MODEL_MODE))
     selected_model_meta, available_model_modes = _get_model_selection_meta(selected_model_mode)
     
     global _API_RISK_CACHE
@@ -3015,18 +3002,14 @@ def get_risk():
             print(f"Erro ao calcular datas de inteligência: {e}")
             meta['intelligence_label'] = "Janela de Inteligência: Ativa"
 
-        if selected_model_mode != 'stgat':
+        if selected_model_mode == DEFAULT_MODEL_MODE:
             metrics = selected_model_meta.get('metrics') or {}
             metric_bits = []
             if isinstance(metrics.get('p10'), (int, float)):
                 metric_bits.append(f"P@10 hist.: {metrics['p10'] * 100:.1f}%")
             if isinstance(metrics.get('p20'), (int, float)):
                 metric_bits.append(f"P@20 hist.: {metrics['p20'] * 100:.1f}%")
-            meta['model_architecture'] = f"{selected_model_meta.get('label')} (Comparativo Fortaleza)"
-            meta['intelligence_label'] = (
-                f"{meta.get('intelligence_label', 'Janela de Inteligência: Ativa')} • "
-                f"Modo opcional aplicado somente em Fortaleza"
-            )
+            meta['model_architecture'] = selected_model_meta.get('label') or DEFAULT_MODEL_LABEL
             if metric_bits:
                 meta['selected_model_validation_text'] = ' | '.join(metric_bits)
 
@@ -4791,4 +4774,3 @@ if __name__ == "__main__":
     print("="*50 + "\n")
     # Usando 0.0.0.0 para maior compatibilidade, mas o link impresso é localhost
     app.run(host='0.0.0.0', port=app_port, debug=debug_mode, use_reloader=False)
-

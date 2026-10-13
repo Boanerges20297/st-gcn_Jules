@@ -3,6 +3,7 @@ train_all_specialists.py - Script oficial de retreino (FOCO CVLI - HONESTY PARAD
 Versao 2026-07-24: Horizonte 30d, MemPalace Universal, Honesty Constraint.
 """
 import gc
+import json
 import logging
 import math
 import os
@@ -54,9 +55,9 @@ VALIDATION_DAYS = 60
 REGION_CONFIGS = {
     'fortaleza': dict(
         window=120,             # +contexto histórico (era 90)
-        lr=0.00005,             # LR modelo ligeiramente maior
-        epochs=100,
-        patience=25,
+        lr=0.000015,            # regime conservador: preserva o ranking validado cedo
+        epochs=40,
+        patience=6,
         dropout=0.40,
         margin=1.0,
         k_eval=10,
@@ -65,13 +66,27 @@ REGION_CONFIGS = {
         output_name=os.path.join('legacy_torch', 'fortaleza_model_active.pth'),
         model_class='DeepSTGAT_v5',
         loss_type='negbinom',
-        nb_r_init=5.0,          # começa em r=5, converge para r real (~1.5) rapidamente
-        nb_r_lr=0.005,          # LR dedicado para log_r — 100x maior que o modelo
-        ranking_weight=3.0,     # mais ênfase no ListMLE
+        nb_r_init=2.0,
+        nb_r_lr=0.00005,        # evita que a dispersão absorva a otimização do ranking
+        nb_r_min=0.75,
+        nb_r_max=50.0,
+        ranking_weight=2.0,
         indecision_weight=0.2,
-        weight_decay=0.01,
+        weight_decay=0.02,
         scheduler='onecycle',
+        onecycle_pct_start=0.10,
+        validation_p10_weight=0.60,
+        validation_min_delta=0.0025,
+        incumbent_validation_score=0.42734,  # E002 anterior: 0.6*P@10 + 0.4*P@20
         bimestral_filter=True,
+        # Hiperparâmetros para fine-tuning RL (SCST)
+        rl_lr=0.000005,
+        rl_epochs=6,
+        rl_patience=4,
+        rl_weight=0.15,
+        rl_fp_penalty=0.10,
+        rl_w10=0.60,
+        rl_w20=0.40,
     ),
     'rmf': dict(
         window=14,
@@ -202,6 +217,63 @@ def build_temporal_split_config(dates):
     }
 
 
+def negative_binomial_from_mean(mu, r):
+    """Create a PyTorch NegativeBinomial parameterized by its mean ``mu``."""
+    probs = (mu / (r + mu)).clamp(1e-6, 1.0 - 1e-6)
+    return torch.distributions.NegativeBinomial(total_count=r, probs=probs)
+
+
+def calculate_batch_metrics(pred, target, loss_type, active_mask=None):
+    """Return deterministic ranking and calibration metrics for one window."""
+    pred = pred.detach().squeeze()
+    target = target.detach().squeeze()
+    if active_mask is not None and active_mask.sum() > 0:
+        mask = active_mask.detach().bool()
+        pred = pred[mask]
+        target = target[mask]
+
+    positive_count = int((target > 0).sum().item())
+    metrics = {
+        'nodes_evaluated': int(target.numel()),
+        'target_positive_nodes': positive_count,
+        'target_total_events': float(target.sum().item()),
+    }
+    for k in (10, 20):
+        predicted_k = min(k, int(target.numel()))
+        true_k = min(k, positive_count)
+        if predicted_k == 0 or true_k == 0:
+            hits = 0
+        else:
+            pred_idx = set(torch.topk(pred, predicted_k).indices.cpu().tolist())
+            true_idx = set(torch.topk(target, true_k).indices.cpu().tolist())
+            hits = len(pred_idx & true_idx)
+        metrics[f'hits_at_{k}'] = hits
+        metrics[f'misses_at_{k}'] = true_k - hits
+        metrics[f'false_positives_at_{k}'] = predicted_k - hits
+        metrics[f'precision_at_{k}'] = hits / true_k if true_k else 0.0
+
+    if loss_type == 'negbinom':
+        estimate = F.softplus(pred)
+        expected = target.float()
+        metrics['error_scale'] = 'count_mean'
+    else:
+        estimate = torch.sigmoid(pred)
+        expected = (target > 0).float()
+        metrics['error_scale'] = 'event_probability'
+    residual = estimate - expected
+    metrics['mae'] = float(residual.abs().mean().item())
+    metrics['rmse'] = float(torch.sqrt((residual ** 2).mean()).item())
+    metrics['prediction_mean'] = float(estimate.mean().item())
+    metrics['target_mean'] = float(expected.mean().item())
+    return metrics
+
+
+def _detached_float(value):
+    if torch.is_tensor(value):
+        return float(value.detach().item())
+    return float(value)
+
+
 class NegBinomRankingLoss(nn.Module):
     """
     Loss para contagem de CVLI com distribuição Binomial Negativa + ListMLE.
@@ -213,17 +285,35 @@ class NegBinomRankingLoss(nn.Module):
     - ListMLE alinha diretamente com P@K em vez de minimizar erro de magnitude
 
     Parâmetros:
-        log_r: dispersão aprendível (r = exp(log_r), clamp [0.1, 50])
+        log_r: dispersão aprendível (r = exp(log_r), limitado por nb_r_min/nb_r_max)
                 Começa em r=nb_r_init. Converge para a overdispersão real dos dados.
         ranking_weight: peso do componente ListMLE
         indecision_weight: peso do gap penalty (top-K vs média)
     """
 
-    def __init__(self, nb_r_init=2.0, ranking_weight=2.0, indecision_weight=0.2):
+    def __init__(
+        self,
+        nb_r_init=2.0,
+        ranking_weight=2.0,
+        indecision_weight=0.2,
+        nb_r_min=0.1,
+        nb_r_max=50.0,
+    ):
         super().__init__()
+        if not 0 < nb_r_min <= nb_r_init <= nb_r_max:
+            raise ValueError('Esperado 0 < nb_r_min <= nb_r_init <= nb_r_max')
         self.log_r = nn.Parameter(torch.tensor(math.log(nb_r_init)))
         self.ranking_weight = ranking_weight
         self.indecision_weight = indecision_weight
+        self.nb_r_min = float(nb_r_min)
+        self.nb_r_max = float(nb_r_max)
+
+    def dispersion(self):
+        return self.log_r.exp().clamp(min=self.nb_r_min, max=self.nb_r_max)
+
+    def constrain_dispersion_(self):
+        with torch.no_grad():
+            self.log_r.clamp_(math.log(self.nb_r_min), math.log(self.nb_r_max))
 
     def forward(self, pred, target, active_mask=None, cold_streak_signal=None):
         # Filtro de nós ativos
@@ -234,16 +324,17 @@ class NegBinomRankingLoss(nn.Module):
                 cold_streak_signal = cold_streak_signal[active_mask]
 
         mu = F.softplus(pred.squeeze())                              # pred → μ positivo
-        r = self.log_r.exp().clamp(min=0.1, max=50.0)               # dispersão aprendível
+        r = self.dispersion()                                      # dispersão aprendível
 
         # Binomial Negativa NLL: -log P(y | μ, r)
-        p = (r / (r + mu)).clamp(1e-6, 1.0 - 1e-6)
-        dist = torch.distributions.NegativeBinomial(total_count=r, probs=p)
+        dist = negative_binomial_from_mean(mu, r)
         nb_loss = -dist.log_prob(target.float()).mean()
 
-        # ListMLE: maximiza P(ranking previsto = ranking real)
-        # Alinha diretamente com P@K sem memorizar magnitudes absolutas
-        rank_loss = -(F.softmax(target.float(), dim=0) * F.log_softmax(mu, dim=0)).sum()
+        # Entropia cruzada listwise: aproxima a distribuição espacial do alvo.
+        # Não é o ListMLE clássico (Plackett-Luce).
+        listwise_ce_loss = -(
+            F.softmax(target.float(), dim=0) * F.log_softmax(mu, dim=0)
+        ).sum()
 
         # Gap penalty: top-K deve ter μ bem separado do restante
         top_vals, _ = torch.topk(mu, min(10, len(mu)))
@@ -256,7 +347,131 @@ class NegBinomRankingLoss(nn.Module):
             calmness = torch.clamp(-cold_streak_signal / 30.0, 0, 1)
             honesty_penalty = (calmness * mu).mean()
 
-        return nb_loss + self.ranking_weight * rank_loss + self.indecision_weight * indecision_penalty + honesty_penalty
+        total_loss = (
+            nb_loss
+            + self.ranking_weight * listwise_ce_loss
+            + self.indecision_weight * indecision_penalty
+            + honesty_penalty
+        )
+        self.last_components = {
+            'nb_nll': _detached_float(nb_loss),
+            'listwise_ce': _detached_float(listwise_ce_loss),
+            'listwise_weighted': _detached_float(self.ranking_weight * listwise_ce_loss),
+            'indecision': _detached_float(indecision_penalty),
+            'indecision_weighted': _detached_float(self.indecision_weight * indecision_penalty),
+            'honesty': _detached_float(honesty_penalty),
+            'total': _detached_float(total_loss),
+        }
+        return total_loss
+
+
+class SelfCriticalRankingLoss(nn.Module):
+    """
+    Fine-tuning via Aprendizado por Reforco (Self-Critical Policy Gradient / SCST).
+    Otimiza diretamente as metricas operacionais de corte P@10 e P@20 combinadas com
+    a probabilidade de Poisson / Negative Binomial para refinar a fronteira de ranqueamento.
+    """
+
+    def __init__(
+        self,
+        base_criterion,
+        k1=10,
+        k2=20,
+        w10=0.6,
+        w20=0.4,
+        fp_penalty=0.10,
+        rl_weight=0.15,
+    ):
+        super().__init__()
+        self.base_criterion = base_criterion
+        self.k1 = k1
+        self.k2 = k2
+        self.w10 = w10
+        self.w20 = w20
+        self.fp_penalty = fp_penalty
+        self.rl_weight = rl_weight
+
+    def dispersion(self):
+        if hasattr(self.base_criterion, 'dispersion'):
+            return self.base_criterion.dispersion()
+        return None
+
+    def constrain_dispersion_(self):
+        if hasattr(self.base_criterion, 'constrain_dispersion_'):
+            self.base_criterion.constrain_dispersion_()
+
+    @property
+    def log_r(self):
+        if hasattr(self.base_criterion, 'log_r'):
+            return self.base_criterion.log_r
+        return None
+
+    def _compute_reward(self, selected_indices, target):
+        pos_mask = (target > 0)
+        pos_count = int(pos_mask.sum().item())
+        if pos_count == 0:
+            return 0.0
+
+        target_k1 = min(self.k1, pos_count)
+        target_k2 = min(self.k2, pos_count)
+        target_top10 = set(torch.topk(target, target_k1).indices.cpu().tolist())
+        target_top20 = set(torch.topk(target, target_k2).indices.cpu().tolist())
+
+        sel10 = set(selected_indices[:min(self.k1, len(selected_indices))].cpu().tolist())
+        sel20 = set(selected_indices[:min(self.k2, len(selected_indices))].cpu().tolist())
+
+        p10 = len(sel10 & target_top10) / target_k1 if target_k1 else 0.0
+        p20 = len(sel20 & target_top20) / target_k2 if target_k2 else 0.0
+
+        # Penalidade por falso positivo no Top-10
+        fp10 = sum(1 for idx in sel10 if target[idx] == 0) / max(1, len(sel10))
+        return (self.w10 * p10) + (self.w20 * p20) - (self.fp_penalty * fp10)
+
+    def forward(self, pred, target, active_mask=None, cold_streak_signal=None):
+        base_loss = self.base_criterion(pred, target, active_mask=active_mask, cold_streak_signal=cold_streak_signal)
+
+        # Filtrar nós para a amostragem de RL
+        p_work = pred.squeeze()
+        t_work = target.squeeze()
+        if active_mask is not None and active_mask.sum() > 0:
+            p_work = p_work[active_mask]
+            t_work = t_work[active_mask]
+
+        scores = F.softplus(p_work)
+        n_nodes = scores.numel()
+        if n_nodes < self.k1:
+            self.last_components = dict(getattr(self.base_criterion, 'last_components', {}))
+            self.last_components['rl_policy'] = 0.0
+            self.last_components['rl_advantage'] = 0.0
+            return base_loss
+
+        log_probs = F.log_softmax(scores, dim=0)
+
+        # 1. Trajetoria Gulosa (Baseline de comparacao sem gradiente)
+        greedy_indices = torch.topk(scores, min(self.k2, n_nodes)).indices
+        with torch.no_grad():
+            r_greedy = self._compute_reward(greedy_indices, t_work)
+
+        # 2. Amostragem Exploratoria com Ruido Gumbel (Plackett-Luce)
+        gumbel = -torch.empty_like(scores).exponential_().log()
+        perturbed_scores = (scores + 1e-6).log() + gumbel
+        sampled_indices = torch.topk(perturbed_scores, min(self.k2, n_nodes)).indices
+
+        with torch.no_grad():
+            r_sample = self._compute_reward(sampled_indices, t_work)
+            advantage = r_sample - r_greedy
+
+        # 3. Policy gradient: desencoraja escolhas piores e incentiva acertos na fronteira
+        sampled_log_probs = log_probs[sampled_indices]
+        policy_loss = -advantage * sampled_log_probs.sum()
+
+        total_loss = base_loss + self.rl_weight * policy_loss
+
+        self.last_components = dict(getattr(self.base_criterion, 'last_components', {}))
+        self.last_components['rl_policy'] = _detached_float(policy_loss)
+        self.last_components['rl_advantage'] = _detached_float(advantage)
+        self.last_components['total'] = _detached_float(total_loss)
+        return total_loss
 
 
 class BinaryFocalRankingLoss(nn.Module):
@@ -307,20 +522,36 @@ class BinaryFocalRankingLoss(nn.Module):
             calmness = torch.clamp(-cold_streak_signal / 30.0, 0, 1)
             honesty_penalty = (calmness * torch.relu(pred)).mean()
 
-        return (
+        total_loss = (
             focal_loss
             + self.ranking_weight * rank_loss
             + self.honesty_weight * honesty_penalty
             + self.indecision_weight * indecision_penalty
             + self.l2_weight * torch.norm(pred, 2)
         )
+        self.last_components = {
+            'focal': _detached_float(focal_loss),
+            'positive_mse': _detached_float(rank_loss),
+            'positive_mse_weighted': _detached_float(self.ranking_weight * rank_loss),
+            'honesty': _detached_float(honesty_penalty),
+            'indecision': _detached_float(indecision_penalty),
+            'l2': _detached_float(self.l2_weight * torch.norm(pred, 2)),
+            'total': _detached_float(total_loss),
+        }
+        return total_loss
 
 
 class SpecialistTrainer:
-    def __init__(self, region_key):
-        self.cfg = REGION_CONFIGS[region_key]
+    def __init__(self, region_key, fine_tune_rl=False):
+        self.cfg = dict(REGION_CONFIGS[region_key])
         self.region_key = region_key
+        self.fine_tune_rl = fine_tune_rl
         self.vault = None
+        if self.fine_tune_rl:
+            self.cfg['lr'] = float(self.cfg.get('rl_lr', 5e-6))
+            self.cfg['epochs'] = int(self.cfg.get('rl_epochs', 5))
+            self.cfg['patience'] = int(self.cfg.get('rl_patience', 4))
+            self.cfg['scheduler'] = 'static'
 
     def train(self):
         logging.info(f"\nESPECIALISTA: {self.region_key.upper()} (SENTINELA V4 - HONESTY)")
@@ -450,16 +681,32 @@ class SpecialistTrainer:
 
         model = self._build_model(n_nodes=n_nodes, in_channels=41, window=window).to(DEVICE)
 
+        # Se modo Fine-Tuning RL estiver ativo, carregar pesos consolidados do checkpoint incumbente
+        output_path = os.path.join(ROOT_DIR, 'models', 'active', self.cfg['output_name'])
+        if self.fine_tune_rl:
+            if os.path.exists(output_path):
+                logging.info("Carregando checkpoint para Fine-Tuning RL: %s", output_path)
+                ckpt = torch.load(output_path, map_location=DEVICE, weights_only=False)
+                if 'model_state_dict' in ckpt:
+                    model.load_state_dict(ckpt['model_state_dict'], strict=False)
+                    logging.info("Pesos do modelo carregados com sucesso para etapa de Reforco.")
+            else:
+                logging.warning("Checkpoint %s nao encontrado. Fine-Tuning RL comecara dos pesos atuais.", output_path)
+
         # Construir criterion antes do optimizer para incluir log_r se NegBinom
         if self.cfg.get('loss_type') == 'negbinom':
             criterion = NegBinomRankingLoss(
                 nb_r_init=self.cfg.get('nb_r_init', 2.0),
                 ranking_weight=self.cfg.get('ranking_weight', 2.0),
                 indecision_weight=self.cfg.get('indecision_weight', 0.2),
+                nb_r_min=self.cfg.get('nb_r_min', 0.1),
+                nb_r_max=self.cfg.get('nb_r_max', 50.0),
             ).to(DEVICE)
             logging.info(
-                "Loss: NegBinomRankingLoss | r_init=%.2f | ranking_w=%.2f | indecision_w=%.2f",
+                "Loss: NegBinomRankingLoss | r_init=%.2f | r_bounds=[%.2f, %.2f] | ranking_w=%.2f | indecision_w=%.2f",
                 self.cfg.get('nb_r_init', 2.0),
+                self.cfg.get('nb_r_min', 0.1),
+                self.cfg.get('nb_r_max', 50.0),
                 self.cfg.get('ranking_weight', 2.0),
                 self.cfg.get('indecision_weight', 0.2),
             )
@@ -469,6 +716,23 @@ class SpecialistTrainer:
                 gamma=self.cfg['focal_gamma'],
                 ranking_weight=self.cfg['ranking_weight'],
                 indecision_weight=self.cfg.get('indecision_weight', 1.5),
+            )
+
+        if self.fine_tune_rl:
+            criterion = SelfCriticalRankingLoss(
+                base_criterion=criterion,
+                k1=10,
+                k2=20,
+                w10=self.cfg.get('rl_w10', 0.6),
+                w20=self.cfg.get('rl_w20', 0.4),
+                fp_penalty=self.cfg.get('rl_fp_penalty', 0.10),
+                rl_weight=self.cfg.get('rl_weight', 0.15),
+            ).to(DEVICE)
+            logging.info(
+                "Fine-Tuning RL Ativo: SelfCriticalRankingLoss | rl_weight=%.2f | fp_pen=%.2f | lr=%.2e",
+                self.cfg.get('rl_weight', 0.15),
+                self.cfg.get('rl_fp_penalty', 0.10),
+                self.cfg['lr'],
             )
 
         # Optimizer com grupos de parâmetros separados:
@@ -499,6 +763,9 @@ class SpecialistTrainer:
                 weight_decay=self.cfg.get('weight_decay', 0.005),
             )
 
+        trainable_parameters = list(model.parameters()) + list(criterion.parameters())
+        metrics_path = os.path.join(ROOT_DIR, 'logs', 'training_batch_metrics.jsonl')
+
         if self.cfg.get('scheduler') == 'cosine_restarts':
             scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
                 optimizer,
@@ -519,10 +786,16 @@ class SpecialistTrainer:
                 max_lr=max_lrs,
                 steps_per_epoch=len(train_x) // self.cfg['grad_accum'] + 1,
                 epochs=self.cfg['epochs'],
+                pct_start=self.cfg.get('onecycle_pct_start', 0.3),
             )
 
-        best_pk = 0.0
+        best_validation_score = self.cfg.get('incumbent_validation_score', 0.0)
         no_improve = 0
+        if best_validation_score > 0:
+            logging.info(
+                "Piso do checkpoint incumbente: score composto=%.2f%%",
+                best_validation_score * 100,
+            )
         optimizer_steps_per_epoch = max(1, (len(train_x) + self.cfg['grad_accum'] - 1) // self.cfg['grad_accum'])
         logging.info(
             "Dataset preparado | train=%s | val=%s | nodes=%s | base_channels=%s | total_channels=%s | grad_accum=%s | opt_steps/epoch=%s",
@@ -570,9 +843,40 @@ class SpecialistTrainer:
                 loss_value = loss.item() * self.cfg['grad_accum']
                 running_loss += loss_value
 
+                batch_metrics = calculate_batch_metrics(
+                    pred,
+                    train_y[idx].to(DEVICE),
+                    self.cfg.get('loss_type', 'binary_focal'),
+                    active_mask=active_mask_t,
+                )
+                component_metrics = dict(getattr(criterion, 'last_components', {}))
+                current_lrs = [group['lr'] for group in optimizer.param_groups]
+                metric_record = {
+                    'timestamp': datetime.now().isoformat(timespec='seconds'),
+                    'phase': 'train',
+                    'region': self.region_key,
+                    'epoch': epoch + 1,
+                    'batch': step + 1,
+                    'batches_in_epoch': len(idx_list),
+                    'loss_total': loss_value,
+                    'loss_components': component_metrics,
+                    'lr_model': current_lrs[0],
+                    'lr_loss': current_lrs[1] if len(current_lrs) > 1 else current_lrs[0],
+                    'learned_nb_r': (
+                        criterion.dispersion().item()
+                        if hasattr(criterion, 'log_r')
+                        else None
+                    ),
+                    **batch_metrics,
+                }
+                with open(metrics_path, 'a', encoding='utf-8') as metrics_file:
+                    metrics_file.write(json.dumps(metric_record, ensure_ascii=False) + '\n')
+
                 if (step + 1) % self.cfg['grad_accum'] == 0:
-                    torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                    torch.nn.utils.clip_grad_norm_(trainable_parameters, 1.0)
                     optimizer.step()
+                    if hasattr(criterion, 'constrain_dispersion_'):
+                        criterion.constrain_dispersion_()
                     optimizer.zero_grad()
                     if scheduler is not None and self.cfg.get('scheduler') != 'cosine_restarts':
                         scheduler.step()
@@ -589,8 +893,13 @@ class SpecialistTrainer:
                     elapsed = time.time() - epoch_start
                     progress_pct = ((step + 1) / len(idx_list)) * 100.0
                     current_lr = optimizer.param_groups[0]['lr']
+                    loss_lr = (
+                        optimizer.param_groups[1]['lr']
+                        if len(optimizer.param_groups) > 1
+                        else current_lr
+                    )
                     logging.info(
-                        "E%03d batch %s/%s (%.1f%%) | opt_steps=%s/%s | lr=%.6g | loss_cur=%.4f | loss_epoch=%.4f | elapsed=%.1fs",
+                        "E%03d batch %s/%s (%.1f%%) | opt_steps=%s/%s | lr_model=%.6g | lr_loss=%.6g | loss=%.4f | P@10=%.1f%% (%s hit/%s miss/%s FP) | MAE=%.4f RMSE=%.4f | loss_epoch=%.4f | elapsed=%.1fs",
                         epoch + 1,
                         step + 1,
                         len(idx_list),
@@ -598,14 +907,23 @@ class SpecialistTrainer:
                         optimizer_step_count,
                         optimizer_steps_per_epoch,
                         current_lr,
+                        loss_lr,
                         loss_value,
+                        batch_metrics['precision_at_10'] * 100,
+                        batch_metrics['hits_at_10'],
+                        batch_metrics['misses_at_10'],
+                        batch_metrics['false_positives_at_10'],
+                        batch_metrics['mae'],
+                        batch_metrics['rmse'],
                         (epoch_loss + running_loss) / (step + 1),
                         elapsed,
                     )
 
             if len(idx_list) % self.cfg['grad_accum'] != 0:
-                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                torch.nn.utils.clip_grad_norm_(trainable_parameters, 1.0)
                 optimizer.step()
+                if hasattr(criterion, 'constrain_dispersion_'):
+                    criterion.constrain_dispersion_()
                 optimizer.zero_grad()
                 if scheduler is not None and self.cfg.get('scheduler') != 'cosine_restarts':
                     scheduler.step()
@@ -655,29 +973,57 @@ class SpecialistTrainer:
 
             avg_p10 = np.mean(pk10) if pk10 else 0.0
             avg_p20 = np.mean(pk20) if pk20 else 0.0
+            p10_weight = self.cfg.get('validation_p10_weight', 0.6)
+            validation_score = p10_weight * avg_p10 + (1.0 - p10_weight) * avg_p20
+            validation_min_delta = self.cfg.get('validation_min_delta', 0.0)
             # Log do parâmetro r aprendido (apenas para NegBinom)
             r_str = ""
             if hasattr(criterion, 'log_r'):
-                r_val = criterion.log_r.exp().item()
+                r_val = criterion.dispersion().item()
                 r_str = f" | r={r_val:.3f}"
             logging.info(
-                "E%03d done | Val P@10: %.2f%% | Val P@20: %.2f%% | Loss: %.4f | opt_steps=%s | elapsed=%.1fs%s",
+                "E%03d done | Val P@10: %.2f%% | Val P@20: %.2f%% | Score: %.2f%% | Loss: %.4f | opt_steps=%s | elapsed=%.1fs%s",
                 epoch + 1,
                 avg_p10 * 100,
                 avg_p20 * 100,
+                validation_score * 100,
                 epoch_loss / len(train_x),
                 optimizer_step_count,
                 time.time() - epoch_start,
                 r_str,
             )
-            if avg_p10 > best_pk:
-                best_pk = avg_p10
+            if validation_score > best_validation_score + validation_min_delta:
+                best_validation_score = validation_score
                 no_improve = 0
                 output_path = os.path.join(ROOT_DIR, 'models', 'active', self.cfg['output_name'])
                 os.makedirs(os.path.dirname(output_path), exist_ok=True)
                 torch.save(
                     {
                         'model_state_dict': model.state_dict(),
+                        'criterion_state_dict': criterion.state_dict(),
+                        'loss_type': self.cfg.get('loss_type', 'binary_focal'),
+                        'loss_config': {
+                            'nb_r_init': self.cfg.get('nb_r_init'),
+                            'nb_r_lr': self.cfg.get('nb_r_lr'),
+                            'nb_r_min': self.cfg.get('nb_r_min'),
+                            'nb_r_max': self.cfg.get('nb_r_max'),
+                            'ranking_weight': self.cfg.get('ranking_weight'),
+                            'indecision_weight': self.cfg.get('indecision_weight', 1.5),
+                            'focal_alpha': self.cfg.get('focal_alpha'),
+                            'focal_gamma': self.cfg.get('focal_gamma'),
+                        },
+                        'learned_nb_r': (
+                            criterion.dispersion().item()
+                            if hasattr(criterion, 'log_r')
+                            else None
+                        ),
+                        'validation_metrics': {
+                            'p10': float(avg_p10),
+                            'p20': float(avg_p20),
+                            'composite_score': float(validation_score),
+                            'p10_weight': float(p10_weight),
+                            'min_delta': float(validation_min_delta),
+                        },
                         'model_class': model.__class__.__name__,
                         'window': window,
                         'predict_horizon': PREDICT_HORIZON,
@@ -690,10 +1036,28 @@ class SpecialistTrainer:
                     },
                     output_path,
                 )
-                logging.info(f"NOVO RECORDE: {best_pk * 100:.2f}%")
+                logging.info(
+                    "NOVO RECORDE COMPOSTO: %.2f%% | P@10=%.2f%% | P@20=%.2f%%",
+                    best_validation_score * 100,
+                    avg_p10 * 100,
+                    avg_p20 * 100,
+                )
             else:
                 no_improve += 1
+                logging.info(
+                    "Sem melhora composta: %s/%s | score=%.2f%% | best=%.2f%% | min_delta=%.2fpp",
+                    no_improve,
+                    self.cfg['patience'],
+                    validation_score * 100,
+                    best_validation_score * 100,
+                    validation_min_delta * 100,
+                )
                 if no_improve >= self.cfg['patience']:
+                    logging.info(
+                        "Early stopping | region=%s | best_score=%.2f%%",
+                        self.region_key,
+                        best_validation_score * 100,
+                    )
                     break
 
             if self.cfg.get('scheduler') == 'cosine_restarts' and scheduler is not None:
@@ -754,13 +1118,25 @@ def main():
         choices=list(REGION_CONFIGS.keys()),
         help='Regiões a treinar (default: todas)',
     )
+    parser.add_argument(
+        '--fine-tune-rl', action='store_true',
+        help='Executa fine-tuning via Aprendizado por Reforço (SCST) sobre o checkpoint incumbente',
+    )
     args, _ = parser.parse_known_args()
-    logging.info("Regiões selecionadas: %s", args.region)
+    metrics_path = os.path.join(ROOT_DIR, 'logs', 'training_batch_metrics.jsonl')
+    with open(metrics_path, 'w', encoding='utf-8'):
+        pass
+    logging.info("Regiões selecionadas: %s | Modo RL Fine-Tuning: %s", args.region, args.fine_tune_rl)
+    failures = []
     for region in args.region:
         try:
-            SpecialistTrainer(region).train()
+            SpecialistTrainer(region, fine_tune_rl=args.fine_tune_rl).train()
         except Exception as e:
             logging.error(f"Erro em {region}: {e}", exc_info=True)
+            failures.append((region, str(e)))
+    if failures:
+        details = '; '.join(f'{region}: {message}' for region, message in failures)
+        raise RuntimeError(f"Falha no retreino de {len(failures)} região(ões): {details}")
 
 
 if __name__ == "__main__":

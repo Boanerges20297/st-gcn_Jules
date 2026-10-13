@@ -1,13 +1,24 @@
 {
   "mcpServers": {
     "code-review-graph": {
-      "command": "uvx",
+      "command": "C:\\Users\\Boanerges\\AppData\\Local\\Programs\\Python\\Python313\\Scripts\\code-review-graph.exe",
       "args": [
-        "code-review-graph",
-        "serve"
+        "serve",
+        "--repo",
+        "C:\\Users\\Boanerges\\Desktop\\Projetos\\Report Preview",
+        "--auto-watch"
       ],
-      "cwd": "C:\\Users\\STI01\\Desktop\\Projetos\\Report Preview",
+      "cwd": "C:\\Users\\Boanerges\\Desktop\\Projetos\\Report Preview",
       "type": "stdio"
+    },
+    "codegraph": {
+      "type": "stdio",
+      "command": "codegraph",
+      "args": [
+        "serve",
+        "--mcp"
+      ],
+      "alwaysLoad": true
     }
   }
 }

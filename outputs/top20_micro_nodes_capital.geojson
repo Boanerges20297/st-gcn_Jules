@@ -6,26 +6,672 @@
       "properties": {
         "node_id": 1,
         "rank": 1,
+        "name": "Conjunto São Cristovão",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 79.286,
+        "score": 79.286,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 24.846,
+        "nearby_streets_count": 132,
+        "nearby_streets": [
+          "CONJUNTO SÃO CRISTOVÃO",
+          "AVENIDA GOVERNADOR LEONEL BRIZOLA",
+          "RUA 301"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.521063857142856,
+          -3.834475285714285
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 2,
+        "rank": 2,
+        "name": "Conjunto José Euclides",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 78.747,
+        "score": 78.747,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 30.047,
+        "nearby_streets_count": 110,
+        "nearby_streets": [
+          "CONJUNTO JOSÉ EUCLIDES",
+          "RUA D",
+          "CONJUNTO PATATIVA DO ASSARÉ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.51681466666667,
+          -3.8531005000000005
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 3,
+        "rank": 3,
+        "name": "Sitio São João",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 78.162,
+        "score": 78.162,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 27.886,
+        "nearby_streets_count": 120,
+        "nearby_streets": [
+          "SITIO SÃO JOÃO",
+          "AREA SEM NOME",
+          "RUA 4"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.51658599999999,
+          -3.848137611111111
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 4,
+        "rank": 4,
+        "name": "JOSÉ EUCLIDES",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 78.152,
+        "score": 78.152,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 29.032,
+        "nearby_streets_count": 110,
+        "nearby_streets": [
+          "JOSÉ EUCLIDES",
+          "RUA E",
+          "CONJUNTO JOSÉ EUCLIDES"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.518974,
+          -3.8520968000000004
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 5,
+        "rank": 5,
+        "name": "Favela do Circo",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 78.126,
+        "score": 78.126,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 28.602,
+        "nearby_streets_count": 127,
+        "nearby_streets": [
+          "FAVELA DO CIRCO",
+          "RUA VERDE 34",
+          "RUA NOSSA SENHORA DA CONCEIÇÃO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.51968635714285,
+          -3.8447240714285718
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 6,
+        "rank": 6,
+        "name": "Tamandaré",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 77.693,
+        "score": 77.693,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 26.506,
+        "nearby_streets_count": 135,
+        "nearby_streets": [
+          "TAMANDARÉ",
+          "COMUNIDADE NO BAIRRO TAMANDARÉ",
+          "VILA BINCEL"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.514598571428564,
+          -3.8412979047619045
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 7,
+        "rank": 7,
+        "name": "Palmeiras 1",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 77.462,
+        "score": 77.462,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 26.357,
+        "nearby_streets_count": 119,
+        "nearby_streets": [
+          "PALMEIRAS 1",
+          "RUA SALMÃO",
+          "FAVELA DO CIRCO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.52350130769231,
+          -3.8417178461538457
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 8,
+        "rank": 8,
+        "name": "Conjunto Patativa do Assaré",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 77.406,
+        "score": 77.406,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 28.212,
+        "nearby_streets_count": 106,
+        "nearby_streets": [
+          "CONJUNTO PATATIVA DO ASSARÉ",
+          "CASINHAS DO MARIA TOMASIA",
+          "CONJUNTO JOSÉ EUCLIDES"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.515613875,
+          -3.8546858750000004
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 9,
+        "rank": 9,
+        "name": "Casinhas do Maria Tomasia",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 76.831,
+        "score": 76.831,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 27.346,
+        "nearby_streets_count": 105,
+        "nearby_streets": [
+          "CASINHAS DO MARIA TOMASIA",
+          "CONJUNTO PATATIVA DO ASSARÉ",
+          "MARIA TOMÁSIA - JANGURUSSU"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.51577316666667,
+          -3.8557143333333332
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 10,
+        "rank": 10,
+        "name": "ADEMIR MARTINS",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 76.423,
+        "score": 76.423,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 25.666,
+        "nearby_streets_count": 107,
+        "nearby_streets": [
+          "ADEMIR MARTINS",
+          "RUA AUDIFAX RIOS",
+          "RESIDENCIAL ALDEMIR"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.51181122222222,
+          -3.854912111111111
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 11,
+        "rank": 11,
+        "name": "Favela do Seu Geraldo",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 76.328,
+        "score": 76.328,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 26.293,
+        "nearby_streets_count": 128,
+        "nearby_streets": [
+          "FAVELA DO SEU GERALDO",
+          "FAVELA DO PREÁ",
+          "FAVELA DO CAJUEIRO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.508675749999995,
+          -3.843959777777778
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 12,
+        "rank": 12,
+        "name": "Maria Tomásia - Jangurussu",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 75.743,
+        "score": 75.743,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 24.661,
+        "nearby_streets_count": 95,
+        "nearby_streets": [
+          "MARIA TOMÁSIA - JANGURUSSU",
+          "CASINHAS DO MARIA TOMASIA",
+          "RUA MYRIAN FRAGA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.517724449999996,
+          -3.8565843
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 13,
+        "rank": 13,
+        "name": "Favela do Cajueiro",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 75.404,
+        "score": 75.404,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 24.469,
+        "nearby_streets_count": 116,
+        "nearby_streets": [
+          "FAVELA DO CAJUEIRO",
+          "RUA NUNES FEIJÓ",
+          "FAVELA DO PREÁ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.50653835294117,
+          -3.846192617647059
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 14,
+        "rank": 14,
+        "name": "Favela do Preá",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 75.104,
+        "score": 75.104,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 23.77,
+        "nearby_streets_count": 115,
+        "nearby_streets": [
+          "FAVELA DO PREÁ",
+          "FAVELA DO SEU GERALDO",
+          "RUA SÃO JOÃO DO JANGURUSSU"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.50746778181818,
+          -3.842740018181818
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 15,
+        "rank": 15,
+        "name": "Comunidade no bairro Tamandaré",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 74.782,
+        "score": 74.782,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 23.837,
+        "nearby_streets_count": 120,
+        "nearby_streets": [
+          "COMUNIDADE NO BAIRRO TAMANDARÉ",
+          "VILA BINCEL",
+          "SANTA FILOMENA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.511114782608686,
+          -3.8400063913043483
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 16,
+        "rank": 16,
+        "name": "Beco do Tatu",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 74.446,
+        "score": 74.446,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 23.298,
+        "nearby_streets_count": 124,
+        "nearby_streets": [
+          "BECO DO TATU",
+          "VILA BINCEL",
+          "TAMANDARÉ"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.51446652,
+          -3.8352301200000003
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 17,
+        "rank": 17,
+        "name": "Vila Bincel",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 74.269,
+        "score": 74.269,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 23.031,
+        "nearby_streets_count": 124,
+        "nearby_streets": [
+          "VILA BINCEL",
+          "COMUNIDADE NO BAIRRO TAMANDARÉ",
+          "BECO DO TATU"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.511793,
+          -3.837547111111111
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 18,
+        "rank": 18,
+        "name": "Parque Betânia",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 72.638,
+        "score": 72.638,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 19.729,
+        "nearby_streets_count": 91,
+        "nearby_streets": [
+          "PARQUE BETÂNIA",
+          "TRAVESSA LADISLAU LOURENÇO",
+          "RUA NILTON REBOUÇAS"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.505407749999996,
+          -3.838398916666667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 19,
+        "rank": 19,
+        "name": "Comunidade da Cidade Nobre",
+        "bairro": "JANGURUSSU",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 72.062,
+        "score": 72.062,
+        "region": "capital",
+        "parent_area": "JANGURUSSU",
+        "parent_risk_score": 79.9,
+        "parent_risk_level": "crítico",
+        "parent_status": "CRÍTICO",
+        "local_street_pressure": 19.189,
+        "nearby_streets_count": 93,
+        "nearby_streets": [
+          "COMUNIDADE DA CIDADE NOBRE",
+          "RUA PADRE ARTUR JUNCOSA",
+          "PARQUE BETÂNIA"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.505980571428566,
+          -3.8336821428571426
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 20,
+        "rank": 20,
         "name": "Levada",
         "bairro": "MESSEJANA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 91.494,
-        "score": 91.494,
+        "risk_score": 58.022,
+        "score": 58.022,
         "region": "capital",
         "parent_area": "MESSEJANA",
-        "parent_risk_score": 94.7,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 17.115,
-        "nearby_streets_count": 67,
+        "parent_risk_score": 49.8,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 30.934,
+        "nearby_streets_count": 123,
         "nearby_streets": [
           "LEVADA",
           "RUA MUNIZ FREIRE",
-          "RUA DOUTOR JOAQUIM BENTO"
+          "RUA CORONEL ERNESTO MATOS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -38,28 +684,28 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 2,
-        "rank": 2,
+        "node_id": 21,
+        "rank": 21,
         "name": "Conjunto São Bernardo",
         "bairro": "MESSEJANA",
         "municipality": "Fortaleza",
         "faction": "MASSA",
-        "risk_score": 89.688,
-        "score": 89.688,
+        "risk_score": 57.095,
+        "score": 57.095,
         "region": "capital",
         "parent_area": "MESSEJANA",
-        "parent_risk_score": 94.7,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 15.448,
-        "nearby_streets_count": 63,
+        "parent_risk_score": 49.8,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 29.379,
+        "nearby_streets_count": 112,
         "nearby_streets": [
-          "CONJUNTO SÃO BERNARDO",
-          "RUA CECÍLIA MEIRELES",
-          "RUA NICOLAU COELHO"
+          "TRAVESSA MARGARIDA",
+          "RUA DOM BOSCO",
+          "CONJUNTO SÃO BERNARDO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -72,28 +718,28 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 3,
-        "rank": 3,
+        "node_id": 22,
+        "rank": 22,
         "name": "Comunidade da Portelinha- Messejana",
         "bairro": "MESSEJANA",
         "municipality": "Fortaleza",
         "faction": "MASSA",
-        "risk_score": 87.848,
-        "score": 87.848,
+        "risk_score": 56.243,
+        "score": 56.243,
         "region": "capital",
         "parent_area": "MESSEJANA",
-        "parent_risk_score": 94.7,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 15.543,
-        "nearby_streets_count": 57,
+        "parent_risk_score": 49.8,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 29.352,
+        "nearby_streets_count": 105,
         "nearby_streets": [
           "COMUNIDADE DA PORTELINHA- MESSEJANA",
           "RUA NICOLAU COELHO",
-          "RUA VILAMAR DAMASCENO"
+          "RUA SÃO FRANCISCO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -106,28 +752,28 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 4,
-        "rank": 4,
+        "node_id": 23,
+        "rank": 23,
         "name": "Comunidade da Conquista",
         "bairro": "MESSEJANA",
         "municipality": "Fortaleza",
         "faction": "MASSA",
-        "risk_score": 87.499,
-        "score": 87.499,
+        "risk_score": 55.773,
+        "score": 55.773,
         "region": "capital",
         "parent_area": "MESSEJANA",
-        "parent_risk_score": 94.7,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 14.735,
-        "nearby_streets_count": 54,
+        "parent_risk_score": 49.8,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 28.173,
+        "nearby_streets_count": 106,
         "nearby_streets": [
           "RUA LETÍCIA",
           "COMUNIDADE DA CONQUISTA",
           "RUA VILAMAR DAMASCENO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -140,62 +786,28 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 5,
-        "rank": 5,
-        "name": "Beco da Maravilha",
-        "bairro": "MESSEJANA",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 87.056,
-        "score": 87.056,
-        "region": "capital",
-        "parent_area": "MESSEJANA",
-        "parent_risk_score": 94.7,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 14.746,
-        "nearby_streets_count": 58,
-        "nearby_streets": [
-          "BECO DA MARAVILHA",
-          "RUA DOUTOR JOAQUIM BENTO",
-          "RUA SANTO EXPEDITO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.488959,
-          -3.8290662500000003
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 6,
-        "rank": 6,
+        "node_id": 24,
+        "rank": 24,
         "name": "Parque Iracema I",
         "bairro": "MESSEJANA",
         "municipality": "Fortaleza",
         "faction": "MASSA",
-        "risk_score": 87.042,
-        "score": 87.042,
+        "risk_score": 55.119,
+        "score": 55.119,
         "region": "capital",
         "parent_area": "MESSEJANA",
-        "parent_risk_score": 94.7,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 13.836,
-        "nearby_streets_count": 54,
+        "parent_risk_score": 49.8,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 26.687,
+        "nearby_streets_count": 100,
         "nearby_streets": [
           "PARQUE IRACEMA I",
           "COMUNIDADE DA PORTELINHA- MESSEJANA",
-          "RUA NICOLAU COELHO"
+          "AVENIDA DOMINGOS SÁVIO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -208,28 +820,62 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 7,
-        "rank": 7,
+        "node_id": 25,
+        "rank": 25,
+        "name": "Beco da Maravilha",
+        "bairro": "MESSEJANA",
+        "municipality": "Fortaleza",
+        "faction": "CV",
+        "risk_score": 55.117,
+        "score": 55.117,
+        "region": "capital",
+        "parent_area": "MESSEJANA",
+        "parent_risk_score": 49.8,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 27.381,
+        "nearby_streets_count": 108,
+        "nearby_streets": [
+          "BECO DA MARAVILHA",
+          "RUA CESÁRIO LANGE",
+          "RUA DOUTOR JOAQUIM BENTO"
+        ],
+        "is_tactical": true,
+        "generated_at": "2026-10-13T11:34:40.408637"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -38.488959,
+          -3.8290662500000003
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "node_id": 26,
+        "rank": 26,
         "name": "LAGOA SECA",
         "bairro": "MESSEJANA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 86.534,
-        "score": 86.534,
+        "risk_score": 54.175,
+        "score": 54.175,
         "region": "capital",
         "parent_area": "MESSEJANA",
-        "parent_risk_score": 94.7,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 12.249,
-        "nearby_streets_count": 55,
+        "parent_risk_score": 49.8,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 24.204,
+        "nearby_streets_count": 108,
         "nearby_streets": [
           "LAGOA SECA",
-          "RUA JURITI",
-          "TRAVESSA CHICÓ MENDES DA CONQUISTA"
+          "RUA ALVES RIBEIRO",
+          "RUA JURITI"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -242,28 +888,28 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 8,
-        "rank": 8,
+        "node_id": 27,
+        "rank": 27,
         "name": "Cemitério",
         "bairro": "MESSEJANA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 83.201,
-        "score": 83.201,
+        "risk_score": 50.771,
+        "score": 50.771,
         "region": "capital",
         "parent_area": "MESSEJANA",
-        "parent_risk_score": 94.7,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 10.177,
-        "nearby_streets_count": 42,
+        "parent_risk_score": 49.8,
+        "parent_risk_level": "moderado",
+        "parent_status": "MODERADO",
+        "local_street_pressure": 19.21,
+        "nearby_streets_count": 81,
         "nearby_streets": [
           "RUA COPÉRNICO",
           "CEMITÉRIO",
           "TRAVESSA MARIO BARCELOS"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -276,266 +922,28 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 9,
-        "rank": 9,
-        "name": "Santa Rosa- Messejana",
-        "bairro": "COAÇU",
-        "municipality": "Messejana",
-        "faction": "CV",
-        "risk_score": 78.168,
-        "score": 78.168,
-        "region": "capital",
-        "parent_area": "COAÇU",
-        "parent_risk_score": 94.7,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 3.062,
-        "nearby_streets_count": 9,
-        "nearby_streets": [
-          "SANTA ROSA- MESSEJANA",
-          "RUA ZUMBI",
-          "COMUNIDADE PÔR DO SOL"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.474496326530605,
-          -3.8467255510204077
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 10,
-        "rank": 10,
-        "name": "Comunidade do Serrote - Messejana",
-        "bairro": "PARQUE SANTA MARIA",
-        "municipality": "Messejana",
-        "faction": "CV",
-        "risk_score": 75.498,
-        "score": 75.498,
-        "region": "capital",
-        "parent_area": "PARQUE SANTA MARIA",
-        "parent_risk_score": 94.7,
-        "parent_risk_level": "crítico",
-        "parent_status": "CRÍTICO",
-        "local_street_pressure": 3.594,
-        "nearby_streets_count": 13,
-        "nearby_streets": [
-          "COMUNIDADE DO SERROTE - MESSEJANA",
-          "RUA COPÉRNICO",
-          "CEMITÉRIO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.49207783333333,
-          -3.842039083333333
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 11,
-        "rank": 11,
-        "name": "Residencial ll",
-        "bairro": "MARACANAÚ",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 54.93,
-        "score": 54.93,
-        "region": "capital",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 61.8,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 2.98,
-        "nearby_streets_count": 14,
-        "nearby_streets": [
-          "RESIDENCIAL LL",
-          "RESIDENCIAL/JABUTI - MARACANAÚ",
-          "RUA VINTE E UM"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.63555228571428,
-          -3.8542941428571424
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 12,
-        "rank": 12,
-        "name": "Jenipapeiro",
-        "bairro": "MARACANAÚ",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 52.317,
-        "score": 52.317,
-        "region": "capital",
-        "parent_area": "MARACANAÚ",
-        "parent_risk_score": 61.8,
-        "parent_risk_level": "alto",
-        "parent_status": "ALTO",
-        "local_street_pressure": 3.788,
-        "nearby_streets_count": 17,
-        "nearby_streets": [
-          "JENIPAPEIRO",
-          "NOVO MARACANAÚ",
-          "SANTO SATIRO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.61721165789474,
-          -3.85803897368421
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 13,
-        "rank": 13,
-        "name": "Rua da Feira - Antonio Bezerra",
-        "bairro": "ANTÔNIO BEZERRA",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 47.327,
-        "score": 47.327,
-        "region": "capital",
-        "parent_area": "ANTÔNIO BEZERRA",
-        "parent_risk_score": 41.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 12.121,
-        "nearby_streets_count": 50,
-        "nearby_streets": [
-          "RUA DA FEIRA - ANTONIO BEZERRA",
-          "RUA RUI MONTE",
-          "RUA PROFESSOR JOAQUIM NOGUEIRA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.58818917647059,
-          -3.7442346470588235
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 14,
-        "rank": 14,
-        "name": "Anario Braga",
-        "bairro": "ANTÔNIO BEZERRA",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 47.115,
-        "score": 47.115,
-        "region": "capital",
-        "parent_area": "ANTÔNIO BEZERRA",
-        "parent_risk_score": 41.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 12.313,
-        "nearby_streets_count": 49,
-        "nearby_streets": [
-          "RUA PANAMÁ",
-          "ANARIO BRAGA",
-          "RUA JOSÉ ACIOLY"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.592059444444445,
-          -3.736416
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 15,
-        "rank": 15,
-        "name": "Comunidade do Aterro/Ocupação",
-        "bairro": "ANTÔNIO BEZERRA",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 46.556,
-        "score": 46.556,
-        "region": "capital",
-        "parent_area": "ANTÔNIO BEZERRA",
-        "parent_risk_score": 41.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 11.409,
-        "nearby_streets_count": 52,
-        "nearby_streets": [
-          "COMUNIDADE DO ATERRO/OCUPAÇÃO",
-          "AREA SEM NOME",
-          "PORTELINHA (ALTO DO BODE)"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.59591828125001,
-          -3.7465292812499995
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 16,
-        "rank": 16,
+        "node_id": 28,
+        "rank": 28,
         "name": "Favela Do Abc",
         "bairro": "LAGOA REDONDA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 45.785,
-        "score": 45.785,
+        "risk_score": 47.317,
+        "score": 47.317,
         "region": "capital",
         "parent_area": "LAGOA REDONDA",
-        "parent_risk_score": 35.3,
+        "parent_risk_score": 38.0,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 15.696,
-        "nearby_streets_count": 62,
+        "local_street_pressure": 28.209,
+        "nearby_streets_count": 101,
         "nearby_streets": [
           "FAVELA DO ABC",
-          "RUA SANTA ISABEL",
-          "RUA PAULO DE TASSO RAMOS"
+          "RUA JOSÉ GAUDÊNCIO MOREIRA",
+          "RUA SANTA ISABEL"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -548,28 +956,28 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 17,
-        "rank": 17,
+        "node_id": 29,
+        "rank": 29,
         "name": "11 De Novembro",
         "bairro": "LAGOA REDONDA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 45.413,
-        "score": 45.413,
+        "risk_score": 46.942,
+        "score": 46.942,
         "region": "capital",
         "parent_area": "LAGOA REDONDA",
-        "parent_risk_score": 35.3,
+        "parent_risk_score": 38.0,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 15.234,
-        "nearby_streets_count": 51,
+        "local_street_pressure": 27.481,
+        "nearby_streets_count": 82,
         "nearby_streets": [
           "11 DE NOVEMBRO",
           "RUA MORONI BING TORGAN",
-          "AREA SEM NOME"
+          "RUA MIRES PIRES MARINHO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -582,28 +990,28 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 18,
-        "rank": 18,
+        "node_id": 30,
+        "rank": 30,
         "name": "Caixa D’água",
         "bairro": "LAGOA REDONDA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 44.425,
-        "score": 44.425,
+        "risk_score": 46.253,
+        "score": 46.253,
         "region": "capital",
         "parent_area": "LAGOA REDONDA",
-        "parent_risk_score": 35.3,
+        "parent_risk_score": 38.0,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 13.923,
-        "nearby_streets_count": 50,
+        "local_street_pressure": 26.006,
+        "nearby_streets_count": 80,
         "nearby_streets": [
+          "RUA GEORGE SOSA",
           "CAIXA D’ÁGUA",
-          "RUA ISABEL FERREIRA",
-          "11 DE NOVEMBRO"
+          "RUA LEONICE AGUIAR"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -616,28 +1024,28 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 19,
-        "rank": 19,
+        "node_id": 31,
+        "rank": 31,
         "name": "Arco Verde",
         "bairro": "LAGOA REDONDA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 44.325,
-        "score": 44.325,
+        "risk_score": 45.969,
+        "score": 45.969,
         "region": "capital",
         "parent_area": "LAGOA REDONDA",
-        "parent_risk_score": 35.3,
+        "parent_risk_score": 38.0,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 14.28,
-        "nearby_streets_count": 55,
+        "local_street_pressure": 25.871,
+        "nearby_streets_count": 91,
         "nearby_streets": [
           "ARCO VERDE",
           "RUA ISABEL FERREIRA",
-          "CAIXA D’ÁGUA"
+          "RUA LEONICE AGUIAR"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -650,28 +1058,28 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 20,
-        "rank": 20,
+        "node_id": 32,
+        "rank": 32,
         "name": "AP",
         "bairro": "LAGOA REDONDA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 44.234,
-        "score": 44.234,
+        "risk_score": 45.817,
+        "score": 45.817,
         "region": "capital",
         "parent_area": "LAGOA REDONDA",
-        "parent_risk_score": 35.3,
+        "parent_risk_score": 38.0,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 14.5,
-        "nearby_streets_count": 50,
+        "local_street_pressure": 25.848,
+        "nearby_streets_count": 84,
         "nearby_streets": [
           "AP",
-          "FINAL FELIZ",
-          "RUA SETE"
+          "RUA JOSÉ CARLOS RODRIGUES",
+          "FINAL FELIZ"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -684,28 +1092,28 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 21,
-        "rank": 21,
+        "node_id": 33,
+        "rank": 33,
         "name": "Favela Do Pó",
         "bairro": "LAGOA REDONDA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 43.952,
-        "score": 43.952,
+        "risk_score": 45.324,
+        "score": 45.324,
         "region": "capital",
         "parent_area": "LAGOA REDONDA",
-        "parent_risk_score": 35.3,
+        "parent_risk_score": 38.0,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 13.985,
-        "nearby_streets_count": 44,
+        "local_street_pressure": 24.809,
+        "nearby_streets_count": 74,
         "nearby_streets": [
           "FAVELA DO PÓ",
           "RUA SETE",
-          "RUA MORONI BING TORGAN"
+          "RUA 4"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -718,28 +1126,28 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 22,
-        "rank": 22,
+        "node_id": 34,
+        "rank": 34,
         "name": "Final Feliz",
         "bairro": "LAGOA REDONDA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 43.142,
-        "score": 43.142,
+        "risk_score": 44.635,
+        "score": 44.635,
         "region": "capital",
         "parent_area": "LAGOA REDONDA",
-        "parent_risk_score": 35.3,
+        "parent_risk_score": 38.0,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 12.967,
-        "nearby_streets_count": 47,
+        "local_street_pressure": 23.433,
+        "nearby_streets_count": 82,
         "nearby_streets": [
           "FINAL FELIZ",
-          "AP",
-          "RUA SETE"
+          "RUA JOSÉ CARLOS RODRIGUES",
+          "AP"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -752,198 +1160,28 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 23,
-        "rank": 23,
-        "name": "ÁREA DE GUERRA",
-        "bairro": "CONJUNTO PALMEIRAS",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 42.36,
-        "score": 42.36,
-        "region": "capital",
-        "parent_area": "CONJUNTO PALMEIRAS",
-        "parent_risk_score": 32.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 12.845,
-        "nearby_streets_count": 46,
-        "nearby_streets": [
-          "ÁREA DE GUERRA",
-          "RUA CODÓ",
-          "RUA DA FEIRA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.52384677777778,
-          -3.8479865555555555
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 24,
-        "rank": 24,
-        "name": "Palmeiras1",
-        "bairro": "CONJUNTO PALMEIRAS",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 41.828,
-        "score": 41.828,
-        "region": "capital",
-        "parent_area": "CONJUNTO PALMEIRAS",
-        "parent_risk_score": 32.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 12.968,
-        "nearby_streets_count": 49,
-        "nearby_streets": [
-          "PALMEIRAS1",
-          "CJ PALMEIRAS L",
-          "RUA DA FEIRA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.52552871428572,
-          -3.843301285714286
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 25,
-        "rank": 25,
-        "name": "Palmeiras 2",
-        "bairro": "CONJUNTO PALMEIRAS",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 41.819,
-        "score": 41.819,
-        "region": "capital",
-        "parent_area": "CONJUNTO PALMEIRAS",
-        "parent_risk_score": 32.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 10.847,
-        "nearby_streets_count": 45,
-        "nearby_streets": [
-          "PALMEIRAS 2",
-          "RUA JOSÉ DO CRATO",
-          "AVENIDA VALPARAÍSO"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.52976605263157,
-          -3.837266736842105
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 26,
-        "rank": 26,
-        "name": "Cj Palmeiras l",
-        "bairro": "CONJUNTO PALMEIRAS",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 41.647,
-        "score": 41.647,
-        "region": "capital",
-        "parent_area": "CONJUNTO PALMEIRAS",
-        "parent_risk_score": 32.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 12.453,
-        "nearby_streets_count": 42,
-        "nearby_streets": [
-          "CJ PALMEIRAS L",
-          "RUA DA FEIRA",
-          "CANAL - CONJ. PALMEIRAS I"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.528010357142854,
-          -3.8455535714285713
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 27,
-        "rank": 27,
-        "name": "Rua da Feira",
-        "bairro": "CONJUNTO PALMEIRAS",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 41.098,
-        "score": 41.098,
-        "region": "capital",
-        "parent_area": "CONJUNTO PALMEIRAS",
-        "parent_risk_score": 32.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 12.72,
-        "nearby_streets_count": 43,
-        "nearby_streets": [
-          "RUA DA FEIRA",
-          "CJ PALMEIRAS L",
-          "ÁREA DE GUERRA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.5266295,
-          -3.846913875
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 28,
-        "rank": 28,
+        "node_id": 35,
+        "rank": 35,
         "name": "Comunidade Do Brooklyn",
         "bairro": "LAGOA REDONDA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 40.891,
-        "score": 40.891,
+        "risk_score": 42.163,
+        "score": 42.163,
         "region": "capital",
         "parent_area": "LAGOA REDONDA",
-        "parent_risk_score": 35.3,
+        "parent_risk_score": 38.0,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 10.49,
-        "nearby_streets_count": 37,
+        "local_street_pressure": 18.922,
+        "nearby_streets_count": 61,
         "nearby_streets": [
           "COMUNIDADE DO BROOKLYN",
-          "FAVELA DO PÓ",
-          "RUA MORONI BING TORGAN"
+          "RUA MIRES PIRES MARINHO",
+          "RUA 4"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -956,96 +1194,28 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 29,
-        "rank": 29,
-        "name": "Comunidade do Sossego - Quintino Cunha",
-        "bairro": "ANTÔNIO BEZERRA",
-        "municipality": "Quintino Cunha",
-        "faction": "CV",
-        "risk_score": 40.647,
-        "score": 40.647,
-        "region": "capital",
-        "parent_area": "ANTÔNIO BEZERRA",
-        "parent_risk_score": 41.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 6.572,
-        "nearby_streets_count": 15,
-        "nearby_streets": [
-          "COMUNIDADE DO SOSSEGO - QUINTINO CUNHA",
-          "RUA ANÁRIO BRAGA",
-          "COMUNIDADE DOS PLÁSTICOS - QUINTINO CUNHA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.597297125000004,
-          -3.736254041666667
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 30,
-        "rank": 30,
-        "name": "Rua Codó",
-        "bairro": "CONJUNTO PALMEIRAS",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 40.566,
-        "score": 40.566,
-        "region": "capital",
-        "parent_area": "CONJUNTO PALMEIRAS",
-        "parent_risk_score": 32.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 11.421,
-        "nearby_streets_count": 42,
-        "nearby_streets": [
-          "RUA CODÓ",
-          "JAGATÁ",
-          "FAVELINHA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.522435428571434,
-          -3.8506085000000003
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 31,
-        "rank": 31,
+        "node_id": 36,
+        "rank": 36,
         "name": "Comunidade Carandiru",
         "bairro": "LAGOA REDONDA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 40.543,
-        "score": 40.543,
+        "risk_score": 42.01,
+        "score": 42.01,
         "region": "capital",
         "parent_area": "LAGOA REDONDA",
-        "parent_risk_score": 35.3,
+        "parent_risk_score": 38.0,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 10.396,
-        "nearby_streets_count": 41,
+        "local_street_pressure": 18.844,
+        "nearby_streets_count": 69,
         "nearby_streets": [
           "COMUNIDADE CARANDIRU",
-          "CAIXA D’ÁGUA",
-          "SERROTE - CURIÓ"
+          "RUA MARCOLINA FERREIRA",
+          "CAIXA D’ÁGUA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -1058,198 +1228,28 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 32,
-        "rank": 32,
-        "name": "Favelinha do Palmeiras",
-        "bairro": "CONJUNTO PALMEIRAS",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 39.518,
-        "score": 39.518,
-        "region": "capital",
-        "parent_area": "CONJUNTO PALMEIRAS",
-        "parent_risk_score": 32.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 12.147,
-        "nearby_streets_count": 40,
-        "nearby_streets": [
-          "FAVELINHA DO PALMEIRAS",
-          "RUA DA FEIRA",
-          "FAVELINHA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.5265412,
-          -3.8493798000000004
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 33,
-        "rank": 33,
-        "name": "Jagatá",
-        "bairro": "CONJUNTO PALMEIRAS",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 39.498,
-        "score": 39.498,
-        "region": "capital",
-        "parent_area": "CONJUNTO PALMEIRAS",
-        "parent_risk_score": 32.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 11.069,
-        "nearby_streets_count": 43,
-        "nearby_streets": [
-          "JAGATÁ",
-          "FAVELINHA",
-          "RUA CODÓ"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.521445500000006,
-          -3.853028214285714
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 34,
-        "rank": 34,
-        "name": "Favelinha",
-        "bairro": "CONJUNTO PALMEIRAS",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 38.923,
-        "score": 38.923,
-        "region": "capital",
-        "parent_area": "CONJUNTO PALMEIRAS",
-        "parent_risk_score": 32.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 11.564,
-        "nearby_streets_count": 40,
-        "nearby_streets": [
-          "FAVELINHA",
-          "LOTEAMENTO",
-          "FAVELINHA DO PALMEIRAS"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.52515184210526,
-          -3.8519862631578943
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 35,
-        "rank": 35,
-        "name": "Loteamento",
-        "bairro": "CONJUNTO PALMEIRAS",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 38.544,
-        "score": 38.544,
-        "region": "capital",
-        "parent_area": "CONJUNTO PALMEIRAS",
-        "parent_risk_score": 32.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 10.317,
-        "nearby_streets_count": 38,
-        "nearby_streets": [
-          "LOTEAMENTO",
-          "FAVELINHA",
-          "RUA PATATIVA DO ASSARÉ"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.52610515384616,
-          -3.8536137692307695
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 36,
-        "rank": 36,
-        "name": "Palmeirinha",
-        "bairro": "LAGOA REDONDA",
-        "municipality": "Fortaleza",
-        "faction": "CV",
-        "risk_score": 37.68,
-        "score": 37.68,
-        "region": "capital",
-        "parent_area": "LAGOA REDONDA",
-        "parent_risk_score": 35.3,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 7.688,
-        "nearby_streets_count": 24,
-        "nearby_streets": [
-          "PALMEIRINHA",
-          "AVENIDA PROFESSOR JOSÉ ARTHUR DE CARVALHO",
-          "COMUNIDADE ISABELZINHA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.45670834782608,
-          -3.826025
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
         "node_id": 37,
         "rank": 37,
         "name": "Comunidade Isabelzinha",
         "bairro": "LAGOA REDONDA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 37.657,
-        "score": 37.657,
+        "risk_score": 38.601,
+        "score": 38.601,
         "region": "capital",
         "parent_area": "LAGOA REDONDA",
-        "parent_risk_score": 35.3,
+        "parent_risk_score": 38.0,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 7.732,
-        "nearby_streets_count": 31,
+        "local_street_pressure": 13.047,
+        "nearby_streets_count": 51,
         "nearby_streets": [
           "COMUNIDADE ISABELZINHA",
-          "AVENIDA PROFESSOR JOSÉ ARTHUR DE CARVALHO",
+          "RUA JOSÉ ANDRÉ",
           "PALMEIRINHA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -1264,32 +1264,32 @@
       "properties": {
         "node_id": 38,
         "rank": 38,
-        "name": "Beira Rio - Conj. Palmeiras I",
-        "bairro": "CONJUNTO PALMEIRAS",
-        "municipality": "Conj. Palmeiras I",
+        "name": "Palmeirinha",
+        "bairro": "LAGOA REDONDA",
+        "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 37.319,
-        "score": 37.319,
+        "risk_score": 38.393,
+        "score": 38.393,
         "region": "capital",
-        "parent_area": "CONJUNTO PALMEIRAS",
-        "parent_risk_score": 32.4,
+        "parent_area": "LAGOA REDONDA",
+        "parent_risk_score": 38.0,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 8.65,
-        "nearby_streets_count": 21,
+        "local_street_pressure": 12.639,
+        "nearby_streets_count": 41,
         "nearby_streets": [
-          "BEIRA RIO - CONJ. PALMEIRAS I",
-          "RUA VALPARAÍSO",
-          "AVENIDA VALPARAÍSO"
+          "PALMEIRINHA",
+          "RUA RAQUEL FLORÊNCIO",
+          "COMUNIDADE ISABELZINHA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -38.531143875000005,
-          -3.8424397499999996
+          -38.45670834782608,
+          -3.826025
         ]
       }
     },
@@ -1298,94 +1298,26 @@
       "properties": {
         "node_id": 39,
         "rank": 39,
-        "name": "Canal - Conj. Palmeiras I",
-        "bairro": "CONJUNTO PALMEIRAS",
-        "municipality": "Conj. Palmeiras I",
-        "faction": "CV",
-        "risk_score": 36.896,
-        "score": 36.896,
-        "region": "capital",
-        "parent_area": "CONJUNTO PALMEIRAS",
-        "parent_risk_score": 32.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 9.295,
-        "nearby_streets_count": 22,
-        "nearby_streets": [
-          "CANAL - CONJ. PALMEIRAS I",
-          "BECO - CONJ. PALMEIRAS",
-          "PISSAREIRA - CONJ. PALMEIRAS I"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.530499444444445,
-          -3.8462358888888892
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 40,
-        "rank": 40,
-        "name": "Pissareira - Conj. Palmeiras I",
-        "bairro": "CONJUNTO PALMEIRAS",
-        "municipality": "Conj. Palmeiras I",
-        "faction": "CV",
-        "risk_score": 36.735,
-        "score": 36.735,
-        "region": "capital",
-        "parent_area": "CONJUNTO PALMEIRAS",
-        "parent_risk_score": 32.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 9.082,
-        "nearby_streets_count": 22,
-        "nearby_streets": [
-          "PISSAREIRA - CONJ. PALMEIRAS I",
-          "AREA SEM NOME",
-          "CANAL - CONJ. PALMEIRAS I"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.52996855555555,
-          -3.847995166666666
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 41,
-        "rank": 41,
         "name": "Serrote - Curió",
         "bairro": "LAGOA REDONDA",
         "municipality": "Curió",
         "faction": "CV",
-        "risk_score": 35.996,
-        "score": 35.996,
+        "risk_score": 37.391,
+        "score": 37.391,
         "region": "capital",
         "parent_area": "LAGOA REDONDA",
-        "parent_risk_score": 35.3,
+        "parent_risk_score": 38.0,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 5.959,
-        "nearby_streets_count": 21,
+        "local_street_pressure": 10.817,
+        "nearby_streets_count": 35,
         "nearby_streets": [
+          "RUA PITU BANDEIRA",
           "SERROTE - CURIÓ",
-          "COMUNIDADE CARANDIRU",
-          "COMUNIDADE DO BROOKLYN"
+          "RUA NELSON COELHO"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -1398,96 +1330,28 @@
     {
       "type": "Feature",
       "properties": {
-        "node_id": 42,
-        "rank": 42,
-        "name": "Beco - Conj. Palmeiras",
-        "bairro": "CONJUNTO PALMEIRAS",
-        "municipality": "Conj. Palmeiras",
-        "faction": "CV",
-        "risk_score": 35.676,
-        "score": 35.676,
-        "region": "capital",
-        "parent_area": "CONJUNTO PALMEIRAS",
-        "parent_risk_score": 32.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 8.077,
-        "nearby_streets_count": 21,
-        "nearby_streets": [
-          "BECO - CONJ. PALMEIRAS",
-          "CANAL - CONJ. PALMEIRAS I",
-          "BEIRA RIO - CONJ. PALMEIRAS I"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.53253993333333,
-          -3.844583333333333
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 43,
-        "rank": 43,
-        "name": "Sorriso - São Cristóvão",
-        "bairro": "CONJUNTO PALMEIRAS",
-        "municipality": "São Cristóvão",
-        "faction": "CV",
-        "risk_score": 35.07,
-        "score": 35.07,
-        "region": "capital",
-        "parent_area": "CONJUNTO PALMEIRAS",
-        "parent_risk_score": 32.4,
-        "parent_risk_level": "moderado",
-        "parent_status": "MODERADO",
-        "local_street_pressure": 7.128,
-        "nearby_streets_count": 22,
-        "nearby_streets": [
-          "SORRISO - SÃO CRISTÓVÃO",
-          "RUA JOSÉ DO CRATO",
-          "RUA ABENÇOADA"
-        ],
-        "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -38.52812833333334,
-          -3.8341267142857136
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "node_id": 44,
-        "rank": 44,
+        "node_id": 40,
+        "rank": 40,
         "name": "Beco do 12",
         "bairro": "LAGOA REDONDA",
         "municipality": "Fortaleza",
         "faction": "CV",
-        "risk_score": 32.031,
-        "score": 32.031,
+        "risk_score": 33.312,
+        "score": 33.312,
         "region": "capital",
         "parent_area": "LAGOA REDONDA",
-        "parent_risk_score": 35.3,
+        "parent_risk_score": 38.0,
         "parent_risk_level": "moderado",
         "parent_status": "MODERADO",
-        "local_street_pressure": 2.532,
-        "nearby_streets_count": 11,
+        "local_street_pressure": 4.075,
+        "nearby_streets_count": 18,
         "nearby_streets": [
           "BECO DO 12",
-          "ALDEIA",
-          "BARRO DURO"
+          "AVENIDA RECREIO",
+          "AVENIDA MAESTRO LISBOA"
         ],
         "is_tactical": true,
-        "generated_at": "2026-09-24T14:42:49.820787"
+        "generated_at": "2026-10-13T11:34:40.408637"
       },
       "geometry": {
         "type": "Point",
@@ -1499,10 +1363,10 @@
     }
   ],
   "metadata": {
-    "total": 44,
+    "total": 40,
     "source": "Sentinela Micronodes Dynamic Overlay",
     "threshold_min_score": 31.0,
-    "generated_at": "2026-09-24T14:42:49.820787",
+    "generated_at": "2026-10-13T11:34:40.408637",
     "region": "capital"
   }
 }

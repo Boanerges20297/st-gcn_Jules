@@ -1,0 +1,4243 @@
+{
+  "source_rows": 131710,
+  "local_rows": 159639,
+  "candidate_rows": 96167,
+  "verified_source_ids": 95644,
+  "unresolved_rows_preserved": 523,
+  "private_columns_removed": [],
+  "actions": {
+    "verified_id_associations_corrected": 1775,
+    "no_unique_source_signature": 494,
+    "verified_duplicate_representations_removed": 64132,
+    "verified_grouped_rows_expanded": 578,
+    "lost_multi_victim_counts_recovered": 568,
+    "grouped_victims_require_individual_review": 26,
+    "grouped_ids_not_verified_by_source": 3
+  },
+  "unresolved": [
+    {
+      "row_position": 56584,
+      "mysql_ids": [
+        "68916"
+      ],
+      "id_evento": "4020865",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 57459,
+      "mysql_ids": [
+        "69805"
+      ],
+      "id_evento": "4028018",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 57584,
+      "mysql_ids": [
+        "69925"
+      ],
+      "id_evento": "4040702",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 58020,
+      "mysql_ids": [
+        "70374"
+      ],
+      "id_evento": "4041537",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 58185,
+      "mysql_ids": [
+        "70527"
+      ],
+      "id_evento": "4072749",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 58597,
+      "mysql_ids": [
+        "70935"
+      ],
+      "id_evento": "4073496",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 59270,
+      "mysql_ids": [
+        "71599"
+      ],
+      "id_evento": "4104503",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 59598,
+      "mysql_ids": [
+        "71931"
+      ],
+      "id_evento": "4155713",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 59943,
+      "mysql_ids": [
+        "72286"
+      ],
+      "id_evento": "4156489",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 60202,
+      "mysql_ids": [
+        "72541"
+      ],
+      "id_evento": "4253048",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 60333,
+      "mysql_ids": [
+        "72673"
+      ],
+      "id_evento": "4253278",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61538,
+      "mysql_ids": [
+        "74009"
+      ],
+      "id_evento": "4304753",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61539,
+      "mysql_ids": [
+        "74010"
+      ],
+      "id_evento": "4304754",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61540,
+      "mysql_ids": [
+        "74004"
+      ],
+      "id_evento": "4304759",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61541,
+      "mysql_ids": [
+        "74005"
+      ],
+      "id_evento": "4304761",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61542,
+      "mysql_ids": [
+        "74002"
+      ],
+      "id_evento": "4304762",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61543,
+      "mysql_ids": [
+        "74003"
+      ],
+      "id_evento": "4304763",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61544,
+      "mysql_ids": [
+        "74006"
+      ],
+      "id_evento": "4304765",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61545,
+      "mysql_ids": [
+        "74008"
+      ],
+      "id_evento": "4304766",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61546,
+      "mysql_ids": [
+        "74007"
+      ],
+      "id_evento": "4304769",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61547,
+      "mysql_ids": [
+        "74012"
+      ],
+      "id_evento": "4304770",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61548,
+      "mysql_ids": [
+        "74011"
+      ],
+      "id_evento": "4304773",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61549,
+      "mysql_ids": [
+        "74013"
+      ],
+      "id_evento": "4304775",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61550,
+      "mysql_ids": [
+        "74015"
+      ],
+      "id_evento": "4304777",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61551,
+      "mysql_ids": [
+        "74014"
+      ],
+      "id_evento": "4304778",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61552,
+      "mysql_ids": [
+        "74016"
+      ],
+      "id_evento": "4304781",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61553,
+      "mysql_ids": [
+        "74031"
+      ],
+      "id_evento": "4304782",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61554,
+      "mysql_ids": [
+        "74030"
+      ],
+      "id_evento": "4304784",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61555,
+      "mysql_ids": [
+        "74017"
+      ],
+      "id_evento": "4304785",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61556,
+      "mysql_ids": [
+        "74018"
+      ],
+      "id_evento": "4304786",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61557,
+      "mysql_ids": [
+        "74019"
+      ],
+      "id_evento": "4304789",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61558,
+      "mysql_ids": [
+        "74020"
+      ],
+      "id_evento": "4304793",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61559,
+      "mysql_ids": [
+        "74033"
+      ],
+      "id_evento": "4304795",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61560,
+      "mysql_ids": [
+        "74021"
+      ],
+      "id_evento": "4304796",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61561,
+      "mysql_ids": [
+        "74022"
+      ],
+      "id_evento": "4304797",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61562,
+      "mysql_ids": [
+        "74023"
+      ],
+      "id_evento": "4304798",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61563,
+      "mysql_ids": [
+        "74024"
+      ],
+      "id_evento": "4304799",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61564,
+      "mysql_ids": [
+        "74032"
+      ],
+      "id_evento": "4304801",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61565,
+      "mysql_ids": [
+        "74025"
+      ],
+      "id_evento": "4304803",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61566,
+      "mysql_ids": [
+        "74026"
+      ],
+      "id_evento": "4304804",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61567,
+      "mysql_ids": [
+        "74027"
+      ],
+      "id_evento": "4304805",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61568,
+      "mysql_ids": [
+        "74028"
+      ],
+      "id_evento": "4304806",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61569,
+      "mysql_ids": [
+        "74029"
+      ],
+      "id_evento": "4304808",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61570,
+      "mysql_ids": [
+        "74039"
+      ],
+      "id_evento": "4304811",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61571,
+      "mysql_ids": [
+        "74040"
+      ],
+      "id_evento": "4304814",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61572,
+      "mysql_ids": [
+        "74041"
+      ],
+      "id_evento": "4304815",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61573,
+      "mysql_ids": [
+        "74038"
+      ],
+      "id_evento": "4304816",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61574,
+      "mysql_ids": [
+        "74042"
+      ],
+      "id_evento": "4304818",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61575,
+      "mysql_ids": [
+        "74043"
+      ],
+      "id_evento": "4304826",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61576,
+      "mysql_ids": [
+        "74036"
+      ],
+      "id_evento": "4304830",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61577,
+      "mysql_ids": [
+        "74034"
+      ],
+      "id_evento": "4304834",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61578,
+      "mysql_ids": [
+        "74037"
+      ],
+      "id_evento": "4304836",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61579,
+      "mysql_ids": [
+        "74035"
+      ],
+      "id_evento": "4304838",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61580,
+      "mysql_ids": [
+        "74046"
+      ],
+      "id_evento": "4304840",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61581,
+      "mysql_ids": [
+        "74047"
+      ],
+      "id_evento": "4304842",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61582,
+      "mysql_ids": [
+        "74045"
+      ],
+      "id_evento": "4304843",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61583,
+      "mysql_ids": [
+        "74048"
+      ],
+      "id_evento": "4304846",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61584,
+      "mysql_ids": [
+        "74049"
+      ],
+      "id_evento": "4304847",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61585,
+      "mysql_ids": [
+        "74050"
+      ],
+      "id_evento": "4304849",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61586,
+      "mysql_ids": [
+        "74044"
+      ],
+      "id_evento": "4304853",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61587,
+      "mysql_ids": [
+        "74051"
+      ],
+      "id_evento": "4304854",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61588,
+      "mysql_ids": [
+        "74052"
+      ],
+      "id_evento": "4304859",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61589,
+      "mysql_ids": [
+        "74053"
+      ],
+      "id_evento": "4304861",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61590,
+      "mysql_ids": [
+        "74054"
+      ],
+      "id_evento": "4304863",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61591,
+      "mysql_ids": [
+        "74066"
+      ],
+      "id_evento": "4304867",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61592,
+      "mysql_ids": [
+        "74067"
+      ],
+      "id_evento": "4304869",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61593,
+      "mysql_ids": [
+        "74068"
+      ],
+      "id_evento": "4304870",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61594,
+      "mysql_ids": [
+        "74061"
+      ],
+      "id_evento": "4304871",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61595,
+      "mysql_ids": [
+        "74055"
+      ],
+      "id_evento": "4304873",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61596,
+      "mysql_ids": [
+        "74062"
+      ],
+      "id_evento": "4304874",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61597,
+      "mysql_ids": [
+        "74056"
+      ],
+      "id_evento": "4304875",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61598,
+      "mysql_ids": [
+        "74065"
+      ],
+      "id_evento": "4304876",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61599,
+      "mysql_ids": [
+        "74063"
+      ],
+      "id_evento": "4304877",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61600,
+      "mysql_ids": [
+        "74064"
+      ],
+      "id_evento": "4304879",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61601,
+      "mysql_ids": [
+        "74057"
+      ],
+      "id_evento": "4304880",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61602,
+      "mysql_ids": [
+        "74069"
+      ],
+      "id_evento": "4304881",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61603,
+      "mysql_ids": [
+        "74070"
+      ],
+      "id_evento": "4304883",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61604,
+      "mysql_ids": [
+        "74058"
+      ],
+      "id_evento": "4304884",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61605,
+      "mysql_ids": [
+        "74059"
+      ],
+      "id_evento": "4304887",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61606,
+      "mysql_ids": [
+        "74060"
+      ],
+      "id_evento": "4304888",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61607,
+      "mysql_ids": [
+        "74071"
+      ],
+      "id_evento": "4304889",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61608,
+      "mysql_ids": [
+        "74073"
+      ],
+      "id_evento": "4304892",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61609,
+      "mysql_ids": [
+        "74072"
+      ],
+      "id_evento": "4304893",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61610,
+      "mysql_ids": [
+        "74077"
+      ],
+      "id_evento": "4304897",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61611,
+      "mysql_ids": [
+        "74076"
+      ],
+      "id_evento": "4304900",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61612,
+      "mysql_ids": [
+        "74075"
+      ],
+      "id_evento": "4304902",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61613,
+      "mysql_ids": [
+        "74074"
+      ],
+      "id_evento": "4304903",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61614,
+      "mysql_ids": [
+        "74081"
+      ],
+      "id_evento": "4304906",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61615,
+      "mysql_ids": [
+        "74080"
+      ],
+      "id_evento": "4304907",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61616,
+      "mysql_ids": [
+        "74079"
+      ],
+      "id_evento": "4304908",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61617,
+      "mysql_ids": [
+        "74078"
+      ],
+      "id_evento": "4304910",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61618,
+      "mysql_ids": [
+        "74090"
+      ],
+      "id_evento": "4304912",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61619,
+      "mysql_ids": [
+        "74085"
+      ],
+      "id_evento": "4304914",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61620,
+      "mysql_ids": [
+        "74087"
+      ],
+      "id_evento": "4304916",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61621,
+      "mysql_ids": [
+        "74084"
+      ],
+      "id_evento": "4304920",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61622,
+      "mysql_ids": [
+        "74094"
+      ],
+      "id_evento": "4304924",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61623,
+      "mysql_ids": [
+        "74092"
+      ],
+      "id_evento": "4304928",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61624,
+      "mysql_ids": [
+        "74091"
+      ],
+      "id_evento": "4304929",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61625,
+      "mysql_ids": [
+        "74089"
+      ],
+      "id_evento": "4304930",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61626,
+      "mysql_ids": [
+        "74082"
+      ],
+      "id_evento": "4304931",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61627,
+      "mysql_ids": [
+        "74088"
+      ],
+      "id_evento": "4304932",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61628,
+      "mysql_ids": [
+        "74086"
+      ],
+      "id_evento": "4304934",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61629,
+      "mysql_ids": [
+        "74093"
+      ],
+      "id_evento": "4304935",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61630,
+      "mysql_ids": [
+        "74083"
+      ],
+      "id_evento": "4304938",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61631,
+      "mysql_ids": [
+        "74101"
+      ],
+      "id_evento": "4304940",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61632,
+      "mysql_ids": [
+        "74097"
+      ],
+      "id_evento": "4304943",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61633,
+      "mysql_ids": [
+        "74102"
+      ],
+      "id_evento": "4304944",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61634,
+      "mysql_ids": [
+        "74103"
+      ],
+      "id_evento": "4304946",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61635,
+      "mysql_ids": [
+        "74098"
+      ],
+      "id_evento": "4304950",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61636,
+      "mysql_ids": [
+        "74099"
+      ],
+      "id_evento": "4304951",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61637,
+      "mysql_ids": [
+        "74104"
+      ],
+      "id_evento": "4304952",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61638,
+      "mysql_ids": [
+        "74100"
+      ],
+      "id_evento": "4304958",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61639,
+      "mysql_ids": [
+        "74095"
+      ],
+      "id_evento": "4304962",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61640,
+      "mysql_ids": [
+        "74096"
+      ],
+      "id_evento": "4304963",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61641,
+      "mysql_ids": [
+        "74108"
+      ],
+      "id_evento": "4304973",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61642,
+      "mysql_ids": [
+        "74109"
+      ],
+      "id_evento": "4304974",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61643,
+      "mysql_ids": [
+        "74110"
+      ],
+      "id_evento": "4304978",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61644,
+      "mysql_ids": [
+        "74105"
+      ],
+      "id_evento": "4304979",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61645,
+      "mysql_ids": [
+        "74106"
+      ],
+      "id_evento": "4304984",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61646,
+      "mysql_ids": [
+        "74107"
+      ],
+      "id_evento": "4304986",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61647,
+      "mysql_ids": [
+        "74112"
+      ],
+      "id_evento": "4304987",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61648,
+      "mysql_ids": [
+        "74113"
+      ],
+      "id_evento": "4304988",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61649,
+      "mysql_ids": [
+        "74111"
+      ],
+      "id_evento": "4304990",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61650,
+      "mysql_ids": [
+        "74114"
+      ],
+      "id_evento": "4304991",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61651,
+      "mysql_ids": [
+        "74118"
+      ],
+      "id_evento": "4304992",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61652,
+      "mysql_ids": [
+        "74119"
+      ],
+      "id_evento": "4304993",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61653,
+      "mysql_ids": [
+        "74120"
+      ],
+      "id_evento": "4304994",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61654,
+      "mysql_ids": [
+        "74115"
+      ],
+      "id_evento": "4305000",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61655,
+      "mysql_ids": [
+        "74116"
+      ],
+      "id_evento": "4305002",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61656,
+      "mysql_ids": [
+        "74117"
+      ],
+      "id_evento": "4305005",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61657,
+      "mysql_ids": [
+        "74134"
+      ],
+      "id_evento": "4305008",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61658,
+      "mysql_ids": [
+        "74135"
+      ],
+      "id_evento": "4305009",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61659,
+      "mysql_ids": [
+        "74138"
+      ],
+      "id_evento": "4316973",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61660,
+      "mysql_ids": [
+        "74139"
+      ],
+      "id_evento": "4316974",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61661,
+      "mysql_ids": [
+        "74137"
+      ],
+      "id_evento": "4316488",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61662,
+      "mysql_ids": [
+        "74142"
+      ],
+      "id_evento": "4316489",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61663,
+      "mysql_ids": [
+        "74140"
+      ],
+      "id_evento": "4316979",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61664,
+      "mysql_ids": [
+        "74136"
+      ],
+      "id_evento": "4317289",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61665,
+      "mysql_ids": [
+        "74141"
+      ],
+      "id_evento": "4316982",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61666,
+      "mysql_ids": [
+        "74144"
+      ],
+      "id_evento": "4316985",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61667,
+      "mysql_ids": [
+        "74145"
+      ],
+      "id_evento": "4316989",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61668,
+      "mysql_ids": [
+        "74152"
+      ],
+      "id_evento": "4317255",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61669,
+      "mysql_ids": [
+        "74146"
+      ],
+      "id_evento": "4316990",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61670,
+      "mysql_ids": [
+        "74147"
+      ],
+      "id_evento": "4316992",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61671,
+      "mysql_ids": [
+        "74150"
+      ],
+      "id_evento": "4316490",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61672,
+      "mysql_ids": [
+        "74148"
+      ],
+      "id_evento": "4316993",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61673,
+      "mysql_ids": [
+        "74143"
+      ],
+      "id_evento": "4317256",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61674,
+      "mysql_ids": [
+        "74149"
+      ],
+      "id_evento": "4316996",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61675,
+      "mysql_ids": [
+        "74155"
+      ],
+      "id_evento": "4316998",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61676,
+      "mysql_ids": [
+        "74151"
+      ],
+      "id_evento": "4316491",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61677,
+      "mysql_ids": [
+        "74153"
+      ],
+      "id_evento": "4317001",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61678,
+      "mysql_ids": [
+        "74154"
+      ],
+      "id_evento": "4317327",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61679,
+      "mysql_ids": [
+        "74164"
+      ],
+      "id_evento": "4317005",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61680,
+      "mysql_ids": [
+        "74165"
+      ],
+      "id_evento": "4317006",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61681,
+      "mysql_ids": [
+        "74166"
+      ],
+      "id_evento": "4317007",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61682,
+      "mysql_ids": [
+        "74156"
+      ],
+      "id_evento": "4317009",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61683,
+      "mysql_ids": [
+        "74159"
+      ],
+      "id_evento": "4317010",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61684,
+      "mysql_ids": [
+        "74157"
+      ],
+      "id_evento": "4317317",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61685,
+      "mysql_ids": [
+        "74160"
+      ],
+      "id_evento": "4317012",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61686,
+      "mysql_ids": [
+        "74162"
+      ],
+      "id_evento": "4317013",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61687,
+      "mysql_ids": [
+        "74168"
+      ],
+      "id_evento": "4317258",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61688,
+      "mysql_ids": [
+        "74161"
+      ],
+      "id_evento": "4317015",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61689,
+      "mysql_ids": [
+        "74163"
+      ],
+      "id_evento": "4317016",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61690,
+      "mysql_ids": [
+        "74167"
+      ],
+      "id_evento": "4317306",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61691,
+      "mysql_ids": [
+        "74158"
+      ],
+      "id_evento": "4317017",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61692,
+      "mysql_ids": [
+        "74174"
+      ],
+      "id_evento": "4317020",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61693,
+      "mysql_ids": [
+        "74175"
+      ],
+      "id_evento": "4317022",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61694,
+      "mysql_ids": [
+        "74170"
+      ],
+      "id_evento": "4316734",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61695,
+      "mysql_ids": [
+        "74176"
+      ],
+      "id_evento": "4317024",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61696,
+      "mysql_ids": [
+        "74177"
+      ],
+      "id_evento": "4317026",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61697,
+      "mysql_ids": [
+        "74178"
+      ],
+      "id_evento": "4317027",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61698,
+      "mysql_ids": [
+        "74179"
+      ],
+      "id_evento": "4317028",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61699,
+      "mysql_ids": [
+        "74180"
+      ],
+      "id_evento": "4317029",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61700,
+      "mysql_ids": [
+        "74181"
+      ],
+      "id_evento": "4317030",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61701,
+      "mysql_ids": [
+        "74182"
+      ],
+      "id_evento": "4317031",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61702,
+      "mysql_ids": [
+        "74171"
+      ],
+      "id_evento": "4317034",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61703,
+      "mysql_ids": [
+        "74169"
+      ],
+      "id_evento": "4316735",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61704,
+      "mysql_ids": [
+        "74173"
+      ],
+      "id_evento": "4317035",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61705,
+      "mysql_ids": [
+        "74172"
+      ],
+      "id_evento": "4317038",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61706,
+      "mysql_ids": [
+        "74183"
+      ],
+      "id_evento": "4317039",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61707,
+      "mysql_ids": [
+        "74189"
+      ],
+      "id_evento": "4317042",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61708,
+      "mysql_ids": [
+        "74190"
+      ],
+      "id_evento": "4317043",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61709,
+      "mysql_ids": [
+        "74192"
+      ],
+      "id_evento": "4317045",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61710,
+      "mysql_ids": [
+        "74191"
+      ],
+      "id_evento": "4317046",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61711,
+      "mysql_ids": [
+        "74184"
+      ],
+      "id_evento": "4317047",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61712,
+      "mysql_ids": [
+        "74185"
+      ],
+      "id_evento": "4317048",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61713,
+      "mysql_ids": [
+        "74186"
+      ],
+      "id_evento": "4317051",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61714,
+      "mysql_ids": [
+        "74187"
+      ],
+      "id_evento": "4317052",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61715,
+      "mysql_ids": [
+        "74188"
+      ],
+      "id_evento": "4317054",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61716,
+      "mysql_ids": [
+        "74201"
+      ],
+      "id_evento": "4317057",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61717,
+      "mysql_ids": [
+        "74200"
+      ],
+      "id_evento": "4317059",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61718,
+      "mysql_ids": [
+        "74202"
+      ],
+      "id_evento": "4316740",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61719,
+      "mysql_ids": [
+        "74193"
+      ],
+      "id_evento": "4317061",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61720,
+      "mysql_ids": [
+        "74199"
+      ],
+      "id_evento": "4317063",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61721,
+      "mysql_ids": [
+        "74194"
+      ],
+      "id_evento": "4317064",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61722,
+      "mysql_ids": [
+        "74195"
+      ],
+      "id_evento": "4317065",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61723,
+      "mysql_ids": [
+        "74196"
+      ],
+      "id_evento": "4317066",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61724,
+      "mysql_ids": [
+        "74197"
+      ],
+      "id_evento": "4317067",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61725,
+      "mysql_ids": [
+        "74198"
+      ],
+      "id_evento": "4317070",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61726,
+      "mysql_ids": [
+        "74204"
+      ],
+      "id_evento": "4317072",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61727,
+      "mysql_ids": [
+        "74206"
+      ],
+      "id_evento": "4317074",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61728,
+      "mysql_ids": [
+        "74203"
+      ],
+      "id_evento": "4317076",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61729,
+      "mysql_ids": [
+        "74205"
+      ],
+      "id_evento": "4317231",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61730,
+      "mysql_ids": [
+        "74211"
+      ],
+      "id_evento": "4317078",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61731,
+      "mysql_ids": [
+        "74210"
+      ],
+      "id_evento": "4317079",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61732,
+      "mysql_ids": [
+        "74209"
+      ],
+      "id_evento": "4317080",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61733,
+      "mysql_ids": [
+        "74208"
+      ],
+      "id_evento": "4317081",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61734,
+      "mysql_ids": [
+        "74207"
+      ],
+      "id_evento": "4317082",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61735,
+      "mysql_ids": [
+        "74214"
+      ],
+      "id_evento": "4317088",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61736,
+      "mysql_ids": [
+        "74215"
+      ],
+      "id_evento": "4317090",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61737,
+      "mysql_ids": [
+        "74216"
+      ],
+      "id_evento": "4317091",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61738,
+      "mysql_ids": [
+        "74217"
+      ],
+      "id_evento": "4317092",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61739,
+      "mysql_ids": [
+        "74212"
+      ],
+      "id_evento": "4317095",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61740,
+      "mysql_ids": [
+        "74213"
+      ],
+      "id_evento": "4317096",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61741,
+      "mysql_ids": [
+        "74222"
+      ],
+      "id_evento": "4317101",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61742,
+      "mysql_ids": [
+        "74224"
+      ],
+      "id_evento": "4317234",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61743,
+      "mysql_ids": [
+        "74223"
+      ],
+      "id_evento": "4317235",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61744,
+      "mysql_ids": [
+        "74227"
+      ],
+      "id_evento": "4317308",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61745,
+      "mysql_ids": [
+        "74221"
+      ],
+      "id_evento": "4317106",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61746,
+      "mysql_ids": [
+        "74220"
+      ],
+      "id_evento": "4317108",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61747,
+      "mysql_ids": [
+        "74226"
+      ],
+      "id_evento": "4317309",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61748,
+      "mysql_ids": [
+        "74219"
+      ],
+      "id_evento": "4317109",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61749,
+      "mysql_ids": [
+        "74218"
+      ],
+      "id_evento": "4317110",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61750,
+      "mysql_ids": [
+        "74225"
+      ],
+      "id_evento": "4317279",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61751,
+      "mysql_ids": [
+        "74231"
+      ],
+      "id_evento": "4317111",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61752,
+      "mysql_ids": [
+        "74232"
+      ],
+      "id_evento": "4317112",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61753,
+      "mysql_ids": [
+        "74229"
+      ],
+      "id_evento": "4317113",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61754,
+      "mysql_ids": [
+        "74230"
+      ],
+      "id_evento": "4317114",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61755,
+      "mysql_ids": [
+        "74228"
+      ],
+      "id_evento": "4316742",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61756,
+      "mysql_ids": [
+        "74233"
+      ],
+      "id_evento": "4317115",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61757,
+      "mysql_ids": [
+        "74235"
+      ],
+      "id_evento": "4317209",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61758,
+      "mysql_ids": [
+        "74234"
+      ],
+      "id_evento": "4317120",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61759,
+      "mysql_ids": [
+        "74243"
+      ],
+      "id_evento": "4317121",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61760,
+      "mysql_ids": [
+        "74240"
+      ],
+      "id_evento": "4317325",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61761,
+      "mysql_ids": [
+        "74244"
+      ],
+      "id_evento": "4317122",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61762,
+      "mysql_ids": [
+        "74245"
+      ],
+      "id_evento": "4317124",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61763,
+      "mysql_ids": [
+        "74246"
+      ],
+      "id_evento": "4317126",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61764,
+      "mysql_ids": [
+        "74241"
+      ],
+      "id_evento": "4316747",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61765,
+      "mysql_ids": [
+        "74247"
+      ],
+      "id_evento": "4317127",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61766,
+      "mysql_ids": [
+        "74242"
+      ],
+      "id_evento": "4317128",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61767,
+      "mysql_ids": [
+        "74238"
+      ],
+      "id_evento": "4317129",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61768,
+      "mysql_ids": [
+        "74239"
+      ],
+      "id_evento": "4317132",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61769,
+      "mysql_ids": [
+        "74237"
+      ],
+      "id_evento": "4317133",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61770,
+      "mysql_ids": [
+        "74236"
+      ],
+      "id_evento": "4317136",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61771,
+      "mysql_ids": [
+        "74251"
+      ],
+      "id_evento": "4317139",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61772,
+      "mysql_ids": [
+        "74252"
+      ],
+      "id_evento": "4317140",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61773,
+      "mysql_ids": [
+        "74253"
+      ],
+      "id_evento": "4317141",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61774,
+      "mysql_ids": [
+        "74254"
+      ],
+      "id_evento": "4317143",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61775,
+      "mysql_ids": [
+        "74268"
+      ],
+      "id_evento": "4317324",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61776,
+      "mysql_ids": [
+        "74255"
+      ],
+      "id_evento": "4317145",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61777,
+      "mysql_ids": [
+        "74256"
+      ],
+      "id_evento": "4317146",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61778,
+      "mysql_ids": [
+        "74257"
+      ],
+      "id_evento": "4317147",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61779,
+      "mysql_ids": [
+        "74258"
+      ],
+      "id_evento": "4317148",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61780,
+      "mysql_ids": [
+        "74269"
+      ],
+      "id_evento": "4317321",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61781,
+      "mysql_ids": [
+        "74259"
+      ],
+      "id_evento": "4317149",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61782,
+      "mysql_ids": [
+        "74260"
+      ],
+      "id_evento": "4317151",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61783,
+      "mysql_ids": [
+        "74248"
+      ],
+      "id_evento": "4317247",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61784,
+      "mysql_ids": [
+        "74267"
+      ],
+      "id_evento": "4316748",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61785,
+      "mysql_ids": [
+        "74249"
+      ],
+      "id_evento": "4317262",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61786,
+      "mysql_ids": [
+        "74261"
+      ],
+      "id_evento": "4317152",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61787,
+      "mysql_ids": [
+        "74262"
+      ],
+      "id_evento": "4317153",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61788,
+      "mysql_ids": [
+        "74250"
+      ],
+      "id_evento": "4317154",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61789,
+      "mysql_ids": [
+        "74263"
+      ],
+      "id_evento": "4317155",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61790,
+      "mysql_ids": [
+        "74264"
+      ],
+      "id_evento": "4317160",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61791,
+      "mysql_ids": [
+        "74265"
+      ],
+      "id_evento": "4317161",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61792,
+      "mysql_ids": [
+        "74266"
+      ],
+      "id_evento": "4317162",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61793,
+      "mysql_ids": [
+        "74276"
+      ],
+      "id_evento": "4317167",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61794,
+      "mysql_ids": [
+        "74277"
+      ],
+      "id_evento": "4317168",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61795,
+      "mysql_ids": [
+        "74278"
+      ],
+      "id_evento": "4317169",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61796,
+      "mysql_ids": [
+        "74275"
+      ],
+      "id_evento": "4317170",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61797,
+      "mysql_ids": [
+        "74279"
+      ],
+      "id_evento": "4317171",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61798,
+      "mysql_ids": [
+        "74280"
+      ],
+      "id_evento": "4317172",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61799,
+      "mysql_ids": [
+        "74272"
+      ],
+      "id_evento": "4317173",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61800,
+      "mysql_ids": [
+        "74270"
+      ],
+      "id_evento": "4316752",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61801,
+      "mysql_ids": [
+        "74271"
+      ],
+      "id_evento": "4317175",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61802,
+      "mysql_ids": [
+        "74273"
+      ],
+      "id_evento": "4317176",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61803,
+      "mysql_ids": [
+        "74274"
+      ],
+      "id_evento": "4317177",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61804,
+      "mysql_ids": [
+        "74286"
+      ],
+      "id_evento": "4317179",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61805,
+      "mysql_ids": [
+        "74291"
+      ],
+      "id_evento": "4317180",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61806,
+      "mysql_ids": [
+        "74289"
+      ],
+      "id_evento": "4316763",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61807,
+      "mysql_ids": [
+        "74292"
+      ],
+      "id_evento": "4317182",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61808,
+      "mysql_ids": [
+        "74293"
+      ],
+      "id_evento": "4317184",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61809,
+      "mysql_ids": [
+        "74294"
+      ],
+      "id_evento": "4317185",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61810,
+      "mysql_ids": [
+        "74283"
+      ],
+      "id_evento": "4317186",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61811,
+      "mysql_ids": [
+        "74288"
+      ],
+      "id_evento": "4316753",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61812,
+      "mysql_ids": [
+        "74284"
+      ],
+      "id_evento": "4317189",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61813,
+      "mysql_ids": [
+        "74285"
+      ],
+      "id_evento": "4317190",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61814,
+      "mysql_ids": [
+        "74281"
+      ],
+      "id_evento": "4317302",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61815,
+      "mysql_ids": [
+        "74282"
+      ],
+      "id_evento": "4317239",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61816,
+      "mysql_ids": [
+        "74290"
+      ],
+      "id_evento": "4317194",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61817,
+      "mysql_ids": [
+        "74287"
+      ],
+      "id_evento": "4317195",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61818,
+      "mysql_ids": [
+        "74298"
+      ],
+      "id_evento": "4317196",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61819,
+      "mysql_ids": [
+        "74309"
+      ],
+      "id_evento": "4316754",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61820,
+      "mysql_ids": [
+        "74295"
+      ],
+      "id_evento": "4317197",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61821,
+      "mysql_ids": [
+        "74315"
+      ],
+      "id_evento": "4317240",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61822,
+      "mysql_ids": [
+        "74310"
+      ],
+      "id_evento": "4317298",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61823,
+      "mysql_ids": [
+        "74299"
+      ],
+      "id_evento": "4317198",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61824,
+      "mysql_ids": [
+        "74300"
+      ],
+      "id_evento": "4317199",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61825,
+      "mysql_ids": [
+        "74314"
+      ],
+      "id_evento": "4317265",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61826,
+      "mysql_ids": [
+        "74301"
+      ],
+      "id_evento": "4317200",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61827,
+      "mysql_ids": [
+        "74302"
+      ],
+      "id_evento": "4317202",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61828,
+      "mysql_ids": [
+        "74316"
+      ],
+      "id_evento": "4317241",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61829,
+      "mysql_ids": [
+        "74303"
+      ],
+      "id_evento": "4317203",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61830,
+      "mysql_ids": [
+        "74304"
+      ],
+      "id_evento": "4317204",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61831,
+      "mysql_ids": [
+        "74305"
+      ],
+      "id_evento": "4317205",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61832,
+      "mysql_ids": [
+        "74317"
+      ],
+      "id_evento": "4377365",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61833,
+      "mysql_ids": [
+        "74306"
+      ],
+      "id_evento": "4377291",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61834,
+      "mysql_ids": [
+        "74307"
+      ],
+      "id_evento": "4377296",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61835,
+      "mysql_ids": [
+        "74308"
+      ],
+      "id_evento": "4377297",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61836,
+      "mysql_ids": [
+        "74296"
+      ],
+      "id_evento": "4377299",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61837,
+      "mysql_ids": [
+        "74318"
+      ],
+      "id_evento": "4377367",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61838,
+      "mysql_ids": [
+        "74311"
+      ],
+      "id_evento": "4377368",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61839,
+      "mysql_ids": [
+        "74297"
+      ],
+      "id_evento": "4377300",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61840,
+      "mysql_ids": [
+        "74312"
+      ],
+      "id_evento": "4377301",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61841,
+      "mysql_ids": [
+        "74313"
+      ],
+      "id_evento": "4377302",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61842,
+      "mysql_ids": [
+        "74319"
+      ],
+      "id_evento": "4377305",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61843,
+      "mysql_ids": [
+        "74322"
+      ],
+      "id_evento": "4377307",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61844,
+      "mysql_ids": [
+        "74325"
+      ],
+      "id_evento": "4377418",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61845,
+      "mysql_ids": [
+        "74323"
+      ],
+      "id_evento": "4376836",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61846,
+      "mysql_ids": [
+        "74321"
+      ],
+      "id_evento": "4377308",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61847,
+      "mysql_ids": [
+        "74320"
+      ],
+      "id_evento": "4377309",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61848,
+      "mysql_ids": [
+        "74326"
+      ],
+      "id_evento": "4377427",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61849,
+      "mysql_ids": [
+        "74324"
+      ],
+      "id_evento": "4377416",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61850,
+      "mysql_ids": [
+        "74335"
+      ],
+      "id_evento": "4377312",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61851,
+      "mysql_ids": [
+        "74336"
+      ],
+      "id_evento": "4377313",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61852,
+      "mysql_ids": [
+        "74328"
+      ],
+      "id_evento": "4377439",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61853,
+      "mysql_ids": [
+        "74329"
+      ],
+      "id_evento": "4377372",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61854,
+      "mysql_ids": [
+        "74330"
+      ],
+      "id_evento": "4377386",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61855,
+      "mysql_ids": [
+        "74331"
+      ],
+      "id_evento": "4377316",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61856,
+      "mysql_ids": [
+        "74333"
+      ],
+      "id_evento": "4377318",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61857,
+      "mysql_ids": [
+        "74332"
+      ],
+      "id_evento": "4377319",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61858,
+      "mysql_ids": [
+        "74334"
+      ],
+      "id_evento": "4377322",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61859,
+      "mysql_ids": [
+        "74327"
+      ],
+      "id_evento": "4377339",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61860,
+      "mysql_ids": [
+        "74338"
+      ],
+      "id_evento": "4377323",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61861,
+      "mysql_ids": [
+        "74347"
+      ],
+      "id_evento": "4376838",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61862,
+      "mysql_ids": [
+        "74346"
+      ],
+      "id_evento": "4376839",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 61863,
+      "mysql_ids": [],
+      "id_evento": null,
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 132063,
+      "mysql_ids": [
+        "2479",
+        "2480"
+      ],
+      "id_evento": "1738475",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 133194,
+      "mysql_ids": [
+        "3663",
+        "3662"
+      ],
+      "id_evento": "2407039",
+      "reason": "grouped_ids_not_verified_by_source"
+    },
+    {
+      "row_position": 134295,
+      "mysql_ids": [
+        "4801",
+        "4805"
+      ],
+      "id_evento": "2429796",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 135751,
+      "mysql_ids": [
+        "6334",
+        "6336"
+      ],
+      "id_evento": "2480860",
+      "reason": "grouped_ids_not_verified_by_source"
+    },
+    {
+      "row_position": 136181,
+      "mysql_ids": [
+        "6789",
+        "6790"
+      ],
+      "id_evento": "2488982",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 136200,
+      "mysql_ids": [
+        "6812",
+        "6813"
+      ],
+      "id_evento": "2489004",
+      "reason": "grouped_ids_not_verified_by_source"
+    },
+    {
+      "row_position": 139178,
+      "mysql_ids": [
+        "9912",
+        "9915"
+      ],
+      "id_evento": "2668119",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 140049,
+      "mysql_ids": [
+        "10827",
+        "10828"
+      ],
+      "id_evento": "4302382",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 140104,
+      "mysql_ids": [
+        "10884",
+        "10894"
+      ],
+      "id_evento": "4302439",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 140333,
+      "mysql_ids": [
+        "11130",
+        "11131"
+      ],
+      "id_evento": "4093249",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 140334,
+      "mysql_ids": [
+        "11132",
+        "11139"
+      ],
+      "id_evento": "4093261",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 140798,
+      "mysql_ids": [
+        "11625",
+        "11638"
+      ],
+      "id_evento": "4303171",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 140800,
+      "mysql_ids": [
+        "11619",
+        "11634"
+      ],
+      "id_evento": "4303172",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 140801,
+      "mysql_ids": [
+        "11620",
+        "11643"
+      ],
+      "id_evento": "4303173",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 140803,
+      "mysql_ids": [
+        "11621",
+        "11640"
+      ],
+      "id_evento": "4303174",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 140804,
+      "mysql_ids": [
+        "11622",
+        "11641"
+      ],
+      "id_evento": "4303175",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 140805,
+      "mysql_ids": [
+        "11623",
+        "11633"
+      ],
+      "id_evento": "4303176",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 140807,
+      "mysql_ids": [
+        "11631",
+        "11636"
+      ],
+      "id_evento": "4228095",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 140808,
+      "mysql_ids": [
+        "11628",
+        "11644"
+      ],
+      "id_evento": "4303179",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 140813,
+      "mysql_ids": [
+        "11630",
+        "11632"
+      ],
+      "id_evento": "4228094",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 141316,
+      "mysql_ids": [
+        "12173",
+        "12174"
+      ],
+      "id_evento": "4303710",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 141317,
+      "mysql_ids": [
+        "12173",
+        "12174"
+      ],
+      "id_evento": "4296205",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 141321,
+      "mysql_ids": [
+        "12177",
+        "12178"
+      ],
+      "id_evento": "4303714",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 141332,
+      "mysql_ids": [
+        "12179",
+        "12191"
+      ],
+      "id_evento": "4303725",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 141357,
+      "mysql_ids": [
+        "12216",
+        "12218"
+      ],
+      "id_evento": "4303750",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 141360,
+      "mysql_ids": [
+        "12219",
+        "12221"
+      ],
+      "id_evento": "4296319",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 141365,
+      "mysql_ids": [
+        "12225",
+        "12229"
+      ],
+      "id_evento": "4303759",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 141395,
+      "mysql_ids": [
+        "12258"
+      ],
+      "id_evento": "4304415",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141397,
+      "mysql_ids": [
+        "12263"
+      ],
+      "id_evento": "4304420",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141398,
+      "mysql_ids": [
+        "12261"
+      ],
+      "id_evento": "4304418",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141399,
+      "mysql_ids": [
+        "12264"
+      ],
+      "id_evento": "4304421",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141400,
+      "mysql_ids": [
+        "12259"
+      ],
+      "id_evento": "4304416",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141402,
+      "mysql_ids": [
+        "12260"
+      ],
+      "id_evento": "4304417",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141403,
+      "mysql_ids": [
+        "12266"
+      ],
+      "id_evento": "4304423",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141405,
+      "mysql_ids": [
+        "12265"
+      ],
+      "id_evento": "4304422",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141407,
+      "mysql_ids": [
+        "12267"
+      ],
+      "id_evento": "4304414",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141409,
+      "mysql_ids": [
+        "12262"
+      ],
+      "id_evento": "4304419",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141411,
+      "mysql_ids": [
+        "12271"
+      ],
+      "id_evento": "4304427",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141412,
+      "mysql_ids": [
+        "12272"
+      ],
+      "id_evento": "4304428",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141413,
+      "mysql_ids": [
+        "12268"
+      ],
+      "id_evento": "4304424",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141414,
+      "mysql_ids": [
+        "12269"
+      ],
+      "id_evento": "4304425",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141415,
+      "mysql_ids": [
+        "12270"
+      ],
+      "id_evento": "4304426",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141416,
+      "mysql_ids": [
+        "12277"
+      ],
+      "id_evento": "4304433",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141417,
+      "mysql_ids": [
+        "12274"
+      ],
+      "id_evento": "4304430",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141418,
+      "mysql_ids": [
+        "12273"
+      ],
+      "id_evento": "4304429",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141420,
+      "mysql_ids": [
+        "12278"
+      ],
+      "id_evento": "4304434",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141422,
+      "mysql_ids": [
+        "12279"
+      ],
+      "id_evento": "4304435",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141424,
+      "mysql_ids": [
+        "12287"
+      ],
+      "id_evento": "4304443",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141425,
+      "mysql_ids": [
+        "12290"
+      ],
+      "id_evento": "4304447",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141427,
+      "mysql_ids": [
+        "12281"
+      ],
+      "id_evento": "4304437",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141429,
+      "mysql_ids": [
+        "12286"
+      ],
+      "id_evento": "4304442",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141430,
+      "mysql_ids": [
+        "12283",
+        "12284"
+      ],
+      "id_evento": "4304439",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141432,
+      "mysql_ids": [
+        "12289",
+        "12291"
+      ],
+      "id_evento": "4304445",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141433,
+      "mysql_ids": [
+        "12285"
+      ],
+      "id_evento": "4304441",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141434,
+      "mysql_ids": [
+        "12288"
+      ],
+      "id_evento": "4304444",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141436,
+      "mysql_ids": [
+        "12282"
+      ],
+      "id_evento": "4304438",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141437,
+      "mysql_ids": [
+        "12280"
+      ],
+      "id_evento": "4304436",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141438,
+      "mysql_ids": [
+        "12294"
+      ],
+      "id_evento": "4304451",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141439,
+      "mysql_ids": [
+        "12292"
+      ],
+      "id_evento": "4304449",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141440,
+      "mysql_ids": [
+        "12293"
+      ],
+      "id_evento": "4304448",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141442,
+      "mysql_ids": [
+        "12295"
+      ],
+      "id_evento": "4304450",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141443,
+      "mysql_ids": [
+        "12297"
+      ],
+      "id_evento": "4304452",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141445,
+      "mysql_ids": [
+        "12299"
+      ],
+      "id_evento": "4304455",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141446,
+      "mysql_ids": [
+        "12296"
+      ],
+      "id_evento": "4304453",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141449,
+      "mysql_ids": [
+        "12300"
+      ],
+      "id_evento": "4304454",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141450,
+      "mysql_ids": [
+        "12305"
+      ],
+      "id_evento": "4304460",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141451,
+      "mysql_ids": [
+        "12301"
+      ],
+      "id_evento": "4304456",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141452,
+      "mysql_ids": [
+        "12303"
+      ],
+      "id_evento": "4304458",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141453,
+      "mysql_ids": [
+        "12304"
+      ],
+      "id_evento": "4304459",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141454,
+      "mysql_ids": [
+        "12302"
+      ],
+      "id_evento": "4304457",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141456,
+      "mysql_ids": [
+        "12310"
+      ],
+      "id_evento": "4304466",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141458,
+      "mysql_ids": [
+        "12312"
+      ],
+      "id_evento": "4304461",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141461,
+      "mysql_ids": [
+        "12309"
+      ],
+      "id_evento": "4304465",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141462,
+      "mysql_ids": [
+        "12308"
+      ],
+      "id_evento": "4304464",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141463,
+      "mysql_ids": [
+        "12307"
+      ],
+      "id_evento": "4304463",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141464,
+      "mysql_ids": [
+        "12306"
+      ],
+      "id_evento": "4304462",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141466,
+      "mysql_ids": [
+        "12320"
+      ],
+      "id_evento": "4304472",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141468,
+      "mysql_ids": [
+        "12317",
+        "12318"
+      ],
+      "id_evento": "4304467",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141470,
+      "mysql_ids": [
+        "12316"
+      ],
+      "id_evento": "4304473",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141471,
+      "mysql_ids": [
+        "12315"
+      ],
+      "id_evento": "4304470",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141472,
+      "mysql_ids": [
+        "12316"
+      ],
+      "id_evento": "4304471",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141474,
+      "mysql_ids": [
+        "12319"
+      ],
+      "id_evento": "4304469",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141475,
+      "mysql_ids": [
+        "12321"
+      ],
+      "id_evento": "4304474",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141477,
+      "mysql_ids": [
+        "12332"
+      ],
+      "id_evento": "4304484",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141479,
+      "mysql_ids": [
+        "12334"
+      ],
+      "id_evento": "4304486",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141480,
+      "mysql_ids": [
+        "12330"
+      ],
+      "id_evento": "4304482",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141481,
+      "mysql_ids": [
+        "12322"
+      ],
+      "id_evento": "4304483",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141482,
+      "mysql_ids": [
+        "12333"
+      ],
+      "id_evento": "4304485",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141483,
+      "mysql_ids": [
+        "12328"
+      ],
+      "id_evento": "4304480",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141484,
+      "mysql_ids": [
+        "12335"
+      ],
+      "id_evento": "4304487",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141485,
+      "mysql_ids": [
+        "12323"
+      ],
+      "id_evento": "4304475",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141486,
+      "mysql_ids": [
+        "12325"
+      ],
+      "id_evento": "4304477",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141487,
+      "mysql_ids": [
+        "12329"
+      ],
+      "id_evento": "4304481",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141489,
+      "mysql_ids": [
+        "12326"
+      ],
+      "id_evento": "4304478",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141490,
+      "mysql_ids": [
+        "12327"
+      ],
+      "id_evento": "4304479",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141491,
+      "mysql_ids": [
+        "12324"
+      ],
+      "id_evento": "4304476",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141493,
+      "mysql_ids": [
+        "12340"
+      ],
+      "id_evento": "4304491",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141495,
+      "mysql_ids": [
+        "12335"
+      ],
+      "id_evento": "4304494",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141496,
+      "mysql_ids": [
+        "12338"
+      ],
+      "id_evento": "4304490",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141498,
+      "mysql_ids": [
+        "12343"
+      ],
+      "id_evento": "4304493",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141499,
+      "mysql_ids": [
+        "12336"
+      ],
+      "id_evento": "4304489",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141500,
+      "mysql_ids": [
+        "12345"
+      ],
+      "id_evento": "4304495",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141501,
+      "mysql_ids": [
+        "12342"
+      ],
+      "id_evento": "4304492",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141509,
+      "mysql_ids": [
+        "12356"
+      ],
+      "id_evento": "4315621",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141511,
+      "mysql_ids": [
+        "12355"
+      ],
+      "id_evento": "4315562",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141513,
+      "mysql_ids": [
+        "12353"
+      ],
+      "id_evento": "4315486",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141515,
+      "mysql_ids": [
+        "12354"
+      ],
+      "id_evento": "4315502",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141517,
+      "mysql_ids": [
+        "12357"
+      ],
+      "id_evento": "4315506",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141518,
+      "mysql_ids": [
+        "12364"
+      ],
+      "id_evento": "4315617",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141520,
+      "mysql_ids": [
+        "12358"
+      ],
+      "id_evento": "4315544",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141522,
+      "mysql_ids": [
+        "12363"
+      ],
+      "id_evento": "4315578",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141524,
+      "mysql_ids": [
+        "12359"
+      ],
+      "id_evento": "4315553",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141526,
+      "mysql_ids": [
+        "12362"
+      ],
+      "id_evento": "4315574",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141528,
+      "mysql_ids": [
+        "12360",
+        "12361"
+      ],
+      "id_evento": "4315563",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141530,
+      "mysql_ids": [
+        "12367"
+      ],
+      "id_evento": "4315624",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141532,
+      "mysql_ids": [
+        "12366"
+      ],
+      "id_evento": "4315602",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141534,
+      "mysql_ids": [
+        "12365"
+      ],
+      "id_evento": "4315515",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141535,
+      "mysql_ids": [
+        "12368"
+      ],
+      "id_evento": "4315643",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141537,
+      "mysql_ids": [
+        "12373"
+      ],
+      "id_evento": "4315588",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141539,
+      "mysql_ids": [
+        "12371"
+      ],
+      "id_evento": "4315514",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141540,
+      "mysql_ids": [
+        "12369"
+      ],
+      "id_evento": "4315638",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141542,
+      "mysql_ids": [
+        "12372"
+      ],
+      "id_evento": "4315550",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141544,
+      "mysql_ids": [
+        "12374"
+      ],
+      "id_evento": "4315618",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141546,
+      "mysql_ids": [
+        "12370"
+      ],
+      "id_evento": "4315497",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141549,
+      "mysql_ids": [
+        "12376",
+        "12377",
+        "12378"
+      ],
+      "id_evento": "4315568",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141550,
+      "mysql_ids": [
+        "12375"
+      ],
+      "id_evento": "4315500",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141552,
+      "mysql_ids": [
+        "12381"
+      ],
+      "id_evento": "4315640",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141554,
+      "mysql_ids": [
+        "12379"
+      ],
+      "id_evento": "4315556",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141556,
+      "mysql_ids": [
+        "12380"
+      ],
+      "id_evento": "4315614",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141558,
+      "mysql_ids": [
+        "12391"
+      ],
+      "id_evento": "4315610",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141560,
+      "mysql_ids": [
+        "12388",
+        "12389"
+      ],
+      "id_evento": "4315580",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141562,
+      "mysql_ids": [
+        "12383"
+      ],
+      "id_evento": "4315508",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141563,
+      "mysql_ids": [
+        "12385"
+      ],
+      "id_evento": "4315520",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141564,
+      "mysql_ids": [
+        "12384"
+      ],
+      "id_evento": "4315517",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141565,
+      "mysql_ids": [
+        "12386"
+      ],
+      "id_evento": "4315530",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141566,
+      "mysql_ids": [
+        "12387"
+      ],
+      "id_evento": "4315545",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141568,
+      "mysql_ids": [
+        "12390"
+      ],
+      "id_evento": "4315596",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141570,
+      "mysql_ids": [
+        "12382"
+      ],
+      "id_evento": "4315612",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141572,
+      "mysql_ids": [
+        "12392"
+      ],
+      "id_evento": "4315523",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141573,
+      "mysql_ids": [
+        "12395"
+      ],
+      "id_evento": "4315492",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141575,
+      "mysql_ids": [
+        "12393"
+      ],
+      "id_evento": "4315546",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141577,
+      "mysql_ids": [
+        "12394"
+      ],
+      "id_evento": "4315557",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141579,
+      "mysql_ids": [
+        "12396"
+      ],
+      "id_evento": "4315493",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141581,
+      "mysql_ids": [
+        "12398"
+      ],
+      "id_evento": "4315629",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141583,
+      "mysql_ids": [
+        "12397"
+      ],
+      "id_evento": "4315491",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141585,
+      "mysql_ids": [
+        "12401"
+      ],
+      "id_evento": "4315570",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141587,
+      "mysql_ids": [
+        "12399"
+      ],
+      "id_evento": "4315613",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141589,
+      "mysql_ids": [
+        "12400"
+      ],
+      "id_evento": "4315571",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141591,
+      "mysql_ids": [
+        "12403"
+      ],
+      "id_evento": "4315604",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141593,
+      "mysql_ids": [
+        "12407"
+      ],
+      "id_evento": "4315576",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141595,
+      "mysql_ids": [
+        "12402"
+      ],
+      "id_evento": "4315483",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141597,
+      "mysql_ids": [
+        "12405"
+      ],
+      "id_evento": "4315488",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141598,
+      "mysql_ids": [
+        "12404"
+      ],
+      "id_evento": "4376066",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141601,
+      "mysql_ids": [
+        "12406"
+      ],
+      "id_evento": "4315485",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141604,
+      "mysql_ids": [
+        "12409"
+      ],
+      "id_evento": "4315549",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141606,
+      "mysql_ids": [
+        "12408"
+      ],
+      "id_evento": "4315616",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141608,
+      "mysql_ids": [
+        "12414"
+      ],
+      "id_evento": "4315541",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141610,
+      "mysql_ids": [
+        "12412"
+      ],
+      "id_evento": "4315531",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141611,
+      "mysql_ids": [
+        "12416"
+      ],
+      "id_evento": "4315560",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141613,
+      "mysql_ids": [
+        "12413"
+      ],
+      "id_evento": "4376073",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141614,
+      "mysql_ids": [
+        "12415"
+      ],
+      "id_evento": "4315535",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141615,
+      "mysql_ids": [
+        "12421"
+      ],
+      "id_evento": "4315554",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141617,
+      "mysql_ids": [
+        "12417"
+      ],
+      "id_evento": "4315482",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141619,
+      "mysql_ids": [
+        "12418"
+      ],
+      "id_evento": "4315528",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141620,
+      "mysql_ids": [
+        "12419"
+      ],
+      "id_evento": "4315542",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141622,
+      "mysql_ids": [
+        "12420"
+      ],
+      "id_evento": "4315551",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141624,
+      "mysql_ids": [
+        "12425"
+      ],
+      "id_evento": "4315627",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141626,
+      "mysql_ids": [
+        "12424"
+      ],
+      "id_evento": "4315592",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141628,
+      "mysql_ids": [
+        "12422"
+      ],
+      "id_evento": "4315534",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141629,
+      "mysql_ids": [
+        "12423"
+      ],
+      "id_evento": "4315561",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141631,
+      "mysql_ids": [
+        "12431"
+      ],
+      "id_evento": "4376090",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141633,
+      "mysql_ids": [
+        "12429"
+      ],
+      "id_evento": "4376088",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141635,
+      "mysql_ids": [
+        "12427"
+      ],
+      "id_evento": "4376085",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141637,
+      "mysql_ids": [
+        "12430"
+      ],
+      "id_evento": "4376089",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141639,
+      "mysql_ids": [
+        "12428"
+      ],
+      "id_evento": "4376086",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141640,
+      "mysql_ids": [
+        "12426"
+      ],
+      "id_evento": "4376087",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141641,
+      "mysql_ids": [
+        "12433"
+      ],
+      "id_evento": "4376093",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141643,
+      "mysql_ids": [
+        "12432"
+      ],
+      "id_evento": "4376092",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141645,
+      "mysql_ids": [
+        "12434"
+      ],
+      "id_evento": "4376091",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141647,
+      "mysql_ids": [
+        "12435"
+      ],
+      "id_evento": "4376095",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141648,
+      "mysql_ids": [
+        "12438"
+      ],
+      "id_evento": "4376097",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141649,
+      "mysql_ids": [
+        "12439"
+      ],
+      "id_evento": "4376094",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141651,
+      "mysql_ids": [
+        "12437"
+      ],
+      "id_evento": "4376098",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141653,
+      "mysql_ids": [
+        "12436"
+      ],
+      "id_evento": "4376096",
+      "reason": "no_unique_source_signature"
+    },
+    {
+      "row_position": 141762,
+      "mysql_ids": [
+        "74969",
+        "74972"
+      ],
+      "id_evento": "4392566",
+      "reason": "grouped_victims_require_individual_review"
+    },
+    {
+      "row_position": 141763,
+      "mysql_ids": [
+        "74970",
+        "74971"
+      ],
+      "id_evento": "4392567",
+      "reason": "grouped_victims_require_individual_review"
+    }
+  ],
+  "official_csv_replaced": false,
+  "official_sha256": "41c60dad28ff2ac6a4e23ece0c646bbce898b3d84bf932779130244dece803b2",
+  "verified_sha256": "903b6f82403da61b5f86cf2a28dbb0823875d1c25b202b69813f6a6ce660f556",
+  "pending_sha256": "486661614a4e1f479a19e6ed0976442ed8d0f9e75b3ba196426299b8b89cd2f7",
+  "candidate_is_ready_to_replace_official": false,
+  "candidate_sha256": "2b8b6b6ca490d61ac2c1c8aef91a83623d9570ef81d523ff8fcf06d381bb8932"
+}

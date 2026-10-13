@@ -65,8 +65,8 @@ class EfficiencyMonitor:
         try:
             print("🧠 [Monitor] Iniciando avaliação de eficiência...")
             # 1. Obter Predições Consolidadas
-            if self.model_mode == "stgat_v5" and hasattr(self.orchestrator, "get_combined_risk_stgat_v5"):
-                scores_map = self.orchestrator.get_combined_risk_stgat_v5(None)
+            if self.model_mode == "hybrid" and hasattr(self.orchestrator, "get_combined_risk_hybrid"):
+                scores_map = self.orchestrator.get_combined_risk_hybrid(None)
             else:
                 scores_map = self.orchestrator.get_combined_risk(None)
             print(f"🧠 [Monitor] Scores gerados para {len(scores_map)} localidades.")

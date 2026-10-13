@@ -409,7 +409,7 @@
                         <small class="text-muted d-block" id="base-historica-info">Base Histórica: 19/11/2025 → 19/03/2026 (120 dias)</small>
                         <small class="text-primary fw-bold" id="horizon-info">Horizonte de Predição: 30 dias</small>
                         <small class="text-success d-block" id="validity-info">📅 Janela de Inteligência: Projeção 30 dias (Tempo Real)</small>
-                        <small class="text-secondary d-block" id="model-window-info">Modelo: Poisson Ranker Estadual (Janela: 120d)</small>
+                        <small class="text-secondary d-block" id="model-window-info">Modelo: Híbrido Poisson 80% + ST-GAT v5 20% (Janela: 120d)</small>
                         <small class="text-warning d-none" id="model-validation-info"></small>
                     </div>
 
@@ -553,16 +553,7 @@
                                 <option value="rmf">Região Metropolitana (RMF)</option>
                                 <option value="interior">Interior do Estado</option>
                             </select>
-                            <label for="model-mode-filter" class="form-label small fw-bold text-muted mt-2">Modelo de previsão:</label>
-                            <select class="form-select form-select-sm" id="model-mode-filter">
-                                <option value="stgat_v5" selected>ST-GAT v5 ⚡ (DeepSTGAT_v5 Ativo)</option>
-                                <option value="stgat">Poisson Ranker (Legacy)</option>
-                                <option value="cvli_tactical">CVLI Tático (Experimental)</option>
-                                <option value="short20_mix">CVLI Shortlist 20 (Experimental)</option>
-                            </select>
-                            <small class="text-muted d-block mt-1" id="model-selector-help">
-                                ST-GAT v5 usa o modelo DeepSTGAT_v5 retreinado (07/07/2026) com atenção por aresta e Binomial Negativa. Poisson Ranker disponível como alternativa.
-                            </small>
+                            <small class="text-muted d-block mt-2" id="official-model-info"><b>Modelo oficial:</b> Híbrido Poisson 80% + ST-GAT v5 20%.</small>
                             <div class="form-check mt-2">
                                 <input class="form-check-input" type="checkbox" id="toggle-visible-micronodes">
                                 <label class="form-check-label small fw-bold text-danger" for="toggle-visible-micronodes">
@@ -1087,7 +1078,7 @@
     var selectedLayer = null;  // território em destaque (borda dourada)
     var riskDataGlobal = null;
     var metaDataGlobal = null;
-    var DEFAULT_MODEL_MODE = 'stgat_v5';
+    var DEFAULT_MODEL_MODE = 'hybrid';
     var selectedExplainabilityState = {
         feature: null,
         explanation: null,
@@ -1841,17 +1832,14 @@
 
         // Show model's internal window and architecture
         try {
-            var modelArch = (metaDataGlobal && metaDataGlobal.model_architecture) || 'Poisson Ranker Estadual';
+            var modelArch = (metaDataGlobal && metaDataGlobal.model_architecture) || 'Híbrido Poisson 80% + ST-GAT v5 20%';
             var modelWindow = (metaDataGlobal && metaDataGlobal.model_window_cvli) || 120;
             $('#model-window-info').html('Modelo: <strong>' + modelArch + '</strong> (Janela: ' + modelWindow + 'd)');
             var selectedDescription = (metaDataGlobal && metaDataGlobal.selected_model_description) || '';
             var validationText = (metaDataGlobal && metaDataGlobal.selected_model_validation_text) || '';
             if (selectedDescription) {
                 var selectorHelp = selectedDescription;
-                if (metaDataGlobal.selected_model_mode && metaDataGlobal.selected_model_mode !== 'stgat') {
-                    selectorHelp += ' O comparativo opcional atua só em Fortaleza; o champion estadual é o Poisson Ranker.';
-                }
-                $('#model-selector-help').text(selectorHelp);
+                $('#official-model-info').text(selectorHelp);
             }
             if (validationText) {
                 $('#model-validation-info').removeClass('d-none').text(validationText);
@@ -3395,17 +3383,6 @@
         try { updateDashboard('CVLI'); } catch(e) { console.warn('updateDashboard failed on region change', e); }
     });
 
-    $('#model-mode-filter').on('change', function() {
-        showLoading('Trocando modelo...', 'Atualizando o mapa com a estratégia selecionada.');
-        reloadMapLayer()
-            .catch(function(err) {
-                console.error('Falha ao trocar modelo', err);
-            })
-            .finally(function() {
-                hideLoading();
-            });
-    });
-
     // Micronodes KML 2026 layer
     var micronodesLayer = L.layerGroup();
     
@@ -4301,4 +4278,3 @@
 </script>
 </body>
 </html>
-

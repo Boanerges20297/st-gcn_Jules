@@ -18,14 +18,14 @@ def _status_for_p10(p10: float) -> str:
 
 def _load_scores(project_root: str, orchestrator: StateOrchestrator | None, model_mode: str = "stgat"):
     if orchestrator is not None:
-        if model_mode == "stgat_v5" and hasattr(orchestrator, "get_combined_risk_stgat_v5"):
-            scores_map = orchestrator.get_combined_risk_stgat_v5()
+        if model_mode == "hybrid" and hasattr(orchestrator, "get_combined_risk_hybrid"):
+            scores_map = orchestrator.get_combined_risk_hybrid()
         else:
             scores_map = orchestrator.get_combined_risk()
         return orchestrator, scores_map
     temp_orchestrator = StateOrchestrator(project_root)
-    if model_mode == "stgat_v5" and hasattr(temp_orchestrator, "get_combined_risk_stgat_v5"):
-        scores_map = temp_orchestrator.get_combined_risk_stgat_v5()
+    if model_mode == "hybrid" and hasattr(temp_orchestrator, "get_combined_risk_hybrid"):
+        scores_map = temp_orchestrator.get_combined_risk_hybrid()
     else:
         scores_map = temp_orchestrator.get_combined_risk()
     return temp_orchestrator, scores_map

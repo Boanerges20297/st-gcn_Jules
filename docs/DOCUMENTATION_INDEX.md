@@ -8,6 +8,8 @@ Estes arquivos representam a arquitetura e a operação atual:
 - [CURRENT_OPERATIONS.md](/C:/Users/Boanerges/Desktop/Projetos/Report%20Preview/docs/CURRENT_OPERATIONS.md)
 - [CVLI_STOCHASTIC_BENCHMARK.md](/C:/Users/Boanerges/Desktop/Projetos/Report%20Preview/docs/CVLI_STOCHASTIC_BENCHMARK.md)
 - [INDEX.md](/C:/Users/Boanerges/Desktop/Projetos/Report%20Preview/docs/INDEX.md)
+- [RL_RANKING_OPTIMIZATION_SPEC.md](/C:/Users/Boanerges/Desktop/Projetos/Report%20Preview/docs/RL_RANKING_OPTIMIZATION_SPEC.md)
+- [HYBRID_STGAT_POISSON_EXPERIMENT.md](/C:/Users/Boanerges/Desktop/Projetos/Report%20Preview/docs/HYBRID_STGAT_POISSON_EXPERIMENT.md)
 
 ## Referências úteis ainda válidas
 
