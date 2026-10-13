@@ -35,7 +35,10 @@ except Exception:
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 INTEL_DIR = os.path.join(BASE_DIR, 'data', 'raw', 'inteligencia')
 DICT_PATH = os.path.join(BASE_DIR, 'data', 'raw', 'bairros_centros_latlong.json')
-DOWNLOADS_DIR = os.environ.get('ORCRIMS_DOWNLOADS_DIR') or os.path.join(os.path.expanduser('~'), 'Downloads')
+# Keep the browser fallback's destination inside the application data tree.  This
+# avoids the interactive Chrome Save dialog and makes the downloaded source
+# available to the importer immediately.
+DOWNLOADS_DIR = os.environ.get('ORCRIMS_DOWNLOADS_DIR') or INTEL_DIR
 CURRENT_KML_PATH = os.path.join(INTEL_DIR, 'current_orcrim.kml')
 STATIC_KML_PATH = os.path.join(BASE_DIR, 'data', 'static', 'ORCRIMS 2026.kml')
 LOCAL_KMZ_PATH = os.path.join(INTEL_DIR, 'ORCRIMS 2026.kmz')
@@ -1136,6 +1139,10 @@ def _download_payload_via_logged_in_chrome(source_url: str):
     command = [
         chrome_executable,
         f'--profile-directory={profile_name}',
+        f'--download.default_directory={DOWNLOADS_DIR}',
+        '--download.prompt_for_download=false',
+        '--download.directory_upgrade=true',
+        '--safebrowsing.enabled=true',
         '--new-window',
         source_url,
     ]

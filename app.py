@@ -87,7 +87,12 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 RISK_MODEL_NAME = "Híbrido Poisson 80% + ST-GAT v5 20%"
 DEFAULT_MODEL_MODE = "hybrid"
+# Reassert public labels with valid Unicode escapes for old source snapshots.
+RISK_MODEL_NAME = "H\u00edbrido Poisson 80% + ST-GAT v5 20%"
+DEFAULT_MODEL_LABEL = "H\u00edbrido Poisson 80% + ST-GAT v5 20%"
 DEFAULT_MODEL_LABEL = "Híbrido Poisson 80% + ST-GAT v5 20%"
+RISK_MODEL_NAME = "H\u00edbrido Poisson 80% + ST-GAT v5 20%"
+DEFAULT_MODEL_LABEL = "H\u00edbrido Poisson 80% + ST-GAT v5 20%"
 STATIC_EXPORT_SCRIPT = os.path.join(BASE_DIR, 'scripts', 'export_static_snapshot.py')
 STATIC_EXPORT_OUTPUT_DIR = os.path.normpath(
     os.environ.get('STATIC_EXPORT_OUTPUT_DIR', os.path.join(BASE_DIR, 'static_export', 'data'))
@@ -1154,32 +1159,6 @@ def load_data_and_models():
         if not export_worker:
             threading.Thread(target=_compute_peak_hours_cache, daemon=True).start()
 
-        # Exportar base para o projeto Crime-Predict em background (não bloqueia startup)
-        def _run_crime_predict_export():
-            try:
-                import subprocess
-                export_script = os.path.join(BASE_DIR, 'scripts', 'export_to_crime_predict.py')
-                if os.path.exists(export_script):
-                    print("--- [EXPORT] Iniciando sincronização em background com o Crime-Predict...")
-                    completed = subprocess.run(
-                        [sys.executable, export_script],
-                        capture_output=True,
-                        text=True,
-                        encoding='utf-8',
-                        errors='replace'
-                    )
-                    if completed.returncode == 0:
-                        print("--- [EXPORT] Sincronização com o Crime-Predict concluída com sucesso.")
-                    else:
-                        print(f"--- [EXPORT] Falha na sincronização. Código: {completed.returncode}\nstdout: {completed.stdout}\nstderr: {completed.stderr}")
-                else:
-                    print("--- [EXPORT] Script export_to_crime_predict.py não encontrado.")
-            except Exception as e:
-                print(f"--- [EXPORT] Erro inesperado ao rodar exportação em background: {e}")
-
-        if not export_worker:
-            threading.Thread(target=_run_crime_predict_export, daemon=True, name="crime-predict-export").start()
-
         # Regenerar micronodos dinâmicos no startup para alinhar a camada ao mapa.
         if not export_worker:
             rebuild_dynamic_micronode_exports(force=True)
@@ -1261,7 +1240,8 @@ def _classify_region(props: dict) -> str:
 
 def _normalize_polygon_lookup_name(text: str) -> str:
     normalized = re.sub(r'\s+', ' ', normalize_name(text or '')).strip()
-    return normalized.split('- AIS')[0].strip()
+    normalized = normalized.split('- AIS')[0].strip()
+    return {'JANGURURSSU': 'JANGURUSSU'}.get(normalized, normalized)
 
 
 def _build_micronode_polygon_lookup_keys(micronodo=None, bairro=None, name=None):
@@ -2981,6 +2961,7 @@ def get_risk():
                 
                 meta['start_cvli'] = str(orchestrator.dates[0])
                 meta['last_date_base'] = last_db_dt.strftime('%d/%m/%Y')
+                meta['data_limit'] = last_db_dt.strftime('%Y-%m-%d')
                 meta['prediction_window'] = f"{start_pred.strftime('%d/%m')} a {end_pred.strftime('%d/%m')}"
                 meta['intelligence_label'] = f"Janela de Inteligência: {meta['prediction_window']} (Atualizada com Eventos de Hoje)"
                 meta['window_cvli'] = len(orchestrator.dates)

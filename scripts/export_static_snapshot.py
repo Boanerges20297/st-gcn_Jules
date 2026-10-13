@@ -145,7 +145,9 @@ def _region_display_name(region: str) -> str:
 def _normalize_polygon_lookup_name(value: Any) -> str:
     text = str(value or "")
     text = report_app.normalize_name(text)
-    return report_app.normalize_name(text.split("- AIS")[0].strip())
+    text = report_app.normalize_name(text.split("- AIS")[0].strip())
+    # Corrige grafia histórica do polígono oficial de Jangurussu.
+    return {"JANGURURSSU": "JANGURUSSU"}.get(text, text)
 
 
 def _load_municipality_geometry_index() -> Dict[str, Any]:
@@ -488,8 +490,61 @@ def _count_recent_exogenous_by_node(risk_items: Iterable[Dict[str, Any]]) -> Dic
     return dict(counts)
 
 
-def _build_momentum_index() -> Dict[str, Dict[str, float]]:
-    momentum_index: Dict[str, Dict[str, float]] = {}
+def _validate_observed_trend(
+    recent_7: int,
+    previous_7: int,
+    recent_14: int,
+    previous_14: int,
+    recent_30: int,
+    previous_30: int,
+    active_days_14: int,
+) -> Dict[str, Any]:
+    """Validate an observed temporal signal; this is not a forecast score.
+
+    A trend is only confirmed when the recent 14-day window has enough active
+    days and the short and medium windows agree.  Thirty-day comparison is
+    reported as supporting evidence when the tensor contains that history.
+    """
+    has_sample = recent_14 > 0 and active_days_14 >= 3
+    short_delta = recent_7 - previous_7
+    medium_delta = recent_14 - previous_14
+    long_delta = recent_30 - previous_30
+
+    if not has_sample:
+        status = "indeterminado" if recent_14 > 0 else "sem_evidencia_recente"
+        direction = "indeterminado"
+    elif short_delta > 0 and medium_delta > 0:
+        status, direction = "confirmada_alta", "alta"
+    elif short_delta < 0 and medium_delta < 0:
+        status, direction = "confirmada_baixa", "baixa"
+    elif medium_delta == 0 and short_delta == 0:
+        status, direction = "estavel", "estavel"
+    else:
+        status, direction = "indeterminado", "conflitante"
+
+    agreement = 0
+    if short_delta > 0 and medium_delta > 0:
+        agreement = 2
+    elif short_delta < 0 and medium_delta < 0:
+        agreement = 2
+    elif short_delta == 0 or medium_delta == 0:
+        agreement = 1
+
+    return {
+        "status": status,
+        "direction": direction,
+        "active_days_14": active_days_14,
+        "sample_days": 14,
+        "short_delta_7d": short_delta,
+        "medium_delta_14d": medium_delta,
+        "long_delta_30d": long_delta,
+        "window_agreement": agreement,
+        "evidence": "contagem diária de CVLI por território; persistência mínima de 3 dias e concordância entre janelas de 7/14 dias",
+    }
+
+
+def _build_momentum_index() -> Dict[str, Dict[str, Any]]:
+    momentum_index: Dict[str, Dict[str, Any]] = {}
     specialists = getattr(report_app.orchestrator, "specialists", {}) or {}
 
     for region_key, specialist in specialists.items():
@@ -511,10 +566,17 @@ def _build_momentum_index() -> Dict[str, Dict[str, float]]:
                 previous_7 = int(features[spec_idx, -14:-7, 0].sum()) if features.shape[1] >= 14 else 0
                 recent_14 = int(features[spec_idx, -14:, 0].sum()) if features.shape[1] >= 14 else recent_7
                 previous_14 = int(features[spec_idx, -28:-14, 0].sum()) if features.shape[1] >= 28 else previous_7
+                recent_30 = int(features[spec_idx, -30:, 0].sum()) if features.shape[1] >= 30 else recent_14
+                previous_30 = int(features[spec_idx, -60:-30, 0].sum()) if features.shape[1] >= 60 else 0
+                active_days_14 = int(np.count_nonzero(features[spec_idx, -14:, 0])) if features.shape[1] >= 14 else int(np.count_nonzero(features[spec_idx, :, 0]))
                 momentum_index[item_id] = {
                     "momentum_7d": float(recent_7 - previous_7),
                     "momentum_14d": float(recent_14 - previous_14),
                     "recent_cvli": recent_7,
+                    "trend_validation": _validate_observed_trend(
+                        recent_7, previous_7, recent_14, previous_14,
+                        recent_30, previous_30, active_days_14,
+                    ),
                 }
             except Exception:
                 continue
@@ -1039,15 +1101,23 @@ def _enrich_polygons_with_risk(
     }
 
 
-def _build_manifest(snapshot_id: str, generated_at: str) -> Dict[str, Any]:
+def _build_manifest(snapshot_id: str, generated_at: str, risk_meta: Dict[str, Any]) -> Dict[str, Any]:
+    model_label = (
+        risk_meta.get("selected_model_label")
+        or risk_meta.get("model_architecture")
+        or getattr(report_app, "RISK_MODEL_NAME", None)
+        or "Modelo não informado"
+    )
     return {
         "snapshot_id": snapshot_id,
         "generated_at": generated_at,
         "source_repo": "Report Preview",
         "source_commit": _git_commit_sha(),
-        "model_label": "ELITE P10",
-        "model_architecture": getattr(report_app, "RISK_MODEL_NAME", None)
-        or "Poisson Ranker Estadual",
+        "model_label": model_label,
+        "model_architecture": risk_meta.get("model_architecture") or model_label,
+        "model_mode": risk_meta.get("selected_model_mode") or getattr(report_app, "DEFAULT_MODEL_MODE", None),
+        "data_limit": risk_meta.get("data_limit"),
+        "risk_meta_counts": risk_meta.get("counts", {}),
         "momentum_window_days": MOMENTUM_WINDOW_DAYS,
         "regions": ["fortaleza", "rmf", "interior"],
         "notes": "Snapshot estático publicado manualmente",
@@ -1091,6 +1161,11 @@ def export_snapshot(output_dir: Path) -> Path:
     peak_hours_cache = report_app._compute_peak_hours_cache() or {}
 
     risk_items = _dedupe_risk_items(list(risk_payload.get("data", [])))
+    risk_meta = dict(risk_payload.get("meta") or {})
+    if not risk_meta.get("data_limit"):
+        raise RuntimeError("/api/risk não informou data_limit; snapshot não publicado")
+    if not risk_meta.get("selected_model_mode"):
+        raise RuntimeError("/api/risk não informou selected_model_mode; snapshot não publicado")
     risk_items.sort(key=lambda item: _safe_float(item.get("risk_score")), reverse=True)
 
     momentum_index = _build_momentum_index()
@@ -1188,7 +1263,7 @@ def export_snapshot(output_dir: Path) -> Path:
         top_layers[region] = layer_payload
 
     _export_stage("gravando artefatos")
-    _write_json(output_dir / "manifest.json", _build_manifest(snapshot_id, generated_at))
+    _write_json(output_dir / "manifest.json", _build_manifest(snapshot_id, generated_at, risk_meta))
     _write_json(output_dir / "dashboard_summary.json", _build_dashboard_summary(risk_items))
     _write_json(
         output_dir / "risk_snapshot.json",

@@ -1787,21 +1787,17 @@
     function syncRiskCardsFromVisibleMap() {
         try {
             var criticalRisk = 0, highRisk = 0, mediumRisk = 0, stableAreas = 0;
-            if (geojsonLayer) {
-                geojsonLayer.eachLayer(function(layer) {
-                    if (!map.hasLayer(layer)) return;
-                    var props = (layer.feature && layer.feature.properties) || {};
-                    var score = (typeof props.risk_score === 'number')
-                        ? props.risk_score
-                        : (typeof props.risk_score_cvli === 'number' ? props.risk_score_cvli : null);
-                    if (score === null) return;
-
-                    if (score >= 71) criticalRisk++;
-                    else if (score >= 51) highRisk++;
-                    else if (score >= 31) mediumRisk++;
-                    else stableAreas++;
-                });
-            }
+            var visibleRegion = normalizeDashboardRegion($('#region-filter').val(), 'all');
+            (Array.isArray(riskDataGlobal) ? riskDataGlobal : []).filter(function(item) {
+                return visibleRegion === 'all' || normalizeDashboardRegion(item.region_type || item.region, 'unknown') === visibleRegion;
+            }).forEach(function(item) {
+                var score = Number(item.risk_score);
+                if (!Number.isFinite(score)) return;
+                if (score >= 71) criticalRisk++;
+                else if (score >= 51) highRisk++;
+                else if (score >= 31) mediumRisk++;
+                else stableAreas++;
+            });
             $('#high-risk-count').text(criticalRisk);
             $('#medium-risk-count').text(highRisk);
             $('#low-risk-count').text(mediumRisk);
@@ -2020,12 +2016,13 @@
 
     function normalizeName(text) {
         if (!text) return "";
-        return text.toString()
+        var normalized = text.toString()
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "")
             .replace(/\s*-\s*AIS.*$/gi, "") // Remove " - AIS 12, 26", " - AIS CAPITAL", etc
             .toUpperCase()
             .trim();
+        return normalized === 'JANGURURSSU' ? 'JANGURUSSU' : normalized;
     }
 
     function normalizeDashboardRegion(region, fallback) {
@@ -2108,11 +2105,16 @@
                 });
 
                 geojson.features.forEach(function(feature) {
-                    var rawName = feature.properties.Name || feature.properties.name || feature.properties.NOME || "";
+                    // Prefer the backend-normalized bairro over legacy Name spelling.
+                    var rawName = feature.properties.bairro || feature.properties.Name || feature.properties.name || feature.properties.NOME || "";
                     var normName = normalizeName(rawName);
                     var regionType = normalizeDashboardRegion(feature.properties.region_type, 'unknown');
                     var compositeKey = normName + '|' + regionType;
-                    var r = riskByName[compositeKey] || {};
+                    var r = riskByName[compositeKey];
+                    if (!r) {
+                        console.error('[MAP INTEGRITY] Polígono sem correspondência no /api/risk:', compositeKey);
+                        r = { risk_score: null, risk_score_cvli: null, metrics: {} };
+                    }
                     
                     // Use apenas o `risk_score` fornecido pelo backend quando disponível.
                     // NÃO criar/fabricar valores locais (remover suavização/fallback no front).
