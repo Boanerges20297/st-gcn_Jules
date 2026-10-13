@@ -1188,6 +1188,17 @@ def export_snapshot(output_dir: Path) -> Path:
         peak_hours = _extract_peak_hours(item, metrics)
         recent_cvli = _safe_int(momentum.get("recent_cvli", metrics.get("cvli_7d")))
         recent_exogenous = _safe_int(exogenous_index.get(item_id, 0))
+        trend_validation = dict(momentum.get("trend_validation") or {
+            "status": "indeterminado",
+            "direction": "indeterminado",
+            "active_days_14": 0,
+            "sample_days": 14,
+            "short_delta_7d": 0,
+            "medium_delta_14d": 0,
+            "long_delta_30d": 0,
+            "window_agreement": 0,
+            "evidence": "série temporal não disponível",
+        })
 
         combined_metrics = {
             "critical_streets": metrics.get("critical_streets", "Sem logradouros críticos registrados"),
@@ -1225,6 +1236,7 @@ def export_snapshot(output_dir: Path) -> Path:
             "recent_exogenous": recent_exogenous,
             "momentum_7d": combined_metrics["momentum_7d"],
             "momentum_14d": combined_metrics["momentum_14d"],
+            "trend_validation": trend_validation,
             "critical_streets": combined_metrics["critical_streets"],
             "peak_hours": peak_hours,
             "summary": summary,
@@ -1245,6 +1257,7 @@ def export_snapshot(output_dir: Path) -> Path:
                 "rank_global": global_rank,
                 "momentum_7d": combined_metrics["momentum_7d"],
                 "momentum_14d": combined_metrics["momentum_14d"],
+                "trend_validation": trend_validation,
                 "recent_cvli": recent_cvli,
                 "recent_exogenous": recent_exogenous,
                 "peak_hours": peak_hours,
