@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-22T18:18:54.997442",
+  "seed": 221026,
+  "full_features": true,
+  "graph": "original tactical geo/conflict 2026 snapshot",
+  "train_samples": 98,
+  "train_start": "2022-09-01",
+  "train_last_target_end": "2026-06-19",
+  "validation_cutoffs": [
+    "2026-07-01",
+    "2026-07-15",
+    "2026-07-22",
+    "2026-08-01"
+  ],
+  "test_cutoffs": [
+    "2026-09-01",
+    "2026-09-08",
+    "2026-09-15"
+  ],
+  "source_checkpoint_train_end": "2026-06-30",
+  "transfer_best_epoch": 7,
+  "scratch_best_epoch": 1,
+  "cpu_threads": 3,
+  "limitations": [
+    "spatial metadata and graphs include contemporary snapshot, historical as-of validity not fully proven",
+    "top60 selected using 2025 historical totals while training dates start 2022",
+    "pretrained initialization already saw data through June 2026; no independent additional training sample",
+    "tiny and overlapping July/Aug validation and September holdout; not enough evidence for operational promotion",
+    "original STGAT training normalization inconsistent with historical trainer, comparison uses production inference transform consistently",
+    "different learning rates selected in advance to accommodate warm start vs random initialization",
+    "ranking scores are not calibrated future probabilities"
+  ],
+  "elapsed_seconds": 387.5,
+  "production_untouched": true
+}
