@@ -1,0 +1,53 @@
+{
+  "generated_at": "2026-10-22T16:20:52.707457",
+  "dates": [
+    "2026-07-01",
+    "2026-07-08",
+    "2026-07-15",
+    "2026-07-22",
+    "2026-07-29",
+    "2026-08-05",
+    "2026-08-12",
+    "2026-08-19",
+    "2026-08-26",
+    "2026-09-02",
+    "2026-09-09",
+    "2026-09-16"
+  ],
+  "weights": [
+    0,
+    0.1,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    1.0
+  ],
+  "poisson_train": {
+    "start": "2022-01-01",
+    "end": "2025-12-31"
+  },
+  "poisson_horizon": 14,
+  "stgat_horizon": 30,
+  "stgat_training_end": "2026-06-30",
+  "stgat_validation_end": "2026-08-29",
+  "horizon_eval": 30,
+  "candidate_nodes": 40,
+  "evaluation_universe": "40 bairros do processed_fortaleza.pkl",
+  "limitations": [
+    "Tension index e grafo do snapshot de 21/10 podem conter sinais posteriores aos cutoffs",
+    "Checkpoints treinados com horizontes diferentes (Poisson 14, STGAT 30)",
+    "STGAT usa dados jul-ago em selecao/validacao; sep-out mais confiavel",
+    "Poisson foi salvo com sklearn 1.8 mas ambiente atual 1.5.2; warning de compatibilidade",
+    "janelas de 14 dias a cada 7 dias sao sobrepostas"
+  ],
+  "sources": [
+    "src/core/orchestrator.py",
+    "src/core/fortaleza_poisson_backend.py",
+    "scripts/validate_stgat_v5_walk_forward.py"
+  ]
+}

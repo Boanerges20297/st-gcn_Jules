@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-10-22T17:18:23.947085",
+  "training_count": 60,
+  "val_cutoffs": [
+    "2026-07-01",
+    "2026-07-15",
+    "2026-07-29"
+  ],
+  "holdout_cutoffs": [
+    "2026-09-01",
+    "2026-09-08",
+    "2026-09-15"
+  ],
+  "duration_sec": 113.79599999997299,
+  "weights": [
+    0.0,
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.7,
+    1.0
+  ],
+  "model_family": "STGAT v5 NegBinomial fine-tune warm start from 40-node official checkpoint",
+  "leakage_protection": "cutoff-only CVLI/calendar features; geometry only, no faction/conflict or troop intelligence; point-in-time static Poisson counts",
+  "poisson_window": "2022-01-01..2026-06-30",
+  "stgat_train": "2023-01-01..2026-05-31 with target <=2026-06-30",
+  "known_limits": [
+    "original STGAT40 checkpoint trained on data through June 2026 but may have used historical snapshot-derived features",
+    "fixed selection of nodes uses CVLI through end of 2025; fair for 2026 evaluation, selection for early training dates can be historical hindsight",
+    "small September holdout: low statistical power",
+    "finetuning on CPU few sparse windows not a full hyperparameter study",
+    "scikit-learn experimental environment 1.5.2"
+  ]
+}

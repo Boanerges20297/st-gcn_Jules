@@ -1,0 +1,21 @@
+{
+  "train": "2022-01-01..2025-12-31",
+  "poisson_horizon": 30,
+  "stgat_horizon": 30,
+  "training_stride_days": 14,
+  "poisson_train_examples": 11616,
+  "eval_horizon_days": 30,
+  "eval_start": "2026-07-01",
+  "eval_end": "2026-09-16",
+  "stgat_transfer": "zero-shot: checkpoint 40 transferred to 60 and 121 with new graph adjacency; not retrained",
+  "reference": "official Poisson14 and STGAT30 existing, remain untouched",
+  "limitations": [
+    "ST-GAT training validation July-Aug 2026 means September preferred for testing",
+    "only three-to-four September cutoffs; not statistically robust",
+    "Static geographic faction/tension attributes may reflect post-cutoff intelligence",
+    "graph attention uses changed node count and adjacency in zero-shot experiments",
+    "Poisson stride14 is experimental retraining, not official identical 2022-2025 daily fit",
+    "Rolling nodes selected past 730 days at each cutoff, with no held-out selection leak"
+  ],
+  "duration_s": 22.45901649998268
+}
