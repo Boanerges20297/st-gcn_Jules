@@ -1,0 +1,35 @@
+{
+  "folds": [
+    2024,
+    2025,
+    2026
+  ],
+  "historical_training_start": "2022-07-01",
+  "validation": "first 90 days after each training year; no holdout usage",
+  "independent_test_windows": {
+    "2024": 9,
+    "2025": 9,
+    "2026": 6
+  },
+  "control_data_anomaly": {
+    "2022": 840,
+    "2023": 1462,
+    "2024": 1653,
+    "2025": 1487,
+    "2026_through_oct21": 378,
+    "raw_csv_2026_fortaleza_cvli_type_records": 381
+  },
+  "pool": "rolling40 or 60 based on previous 730d CVLI",
+  "training": "fresh weights per origin, CVLI+calendar+momentum, geography-only graph",
+  "poisson": "official pipeline refit to all121 per origin, point-in-time static features, no tactical signals",
+  "prospective_shadow_separate": true,
+  "stable_years_all121_events_evaluated": 2260,
+  "leakage_protection": "do not use original 2026 checkpoint for 2024/2025 testing",
+  "limitations": [
+    "input may have been retrospectively corrected in source",
+    "2026 volume drop is already in raw source and not explained",
+    "temporal dependence between monthly data despite nonoverlapping 30d windows",
+    "2018-2021 CVLI data not in 121 processed source",
+    "ranking not a calibrated homicide probability"
+  ]
+}

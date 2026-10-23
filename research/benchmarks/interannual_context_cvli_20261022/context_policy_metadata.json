@@ -1,0 +1,14 @@
+{
+  "train_policy_on": 2024,
+  "evaluation_on": 2025,
+  "sensitivity_on": 2026,
+  "selected_window": 120,
+  "selected_threshold": -0.15,
+  "direction": "positive_to_high",
+  "training_2024_utility": 0.6151174461991622,
+  "potential_overfit": "30 policy candidates tried on 9 development months",
+  "future_current_year_labels_used_to_choose_weight": false,
+  "production_untouched": true,
+  "reason": "Use relative neighborhood CVLI SHARE between preceding two complete years and sign of its update over past window",
+  "not_a_calibrated_probability": true
+}

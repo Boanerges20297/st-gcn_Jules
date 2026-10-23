@@ -1,0 +1,66 @@
+{
+  "fold": 2025,
+  "train_until": "2024-12-31",
+  "train_samples": 43,
+  "validation_dates": [
+    "2025-01-01",
+    "2025-01-31",
+    "2025-03-02"
+  ],
+  "test_dates": [
+    "2025-04-01",
+    "2025-05-01",
+    "2025-06-01",
+    "2025-07-01",
+    "2025-08-01",
+    "2025-09-01",
+    "2025-10-01",
+    "2025-11-01",
+    "2025-12-01"
+  ],
+  "model": "DeepSTGAT_v5 trained from RANDOM initialization at each year origin",
+  "train_channels": [
+    0,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    33,
+    34,
+    35,
+    36
+  ],
+  "training_pool": [
+    "rolling 60 based on 730 previous days to fold origin"
+  ],
+  "metric_denominator": "all 121 Fortaleza neighborhoods",
+  "source_range": [
+    "2022-01-01",
+    "2026-10-21"
+  ],
+  "stgat_epochs": 5,
+  "best_epoch": 2,
+  "graph": "distance-only plus identity, conflict adjacency identity",
+  "poisson_fit": "Official Poisson feature generator, 30d target, static attributes rebuilt point-in-time, all121",
+  "selection": "target previous 730 days, reselected before each test month",
+  "leakage_controls": "all channels except CVLI, calendar and momentum masked, no original pretrained checkpoint",
+  "nonsynchronized_31st": "30d windows commence on day1 and exclude day31 of 31-day months; do not double-count labels",
+  "production_untouched": true,
+  "secs": 68.2
+}

@@ -25,3 +25,6 @@ outputs/experiments/
 /models/backup/
 *.pkl
 trash/
+
+# Runtime research snapshots, local backups and temp data: never publish
+/data/runtime/

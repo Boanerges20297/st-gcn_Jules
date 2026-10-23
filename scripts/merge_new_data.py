@@ -6,6 +6,9 @@ import json
 import unicodedata
 import subprocess
 import sys
+import tempfile
+import shutil
+from pathlib import Path
 
 # Force UTF-8 stdout/stderr to prevent cp1252 UnicodeEncodeErrors on Windows
 if hasattr(sys.stdout, 'reconfigure'):
@@ -32,6 +35,10 @@ except ImportError:
 
 # Importação de Enriquecimento (V33)
 sys.path.append(os.getcwd())
+from src.core.occurrence_integrity import collect_mysql_ids, normalize_mysql_id, deduplicate_mysql_rows
+from scripts.repair_enriched_cvli_from_mysql import build_candidate, sha
+from scripts.reconcile_mysql_data import read_mysql_snapshot
+
 try:
     from src.enrichment import (
         get_day_of_week_pt, 
@@ -481,17 +488,20 @@ def merge(new_data_path):
     # Termos de natureza para disparar geolocalizacao reversa
     invalid_street_terms = ['HOMICIDIO', 'BALA', 'FOGO', 'LESAO', 'MORTE', 'CADAVER', 'LATROCINIO', 'TIRO']
 
-    # --- FILTRAGEM PRÉVIA (Evitar reprocessar o que já existe) ---
-    print(f"Filtrando registros inéditos...")
-    if not df_official.empty and 'id' in df_official.columns:
-        existing_ids = set(df_official['id'].astype(str).unique())
-        df_new['id_str'] = df_new['id'].astype(str)
-        df_new = df_new[~df_new['id_str'].isin(existing_ids)].copy()
-        df_new = df_new.drop(columns=['id_str'])
+    # --- FILTRAGEM POR IDENTIDADE MYSQL, INCLUSIVE ALIASES 'id1 | id2' ---
+    print("Filtrando registros ineditos por TODOS os IDs de origem...")
+    if not df_official.empty and "id" in df_official.columns:
+        existing_ids = collect_mysql_ids(df_official["id"])
+        if "id" not in df_new:
+            raise ValueError("Lote MySQL sem ID: mesclagem recusada")
+        identifiers = df_new["id"].map(normalize_mysql_id)
+        df_new = df_new.loc[~identifiers.isin(existing_ids)].copy()
+        df_new["id"] = df_new["id"].map(normalize_mysql_id)
+        df_new = deduplicate_mysql_rows(df_new)
         print(f"New records identified for enrichment: {len(df_new)}")
-    
     if df_new.empty:
-        print("✅ Nenhum dado novo para processar. Indo direto para convergência.")
+        print("[OK] Nenhum ID MySQL novo: CSV preservado sem regravacao.")
+        return
     else:
         print(f"\nEnriquecendo {len(df_new)} registros inéditos (Bairro + Rua + Clima)...", flush=True)
         for i, (idx, row) in enumerate(df_new.iterrows()):
@@ -620,128 +630,54 @@ def merge(new_data_path):
         matched = (df_new['ais'] != '').sum()
         print(f"  [AIS OK] {matched}/{len(df_new)} novos registros mapeados.")
 
-    # Mesclagem incremental: apenas anexar registros inéditos ao CSV oficial
-    print("\nMesclando incrementalmente com base oficial (append apenas registros novos)...")
-    # construir temp_key no novo lote
-    if 'id' in df_new.columns and 'data' in df_new.columns and 'hora' in df_new.columns:
-        df_new['temp_key'] = df_new['id'].astype(str) + "_" + df_new['data'].astype(str) + "_" + df_new['hora'].astype(str)
+    # Mesclagem validada inteiramente em memoria: NUNCA append direto.
+    # O antigo append saltava a deduplicacao, e o colapso por local/horario
+    # confundia vitimas diferentes e copiava a mesma vitima entre fontes.
+    print("Conciliando lote em memoria com o MySQL (somente SELECT)...")
+    if not df_official.empty:
+        df_new = df_new.reindex(columns=df_official.columns, fill_value="")
+        df_combined = pd.concat([df_official, df_new], ignore_index=True)
     else:
-        df_new['temp_key'] = df_new.index.astype(str)
-
-    existing_temp_keys = set()
-    if not df_official.empty and 'id' in df_official.columns and 'data' in df_official.columns and 'hora' in df_official.columns:
-        df_official['temp_key'] = df_official['id'].astype(str) + "_" + df_official['data'].astype(str) + "_" + df_official['hora'].astype(str)
-        existing_temp_keys = set(df_official['temp_key'].astype(str).unique())
-
-    to_append = df_new[~df_new['temp_key'].astype(str).isin(existing_temp_keys)].copy()
-    if to_append.empty:
-        print("✅ Nenhum registro novo para anexar ao CSV oficial.")
-        did_append = False
-    else:
-        print(f"✨ Preparando {len(to_append)} registros inéditos para anexar ao CSV oficial.")
-        # Remover coluna temporária de controle para não ser gravada no CSV físico
-        if 'temp_key' in to_append.columns:
-            to_append = to_append.drop(columns=['temp_key'])
-        if not df_official.empty and 'temp_key' in df_official.columns:
-            df_official = df_official.drop(columns=['temp_key'])
-
-        # Ajustar colunas para manter compatibilidade com CSV oficial
-        if not df_official.empty:
-            # Reindexar para colunas da oficial, adicionando colunas faltantes se houver
-            to_append = to_append.reindex(columns=df_official.columns, fill_value="")
-
-        # Se o CSV oficial existir, anexar; caso contrario, salvar novo arquivo completo
-        if os.path.exists(OFFICIAL_CSV):
-            to_append.to_csv(OFFICIAL_CSV, mode='a', header=False, index=False, encoding='utf-8')
-            print(f"✅ {len(to_append)} registros anexados a {OFFICIAL_CSV} (modo append).")
-            did_append = True
-        else:
-            # sem arquivo oficial previo: salvar cabeçalho completo
-            to_append.to_csv(OFFICIAL_CSV, index=False, encoding='utf-8')
-            print(f"✅ Arquivo oficial criado em {OFFICIAL_CSV} com {len(to_append)} registros.")
-            did_append = False
-
-    # Construir dataframe combinado em memoria para cache e validacao
-    if os.path.exists(OFFICIAL_CSV):
-        try:
-            df_combined = pd.read_csv(OFFICIAL_CSV, low_memory=False)
-        except Exception:
-            df_combined = pd.concat([df_official, to_append], ignore_index=True)
-    else:
-        df_combined = pd.concat([df_official, to_append], ignore_index=True)
-
-    # --- CONVERGÊNCIA DE MÚLTIPLAS MORTES (ANOMALIAS) ---
-    print("Analisando e convergindo anomalias (múltiplas mortes por ocorrência)...")
-    # Chave de evento robusta
-    df_combined['event_key'] = (
-        df_combined['data'].astype(str) + "_" + 
-        df_combined['hora'].astype(str) + "_" + 
-        df_combined['bairro'].fillna('').astype(str).str.upper() + "_" +
-        pd.to_numeric(df_combined['latitude'], errors='coerce').fillna(0).round(3).astype(str) + "_" +
-        pd.to_numeric(df_combined['longitude'], errors='coerce').fillna(0).round(3).astype(str)
-    )
-    
-    cvli_mask = df_combined['tipo'].str.lower() == 'cvli'
-    if cvli_mask.any():
-        df_cvli = df_combined[cvli_mask].copy()
-        df_others = df_combined[~cvli_mask].copy()
-        
-        # Agregar CVLIs (Convergência)
-        agg_dict = {col: 'first' for col in df_cvli.columns if col not in ['event_key', 'qtd_mortes']}
-        if 'id' in df_cvli.columns:
-            agg_dict['id'] = lambda x: ' | '.join([str(v) for v in x if pd.notna(v)])
-            
-        # Privacidade (Remover nomes)
-        for col_priv in ['nome_vitima', 'vitima']:
-            if col_priv in agg_dict: del agg_dict[col_priv]
-            if col_priv in df_others.columns: df_others = df_others.drop(columns=[col_priv])
-            if col_priv in df_cvli.columns: df_cvli = df_cvli.drop(columns=[col_priv])
-
-        df_cvli_collapsed = df_cvli.groupby('event_key').agg(agg_dict).reset_index()
-        df_cvli_collapsed['qtd_mortes'] = df_cvli.groupby('event_key').size().values
-        
-        df_combined = pd.concat([df_others, df_cvli_collapsed], ignore_index=True)
-        print(f"  ✓ {len(df_cvli) - len(df_cvli_collapsed)} registros de vítimas extras convergidos em seus eventos de origem.")
-    else:
-        df_combined['qtd_mortes'] = 1
-
-    df_combined = df_combined.drop(columns=['event_key'])
-    
-    # --- AJUSTE DE ORDEM DE COLUNAS (Solicitação do Usuário) ---
-    # Ordem: ... version, dia_semana, eh_feriado, dia_quente_cvp, clima, precipitacao_mm, ... restante
-    cols = list(df_combined.columns)
-    new_v33_cols = ['dia_semana', 'eh_feriado', 'dia_quente_cvp', 'clima', 'precipitacao_mm', 'qtd_mortes']
-    
-    # Remove as novas colunas da lista atual para reinceri-las na posição certa
-    for c in new_v33_cols:
-        if c in cols: cols.remove(c)
-    
-    if 'version' in cols:
-        v_idx = cols.index('version') + 1
-        # Reconstrói a lista de colunas na ordem exata
-        final_cols = cols[:v_idx] + new_v33_cols + cols[v_idx:]
-        df_combined = df_combined[final_cols]
-    elif 'id' in cols:
-        # Fallback se version não existir
-        v_idx = cols.index('id') + 1
-        final_cols = cols[:v_idx] + new_v33_cols + cols[v_idx:]
-        df_combined = df_combined[final_cols]
-    
-    if not did_append:
-        df_combined.to_csv(OFFICIAL_CSV, index=False, encoding='utf-8')
-        print(f"[OK] SUCESSO! Base atualizada em {OFFICIAL_CSV} com colunas ordenadas.")
-        # Construir cache de ruas críticas geolocalizadas (reconstrução completa)
-        print("\nConstruindo cache de ruas críticas (reconstrucao completa)...")
-        build_streets_cache(df_combined)
-    else:
-        print("[OK] CSV oficial atualizado por append; evitando reescrita completa.")
-        # Atualizacao incremental do cache de ruas apenas com os novos registros
-        if 'to_append' in globals() and not to_append.empty:
-            print("\nAtualizando cache de ruas criticamente de forma incremental...")
-            incremental_update_streets_cache(to_append)
-        else:
-            print("\nNenhum registro novo para atualizar o cache incremental.")
-    
+        for private in ("nome_vitima", "vitima"):
+            df_new = df_new.drop(columns=[private], errors="ignore")
+        df_combined = df_new.copy()
+    snapshot_mysql = read_mysql_snapshot()
+    df_combined, repair_audit = build_candidate(df_combined, snapshot_mysql)
+    print("CVLI: duplicacoes de representacao verificadas:",
+          repair_audit["removed_duplicate_representations"])
+    print("CVLI: grupos ambiguos preservados:",
+          repair_audit["ambiguous_groups_preserved"])
+    # Nunca altera arquivo sem copia e verificador de versao (pipeline concorrente).
+    source_path = Path(OFFICIAL_CSV)
+    if original_csv_sha is not None and sha(source_path) != original_csv_sha:
+        raise RuntimeError("CSV mudou durante a mesclagem; original preservado")
+    backup_dir = Path(BASE_DIR) / "data" / "runtime" / "research" / "merge_backups"
+    backup_dir.mkdir(parents=True, exist_ok=True)
+    if source_path.exists():
+        backup_path = backup_dir / (
+            "enriched_" + datetime.now().strftime("%Y%m%d_%H%M%S")
+            + "_" + original_csv_sha[:12] + ".csv")
+        shutil.copy2(source_path, backup_path)
+        if sha(backup_path) != original_csv_sha:
+            raise RuntimeError("Backup do CSV invalido: alteracao recusada")
+    temp_path = None
+    try:
+        with tempfile.NamedTemporaryFile(
+                dir=source_path.parent, prefix=".merge_verified_",suffix=".csv.tmp",
+                mode="w", encoding="utf-8", newline="", delete=False) as file:
+            temp_path = Path(file.name)
+            df_combined.to_csv(file,index=False)
+            file.flush()
+            os.fsync(file.fileno())
+        if original_csv_sha is not None and sha(source_path) != original_csv_sha:
+            raise RuntimeError("CSV alterado antes do commit atomico")
+        os.replace(temp_path,source_path)
+    finally:
+        if temp_path is not None and temp_path.exists():
+            temp_path.unlink()
+    print("[OK] CSV original atualizado atomicamente, preservando IDs e vitimas.")
+    # Cache de ruas usa somente novos registros, nao precisa varrer historico.
+    incremental_update_streets_cache(df_new)
     # 7. Disparar processamento subsequente
     dp_path = os.path.join('src', 'core', 'data_processing.py')
     if os.path.exists(dp_path):

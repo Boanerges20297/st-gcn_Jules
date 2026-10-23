@@ -1,0 +1,48 @@
+{
+  "source_rows": 132217,
+  "original_rows": 132217,
+  "candidate_rows": 129765,
+  "verified_alias_groups": 2446,
+  "removed_duplicate_representations": 2452,
+  "cvli_missing_or_zero_counts_defaulted_to_one": 199,
+  "already_grouped": 0,
+  "unresolved_group_conflicts": 0,
+  "ambiguous_groups_preserved": 26,
+  "removed_by_year": {
+    "2023": 737,
+    "2024": 820,
+    "2025": 746,
+    "2026": 149
+  },
+  "cvli_yearly_after": {
+    "2022": {
+      "rows": 2970,
+      "deaths": 2970
+    },
+    "2023": {
+      "rows": 2971,
+      "deaths": 2971
+    },
+    "2024": {
+      "rows": 3297,
+      "deaths": 3297
+    },
+    "2025": {
+      "rows": 3042,
+      "deaths": 3042
+    },
+    "2026": {
+      "rows": 1253,
+      "deaths": 1253
+    }
+  },
+  "source_mysql_ids_preserved": 132217,
+  "victim_names_in_output": false,
+  "mysql_readonly": true,
+  "original_sha256": "144d3cf0f74809028ec4f8e156620f850705919e27f1f29989a0f1c372e972b2",
+  "mode": "apply",
+  "candidate_sha256": "9416f1b709e27739f700daa613cc2219f2ed90362c8b947059b8b683bbc07df1",
+  "backup": "data\\runtime\\research\\cvli_mysql_integrity_20261022\\backups\\enriched_before_20261022_222944_144d3cf0f748.csv",
+  "official_new_sha256": "9416f1b709e27739f700daa613cc2219f2ed90362c8b947059b8b683bbc07df1",
+  "official_csv_replaced": true
+}

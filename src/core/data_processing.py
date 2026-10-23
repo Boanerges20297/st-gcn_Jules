@@ -21,6 +21,7 @@ from src.core.occurrence_integrity import (
     normalize_mysql_id,
     sanitize_death_count,
 )
+from src.core.cvli_source_canonical import multi_victim_event_flags
 from src.core.fortaleza_bairros import (
     canonicalize_fortaleza_bairro,
     load_official_fortaleza_bairros,
@@ -437,6 +438,7 @@ def process_ism_data(
             return location_cache[key]
 
         tipos = source_column('tipo', '').astype(str).str.lower()
+        flags_multi_event = multi_victim_event_flags(occ_raw)
         counts = pd.to_numeric(source_column('qtd_mortes', 1), errors='coerce')
         clean_records = pd.DataFrame({
             'data': pd.to_datetime(source_column('data'), errors='coerce'),
@@ -450,6 +452,7 @@ def process_ism_data(
             'longitude': source_column('longitude'),
             # CVLI sem total explícito continua representando uma vítima.
             'qtd_mortes': counts.where(counts.gt(0), np.where(tipos.eq('cvli'), 1.0, 0.0)),
+            'multi_victim_event': flags_multi_event,
         }).to_dict('records')
         logging.info("Normalização concluída (%s combinações territoriais únicas).", len(location_cache))
     else:
@@ -485,7 +488,8 @@ def process_ism_data(
                     'arma': str(extract_scalar('arma') or '').upper(),
                     'latitude': extract_scalar('latitude'),
                     'longitude': extract_scalar('longitude'),
-                    'qtd_mortes': sanitize_qtd_mortes(extract_scalar('qtd_mortes'), extract_scalar('tipo'))
+                    'qtd_mortes': sanitize_qtd_mortes(extract_scalar('qtd_mortes'), extract_scalar('tipo')),
+                    'multi_victim_event': False
                 })
             except: continue
     
@@ -508,7 +512,7 @@ def process_ism_data(
     factions = occ_df['loc_clean'].map(faction_by_location).fillna('NEUTRO')
     is_cvli = occ_df['tipo'].eq('cvli')
     is_firearm = occ_df['arma'].str.contains('FOGO', regex=False, na=False)
-    is_multi = pd.to_numeric(occ_df['qtd_mortes'], errors='coerce').fillna(1).gt(1)
+    is_multi = pd.to_numeric(occ_df['qtd_mortes'], errors='coerce').fillna(1).gt(1) | occ_df['multi_victim_event'].astype(bool)
     is_domestic = occ_df['tipo_evento'].str.contains(
         'FEMINICIDIO|PARENTE|BRIGA|VIZINHO|PASSIONAL|CULPOSO', regex=True, na=False,
     )
