@@ -1,0 +1,79 @@
+{
+  "random_null": {
+    "target": "sustained135",
+    "city_events": 42,
+    "pool_events": 40,
+    "monthly_cutoffs": 21,
+    "stgat_surprise_hits10": 12,
+    "random_top10_expected_hits": 6.666666666666667,
+    "single_method_one_sided_conditional_null_p": 0.024123374022807047,
+    "warning": "Unadjusted for selecting 15 methods and multiple event labels post hoc; monthly target windows overlap"
+  },
+  "paired_controls": [
+    {
+      "control": "share_momentum_30_vs_90",
+      "stgat_surprise_hits": 12,
+      "control_hits": 10,
+      "difference": 2,
+      "unadjusted_date_resample_ci_low": -5.0,
+      "unadjusted_date_resample_ci_high": 9.0,
+      "per_year_diff": {
+        "2023": 0,
+        "2024": 2,
+        "2025": 0
+      }
+    },
+    {
+      "control": "inverse_recency30",
+      "stgat_surprise_hits": 12,
+      "control_hits": 8,
+      "difference": 4,
+      "unadjusted_date_resample_ci_low": -3.0,
+      "unadjusted_date_resample_ci_high": 11.0,
+      "per_year_diff": {
+        "2023": 2,
+        "2024": 0,
+        "2025": 2
+      }
+    },
+    {
+      "control": "poisson_surprise_vs_120",
+      "stgat_surprise_hits": 12,
+      "control_hits": 8,
+      "difference": 4,
+      "unadjusted_date_resample_ci_low": -2.0,
+      "unadjusted_date_resample_ci_high": 11.0,
+      "per_year_diff": {
+        "2023": 1,
+        "2024": 2,
+        "2025": 1
+      }
+    },
+    {
+      "control": "operational_surprise_vs_120",
+      "stgat_surprise_hits": 12,
+      "control_hits": 12,
+      "difference": 0,
+      "unadjusted_date_resample_ci_low": -6.0,
+      "unadjusted_date_resample_ci_high": 6.0,
+      "per_year_diff": {
+        "2023": -1,
+        "2024": 1,
+        "2025": 0
+      }
+    },
+    {
+      "control": "recency30",
+      "stgat_surprise_hits": 12,
+      "control_hits": 10,
+      "difference": 2,
+      "unadjusted_date_resample_ci_low": -6.0,
+      "unadjusted_date_resample_ci_high": 9.0,
+      "per_year_diff": {
+        "2023": -3,
+        "2024": 2,
+        "2025": 3
+      }
+    }
+  ]
+}

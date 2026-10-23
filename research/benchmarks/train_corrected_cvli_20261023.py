@@ -29,7 +29,7 @@ def digest(path: Path) -> str:
     return hasher.hexdigest()
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--fold", choices=(2024, 2025, 2026), required=True, type=int)
+    parser.add_argument("--fold", choices=(2023, 2024, 2025, 2026), required=True, type=int)
     args = parser.parse_args()
     if not SOURCE.is_file():
         raise FileNotFoundError(f"Missing corrected tensor: {SOURCE}")
@@ -43,6 +43,25 @@ def main():
     print("CORRECTED_RETRAIN_BEGIN", "fold",args.fold,"tensor_sha256",source_hash,
           "nodes",len(full["nodes_gdf"]),"days",len(dates),flush=True)
     engine.OUT = OUT
+    if args.fold == 2023:
+        # Only 2022 is available for training. Use 7-day rather than 21-day
+        # sampling so the v5 training has >15 windows; still strictly
+        # train on targets completed before 2023-01-01.
+        def training_2022_only(all_dates, train_end):
+            import pandas as pd
+            assert train_end == pd.Timestamp("2022-12-31")
+            positions = [i for i, stamp in enumerate(all_dates)
+                if stamp >= pd.Timestamp("2022-07-01")
+                and i >= engine.WINDOW + 60
+                and i + engine.HORIZON <= len(all_dates)
+                and all_dates[i + engine.HORIZON - 1] <= train_end]
+            cutoffs = positions[::7]
+            assert len(cutoffs) >= 15
+            print("FOLD_2023_SHORT_HISTORY", len(cutoffs),
+                  "train_max", all_dates[cutoffs[-1] + engine.HORIZON - 1],
+                  flush=True)
+            return cutoffs
+        engine.training_cutoffs = training_2022_only
     orig_train = engine.train_stgat
     orig_poisson = engine.poisson_fit
     def save_train(full, indices, tr, val, year, max_epochs=6):
